@@ -23,6 +23,7 @@ import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCa
 import com.glia.widgets.engagement.domain.MediaUpgradeOfferData
 import com.glia.widgets.engagement.domain.OperatorMediaUpgradeOfferUseCase
 import com.glia.widgets.engagement.domain.ScreenSharingUseCase
+import com.glia.widgets.helper.DialogHolderActivity
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.OneTimeEvent
 import com.glia.widgets.helper.TAG
@@ -30,7 +31,6 @@ import com.glia.widgets.helper.asOneTimeStateFlowable
 import com.glia.widgets.helper.isAudio
 import com.glia.widgets.helper.unSafeSubscribe
 import com.glia.widgets.operator.OperatorRequestContract.State
-import com.glia.widgets.view.dialog.holder.DialogHolderActivity
 import io.reactivex.Flowable
 import io.reactivex.processors.PublishProcessor
 
@@ -82,7 +82,7 @@ internal class OperatorRequestController(
         if (isCurrentEngagementCallVisualizerUseCase() && isShowOverlayPermissionRequestDialogUseCase()) {
             dialogController.showCVOverlayPermissionDialog()
         } else {
-            finishIfDialogHolder(activity)
+            finishIfDialogHolderActivity(activity)
         }
     }
 
@@ -119,7 +119,7 @@ internal class OperatorRequestController(
     override fun onMediaUpgradeAccepted(offer: MediaUpgradeOffer, activity: Activity) {
         dismissAlertDialog()
         checkMediaUpgradePermissionsUseCase(offer) { granted ->
-            finishIfDialogHolder(activity)
+            finishIfDialogHolderActivity(activity)
             onMediaUpgradePermissionResult(offer, granted)
         }
     }
@@ -134,7 +134,7 @@ internal class OperatorRequestController(
 
     override fun onMediaUpgradeDeclined(offer: MediaUpgradeOffer, activity: Activity) {
         dismissAlertDialog()
-        finishIfDialogHolder(activity)
+        finishIfDialogHolderActivity(activity)
         declineMediaUpgradeOfferUseCase(offer)
     }
 
@@ -145,7 +145,7 @@ internal class OperatorRequestController(
 
     override fun onShowEnableScreenSharingNotificationsDeclined(activity: Activity) {
         dismissAlertDialog()
-        finishIfDialogHolder(activity)
+        finishIfDialogHolderActivity(activity)
         screenSharingUseCase.declineRequest()
     }
 
@@ -158,7 +158,7 @@ internal class OperatorRequestController(
 
     override fun onScreenSharingDialogDeclined(activity: Activity) {
         dismissAlertDialog()
-        finishIfDialogHolder(activity)
+        finishIfDialogHolderActivity(activity)
         screenSharingUseCase.declineRequest()
     }
 
@@ -176,7 +176,7 @@ internal class OperatorRequestController(
                 screenSharingUseCase.onActivityResultSkipPermissionRequest(resultCode, data)
                 showCvDialogIfRequired(activity)
             } else {
-                finishIfDialogHolder(activity)
+                finishIfDialogHolderActivity(activity)
                 screenSharingUseCase.declineRequest()
                 removeScreenSharingNotificationUseCase()
             }
@@ -185,7 +185,7 @@ internal class OperatorRequestController(
 
     override fun onOverlayPermissionRequestAccepted(activity: Activity) {
         dismissAlertDialog()
-        finishIfDialogHolder(activity)
+        finishIfDialogHolderActivity(activity)
         setOverlayPermissionRequestDialogShownUseCase()
         Logger.d(TAG, "Allowed to request overlay permission ✅")
         _state.onNext(State.OpenOverlayPermissionScreen)
@@ -193,7 +193,7 @@ internal class OperatorRequestController(
 
     override fun onOverlayPermissionRequestDeclined(activity: Activity) {
         dismissAlertDialog()
-        finishIfDialogHolder(activity)
+        finishIfDialogHolderActivity(activity)
         setOverlayPermissionRequestDialogShownUseCase()
         Logger.d(TAG, "Declined to request overlay permission ❌")
     }
@@ -210,7 +210,7 @@ internal class OperatorRequestController(
         _state.onNext(State.WaitForNotificationScreenResult)
     }
 
-    private fun finishIfDialogHolder(activity: Activity) {
+    private fun finishIfDialogHolderActivity(activity: Activity) {
         if (activity is DialogHolderActivity) {
             activity.finish()
         }

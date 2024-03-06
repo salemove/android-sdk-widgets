@@ -9,9 +9,9 @@ import androidx.appcompat.app.AlertDialog
 import com.glia.widgets.UiTheme
 import com.glia.widgets.call.CallActivity
 import com.glia.widgets.chat.ChatActivity
+import com.glia.widgets.helper.DialogHolderActivity
 import com.glia.widgets.helper.GliaActivityManager
 import com.glia.widgets.helper.withRuntimeTheme
-import com.glia.widgets.view.dialog.holder.DialogHolderActivity
 import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockk

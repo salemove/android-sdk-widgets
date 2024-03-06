@@ -12,12 +12,12 @@ import com.glia.widgets.callvisualizer.controller.CallVisualizerContract
 import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.core.dialog.model.ConfirmationDialogLinks
 import com.glia.widgets.core.dialog.model.Link
+import com.glia.widgets.helper.DialogHolderActivity
 import com.glia.widgets.helper.GliaActivityManager
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.OneTimeEvent
 import com.glia.widgets.helper.withRuntimeTheme
 import com.glia.widgets.view.Dialogs
-import com.glia.widgets.view.dialog.holder.DialogHolderActivity
 import com.glia.widgets.webbrowser.WebBrowserActivity
 import io.mockk.Runs
 import io.mockk.confirmVerified

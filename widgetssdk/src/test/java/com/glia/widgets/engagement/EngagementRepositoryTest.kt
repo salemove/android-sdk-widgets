@@ -320,33 +320,36 @@ class EngagementRepositoryTest {
         }
 
         if (ongoingEngagement) {
-            verify { engagement.off(Engagement.Events.END, any()) }
-            verify { engagement.off(Engagement.Events.STATE_UPDATE, any()) }
-
-            verify { media.off(Media.Events.MEDIA_UPGRADE_OFFER, any()) }
-            verify { media.off(Media.Events.OPERATOR_STATE_UPDATE, any()) }
-            verify { media.off(Media.Events.VISITOR_STATE_UPDATE, any()) }
-
-            verify { screenSharing.off(ScreenSharing.Events.SCREEN_SHARING_REQUEST, any()) }
-            verify { screenSharing.off(ScreenSharing.Events.VISITOR_STATE, any()) }
-
-            verify { engagement.state }
-            verify { engagementState.operator }
-            verify { engagement.media }
-            verify { engagement.screenSharing }
-            verify { chat.off(Chat.Events.OPERATOR_TYPING_STATUS, any()) }
-            verify { engagement.chat }
-
             if (endedLocally) {
                 verify { engagement.end(any()) }
             }
 
+            verifyUnsubscribedFromEngagement()
 
             val state = if (engagement is OmnicoreEngagement) State.FinishedOmniCore else State.FinishedCallVisualizer
             repository.engagementState.test().assertNotComplete().assertValue(state)
-
-            confirmEngagementVerified()
         }
+    }
+
+    private fun verifyUnsubscribedFromEngagement() {
+        verify { engagement.off(Engagement.Events.END, any()) }
+        verify { engagement.off(Engagement.Events.STATE_UPDATE, any()) }
+
+        verify { media.off(Media.Events.MEDIA_UPGRADE_OFFER, any()) }
+        verify { media.off(Media.Events.OPERATOR_STATE_UPDATE, any()) }
+        verify { media.off(Media.Events.VISITOR_STATE_UPDATE, any()) }
+
+        verify { screenSharing.off(ScreenSharing.Events.SCREEN_SHARING_REQUEST, any()) }
+        verify { screenSharing.off(ScreenSharing.Events.VISITOR_STATE, any()) }
+
+        verify { engagement.state }
+        verify { engagementState.operator }
+        verify { engagement.media }
+        verify { engagement.screenSharing }
+        verify { chat.off(Chat.Events.OPERATOR_TYPING_STATUS, any()) }
+        verify { engagement.chat }
+
+        confirmEngagementVerified()
     }
 
     private fun confirmEngagementVerified() {
@@ -1161,6 +1164,135 @@ class EngagementRepositoryTest {
 
         confirmVerified(localScreen)
 
+    }
+
+    @Test
+    fun `unsubscribe from the old engagement will happen when new omnicore engagement received`() {
+        mockEngagementAndStart()
+        //emit new state start
+        val operator1: Operator = mockk(relaxed = true) {
+            every { id } returns "1"
+        }
+
+        val state1: EngagementState = mockk(relaxed = true) {
+            every { operator } returns operator1
+            every { visitorStatus } returns EngagementState.VisitorStatus.ENGAGED
+            every { id } returns "s_1"
+        }
+        engagementStateCallbackSlot.captured.accept(state1)
+        repository.engagementState.test().assertNotComplete().assertValues(
+            State.Update(state1, EngagementUpdateState.OperatorConnected(operator1))
+        )
+        verify { operatorRepository.emit(operator1) }
+        //emit a new state end
+
+        //emit new engagement start
+        val newEngagement = mockk<OmnicoreEngagement>(relaxUnitFun = true)
+
+        val newMedia: Media = mockk(relaxUnitFun = true)
+        val newChat: Chat = mockk(relaxUnitFun = true)
+        val newScreenSharing: ScreenSharing = mockk(relaxUnitFun = true)
+
+        val newOperator: Operator = mockk(relaxUnitFun = true)
+        val newEngagementState: EngagementState = mockk(relaxUnitFun = true)
+        every { newEngagementState.operator } returns newOperator
+        every { newEngagement.state } returns newEngagementState
+        every { newEngagement.media } returns newMedia
+        every { newEngagement.chat } returns newChat
+        every { newEngagement.screenSharing } returns newScreenSharing
+
+        omniCoreEngagementCallbackSlot.captured.accept(newEngagement)
+        repository.engagementState.test().assertNotComplete().assertValue(State.Update(state1, EngagementUpdateState.OperatorConnected(operator1)))
+        assertTrue(repository.hasOngoingEngagement)
+
+        verify { operatorRepository.emit(newOperator) }
+
+        verify { newEngagement.on(Engagement.Events.END, any()) }
+        verify { newEngagement.on(Engagement.Events.STATE_UPDATE, any()) }
+
+        verify { newMedia.on(Media.Events.MEDIA_UPGRADE_OFFER, any()) }
+        verify { newMedia.on(Media.Events.OPERATOR_STATE_UPDATE, any()) }
+        verify { newMedia.on(Media.Events.VISITOR_STATE_UPDATE, any()) }
+
+        verify { newScreenSharing.on(ScreenSharing.Events.SCREEN_SHARING_REQUEST, any()) }
+        verify { newScreenSharing.on(ScreenSharing.Events.VISITOR_STATE, any()) }
+
+        verify { newChat.on(Chat.Events.OPERATOR_TYPING_STATUS, any()) }
+
+        verify { newEngagement.state }
+        verify { newEngagementState.operator }
+        verify { newEngagement.media }
+        verify { newEngagement.screenSharing }
+        verify { newEngagement.chat }
+        //emit new engagement end
+
+        verifyUnsubscribedFromEngagement()
+        confirmVerified(newEngagement, newMedia, newChat, newScreenSharing, newOperator, newEngagementState)
+    }
+
+
+    @Test
+    fun `unsubscribe from the old engagement will happen when new omnibrowse engagement received`() {
+        mockEngagementAndStart(true)
+        //emit new state start
+        val operator1: Operator = mockk(relaxed = true) {
+            every { id } returns "1"
+        }
+
+        val state1: EngagementState = mockk(relaxed = true) {
+            every { operator } returns operator1
+            every { visitorStatus } returns EngagementState.VisitorStatus.ENGAGED
+            every { id } returns "s_1"
+        }
+        engagementStateCallbackSlot.captured.accept(state1)
+        repository.engagementState.test().assertNotComplete().assertValues(
+            State.Update(state1, EngagementUpdateState.OperatorConnected(operator1))
+        )
+        verify { operatorRepository.emit(operator1) }
+        //emit a new state end
+
+        //emit new engagement start
+        val newEngagement = mockk<OmnibrowseEngagement>(relaxUnitFun = true)
+
+        val newMedia: Media = mockk(relaxUnitFun = true)
+        val newChat: Chat = mockk(relaxUnitFun = true)
+        val newScreenSharing: ScreenSharing = mockk(relaxUnitFun = true)
+
+        val newOperator: Operator = mockk(relaxUnitFun = true)
+        val newEngagementState: EngagementState = mockk(relaxUnitFun = true)
+        every { newEngagementState.operator } returns newOperator
+        every { newEngagement.state } returns newEngagementState
+        every { newEngagement.media } returns newMedia
+        every { newEngagement.chat } returns newChat
+        every { newEngagement.screenSharing } returns newScreenSharing
+
+        callVisualizerEngagementCallbackSlot.captured.accept(newEngagement)
+        repository.engagementState.test().assertNotComplete().assertValue(State.Update(state1, EngagementUpdateState.OperatorConnected(operator1)))
+        assertTrue(repository.hasOngoingEngagement)
+
+        verify { operatorRepository.emit(newOperator) }
+
+        verify { newEngagement.on(Engagement.Events.END, any()) }
+        verify { newEngagement.on(Engagement.Events.STATE_UPDATE, any()) }
+
+        verify { newMedia.on(Media.Events.MEDIA_UPGRADE_OFFER, any()) }
+        verify { newMedia.on(Media.Events.OPERATOR_STATE_UPDATE, any()) }
+        verify { newMedia.on(Media.Events.VISITOR_STATE_UPDATE, any()) }
+
+        verify { newScreenSharing.on(ScreenSharing.Events.SCREEN_SHARING_REQUEST, any()) }
+        verify { newScreenSharing.on(ScreenSharing.Events.VISITOR_STATE, any()) }
+
+        verify(exactly = 0) { newChat.on(Chat.Events.OPERATOR_TYPING_STATUS, any()) }
+
+        verify { newEngagement.state }
+        verify { newEngagementState.operator }
+        verify { newEngagement.media }
+        verify { newEngagement.screenSharing }
+        verify(exactly = 0) { newEngagement.chat }
+        //emit new engagement end
+
+        verifyUnsubscribedFromEngagement()
+        confirmVerified(newEngagement, newMedia, newChat, newScreenSharing, newOperator, newEngagementState)
     }
 
 }

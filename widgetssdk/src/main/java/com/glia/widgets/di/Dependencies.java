@@ -261,6 +261,11 @@ public class Dependencies {
         getRepositoryFactory().getEngagementRepository().reset();
     }
 
+    public static void destroyControllersAndResetQueueing() {
+        getControllerFactory().destroyControllersForAuthentication();
+        getRepositoryFactory().getEngagementRepository().resetQueueing();
+    }
+
     static class AuthenticationManagerProvider {
         @Nullable
         private AuthenticationManager authenticationManager;

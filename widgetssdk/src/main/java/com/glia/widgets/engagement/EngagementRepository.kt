@@ -37,6 +37,7 @@ internal interface EngagementRepository {
 
     fun initialize()
     fun reset()
+    fun resetQueueing()
     fun endEngagement(silently: Boolean)
     fun queueForChatEngagement(queueId: String, visitorContextAssetId: String?)
     fun queueForMediaEngagement(queueId: String, mediaType: MediaType, visitorContextAssetId: String?)

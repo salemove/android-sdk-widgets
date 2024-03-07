@@ -29,6 +29,7 @@ import com.glia.androidsdk.omnibrowse.Omnibrowse
 import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.androidsdk.visitor.Authentication
 import com.glia.exampleapp.ExampleAppConfigManager.createDefaultConfig
+import com.glia.exampleapp.Utils.getAuthenticationBehaviorFromPrefs
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.UiTheme
 import com.glia.widgets.call.CallActivity
@@ -188,6 +189,7 @@ class MainFragment : Fragment() {
     private fun authenticate(callback: OnAuthCallback) {
         if (Glia.isInitialized() && authentication == null) {
             prepareAuthentication()
+            setupAuthButtonsVisibility()
         }
         if (!Glia.isInitialized()) {
             thread {
@@ -209,6 +211,7 @@ class MainFragment : Fragment() {
 
             if (authentication == null) {
                 prepareAuthentication()
+                setupAuthButtonsVisibility()
             }
         }
     }
@@ -454,6 +457,7 @@ class MainFragment : Fragment() {
             )
         )
         prepareAuthentication()
+        setupAuthButtonsVisibility()
         listenForCallVisualizerEngagements()
 
         view?.post {
@@ -467,9 +471,9 @@ class MainFragment : Fragment() {
     )
 
     private fun prepareAuthentication() {
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
         authentication =
-            GliaWidgets.getAuthentication(Authentication.Behavior.FORBIDDEN_DURING_ENGAGEMENT)
-        setupAuthButtonsVisibility()
+            GliaWidgets.getAuthentication(getAuthenticationBehaviorFromPrefs(sharedPreferences, resources))
     }
 
     private fun authenticate(
@@ -478,6 +482,7 @@ class MainFragment : Fragment() {
         callback: OnAuthCallback?
     ) {
         if (activity == null || containerView == null) return
+        prepareAuthentication()
         val jwt = jwtInput.text.toString()
         var externalAccessToken: String? = externalTokenInput.text.toString()
         if (externalAccessToken!!.isEmpty()) externalAccessToken = null
@@ -489,7 +494,11 @@ class MainFragment : Fragment() {
                 setupAuthButtonsVisibility()
                 callback?.onAuthenticated()
             } else {
-                showToast("Error: $exception")
+                if (exception?.cause == GliaException.Cause.AUTHENTICATION_ERROR) {
+                    showToast(exception.message.toString())
+                } else {
+                    showToast("Error: $exception")
+                }
             }
         }
         saveAuthToken(jwt)

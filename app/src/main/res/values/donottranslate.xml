@@ -50,6 +50,7 @@
     <string name="pref_chat_started_caption_text_color">chat_started_caption_text_color</string>
     <string name="pref_send_message_button_tint_color">send_message_button_tint_color</string>
     <string name="pref_screen_sharing_mode">screen_sharing_mode</string>
+    <string name="pref_authentication_behavior">authentication_behavior</string>
     <string name="default_value">default</string>
     <string name="color_blue_value">blue</string>
     <string name="color_grey_value">grey</string>
@@ -70,6 +71,8 @@
     <string name="font_size_large">large</string>
     <string name="screen_sharing_mode_unbounded">unbounded</string>
     <string name="screen_sharing_mode_app_bounded">app_bounded</string>
+    <string name="authentication_behavior_forbidden_during_engagement">forbidden_during_engagement</string>
+    <string name="authentication_behavior_allowed_during_engagement">allowed_during_engagement</string>
     <array name="colors">
         <item>@string/settings_value_default</item>
         <item>@string/settings_color_blue</item>
@@ -117,5 +120,13 @@
     <array name="screen_sharing_mode_values">
         <item>@string/screen_sharing_mode_unbounded</item>
         <item>@string/screen_sharing_mode_app_bounded</item>
+    </array>
+    <array name="authentication_behavior_keys">
+        <item>@string/settings_authentication_behavior_forbidden_during_engagement</item>
+        <item>@string/settings_authentication_behavior_allowed_during_engagement</item>
+    </array>
+    <array name="authentication_behavior_values">
+        <item>@string/authentication_behavior_forbidden_during_engagement</item>
+        <item>@string/authentication_behavior_allowed_during_engagement</item>
     </array>
 </resources>

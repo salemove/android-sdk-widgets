@@ -57,6 +57,15 @@
             android:key="@string/pref_screen_sharing_mode"
             android:title="@string/settings_screen_sharing_mode_title"
             app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            android:layout_height="wrap_content"
+            android:defaultValue="@string/authentication_behavior_forbidden_during_engagement"
+            android:entries="@array/authentication_behavior_keys"
+            android:entryValues="@array/authentication_behavior_values"
+            android:key="@string/pref_authentication_behavior"
+            android:title="@string/settings_authentication_behavior_title"
+            app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
     <PreferenceCategory app:title="Engagement settings">

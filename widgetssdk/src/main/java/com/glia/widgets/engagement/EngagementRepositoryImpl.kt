@@ -143,6 +143,10 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
         currentEngagement?.let { endEngagement(true) } ?: cancelQueuing()
     }
 
+    override fun resetQueueing() {
+        cancelQueuing()
+    }
+
     private fun resetState() {
         _operatorMediaState.onNext(Data.Empty)
         _visitorMediaState.onNext(Data.Empty)
@@ -325,9 +329,14 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
 
     private fun handleOmniCoreEngagement(engagement: OmnicoreEngagement) {
         Logger.i(TAG, "Omnicore Engagement started")
+
+        currentEngagement?.also {
+            unsubscribeFromEvents(it)
+            currentEngagement = null
+        } ?: _engagementState.onNext(State.StartedOmniCore)
+
         currentEngagement = engagement
         operatorRepository.emit(engagement.state.operator)
-        _engagementState.onNext(State.StartedOmniCore)
 
         subscribeToEngagementEvents(engagement)
         subscribeToEngagementMediaEvents(engagement.media)
@@ -337,9 +346,14 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
 
     private fun handleCallVisualizerEngagement(engagement: OmnibrowseEngagement) {
         Logger.i(TAG, "Call Visualizer Engagement started")
+
+        currentEngagement?.also {
+            unsubscribeFromEvents(it)
+            currentEngagement = null
+        } ?: _engagementState.onNext(State.StartedCallVisualizer)
+
         currentEngagement = engagement
         operatorRepository.emit(engagement.state.operator)
-        _engagementState.onNext(State.StartedCallVisualizer)
 
         subscribeToEngagementEvents(engagement)
         subscribeToEngagementMediaEvents(engagement.media)

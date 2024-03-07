@@ -12,6 +12,7 @@ import com.glia.widgets.helper.DialogHolderActivity
 import com.glia.widgets.helper.GliaActivityManager
 import com.glia.widgets.helper.asStateFlowable
 import com.glia.widgets.helper.isGlia
+import com.glia.widgets.helper.parentActivity
 import com.glia.widgets.helper.withRuntimeTheme
 import io.reactivex.Flowable
 import io.reactivex.Observable
@@ -95,6 +96,11 @@ internal open class BaseSingleActivityWatcher(private val gliaActivityManager: G
 
     @CallSuper
     final override fun onActivityDestroyed(activity: Activity) {
+
+        if (activity == alertDialog?.parentActivity) {
+            dismissAlertDialogSilently()
+        }
+
         gliaActivityManager.onActivityDestroyed(activity)
     }
 

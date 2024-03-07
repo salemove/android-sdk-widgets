@@ -10,9 +10,10 @@ import androidx.annotation.AttrRes
 import androidx.annotation.DimenRes
 import androidx.annotation.IntRange
 import androidx.annotation.StyleRes
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.withStyledAttributes
-import com.glia.widgets.GliaWidgets
 import com.glia.widgets.BuildConfig
+import com.glia.widgets.GliaWidgets
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
@@ -67,3 +68,5 @@ internal val Activity.qualifiedName: String
 
 internal val Activity.isGlia: Boolean
     get() = qualifiedName.startsWith(BuildConfig.LIBRARY_PACKAGE_NAME)
+
+internal val AlertDialog.parentActivity: Activity? get() = context.asActivity()

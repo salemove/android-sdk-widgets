@@ -72,7 +72,6 @@
         <activity
             android:name=".helper.DialogHolderActivity"
             android:launchMode="singleTask"
-            android:noHistory="true"
             android:theme="@style/Application.Glia.Translucent.Activity" />
 
         <service

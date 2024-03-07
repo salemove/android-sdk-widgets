@@ -45,7 +45,7 @@ internal class AuthenticationManager(
     }
 
     private fun cleanup() {
-        Dependencies.destroyControllersAndResetEngagementData()
+        Dependencies.destroyControllersAndResetQueueing()
     }
 
     override fun isAuthenticated(): Boolean = authentication.isAuthenticated

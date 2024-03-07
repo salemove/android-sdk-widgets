@@ -183,6 +183,12 @@ public class ControllerFactory {
         messagesNotSeenHandler.onDestroy();
     }
 
+    public void destroyControllersForAuthentication() {
+        destroyCallController();
+        destroyChatController();
+        messagesNotSeenHandler.onDestroy();
+    }
+
     public void destroyCallController() {
         Logger.d(TAG, "destroyCallController");
         if (retainedCallController != null) {

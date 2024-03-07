@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat;
 
 import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.screensharing.ScreenSharing;
+import com.glia.androidsdk.visitor.Authentication;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.view.configuration.ButtonConfiguration;
@@ -305,6 +306,24 @@ class Utils {
             return ScreenSharing.Mode.APP_BOUNDED;
         } else {
             return ScreenSharing.Mode.UNBOUNDED;
+        }
+    }
+
+    public static Authentication.Behavior getAuthenticationBehaviorFromPrefs(
+        SharedPreferences sharedPreferences,
+        Resources resources
+    ) {
+        String forbiddenDuringEngagementValue = resources.getString(R.string.authentication_behavior_forbidden_during_engagement);
+        String allowedDuringEngagementValue = resources.getString(R.string.authentication_behavior_allowed_during_engagement);
+        String valueFromPrefs = sharedPreferences.getString(
+            resources.getString(R.string.pref_authentication_behavior),
+            forbiddenDuringEngagementValue
+        );
+
+        if (valueFromPrefs.equals(allowedDuringEngagementValue)) {
+            return Authentication.Behavior.ALLOWED_DURING_ENGAGEMENT;
+        } else {
+            return Authentication.Behavior.FORBIDDEN_DURING_ENGAGEMENT;
         }
     }
 

@@ -143,6 +143,14 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
         currentEngagement?.let { endEngagement(true) } ?: cancelQueuing()
     }
 
+    private fun resetState() {
+        _operatorMediaState.onNext(Data.Empty)
+        _visitorMediaState.onNext(Data.Empty)
+        _currentOperator.onNext(Data.Empty)
+        _onHoldState.onNext(false)
+        markScreenSharingEnded()
+    }
+
     override fun endEngagement(silently: Boolean) {
         currentEngagement?.also {
             currentEngagement = null
@@ -155,10 +163,7 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
             } else {
                 fetchSurvey(it, false)
             }
-            _operatorMediaState.onNext(Data.Empty)
-            _visitorMediaState.onNext(Data.Empty)
-            _currentOperator.onNext(Data.Empty)
-            _onHoldState.onNext(false)
+            resetState()
         }
     }
 
@@ -421,10 +426,7 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
             currentEngagement = null
             unsubscribeFromEvents(it)
             notifyEngagementEnded(it)
-            _operatorMediaState.onNext(Data.Empty)
-            _visitorMediaState.onNext(Data.Empty)
-            _currentOperator.onNext(Data.Empty)
-            _onHoldState.onNext(false)
+            resetState()
 
             if (it is OmnicoreEngagement) {
                 fetchSurvey(it, true)
@@ -540,6 +542,10 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
 
     private fun onScreenSharingEnded() {
         Logger.i(TAG, "Screen sharing ended")
+        markScreenSharingEnded()
+    }
+
+    private fun markScreenSharingEnded() {
         _screenSharingState.onNext(ScreenSharingState.Ended)
         currentScreenSharingScreen = null
     }

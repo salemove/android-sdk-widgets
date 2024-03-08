@@ -312,6 +312,9 @@ class EngagementRepositoryTest {
             visitorMediaState.test().assertNotComplete().assertValue(Data.Empty)
             onHoldState.test().assertNotComplete().assertValue(false)
             operatorMediaState.test().assertNotComplete().assertValue(Data.Empty)
+            if (ongoingEngagement) {
+                screenSharingState.test().assertNotComplete().assertValue(ScreenSharingState.Ended)
+            }
             assertNull(operatorCurrentMediaState)
             assertNull(currentOperatorValue)
         }

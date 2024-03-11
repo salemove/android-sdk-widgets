@@ -20,7 +20,7 @@ internal class VisitorMediaUseCaseImpl(private val engagementRepository: Engagem
 
     override val onHoldState: Flowable<Boolean> = engagementRepository.onHoldState
 
-    override val hasMedia: Boolean get() = engagementRepository.operatorCurrentMediaState?.hasMedia ?: false
+    override val hasMedia: Boolean get() = engagementRepository.visitorCurrentMediaState?.hasMedia ?: false
 
     override fun invoke(): Flowable<MediaState> = visitorMediaState
 }

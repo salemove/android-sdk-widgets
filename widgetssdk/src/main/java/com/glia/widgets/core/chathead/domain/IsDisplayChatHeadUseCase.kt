@@ -10,6 +10,7 @@ import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCa
 import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
 import com.glia.widgets.engagement.domain.ScreenSharingUseCase
 import com.glia.widgets.filepreview.ui.FilePreviewView
+import com.glia.widgets.helper.DialogHolderActivity
 import com.glia.widgets.messagecenter.MessageCenterView
 
 internal abstract class IsDisplayChatHeadUseCase(
@@ -20,7 +21,6 @@ internal abstract class IsDisplayChatHeadUseCase(
     private val configurationManager: GliaSdkConfigurationManager,
     private val engagementTypeUseCase: EngagementTypeUseCase
 ) {
-    private val hasOngoingEngagement: Boolean get() = isQueueingOrEngagementUseCase.hasOngoingEngagement
     abstract fun isDisplayBasedOnPermission(): Boolean
 
     open operator fun invoke(viewName: String?): Boolean {
@@ -52,7 +52,8 @@ internal abstract class IsDisplayChatHeadUseCase(
         return viewName != CallView::class.java.simpleName &&
             viewName != FilePreviewView::class.java.simpleName &&
             viewName != EndScreenSharingView::class.java.simpleName &&
-            viewName != MessageCenterView::class.java.simpleName
+            viewName != MessageCenterView::class.java.simpleName &&
+            viewName != DialogHolderActivity::class.java.simpleName
     }
 
     private fun isNotInListOfGliaViews(viewName: String?): Boolean {

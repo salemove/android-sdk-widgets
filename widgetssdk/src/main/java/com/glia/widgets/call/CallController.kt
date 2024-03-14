@@ -151,12 +151,12 @@ internal class CallController(
         companyName: String,
         queueId: String?,
         visitorContextAssetId: String?,
-        mediaType: Engagement.MediaType,
+        mediaType: Engagement.MediaType?,
         useOverlays: Boolean,
         screenSharingMode: ScreenSharing.Mode,
         upgradeToCall: Boolean
     ) {
-        if (upgradeToCall) {
+        if (upgradeToCall || mediaType == null) {
             initCall(companyName, queueId, visitorContextAssetId, mediaType, useOverlays, screenSharingMode)
             return
         }
@@ -173,7 +173,7 @@ internal class CallController(
         companyName: String,
         queueId: String?,
         visitorContextAssetId: String?,
-        mediaType: Engagement.MediaType,
+        mediaType: Engagement.MediaType?,
         useOverlays: Boolean,
         screenSharingMode: ScreenSharing.Mode
     ) {

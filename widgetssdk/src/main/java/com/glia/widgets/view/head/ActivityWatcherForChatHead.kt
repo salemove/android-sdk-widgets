@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.util.Pair
 import androidx.core.view.contains
-import com.glia.widgets.GliaWidgets
 import com.glia.widgets.R
 import com.glia.widgets.base.BaseActivityStackWatcher
 import com.glia.widgets.call.CallActivity
@@ -22,7 +21,6 @@ import com.glia.widgets.di.Dependencies
 import com.glia.widgets.filepreview.ui.FilePreviewView
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
-import com.glia.widgets.helper.Utils
 import com.glia.widgets.helper.WeakReferenceDelegate
 import com.glia.widgets.helper.hasChildOfType
 import com.glia.widgets.messagecenter.MessageCenterView
@@ -147,7 +145,7 @@ internal class ActivityWatcherForChatHead(
         activity?.let {
             gliaView = it.findViewById(R.id.call_view)
                 ?: it.findViewById<FilePreviewView>(R.id.file_preview_view)
-                ?: it.findViewById<EndScreenSharingView>(R.id.screen_sharing_screen_view)
+                    ?: it.findViewById<EndScreenSharingView>(R.id.screen_sharing_screen_view)
         }
         return gliaView != null
     }
@@ -161,18 +159,6 @@ internal class ActivityWatcherForChatHead(
                 ?: it.findViewById<MessageCenterView>(R.id.message_center_view)
                 ?: it.findViewById(android.R.id.content)
                 ?: it.window.decorView.findViewById(android.R.id.content)
-        }
-    }
-
-    override fun openCallActivity() {
-        resumedActivity?.let {
-            val intent = CallActivity.getIntent(
-                it,
-                getConfigurationBuilder().setMediaType(Utils.toMediaType(GliaWidgets.MEDIA_TYPE_VIDEO))
-                    .setIsUpgradeToCall(true)
-                    .build()
-            )
-            it.startActivity(intent)
         }
     }
 
@@ -202,11 +188,7 @@ internal class ActivityWatcherForChatHead(
         activity?.let {
             val intent = CallActivity.getIntent(
                 it,
-                getConfigurationBuilder().setMediaType(
-                    Utils.toMediaType(GliaWidgets.MEDIA_TYPE_VIDEO)
-                )
-                    .setIsUpgradeToCall(true)
-                    .build()
+                getConfigurationBuilder().setIsUpgradeToCall(true).build()
             )
             it.startActivity(intent)
         }

@@ -170,6 +170,7 @@ internal class ApplicationChatHeadLayoutController(
 
     private fun onNewEngagementLoaded() {
         state = State.ENGAGEMENT
+        chatHeadLayout?.show()
         updateChatHeadView()
     }
 

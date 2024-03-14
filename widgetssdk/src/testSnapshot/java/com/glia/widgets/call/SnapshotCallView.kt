@@ -205,10 +205,11 @@ internal interface SnapshotCallView : SnapshotContent, SnapshotTheme, SnapshotAc
     fun CallState.operatorConnected(
         name: String = "Screenshot Operator",
         url: String? = null,
-        operatorMediaState: OperatorMediaState = operatorMediaState(null, null),
+        operatorMediaState: OperatorMediaState = operatorMediaState(),
         formattedTime: String = "00:01"
     ): CallState = this
         .operatorConnecting(name, url)
+        //To replicate a real situation, need to pass here not-empty operatorMediaState
         .videoCallOperatorVideoStarted(operatorMediaState, formattedTime)
 
     fun CallState.audioCallStarted(

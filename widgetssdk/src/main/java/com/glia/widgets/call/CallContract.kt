@@ -23,7 +23,7 @@ internal interface CallContract {
             companyName: String,
             queueId: String?,
             visitorContextAssetId: String?,
-            mediaType: Engagement.MediaType,
+            mediaType: Engagement.MediaType?,
             useOverlays: Boolean,
             screenSharingMode: ScreenSharing.Mode,
             upgradeToCall: Boolean

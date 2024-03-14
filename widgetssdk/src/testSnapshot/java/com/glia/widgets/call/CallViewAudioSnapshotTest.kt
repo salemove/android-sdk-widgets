@@ -64,7 +64,8 @@ internal class CallViewAudioSnapshotTest : SnapshotTest(
     // MARK: Operator connected
 
     private fun operatorConnectedState(): CallState = initCallState()
-        .operatorConnected()
+        .operatorConnecting("Screenshot Operator", null)
+        .videoCallOperatorVideoStarted(operatorMediaState(null, null), formattedTime = "00:01")
 
     @Test
     fun operatorConnected() {

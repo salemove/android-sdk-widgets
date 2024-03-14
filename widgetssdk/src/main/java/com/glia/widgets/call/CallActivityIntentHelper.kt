@@ -27,7 +27,7 @@ internal object CallActivityIntentHelper {
     fun readConfiguration(activity: AppCompatActivity): Configuration {
         val intent = activity.intent
         val sdkConfiguration = GliaSdkConfiguration.Builder().intent(intent).build()
-        val mediaType = intent.getSerializableExtra(GliaWidgets.MEDIA_TYPE) as Engagement.MediaType? ?: Engagement.MediaType.AUDIO
+        val mediaType = intent.getSerializableExtra(GliaWidgets.MEDIA_TYPE) as Engagement.MediaType?
         val isUpgradeToCall = intent.getBooleanExtra(GliaWidgets.IS_UPGRADE_TO_CALL, false)
         return Configuration.Builder()
             .setWidgetsConfiguration(sdkConfiguration)

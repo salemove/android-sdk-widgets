@@ -14,7 +14,6 @@ internal class ActivityWatcherForChatHeadContract {
     }
 
     interface Watcher {
-        fun openCallActivity()
         fun fetchGliaOrRootView(): View?
         fun addChatHeadLayoutIfAbsent()
         fun removeChatHeadLayoutIfPresent()

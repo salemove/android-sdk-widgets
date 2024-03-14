@@ -175,7 +175,7 @@ internal class CallView(
         useOverlays: Boolean,
         screenSharingMode: ScreenSharing.Mode,
         isUpgradeToCall: Boolean,
-        mediaType: Engagement.MediaType
+        mediaType: Engagement.MediaType?
     ) {
         callController?.startCall(
             companyName,
@@ -464,7 +464,6 @@ internal class CallView(
         chatButtonBadgeView.applyBadgeTheme(callTheme?.buttonBar?.badge)
 
         // Texts
-        appBar.setTitle(stringProvider.getRemoteString(R.string.engagement_audio_title))
         chatButtonLabel.text = stringProvider.getRemoteString(R.string.engagement_chat_title)
         speakerButtonLabel.text = stringProvider.getRemoteString(R.string.call_speaker_button)
         minimizeButtonLabel.text = stringProvider.getRemoteString(R.string.engagement_minimize_video_button)
@@ -791,11 +790,14 @@ internal class CallView(
                 appBar.hideEndScreenSharingButton()
             }
 
-            if (callState.requestedMediaType == Engagement.MediaType.VIDEO) {
-                setTitle(stringProvider.getRemoteString(R.string.engagement_video_title))
-            } else {
-                setTitle(stringProvider.getRemoteString(R.string.engagement_audio_title))
+            callState.isCurrentCallVideo?.also {
+                if (it) {
+                    setTitle(stringProvider.getRemoteString(R.string.engagement_video_title))
+                } else {
+                    setTitle(stringProvider.getRemoteString(R.string.engagement_audio_title))
+                }
             }
+
             operatorNameView.text = callState.callStatus.formattedOperatorName
             connectingView.contentDescription = stringProvider.getRemoteString(
                 R.string.engagement_connection_screen_connect_with,

@@ -8,7 +8,7 @@ internal class Configuration private constructor(builder: Builder) {
     @JvmField
     val sdkConfiguration: GliaSdkConfiguration?
     @JvmField
-    val mediaType: Engagement.MediaType
+    val mediaType: Engagement.MediaType?
     @JvmField
     val isUpgradeToCall: Boolean
 
@@ -21,7 +21,7 @@ internal class Configuration private constructor(builder: Builder) {
     class Builder {
         var widgetsConfiguration: GliaSdkConfiguration? = null
             private set
-        var mediaType: Engagement.MediaType = Engagement.MediaType.AUDIO
+        var mediaType: Engagement.MediaType? = null
             private set
         var isUpgradeToCall = false
             private set
@@ -30,7 +30,7 @@ internal class Configuration private constructor(builder: Builder) {
             widgetsConfiguration = configuration
         }
 
-        fun setMediaType(mediaType: Engagement.MediaType) = apply {
+        fun setMediaType(mediaType: Engagement.MediaType?) = apply {
             this.mediaType = mediaType
         }
 

@@ -6,7 +6,6 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
 
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
@@ -90,19 +89,6 @@ public final class CallActivity extends FadeTransitionActivity {
         if (savedInstanceState == null) {
             startCall();
         }
-
-        setTitle(getTitleText());
-    }
-
-    @StringRes
-    private int getTitleText() {
-        switch (configuration.mediaType) {
-            case VIDEO:
-                return R.string.engagement_video_title;
-            case AUDIO:
-            default:
-                return R.string.engagement_audio_title;
-        }
     }
 
     @Override
@@ -145,7 +131,7 @@ public final class CallActivity extends FadeTransitionActivity {
     }
 
     private void startCall() {
-        GliaSdkConfiguration sdkConfiguration = configuration.sdkConfiguration;
+        GliaSdkConfiguration sdkConfiguration = Objects.requireNonNull(configuration.sdkConfiguration);
         callView.startCall(
             Objects.requireNonNull(sdkConfiguration.getCompanyName()),
             sdkConfiguration.getQueueId(),
@@ -159,9 +145,9 @@ public final class CallActivity extends FadeTransitionActivity {
 
     private void navigateToChat() {
         Logger.d(TAG, "navigateToChat");
-        GliaSdkConfiguration sdkConfiguration = configuration.sdkConfiguration;
+        GliaSdkConfiguration sdkConfiguration = Objects.requireNonNull(configuration.sdkConfiguration);
         Intent newIntent = new Intent(getApplicationContext(), ChatActivity.class)
-                .putExtra(GliaWidgets.QUEUE_ID, sdkConfiguration.getQueueId())
+            .putExtra(GliaWidgets.QUEUE_ID, Objects.requireNonNull(sdkConfiguration.getQueueId()))
                 .putExtra(GliaWidgets.CONTEXT_ASSET_ID, sdkConfiguration.getContextAssetId())
                 .putExtra(GliaWidgets.UI_THEME, sdkConfiguration.getRunTimeTheme())
                 .putExtra(GliaWidgets.USE_OVERLAY, sdkConfiguration.getUseOverlay())

@@ -1,6 +1,7 @@
 package com.glia.widgets.call;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.comms.Media;
@@ -21,6 +22,7 @@ class CallState {
     public final boolean isMuted;
     public final boolean hasVideo;
     public final String companyName;
+    @Nullable
     public final Engagement.MediaType requestedMediaType;
     public final boolean isSpeakerOn;
     public final boolean isOnHold;
@@ -136,6 +138,12 @@ class CallState {
 
     public boolean isAudioCall() {
         return callStatus instanceof CallStatus.EngagementOngoingAudioCallStarted;
+    }
+
+    public Boolean isCurrentCallVideo() {
+        if (requestedMediaType == null && callStatus.getOperatorMediaState() == null) return null;
+
+        return callStatus.getOperatorMediaState() == null ? requestedMediaType == Engagement.MediaType.VIDEO : callStatus.getOperatorMediaState().getVideo() != null;
     }
 
     @NonNull
@@ -456,7 +464,7 @@ class CallState {
             visitorMediaState.getAudio().getStatus() != Media.Status.PLAYING;
     }
 
-    public CallState initCall(String companyName, String queueId, String visitorContextAssetId, Engagement.MediaType requestedMediaType) {
+    public CallState initCall(String companyName, String queueId, String visitorContextAssetId, @Nullable Engagement.MediaType requestedMediaType) {
         return new Builder()
             .copyFrom(this)
             .setIntegratorCallStarted(true)

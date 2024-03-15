@@ -178,4 +178,19 @@ class UndocumentedApiDetectorTest {
             .run()
             .expectClean()
     }
+
+    @Test
+    fun `does not throw for internal high level Kotlin functions`() {
+        lint().files(
+            kotlin(
+                """
+                package test.pkg
+                internal fun AlertTheme() { }
+                """
+            ).indented()
+        )
+            .issues(UndocumentedApiDetector.ISSUE)
+            .run()
+            .expectClean()
+    }
 }

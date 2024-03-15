@@ -22,6 +22,11 @@ import org.jetbrains.uast.kotlin.parentAs
 class UndocumentedApiChecker(private val context: JavaContext) : UElementHandler() {
 
     override fun visitClass(node: UClass) {
+        if (node.getAnchorPsi() == null) {
+            // This is most likely a Kotlin function that is outside of class scope.
+            // For some reason they are identified as classes
+            return
+        }
         if (isPublicApiWithoutDocs(node)) {
             reportIssue(node)
         }

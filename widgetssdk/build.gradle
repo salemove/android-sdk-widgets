@@ -117,6 +117,8 @@ dependencies {
   // To prevent unit tests firing errors like 'Method length in org.json.JSONObject not mocked'
   testImplementation "org.json:json:20220924"
   implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+
+  lintChecks project(':lint_checker')
 }
 
 ext {

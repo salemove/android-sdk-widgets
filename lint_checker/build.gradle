@@ -1,0 +1,34 @@
+plugins {
+  id("java-library")
+  id("org.jetbrains.kotlin.jvm")
+  id("com.android.lint")
+  id ("kotlin")
+}
+
+java {
+  sourceCompatibility = JavaVersion.VERSION_17
+  targetCompatibility = JavaVersion.VERSION_17
+}
+
+lint {
+  htmlReport = true
+  htmlOutput = file("lint-report.html")
+  textReport = true
+  absolutePaths = false
+  ignoreTestSources = true
+}
+
+dependencies {
+  compileOnly "com.android.tools.lint:lint-api:$lintVersion"
+
+  testImplementation "com.android.tools.lint:lint-api:$lintVersion"
+  testImplementation "com.android.tools.lint:lint-tests:$lintVersion"
+  testImplementation "junit:junit:$junitVersion"
+}
+
+jar {
+  manifest {
+    // This line is the one that actually registers the Lint checks for gradle to see them
+    attributes('Lint-Registry-v2': 'com.glia.widgets.lint.LintIssueRegistry')
+  }
+}

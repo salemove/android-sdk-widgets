@@ -1,3 +1,4 @@
+rootProject.name = "Glia Android SDK Widgets"
 include ':widgetssdk'
 include ':app'
-rootProject.name = "Glia Android SDK Widgets"
+include ':lint_checker'

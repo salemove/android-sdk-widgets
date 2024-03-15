@@ -142,7 +142,7 @@ class UndocumentedApiDetectorTest {
     }
 
     @Test
-    fun `does not throw when has documentation`() {
+    fun `does not throw when public Java class has documentation`() {
         lint().files(
             java(
                 """
@@ -152,6 +152,25 @@ class UndocumentedApiDetectorTest {
                 * This is this class documentation
                 */
                 public class PublicClass {}
+                """
+            ).indented()
+        )
+            .issues(UndocumentedApiDetector.ISSUE)
+            .run()
+            .expectClean()
+    }
+
+    @Test
+    fun `does not throw when public Kotlin class has documentation`() {
+        lint().files(
+            kotlin(
+                """
+                package test.pkg
+
+                /**
+                * This is this class documentation
+                */
+                class PublicClass
                 """
             ).indented()
         )

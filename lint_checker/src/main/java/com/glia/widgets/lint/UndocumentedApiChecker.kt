@@ -3,18 +3,18 @@ package com.glia.widgets.lint
 import com.android.tools.lint.client.api.UElementHandler
 import com.android.tools.lint.detector.api.Incident
 import com.android.tools.lint.detector.api.JavaContext
-import com.intellij.psi.PsiJavaDocumentedElement
+import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtModifierList
 import org.jetbrains.kotlin.psi.KtModifierListOwner
 import org.jetbrains.kotlin.psi.psiUtil.getChildOfType
 import org.jetbrains.uast.UClass
 import org.jetbrains.uast.UDeclaration
 import org.jetbrains.uast.UElement
-import org.jetbrains.uast.UField
-import org.jetbrains.uast.UMethod
 import org.jetbrains.uast.UastVisibility
 import org.jetbrains.uast.getAnchorPsi
 import org.jetbrains.uast.getContainingUClass
+import org.jetbrains.uast.java.JavaUClass
+import org.jetbrains.uast.kotlin.KotlinUClass
 import org.jetbrains.uast.kotlin.parentAs
 
 // This class goes through the scope (scope is set by 'Detector' class) of UAST elements.
@@ -27,24 +27,11 @@ class UndocumentedApiChecker(private val context: JavaContext) : UElementHandler
         }
     }
 
-    override fun visitMethod(node: UMethod) {
-        // I think that for now we don't need method warning. But technically current solution should work for methods as well
-    }
-
-    override fun visitField(node: UField) {
-        // I think that for now we don't need fields warning. But technically current solution should work for fields as well
-    }
-
     private fun isPublicApiWithoutDocs(element: UDeclaration): Boolean {
-        if (element !is PsiJavaDocumentedElement) {
-            // Not public API because this element can't have documentation element.
-            return false
-        }
         if (!element.isPublicWhenResolvedWithParents()) {
-            // Not a public method/class/field
             return false
         }
-        val docText = element.docComment?.text
+        val docText = getDocText(element)
         if (docText.isNullOrBlank()) {
             // No documentation
             return true
@@ -59,6 +46,18 @@ class UndocumentedApiChecker(private val context: JavaContext) : UElementHandler
         }
     }
 
+    private fun getDocText(element: UDeclaration): String? {
+        if (element is JavaUClass) {
+            // Returns JavaDocs content
+            return element.docComment?.text
+        } else if (element is KotlinUClass) {
+            // Returns KDoc content
+            return element.getAnchorPsi().parentAs<KtDeclaration>()?.docComment?.text
+        } else {
+            throw UnsupportedOperationException("This Lint checker supports only Java and Kotlin languages")
+        }
+    }
+
     // Checks specifically for Kotlin 'internal' access modifier
     private fun UDeclaration.isVisibilityInternal(): Boolean {
         return getAnchorPsi()
@@ -69,9 +68,8 @@ class UndocumentedApiChecker(private val context: JavaContext) : UElementHandler
 
     }
 
-    // For some reason 'UastVisibility.PUBLIC' is returned
-    // when UElement 'getVisibility()' method is used even when there is Kotlin 'internal' access modifier.
-    // So adding this custom visibility checker to solve it
+    // When UElement 'getVisibility()' method is used with Kotlin 'internal' access modifier it returns 'UastVisibility.PUBLIC'.
+    // Adding this custom visibility checker to fix this behavior.
     private fun UDeclaration.isPublic(): Boolean {
         return this.visibility == UastVisibility.PUBLIC && !this.isVisibilityInternal()
     }

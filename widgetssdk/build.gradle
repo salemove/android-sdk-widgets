@@ -4,13 +4,13 @@ apply plugin: 'kotlin-parcelize'
 apply plugin: 'app.cash.paparazzi'
 
 android {
-  compileSdkVersion 31
+  compileSdkVersion 33
   buildToolsVersion "30.0.3"
   defaultPublishConfig "debug"
   namespace 'com.glia.widgets'
   defaultConfig {
     minSdkVersion 24
-    targetSdkVersion 31
+    targetSdkVersion 33
     versionCode widgetsVersionCode
     versionName widgetsVersionName
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

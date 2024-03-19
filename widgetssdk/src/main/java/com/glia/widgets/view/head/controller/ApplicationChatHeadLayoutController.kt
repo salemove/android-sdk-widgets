@@ -127,6 +127,7 @@ internal class ApplicationChatHeadLayoutController(
     }
 
     private fun engagementEnded() {
+        isOnHold = false
         state = State.ENDED
         operatorProfileImgUrl = null
         unreadMessagesCount = 0
@@ -169,6 +170,7 @@ internal class ApplicationChatHeadLayoutController(
     }
 
     private fun onNewEngagementLoaded() {
+        isOnHold = false
         state = State.ENGAGEMENT
         chatHeadLayout?.show()
         updateChatHeadView()

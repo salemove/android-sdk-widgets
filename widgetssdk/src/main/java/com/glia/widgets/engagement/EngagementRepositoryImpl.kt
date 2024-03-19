@@ -333,6 +333,7 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
         currentEngagement?.also {
             unsubscribeFromEvents(it)
             currentEngagement = null
+            resetState()
         } ?: _engagementState.onNext(State.StartedOmniCore)
 
         currentEngagement = engagement
@@ -350,6 +351,7 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
         currentEngagement?.also {
             unsubscribeFromEvents(it)
             currentEngagement = null
+            resetState()
         } ?: _engagementState.onNext(State.StartedCallVisualizer)
 
         currentEngagement = engagement

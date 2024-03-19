@@ -154,5 +154,5 @@ internal fun mapUriToFileAttachment(contentResolver: ContentResolver, uri: Uri):
         val displayName = it.getString(nameIndex)
         val mimeType = contentResolver.getType(uri)
         val size = it.getLong(sizeIndex)
-        FileAttachment(uri, displayName, size, mimeType)
+        FileAttachment(uri, mimeType, displayName, size)
     }

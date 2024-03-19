@@ -18,6 +18,9 @@ import com.glia.widgets.core.fileupload.model.FileAttachment;
 import com.glia.widgets.helper.FileHelper;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 
+/**
+ * @hide
+ */
 public class FileAttachmentViewHolder extends RecyclerView.ViewHolder {
     private final CardView extensionContainerView;
     private final TextView extensionTypeText;

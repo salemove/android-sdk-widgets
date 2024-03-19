@@ -41,7 +41,7 @@ class MapOperatorUseCaseTest {
         val chatMessage: OperatorMessage = mock()
         whenever(chatMessage.senderType) doReturn Chat.Participant.OPERATOR
         whenever(chatMessage.operatorId) doReturn operator.id
-        whenever(getOperatorUseCase.execute(operator.id)) doReturn (Single.just(Optional.of(operator)))
+        whenever(getOperatorUseCase(operator.id)) doReturn (Single.just(Optional.of(operator)))
         mapOperatorUseCase(chatMessage)
             .doOnSuccess { assertEquals(it.operatorId, operator.id) }
             .test()

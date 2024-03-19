@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * @hide
+ */
 public class MessagesNotSeenHandler {
 
     private final static String TAG = "MessagesNotSeenHandler";
@@ -97,6 +100,9 @@ public class MessagesNotSeenHandler {
         reset();
     }
 
+    /**
+     * @hide
+     */
     public interface MessagesNotSeenHandlerListener {
         void onNewCount(int count);
     }

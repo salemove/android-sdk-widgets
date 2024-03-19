@@ -14,6 +14,9 @@ import com.glia.widgets.StringProvider;
 import com.glia.widgets.di.Dependencies;
 import com.google.android.material.card.MaterialCardView;
 
+/**
+ * @hide
+ */
 public class FloatingVisitorVideoView extends MaterialCardView {
     private VideoView videoView;
     private TextView onHoldOverlay;

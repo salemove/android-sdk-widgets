@@ -43,6 +43,9 @@ import com.glia.widgets.view.head.controller.ServiceChatHeadController;
 import com.glia.widgets.view.snackbar.ActivityWatcherForLiveObservationContract;
 import com.glia.widgets.view.snackbar.ActivityWatcherForLiveObservationController;
 
+/**
+ * @hide
+ */
 public class ControllerFactory {
 
     private static final String TAG = "ControllerFactory";

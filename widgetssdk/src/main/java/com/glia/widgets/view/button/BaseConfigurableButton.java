@@ -10,6 +10,9 @@ import com.glia.widgets.view.configuration.ButtonConfiguration;
 import com.glia.widgets.view.configuration.TextConfiguration;
 import com.google.android.material.button.MaterialButton;
 
+/**
+ * @hide
+ */
 public abstract class BaseConfigurableButton extends MaterialButton {
     private final String TAG = BaseConfigurableButton.class.getSimpleName();
 

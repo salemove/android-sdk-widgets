@@ -5,8 +5,14 @@ import android.view.View;
 
 import androidx.core.util.Pair;
 
+/**
+ * @hide
+ */
 public class ViewHelpers {
 
+    /**
+     * @hide
+     */
     public static class OnTouchListener implements View.OnTouchListener {
         private static final int DIFF_THRESHOLD = 20;
         private int initialX;
@@ -57,6 +63,9 @@ public class ViewHelpers {
             return false;
         }
 
+        /**
+         * @hide
+         */
         public interface OnRequestInitialCoordinates {
             /**
              * @return x, y coordinates of the current position of the view when moving starts.
@@ -64,6 +73,9 @@ public class ViewHelpers {
             Pair<Integer, Integer> request();
         }
 
+        /**
+         * @hide
+         */
         public interface OnMoveListener {
             void onMove(float x, float y);
         }

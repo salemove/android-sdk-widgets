@@ -136,7 +136,7 @@ class ChatHeadService : Service() {
     // 🤔Need to think why it is strictly the 4/5 of screen height
     private fun getDefaultYPosition(screenHeight: Int): Int = screenHeight / 10 * 8
 
-    companion object {
+    internal companion object {
         @JvmStatic
         fun getIntent(context: Context): Intent {
             return Intent(context, ChatHeadService::class.java)

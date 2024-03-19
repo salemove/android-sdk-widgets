@@ -4,6 +4,9 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 
+/**
+ * @hide
+ */
 open class FadeTransitionActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -8,6 +8,9 @@ import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.ResourceProvider;
 
+/**
+ * Please use remote configurations {@link com.glia.widgets.GliaWidgetsConfig.Builder#setUiJsonRemoteConfig(String)}
+ */
 @Deprecated
 public class OptionButtonConfiguration implements Parcelable {
     // Title text for normal state.
@@ -56,6 +59,9 @@ public class OptionButtonConfiguration implements Parcelable {
         return highlightedLayer;
     }
 
+    /**
+     * Please use remote configurations {@link com.glia.widgets.GliaWidgetsConfig.Builder#setUiJsonRemoteConfig(String)}
+     */
     @Deprecated
     public static class Builder {
         private final String TAG = OptionButtonConfiguration.Builder.class.getSimpleName();

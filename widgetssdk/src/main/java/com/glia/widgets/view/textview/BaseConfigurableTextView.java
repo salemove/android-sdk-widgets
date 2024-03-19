@@ -16,6 +16,9 @@ import com.glia.widgets.UiTheme;
 import com.glia.widgets.view.configuration.TextConfiguration;
 import com.google.android.material.textview.MaterialTextView;
 
+/**
+ * @hide
+ */
 public abstract class BaseConfigurableTextView extends MaterialTextView {
     private TextConfiguration textConfiguration;
 

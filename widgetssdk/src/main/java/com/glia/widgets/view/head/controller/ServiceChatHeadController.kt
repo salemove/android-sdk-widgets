@@ -147,6 +147,7 @@ internal class ServiceChatHeadController(
 
     private fun engagementEnded() {
         toggleChatHeadServiceUseCase.onDestroy()
+        isOnHold = false
         state = State.ENDED
         operatorProfileImgUrl = null
         unreadMessagesCount = 0
@@ -155,6 +156,7 @@ internal class ServiceChatHeadController(
     }
 
     private fun newEngagementLoaded() {
+        isOnHold = false
         state = State.ENGAGEMENT
         toggleChatHeadServiceUseCase.invoke(resumedViewName)
         if (sdkConfiguration == null) setSdkConfiguration(

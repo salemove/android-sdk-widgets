@@ -14,6 +14,9 @@ import com.glia.widgets.view.configuration.LayerConfiguration;
 import com.glia.widgets.view.configuration.OptionButtonConfiguration;
 import com.glia.widgets.view.configuration.TextConfiguration;
 
+/**
+ * @hide
+ */
 public class GliaSurveyOptionButton extends BaseConfigurableButton {
     private boolean isError = false;
     private OptionButtonConfiguration buttonConfiguration;

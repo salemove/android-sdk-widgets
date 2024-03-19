@@ -5,6 +5,9 @@ import com.glia.widgets.helper.Logger.logDeprecatedClassUse
 import com.glia.widgets.helper.TAG
 import com.google.gson.internal.LinkedTreeMap
 
+/**
+ * Deprecated. Use [VisitorInfo] instead
+ */
 @Deprecated("since 1.9.0 use @see {@link VisitorInfo}")
 class GliaVisitorInfo(visitorInfo: VisitorInfo) : VisitorInfo {
     private var name: String

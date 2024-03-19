@@ -2,6 +2,9 @@ package com.glia.widgets.core.visitor;
 
 import com.glia.androidsdk.GliaException;
 
+/**
+ * Glia Exception that has been thrown by Widgets SDK.
+ */
 public class GliaWidgetException extends RuntimeException {
     private String debugMessage;
     private GliaException.Cause cause;

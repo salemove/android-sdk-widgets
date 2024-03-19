@@ -12,12 +12,19 @@ import com.glia.widgets.di.GliaCore;
 
 import java.util.function.Consumer;
 
+/**
+ * @hide
+ */
 public class GliaChatRepository {
     private final GliaCore gliaCore;
 
     public GliaChatRepository(GliaCore gliaCore) {
         this.gliaCore = gliaCore;
     }
+
+    /**
+     * @hide
+     */
     public interface HistoryLoadedListener {
         void loaded(ChatMessage[] messages, Throwable error);
     }

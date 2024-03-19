@@ -15,7 +15,7 @@ internal class MapOperatorUseCase(private val getOperatorUseCase: GetOperatorUse
         }
 
     private fun processOperatorMessage(chatMessage: OperatorMessage): Single<ChatMessageInternal> =
-        getOperatorUseCase.execute(chatMessage.operatorId!!).map { ChatMessageInternal(chatMessage, it.getOrNull()) }
+        getOperatorUseCase(chatMessage.operatorId!!).map { ChatMessageInternal(chatMessage, it.getOrNull()) }
 
     private fun processVisitorMessage(chatMessage: ChatMessage): Single<ChatMessageInternal> = Single.just(ChatMessageInternal(chatMessage))
 }

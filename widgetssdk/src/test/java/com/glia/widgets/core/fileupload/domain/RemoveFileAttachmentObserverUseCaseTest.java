@@ -24,13 +24,13 @@ public class RemoveFileAttachmentObserverUseCaseTest {
     @Test
     public void execute_callsRepositoryRemoveObserver_whenValidArgument() {
         Observer observer = mock(Observer.class);
-        subjectUnderTest.execute(observer);
+        subjectUnderTest.invoke(observer);
         verify(repository).removeObserver(observer);
     }
 
     @Test
     public void execute_callsRepositoryRemoveObserver_whenNullArgument() {
-        subjectUnderTest.execute(null);
+        subjectUnderTest.invoke(null);
         verify(repository).removeObserver(null);
     }
 }

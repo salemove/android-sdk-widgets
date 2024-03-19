@@ -13,6 +13,9 @@ import com.glia.widgets.view.configuration.LayerConfiguration;
 import com.glia.widgets.view.configuration.OptionButtonConfiguration;
 import com.glia.widgets.view.configuration.TextConfiguration;
 
+/**
+ * Please use remote configurations {@link com.glia.widgets.GliaWidgetsConfig.Builder#setUiJsonRemoteConfig(String)}
+ */
 @Deprecated
 public class ScaleQuestionConfiguration implements Parcelable {
     private TextConfiguration title;
@@ -31,6 +34,9 @@ public class ScaleQuestionConfiguration implements Parcelable {
         return optionButton;
     }
 
+    /**
+     * Please use remote configurations {@link com.glia.widgets.GliaWidgetsConfig.Builder#setUiJsonRemoteConfig(String)}
+     */
     @Deprecated
     public static class Builder {
         private final String TAG = ScaleQuestionConfiguration.Builder.class.getSimpleName();

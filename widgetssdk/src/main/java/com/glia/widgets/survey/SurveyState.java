@@ -4,6 +4,9 @@ import androidx.annotation.Nullable;
 
 import java.util.List;
 
+/**
+ * @hide
+ */
 public class SurveyState {
     @Nullable
     public final String title;

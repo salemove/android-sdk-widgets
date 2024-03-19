@@ -12,6 +12,9 @@ import com.glia.widgets.view.configuration.ButtonConfiguration;
 import com.glia.widgets.view.configuration.LayerConfiguration;
 import com.glia.widgets.view.configuration.TextConfiguration;
 
+/**
+ * Please use remote configurations {@link com.glia.widgets.GliaWidgetsConfig.Builder#setUiJsonRemoteConfig(String)}
+ */
 @Deprecated
 public class SurveyStyle implements Parcelable {
     // Layer style.
@@ -75,6 +78,10 @@ public class SurveyStyle implements Parcelable {
         this.inputQuestion = builder.inputQuestion;
     }
 
+    /**
+     * Please use remote configurations {@link com.glia.widgets.GliaWidgetsConfig.Builder#setUiJsonRemoteConfig(String)}
+     */
+    @Deprecated
     public static class Builder {
         private final String TAG = SurveyStyle.Builder.class.getSimpleName();
 

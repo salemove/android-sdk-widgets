@@ -5,6 +5,9 @@ import android.util.AttributeSet;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+/**
+ * @hide
+ */
 public class ChatRecyclerView extends RecyclerView {
     private int oldHeight;
     private boolean isInBottom;

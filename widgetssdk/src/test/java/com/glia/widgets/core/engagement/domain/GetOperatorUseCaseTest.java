@@ -32,7 +32,7 @@ public class GetOperatorUseCaseTest {
     public void execute_returnsOperator_whenOperatorExists() {
         stubGetOperatorResponse(operator);
 
-        getOperatorUseCase.execute(operator.getId())
+        getOperatorUseCase.invoke(operator.getId())
                 .test()
                 .assertResult(Optional.of(operator));
     }
@@ -41,7 +41,7 @@ public class GetOperatorUseCaseTest {
     public void execute_returnsEmptyOptional_whenOperatorNotExists() {
         stubGetOperatorResponse(null);
 
-        getOperatorUseCase.execute(operator.getId())
+        getOperatorUseCase.invoke(operator.getId())
                 .test()
                 .assertResult(Optional.empty());
     }

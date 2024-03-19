@@ -9,6 +9,9 @@ import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.ResourceProvider;
 
+/**
+ * Please use remote configurations {@link com.glia.widgets.GliaWidgetsConfig.Builder#setUiJsonRemoteConfig(String)}
+ */
 @Deprecated
 public class LayerConfiguration implements Parcelable {
     // Background hex color.
@@ -43,6 +46,9 @@ public class LayerConfiguration implements Parcelable {
         return cornerRadius;
     }
 
+    /**
+     * Please use remote configurations {@link com.glia.widgets.GliaWidgetsConfig.Builder#setUiJsonRemoteConfig(String)}
+     */
     @Deprecated
     public static class Builder {
         private final String TAG = LayerConfiguration.Builder.class.getSimpleName();

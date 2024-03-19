@@ -4,7 +4,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.ProcessLifecycleOwner
 
-class ApplicationLifecycleManager {
+internal class ApplicationLifecycleManager {
     private val lifecycleEventObserverList: MutableList<LifecycleEventObserver> = ArrayList()
     private val lifecycle: Lifecycle = ProcessLifecycleOwner.get().lifecycle
 

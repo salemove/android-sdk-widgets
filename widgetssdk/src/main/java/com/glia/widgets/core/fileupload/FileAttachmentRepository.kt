@@ -89,10 +89,10 @@ internal class FileAttachmentRepository(
         setFileAttachmentStatus(uri, FileAttachment.Status.ERROR_ENGAGEMENT_MISSING)
     }
 
-    fun detachFile(attachment: FileAttachment) {
+    fun detachFile(attachment: FileAttachment?) {
         observable.notifyUpdate(
             observable.fileAttachments
-                .filter { it.uri !== attachment.uri }
+                .filter { it.uri !== attachment?.uri }
         )
     }
 

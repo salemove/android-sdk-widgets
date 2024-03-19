@@ -4,6 +4,9 @@ import android.graphics.Bitmap;
 
 import androidx.collection.ArrayMap;
 
+/**
+ * @hide
+ */
 public class InAppBitmapCache {
 
     private InAppBitmapCache() {

@@ -5,6 +5,9 @@ import android.os.Parcelable;
 
 import com.glia.widgets.helper.Logger;
 
+/**
+ * Please use remote configurations {@link com.glia.widgets.GliaWidgetsConfig.Builder#setUiJsonRemoteConfig(String)}
+ */
 @Deprecated
 public class ChatHeadConfiguration implements Parcelable {
     private final Integer operatorPlaceholderBackgroundColor;
@@ -190,6 +193,9 @@ public class ChatHeadConfiguration implements Parcelable {
         return iconScreenSharingDialog;
     }
 
+    /**
+     * Please use remote configurations {@link com.glia.widgets.GliaWidgetsConfig.Builder#setUiJsonRemoteConfig(String)}
+     */
     @Deprecated
     public static class Builder {
         private final String TAG = ChatHeadConfiguration.Builder.class.getSimpleName();

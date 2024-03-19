@@ -3,6 +3,9 @@ package com.glia.widgets.core.engagement.domain;
 import com.glia.widgets.engagement.domain.EngagementTypeUseCase;
 import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase;
 
+/**
+ * @hide
+ */
 public class ShouldShowMediaEngagementViewUseCase {
     private final IsQueueingOrEngagementUseCase isQueueingOrEngagementUseCase;
     private final EngagementTypeUseCase engagementTypeUseCase;

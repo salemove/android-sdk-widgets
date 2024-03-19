@@ -147,11 +147,11 @@ public final class CallActivity extends FadeTransitionActivity {
         Logger.d(TAG, "navigateToChat");
         GliaSdkConfiguration sdkConfiguration = Objects.requireNonNull(configuration.sdkConfiguration);
         Intent newIntent = new Intent(getApplicationContext(), ChatActivity.class)
-            .putExtra(GliaWidgets.QUEUE_ID, Objects.requireNonNull(sdkConfiguration.getQueueId()))
-                .putExtra(GliaWidgets.CONTEXT_ASSET_ID, sdkConfiguration.getContextAssetId())
-                .putExtra(GliaWidgets.UI_THEME, sdkConfiguration.getRunTimeTheme())
-                .putExtra(GliaWidgets.USE_OVERLAY, sdkConfiguration.getUseOverlay())
-                .putExtra(GliaWidgets.SCREEN_SHARING_MODE, sdkConfiguration.getScreenSharingMode());
+            .putExtra(GliaWidgets.QUEUE_ID, sdkConfiguration.getQueueId())
+            .putExtra(GliaWidgets.CONTEXT_ASSET_ID, sdkConfiguration.getContextAssetId())
+            .putExtra(GliaWidgets.UI_THEME, sdkConfiguration.getRunTimeTheme())
+            .putExtra(GliaWidgets.USE_OVERLAY, sdkConfiguration.getUseOverlay())
+            .putExtra(GliaWidgets.SCREEN_SHARING_MODE, sdkConfiguration.getScreenSharingMode());
         startActivity(newIntent);
     }
 

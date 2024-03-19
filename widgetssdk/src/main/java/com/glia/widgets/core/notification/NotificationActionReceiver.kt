@@ -31,7 +31,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
         endScreenSharingUseCase()
     }
 
-    companion object {
+    internal companion object {
         // NB - literals should match with ones in the manifest
         private const val ACTION_ON_SCREEN_SHARING_END_PRESSED =
             "com.glia.widgets.core.notification.NotificationActionReceiver.ACTION_ON_SCREEN_SHARING_END_PRESSED"

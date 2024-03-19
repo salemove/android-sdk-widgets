@@ -4,6 +4,9 @@ import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharing
 import com.glia.widgets.engagement.domain.EngagementTypeUseCase;
 import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase;
 
+/**
+ * @hide
+ */
 public class ResolveChatHeadNavigationUseCase {
     private final IsQueueingOrEngagementUseCase isQueueingOrEngagementUseCase;
     private final EngagementTypeUseCase engagementTypeUseCase;
@@ -29,6 +32,9 @@ public class ResolveChatHeadNavigationUseCase {
         }
     }
 
+    /**
+     * @hide
+     */
     public enum Destinations {
         CALL_VIEW,
         CHAT_VIEW,

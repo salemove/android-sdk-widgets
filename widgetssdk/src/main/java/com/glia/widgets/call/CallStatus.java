@@ -6,6 +6,9 @@ import com.glia.androidsdk.comms.MediaState;
 
 import java.util.Objects;
 
+/**
+ * @hide
+ */
 public interface CallStatus {
 
     String getFormattedOperatorName();
@@ -29,6 +32,9 @@ public interface CallStatus {
 
     void setVisitorMediaState(MediaState visitorMediaState);
 
+    /**
+     * @hide
+     */
     class EngagementNotOngoing implements CallStatus {
         private MediaState visitorMediaState;
 
@@ -88,6 +94,9 @@ public interface CallStatus {
         }
     }
 
+    /**
+     * @hide
+     */
     class EngagementOngoingOperatorIsConnecting implements CallStatus {
         private final String formattedOperatorName;
         private final String time;
@@ -164,6 +173,9 @@ public interface CallStatus {
         }
     }
 
+    /**
+     * @hide
+     */
     class EngagementOngoingAudioCallStarted implements CallStatus {
         private final String formattedOperatorName;
         private final String time;
@@ -245,6 +257,9 @@ public interface CallStatus {
         }
     }
 
+    /**
+     * @hide
+     */
     class EngagementOngoingVideoCallStarted implements CallStatus {
         private final String formattedOperatorName;
         private final String time;
@@ -326,6 +341,9 @@ public interface CallStatus {
         }
     }
 
+    /**
+     * @hide
+     */
     class EngagementOngoingTransferring implements CallStatus {
         private final String time;
         private MediaState visitorMediaState;

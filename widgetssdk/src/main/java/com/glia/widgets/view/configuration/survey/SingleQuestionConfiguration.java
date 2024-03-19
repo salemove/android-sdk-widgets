@@ -11,6 +11,9 @@ import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.ResourceProvider;
 import com.glia.widgets.view.configuration.TextConfiguration;
 
+/**
+ * Please use remote configurations {@link com.glia.widgets.GliaWidgetsConfig.Builder#setUiJsonRemoteConfig(String)}
+ */
 @Deprecated
 public class SingleQuestionConfiguration implements Parcelable {
     private TextConfiguration title;
@@ -35,6 +38,9 @@ public class SingleQuestionConfiguration implements Parcelable {
         return tintColor;
     }
 
+    /**
+     * Please use remote configurations {@link com.glia.widgets.GliaWidgetsConfig.Builder#setUiJsonRemoteConfig(String)}
+     */
     @Deprecated
     public static class Builder {
         private final String TAG = SingleQuestionConfiguration.Builder.class.getSimpleName();

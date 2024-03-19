@@ -39,6 +39,9 @@ import com.glia.widgets.view.head.ChatHeadContract;
 import com.glia.widgets.view.snackbar.ActivityWatcherForLiveObservation;
 import com.glia.widgets.view.unifiedui.theme.UnifiedThemeManager;
 
+/**
+ * @hide
+ */
 public class Dependencies {
 
     private final static String TAG = "Dependencies";

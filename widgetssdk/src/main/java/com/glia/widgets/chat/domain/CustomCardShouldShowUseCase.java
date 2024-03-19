@@ -7,6 +7,9 @@ import com.glia.androidsdk.chat.ChatMessage;
 import com.glia.androidsdk.chat.SingleChoiceAttachment;
 import com.glia.widgets.chat.adapter.CustomCardAdapter;
 
+/**
+ * @hide
+ */
 public class CustomCardShouldShowUseCase {
     @Nullable
     private final CustomCardAdapter adapter;

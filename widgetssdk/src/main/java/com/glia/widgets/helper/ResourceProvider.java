@@ -15,6 +15,9 @@ import androidx.core.content.res.ResourcesCompat;
 
 import java.lang.ref.WeakReference;
 
+/**
+ * @hide
+ */
 interface IResourceProvider {
 
     String getString(@StringRes int id);
@@ -37,6 +40,9 @@ interface IResourceProvider {
     String getResourceKey(@StringRes int stringKey);
 }
 
+/**
+ * @hide
+ */
 public class ResourceProvider implements IResourceProvider {
 
     @VisibleForTesting

@@ -31,6 +31,9 @@ import java.util.Objects;
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
 
+/**
+ * @hide
+ */
 public class DownloadsFolderDataSource {
     private final static String TAG = DownloadsFolderDataSource.class.getSimpleName();
     private final Context context;

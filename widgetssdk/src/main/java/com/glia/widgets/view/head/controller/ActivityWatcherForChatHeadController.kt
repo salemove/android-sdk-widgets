@@ -76,11 +76,11 @@ internal class ActivityWatcherForChatHeadController(
     }
 
     override fun isFromCallScreen(): Boolean {
-        return isFromCallScreenUseCase.isFromCallScreen
+        return isFromCallScreenUseCase()
     }
 
     override fun resetFromCallScreen() {
-        updateFromCallScreenUseCase.updateFromCallScreen(false)
+        updateFromCallScreenUseCase(false)
     }
 
     override fun onActivityResumed() {

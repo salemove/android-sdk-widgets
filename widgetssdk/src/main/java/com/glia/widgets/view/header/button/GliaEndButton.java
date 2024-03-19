@@ -8,6 +8,9 @@ import com.glia.widgets.UiTheme;
 import com.glia.widgets.view.button.BaseConfigurableButton;
 import com.glia.widgets.view.configuration.ButtonConfiguration;
 
+/**
+ * @hide
+ */
 public class GliaEndButton extends BaseConfigurableButton {
     @Override
     public ButtonConfiguration getButtonConfigurationFromTheme(UiTheme theme) {

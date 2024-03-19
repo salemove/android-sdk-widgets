@@ -12,6 +12,9 @@ import com.glia.widgets.helper.ResourceProvider;
 
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * @hide
+ */
 public class GliaSdkConfigurationManager {
 
     private boolean useOverlay = false;

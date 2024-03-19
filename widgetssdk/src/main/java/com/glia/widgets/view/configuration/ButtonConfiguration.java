@@ -12,6 +12,9 @@ import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.ResourceProvider;
 
+/**
+ * Please use remote configurations {@link com.glia.widgets.GliaWidgetsConfig.Builder#setUiJsonRemoteConfig(String)}
+ */
 @Deprecated
 public class ButtonConfiguration implements Parcelable {
     private final ColorStateList backgroundColor;
@@ -88,6 +91,9 @@ public class ButtonConfiguration implements Parcelable {
         return textConfiguration;
     }
 
+    /**
+     * Please use remote configurations {@link com.glia.widgets.GliaWidgetsConfig.Builder#setUiJsonRemoteConfig(String)}
+     */
     @Deprecated
     public static class Builder {
         private final String TAG = ButtonConfiguration.Builder.class.getSimpleName();

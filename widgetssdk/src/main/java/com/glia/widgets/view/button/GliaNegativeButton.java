@@ -7,6 +7,9 @@ import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.view.configuration.ButtonConfiguration;
 
+/**
+ * @hide
+ */
 public class GliaNegativeButton extends BaseConfigurableButton {
     @Override
     public ButtonConfiguration getButtonConfigurationFromTheme(UiTheme theme) {

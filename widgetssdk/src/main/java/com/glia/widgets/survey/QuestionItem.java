@@ -7,6 +7,9 @@ import com.glia.androidsdk.engagement.Survey;
 
 import java.util.Objects;
 
+/**
+ * @hide
+ */
 public class QuestionItem {
     @NonNull
     private final Survey.Question question;

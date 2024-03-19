@@ -30,7 +30,7 @@ public class GetFileAttachmentsUseCaseTest {
                 Collections.singletonList(mock(FileAttachment.class));
         when(repository.getFileAttachments()).thenReturn(fileAttachments);
 
-        List<FileAttachment> result = subjectUnderTest.execute();
+        List<FileAttachment> result = subjectUnderTest.invoke();
 
         assertEquals(fileAttachments, result);
     }

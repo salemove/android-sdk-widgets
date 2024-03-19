@@ -17,6 +17,9 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+/**
+ * @hide
+ */
 public class GliaSurveyAnswerUseCase {
 
     private final GliaSurveyRepository repository;

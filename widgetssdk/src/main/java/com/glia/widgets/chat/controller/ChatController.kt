@@ -156,10 +156,10 @@ internal class ChatController(
 
     private val fileAttachmentObserver = Observer { _, _ ->
         view?.apply {
-            emitUploadAttachments(getFileAttachmentsUseCase.execute())
+            emitUploadAttachments(getFileAttachmentsUseCase())
             emitViewState {
                 chatState.setShowSendButton(isShowSendButtonUseCase(chatState.lastTypedText))
-                    .setIsAttachmentButtonEnabled(supportedFileCountCheckUseCase.execute())
+                    .setIsAttachmentButtonEnabled(supportedFileCountCheckUseCase())
             }
         }
     }
@@ -303,7 +303,7 @@ internal class ChatController(
             timerStatusListener = null
             callTimer.clear()
             minimizeHandler.clear()
-            removeFileAttachmentObserverUseCase.execute(fileAttachmentObserver)
+            removeFileAttachmentObserverUseCase(fileAttachmentObserver)
             chatManager.reset()
         }
     }
@@ -340,7 +340,7 @@ internal class ChatController(
 
     private fun sendMessagePreview(message: String) {
         if (chatState.isOperatorOnline) {
-            sendMessagePreviewUseCase.execute(message)
+            sendMessagePreviewUseCase(message)
         }
     }
 
@@ -391,14 +391,14 @@ internal class ChatController(
     }
 
     private fun navigateBack() {
-        if (isFromCallScreenUseCase.isFromCallScreen) {
+        if (isFromCallScreenUseCase()) {
             view?.backToCall()
         } else {
             backClickedListener?.onBackClicked()
             onDestroy(isQueueingOrOngoingEngagement || isAuthenticatedUseCase())
             Dependencies.getControllerFactory().destroyCallController()
         }
-        updateFromCallScreenUseCase.updateFromCallScreen(false)
+        updateFromCallScreenUseCase(false)
     }
 
     override fun noMoreOperatorsAvailableDismissed() {
@@ -445,7 +445,7 @@ internal class ChatController(
         Logger.d(TAG, "setViewCallback")
         this.view = view
         view.emitState(chatState)
-        view.emitUploadAttachments(getFileAttachmentsUseCase.execute())
+        view.emitUploadAttachments(getFileAttachmentsUseCase())
 
         // always start in bottom
         emitViewState { chatState.isInBottomChanged(true).changeVisibility(true) }
@@ -750,7 +750,7 @@ internal class ChatController(
     }
 
     override fun onRemoveAttachment(attachment: FileAttachment) {
-        removeFileAttachmentUseCase.execute(attachment)
+        removeFileAttachmentUseCase(attachment)
     }
 
     override fun onAttachmentReceived(file: FileAttachment) {

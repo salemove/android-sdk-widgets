@@ -55,7 +55,7 @@ internal class FloatingVisitorVideoController(
             isShowVideoUseCase.execute(visitorMediaState, isOnHold).subscribe({ showVisitorVideo(it, null) }) { }
         )
         disposables.add(
-            isShowOnHoldUseCase.execute(isOnHold).subscribe({ showOnHold(it) }) { }
+            isShowOnHoldUseCase(isOnHold).subscribe({ showOnHold(it) }) { }
         )
     }
 

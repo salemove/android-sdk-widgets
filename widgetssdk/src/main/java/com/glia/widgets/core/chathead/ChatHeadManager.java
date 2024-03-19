@@ -5,7 +5,9 @@ import android.content.Intent;
 
 import com.glia.widgets.helper.Logger;
 
-
+/**
+ * @hide
+ */
 public class ChatHeadManager {
     private static final String TAG = ChatHeadManager.class.getSimpleName();
 

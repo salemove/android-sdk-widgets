@@ -7,6 +7,9 @@ import com.glia.widgets.helper.rx.Schedulers;
 
 import io.reactivex.Single;
 
+/**
+ * @hide
+ */
 public class IsShowVideoUseCase {
     private final Schedulers schedulers;
 

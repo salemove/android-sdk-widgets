@@ -27,7 +27,7 @@ class AppendHistoryCustomCardItemUseCaseTest {
         customCardTypeUseCase = mock()
         customCardShouldShowUseCase = mock()
 
-        whenever(customCardTypeUseCase.execute(any())) doReturn 100
+        whenever(customCardTypeUseCase(any())) doReturn 100
 
         useCase = AppendHistoryCustomCardItemUseCase(customCardTypeUseCase, customCardShouldShowUseCase)
     }

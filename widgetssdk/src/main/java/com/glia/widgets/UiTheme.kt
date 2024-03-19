@@ -19,6 +19,12 @@ import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
 import com.glia.widgets.view.unifiedui.theme.defaulttheme.AlertTheme
 import kotlinx.parcelize.Parcelize
 
+/**
+ * Customize Glia UI at runtime.
+ *
+ * Please use the remote configurations which is newer and more flexible solution for
+ * Widgets UI customization [GliaWidgetsConfig.Builder.setUiJsonRemoteConfig]
+ */
 @Parcelize
 data class UiTheme(
     /**
@@ -458,6 +464,12 @@ data class UiTheme(
         return AlertDialogConfiguration(theme, properties, icons)
     }
 
+    /**
+     * Builder for Glia UI customization at runtime.
+     *
+     * Please use the remote configurations which is newer and more flexible solution for
+     * Widgets UI customization [GliaWidgetsConfig.Builder.setUiJsonRemoteConfig]
+     */
     class UiThemeBuilder {
         /**
          * Text to be shown on the top of the app bar in the chat

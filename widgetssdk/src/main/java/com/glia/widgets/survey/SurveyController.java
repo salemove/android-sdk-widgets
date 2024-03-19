@@ -11,9 +11,14 @@ import com.glia.widgets.core.survey.domain.GliaSurveyAnswerUseCase;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * @hide
+ */
 public class SurveyController implements SurveyContract.Controller {
-    private static final String TAG = SurveyController.class.getSimpleName();
 
+    /**
+     * @hide
+     */
     public interface AnswerCallback {
         void answerCallback(boolean showError);
     }

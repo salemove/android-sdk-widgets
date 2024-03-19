@@ -32,6 +32,9 @@ private data class ViewDefaultProperties(
     val verticalMargin: Int
 )
 
+/**
+ * @hide
+ */
 class CharCodeView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -149,7 +152,7 @@ class CharCodeView @JvmOverloads constructor(
         charView.applyTextTheme(theme.numberSlotText, withAlignment = false)
     }
 
-    companion object {
+    internal companion object {
         private const val WIDTH_NOT_SPECIFIED = 0
         private const val USE_ALL_AVAILABLE_WIDTH = 1f
     }

@@ -2,6 +2,9 @@ package com.glia.widgets.helper.rx;
 
 import io.reactivex.Scheduler;
 
+/**
+ * @hide
+ */
 public class GliaWidgetsSchedulers implements Schedulers {
 
     @Override

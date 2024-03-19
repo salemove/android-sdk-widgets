@@ -242,7 +242,7 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
         }
     }
 
-    companion object {
+    internal companion object {
         const val DEFAULT_USE_OVERLAY = true
         val DEFAULT_SCREEN_SHARING_MODE = ScreenSharing.Mode.APP_BOUNDED
     }

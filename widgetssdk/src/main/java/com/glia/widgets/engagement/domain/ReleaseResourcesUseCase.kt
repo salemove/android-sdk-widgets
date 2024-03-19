@@ -27,7 +27,7 @@ internal class ReleaseResourcesUseCaseImpl(
         removeScreenSharingNotificationUseCase()
         callNotificationUseCase.removeAllNotifications()
         gliaEngagementConfigRepository.reset()
-        updateFromCallScreenUseCase.updateFromCallScreen(false)
+        updateFromCallScreenUseCase(false)
         Dependencies.destroyControllers()
     }
 }

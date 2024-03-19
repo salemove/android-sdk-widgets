@@ -21,6 +21,9 @@ import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource;
 import com.glia.widgets.filepreview.data.source.local.InAppBitmapCache;
 import com.glia.widgets.permissions.PermissionsRequestRepository;
 
+/**
+ * @hide
+ */
 public class RepositoryFactory {
     private static SecureConversationsRepository secureConversationsRepository;
     private static SecureFileAttachmentRepository secureFileAttachmentRepository;

@@ -351,7 +351,7 @@ internal class CallController(
 
     override fun chatButtonClicked() {
         d(TAG, "chatButtonClicked")
-        updateFromCallScreenUseCase.updateFromCallScreen(true)
+        updateFromCallScreenUseCase(true)
         view?.navigateToChat()
         onDestroy(true)
         messagesNotSeenHandler.callChatButtonClicked()
@@ -414,7 +414,7 @@ internal class CallController(
     }
 
     override fun onBackClicked() {
-        updateFromCallScreenUseCase.updateFromCallScreen(false)
+        updateFromCallScreenUseCase(false)
     }
 
     @Synchronized

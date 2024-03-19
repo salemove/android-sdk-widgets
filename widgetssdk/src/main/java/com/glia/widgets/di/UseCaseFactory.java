@@ -163,6 +163,9 @@ import com.glia.widgets.view.snackbar.LiveObservationPopupUseCase;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+/**
+ * @hide
+ */
 public class UseCaseFactory {
     private static CallNotificationUseCase callNotificationUseCase;
     private static ShowScreenSharingNotificationUseCase showScreenSharingNotificationUseCase;

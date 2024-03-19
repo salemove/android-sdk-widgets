@@ -121,7 +121,7 @@ internal class AppendHistoryCustomCardItemUseCase(
     private val customCardShouldShowUseCase: CustomCardShouldShowUseCase
 ) {
     operator fun invoke(chatItems: MutableList<ChatItem>, message: OperatorMessage, viewType: Int) {
-        val customCardType = customCardTypeUseCase.execute(viewType) ?: return
+        val customCardType = customCardTypeUseCase(viewType) ?: return
         if (customCardShouldShowUseCase.execute(message, customCardType, true)) {
             chatItems.add(message.run { CustomCardChatItem(message, viewType) })
         }

@@ -4,6 +4,9 @@ import com.glia.widgets.core.fileupload.FileAttachmentRepository;
 
 import java.util.Observer;
 
+/**
+ * @hide
+ */
 public class AddFileAttachmentsObserverUseCase {
     private final FileAttachmentRepository repository;
 

@@ -2,7 +2,7 @@ package com.glia.widgets.engagement.completion
 
 import com.glia.androidsdk.engagement.Survey
 
-sealed interface EngagementCompletionState {
+internal sealed interface EngagementCompletionState {
     object QueueUnstaffed : EngagementCompletionState
     object UnexpectedErrorHappened : EngagementCompletionState
     object OperatorEndedEngagement : EngagementCompletionState

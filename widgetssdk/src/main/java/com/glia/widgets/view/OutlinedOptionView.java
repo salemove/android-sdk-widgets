@@ -17,6 +17,9 @@ import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.google.android.material.card.MaterialCardView;
 
+/**
+ * @hide
+ */
 public class OutlinedOptionView extends FrameLayout {
 
     private final MaterialCardView cardView;

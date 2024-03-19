@@ -32,7 +32,7 @@ public class SupportedFileCountCheckUseCaseTest {
         when(repository.getFileAttachments())
                 .thenReturn(Collections.singletonList(FILE_ATTACHMENT));
 
-        assertTrue(subjectUnderTest.execute());
+        assertTrue(subjectUnderTest.invoke());
     }
 
     @Test
@@ -40,7 +40,7 @@ public class SupportedFileCountCheckUseCaseTest {
         when(repository.getFileAttachments())
                 .thenReturn(Collections.emptyList());
 
-        assertTrue(subjectUnderTest.execute());
+        assertTrue(subjectUnderTest.invoke());
     }
 
     @Test
@@ -51,7 +51,7 @@ public class SupportedFileCountCheckUseCaseTest {
         }
         when(repository.getFileAttachments()).thenReturn(fileAttachmentList);
 
-        assertTrue(subjectUnderTest.execute());
+        assertTrue(subjectUnderTest.invoke());
     }
 
     @Test
@@ -62,7 +62,7 @@ public class SupportedFileCountCheckUseCaseTest {
         }
         when(repository.getFileAttachments()).thenReturn(fileAttachmentList);
 
-        assertFalse(subjectUnderTest.execute());
+        assertFalse(subjectUnderTest.invoke());
     }
 
     private static final FileAttachment FILE_ATTACHMENT = mock(FileAttachment.class);

@@ -15,7 +15,7 @@ internal class HandleCustomCardClickUseCase(
         attachment: SingleChoiceAttachment,
         state: ChatManager.State
     ): ChatManager.State {
-        val customCardType = customCardTypeUseCase.execute(customCard.viewType) ?: return state
+        val customCardType = customCardTypeUseCase(customCard.viewType) ?: return state
         val currentMessage = customCard.message
         val showCustomCard = customCardShouldShowUseCase.execute(
             currentMessage,

@@ -313,14 +313,13 @@ class Utils {
         SharedPreferences sharedPreferences,
         Resources resources
     ) {
-        String forbiddenDuringEngagementValue = resources.getString(R.string.authentication_behavior_forbidden_during_engagement);
         String allowedDuringEngagementValue = resources.getString(R.string.authentication_behavior_allowed_during_engagement);
         String valueFromPrefs = sharedPreferences.getString(
             resources.getString(R.string.pref_authentication_behavior),
-            forbiddenDuringEngagementValue
+            allowedDuringEngagementValue
         );
 
-        if (valueFromPrefs.equals(allowedDuringEngagementValue)) {
+        if (valueFromPrefs != null && valueFromPrefs.equals(allowedDuringEngagementValue)) {
             return Authentication.Behavior.ALLOWED_DURING_ENGAGEMENT;
         } else {
             return Authentication.Behavior.FORBIDDEN_DURING_ENGAGEMENT;

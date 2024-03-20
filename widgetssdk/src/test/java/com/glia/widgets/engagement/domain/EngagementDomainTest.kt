@@ -1,7 +1,10 @@
 package com.glia.widgets.engagement.domain
 
+import android.Manifest
 import com.glia.androidsdk.comms.MediaUpgradeOffer
+import com.glia.widgets.core.permissions.PermissionManager
 import com.glia.widgets.engagement.EngagementRepository
+import com.glia.widgets.permissions.Permissions
 import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockk
@@ -57,6 +60,19 @@ class EngagementDomainTest {
         resultTest.assertNotComplete().assertValue(mediaUpgradeOffer)
 
         confirmVerified(repository, mediaUpgradeOffer)
+    }
+
+    @Test
+    fun `CheckMediaUpgradePermissionsUseCase will invoke callback when it invoked in PermissionManager`() {
+        val additionalPermissions = listOf(Manifest.permission.BLUETOOTH_CONNECT)
+        val requiredPermissions = listOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA)
+        val permissions = Permissions(requiredPermissions, additionalPermissions)
+        val offer: MediaUpgradeOffer = mockk(relaxed = true)
+        val permissionManager: PermissionManager = mockk {
+            every { getPermissionsForMediaUpgradeOffer(offer) } returns permissions
+            every { handlePermissions(requiredPermissions, additionalPermissions) }
+        }
+        val useCase: CheckMediaUpgradePermissionsUseCase = CheckMediaUpgradePermissionsUseCaseImpl()
     }
 
 }

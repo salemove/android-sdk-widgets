@@ -67,6 +67,9 @@ subprojects {
 
     moduleName = "Glia Android Widgets SDK"
     suppressInheritedMembers.set(true)
+
+    String formatName = name.replaceFirst("dokka", "").toLowerCase()
+    outputDirectory.set(file("build/dokka/widgets/$formatName"))
   }
 
   // This adds support for @hide keyword inside in-code docs

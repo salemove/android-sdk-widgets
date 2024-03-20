@@ -207,6 +207,18 @@ workflows:
         - module: $EXAMPLE_APP_MODULE
         - variant: $DEBUG_VARIANT
         - project_location: $PROJECT_LOCATION
+    - gradle-runner@2:
+        title: Generate JavaDoc
+        inputs:
+          - gradle_task: $WIDGET_SDK_MODULE:dokkaJavadoc
+    - amazon-s3-upload@3:
+        title: Upload JavaDoc
+        inputs:
+          - secret_access_key: $AMAZON_AWS_SECRET
+          - upload_bucket: "$AMAZON_AWS_NAME/widgets"
+          - acl_control: public-read
+          - upload_local_path: "$PROJECT_LOCATION/$WIDGET_SDK_MODULE/build/dokka"
+          - access_key_id: $AMAZON_AWS_KEY
     - script@1:
         title: Publish Android SDK to Nexus Repository Manager (Staging)
         inputs:

@@ -215,7 +215,7 @@ workflows:
         title: Upload JavaDoc
         inputs:
           - secret_access_key: $AMAZON_AWS_SECRET
-          - upload_bucket: $AMAZON_AWS_NAME
+          - upload_bucket: "$AMAZON_AWS_NAME/widgets"
           - acl_control: public-read
           - upload_local_path: "$PROJECT_LOCATION/$WIDGET_SDK_MODULE/build/dokka"
           - access_key_id: $AMAZON_AWS_KEY

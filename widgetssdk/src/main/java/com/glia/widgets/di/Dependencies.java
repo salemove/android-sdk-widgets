@@ -27,6 +27,7 @@ import com.glia.widgets.engagement.completion.EngagementCompletionActivityWatche
 import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource;
 import com.glia.widgets.helper.ApplicationLifecycleManager;
 import com.glia.widgets.helper.GliaActivityManagerImpl;
+import com.glia.widgets.helper.IntentConfigurationHelper;
 import com.glia.widgets.helper.IntentConfigurationHelperImpl;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.ResourceProvider;
@@ -56,6 +57,7 @@ public class Dependencies {
     private static StringProvider stringProvider;
     private static Schedulers schedulers;
     private static GliaSdkConfigurationManager sdkConfigurationManager = new GliaSdkConfigurationManager();
+    private static IntentConfigurationHelper intentConfigurationHelper = new IntentConfigurationHelperImpl();
     private static RepositoryFactory repositoryFactory;
 
     public static void onAppCreate(Application application) {
@@ -132,7 +134,7 @@ public class Dependencies {
 
         OperatorRequestActivityWatcher operatorRequestActivityWatcher = new OperatorRequestActivityWatcher(
             controllerFactory.getOperatorRequestController(),
-            new IntentConfigurationHelperImpl(),
+            intentConfigurationHelper,
             new GliaActivityManagerImpl()
         );
         application.registerActivityLifecycleCallbacks(operatorRequestActivityWatcher);
@@ -228,6 +230,14 @@ public class Dependencies {
     @VisibleForTesting
     public static void setRepositoryFactory(RepositoryFactory repositoryFactory) {
         Dependencies.repositoryFactory = repositoryFactory;
+    }
+
+    public static IntentConfigurationHelper getIntentConfigurationHelper() {
+        return intentConfigurationHelper;
+    }
+
+    public static void setIntentConfigurationHelper(IntentConfigurationHelper intentConfigurationHelper) {
+        Dependencies.intentConfigurationHelper = intentConfigurationHelper;
     }
 
     public static void setAuthenticationManager(@NonNull AuthenticationManager authenticationManager) {

@@ -31,7 +31,7 @@ internal class NotificationManager(private val applicationContext: Application) 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private fun createCallChannel() {
         if (notificationManager.getNotificationChannel(NotificationFactory.NOTIFICATION_CALL_CHANNEL_ID) == null) {
-            val importance = NotificationManager.IMPORTANCE_HIGH
+            val importance = NotificationManager.IMPORTANCE_LOW
             val notificationChannel = NotificationChannel(
                 NotificationFactory.NOTIFICATION_CALL_CHANNEL_ID,
                 applicationContext.getString(R.string.android_notification_audio_call_channel_name),
@@ -44,7 +44,7 @@ internal class NotificationManager(private val applicationContext: Application) 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private fun createScreenSharingChannel() {
         if (notificationManager.getNotificationChannel(NotificationFactory.NOTIFICATION_SCREEN_SHARING_CHANNEL_ID) == null) {
-            val importance = NotificationManager.IMPORTANCE_HIGH
+            val importance = NotificationManager.IMPORTANCE_LOW
             val notificationChannel = NotificationChannel(
                 NotificationFactory.NOTIFICATION_SCREEN_SHARING_CHANNEL_ID,
                 applicationContext.getString(R.string.android_notification_screen_sharing_channel_name),

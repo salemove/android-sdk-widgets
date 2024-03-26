@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.glia.widgets.GliaWidgets;
@@ -116,18 +115,6 @@ public final class CallActivity extends FadeTransitionActivity {
     public void onUserInteraction() {
         super.onUserInteraction();
         callView.onUserInteraction();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        GliaWidgets.onActivityResult(requestCode, resultCode, data);
-        super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        GliaWidgets.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     private void startCall() {

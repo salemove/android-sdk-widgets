@@ -1,5 +1,7 @@
 package com.glia.widgets.di;
 
+import android.content.Context;
+
 import androidx.annotation.NonNull;
 
 import com.glia.widgets.GliaWidgets;
@@ -157,6 +159,8 @@ import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromNetworkUseCas
 import com.glia.widgets.filepreview.domain.usecase.IsFileReadyForPreviewUseCase;
 import com.glia.widgets.filepreview.domain.usecase.PutImageFileToDownloadsUseCase;
 import com.glia.widgets.helper.rx.Schedulers;
+import com.glia.widgets.push.notifications.IsPushNotificationsSetUpUseCase;
+import com.glia.widgets.push.notifications.IsPushNotificationsSetUpUseCaseImpl;
 import com.glia.widgets.view.snackbar.LiveObservationPopupUseCase;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -183,8 +187,8 @@ public class UseCaseFactory {
     private final Schedulers schedulers;
     private final StringProvider stringProvider;
     private final GliaCore gliaCore;
-
     private Gson gvaGson;
+    private final Context applicationContext;
 
     UseCaseFactory(RepositoryFactory repositoryFactory,
                    PermissionManager permissionManager,
@@ -196,7 +200,8 @@ public class UseCaseFactory {
                    Dependencies.AuthenticationManagerProvider authenticationManagerProvider,
                    Schedulers schedulers,
                    StringProvider stringProvider,
-                   GliaCore gliaCore) {
+                   GliaCore gliaCore,
+                   Context applicationContext) {
         this.repositoryFactory = repositoryFactory;
         this.permissionManager = permissionManager;
         this.permissionDialogManager = permissionDialogManager;
@@ -208,6 +213,7 @@ public class UseCaseFactory {
         this.stringProvider = stringProvider;
         this.gliaCore = gliaCore;
         this.authenticationManagerProvider = authenticationManagerProvider;
+        this.applicationContext = applicationContext;
     }
 
     @NonNull
@@ -976,4 +982,8 @@ public class UseCaseFactory {
         return new EndScreenSharingUseCaseImpl(getScreenSharingUseCase());
     }
 
+    @NonNull
+    public IsPushNotificationsSetUpUseCase getIsPushNotificationsSetUpUseCase() {
+        return new IsPushNotificationsSetUpUseCaseImpl(applicationContext);
+    }
 }

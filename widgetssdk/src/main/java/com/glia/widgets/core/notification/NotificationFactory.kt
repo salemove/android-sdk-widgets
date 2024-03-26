@@ -30,6 +30,7 @@ internal object NotificationFactory {
             .setSmallIcon(R.drawable.ic_screensharing)
             .setContentTitle(stringProvider.getRemoteString(R.string.android_notification_screen_sharing_title))
             .setContentText(stringProvider.getRemoteString(R.string.android_notification_screen_sharing_message))
+            //Screen-sharing notification should be the highest in the app notifications list, because it contains action item
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .setOngoing(true)
@@ -100,7 +101,8 @@ internal object NotificationFactory {
             .setSmallIcon(icon)
             .setContentTitle(title)
             .setContentText(message)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            //Based on priority level description, audio/video notification will always be below screen-sharing notification in a list
+            .setPriority(NotificationCompat.PRIORITY_LOW)
             .setCategory(NotificationCompat.CATEGORY_CALL)
             .setOngoing(true)
             .build()

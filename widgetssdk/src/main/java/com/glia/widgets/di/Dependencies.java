@@ -43,13 +43,12 @@ import com.glia.widgets.view.unifiedui.theme.UnifiedThemeManager;
  * @hide
  */
 public class Dependencies {
-
     private final static String TAG = "Dependencies";
     private static final UnifiedThemeManager UNIFIED_THEME_MANAGER = new UnifiedThemeManager();
+    private static final AuthenticationManagerProvider authenticationManagerProvider = new AuthenticationManagerProvider();
     private static ControllerFactory controllerFactory;
     private static INotificationManager notificationManager;
     private static CallVisualizerManager callVisualizerManager;
-    private static final AuthenticationManagerProvider authenticationManagerProvider = new AuthenticationManagerProvider();
     private static UseCaseFactory useCaseFactory;
     private static ManagerFactory managerFactory;
     private static GliaCore gliaCore = new GliaCoreImpl();
@@ -85,7 +84,8 @@ public class Dependencies {
             authenticationManagerProvider,
             schedulers,
             stringProvider,
-            gliaCore
+            gliaCore,
+            application
         );
         initAudioControlManager(audioControlManager, useCaseFactory.createOnAudioStartedUseCase());
 

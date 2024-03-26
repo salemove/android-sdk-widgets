@@ -1,11 +1,8 @@
 package com.glia.widgets.call
 
 import android.content.Context
-import android.content.Intent
 import android.content.res.Configuration
 import android.content.res.TypedArray
-import android.net.Uri
-import android.provider.Settings
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -644,11 +641,7 @@ internal class CallView(
             positiveButtonClickListener = {
                 resetDialogStateAndDismiss()
                 callController?.overlayPermissionsDialogDismissed()
-                val overlayIntent = Intent(
-                    Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                    Uri.parse("package:${context.packageName}")
-                )
-                overlayIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                val overlayIntent = Dependencies.getIntentConfigurationHelper().createForOverlayPermissionScreen(context)
                 this.context.startActivity(overlayIntent)
             },
             negativeButtonClickListener = {
@@ -855,8 +848,8 @@ internal class CallView(
 
             setButtonActivated(
                 muteButton,
-                theme.iconCallAudioOff, // mute (eg. mic-off) button activated icon
-                theme.iconCallAudioOn, // mute (eg. mic-off) button deactivated icon
+                theme.iconCallAudioOff, // mute (e.g., mic-off) button activated icon
+                theme.iconCallAudioOn, // mute (e.g., mic-off) button deactivated icon
                 R.string.android_call_unmute_button_accessibility,
                 R.string.android_call_mute_button_accessibility,
                 callState.isMuted

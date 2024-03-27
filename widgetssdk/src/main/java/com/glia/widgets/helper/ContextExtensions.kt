@@ -67,6 +67,6 @@ internal val Activity.qualifiedName: String
     get() = this::class.qualifiedName!!
 
 internal val Activity.isGlia: Boolean
-    get() = qualifiedName.startsWith(BuildConfig.LIBRARY_PACKAGE_NAME)
+    get() = qualifiedName.startsWith(BuildConfig.LIBRARY_PACKAGE_NAME + ".")
 
 internal val AlertDialog.parentActivity: Activity? get() = context.asActivity()

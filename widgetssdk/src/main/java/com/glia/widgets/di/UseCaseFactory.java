@@ -25,7 +25,11 @@ import com.glia.widgets.chat.domain.CustomCardTypeUseCase;
 import com.glia.widgets.chat.domain.DecideOnQueueingUseCase;
 import com.glia.widgets.chat.domain.DecideOnQueueingUseCaseImpl;
 import com.glia.widgets.chat.domain.DecodeSampledBitmapFromInputStreamUseCase;
+import com.glia.widgets.chat.domain.FileProviderUseCase;
+import com.glia.widgets.chat.domain.FileProviderUseCaseImpl;
 import com.glia.widgets.chat.domain.FindNewMessagesDividerIndexUseCase;
+import com.glia.widgets.chat.domain.FixCapturedPictureRotationUseCase;
+import com.glia.widgets.chat.domain.FixCapturedPictureRotationUseCaseImpl;
 import com.glia.widgets.chat.domain.GliaLoadHistoryUseCase;
 import com.glia.widgets.chat.domain.GliaOnMessageUseCase;
 import com.glia.widgets.chat.domain.GliaSendMessagePreviewUseCase;
@@ -41,7 +45,11 @@ import com.glia.widgets.chat.domain.MapResponseCardUseCase;
 import com.glia.widgets.chat.domain.MapVisitorAttachmentUseCase;
 import com.glia.widgets.chat.domain.SendUnsentMessagesUseCase;
 import com.glia.widgets.chat.domain.SiteInfoUseCase;
+import com.glia.widgets.chat.domain.TakePictureUseCase;
+import com.glia.widgets.chat.domain.TakePictureUseCaseImpl;
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase;
+import com.glia.widgets.chat.domain.UriToFileAttachmentUseCase;
+import com.glia.widgets.chat.domain.UriToFileAttachmentUseCaseImpl;
 import com.glia.widgets.chat.domain.gva.DetermineGvaButtonTypeUseCase;
 import com.glia.widgets.chat.domain.gva.DetermineGvaUrlTypeUseCase;
 import com.glia.widgets.chat.domain.gva.GetGvaTypeUseCase;
@@ -187,8 +195,8 @@ public class UseCaseFactory {
     private final Schedulers schedulers;
     private final StringProvider stringProvider;
     private final GliaCore gliaCore;
-    private Gson gvaGson;
     private final Context applicationContext;
+    private Gson gvaGson;
 
     UseCaseFactory(RepositoryFactory repositoryFactory,
                    PermissionManager permissionManager,
@@ -985,5 +993,30 @@ public class UseCaseFactory {
     @NonNull
     public IsPushNotificationsSetUpUseCase getIsPushNotificationsSetUpUseCase() {
         return new IsPushNotificationsSetUpUseCaseImpl(applicationContext);
+    }
+
+    @NonNull
+    public FileProviderUseCase getFileProviderUseCase() {
+        return new FileProviderUseCaseImpl(applicationContext);
+    }
+
+    @NonNull
+    public FixCapturedPictureRotationUseCase getFixCapturedPictureRotationUseCase() {
+        return new FixCapturedPictureRotationUseCaseImpl(applicationContext);
+    }
+
+    @NonNull
+    public UriToFileAttachmentUseCase getUriToFileAttachmentUseCase() {
+        return new UriToFileAttachmentUseCaseImpl(applicationContext);
+    }
+
+    @NonNull
+    public TakePictureUseCase getTakePictureUseCase() {
+        return new TakePictureUseCaseImpl(
+            applicationContext,
+            getFileProviderUseCase(),
+            getUriToFileAttachmentUseCase(),
+            getFixCapturedPictureRotationUseCase()
+        );
     }
 }

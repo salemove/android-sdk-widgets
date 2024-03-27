@@ -17,7 +17,6 @@ import com.glia.widgets.call.Configuration;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
-import com.glia.widgets.helper.Utils;
 
 import java.util.Objects;
 
@@ -86,7 +85,6 @@ public final class ChatActivity extends FadeTransitionActivity {
             .putExtra(GliaWidgets.CONTEXT_ASSET_ID, contextId)
             .putExtra(GliaWidgets.QUEUE_ID, queueId)
             .putExtra(GliaWidgets.COMPANY_NAME, "Legacy company")
-            .putExtra(GliaWidgets.COMPANY_NAME, "Legacy company")
             .putExtra(GliaWidgets.CHAT_TYPE, (Parcelable) chatType);
     }
 
@@ -152,13 +150,6 @@ public final class ChatActivity extends FadeTransitionActivity {
     @Override
     public void onBackPressed() {
         chatView.onBackPressed();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        GliaWidgets.onActivityResult(requestCode, resultCode, data);
-        chatView.onActivityResult(requestCode, resultCode, data);
-        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override

@@ -12,7 +12,9 @@ import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
 import com.glia.widgets.chat.domain.IsSecureConversationsChatAvailableUseCase
 import com.glia.widgets.chat.domain.IsShowSendButtonUseCase
 import com.glia.widgets.chat.domain.SiteInfoUseCase
+import com.glia.widgets.chat.domain.TakePictureUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
+import com.glia.widgets.chat.domain.UriToFileAttachmentUseCase
 import com.glia.widgets.chat.domain.gva.DetermineGvaButtonTypeUseCase
 import com.glia.widgets.chat.model.Gva
 import com.glia.widgets.chat.model.GvaButton
@@ -98,6 +100,8 @@ class ChatControllerTest {
     private lateinit var enqueueForEngagementUseCase: EnqueueForEngagementUseCase
     private lateinit var decideOnQueueingUseCase: DecideOnQueueingUseCase
     private lateinit var screenSharingUseCase: ScreenSharingUseCase
+    private lateinit var takePictureUseCase: TakePictureUseCase
+    private lateinit var uriToFileAttachmentUseCase: UriToFileAttachmentUseCase
 
     private lateinit var chatController: ChatController
     private lateinit var isAuthenticatedUseCase: IsAuthenticatedUseCase
@@ -160,6 +164,9 @@ class ChatControllerTest {
             on { invoke() } doReturn Flowable.empty()
         }
 
+        takePictureUseCase = mock()
+        uriToFileAttachmentUseCase = mock()
+
         chatController = ChatController(
             callTimer = callTimer,
             minimizeHandler = minimizeHandler,
@@ -199,7 +206,9 @@ class ChatControllerTest {
             isQueueingOrEngagementUseCase = isQueueingOrEngagementUseCase,
             enqueueForEngagementUseCase = enqueueForEngagementUseCase,
             decideOnQueueingUseCase = decideOnQueueingUseCase,
-            screenSharingUseCase = screenSharingUseCase
+            screenSharingUseCase = screenSharingUseCase,
+            takePictureUseCase = takePictureUseCase,
+            uriToFileAttachmentUseCase = uriToFileAttachmentUseCase
         )
         chatController.setView(chatView)
     }

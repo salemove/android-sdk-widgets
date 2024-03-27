@@ -4,6 +4,8 @@ import com.glia.androidsdk.GliaException
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.chat.domain.SiteInfoUseCase
+import com.glia.widgets.chat.domain.TakePictureUseCase
+import com.glia.widgets.chat.domain.UriToFileAttachmentUseCase
 import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.fileupload.model.FileAttachment
@@ -46,6 +48,8 @@ internal class MessageCenterControllerTest {
     private lateinit var showMessageLimitErrorUseCase: ShowMessageLimitErrorUseCase
     private lateinit var resetMessageCenterUseCase: ResetMessageCenterUseCase
     private lateinit var dialogController: DialogContract.Controller
+    private lateinit var takePictureUseCase: TakePictureUseCase
+    private lateinit var uriToFileAttachmentUseCase: UriToFileAttachmentUseCase
 
     @Before
     fun setUp() {
@@ -64,23 +68,26 @@ internal class MessageCenterControllerTest {
         showMessageLimitErrorUseCase = mock()
         resetMessageCenterUseCase = mock()
         dialogController = mock()
-        messageCenterController =
-            MessageCenterController(
-                serviceChatHeadController = serviceChatHeadController,
-                sendSecureMessageUseCase = sendSecureMessageUseCase,
-                isMessageCenterAvailableUseCase = isMessageCenterAvailableUseCase,
-                addFileAttachmentsObserverUseCase = addFileAttachmentsObserverUseCase,
-                addFileToAttachmentAndUploadUseCase = addFileToAttachmentAndUploadUseCase,
-                getFileAttachmentsUseCase = getFileAttachmentsUseCase,
-                removeFileAttachmentUseCase = removeFileAttachmentUseCase,
-                isAuthenticatedUseCase = isAuthenticatedUseCase,
-                siteInfoUseCase = siteInfoUseCase,
-                onNextMessageUseCase = onNextMessageUseCase,
-                sendMessageButtonStateUseCase = sendMessageButtonStateUseCase,
-                showMessageLimitErrorUseCase = showMessageLimitErrorUseCase,
-                resetMessageCenterUseCase = resetMessageCenterUseCase,
-                dialogController = dialogController
-            )
+        takePictureUseCase = mock()
+        uriToFileAttachmentUseCase = mock()
+        messageCenterController = MessageCenterController(
+            serviceChatHeadController = serviceChatHeadController,
+            sendSecureMessageUseCase = sendSecureMessageUseCase,
+            isMessageCenterAvailableUseCase = isMessageCenterAvailableUseCase,
+            addFileAttachmentsObserverUseCase = addFileAttachmentsObserverUseCase,
+            addFileToAttachmentAndUploadUseCase = addFileToAttachmentAndUploadUseCase,
+            getFileAttachmentsUseCase = getFileAttachmentsUseCase,
+            removeFileAttachmentUseCase = removeFileAttachmentUseCase,
+            isAuthenticatedUseCase = isAuthenticatedUseCase,
+            siteInfoUseCase = siteInfoUseCase,
+            onNextMessageUseCase = onNextMessageUseCase,
+            sendMessageButtonStateUseCase = sendMessageButtonStateUseCase,
+            showMessageLimitErrorUseCase = showMessageLimitErrorUseCase,
+            resetMessageCenterUseCase = resetMessageCenterUseCase,
+            dialogController = dialogController,
+            takePictureUseCase = takePictureUseCase,
+            uriToFileAttachmentUseCase = uriToFileAttachmentUseCase
+        )
     }
 
     @Test

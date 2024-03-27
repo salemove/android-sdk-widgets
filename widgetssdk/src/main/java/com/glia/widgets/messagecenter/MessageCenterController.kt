@@ -7,9 +7,12 @@ import com.glia.androidsdk.RequestCallback
 import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.androidsdk.engagement.EngagementFile
 import com.glia.androidsdk.site.SiteInfo
+import com.glia.widgets.Constants
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.chat.domain.SiteInfoUseCase
+import com.glia.widgets.chat.domain.TakePictureUseCase
+import com.glia.widgets.chat.domain.UriToFileAttachmentUseCase
 import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase
@@ -43,15 +46,15 @@ internal class MessageCenterController(
     private val sendMessageButtonStateUseCase: SendMessageButtonStateUseCase,
     private val showMessageLimitErrorUseCase: ShowMessageLimitErrorUseCase,
     private val resetMessageCenterUseCase: ResetMessageCenterUseCase,
-    private val dialogController: DialogContract.Controller
+    private val dialogController: DialogContract.Controller,
+    private val takePictureUseCase: TakePictureUseCase,
+    private val uriToFileAttachmentUseCase: UriToFileAttachmentUseCase
 ) : MessageCenterContract.Controller {
     private var view: MessageCenterContract.View? = null
     private val disposables = CompositeDisposable()
 
     @Volatile
     private var state = MessageCenterState()
-
-    override var photoCaptureFileUri: Uri? = null
 
     override fun setConfiguration(uiTheme: UiTheme?, configuration: GliaSdkConfiguration?) {
         serviceChatHeadController.setBuildTimeTheme(uiTheme)
@@ -134,10 +137,12 @@ internal class MessageCenterController(
                     dialogController.showMessageCenterUnavailableDialog()
                     setState(state.copy(showSendMessageGroup = false))
                 }
+
                 GliaException.Cause.INTERNAL_ERROR -> {
                     dialogController.showUnexpectedErrorDialog()
                     setState(state.copy(showSendMessageGroup = false))
                 }
+
                 else -> {
                     dialogController.showUnexpectedErrorDialog()
                     setState(
@@ -165,15 +170,17 @@ internal class MessageCenterController(
     }
 
     override fun onGalleryClicked() {
-        view?.selectAttachmentFile(FILE_TYPE_IMAGES)
+        view?.selectAttachmentFile(Constants.MIME_TYPE_IMAGES)
     }
 
     override fun onBrowseClicked() {
-        view?.selectAttachmentFile(FILE_TYPE_ALL)
+        view?.selectAttachmentFile(Constants.MIME_TYPE_ALL)
     }
 
     override fun onTakePhotoClicked() {
-        view?.takePhoto()
+        takePictureUseCase.prepare {
+            view?.takePhoto(it)
+        }
     }
 
     override fun ensureMessageCenterAvailability() {
@@ -197,14 +204,13 @@ internal class MessageCenterController(
         )
     }
 
-    override fun onAttachmentReceived(file: FileAttachment) {
+    fun onAttachmentReceived(file: FileAttachment) {
         addFileToAttachmentAndUploadUseCase.execute(
             file,
             object : AddFileToAttachmentAndUploadUseCase.Listener {
                 override fun onFinished() {
                     Logger.d(TAG, "fileUploadFinished")
-                    view?.clearTemporaryFile(photoCaptureFileUri)
-                    photoCaptureFileUri = null
+                    takePictureUseCase.deleteCurrent()
                 }
 
                 override fun onStarted() {
@@ -213,8 +219,7 @@ internal class MessageCenterController(
 
                 override fun onError(ex: Exception) {
                     Logger.e(TAG, "Upload file failed: " + ex.message)
-                    view?.clearTemporaryFile(photoCaptureFileUri)
-                    photoCaptureFileUri = null
+                    takePictureUseCase.deleteCurrent()
                 }
 
                 override fun onSecurityCheckStarted() {
@@ -263,8 +268,11 @@ internal class MessageCenterController(
         dialogController.dismissCurrentDialog()
     }
 
-    companion object {
-        private const val FILE_TYPE_IMAGES = "image/*"
-        private const val FILE_TYPE_ALL = "*/*"
+    override fun onImageCaptured(result: Boolean) {
+        takePictureUseCase.onImageCaptured(result, ::onAttachmentReceived)
+    }
+
+    override fun onContentChosen(uri: Uri) {
+        uriToFileAttachmentUseCase(uri)?.also(::onAttachmentReceived)
     }
 }

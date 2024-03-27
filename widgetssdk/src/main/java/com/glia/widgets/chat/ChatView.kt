@@ -1,14 +1,12 @@
 package com.glia.widgets.chat
 
 import android.Manifest
-import android.app.Activity
 import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.TypedArray
 import android.net.Uri
-import android.provider.MediaStore
 import android.provider.Settings
 import android.text.Editable
 import android.text.TextWatcher
@@ -16,11 +14,11 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.accessibility.AccessibilityEvent
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import androidx.core.content.withStyledAttributes
 import androidx.core.view.ViewCompat
 import androidx.core.view.isGone
@@ -62,10 +60,7 @@ import com.glia.widgets.helper.Utils
 import com.glia.widgets.helper.addColorFilter
 import com.glia.widgets.helper.asActivity
 import com.glia.widgets.helper.changeStatusBarColor
-import com.glia.widgets.helper.createTempPhotoFile
 import com.glia.widgets.helper.fileName
-import com.glia.widgets.helper.fileProviderAuthority
-import com.glia.widgets.helper.fixCapturedPhotoRotation
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getColorStateListCompat
 import com.glia.widgets.helper.getContentUriCompat
@@ -74,7 +69,6 @@ import com.glia.widgets.helper.getFullHybridTheme
 import com.glia.widgets.helper.hideKeyboard
 import com.glia.widgets.helper.insetsController
 import com.glia.widgets.helper.layoutInflater
-import com.glia.widgets.helper.mapUriToFileAttachment
 import com.glia.widgets.helper.requireActivity
 import com.glia.widgets.view.Dialogs
 import com.glia.widgets.view.SingleChoiceCardView.OnOptionClickedListener
@@ -92,8 +86,6 @@ import com.glia.widgets.view.unifiedui.theme.chat.UnreadIndicatorTheme
 import com.glia.widgets.webbrowser.WebBrowserActivity
 import com.google.android.material.shape.MarkerEdgeTreatment
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
-import java.io.File
-import java.io.IOException
 import java.util.concurrent.Executor
 import kotlin.properties.Delegates
 
@@ -163,7 +155,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
                     // WebView needs time for calculating the height.
                     // So to scroll to the bottom, we need to do it with delay.
                     postDelayed(
-                        { binding.chatRecyclerView.scrollToPosition(lastIndex) }, WEB_VIEW_INITIALIZATION_DELAY.toLong()
+                        { binding.chatRecyclerView.scrollToPosition(lastIndex) }, Constants.WEB_VIEW_INITIALIZATION_DELAY
                     )
                 } else {
                     binding.chatRecyclerView.scrollToPosition(lastIndex)
@@ -186,6 +178,16 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
 
     private val onGvaButtonsClickListener = ChatAdapter.OnGvaButtonsClickListener {
         controller?.onGvaButtonClicked(it)
+    }
+
+    private val chatActivity: ChatActivity? = context.asActivity() as? ChatActivity
+
+    private val takePictureLauncher = chatActivity?.registerForActivityResult(ActivityResultContracts.TakePicture()) {
+        controller?.onImageCaptured(it)
+    }
+
+    private val getContentLauncher = chatActivity?.registerForActivityResult(ActivityResultContracts.GetContent()) {
+        it?.apply { controller?.onContentChosen(this) }
     }
 
     init {
@@ -341,10 +343,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     override fun setController(controller: ChatContract.Controller) {
         this.controller = controller
         controller.setView(this)
-    }
-
-    override fun clearTempFile() {
-        controller?.photoCaptureFileUri?.let { context.contentResolver.delete(it, null, null) }
     }
 
     override fun emitUploadAttachments(attachments: List<FileAttachment>) {
@@ -749,57 +747,21 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     private fun setupAddAttachmentButton() {
         binding.addAttachmentButton.setOnClickListener {
             attachmentPopup.show(binding.chatMessageLayout, {
-                val intent = Intent()
-                intent.type = INTENT_TYPE_IMAGES
-                intent.action = Intent.ACTION_OPEN_DOCUMENT
-                context.asActivity()?.startActivityForResult(
-                    Intent.createChooser(
-                        intent, stringProvider.getRemoteString(R.string.android_file_select_picture_title)
-                    ), OPEN_DOCUMENT_ACTION_REQUEST
-                )
+                getContentLauncher?.launch(Constants.MIME_TYPE_IMAGES)
             }, {
-                if (ContextCompat.checkSelfPermission(
-                        context, Manifest.permission.CAMERA
-                    ) == PackageManager.PERMISSION_GRANTED
-                ) {
-                    dispatchImageCapture()
+                if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                    controller?.onTakePhotoClicked()
                 } else {
-                    context.asActivity()?.requestPermissions(
-                        arrayOf(Manifest.permission.CAMERA), CAMERA_PERMISSION_REQUEST
-                    )
+                    context.asActivity()?.requestPermissions(arrayOf(Manifest.permission.CAMERA), CAMERA_PERMISSION_REQUEST)
                 }
             }, {
-                val intent = Intent()
-                intent.type = INTENT_TYPE_ALL
-                intent.action = Intent.ACTION_OPEN_DOCUMENT
-                context.asActivity()?.startActivityForResult(
-                    Intent.createChooser(
-                        intent, stringProvider.getRemoteString(R.string.android_file_select_file_title)
-                    ), OPEN_DOCUMENT_ACTION_REQUEST
-                )
+                getContentLauncher?.launch(Constants.MIME_TYPE_ALL)
             })
         }
     }
 
-    private fun dispatchImageCapture() {
-        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        var photoFile: File? = null
-        try {
-            photoFile = createTempPhotoFile(context)
-        } catch (exception: IOException) {
-            Logger.e(TAG, "Create photo file failed: " + exception.message)
-        }
-        if (photoFile != null) {
-            controller?.photoCaptureFileUri = FileProvider.getUriForFile(
-                context, context.fileProviderAuthority, photoFile
-            )
-            if (controller?.photoCaptureFileUri != null) {
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, controller!!.photoCaptureFileUri)
-                context.asActivity()?.startActivityForResult(
-                    intent, CAPTURE_IMAGE_ACTION_REQUEST
-                )
-            }
-        }
+    override fun dispatchImageCapture(uri: Uri) {
+        takePictureLauncher?.launch(uri)
     }
 
     private fun showExitQueueDialog() = showDialog {
@@ -849,31 +811,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
 
     private fun chatEnded() {
         Dependencies.destroyControllers()
-    }
-
-    fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
-        if (resultCode != Activity.RESULT_OK) return
-        when (requestCode) {
-            OPEN_DOCUMENT_ACTION_REQUEST, CAPTURE_VIDEO_ACTION_REQUEST -> handleDocumentOrVideoActionResult(intent)
-            CAPTURE_IMAGE_ACTION_REQUEST -> handleCaptureImageActionResult()
-        }
-    }
-
-    private fun handleDocumentOrVideoActionResult(intent: Intent?) {
-        intent?.data?.let {
-            mapUriToFileAttachment(context.contentResolver, it)
-        }?.also {
-            controller?.onAttachmentReceived(it)
-        }
-    }
-
-    private fun handleCaptureImageActionResult() {
-        controller?.apply {
-            photoCaptureFileUri?.also {
-                fixCapturedPhotoRotation(it, context)
-                onAttachmentReceived(mapUriToFileAttachment(context.contentResolver, it) ?: return)
-            }
-        }
     }
 
     override fun onFileDownloadClick(file: AttachmentFile) {
@@ -947,7 +884,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     fun onRequestPermissionsResult(requestCode: Int, grantResults: IntArray) {
         if (grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED) {
             when (requestCode) {
-                CAMERA_PERMISSION_REQUEST -> dispatchImageCapture()
+                CAMERA_PERMISSION_REQUEST -> controller?.onTakePhotoClicked()
                 WRITE_PERMISSION_REQUEST -> downloadFileHolder?.also(::onFileDownload)
             }
         }
@@ -960,57 +897,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
 
     override fun showToast(message: String, duration: Int) {
         Toast.makeText(context, message, duration).show()
-    }
-
-    fun interface OnBackClickedListener {
-        /**
-         * Callback which is used to notify the enclosing activity or fragment when the user
-         * clicks on the view's top app bar's up button.
-         */
-        fun onBackClicked()
-    }
-
-    fun interface OnEndListener {
-        /**
-         * Callback which is fired when the chat is ended. End can happen due to the user clicking
-         * on the end engagement button or the leave queue button.
-         */
-        fun onEnd()
-    }
-
-    fun interface OnMinimizeListener {
-        fun onMinimize()
-    }
-
-    fun interface OnNavigateToCallListener {
-        /**
-         * Callback which is fired when the user has accepted a media upgrade offer and should be
-         * navigated to a view where they can visually see data about their media upgrade.
-         *
-         * @param theme Used to pass the finalized [UiTheme]
-         * to the activity which is being navigated to.
-         */
-        fun call(theme: UiTheme?, mediaType: String?)
-    }
-
-    fun interface OnBackToCallListener {
-        fun onBackToCall()
-    }
-
-    fun interface OnTitleUpdatedListener {
-        fun onTitleUpdated(title: String?)
-    }
-
-    companion object {
-        private const val OPEN_DOCUMENT_ACTION_REQUEST = 100
-        private const val CAPTURE_IMAGE_ACTION_REQUEST = 101
-        private const val CAPTURE_VIDEO_ACTION_REQUEST = 102
-        private const val CAMERA_PERMISSION_REQUEST = 1010
-        private const val WRITE_PERMISSION_REQUEST = 1001001
-        private const val WEB_VIEW_INITIALIZATION_DELAY = 100
-
-        private const val INTENT_TYPE_IMAGES = "image/*"
-        private const val INTENT_TYPE_ALL = "*/*"
     }
 
     private fun applyTheme(unifiedTheme: UnifiedTheme?) {
@@ -1069,5 +955,49 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
 
     override fun post(action: Runnable?): Boolean {
         return executor?.execute(action)?.let { true } ?: super.post(action)
+    }
+
+    companion object {
+        private const val CAMERA_PERMISSION_REQUEST = 1010
+        private const val WRITE_PERMISSION_REQUEST = 1001001
+    }
+
+    fun interface OnBackClickedListener {
+        /**
+         * Callback which is used to notify the enclosing activity or fragment when the user
+         * clicks on the view's top app bar's up button.
+         */
+        fun onBackClicked()
+    }
+
+    fun interface OnEndListener {
+        /**
+         * Callback which is fired when the chat is ended. End can happen due to the user clicking
+         * on the end engagement button or the leave queue button.
+         */
+        fun onEnd()
+    }
+
+    fun interface OnMinimizeListener {
+        fun onMinimize()
+    }
+
+    fun interface OnNavigateToCallListener {
+        /**
+         * Callback which is fired when the user has accepted a media upgrade offer and should be
+         * navigated to a view where they can visually see data about their media upgrade.
+         *
+         * @param theme Used to pass the finalized [UiTheme]
+         * to the activity which is being navigated to.
+         */
+        fun call(theme: UiTheme?, mediaType: String?)
+    }
+
+    fun interface OnBackToCallListener {
+        fun onBackToCall()
+    }
+
+    fun interface OnTitleUpdatedListener {
+        fun onTitleUpdated(title: String?)
     }
 }

@@ -1,6 +1,8 @@
 package com.glia.widgets.messagecenter
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.content.res.TypedArray
 import android.graphics.Color
 import android.net.Uri
@@ -9,6 +11,7 @@ import android.util.AttributeSet
 import android.view.Window
 import android.widget.LinearLayout
 import androidx.annotation.VisibleForTesting
+import androidx.core.content.ContextCompat
 import androidx.core.content.withStyledAttributes
 import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
@@ -196,7 +199,7 @@ internal class MessageCenterView(
     override fun showAttachmentPopup() {
         messageView?.showAttachmentPopup(
             { controller?.onGalleryClicked() },
-            { controller?.onTakePhotoClicked() },
+            { onTakePhotoClicked() },
             { controller?.onBrowseClicked() }
         )
     }
@@ -241,12 +244,6 @@ internal class MessageCenterView(
         insetsController?.hideKeyboard()
     }
 
-    override fun clearTemporaryFile(uri: Uri?) {
-        uri?.let {
-            context.contentResolver.delete(it, null, null)
-        }
-    }
-
     override fun setController(controller: MessageCenterContract.Controller) {
         this.controller = controller
         controller.setView(this)
@@ -273,9 +270,18 @@ internal class MessageCenterView(
         onAttachFileListener?.selectAttachmentFile(type)
     }
 
-    override fun takePhoto() {
+    override fun takePhoto(uri: Uri) {
+        onAttachFileListener?.takePhoto(uri)
+    }
+
+    private fun onTakePhotoClicked() {
         insetsController?.hideKeyboard()
-        onAttachFileListener?.takePhoto()
+
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            onAttachFileListener?.requestCameraPermission()
+        } else {
+            controller?.onTakePhotoClicked()
+        }
     }
 
     private fun onDialogState(state: DialogState) {
@@ -326,7 +332,8 @@ internal class MessageCenterView(
 
     interface OnAttachFileListener {
         fun selectAttachmentFile(type: String)
-        fun takePhoto()
+        fun takePhoto(uri: Uri)
+        fun requestCameraPermission()
     }
 
     @Parcelize

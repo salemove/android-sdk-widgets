@@ -130,7 +130,9 @@ public class ControllerFactory {
                 useCaseFactory.getIsQueueingOrEngagementUseCase(),
                 useCaseFactory.getQueueForEngagementUseCase(),
                 useCaseFactory.getDecideOnQueueingUseCase(),
-                useCaseFactory.getScreenSharingUseCase()
+                useCaseFactory.getScreenSharingUseCase(),
+                useCaseFactory.getTakePictureUseCase(),
+                useCaseFactory.getUriToFileAttachmentUseCase()
             );
         }
 
@@ -291,7 +293,9 @@ public class ControllerFactory {
             useCaseFactory.createEnableSendMessageButtonUseCase(),
             useCaseFactory.createShowMessageLimitErrorUseCase(),
             useCaseFactory.createResetMessageCenterUseCase(),
-            createDialogController()
+            createDialogController(),
+            useCaseFactory.getTakePictureUseCase(),
+            useCaseFactory.getUriToFileAttachmentUseCase()
         );
     }
 

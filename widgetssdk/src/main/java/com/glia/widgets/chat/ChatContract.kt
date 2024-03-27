@@ -18,7 +18,6 @@ import com.glia.widgets.core.fileupload.model.FileAttachment
 internal interface ChatContract {
     interface Controller : BaseController {
         val isChatVisible: Boolean
-        var photoCaptureFileUri: Uri?
 
         fun setView(view: View)
         fun onDestroy(retain: Boolean)
@@ -26,7 +25,6 @@ internal interface ChatContract {
         fun onGvaButtonClicked(button: GvaButton)
         fun isCallVisualizerOngoing(): Boolean
         fun onFileDownloadClicked(attachmentFile: AttachmentFile)
-        fun onAttachmentReceived(file: FileAttachment)
         fun onRemoveAttachment(attachment: FileAttachment)
         fun notificationDialogDismissed()
         fun newMessagesIndicatorClicked()
@@ -55,10 +53,12 @@ internal interface ChatContract {
         fun onPause()
         fun onResume()
         fun onForceStopScreenSharing()
+        fun onTakePhotoClicked()
+        fun onImageCaptured(result: Boolean)
+        fun onContentChosen(uri: Uri)
     }
 
     interface View : BaseView<Controller> {
-        fun clearTempFile()
         fun emitUploadAttachments(attachments: List<FileAttachment>)
         fun emitState(chatState: ChatState)
         fun emitItems(items: List<ChatItem>)
@@ -79,5 +79,6 @@ internal interface ChatContract {
         fun showEngagementConfirmationDialog()
         fun navigateToWebBrowserActivity(title: String, url: String)
         fun showToast(message: String, duration: Int = Toast.LENGTH_SHORT)
+        fun dispatchImageCapture(uri: Uri)
     }
 }

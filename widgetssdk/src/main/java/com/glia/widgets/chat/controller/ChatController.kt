@@ -24,7 +24,9 @@ import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
 import com.glia.widgets.chat.domain.IsSecureConversationsChatAvailableUseCase
 import com.glia.widgets.chat.domain.IsShowSendButtonUseCase
 import com.glia.widgets.chat.domain.SiteInfoUseCase
+import com.glia.widgets.chat.domain.TakePictureUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
+import com.glia.widgets.chat.domain.UriToFileAttachmentUseCase
 import com.glia.widgets.chat.domain.gva.DetermineGvaButtonTypeUseCase
 import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.ChatState
@@ -118,7 +120,9 @@ internal class ChatController(
     private val isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase,
     private val enqueueForEngagementUseCase: EnqueueForEngagementUseCase,
     private val decideOnQueueingUseCase: DecideOnQueueingUseCase,
-    private val screenSharingUseCase: ScreenSharingUseCase
+    private val screenSharingUseCase: ScreenSharingUseCase,
+    private val takePictureUseCase: TakePictureUseCase,
+    private val uriToFileAttachmentUseCase: UriToFileAttachmentUseCase
 ) : ChatContract.Controller {
     private var backClickedListener: ChatView.OnBackClickedListener? = null
     private var view: ChatContract.View? = null
@@ -151,8 +155,6 @@ internal class ChatController(
 
     @Volatile
     private var isChatViewPaused = false
-
-    override var photoCaptureFileUri: Uri? = null
 
     private val fileAttachmentObserver = Observer { _, _ ->
         view?.apply {
@@ -753,11 +755,11 @@ internal class ChatController(
         removeFileAttachmentUseCase(attachment)
     }
 
-    override fun onAttachmentReceived(file: FileAttachment) {
+    private fun onAttachmentReceived(file: FileAttachment) {
         addFileToAttachmentAndUploadUseCase.execute(file, object : AddFileToAttachmentAndUploadUseCase.Listener {
             override fun onFinished() {
                 Logger.d(TAG, "fileUploadFinished")
-                view?.clearTempFile()
+                takePictureUseCase.deleteCurrent()
             }
 
             override fun onStarted() {
@@ -766,7 +768,7 @@ internal class ChatController(
 
             override fun onError(ex: Exception) {
                 Logger.e(TAG, "Upload file failed: " + ex.message)
-                view?.clearTempFile()
+                takePictureUseCase.deleteCurrent()
             }
 
             override fun onSecurityCheckStarted() {
@@ -823,5 +825,19 @@ internal class ChatController(
     private fun scrollChatToBottom() {
         emitViewState { chatState.copy(isChatInBottom = true) }
         view?.smoothScrollToBottom()
+    }
+
+    override fun onTakePhotoClicked() {
+        takePictureUseCase.prepare {
+            view?.dispatchImageCapture(it)
+        }
+    }
+
+    override fun onImageCaptured(result: Boolean) {
+        takePictureUseCase.onImageCaptured(result, ::onAttachmentReceived)
+    }
+
+    override fun onContentChosen(uri: Uri) {
+        uriToFileAttachmentUseCase(uri)?.also(::onAttachmentReceived)
     }
 }

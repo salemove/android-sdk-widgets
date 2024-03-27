@@ -10,7 +10,6 @@ import com.glia.widgets.core.fileupload.model.FileAttachment
 
 internal interface MessageCenterContract {
     interface Controller : BaseController {
-        var photoCaptureFileUri: Uri?
         fun setConfiguration(uiTheme: UiTheme?, configuration: GliaSdkConfiguration?)
         fun setView(view: View)
         fun onCheckMessagesClicked()
@@ -23,12 +22,13 @@ internal interface MessageCenterContract {
         fun onBrowseClicked()
         fun onTakePhotoClicked()
         fun ensureMessageCenterAvailability()
-        fun onAttachmentReceived(file: FileAttachment)
         fun onRemoveAttachment(file: FileAttachment)
         fun addCallback(dialogCallback: DialogContract.Controller.Callback)
         fun removeCallback(dialogCallback: DialogContract.Controller.Callback)
         fun dismissDialogs()
         fun dismissCurrentDialog()
+        fun onImageCaptured(result: Boolean)
+        fun onContentChosen(uri: Uri)
     }
 
     interface View : BaseView<Controller> {
@@ -36,12 +36,11 @@ internal interface MessageCenterContract {
         fun onStateUpdated(state: MessageCenterState)
         fun emitUploadAttachments(attachments: List<FileAttachment>)
         fun selectAttachmentFile(type: String)
-        fun takePhoto()
+        fun takePhoto(uri: Uri)
         fun finish()
         fun navigateToMessaging()
         fun showAttachmentPopup()
         fun showConfirmationScreen()
         fun hideSoftKeyboard()
-        fun clearTemporaryFile(uri: Uri?)
     }
 }

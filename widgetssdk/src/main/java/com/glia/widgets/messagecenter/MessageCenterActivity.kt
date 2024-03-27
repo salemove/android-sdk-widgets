@@ -2,7 +2,6 @@ package com.glia.widgets.messagecenter
 
 import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
@@ -10,8 +9,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts.GetContent
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.activity.result.contract.ActivityResultContracts.TakePicture
-import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import com.glia.widgets.GliaWidgets.CHAT_TYPE
 import com.glia.widgets.base.FadeTransitionActivity
 import com.glia.widgets.chat.ChatActivity
@@ -21,11 +18,6 @@ import com.glia.widgets.databinding.MessageCenterActivityBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
-import com.glia.widgets.helper.createTempPhotoFile
-import com.glia.widgets.helper.fileProviderAuthority
-import com.glia.widgets.helper.fixCapturedPhotoRotation
-import com.glia.widgets.helper.mapUriToFileAttachment
-import java.io.IOException
 
 /**
  * This activity is used for displaying the welcome screen for secure conversations.
@@ -63,32 +55,19 @@ class MessageCenterActivity :
     }
 
     private val getContent = registerForActivityResult(GetContent()) { uri: Uri? ->
-        uri?.also {
-            controller.onAttachmentReceived(
-                mapUriToFileAttachment(contentResolver, it) ?: return@also
-            )
-        }
+        uri?.also(controller::onContentChosen)
     }
 
     private val getImage = registerForActivityResult(TakePicture()) { captured ->
-        if (captured) {
-            // Handle the returned Uri
-            controller.photoCaptureFileUri?.also {
-                fixCapturedPhotoRotation(it, this)
-                controller.onAttachmentReceived(
-                    mapUriToFileAttachment(contentResolver, it) ?: return@also
-                )
-            }
-        }
+        controller.onImageCaptured(captured)
     }
 
-    private val getPermission =
-        registerForActivityResult(RequestPermission()) { isGranted: Boolean ->
-            // Handle the returned Uri
-            if (isGranted) {
-                takePhoto()
-            }
+    private val getPermission = registerForActivityResult(RequestPermission()) { isGranted: Boolean ->
+        // Handle the returned Uri
+        if (isGranted) {
+            controller.onTakePhotoClicked()
         }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -133,28 +112,12 @@ class MessageCenterActivity :
         getContent.launch(type)
     }
 
-    override fun takePhoto() {
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.CAMERA
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            getPermission.launch(Manifest.permission.CAMERA)
-            return
-        }
+    override fun takePhoto(uri: Uri) {
+        getImage.launch(uri)
+    }
 
-        try {
-            val photoFile = createTempPhotoFile(this)
-            val uri = FileProvider.getUriForFile(
-                this,
-                fileProviderAuthority,
-                photoFile
-            )
-            controller.photoCaptureFileUri = uri
-            getImage.launch(uri)
-        } catch (exception: IOException) {
-            Logger.e(TAG, "Create photo file failed: " + exception.message)
-        }
+    override fun requestCameraPermission() {
+        getPermission.launch(Manifest.permission.CAMERA)
     }
 
     override fun navigateToMessaging() {

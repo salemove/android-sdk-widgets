@@ -132,7 +132,9 @@ public class ControllerFactory {
                 useCaseFactory.getDecideOnQueueingUseCase(),
                 useCaseFactory.getScreenSharingUseCase(),
                 useCaseFactory.getTakePictureUseCase(),
-                useCaseFactory.getUriToFileAttachmentUseCase()
+                useCaseFactory.getUriToFileAttachmentUseCase(),
+                useCaseFactory.getWithCameraPermissionUseCase(),
+                useCaseFactory.getWithReadWritePermissionsUseCase()
             );
         }
 

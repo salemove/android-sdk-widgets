@@ -171,30 +171,18 @@ public class DownloadsFolderDataSource {
 
     private Completable downloadFileToDownloadsOld(String fileName, InputStream inputStream) {
         return Completable.create(emitter -> {
-            OutputStream fos = null;
-            try {
-                String imagesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString();
-                File file = new File(imagesDir, fileName);
-                fos = new FileOutputStream(file);
+            String imagesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString();
+            File file = new File(imagesDir, fileName);
+            try (OutputStream fos = new FileOutputStream(file)) {
                 byte[] buffer = new byte[10 * 1024]; // or other buffer size
                 int read;
                 while ((read = inputStream.read(buffer)) != -1) {
                     fos.write(buffer, 0, read);
                 }
-                fos.flush();
                 emitter.onComplete();
             } catch (FileNotFoundException ex) {
                 Logger.e(TAG, "File saving to downloads folder failed: " + ex.getMessage());
                 emitter.onError(ex);
-            } finally {
-                if (fos != null) {
-                    try {
-                        fos.flush();
-                        fos.close();
-                    } catch (IOException e) {
-                        Logger.e(TAG, e.getMessage());
-                    }
-                }
             }
             emitter.onComplete();
         });

@@ -80,5 +80,6 @@ internal interface ChatContract {
         fun navigateToWebBrowserActivity(title: String, url: String)
         fun showToast(message: String, duration: Int = Toast.LENGTH_SHORT)
         fun dispatchImageCapture(uri: Uri)
+        fun onFileDownload(attachmentFile: AttachmentFile)
     }
 }

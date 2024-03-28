@@ -101,6 +101,10 @@ import com.glia.widgets.core.notification.domain.ShowScreenSharingNotificationUs
 import com.glia.widgets.core.permissions.PermissionManager;
 import com.glia.widgets.core.permissions.domain.HasCallNotificationChannelEnabledUseCase;
 import com.glia.widgets.core.permissions.domain.HasScreenSharingNotificationChannelEnabledUseCase;
+import com.glia.widgets.core.permissions.domain.WithCameraPermissionUseCase;
+import com.glia.widgets.core.permissions.domain.WithCameraPermissionUseCaseImpl;
+import com.glia.widgets.core.permissions.domain.WithReadWritePermissionsUseCase;
+import com.glia.widgets.core.permissions.domain.WithReadWritePermissionsUseCaseImpl;
 import com.glia.widgets.core.secureconversations.domain.AddSecureFileAttachmentsObserverUseCase;
 import com.glia.widgets.core.secureconversations.domain.AddSecureFileToAttachmentAndUploadUseCase;
 import com.glia.widgets.core.secureconversations.domain.GetSecureFileAttachmentsUseCase;
@@ -1030,5 +1034,15 @@ public class UseCaseFactory {
             getUriToFileAttachmentUseCase(),
             getFixCapturedPictureRotationUseCase()
         );
+    }
+
+    @NonNull
+    public WithCameraPermissionUseCase getWithCameraPermissionUseCase() {
+        return new WithCameraPermissionUseCaseImpl(permissionManager);
+    }
+
+    @NonNull
+    WithReadWritePermissionsUseCase getWithReadWritePermissionsUseCase() {
+        return new WithReadWritePermissionsUseCaseImpl(permissionManager);
     }
 }

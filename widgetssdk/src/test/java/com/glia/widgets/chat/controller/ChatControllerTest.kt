@@ -31,6 +31,8 @@ import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentObserverUseCa
 import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentUseCase
 import com.glia.widgets.core.fileupload.domain.SupportedFileCountCheckUseCase
 import com.glia.widgets.core.notification.domain.CallNotificationUseCase
+import com.glia.widgets.core.permissions.domain.WithCameraPermissionUseCase
+import com.glia.widgets.core.permissions.domain.WithReadWritePermissionsUseCase
 import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
 import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCase
 import com.glia.widgets.engagement.domain.DeclineMediaUpgradeOfferUseCase
@@ -102,6 +104,8 @@ class ChatControllerTest {
     private lateinit var screenSharingUseCase: ScreenSharingUseCase
     private lateinit var takePictureUseCase: TakePictureUseCase
     private lateinit var uriToFileAttachmentUseCase: UriToFileAttachmentUseCase
+    private lateinit var withCameraPermissionUseCase: WithCameraPermissionUseCase
+    private lateinit var withReadWritePermissionsUseCase: WithReadWritePermissionsUseCase
 
     private lateinit var chatController: ChatController
     private lateinit var isAuthenticatedUseCase: IsAuthenticatedUseCase
@@ -166,6 +170,8 @@ class ChatControllerTest {
 
         takePictureUseCase = mock()
         uriToFileAttachmentUseCase = mock()
+        withCameraPermissionUseCase = mock()
+        withReadWritePermissionsUseCase = mock()
 
         chatController = ChatController(
             callTimer = callTimer,
@@ -208,7 +214,9 @@ class ChatControllerTest {
             decideOnQueueingUseCase = decideOnQueueingUseCase,
             screenSharingUseCase = screenSharingUseCase,
             takePictureUseCase = takePictureUseCase,
-            uriToFileAttachmentUseCase = uriToFileAttachmentUseCase
+            uriToFileAttachmentUseCase = uriToFileAttachmentUseCase,
+            withCameraPermissionUseCase = withCameraPermissionUseCase,
+            withReadWritePermissionsUseCase = withReadWritePermissionsUseCase
         )
         chatController.setView(chatView)
     }

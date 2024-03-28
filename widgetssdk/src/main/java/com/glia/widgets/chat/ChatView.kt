@@ -1,14 +1,10 @@
 package com.glia.widgets.chat
 
-import android.Manifest
 import android.content.ClipData
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.content.res.TypedArray
 import android.net.Uri
-import android.os.Build
-import android.provider.MediaStore
 import android.provider.Settings
 import android.text.Editable
 import android.text.TextWatcher
@@ -20,7 +16,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityOptionsCompat
-import androidx.core.content.ContextCompat
 import androidx.core.content.withStyledAttributes
 import androidx.core.view.ViewCompat
 import androidx.core.view.isGone
@@ -111,7 +106,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
 
     private var stringProvider = Dependencies.getStringProvider()
     private var isInBottom = true
-    private var downloadFileHolder: AttachmentFile? = null
     private var theme: UiTheme by Delegates.notNull()
 
     // needed for setting status bar color back when view is gone
@@ -751,11 +745,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             attachmentPopup.show(binding.chatMessageLayout, {
                 getContentLauncher?.launch(Constants.MIME_TYPE_IMAGES)
             }, {
-                if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-                    controller?.onTakePhotoClicked()
-                } else {
-                    context.asActivity()?.requestPermissions(arrayOf(Manifest.permission.CAMERA), CAMERA_PERMISSION_REQUEST)
-                }
+                controller?.onTakePhotoClicked()
             }, {
                 getContentLauncher?.launch(Constants.MIME_TYPE_ALL)
             })
@@ -816,24 +806,11 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     }
 
     override fun onFileDownloadClick(file: AttachmentFile) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q || ContextCompat.checkSelfPermission(
-                context, Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            onFileDownload(file)
-        } else {
-            context.asActivity()?.requestPermissions(
-                arrayOf(
-                    Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE
-                ), WRITE_PERMISSION_REQUEST
-            )
-            downloadFileHolder = file
-        }
+        controller?.onFileDownloadClicked(file)
     }
 
-    private fun onFileDownload(attachmentFile: AttachmentFile) {
+    override fun onFileDownload(attachmentFile: AttachmentFile) {
         submitUpdatedItems(attachmentFile, isDownloading = true, isFileExists = false)
-        controller?.onFileDownloadClicked(attachmentFile)
     }
 
     override fun fileDownloadError(attachmentFile: AttachmentFile, error: Throwable) {
@@ -881,15 +858,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
 
     override fun onImageItemClick(item: AttachmentFile, view: View) {
         controller?.onImageItemClick(item, view)
-    }
-
-    fun onRequestPermissionsResult(requestCode: Int, grantResults: IntArray) {
-        if (grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED) {
-            when (requestCode) {
-                CAMERA_PERMISSION_REQUEST -> controller?.onTakePhotoClicked()
-                WRITE_PERMISSION_REQUEST -> downloadFileHolder?.also(::onFileDownload)
-            }
-        }
     }
 
     fun setConfiguration(configuration: GliaSdkConfiguration?) {
@@ -957,11 +925,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
 
     override fun post(action: Runnable?): Boolean {
         return executor?.execute(action)?.let { true } ?: super.post(action)
-    }
-
-    companion object {
-        private const val CAMERA_PERMISSION_REQUEST = 1010
-        private const val WRITE_PERMISSION_REQUEST = 1001001
     }
 
     fun interface OnBackClickedListener {

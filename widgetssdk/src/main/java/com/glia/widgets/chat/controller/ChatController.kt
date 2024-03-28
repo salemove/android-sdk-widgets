@@ -50,6 +50,8 @@ import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentUseCase
 import com.glia.widgets.core.fileupload.domain.SupportedFileCountCheckUseCase
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.notification.domain.CallNotificationUseCase
+import com.glia.widgets.core.permissions.domain.WithCameraPermissionUseCase
+import com.glia.widgets.core.permissions.domain.WithReadWritePermissionsUseCase
 import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.EngagementUpdateState
@@ -122,7 +124,9 @@ internal class ChatController(
     private val decideOnQueueingUseCase: DecideOnQueueingUseCase,
     private val screenSharingUseCase: ScreenSharingUseCase,
     private val takePictureUseCase: TakePictureUseCase,
-    private val uriToFileAttachmentUseCase: UriToFileAttachmentUseCase
+    private val uriToFileAttachmentUseCase: UriToFileAttachmentUseCase,
+    private val withCameraPermissionUseCase: WithCameraPermissionUseCase,
+    private val withReadWritePermissionsUseCase: WithReadWritePermissionsUseCase
 ) : ChatContract.Controller {
     private var backClickedListener: ChatView.OnBackClickedListener? = null
     private var view: ChatContract.View? = null
@@ -782,8 +786,19 @@ internal class ChatController(
     }
 
     override fun onFileDownloadClicked(attachmentFile: AttachmentFile) {
-        disposable.add(downloadFileUseCase(attachmentFile).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ fileDownloadSuccess(attachmentFile) }) { fileDownloadError(attachmentFile, it) })
+        withReadWritePermissionsUseCase {
+            view?.onFileDownload(attachmentFile)
+
+            val downloadDisposable = downloadFileUseCase(attachmentFile)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    fileDownloadSuccess(attachmentFile)
+                }) {
+                    fileDownloadError(attachmentFile, it)
+                }
+            disposable.add(downloadDisposable)
+        }
     }
 
     private fun fileDownloadError(attachmentFile: AttachmentFile, error: Throwable) {
@@ -828,8 +843,10 @@ internal class ChatController(
     }
 
     override fun onTakePhotoClicked() {
-        takePictureUseCase.prepare {
-            view?.dispatchImageCapture(it)
+        withCameraPermissionUseCase {
+            takePictureUseCase.prepare {
+                view?.dispatchImageCapture(it)
+            }
         }
     }
 

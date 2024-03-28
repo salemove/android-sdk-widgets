@@ -4,8 +4,7 @@ apply plugin: 'kotlin-parcelize'
 apply plugin: 'app.cash.paparazzi'
 
 android {
-  compileSdkVersion 33
-  buildToolsVersion "30.0.3"
+  compileSdk 33
   defaultPublishConfig "debug"
   namespace 'com.glia.widgets'
   defaultConfig {

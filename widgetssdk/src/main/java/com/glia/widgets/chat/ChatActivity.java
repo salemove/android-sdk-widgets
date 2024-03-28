@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.glia.widgets.GliaWidgets;
@@ -150,13 +149,6 @@ public final class ChatActivity extends FadeTransitionActivity {
     @Override
     public void onBackPressed() {
         chatView.onBackPressed();
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        GliaWidgets.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        chatView.onRequestPermissionsResult(requestCode, grantResults);
     }
 
     private GliaSdkConfiguration createConfiguration(Intent intent) {

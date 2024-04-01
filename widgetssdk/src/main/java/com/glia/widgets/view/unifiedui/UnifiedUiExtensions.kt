@@ -7,6 +7,7 @@ import android.graphics.Shader
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
+import android.os.Build
 import android.util.TypedValue
 import android.view.View
 import android.widget.ImageView
@@ -135,7 +136,13 @@ internal fun TextView.applyTextTheme(
 ) {
     textTheme?.textColor.also(::applyTextColorTheme)
     textTheme?.textSize?.also { setTextSize(TypedValue.COMPLEX_UNIT_SP, it) }
-    textTheme?.textStyle?.also { typeface = Typeface.create(typeface, it) }
+    textTheme?.textStyle?.let { typeface = Typeface.create(typeface, it) }
+        ?: run {
+            // Edge case fix where some TextView default styles are using narrow font
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
+                typeface = Typeface.SANS_SERIF
+            }
+    }
 
     if (withAlignment) {
         textTheme?.textAlignment?.let { textAlignment = it }

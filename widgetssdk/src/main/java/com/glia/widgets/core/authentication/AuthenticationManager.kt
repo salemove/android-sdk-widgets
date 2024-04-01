@@ -39,7 +39,7 @@ internal class AuthenticationManager(
     }
 
     override fun deauthenticate(requestCallback: RequestCallback<Void>) {
-        Logger.i(TAG, "De-authenticate")
+        Logger.i(TAG, "Unauthenticate")
         cleanup()
         authentication.deauthenticate(requestCallback)
     }

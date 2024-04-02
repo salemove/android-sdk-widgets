@@ -22,4 +22,5 @@ internal class PermissionDialogManager(context: Context) {
     }
 
     fun hasEnableCallNotificationChannelRequestShown(): Boolean = sharedPreferences.getBoolean(CALL_CHANNEL_NOTIFICATION_DIALOG_SHOWN_KEY, false)
+
 }

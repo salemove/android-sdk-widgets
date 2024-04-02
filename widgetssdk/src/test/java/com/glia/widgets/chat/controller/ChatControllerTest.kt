@@ -31,6 +31,7 @@ import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentObserverUseCa
 import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentUseCase
 import com.glia.widgets.core.fileupload.domain.SupportedFileCountCheckUseCase
 import com.glia.widgets.core.notification.domain.CallNotificationUseCase
+import com.glia.widgets.core.permissions.domain.RequestNotificationPermissionIfPushNotificationsSetUpUseCase
 import com.glia.widgets.core.permissions.domain.WithCameraPermissionUseCase
 import com.glia.widgets.core.permissions.domain.WithReadWritePermissionsUseCase
 import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
@@ -106,6 +107,7 @@ class ChatControllerTest {
     private lateinit var uriToFileAttachmentUseCase: UriToFileAttachmentUseCase
     private lateinit var withCameraPermissionUseCase: WithCameraPermissionUseCase
     private lateinit var withReadWritePermissionsUseCase: WithReadWritePermissionsUseCase
+    private lateinit var requestNotificationPermissionIfPushNotificationsSetUpUseCase: RequestNotificationPermissionIfPushNotificationsSetUpUseCase
 
     private lateinit var chatController: ChatController
     private lateinit var isAuthenticatedUseCase: IsAuthenticatedUseCase
@@ -172,6 +174,7 @@ class ChatControllerTest {
         uriToFileAttachmentUseCase = mock()
         withCameraPermissionUseCase = mock()
         withReadWritePermissionsUseCase = mock()
+        requestNotificationPermissionIfPushNotificationsSetUpUseCase = mock()
 
         chatController = ChatController(
             callTimer = callTimer,
@@ -216,7 +219,8 @@ class ChatControllerTest {
             takePictureUseCase = takePictureUseCase,
             uriToFileAttachmentUseCase = uriToFileAttachmentUseCase,
             withCameraPermissionUseCase = withCameraPermissionUseCase,
-            withReadWritePermissionsUseCase = withReadWritePermissionsUseCase
+            withReadWritePermissionsUseCase = withReadWritePermissionsUseCase,
+            requestNotificationPermissionIfPushNotificationsSetUpUseCase = requestNotificationPermissionIfPushNotificationsSetUpUseCase
         )
         chatController.setView(chatView)
     }

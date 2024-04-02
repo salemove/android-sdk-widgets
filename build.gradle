@@ -76,7 +76,7 @@ subprojects {
   }
 }
 
-task clean(type: Delete) {
+tasks.register('clean', Delete) {
   delete rootProject.buildDir
 }
 
@@ -107,7 +107,7 @@ ext {
   androidXTestVersion = '1.1.5'
   mockitoKotlinVersion = '5.2.1'
   mockitoAndroidTestVersion = '5.8.0'
-  mockkVersion = '1.13.9'
+  mockkVersion = '1.13.10'
   archCoreVersion = '2.2.0'
   testRulesVersion = '1.5.0'
   robolectricVersion = '4.11.1'

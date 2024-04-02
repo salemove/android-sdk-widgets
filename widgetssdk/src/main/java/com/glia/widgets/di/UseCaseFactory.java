@@ -101,6 +101,10 @@ import com.glia.widgets.core.notification.domain.ShowScreenSharingNotificationUs
 import com.glia.widgets.core.permissions.PermissionManager;
 import com.glia.widgets.core.permissions.domain.HasCallNotificationChannelEnabledUseCase;
 import com.glia.widgets.core.permissions.domain.HasScreenSharingNotificationChannelEnabledUseCase;
+import com.glia.widgets.core.permissions.domain.IsNotificationPermissionGrantedUseCase;
+import com.glia.widgets.core.permissions.domain.IsNotificationPermissionGrantedUseCaseImpl;
+import com.glia.widgets.core.permissions.domain.RequestNotificationPermissionIfPushNotificationsSetUpUseCase;
+import com.glia.widgets.core.permissions.domain.RequestNotificationPermissionIfPushNotificationsSetUpUseCaseImpl;
 import com.glia.widgets.core.permissions.domain.WithCameraPermissionUseCase;
 import com.glia.widgets.core.permissions.domain.WithCameraPermissionUseCaseImpl;
 import com.glia.widgets.core.permissions.domain.WithReadWritePermissionsUseCase;
@@ -418,7 +422,7 @@ public class UseCaseFactory {
 
     @NonNull
     public HasScreenSharingNotificationChannelEnabledUseCase createHasScreenSharingNotificationChannelEnabledUseCase() {
-        return new HasScreenSharingNotificationChannelEnabledUseCase(permissionManager);
+        return new HasScreenSharingNotificationChannelEnabledUseCase(applicationContext);
     }
 
     @NonNull
@@ -428,12 +432,12 @@ public class UseCaseFactory {
 
     @NonNull
     public HasCallNotificationChannelEnabledUseCase createHasCallNotificationChannelEnabledUseCase() {
-        return new HasCallNotificationChannelEnabledUseCase(permissionManager);
+        return new HasCallNotificationChannelEnabledUseCase(applicationContext);
     }
 
     @NonNull
     public IsShowEnableCallNotificationChannelDialogUseCase createIsShowEnableCallNotificationChannelDialogUseCase() {
-        return new IsShowEnableCallNotificationChannelDialogUseCaseImpl(permissionManager, permissionDialogManager);
+        return new IsShowEnableCallNotificationChannelDialogUseCaseImpl(createHasCallNotificationChannelEnabledUseCase(), permissionDialogManager);
     }
 
     @NonNull
@@ -976,7 +980,10 @@ public class UseCaseFactory {
 
     @NonNull
     public DecideOnQueueingUseCase getDecideOnQueueingUseCase() {
-        return new DecideOnQueueingUseCaseImpl(createIsShowOverlayPermissionRequestDialogUseCase(), createSetOverlayPermissionRequestDialogShownUseCase());
+        return new DecideOnQueueingUseCaseImpl(
+            createIsShowOverlayPermissionRequestDialogUseCase(),
+            createSetOverlayPermissionRequestDialogShownUseCase()
+        );
     }
 
     @NonNull
@@ -1030,7 +1037,21 @@ public class UseCaseFactory {
     }
 
     @NonNull
-    WithReadWritePermissionsUseCase getWithReadWritePermissionsUseCase() {
+    public WithReadWritePermissionsUseCase getWithReadWritePermissionsUseCase() {
         return new WithReadWritePermissionsUseCaseImpl(permissionManager);
+    }
+
+    @NonNull
+    public IsNotificationPermissionGrantedUseCase getIsNotificationPermissionGrantedUseCase() {
+        return new IsNotificationPermissionGrantedUseCaseImpl(permissionManager);
+    }
+
+    @NonNull
+    public RequestNotificationPermissionIfPushNotificationsSetUpUseCase getRequestNotificationPermissionIfPushNotificationsSetUpUseCase() {
+        return new RequestNotificationPermissionIfPushNotificationsSetUpUseCaseImpl(
+            permissionManager,
+            getIsNotificationPermissionGrantedUseCase(),
+            getIsPushNotificationsSetUpUseCase()
+        );
     }
 }

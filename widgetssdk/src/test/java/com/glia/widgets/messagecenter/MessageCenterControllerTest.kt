@@ -9,6 +9,7 @@ import com.glia.widgets.chat.domain.UriToFileAttachmentUseCase
 import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.fileupload.model.FileAttachment
+import com.glia.widgets.core.permissions.domain.RequestNotificationPermissionIfPushNotificationsSetUpUseCase
 import com.glia.widgets.core.secureconversations.domain.AddSecureFileAttachmentsObserverUseCase
 import com.glia.widgets.core.secureconversations.domain.AddSecureFileToAttachmentAndUploadUseCase
 import com.glia.widgets.core.secureconversations.domain.GetSecureFileAttachmentsUseCase
@@ -50,6 +51,7 @@ internal class MessageCenterControllerTest {
     private lateinit var dialogController: DialogContract.Controller
     private lateinit var takePictureUseCase: TakePictureUseCase
     private lateinit var uriToFileAttachmentUseCase: UriToFileAttachmentUseCase
+    private lateinit var requestNotificationPermissionIfPushNotificationsSetUpUseCase: RequestNotificationPermissionIfPushNotificationsSetUpUseCase
 
     @Before
     fun setUp() {
@@ -70,6 +72,7 @@ internal class MessageCenterControllerTest {
         dialogController = mock()
         takePictureUseCase = mock()
         uriToFileAttachmentUseCase = mock()
+        requestNotificationPermissionIfPushNotificationsSetUpUseCase = mock()
         messageCenterController = MessageCenterController(
             serviceChatHeadController = serviceChatHeadController,
             sendSecureMessageUseCase = sendSecureMessageUseCase,
@@ -86,7 +89,8 @@ internal class MessageCenterControllerTest {
             resetMessageCenterUseCase = resetMessageCenterUseCase,
             dialogController = dialogController,
             takePictureUseCase = takePictureUseCase,
-            uriToFileAttachmentUseCase = uriToFileAttachmentUseCase
+            uriToFileAttachmentUseCase = uriToFileAttachmentUseCase,
+            requestNotificationPermissionIfPushNotificationsSetUpUseCase = requestNotificationPermissionIfPushNotificationsSetUpUseCase
         )
     }
 

@@ -50,6 +50,7 @@ import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentUseCase
 import com.glia.widgets.core.fileupload.domain.SupportedFileCountCheckUseCase
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.notification.domain.CallNotificationUseCase
+import com.glia.widgets.core.permissions.domain.RequestNotificationPermissionIfPushNotificationsSetUpUseCase
 import com.glia.widgets.core.permissions.domain.WithCameraPermissionUseCase
 import com.glia.widgets.core.permissions.domain.WithReadWritePermissionsUseCase
 import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
@@ -126,7 +127,8 @@ internal class ChatController(
     private val takePictureUseCase: TakePictureUseCase,
     private val uriToFileAttachmentUseCase: UriToFileAttachmentUseCase,
     private val withCameraPermissionUseCase: WithCameraPermissionUseCase,
-    private val withReadWritePermissionsUseCase: WithReadWritePermissionsUseCase
+    private val withReadWritePermissionsUseCase: WithReadWritePermissionsUseCase,
+    private val requestNotificationPermissionIfPushNotificationsSetUpUseCase: RequestNotificationPermissionIfPushNotificationsSetUpUseCase
 ) : ChatContract.Controller {
     private var backClickedListener: ChatView.OnBackClickedListener? = null
     private var view: ChatContract.View? = null
@@ -283,7 +285,9 @@ internal class ChatController(
     }
 
     private fun enqueueForEngagement() {
-        enqueueForEngagementUseCase(queueId = chatState.queueId!!, visitorContextAssetId = chatState.visitorContextAssetId)
+        requestNotificationPermissionIfPushNotificationsSetUpUseCase {
+            enqueueForEngagementUseCase(queueId = chatState.queueId!!, visitorContextAssetId = chatState.visitorContextAssetId)
+        }
     }
 
     @Synchronized

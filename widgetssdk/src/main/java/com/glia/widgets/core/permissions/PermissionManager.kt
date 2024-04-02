@@ -10,8 +10,6 @@ import androidx.annotation.VisibleForTesting
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.comms.MediaDirection
 import com.glia.androidsdk.comms.MediaUpgradeOffer
-import com.glia.widgets.core.notification.NotificationFactory
-import com.glia.widgets.core.notification.areNotificationsEnabledForChannel
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.permissions.Permissions
@@ -30,13 +28,7 @@ internal class PermissionManager(
 
     fun hasOverlayPermission(): Boolean = Settings.canDrawOverlays(applicationContext)
 
-    fun hasCallNotificationChannelEnabled(): Boolean =
-        applicationContext.areNotificationsEnabledForChannel(NotificationFactory.NOTIFICATION_CALL_CHANNEL_ID)
-
-    fun hasScreenSharingNotificationChannelEnabled(): Boolean =
-        applicationContext.areNotificationsEnabledForChannel(NotificationFactory.NOTIFICATION_SCREEN_SHARING_CHANNEL_ID)
-
-    private fun hasPermission(permission: String) = checkSelfPermission(applicationContext, permission) == PackageManager.PERMISSION_GRANTED
+    fun hasPermission(permission: String) = checkSelfPermission(applicationContext, permission) == PackageManager.PERMISSION_GRANTED
 
     @SuppressLint("InlinedApi")
     fun getPermissionsForMediaUpgradeOffer(offer: MediaUpgradeOffer): Permissions {

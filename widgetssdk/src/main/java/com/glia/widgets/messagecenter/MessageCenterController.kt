@@ -17,6 +17,7 @@ import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase
 import com.glia.widgets.core.fileupload.model.FileAttachment
+import com.glia.widgets.core.permissions.domain.RequestNotificationPermissionIfPushNotificationsSetUpUseCase
 import com.glia.widgets.core.secureconversations.domain.AddSecureFileAttachmentsObserverUseCase
 import com.glia.widgets.core.secureconversations.domain.AddSecureFileToAttachmentAndUploadUseCase
 import com.glia.widgets.core.secureconversations.domain.GetSecureFileAttachmentsUseCase
@@ -48,7 +49,8 @@ internal class MessageCenterController(
     private val resetMessageCenterUseCase: ResetMessageCenterUseCase,
     private val dialogController: DialogContract.Controller,
     private val takePictureUseCase: TakePictureUseCase,
-    private val uriToFileAttachmentUseCase: UriToFileAttachmentUseCase
+    private val uriToFileAttachmentUseCase: UriToFileAttachmentUseCase,
+    private val requestNotificationPermissionIfPushNotificationsSetUpUseCase: RequestNotificationPermissionIfPushNotificationsSetUpUseCase
 ) : MessageCenterContract.Controller {
     private var view: MessageCenterContract.View? = null
     private val disposables = CompositeDisposable()
@@ -122,8 +124,11 @@ internal class MessageCenterController(
             )
         )
         view?.hideSoftKeyboard()
-        sendSecureMessageUseCase { _: VisitorMessage?, gliaException: GliaException? ->
-            handleSendMessageResult(gliaException)
+
+        requestNotificationPermissionIfPushNotificationsSetUpUseCase {
+            sendSecureMessageUseCase { _: VisitorMessage?, gliaException: GliaException? ->
+                handleSendMessageResult(gliaException)
+            }
         }
     }
 

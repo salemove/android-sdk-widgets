@@ -134,7 +134,8 @@ public class ControllerFactory {
                 useCaseFactory.getTakePictureUseCase(),
                 useCaseFactory.getUriToFileAttachmentUseCase(),
                 useCaseFactory.getWithCameraPermissionUseCase(),
-                useCaseFactory.getWithReadWritePermissionsUseCase()
+                useCaseFactory.getWithReadWritePermissionsUseCase(),
+                useCaseFactory.getRequestNotificationPermissionIfPushNotificationsSetUpUseCase()
             );
         }
 
@@ -297,7 +298,8 @@ public class ControllerFactory {
             useCaseFactory.createResetMessageCenterUseCase(),
             createDialogController(),
             useCaseFactory.getTakePictureUseCase(),
-            useCaseFactory.getUriToFileAttachmentUseCase()
+            useCaseFactory.getUriToFileAttachmentUseCase(),
+            useCaseFactory.getRequestNotificationPermissionIfPushNotificationsSetUpUseCase()
         );
     }
 

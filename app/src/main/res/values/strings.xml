@@ -87,7 +87,7 @@
     <string name="visitor_info">Visitor info</string>
     <string name="main_init_glia">Init Glia Widgets SDK</string>
     <string name="main_authenticate">Authenticate</string>
-    <string name="main_deauthenticate">Unauthenticate</string>
+    <string name="main_deauthenticate">De-authenticate</string>
     <string name="main_clear_visitor_session">Clear Session</string>
     <string name="main_show_visitor_code">Show Visitor Code</string>
 

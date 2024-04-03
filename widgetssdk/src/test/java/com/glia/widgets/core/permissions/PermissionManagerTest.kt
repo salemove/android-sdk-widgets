@@ -16,6 +16,8 @@ import com.glia.widgets.permissions.PermissionsRequestRepository
 import com.glia.widgets.permissions.PermissionsRequestResult
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.MockedStatic
@@ -694,6 +696,62 @@ class PermissionManagerTest {
             ),
             result
         )
+    }
+
+    @Test
+    fun `getPermissionsForMediaUpgradeOffer contains POST_NOTIFICATIONS permission when Build version is 33 or higher`() {
+        val permissionManager = PermissionManager(
+            context,
+            checkSelfPermission,
+            permissionsRequestRepository,
+            Build.VERSION_CODES.TIRAMISU
+        )
+
+        val result = permissionManager.getPermissionsForMediaUpgradeOffer(mockMediaUpgradeOffer(video = MediaDirection.ONE_WAY))
+
+        assertTrue(result.additionalPermissions.contains(Manifest.permission.POST_NOTIFICATIONS))
+    }
+
+    @Test
+    fun `getPermissionsForMediaUpgradeOffer does not contain POST_NOTIFICATIONS permission when Build version is below 33`() {
+        val permissionManager = PermissionManager(
+            context,
+            checkSelfPermission,
+            permissionsRequestRepository,
+            Build.VERSION_CODES.S_V2
+        )
+
+        val result = permissionManager.getPermissionsForMediaUpgradeOffer(mockMediaUpgradeOffer(video = MediaDirection.ONE_WAY))
+
+        assertFalse(result.additionalPermissions.contains(Manifest.permission.POST_NOTIFICATIONS))
+    }
+
+    @Test
+    fun `getPermissionsForEngagementMediaType contains POST_NOTIFICATIONS permission when Build version is 33 or higher`() {
+        val permissionManager = PermissionManager(
+            context,
+            checkSelfPermission,
+            permissionsRequestRepository,
+            Build.VERSION_CODES.TIRAMISU
+        )
+
+        val result = permissionManager.getPermissionsForEngagementMediaType(Engagement.MediaType.AUDIO, true)
+
+        assertTrue(result.additionalPermissions.contains(Manifest.permission.POST_NOTIFICATIONS))
+    }
+
+    @Test
+    fun `getPermissionsForEngagementMediaType does not contain POST_NOTIFICATIONS permission when Build version is below 33`() {
+        val permissionManager = PermissionManager(
+            context,
+            checkSelfPermission,
+            permissionsRequestRepository,
+            Build.VERSION_CODES.S_V2
+        )
+
+        val result = permissionManager.getPermissionsForEngagementMediaType(Engagement.MediaType.VIDEO, false)
+
+        assertFalse(result.additionalPermissions.contains(Manifest.permission.POST_NOTIFICATIONS))
     }
 
     private fun mockMediaUpgradeOffer(audio: MediaDirection? = null, video: MediaDirection? = null): MediaUpgradeOffer =

@@ -11,7 +11,6 @@ import androidx.core.content.getSystemService
 import com.glia.androidsdk.Engagement
 import com.glia.widgets.base.BaseSingleActivityWatcher
 import com.glia.widgets.call.CallActivity
-import com.glia.widgets.core.notification.openNotificationChannelScreen
 import com.glia.widgets.helper.GliaActivityManager
 import com.glia.widgets.helper.IntentConfigurationHelper
 import com.glia.widgets.helper.Logger
@@ -52,18 +51,11 @@ internal class OperatorRequestActivityWatcher(
 
         when {
             event.consumed -> Logger.d(TAG, "skipping.., event is already consumed")
-            activity == null && state is ControllerState.WaitForNotificationScreenOpen -> event.consume { controller.onNotificationScreenOpened() }
             activity == null || activity.isFinishing -> Logger.d(TAG, "skipping.. activity is null or finishing")
             state is ControllerState.DismissAlertDialog -> event.consume { dismissAlertDialogSilently() }
             state is ControllerState.OpenCallActivity -> event.consume { openCallActivity(state.mediaType, activity) }
             state is ControllerState.RequestMediaUpgrade -> showUpgradeDialog(state, activity, event::markConsumed)
-            state is ControllerState.EnableScreenSharingNotificationsAndStartSharing -> showEnableScreenSharingNotifications(
-                activity, event::markConsumed
-            )
-
             state is ControllerState.ShowScreenSharingDialog -> showScreenSharingDialog(state.operatorName, activity, event::markConsumed)
-            state is ControllerState.OpenNotificationsScreen -> event.consume { openNotificationsScreen(activity) }
-            state is ControllerState.WaitForNotificationScreenResult -> event.consume { controller.onReturnedFromNotificationScreen() }
             state is ControllerState.AcquireMediaProjectionToken -> requestMediaProjection(activity, event::markConsumed)
             state is ControllerState.DisplayToast -> event.consume { displayToast(activity, state.message) }
             state is ControllerState.ShowOverlayDialog -> showOverlayDialog(activity, event::markConsumed)
@@ -78,7 +70,11 @@ internal class OperatorRequestActivityWatcher(
     private fun requestMediaProjection(activity: Activity, consumeCallback: () -> Unit) {
         enforceComponentActivity(activity) {
             consumeCallback()
-            mediaProjectionResultLauncher.launch(activity.getSystemService<MediaProjectionManager>()?.createScreenCaptureIntent())
+
+            val createScreenCaptureIntent = activity.getSystemService<MediaProjectionManager>()?.createScreenCaptureIntent()
+
+            mediaProjectionResultLauncher.launch(createScreenCaptureIntent)
+            controller.onMediaProjectionRequested(activity)
         }
     }
 
@@ -107,11 +103,6 @@ internal class OperatorRequestActivityWatcher(
         }
     }
 
-    private fun openNotificationsScreen(activity: Activity) {
-        activity.openNotificationChannelScreen()
-        controller.onNotificationScreenRequested()
-    }
-
     private fun showOverlayDialog(activity: Activity, consumeCallback: () -> Unit) {
         showAlertDialogWithStyledContext(activity) { context, uiTheme ->
             Dialogs.showOverlayPermissionsDialog(context, uiTheme, {
@@ -128,22 +119,10 @@ internal class OperatorRequestActivityWatcher(
         showAlertDialogWithStyledContext(activity) { context, uiTheme ->
             Dialogs.showScreenSharingDialog(context, uiTheme, operatorName, {
                 consumeCallback()
-                controller.onScreenSharingDialogAccepted(activity)
+                controller.onScreenSharingDialogAccepted()
             }) {
                 consumeCallback()
                 controller.onScreenSharingDialogDeclined(activity)
-            }
-        }
-    }
-
-    private fun showEnableScreenSharingNotifications(activity: Activity, consumeCallback: () -> Unit) {
-        showAlertDialogWithStyledContext(activity) { context, uiTheme ->
-            Dialogs.showAllowScreenSharingNotificationsAndStartSharingDialog(context, uiTheme, {
-                consumeCallback()
-                controller.onShowEnableScreenSharingNotificationsAccepted()
-            }) {
-                consumeCallback()
-                controller.onShowEnableScreenSharingNotificationsDeclined(activity)
             }
         }
     }

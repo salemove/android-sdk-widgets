@@ -1,33 +1,25 @@
 package com.glia.widgets
 
-import com.glia.widgets.helper.ResourceProvider
 import com.glia.androidsdk.Glia
 import com.glia.androidsdk.GliaException
 import com.glia.widgets.helper.Logger
-import java.lang.Exception
+import com.glia.widgets.helper.ResourceProvider
 
 internal class StringProviderImpl(private val resourceProvider: ResourceProvider) : StringProvider {
 
     private val regex = "(\\{[a-zA-Z\\d]*\\})".toRegex()
     private var shouldLog = true
 
-    override fun getRemoteString(stringKey: Int, vararg values: StringKeyPair?): String {
+    override fun getRemoteString(stringKey: Int, vararg values: StringKeyPair): String {
         val key = resourceProvider.getResourceKey(stringKey)
         return try {
             Glia.getRemoteString(key)?.let {
-                var returnValue = it
-                values.forEach { pair ->
-                    pair?.run {
-                        returnValue = replaceInsertedValues(returnValue, this)
-                    }
-                }
-                cleanupRemainingReferences(returnValue)
-            } ?: kotlin.run {
-                resourceProvider.getString(stringKey, *values.map { pair -> pair?.value }.toTypedArray())
-            }
+                values.fold(it, ::replaceInsertedValues).run(::cleanupRemainingReferences)
+            } ?: resourceProvider.getString(stringKey, *values.map { pair -> pair.value }.toTypedArray())
+
         } catch (e: GliaException) {
             reportImproperInitialisation(e)
-            resourceProvider.getString(stringKey, *values.map { pair -> pair?.value }.toTypedArray())
+            resourceProvider.getString(stringKey, *values.map { pair -> pair.value }.toTypedArray())
         }
     }
 

@@ -6,18 +6,18 @@ import android.os.Build
 import com.glia.widgets.core.permissions.PermissionManager
 import com.glia.widgets.push.notifications.IsPushNotificationsSetUpUseCase
 
-internal interface RequestNotificationPermissionIfPushNotificationsSetUpUseCase {
+internal interface WithNotificationPermissionUseCase {
     operator fun invoke(doneCallback: () -> Unit)
 }
 
-internal class RequestNotificationPermissionIfPushNotificationsSetUpUseCaseImpl(
+internal class WithNotificationPermissionUseCaseImpl(
     private val permissionManager: PermissionManager,
-    private val isNotificationPermissionGrantedUseCase: IsNotificationPermissionGrantedUseCase,
-    private val isPushNotificationsSetUpUseCase: IsPushNotificationsSetUpUseCase
-) : RequestNotificationPermissionIfPushNotificationsSetUpUseCase {
+    private val isNotificationPermissionGrantedUseCase: IsNotificationPermissionGrantedUseCase
+) : WithNotificationPermissionUseCase {
+
     @SuppressLint("InlinedApi")
     override fun invoke(doneCallback: () -> Unit) {
-        if (!isPushNotificationsSetUpUseCase() || isNotificationPermissionGrantedUseCase()) {
+        if (isNotificationPermissionGrantedUseCase()) {
             doneCallback()
             return
         }
@@ -28,6 +28,24 @@ internal class RequestNotificationPermissionIfPushNotificationsSetUpUseCaseImpl(
                 doneCallback()
             }
         )
+    }
+}
+
+internal interface RequestNotificationPermissionIfPushNotificationsSetUpUseCase {
+    operator fun invoke(doneCallback: () -> Unit)
+}
+
+internal class RequestNotificationPermissionIfPushNotificationsSetUpUseCaseImpl(
+    private val withNotificationPermissionUseCase: WithNotificationPermissionUseCase,
+    private val isPushNotificationsSetUpUseCase: IsPushNotificationsSetUpUseCase
+) : RequestNotificationPermissionIfPushNotificationsSetUpUseCase {
+    @SuppressLint("InlinedApi")
+    override fun invoke(doneCallback: () -> Unit) {
+        if (!isPushNotificationsSetUpUseCase()) {
+            doneCallback()
+            return
+        }
+        withNotificationPermissionUseCase(doneCallback)
     }
 }
 

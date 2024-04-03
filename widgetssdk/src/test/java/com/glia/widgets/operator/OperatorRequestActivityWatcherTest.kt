@@ -3,7 +3,6 @@ package com.glia.widgets.operator
 import android.COMMON_EXTENSIONS_CLASS_PATH
 import android.CONTEXT_EXTENSIONS_CLASS_PATH
 import android.LOGGER_PATH
-import android.NOTIFICATION_EXTENSIONS_PATH
 import android.app.Activity
 import android.content.ComponentName
 import android.content.Context
@@ -20,7 +19,6 @@ import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.widgets.UiTheme
 import com.glia.widgets.call.CallActivity
 import com.glia.widgets.chat.ChatActivity
-import com.glia.widgets.core.notification.openNotificationChannelScreen
 import com.glia.widgets.engagement.domain.MediaUpgradeOfferData
 import com.glia.widgets.helper.DialogHolderActivity
 import com.glia.widgets.helper.GliaActivityManager
@@ -295,23 +293,6 @@ class OperatorRequestActivityWatcherTest {
     }
 
     @Test
-    fun `state WaitForNotificationScreenOpen will trigger controller onNotificationScreenOpened when activity is null`() {
-        val event = createMockEvent(OperatorRequestContract.State.WaitForNotificationScreenOpen)
-        watcher.onActivityPaused(mockk())
-        controllerState.onNext(event)
-
-        verify { event.consumed }
-        verify { controller.onNotificationScreenOpened() }
-    }
-
-    @Test
-    fun `state WaitForNotificationScreenOpen will do nothing when activity is not null`() {
-        fireState<ChatActivity>(controllerState, watcher, OperatorRequestContract.State.WaitForNotificationScreenOpen) { _, _ ->
-            verify(exactly = 0) { controller.onNotificationScreenOpened() }
-        }
-    }
-
-    @Test
     fun `state DisplayToast will display toast message`() {
         val message = "_message"
         mockkStatic(CONTEXT_EXTENSIONS_CLASS_PATH)
@@ -337,6 +318,7 @@ class OperatorRequestActivityWatcherTest {
         val mockkActivity: ChatActivity = mockk {
             every { registerForActivityResult(any<ActivityResultContracts.StartActivityForResult>(), any()) } returns resultLauncher
         }
+
         watcher.onActivityCreated(mockkActivity, null)
         verify { mockkActivity.registerForActivityResult(any<ActivityResultContracts.StartActivityForResult>(), any()) }
 
@@ -344,9 +326,11 @@ class OperatorRequestActivityWatcherTest {
             verify(exactly = 0) { activity.startActivity(any()) }
             verify { event.markConsumed() }
             verify { resultLauncher.launch(any()) }
+            verify { controller.onMediaProjectionRequested(activity) }
 
             confirmVerified(mockkActivity, resultLauncher)
         }
+
     }
 
     @Test
@@ -390,58 +374,6 @@ class OperatorRequestActivityWatcherTest {
     }
 
     @Test
-    fun `showEnableScreenSharingNotifications will call onShowEnableScreenSharingNotificationsAccepted when dialog is accepted`() {
-        mockkObject(Dialogs)
-        fireState<ChatActivity>(
-            controllerState,
-            watcher,
-            OperatorRequestContract.State.EnableScreenSharingNotificationsAndStartSharing
-        ) { state, activity ->
-            val onAcceptSlot = slot<View.OnClickListener>()
-            val onDeclineSlot = slot<View.OnClickListener>()
-            verify {
-                Dialogs.showAllowScreenSharingNotificationsAndStartSharingDialog(
-                    activity,
-                    any(),
-                    capture(onAcceptSlot),
-                    capture(onDeclineSlot)
-                )
-            }
-            onAcceptSlot.captured.onClick(mockk())
-
-            verify { state.markConsumed() }
-            verify { controller.onShowEnableScreenSharingNotificationsAccepted() }
-        }
-        unmockkObject(Dialogs)
-    }
-
-    @Test
-    fun `showEnableScreenSharingNotifications will call onShowEnableScreenSharingNotificationsDeclined when dialog is declined`() {
-        mockkObject(Dialogs)
-        fireState<ChatActivity>(
-            controllerState,
-            watcher,
-            OperatorRequestContract.State.EnableScreenSharingNotificationsAndStartSharing
-        ) { state, activity ->
-            val onAcceptSlot = slot<View.OnClickListener>()
-            val onDeclineSlot = slot<View.OnClickListener>()
-            verify {
-                Dialogs.showAllowScreenSharingNotificationsAndStartSharingDialog(
-                    activity,
-                    any(),
-                    capture(onAcceptSlot),
-                    capture(onDeclineSlot)
-                )
-            }
-            onDeclineSlot.captured.onClick(mockk())
-
-            verify { state.markConsumed() }
-            verify { controller.onShowEnableScreenSharingNotificationsDeclined(activity) }
-        }
-        unmockkObject(Dialogs)
-    }
-
-    @Test
     fun `showScreenSharingDialog will call onScreenSharingDialogAccepted when dialog is accepted`() {
         mockkObject(Dialogs)
         fireState<ChatActivity>(
@@ -463,7 +395,7 @@ class OperatorRequestActivityWatcherTest {
             onAcceptSlot.captured.onClick(mockk())
 
             verify { state.markConsumed() }
-            verify { controller.onScreenSharingDialogAccepted(activity) }
+            verify { controller.onScreenSharingDialogAccepted() }
         }
         unmockkObject(Dialogs)
     }
@@ -545,22 +477,6 @@ class OperatorRequestActivityWatcherTest {
             verify { controller.onOverlayPermissionRequestDeclined(activity) }
         }
         unmockkObject(Dialogs)
-    }
-
-    @Test
-    fun `openNotificationsScreen will open notification screen`() {
-        mockkStatic(NOTIFICATION_EXTENSIONS_PATH)
-        every { any<Activity>().openNotificationChannelScreen() } just Runs
-        fireState<ChatActivity>(
-            controllerState,
-            watcher,
-            OperatorRequestContract.State.OpenNotificationsScreen
-        ) { state, activity ->
-            verify { activity.openNotificationChannelScreen() }
-            verify { state.consume(any()) }
-            verify { controller.onNotificationScreenRequested() }
-        }
-        unmockkStatic(NOTIFICATION_EXTENSIONS_PATH)
     }
 
     @Test

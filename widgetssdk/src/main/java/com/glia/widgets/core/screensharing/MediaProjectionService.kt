@@ -1,5 +1,6 @@
 package com.glia.widgets.core.screensharing
 
+import android.app.ForegroundServiceStartNotAllowedException
 import android.app.Service
 import android.content.Intent
 import android.content.pm.ServiceInfo
@@ -10,6 +11,8 @@ import com.glia.widgets.core.notification.NotificationFactory.createScreenSharin
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
+import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.TAG
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 private const val SERVICE_ID = 123
@@ -33,7 +36,17 @@ class MediaProjectionService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        setupAsForegroundService()
+        try {
+            setupAsForegroundService()
+        } catch (e: Exception) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && e is ForegroundServiceStartNotAllowedException) {
+                // App not in a valid state to start foreground service
+                // (e.g., started from bg)
+                Logger.d(TAG, "Service started from background")
+            } else {
+                Logger.e(TAG, "Failed to start service", e)
+            }
+        }
     }
 
     private fun setupAsForegroundService() {
@@ -60,7 +73,7 @@ class MediaProjectionService : Service() {
     }
 
     override fun onDestroy() {
-        compositeDisposable.clear()
         super.onDestroy()
+        compositeDisposable.clear()
     }
 }

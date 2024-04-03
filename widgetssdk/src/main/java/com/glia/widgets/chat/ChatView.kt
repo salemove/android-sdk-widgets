@@ -46,7 +46,6 @@ import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.fileupload.model.FileAttachment
-import com.glia.widgets.core.notification.openNotificationChannelScreen
 import com.glia.widgets.databinding.ChatViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.filepreview.ui.FilePreviewActivity
@@ -511,7 +510,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
                     DialogState.ExitQueue -> post { showExitQueueDialog() }
                     DialogState.OverlayPermission -> post { showOverlayPermissionsDialog() }
                     DialogState.EndEngagement -> post { showEndEngagementDialog() }
-                    DialogState.EnableNotificationChannel -> post { showAllowNotificationsDialog() }
                     DialogState.Confirmation -> post { controller?.onEngagementConfirmationDialogRequested() }
 
                     DialogState.VisitorCode -> {
@@ -571,17 +569,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             showToolbar(stringProvider.getRemoteString(R.string.engagement_chat_title))
             binding.appBarView.showBackButton()
         }
-    }
-
-    private fun showAllowNotificationsDialog() = showDialog {
-        Dialogs.showAllowNotificationsDialog(context = context, uiTheme = theme, positiveButtonClickListener = {
-            resetDialogStateAndDismiss()
-            controller?.notificationDialogDismissed()
-            this.context.openNotificationChannelScreen()
-        }, negativeButtonClickListener = {
-            resetDialogStateAndDismiss()
-            controller?.notificationDialogDismissed()
-        })
     }
 
     private fun showChat() {

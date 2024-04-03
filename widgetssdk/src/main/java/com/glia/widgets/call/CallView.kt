@@ -32,7 +32,6 @@ import com.glia.widgets.call.CallState.ViewState
 import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.dialog.model.DialogState
-import com.glia.widgets.core.notification.openNotificationChannelScreen
 import com.glia.widgets.databinding.CallButtonsLayoutBinding
 import com.glia.widgets.databinding.CallViewBinding
 import com.glia.widgets.di.Dependencies
@@ -226,7 +225,6 @@ internal class CallView(
                     DialogState.ExitQueue -> post { showExitQueueDialog() }
                     DialogState.OverlayPermission -> post { showOverlayPermissionsDialog() }
                     DialogState.EndEngagement -> post { showEndEngagementDialog() }
-                    DialogState.EnableNotificationChannel -> post { showAllowNotificationsDialog() }
                     DialogState.Confirmation -> post { callController?.onLiveObservationDialogRequested() }
                     else -> Logger.e(TAG, "DialogController callback in CallView with $it")
                 }
@@ -351,22 +349,6 @@ internal class CallView(
             negativeButtonClickListener = {
                 resetDialogStateAndDismiss()
                 callController?.endEngagementDialogDismissed()
-            }
-        )
-    }
-
-    private fun showAllowNotificationsDialog() = showDialog {
-        Dialogs.showAllowNotificationsDialog(
-            context = context,
-            uiTheme = theme,
-            positiveButtonClickListener = {
-                resetDialogStateAndDismiss()
-                callController?.notificationsDialogDismissed()
-                this.context.openNotificationChannelScreen()
-            },
-            negativeButtonClickListener = {
-                resetDialogStateAndDismiss()
-                callController?.notificationsDialogDismissed()
             }
         )
     }

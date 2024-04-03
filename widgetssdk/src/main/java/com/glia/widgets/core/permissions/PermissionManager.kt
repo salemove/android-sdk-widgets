@@ -34,17 +34,22 @@ internal class PermissionManager(
     fun getPermissionsForMediaUpgradeOffer(offer: MediaUpgradeOffer): Permissions {
         Logger.i(TAG, "Request permissions for media upgrade offer")
         val requiredPermissions = buildList {
-            if (offer.audio == MediaDirection.TWO_WAY) {
-                add(Manifest.permission.RECORD_AUDIO)
-            }
             if (offer.video == MediaDirection.TWO_WAY) {
                 add(Manifest.permission.CAMERA)
+            }
+
+            if (offer.audio == MediaDirection.TWO_WAY) {
+                add(Manifest.permission.RECORD_AUDIO)
             }
         }
 
         val additionalPermissions = buildList {
             if (sdkInt > Build.VERSION_CODES.R && offer.audio == MediaDirection.TWO_WAY) {
                 add(Manifest.permission.BLUETOOTH_CONNECT)
+            }
+
+            if (sdkInt >= Build.VERSION_CODES.TIRAMISU) {
+                add(Manifest.permission.POST_NOTIFICATIONS)
             }
         }
         return Permissions(requiredPermissions, additionalPermissions)
@@ -65,6 +70,11 @@ internal class PermissionManager(
                 additionalPermissions.add(Manifest.permission.BLUETOOTH_CONNECT)
             }
         }
+
+        if (sdkInt >= Build.VERSION_CODES.TIRAMISU) {
+            additionalPermissions.add(Manifest.permission.POST_NOTIFICATIONS)
+        }
+
         return Permissions(requiredPermissions, additionalPermissions)
     }
 

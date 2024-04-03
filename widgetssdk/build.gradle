@@ -17,7 +17,7 @@ android {
   }
 
   buildTypes {
-    all {
+    configureEach {
       buildConfigField("String", "GLIA_CORE_SDK_VERSION", "\"$gliaSdkVersion\"")
       buildConfigField("String", "GLIA_WIDGETS_SDK_VERSION", "\"$defaultConfig.versionName\"")
     }

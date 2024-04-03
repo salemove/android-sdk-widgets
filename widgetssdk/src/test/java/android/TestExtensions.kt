@@ -6,7 +6,6 @@ import java.nio.charset.StandardCharsets
 internal const val COMMON_EXTENSIONS_CLASS_PATH = "com.glia.widgets.helper.CommonExtensionsKt"
 internal const val CONTEXT_EXTENSIONS_CLASS_PATH = "com.glia.widgets.helper.ContextExtensionsKt"
 internal const val LOGGER_PATH = "com.glia.widgets.helper.Logger"
-internal const val NOTIFICATION_EXTENSIONS_PATH = "com.glia.widgets.core.notification.ExtensionsKt"
 
 fun <T> Class<T>.readRawResource(resName: String): String = classLoader?.getResourceAsStream(resName)?.run {
     bufferedReader(StandardCharsets.UTF_8).use { it.readText() }

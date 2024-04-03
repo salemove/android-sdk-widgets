@@ -8,8 +8,6 @@ internal sealed interface DialogState {
     object CVOverlayPermission : DialogState
     object ExitQueue : DialogState
     object StartScreenSharing : DialogState
-    object EnableNotificationChannel : DialogState
-    object EnableScreenSharingNotificationsAndStartSharing : DialogState
     object VisitorCode : DialogState
     object MessageCenterUnavailable : DialogState
     object Unauthenticated : DialogState

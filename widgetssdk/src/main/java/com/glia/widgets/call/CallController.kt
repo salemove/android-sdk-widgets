@@ -17,14 +17,12 @@ import com.glia.widgets.core.audio.domain.TurnSpeakerphoneUseCase
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.dialog.domain.ConfirmationDialogLinksUseCase
-import com.glia.widgets.core.dialog.domain.IsShowEnableCallNotificationChannelDialogUseCase
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
 import com.glia.widgets.core.dialog.model.ConfirmationDialogLinks
 import com.glia.widgets.core.dialog.model.Link
 import com.glia.widgets.core.engagement.domain.ConfirmationDialogUseCase
 import com.glia.widgets.core.engagement.domain.ShouldShowMediaEngagementViewUseCase
 import com.glia.widgets.core.notification.domain.CallNotificationUseCase
-import com.glia.widgets.core.permissions.domain.HasCallNotificationChannelEnabledUseCase
 import com.glia.widgets.engagement.EngagementUpdateState
 import com.glia.widgets.engagement.ScreenSharingState
 import com.glia.widgets.engagement.State
@@ -70,8 +68,6 @@ internal class CallController(
     private val endEngagementUseCase: EndEngagementUseCase,
     private val shouldShowMediaEngagementViewUseCase: ShouldShowMediaEngagementViewUseCase,
     private val isShowOverlayPermissionRequestDialogUseCase: IsShowOverlayPermissionRequestDialogUseCase,
-    private val hasCallNotificationChannelEnabledUseCase: HasCallNotificationChannelEnabledUseCase,
-    private val isShowEnableCallNotificationChannelDialogUseCase: IsShowEnableCallNotificationChannelDialogUseCase,
     private val updateFromCallScreenUseCase: UpdateFromCallScreenUseCase,
     isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase,
     private val turnSpeakerphoneUseCase: TurnSpeakerphoneUseCase,
@@ -134,6 +130,7 @@ internal class CallController(
 
     private fun onNewVisitorMediaState(visitorMediaState: MediaState?) {
         emitViewState(callState.visitorMediaStateChanged(visitorMediaState))
+        callNotificationUseCase(visitorMediaState, callState.callStatus.operatorMediaState)
     }
 
     private fun onHoldChanged(isOnHold: Boolean) {
@@ -330,7 +327,6 @@ internal class CallController(
     }
 
     private fun onResumeSetup() {
-        showCallNotification()
         showLandscapeControls()
         subscribeToMediaUpgradeEvents()
     }
@@ -377,22 +373,12 @@ internal class CallController(
         toggleVisitorVideoMediaStateUseCase()
     }
 
-    override fun notificationsDialogDismissed() {
-        dialogController.dismissCurrentDialog()
-    }
-
     private fun onNewOperatorMediaState(operatorMediaState: MediaState) {
         if (!isQueueingOrEngagementUseCase.hasOngoingEngagement) return
         d(TAG, "newOperatorMediaState: $operatorMediaState, timer task running: ${callTimer.isRunning}")
         if (operatorMediaState.video != null) {
-            if (isShowEnableCallNotificationChannelDialogUseCase()) {
-                dialogController.showEnableCallNotificationChannelDialog()
-            }
             onOperatorMediaStateVideo(operatorMediaState)
         } else if (operatorMediaState.audio != null) {
-            if (isShowEnableCallNotificationChannelDialogUseCase()) {
-                dialogController.showEnableCallNotificationChannelDialog()
-            }
             onOperatorMediaStateAudio(operatorMediaState)
         } else {
             onOperatorMediaStateUnknown()
@@ -400,6 +386,7 @@ internal class CallController(
         if (callState.isMediaEngagementStarted && !callTimer.isRunning && callTimerStatusListener != null) {
             callTimer.startNew(Constants.CALL_TIMER_DELAY, Constants.CALL_TIMER_INTERVAL_VALUE)
         }
+        callNotificationUseCase(callState.callStatus.visitorMediaState, operatorMediaState)
     }
 
     override fun onSpeakerButtonPressed() {
@@ -508,7 +495,6 @@ internal class CallController(
             formattedTime = callState.callStatus.time
         }
         emitViewState(callState.videoCallOperatorVideoStarted(operatorMediaState, formattedTime))
-        callNotificationUseCase.invoke(callState.callStatus.visitorMediaState, operatorMediaState)
         connectingTimerCounter.stop()
     }
 
@@ -517,7 +503,6 @@ internal class CallController(
         var formattedTime = DateUtils.formatElapsedTime(0)
         if (callState.isCallOngoingAndOperatorConnected) formattedTime = callState.callStatus.time
         emitViewState(callState.audioCallStarted(operatorMediaState, formattedTime))
-        callNotificationUseCase.invoke(callState.callStatus.visitorMediaState, operatorMediaState)
         connectingTimerCounter.stop()
     }
 
@@ -609,12 +594,6 @@ internal class CallController(
 
     private fun onTransferring() {
         emitViewState(callState.setTransferring())
-    }
-
-    private fun showCallNotification() {
-        if (hasCallNotificationChannelEnabledUseCase()) {
-            callNotificationUseCase(callState.callStatus.visitorMediaState, callState.callStatus.operatorMediaState)
-        }
     }
 
     private fun showLandscapeControls() {

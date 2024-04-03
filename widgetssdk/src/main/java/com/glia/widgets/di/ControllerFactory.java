@@ -80,7 +80,7 @@ public class ControllerFactory {
         );
 
         this.useCaseFactory = useCaseFactory;
-        this.dialogController = new DialogController(useCaseFactory.createSetEnableCallNotificationChannelDialogShownUseCase());
+        this.dialogController = new DialogController();
         this.filePreviewController = new FilePreviewController(
             useCaseFactory.createGetImageFileFromDownloadsUseCase(),
             useCaseFactory.createGetImageFileFromCacheUseCase(),
@@ -159,8 +159,6 @@ public class ControllerFactory {
                 useCaseFactory.getEndEngagementUseCase(),
                 useCaseFactory.createShouldShowMediaEngagementViewUseCase(),
                 useCaseFactory.createIsShowOverlayPermissionRequestDialogUseCase(),
-                useCaseFactory.createHasCallNotificationChannelEnabledUseCase(),
-                useCaseFactory.createIsShowEnableCallNotificationChannelDialogUseCase(),
                 useCaseFactory.createUpdateFromCallScreenUseCase(),
                 useCaseFactory.getIsCurrentEngagementCallVisualizer(),
                 useCaseFactory.createTurnSpeakerphoneUseCase(),
@@ -218,7 +216,7 @@ public class ControllerFactory {
     }
 
     public DialogContract.Controller createDialogController() {
-        return new DialogController(useCaseFactory.createSetEnableCallNotificationChannelDialogShownUseCase());
+        return new DialogController();
     }
 
     public void init() {
@@ -375,7 +373,6 @@ public class ControllerFactory {
             useCaseFactory.getDeclineMediaUpgradeOfferUseCase(),
             useCaseFactory.getCheckMediaUpgradePermissionsUseCase(),
             useCaseFactory.getScreenSharingUseCase(),
-            useCaseFactory.createHasScreenSharingNotificationChannelEnabledUseCase(),
             useCaseFactory.getCurrentOperatorUseCase(),
             useCaseFactory.createShowScreenSharingNotificationUseCase(),
             useCaseFactory.createRemoveScreenSharingNotificationUseCase(),
@@ -383,7 +380,8 @@ public class ControllerFactory {
             useCaseFactory.getIsCurrentEngagementCallVisualizer(),
             useCaseFactory.createSetOverlayPermissionRequestDialogShownUseCase(),
             dialogController,
-            sdkConfigurationManager
+            sdkConfigurationManager,
+            useCaseFactory.getWithNotificationPermissionUseCase()
         );
     }
 }

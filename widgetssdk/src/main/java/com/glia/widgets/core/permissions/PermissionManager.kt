@@ -46,6 +46,10 @@ internal class PermissionManager(
             if (sdkInt > Build.VERSION_CODES.R && offer.audio == MediaDirection.TWO_WAY) {
                 add(Manifest.permission.BLUETOOTH_CONNECT)
             }
+
+            if (sdkInt >= Build.VERSION_CODES.TIRAMISU) {
+                add(Manifest.permission.POST_NOTIFICATIONS)
+            }
         }
         return Permissions(requiredPermissions, additionalPermissions)
     }
@@ -65,6 +69,11 @@ internal class PermissionManager(
                 additionalPermissions.add(Manifest.permission.BLUETOOTH_CONNECT)
             }
         }
+
+        if (sdkInt >= Build.VERSION_CODES.TIRAMISU) {
+            additionalPermissions.add(Manifest.permission.POST_NOTIFICATIONS)
+        }
+
         return Permissions(requiredPermissions, additionalPermissions)
     }
 

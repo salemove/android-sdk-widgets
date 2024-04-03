@@ -747,10 +747,6 @@ internal class ChatController(
         chatManager.onChatAction(ChatManager.Action.OnMediaUpgradeStarted(isVideo))
     }
 
-    override fun notificationDialogDismissed() {
-        dialogController.dismissCurrentDialog()
-    }
-
     private fun queueForEngagementStarted() {
         if (chatState.isOperatorOnline) {
             return

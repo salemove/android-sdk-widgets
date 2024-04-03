@@ -35,7 +35,6 @@ internal interface CallContract {
         fun onLiveObservationDialogRequested()
         fun endEngagementDialogYesClicked()
         fun endEngagementDialogDismissed()
-        fun notificationsDialogDismissed()
         fun noMoreOperatorsAvailableDismissed()
         fun unexpectedErrorDialogDismissed()
         fun onLiveObservationDialogAllowed()

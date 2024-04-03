@@ -1,6 +1,5 @@
 package com.glia.widgets.core.dialog
 
-import com.glia.widgets.core.dialog.domain.SetEnableCallNotificationChannelDialogShownUseCase
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.engagement.domain.MediaUpgradeOfferData
 import com.glia.widgets.helper.Logger
@@ -23,8 +22,6 @@ internal interface DialogContract {
         fun dismissOverlayPermissionsDialog()
         fun dismissMessageCenterUnavailableDialog()
         fun showStartScreenSharingDialog()
-        fun showEnableCallNotificationChannelDialog()
-        fun showEnableScreenSharingNotificationsAndStartSharingDialog()
         fun showMessageCenterUnavailableDialog()
         fun showUnauthenticatedDialog()
         fun showEngagementConfirmationDialog()
@@ -38,9 +35,7 @@ internal interface DialogContract {
     }
 }
 
-internal class DialogController(
-    private val setEnableCallNotificationChannelDialogShownUseCase: SetEnableCallNotificationChannelDialogShownUseCase
-) : DialogContract.Controller {
+internal class DialogController : DialogContract.Controller {
     private val viewCallbacks: MutableSet<DialogContract.Controller.Callback> = HashSet()
     private val dialogManager: DialogManager by lazy { DialogManager(::emitDialogState) }
     override val isShowingUnexpectedErrorDialog: Boolean
@@ -118,17 +113,6 @@ internal class DialogController(
     override fun showStartScreenSharingDialog() {
         Logger.i(TAG, "Show Start Screen Sharing Dialog")
         dialogManager.addAndEmit(DialogState.StartScreenSharing)
-    }
-
-    override fun showEnableCallNotificationChannelDialog() {
-        Logger.i(TAG, "Show Enable Call Notification Channel Dialog")
-        setEnableCallNotificationChannelDialogShownUseCase.invoke()
-        dialogManager.addAndEmit(DialogState.EnableNotificationChannel)
-    }
-
-    override fun showEnableScreenSharingNotificationsAndStartSharingDialog() {
-        Logger.i(TAG, "Show Enable Screen Sharing Notifications And Start Screen Sharing Dialog")
-        dialogManager.addAndEmit(DialogState.EnableScreenSharingNotificationsAndStartSharing)
     }
 
     override fun showMessageCenterUnavailableDialog() {

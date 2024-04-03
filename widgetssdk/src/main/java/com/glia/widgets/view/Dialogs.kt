@@ -131,45 +131,6 @@ internal object Dialogs {
         return dialogService.showDialog(context, uiTheme, DialogType.ReversedOption(payload))
     }
 
-    fun showAllowScreenSharingNotificationsAndStartSharingDialog(
-        context: Context,
-        uiTheme: UiTheme,
-        positiveButtonClickListener: View.OnClickListener,
-        negativeButtonClickListener: View.OnClickListener
-    ): AlertDialog {
-        val payload = DialogPayload.Option(
-            title = stringProvider.getRemoteString(R.string.android_screen_sharing_offer_with_notifications_title),
-            message = stringProvider.getRemoteString(R.string.android_screen_sharing_offer_with_notifications_message),
-            positiveButtonText = yes,
-            negativeButtonText = no,
-            poweredByText = poweredByText,
-            positiveButtonClickListener = positiveButtonClickListener,
-            negativeButtonClickListener = negativeButtonClickListener
-        )
-
-        return dialogService.showDialog(context, uiTheme, DialogType.Option(payload))
-    }
-
-    fun showAllowNotificationsDialog(
-        context: Context,
-        uiTheme: UiTheme,
-        positiveButtonClickListener: View.OnClickListener,
-        negativeButtonClickListener: View.OnClickListener
-    ): AlertDialog {
-        val payload = DialogPayload.Option(
-            title = stringProvider.getRemoteString(R.string.android_notification_allow_notifications_title),
-            message = stringProvider.getRemoteString(R.string.android_notification_allow_notifications_message),
-            positiveButtonText = yes,
-            negativeButtonText = no,
-            poweredByText = poweredByText,
-            positiveButtonClickListener = positiveButtonClickListener,
-            negativeButtonClickListener = negativeButtonClickListener
-
-        )
-
-        return dialogService.showDialog(context, uiTheme, DialogType.Option(payload))
-    }
-
     fun showUnAuthenticatedDialog(context: Context, uiTheme: UiTheme, buttonClickListener: View.OnClickListener): AlertDialog {
         val payload = DialogPayload.AlertDialog(
             title = stringProvider.getRemoteString(R.string.message_center_unavailable_title),

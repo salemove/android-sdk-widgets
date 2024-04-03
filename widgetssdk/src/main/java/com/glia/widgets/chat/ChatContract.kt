@@ -26,7 +26,6 @@ internal interface ChatContract {
         fun isCallVisualizerOngoing(): Boolean
         fun onFileDownloadClicked(attachmentFile: AttachmentFile)
         fun onRemoveAttachment(attachment: FileAttachment)
-        fun notificationDialogDismissed()
         fun newMessagesIndicatorClicked()
         fun onRecyclerviewPositionChanged(isBottom: Boolean)
         fun sendCustomCardResponse(customCard: CustomCardChatItem, text: String, value: String)

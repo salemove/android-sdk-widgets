@@ -15,7 +15,7 @@ import com.glia.widgets.core.dialog.domain.SetOverlayPermissionRequestDialogShow
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.notification.domain.RemoveScreenSharingNotificationUseCase
 import com.glia.widgets.core.notification.domain.ShowScreenSharingNotificationUseCase
-import com.glia.widgets.core.permissions.domain.HasScreenSharingNotificationChannelEnabledUseCase
+import com.glia.widgets.core.permissions.domain.WithNotificationPermissionUseCase
 import com.glia.widgets.engagement.ScreenSharingState
 import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCase
 import com.glia.widgets.engagement.domain.CheckMediaUpgradePermissionsUseCase
@@ -56,7 +56,6 @@ class OperatorRequestControllerTest {
     private lateinit var declineMediaUpgradeOfferUseCase: DeclineMediaUpgradeOfferUseCase
     private lateinit var checkMediaUpgradePermissionsUseCase: CheckMediaUpgradePermissionsUseCase
     private lateinit var screenSharingUseCase: ScreenSharingUseCase
-    private lateinit var hasScreenSharingNotificationChannelEnabledUseCase: HasScreenSharingNotificationChannelEnabledUseCase
     private lateinit var currentOperatorUseCase: CurrentOperatorUseCase
     private lateinit var showScreenSharingNotificationUseCase: ShowScreenSharingNotificationUseCase
     private lateinit var removeScreenSharingNotificationUseCase: RemoveScreenSharingNotificationUseCase
@@ -66,6 +65,7 @@ class OperatorRequestControllerTest {
     private lateinit var dialogController: DialogContract.Controller
     private lateinit var dialogCallbackSlot: CapturingSlot<DialogContract.Controller.Callback>
     private lateinit var gliaSdkConfigurationManager: GliaSdkConfigurationManager
+    private lateinit var withNotificationPermissionUseCase: WithNotificationPermissionUseCase
 
     private lateinit var controller: OperatorRequestContract.Controller
 
@@ -82,13 +82,13 @@ class OperatorRequestControllerTest {
         checkMediaUpgradePermissionsUseCase = mockk(relaxUnitFun = true)
         screenSharingUseCase = mockk(relaxUnitFun = true)
         every { screenSharingUseCase() } returns screenSharingProcessor
-        hasScreenSharingNotificationChannelEnabledUseCase = mockk(relaxUnitFun = true)
         currentOperatorUseCase = mockk(relaxUnitFun = true)
         showScreenSharingNotificationUseCase = mockk(relaxUnitFun = true)
         removeScreenSharingNotificationUseCase = mockk(relaxUnitFun = true)
         isShowOverlayPermissionRequestDialogUseCase = mockk(relaxUnitFun = true)
         isCurrentEngagementCallVisualizerUseCase = mockk(relaxUnitFun = true)
         setOverlayPermissionRequestDialogShownUseCase = mockk(relaxUnitFun = true)
+        withNotificationPermissionUseCase = mockk(relaxUnitFun = true)
         dialogController = mockk(relaxUnitFun = true)
 
         dialogCallbackSlot = slot()
@@ -101,7 +101,6 @@ class OperatorRequestControllerTest {
             declineMediaUpgradeOfferUseCase,
             checkMediaUpgradePermissionsUseCase,
             screenSharingUseCase,
-            hasScreenSharingNotificationChannelEnabledUseCase,
             currentOperatorUseCase,
             showScreenSharingNotificationUseCase,
             removeScreenSharingNotificationUseCase,
@@ -109,7 +108,8 @@ class OperatorRequestControllerTest {
             isCurrentEngagementCallVisualizerUseCase,
             setOverlayPermissionRequestDialogShownUseCase,
             dialogController,
-            gliaSdkConfigurationManager
+            gliaSdkConfigurationManager,
+            withNotificationPermissionUseCase
         )
 
         verify { operatorMediaUpgradeOfferUseCase() }
@@ -128,6 +128,17 @@ class OperatorRequestControllerTest {
             checkMediaUpgradePermissionsUseCase,
             dialogController
         )
+    }
+
+    @Test
+    fun `screen-sharing state Requested will show StartScreenSharingDialog when notification permission callback triggered`() {
+        screenSharingProcessor.onNext(ScreenSharingState.Requested)
+        val callbackSlot = slot<() -> Unit>()
+
+        verify { withNotificationPermissionUseCase(capture(callbackSlot)) }
+        verify(exactly = 0) { dialogController.showStartScreenSharingDialog() }
+        callbackSlot.captured.invoke()
+        verify { dialogController.showStartScreenSharingDialog() }
     }
 
     @Test
@@ -190,15 +201,6 @@ class OperatorRequestControllerTest {
         dialogCallbackSlot.captured.emitDialogState(DialogState.None)
 
         state.assertNotComplete().assertValue(OneTimeEvent(OperatorRequestContract.State.DismissAlertDialog))
-    }
-
-    @Test
-    fun `handleDialogCallback will produce EnableScreenSharingNotificationsAndStartSharing state when EnableScreenSharingNotificationsAndStartSharing dialog state is triggered`() {
-        val state = controller.state.test()
-
-        dialogCallbackSlot.captured.emitDialogState(DialogState.EnableScreenSharingNotificationsAndStartSharing)
-
-        state.assertNotComplete().assertValue(OneTimeEvent(OperatorRequestContract.State.EnableScreenSharingNotificationsAndStartSharing))
     }
 
     @Test
@@ -278,26 +280,6 @@ class OperatorRequestControllerTest {
     }
 
     @Test
-    fun `screen-sharing state Requested will show EnableScreenSharingNotificationsAndStartSharingDialog when notification channel is not enabled`() {
-        every { hasScreenSharingNotificationChannelEnabledUseCase() } returns false
-
-        screenSharingProcessor.onNext(ScreenSharingState.Requested)
-
-        verify { dialogController.showEnableScreenSharingNotificationsAndStartSharingDialog() }
-        verify(exactly = 0) { dialogController.showStartScreenSharingDialog() }
-    }
-
-    @Test
-    fun `screen-sharing state Requested will show ScreenSharingDialog when notification channel is enabled`() {
-        every { hasScreenSharingNotificationChannelEnabledUseCase() } returns true
-
-        screenSharingProcessor.onNext(ScreenSharingState.Requested)
-
-        verify(exactly = 0) { dialogController.showEnableScreenSharingNotificationsAndStartSharingDialog() }
-        verify { dialogController.showStartScreenSharingDialog() }
-    }
-
-    @Test
     fun `screen-sharing state Ended will remove notification`() {
         screenSharingProcessor.onNext(ScreenSharingState.Ended)
 
@@ -320,53 +302,22 @@ class OperatorRequestControllerTest {
     }
 
     @Test
-    fun `onShowEnableScreenSharingNotificationsAccepted will produce OpenNotificationsScreen state`() {
+    fun `onScreenSharingDialogAccepted will produce AcquireMediaProjection state`() {
         val state = controller.state.test()
 
-        controller.onShowEnableScreenSharingNotificationsAccepted()
+        controller.onScreenSharingDialogAccepted()
         verify { dialogController.dismissCurrentDialog() }
-
-        state.assertNotComplete().assertValue(OneTimeEvent(OperatorRequestContract.State.OpenNotificationsScreen))
+        state.assertNotComplete().assertValue { it.value == OperatorRequestContract.State.AcquireMediaProjectionToken }
     }
 
     @Test
-    fun `onShowEnableScreenSharingNotificationsDeclined will decline request and finish activity when it is DialogHolderActivity`() {
+    fun `onMediaProjectionRequested  will accept request with acceptRequestWithAskedPermission`() {
         val activity: DialogHolderActivity = mockk(relaxUnitFun = true)
-
-        controller.onShowEnableScreenSharingNotificationsDeclined(activity)
-        verify { dialogController.dismissCurrentDialog() }
-        verify { screenSharingUseCase.declineRequest() }
-        verify { activity.finish() }
-
-        confirmVerified(activity)
-    }
-
-    @Test
-    fun `onShowEnableScreenSharingNotificationsDeclined will decline request and not finish the activity when it is not DialogHolderActivity`() {
-        val activity: ChatActivity = mockk(relaxUnitFun = true)
-
-        controller.onShowEnableScreenSharingNotificationsDeclined(activity)
-        verify { dialogController.dismissCurrentDialog() }
-        verify { screenSharingUseCase.declineRequest() }
-        verify(exactly = 0) { activity.finish() }
-
-        confirmVerified(activity)
-    }
-
-    @Test
-    fun `onScreenSharingDialogAccepted will accept request with acceptRequestWithAskedPermission`() {
-        val activity: DialogHolderActivity = mockk(relaxUnitFun = true)
-
-        val state = controller.state.test()
-
-        controller.onScreenSharingDialogAccepted(activity)
-        verify { dialogController.dismissCurrentDialog() }
+        controller.onMediaProjectionRequested(activity)
         verify { showScreenSharingNotificationUseCase() }
         verify { gliaSdkConfigurationManager.screenSharingMode }
         verify { screenSharingUseCase.acceptRequestWithAskedPermission(eq(activity), any()) }
-
-        state.assertNotComplete().assertValue { it.value == OperatorRequestContract.State.AcquireMediaProjectionToken }
-        confirmVerified(activity, showScreenSharingNotificationUseCase, screenSharingUseCase, gliaSdkConfigurationManager)
+        confirmVerified(showScreenSharingNotificationUseCase, screenSharingUseCase, gliaSdkConfigurationManager)
     }
 
     @Test
@@ -391,44 +342,6 @@ class OperatorRequestControllerTest {
         verify(exactly = 0) { activity.finish() }
 
         confirmVerified(activity)
-    }
-
-    @Test
-    fun `onReturnedFromNotificationScreen will show EnableScreenSharingNotificationsAndStartSharingDialog when notification channel is not enabled`() {
-        every { hasScreenSharingNotificationChannelEnabledUseCase() } returns false
-
-        controller.onReturnedFromNotificationScreen()
-
-        verify { dialogController.showEnableScreenSharingNotificationsAndStartSharingDialog() }
-        verify(exactly = 0) { dialogController.showStartScreenSharingDialog() }
-    }
-
-    @Test
-    fun `onReturnedFromNotificationScreen will show ScreenSharingDialog when notification channel is enabled`() {
-        every { hasScreenSharingNotificationChannelEnabledUseCase() } returns true
-
-        controller.onReturnedFromNotificationScreen()
-
-        verify(exactly = 0) { dialogController.showEnableScreenSharingNotificationsAndStartSharingDialog() }
-        verify { dialogController.showStartScreenSharingDialog() }
-    }
-
-    @Test
-    fun `onNotificationScreenRequested will produce WaitForNotificationScreenOpen state`() {
-        val state = controller.state.test()
-
-        controller.onNotificationScreenRequested()
-
-        state.assertNotComplete().assertValue(OneTimeEvent(OperatorRequestContract.State.WaitForNotificationScreenOpen))
-    }
-
-    @Test
-    fun `onNotificationScreenOpened will produce WaitForNotificationScreenResult state`() {
-        val state = controller.state.test()
-
-        controller.onNotificationScreenOpened()
-
-        state.assertNotComplete().assertValue(OneTimeEvent(OperatorRequestContract.State.WaitForNotificationScreenResult))
     }
 
     @Test

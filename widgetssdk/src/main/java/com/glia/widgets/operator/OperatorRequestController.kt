@@ -13,7 +13,7 @@ import com.glia.widgets.core.dialog.domain.SetOverlayPermissionRequestDialogShow
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.notification.domain.RemoveScreenSharingNotificationUseCase
 import com.glia.widgets.core.notification.domain.ShowScreenSharingNotificationUseCase
-import com.glia.widgets.core.permissions.domain.HasScreenSharingNotificationChannelEnabledUseCase
+import com.glia.widgets.core.permissions.domain.WithNotificationPermissionUseCase
 import com.glia.widgets.engagement.ScreenSharingState
 import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCase
 import com.glia.widgets.engagement.domain.CheckMediaUpgradePermissionsUseCase
@@ -40,7 +40,6 @@ internal class OperatorRequestController(
     private val declineMediaUpgradeOfferUseCase: DeclineMediaUpgradeOfferUseCase,
     private val checkMediaUpgradePermissionsUseCase: CheckMediaUpgradePermissionsUseCase,
     private val screenSharingUseCase: ScreenSharingUseCase,
-    private val hasScreenSharingNotificationChannelEnabledUseCase: HasScreenSharingNotificationChannelEnabledUseCase,
     private val currentOperatorUseCase: CurrentOperatorUseCase,
     private val showScreenSharingNotificationUseCase: ShowScreenSharingNotificationUseCase,
     private val removeScreenSharingNotificationUseCase: RemoveScreenSharingNotificationUseCase,
@@ -48,7 +47,8 @@ internal class OperatorRequestController(
     private val isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase,
     private val setOverlayPermissionRequestDialogShownUseCase: SetOverlayPermissionRequestDialogShownUseCase,
     private val dialogController: DialogContract.Controller,
-    private val gliaSdkConfigurationManager: GliaSdkConfigurationManager
+    private val gliaSdkConfigurationManager: GliaSdkConfigurationManager,
+    private val withNotificationPermissionUseCase: WithNotificationPermissionUseCase
 ) : OperatorRequestContract.Controller {
 
     private val _state: PublishProcessor<State> = PublishProcessor.create()
@@ -87,9 +87,7 @@ internal class OperatorRequestController(
     }
 
     private fun onScreenSharingRequested() {
-        if (!hasScreenSharingNotificationChannelEnabledUseCase()) {
-            dialogController.showEnableScreenSharingNotificationsAndStartSharingDialog()
-        } else {
+        withNotificationPermissionUseCase {
             dialogController.showStartScreenSharingDialog()
         }
     }
@@ -107,7 +105,6 @@ internal class OperatorRequestController(
         when (dialogState) {
             is DialogState.MediaUpgrade -> _state.onNext(State.RequestMediaUpgrade(dialogState.data))
             is DialogState.None -> _state.onNext(State.DismissAlertDialog)
-            is DialogState.EnableScreenSharingNotificationsAndStartSharing -> _state.onNext(State.EnableScreenSharingNotificationsAndStartSharing)
             is DialogState.StartScreenSharing -> _state.onNext(State.ShowScreenSharingDialog(currentOperatorUseCase.formattedNameValue))
             is DialogState.CVOverlayPermission -> _state.onNext(State.ShowOverlayDialog)
             else -> {
@@ -138,22 +135,9 @@ internal class OperatorRequestController(
         declineMediaUpgradeOfferUseCase(offer)
     }
 
-    override fun onShowEnableScreenSharingNotificationsAccepted() {
-        dismissAlertDialog()
-        _state.onNext(State.OpenNotificationsScreen)
-    }
-
-    override fun onShowEnableScreenSharingNotificationsDeclined(activity: Activity) {
-        dismissAlertDialog()
-        finishIfDialogHolderActivity(activity)
-        screenSharingUseCase.declineRequest()
-    }
-
-    override fun onScreenSharingDialogAccepted(activity: Activity) {
+    override fun onScreenSharingDialogAccepted() {
         dismissAlertDialog()
         _state.onNext(State.AcquireMediaProjectionToken)
-        showScreenSharingNotificationUseCase()
-        screenSharingUseCase.acceptRequestWithAskedPermission(activity, gliaSdkConfigurationManager.screenSharingMode)
     }
 
     override fun onScreenSharingDialogDeclined(activity: Activity) {
@@ -162,12 +146,9 @@ internal class OperatorRequestController(
         screenSharingUseCase.declineRequest()
     }
 
-    override fun onReturnedFromNotificationScreen() {
-        onScreenSharingRequested()
-    }
-
-    override fun onNotificationScreenRequested() {
-        _state.onNext(State.WaitForNotificationScreenOpen)
+    override fun onMediaProjectionRequested(activity: Activity) {
+        showScreenSharingNotificationUseCase()
+        screenSharingUseCase.acceptRequestWithAskedPermission(activity, gliaSdkConfigurationManager.screenSharingMode)
     }
 
     override fun onMediaProjectionResultReceived(result: ActivityResult, activity: ComponentActivity) {
@@ -204,10 +185,6 @@ internal class OperatorRequestController(
 
     override fun failedToOpenOverlayPermissionScreen() {
         Logger.d(TAG, "No Activity to open Overlay permission screen ❌")
-    }
-
-    override fun onNotificationScreenOpened() {
-        _state.onNext(State.WaitForNotificationScreenResult)
     }
 
     private fun finishIfDialogHolderActivity(activity: Activity) {

@@ -31,8 +31,6 @@ import com.glia.widgets.survey.SurveyContract;
 import com.glia.widgets.survey.SurveyController;
 import com.glia.widgets.view.MessagesNotSeenHandler;
 import com.glia.widgets.view.MinimizeHandler;
-import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContract;
-import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoController;
 import com.glia.widgets.view.head.ChatHeadContract;
 import com.glia.widgets.view.head.ChatHeadLayoutContract;
 import com.glia.widgets.view.head.ChatHeadPosition;
@@ -276,13 +274,6 @@ public class ControllerFactory {
             );
         }
         return callVisualizerController;
-    }
-
-    public FloatingVisitorVideoContract.Controller getFloatingVisitorVideoController() {
-        return new FloatingVisitorVideoController(
-            useCaseFactory.createIsShowVideoUseCase(),
-            useCaseFactory.createIsShowOnHoldUseCase(),
-            useCaseFactory.getVisitorMediaUseCase());
     }
 
     public MessageCenterContract.Controller getMessageCenterController(String queueId) {

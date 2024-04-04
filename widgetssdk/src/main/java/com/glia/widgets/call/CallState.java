@@ -418,8 +418,12 @@ class CallState {
         return isCallOngoingAndOperatorConnected() && !showOnHold() || isTransferring();
     }
 
+    public boolean showVisitorVideo() {
+        return isVisible && isVisitorVideoPlaying(callStatus.getVisitorMediaState());
+    }
+
     public boolean showOperatorVideo() {
-        return isVideoCallAndOperatorVideoIsConnected() && !showOnHold();
+        return isVisible && isVideoCallAndOperatorVideoIsConnected() && !showOnHold();
     }
 
     public boolean showContinueBrowsingView() {

@@ -5,11 +5,8 @@ import com.glia.widgets.base.BaseController
 import com.glia.widgets.base.BaseView
 
 internal interface FloatingVisitorVideoContract {
-    interface Controller : BaseController {
-        fun setView(view: View)
-    }
 
-    interface View : BaseView<Controller> {
+    interface View {
         fun show(state: MediaState?)
         fun hide()
         fun onResume()

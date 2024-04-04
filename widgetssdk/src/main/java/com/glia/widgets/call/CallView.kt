@@ -306,6 +306,19 @@ internal class CallView(
         }
     }
 
+    private fun handleVisitorVideoState(state: CallState) {
+        if (state.showVisitorVideo()) {
+            showVisitorVideo(state.callStatus.visitorMediaState)
+        } else {
+            hideVisitorVideo()
+        }
+        if (state.showOnHold()) {
+            floatingVisitorVideoContainer.showOnHold()
+        } else {
+            floatingVisitorVideoContainer.hideOnHold()
+        }
+    }
+
     private fun handleOperatorVideoState(state: CallState) {
         if (state.showOperatorVideo() && operatorVideoContainer.visibility == GONE) {
             operatorVideoContainer.visibility = VISIBLE
@@ -649,6 +662,10 @@ internal class CallView(
         Dependencies.destroyControllers()
     }
 
+    private fun showVisitorVideo(visitorMediaState: MediaState?) {
+        floatingVisitorVideoContainer.show(visitorMediaState)
+    }
+
     private fun showOperatorVideo(operatorMediaState: MediaState?) {
         releaseOperatorVideoStream()
         operatorMediaState?.video?.also {
@@ -869,6 +886,7 @@ internal class CallView(
             handleContinueBrowsingView(callState)
             handleOperatorStatusViewState(callState)
             handleOperatorVideoState(callState)
+            handleVisitorVideoState(callState)
             handleControlsVisibility(callState)
             onIsSpeakerOnStateChanged(callState.isSpeakerOn)
             if (callState.isVisible) {

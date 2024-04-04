@@ -19,7 +19,6 @@ import com.glia.widgets.core.configuration.GliaSdkConfigurationManager
 import com.glia.widgets.di.ControllerFactory
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.ResourceProvider
-import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContract
 import com.glia.widgets.view.head.ChatHeadContract
 import io.mockk.CapturingSlot
 import io.mockk.every
@@ -42,7 +41,6 @@ class CallActivityTest {
     private lateinit var serviceChatHeadController: ChatHeadContract.Controller
     private lateinit var sdkConfigurationManager: GliaSdkConfigurationManager
     private lateinit var resourceProvider: ResourceProvider
-    private lateinit var floatingVisitorVideoController: FloatingVisitorVideoContract.Controller
     private lateinit var callStatus: CallStatus
     private lateinit var callViewSlot: CapturingSlot<CallContract.View>
     private lateinit var activityScenario: ActivityScenario<CallActivity>
@@ -61,12 +59,10 @@ class CallActivityTest {
         every { callController.shouldShowMediaEngagementView(any()) } returns true
 
         serviceChatHeadController = mockk(relaxed = true)
-        floatingVisitorVideoController = mockk(relaxed = true)
 
         every { controllerFactory.callController } answers { callController }
 
         every { controllerFactory.chatHeadController } answers { serviceChatHeadController }
-        every { controllerFactory.floatingVisitorVideoController } answers { floatingVisitorVideoController }
         Dependencies.setControllerFactory(controllerFactory)
 
         // set up SdkConfigurationManager

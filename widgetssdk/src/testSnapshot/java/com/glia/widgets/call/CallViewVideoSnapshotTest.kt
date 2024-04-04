@@ -188,11 +188,7 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(
     fun video2WayCallStarted() {
         snapshot(
             setupView(
-                callState = video2WayCallStartedState(),
-                floatingVisitorVideoViewCallback = { view, state ->
-                    view.show(state!!.callStatus.visitorMediaState)
-                    view.hideOnHold()
-                }
+                callState = video2WayCallStartedState()
             ).root
         )
     }
@@ -202,10 +198,6 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(
         snapshot(
             setupView(
                 callState = video2WayCallStartedState(),
-                floatingVisitorVideoViewCallback = { view, state ->
-                    view.show(state!!.callStatus.visitorMediaState)
-                    view.hideOnHold()
-                },
                 uiTheme = uiTheme()
             ).root
         )
@@ -216,10 +208,6 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(
         snapshot(
             setupView(
                 callState = video2WayCallStartedState(),
-                floatingVisitorVideoViewCallback = { view, state ->
-                    view.show(state!!.callStatus.visitorMediaState)
-                    view.hideOnHold()
-                },
                 unifiedTheme = unifiedThemeWithGlobalColors()
             ).root
         )
@@ -230,10 +218,6 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(
         snapshot(
             setupView(
                 callState = video2WayCallStartedState(),
-                floatingVisitorVideoViewCallback = { view, state ->
-                    view.show(state!!.callStatus.visitorMediaState)
-                    view.hideOnHold()
-                },
                 unifiedTheme = unifiedTheme()
             ).root
         )
@@ -244,10 +228,6 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(
         snapshot(
             setupView(
                 callState = video2WayCallStartedState(),
-                floatingVisitorVideoViewCallback = { view, state ->
-                    view.show(state!!.callStatus.visitorMediaState)
-                    view.hideOnHold()
-                },
                 unifiedTheme = unifiedThemeWithoutCall()
             ).root
         )
@@ -262,11 +242,7 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(
     fun onHold() {
         snapshot(
             setupView(
-                callState = onHoldState(),
-                floatingVisitorVideoViewCallback = { view, state ->
-                    view.show(state!!.callStatus.visitorMediaState)
-                    view.hide()
-                }
+                callState = onHoldState()
             ).root
         )
     }
@@ -276,10 +252,6 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(
         snapshot(
             setupView(
                 callState = onHoldState(),
-                floatingVisitorVideoViewCallback = { view, state ->
-                    view.show(state!!.callStatus.visitorMediaState)
-                    view.hide()
-                },
                 uiTheme = uiTheme()
             ).root
         )
@@ -290,10 +262,6 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(
         snapshot(
             setupView(
                 callState = onHoldState(),
-                floatingVisitorVideoViewCallback = { view, state ->
-                    view.show(state!!.callStatus.visitorMediaState)
-                    view.hide()
-                },
                 unifiedTheme = unifiedThemeWithGlobalColors()
             ).root
         )
@@ -304,10 +272,6 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(
         snapshot(
             setupView(
                 callState = onHoldState(),
-                floatingVisitorVideoViewCallback = { view, state ->
-                    view.show(state!!.callStatus.visitorMediaState)
-                    view.hide()
-                },
                 unifiedTheme = unifiedTheme()
             ).root
         )
@@ -318,10 +282,6 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(
         snapshot(
             setupView(
                 callState = onHoldState(),
-                floatingVisitorVideoViewCallback = { view, state ->
-                    view.show(state!!.callStatus.visitorMediaState)
-                    view.hide()
-                },
                 unifiedTheme = unifiedThemeWithoutCall()
             ).root
         )

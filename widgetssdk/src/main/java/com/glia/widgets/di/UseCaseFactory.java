@@ -157,8 +157,6 @@ import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromNetworkUseCas
 import com.glia.widgets.filepreview.domain.usecase.IsFileReadyForPreviewUseCase;
 import com.glia.widgets.filepreview.domain.usecase.PutImageFileToDownloadsUseCase;
 import com.glia.widgets.helper.rx.Schedulers;
-import com.glia.widgets.view.floatingvisitorvideoview.domain.IsShowOnHoldUseCase;
-import com.glia.widgets.view.floatingvisitorvideoview.domain.IsShowVideoUseCase;
 import com.glia.widgets.view.snackbar.LiveObservationPopupUseCase;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -498,16 +496,6 @@ public class UseCaseFactory {
     @NonNull
     public GliaSurveyAnswerUseCase getSurveyAnswerUseCase() {
         return new GliaSurveyAnswerUseCase(repositoryFactory.getGliaSurveyRepository());
-    }
-
-    @NonNull
-    public IsShowVideoUseCase createIsShowVideoUseCase() {
-        return new IsShowVideoUseCase(schedulers);
-    }
-
-    @NonNull
-    public IsShowOnHoldUseCase createIsShowOnHoldUseCase() {
-        return new IsShowOnHoldUseCase(schedulers);
     }
 
     @NonNull

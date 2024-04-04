@@ -22,7 +22,6 @@ import com.glia.widgets.view.ViewHelpers;
  */
 public class FloatingVisitorVideoContainer extends ConstraintLayout
         implements FloatingVisitorVideoContract.View {
-    private FloatingVisitorVideoContract.Controller controller;
     private FloatingVisitorVideoView floatingVisitorVideoView;
 
     public FloatingVisitorVideoContainer(@NonNull Context context) {
@@ -38,12 +37,7 @@ public class FloatingVisitorVideoContainer extends ConstraintLayout
         init();
     }
 
-    private StringProvider stringProvider = Dependencies.getStringProvider();
-
-    @Override
-    public void setController(FloatingVisitorVideoContract.Controller controller) {
-        this.controller = controller;
-    }
+    private final StringProvider stringProvider = Dependencies.getStringProvider();
 
     @Override
     public void show(MediaState state) {
@@ -81,18 +75,10 @@ public class FloatingVisitorVideoContainer extends ConstraintLayout
         floatingVisitorVideoView.hideOnHold();
     }
 
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-        controller.onDestroy();
-    }
-
     private void init() {
         LayoutInflater.from(getContext()).inflate(R.layout.visitor_video_layout_view, this);
         floatingVisitorVideoView = findViewById(R.id.visitor_video_card);
         floatingVisitorVideoView.setContentDescription(stringProvider.getRemoteString(R.string.call_visitor_video_accessibility_label));
-        setController(Dependencies.getControllerFactory().getFloatingVisitorVideoController());
-        controller.setView(this);
         setVisitorVideoContainerTouchListener();
         hide();
     }

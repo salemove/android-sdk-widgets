@@ -22,7 +22,6 @@ import com.glia.widgets.snapshotutils.SnapshotLottie
 import com.glia.widgets.snapshotutils.SnapshotProviders
 import com.glia.widgets.snapshotutils.SnapshotSchedulers
 import com.glia.widgets.snapshotutils.SnapshotTheme
-import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContract
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import org.mockito.kotlin.KArgumentCaptor
 import org.mockito.kotlin.any
@@ -41,8 +40,7 @@ internal interface SnapshotCallView : SnapshotContent, SnapshotTheme, SnapshotAc
         val activityMock: SnapshotActivityWindow.Mock,
         val schedulersMock: SnapshotSchedulers.Mock,
         val controllerFactoryMock: ControllerFactory,
-        val callControllerMock: CallContract.Controller,
-        val floatingVisitorVideoController: FloatingVisitorVideoContract.Controller
+        val callControllerMock: CallContract.Controller
     )
 
     fun callViewMock(): Mock {
@@ -55,16 +53,14 @@ internal interface SnapshotCallView : SnapshotContent, SnapshotTheme, SnapshotAc
 
         val controllerFactoryMock = mock<ControllerFactory>()
         val callControllerMock = mock<CallContract.Controller>()
-        val floatingVisitorVideoController = mock<FloatingVisitorVideoContract.Controller>()
         whenever(controllerFactoryMock.callController).thenReturn(callControllerMock)
-        whenever(controllerFactoryMock.floatingVisitorVideoController).thenReturn(floatingVisitorVideoController)
         Dependencies.setControllerFactory(controllerFactoryMock)
 
         setOnEndListener {
             Dependencies.setControllerFactory(null)
         }
 
-        return Mock(activityMock, schedulersMock, controllerFactoryMock, callControllerMock, floatingVisitorVideoController)
+        return Mock(activityMock, schedulersMock, controllerFactoryMock, callControllerMock)
     }
 
     data class ViewData(
@@ -79,8 +75,7 @@ internal interface SnapshotCallView : SnapshotContent, SnapshotTheme, SnapshotAc
         executor: Executor? = Executor(Runnable::run),
         unifiedTheme: UnifiedTheme? = null,
         uiTheme: UiTheme? = null,
-        callViewCallback: ((CallContract.View, callState: CallState?) -> Unit)? = null,
-        floatingVisitorVideoViewCallback: ((FloatingVisitorVideoContract.View, callState: CallState?) -> Unit)? = null
+        callViewCallback: ((CallContract.View, callState: CallState?) -> Unit)? = null
     ): ViewData {
         val mock = callViewMock()
 
@@ -88,13 +83,11 @@ internal interface SnapshotCallView : SnapshotContent, SnapshotTheme, SnapshotAc
         Dependencies.getSdkConfigurationManager().companyName = companyName
 
         val callViewCaptor: KArgumentCaptor<CallContract.View> = argumentCaptor()
-        val floatingVisitorVideoViewCaptor: KArgumentCaptor<FloatingVisitorVideoContract.View> = argumentCaptor()
 
         val callActivityBinding = CallActivityBinding.inflate(layoutInflater)
         val root = callActivityBinding.root
         val callView = callActivityBinding.callView
         verify(mock.callControllerMock).setView(callViewCaptor.capture())
-        verify(mock.floatingVisitorVideoController).setView(floatingVisitorVideoViewCaptor.capture())
 
         callView.setUiTheme(uiTheme)
 
@@ -103,10 +96,6 @@ internal interface SnapshotCallView : SnapshotContent, SnapshotTheme, SnapshotAc
         val callViewContract = callViewCaptor.lastValue
         callState?.let { callViewContract.emitState(it) }
         callViewCallback?.invoke(callViewContract, callState)
-
-        floatingVisitorVideoViewCallback?.let {
-            it(floatingVisitorVideoViewCaptor.lastValue, callState)
-        }
 
         setOnEndListener {
             Dependencies.getGliaThemeManager().theme = null

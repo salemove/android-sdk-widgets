@@ -44,9 +44,6 @@ private const val TAG = "EngagementRepository"
 internal const val MEDIA_PERMISSION_REQUEST_CODE = 0x3E9
 
 @VisibleForTesting
-internal const val UNIQUE_RESULT_CODE = 0x1994
-
-@VisibleForTesting
 internal const val SKIP_ASKING_SCREEN_SHARING_PERMISSION_RESULT_CODE = 0x1995
 
 internal class EngagementRepositoryImpl(private val core: GliaCore, private val operatorRepository: GliaOperatorRepository) : EngagementRepository {
@@ -112,6 +109,10 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
     private val _screenSharingState: BehaviorProcessor<ScreenSharingState> = BehaviorProcessor.create()
     override val screenSharingState: Flowable<ScreenSharingState> = _screenSharingState.onBackpressureLatest()
 
+
+    private val readyToShareScreenProcessor: PublishProcessor<Unit> = PublishProcessor.create()
+    private val mediaProjectionActivityResultProcessor: PublishProcessor<Pair<Int, Intent?>> = PublishProcessor.create()
+
     private var currentScreenSharingRequest: ScreenSharingRequest? = null
     private var currentScreenSharingScreen: LocalScreen? = null
 
@@ -137,6 +138,13 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
         core.on(Glia.Events.QUEUE_TICKET, queueTicketCallback)
         core.callVisualizer.on(Omnibrowse.Events.ENGAGEMENT, callVisualizerEngagementCallback)
         core.callVisualizer.on(Omnibrowse.Events.ENGAGEMENT_REQUEST, engagementRequestCallback)
+        Flowable.zip(mediaProjectionActivityResultProcessor, readyToShareScreenProcessor) { result, _ ->
+            /**
+             * This function must be called only when both processors have emitted a value, in other words,
+             * when the [onReadyToShareScreen] and the [onReadyToShareScreen] functions have been called
+             */
+            onActivityResult(SKIP_ASKING_SCREEN_SHARING_PERMISSION_RESULT_CODE, result.first, result.second)
+        }.subscribe()
     }
 
     override fun reset() {
@@ -584,11 +592,6 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
         _screenSharingState.onNext(ScreenSharingState.RequestDeclined)
     }
 
-    override fun acceptScreenSharingRequest(activity: Activity, mode: ScreenSharing.Mode) {
-        Logger.i(TAG, "Screen sharing accepted by visitor")
-        currentScreenSharingRequest?.accept(mode, activity, UNIQUE_RESULT_CODE, screenSharingRequestResponseCallback)
-    }
-
     override fun acceptScreenSharingWithAskedPermission(activity: Activity, mode: ScreenSharing.Mode) {
         Logger.i(TAG, "Screen sharing accepted by visitor, permission asked")
         currentScreenSharingRequest?.accept(mode, activity, SKIP_ASKING_SCREEN_SHARING_PERMISSION_RESULT_CODE, screenSharingRequestResponseCallback)
@@ -599,6 +602,10 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
     }
 
     override fun onActivityResultSkipScreenSharingPermissionRequest(resultCode: Int, intent: Intent?) {
-        onActivityResult(SKIP_ASKING_SCREEN_SHARING_PERMISSION_RESULT_CODE, resultCode, intent)
+        mediaProjectionActivityResultProcessor.onNext(resultCode to intent)
+    }
+
+    override fun onReadyToShareScreen() {
+        readyToShareScreenProcessor.onNext(Unit)
     }
 }

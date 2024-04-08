@@ -352,7 +352,6 @@ class OperatorRequestActivityWatcherTest {
         verify { event.markConsumed() }
         verify { mockkActivity.localClassName }
         verify { resultLauncher.launch(any()) }
-        verify { controller.onMediaProjectionRequested(mockkActivity) }
         verify(exactly = 0) { resultLauncher2.launch(any()) }
 
         confirmVerified(mockkActivity, resultLauncher, mockkActivity2, resultLauncher2)
@@ -420,7 +419,7 @@ class OperatorRequestActivityWatcherTest {
             onAcceptSlot.captured.onClick(mockk())
 
             verify { state.markConsumed() }
-            verify { controller.onScreenSharingDialogAccepted() }
+            verify { controller.onScreenSharingDialogAccepted(activity) }
         }
         unmockkObject(Dialogs)
     }

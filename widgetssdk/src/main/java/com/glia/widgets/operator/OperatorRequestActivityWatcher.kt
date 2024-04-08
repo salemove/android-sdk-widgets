@@ -78,7 +78,6 @@ internal class OperatorRequestActivityWatcher(
             mediaProjectionResultLaunchers[activity.localClassName]?.launch(
                 activity.getSystemService<MediaProjectionManager>()?.createScreenCaptureIntent()
             )
-            controller.onMediaProjectionRequested(activity)
         }
     }
 
@@ -124,7 +123,7 @@ internal class OperatorRequestActivityWatcher(
         showAlertDialogWithStyledContext(activity) { context, uiTheme ->
             Dialogs.showScreenSharingDialog(context, uiTheme, operatorName, {
                 consumeCallback()
-                controller.onScreenSharingDialogAccepted()
+                controller.onScreenSharingDialogAccepted(activity)
             }) {
                 consumeCallback()
                 controller.onScreenSharingDialogDeclined(activity)

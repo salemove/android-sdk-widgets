@@ -367,14 +367,14 @@ public class ControllerFactory {
             useCaseFactory.getCheckMediaUpgradePermissionsUseCase(),
             useCaseFactory.getScreenSharingUseCase(),
             useCaseFactory.getCurrentOperatorUseCase(),
-            useCaseFactory.createShowScreenSharingNotificationUseCase(),
-            useCaseFactory.createRemoveScreenSharingNotificationUseCase(),
             useCaseFactory.createIsShowOverlayPermissionRequestDialogUseCase(),
             useCaseFactory.getIsCurrentEngagementCallVisualizer(),
             useCaseFactory.createSetOverlayPermissionRequestDialogShownUseCase(),
             dialogController,
             sdkConfigurationManager,
-            useCaseFactory.getWithNotificationPermissionUseCase()
+            useCaseFactory.getWithNotificationPermissionUseCase(),
+            useCaseFactory.getPrepareToScreenSharingUseCase(),
+            useCaseFactory.getReleaseScreenSharingResourcesUseCase()
         );
     }
 }

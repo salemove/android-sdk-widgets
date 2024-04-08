@@ -1,6 +1,5 @@
 package com.glia.widgets.core.screensharing
 
-import android.app.ForegroundServiceStartNotAllowedException
 import android.app.Service
 import android.content.Intent
 import android.content.pm.ServiceInfo
@@ -11,8 +10,7 @@ import com.glia.widgets.core.notification.NotificationFactory.createScreenSharin
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
-import com.glia.widgets.helper.Logger
-import com.glia.widgets.helper.TAG
+import com.glia.widgets.engagement.domain.InformThatReadyToShareScreenUseCase
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 private const val SERVICE_ID = 123
@@ -29,6 +27,7 @@ const val ACTION_START = "EngagementMonitoringService:Start"
 class MediaProjectionService : Service() {
     private val compositeDisposable: CompositeDisposable by lazy { CompositeDisposable() }
     private val engagementStateUseCase: EngagementStateUseCase by lazy { Dependencies.getUseCaseFactory().engagementStateUseCase }
+    private val informThatReadyToShareScreenUseCase: InformThatReadyToShareScreenUseCase by lazy { Dependencies.getUseCaseFactory().readyToShareScreenUseCase }
 
     override fun onBind(intent: Intent): IBinder? {
         return null
@@ -36,17 +35,7 @@ class MediaProjectionService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        try {
-            setupAsForegroundService()
-        } catch (e: Exception) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && e is ForegroundServiceStartNotAllowedException) {
-                // App not in a valid state to start foreground service
-                // (e.g., started from bg)
-                Logger.d(TAG, "Service started from background")
-            } else {
-                Logger.e(TAG, "Failed to start service", e)
-            }
-        }
+        setupAsForegroundService()
     }
 
     private fun setupAsForegroundService() {
@@ -63,6 +52,8 @@ class MediaProjectionService : Service() {
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+        informThatReadyToShareScreenUseCase()
+
         if (ACTION_START == intent.action) {
             engagementStateUseCase()
                 .filter { it is State.FinishedCallVisualizer || it is State.FinishedOmniCore }

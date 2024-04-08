@@ -1071,22 +1071,6 @@ class EngagementRepositoryTest {
     }
 
     @Test
-    fun `acceptScreenSharingRequest will accept request with UNIQUE_RESULT_CODE result code`() {
-        val activity: Activity = mockk()
-        val screenSharingMode = ScreenSharing.Mode.APP_BOUNDED
-        requestScreenSharing {
-            repository.acceptScreenSharingRequest(activity, screenSharingMode)
-            val onAcceptResultSlot = slot<Consumer<GliaException?>>()
-
-            verify { it.accept(screenSharingMode, activity, UNIQUE_RESULT_CODE, capture(onAcceptResultSlot)) }
-            onAcceptResultSlot.captured.accept(null)
-
-            repository.screenSharingState.test().assertNotComplete().assertValue(ScreenSharingState.RequestAccepted)
-            assertTrue(repository.isSharingScreen)
-        }
-    }
-
-    @Test
     fun `acceptScreenSharingWithAskedPermission will accept request with SKIP_ASKING_SCREEN_SHARING_PERMISSION_RESULT_CODE result code`() {
         val activity: Activity = mockk()
         val screenSharingMode = ScreenSharing.Mode.APP_BOUNDED
@@ -1115,6 +1099,8 @@ class EngagementRepositoryTest {
     fun `onActivityResultSkipScreenSharingPermissionRequest will call appropriate engagement function with special request code when ongoing engagement`() {
         mockEngagementAndStart()
         repository.onActivityResultSkipScreenSharingPermissionRequest(1, null)
+        repository.onReadyToShareScreen()
+        repository.onReadyToShareScreen()
         verify { engagement.onActivityResult(SKIP_ASKING_SCREEN_SHARING_PERMISSION_RESULT_CODE, 1, null) }
     }
 

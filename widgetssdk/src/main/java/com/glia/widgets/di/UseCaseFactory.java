@@ -140,6 +140,8 @@ import com.glia.widgets.engagement.domain.EngagementTypeUseCase;
 import com.glia.widgets.engagement.domain.EngagementTypeUseCaseImpl;
 import com.glia.widgets.engagement.domain.EnqueueForEngagementUseCase;
 import com.glia.widgets.engagement.domain.EnqueueForEngagementUseCaseImpl;
+import com.glia.widgets.engagement.domain.InformThatReadyToShareScreenUseCase;
+import com.glia.widgets.engagement.domain.InformThatReadyToShareScreenUseCaseImpl;
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase;
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCaseImpl;
 import com.glia.widgets.engagement.domain.IsOperatorPresentUseCase;
@@ -152,10 +154,18 @@ import com.glia.widgets.engagement.domain.OperatorMediaUseCase;
 import com.glia.widgets.engagement.domain.OperatorMediaUseCaseImpl;
 import com.glia.widgets.engagement.domain.OperatorTypingUseCase;
 import com.glia.widgets.engagement.domain.OperatorTypingUseCaseImpl;
+import com.glia.widgets.engagement.domain.PrepareToScreenSharingUseCase;
+import com.glia.widgets.engagement.domain.PrepareToScreenSharingUseCaseImpl;
 import com.glia.widgets.engagement.domain.ReleaseResourcesUseCase;
 import com.glia.widgets.engagement.domain.ReleaseResourcesUseCaseImpl;
+import com.glia.widgets.engagement.domain.ReleaseScreenSharingResourcesUseCase;
+import com.glia.widgets.engagement.domain.ReleaseScreenSharingResourcesUseCaseImpl;
 import com.glia.widgets.engagement.domain.ScreenSharingUseCase;
 import com.glia.widgets.engagement.domain.ScreenSharingUseCaseImpl;
+import com.glia.widgets.engagement.domain.StartMediaProjectionServiceUseCase;
+import com.glia.widgets.engagement.domain.StartMediaProjectionServiceUseCaseImpl;
+import com.glia.widgets.engagement.domain.StopMediaProjectionServiceUseCase;
+import com.glia.widgets.engagement.domain.StopMediaProjectionServiceUseCaseImpl;
 import com.glia.widgets.engagement.domain.SurveyUseCase;
 import com.glia.widgets.engagement.domain.SurveyUseCaseImpl;
 import com.glia.widgets.engagement.domain.ToggleVisitorAudioMediaStateUseCase;
@@ -420,6 +430,7 @@ public class UseCaseFactory {
     public IsShowOverlayPermissionRequestDialogUseCase createIsShowOverlayPermissionRequestDialogUseCase() {
         return new IsShowOverlayPermissionRequestDialogUseCaseImpl(permissionManager, permissionDialogManager, gliaSdkConfigurationManager);
     }
+
     @NonNull
     public SetOverlayPermissionRequestDialogShownUseCase createSetOverlayPermissionRequestDialogShownUseCase() {
         return new SetOverlayPermissionRequestDialogShownUseCaseImpl(permissionDialogManager);
@@ -873,7 +884,7 @@ public class UseCaseFactory {
     @NonNull
     public ReleaseResourcesUseCase getReleaseResourcesUseCase(DialogContract.Controller dialogController) {
         return new ReleaseResourcesUseCaseImpl(
-            createRemoveScreenSharingNotificationUseCase(),
+            getReleaseScreenSharingResourcesUseCase(),
             createCallNotificationUseCase(),
             repositoryFactory.getGliaFileAttachmentRepository(),
             repositoryFactory.getEngagementConfigRepository(),
@@ -950,7 +961,7 @@ public class UseCaseFactory {
 
     @NonNull
     public ScreenSharingUseCase getScreenSharingUseCase() {
-        return new ScreenSharingUseCaseImpl(repositoryFactory.getEngagementRepository(), createRemoveScreenSharingNotificationUseCase());
+        return new ScreenSharingUseCaseImpl(repositoryFactory.getEngagementRepository(), getReleaseScreenSharingResourcesUseCase());
     }
 
     @NonNull
@@ -1031,6 +1042,38 @@ public class UseCaseFactory {
         return new RequestNotificationPermissionIfPushNotificationsSetUpUseCaseImpl(
             getWithNotificationPermissionUseCase(),
             getIsPushNotificationsSetUpUseCase()
+        );
+    }
+
+    @NonNull
+    public InformThatReadyToShareScreenUseCase getReadyToShareScreenUseCase() {
+        return new InformThatReadyToShareScreenUseCaseImpl(repositoryFactory.getEngagementRepository());
+    }
+
+    @NonNull
+    public StartMediaProjectionServiceUseCase getStartMediaProjectionServiceUseCase() {
+        return new StartMediaProjectionServiceUseCaseImpl(applicationContext);
+    }
+
+    @NonNull
+    public StopMediaProjectionServiceUseCase getStopMediaProjectionServiceUseCase() {
+        return new StopMediaProjectionServiceUseCaseImpl(applicationContext);
+    }
+
+    @NonNull
+    public ReleaseScreenSharingResourcesUseCase getReleaseScreenSharingResourcesUseCase() {
+        return new ReleaseScreenSharingResourcesUseCaseImpl(
+            createRemoveScreenSharingNotificationUseCase(),
+            getStopMediaProjectionServiceUseCase()
+        );
+    }
+
+    @NonNull
+    public PrepareToScreenSharingUseCase getPrepareToScreenSharingUseCase() {
+        return new PrepareToScreenSharingUseCaseImpl(
+            createShowScreenSharingNotificationUseCase(),
+            getStartMediaProjectionServiceUseCase(),
+            getReadyToShareScreenUseCase()
         );
     }
 }

@@ -10,7 +10,6 @@ import com.glia.widgets.R
 import com.glia.widgets.core.notification.NotificationFactory
 import com.glia.widgets.core.notification.NotificationRemovalService
 import com.glia.widgets.core.notification.areNotificationsEnabledForChannel
-import com.glia.widgets.core.screensharing.MediaProjectionService
 
 internal class NotificationManager(private val applicationContext: Application) : INotificationManager {
     private val notificationManager: NotificationManager by lazy {
@@ -84,26 +83,17 @@ internal class NotificationManager(private val applicationContext: Application) 
     }
 
     /**
-     * Tries showing a notification for screen sharing
+     * Displays notification informing the user that screen sharing is active.
      */
-    override fun showScreenSharingNotification() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            applicationContext.startForegroundService(Intent(applicationContext, MediaProjectionService::class.java))
-        } else {
-            notificationManager.notify(
-                NotificationFactory.SCREEN_SHARING_NOTIFICATION_ID,
-                NotificationFactory.createScreenSharingNotification(applicationContext)
-            )
-        }
-    }
+    override fun showScreenSharingNotification() = notificationManager.notify(
+        NotificationFactory.SCREEN_SHARING_NOTIFICATION_ID,
+        NotificationFactory.createScreenSharingNotification(applicationContext)
+    )
 
-    override fun removeScreenSharingNotification() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            applicationContext.stopService(Intent(applicationContext, MediaProjectionService::class.java))
-        } else {
-            notificationManager.cancel(NotificationFactory.SCREEN_SHARING_NOTIFICATION_ID)
-        }
-    }
+    /**
+     * Removes the screen sharing notification.
+     */
+    override fun removeScreenSharingNotification() = notificationManager.cancel(NotificationFactory.SCREEN_SHARING_NOTIFICATION_ID)
 
     private fun areNotificationsEnabledForChannel(id: String) = applicationContext.areNotificationsEnabledForChannel(id)
 }

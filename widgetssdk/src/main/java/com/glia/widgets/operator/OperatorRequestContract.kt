@@ -25,13 +25,12 @@ internal interface OperatorRequestContract {
         val state: Flowable<OneTimeEvent<State>>
         fun onMediaUpgradeAccepted(offer: MediaUpgradeOffer, activity: Activity)
         fun onMediaUpgradeDeclined(offer: MediaUpgradeOffer, activity: Activity)
-        fun onScreenSharingDialogAccepted()
+        fun onScreenSharingDialogAccepted(activity: Activity)
         fun onScreenSharingDialogDeclined(activity: Activity)
         fun onMediaProjectionResultReceived(result: ActivityResult, activity: ComponentActivity)
         fun onOverlayPermissionRequestAccepted(activity: Activity)
         fun onOverlayPermissionRequestDeclined(activity: Activity)
         fun overlayPermissionScreenOpened()
         fun failedToOpenOverlayPermissionScreen()
-        fun onMediaProjectionRequested(activity: Activity)
     }
 }

@@ -666,7 +666,7 @@ class PermissionManagerTest {
 
         assertEquals(
             Permissions(
-                listOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA),
+                listOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO),
                 emptyList()
             ),
             result
@@ -691,7 +691,7 @@ class PermissionManagerTest {
 
         assertEquals(
             Permissions(
-                listOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA),
+                listOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO),
                 listOf(Manifest.permission.BLUETOOTH_CONNECT)
             ),
             result

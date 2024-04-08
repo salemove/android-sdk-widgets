@@ -52,8 +52,8 @@ internal interface EngagementRepository {
     fun resumeVisitorVideo()
     fun endScreenSharing()
     fun declineScreenSharingRequest()
-    fun acceptScreenSharingRequest(activity: Activity, mode: Mode)
     fun acceptScreenSharingWithAskedPermission(activity: Activity, mode: Mode)
     fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?)
     fun onActivityResultSkipScreenSharingPermissionRequest(resultCode: Int, intent: Intent?)
+    fun onReadyToShareScreen()
 }

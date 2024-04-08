@@ -13,8 +13,6 @@ import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
 import com.glia.widgets.core.dialog.domain.SetOverlayPermissionRequestDialogShownUseCase
 import com.glia.widgets.core.dialog.model.DialogState
-import com.glia.widgets.core.notification.domain.RemoveScreenSharingNotificationUseCase
-import com.glia.widgets.core.notification.domain.ShowScreenSharingNotificationUseCase
 import com.glia.widgets.core.permissions.domain.WithNotificationPermissionUseCase
 import com.glia.widgets.engagement.ScreenSharingState
 import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCase
@@ -24,6 +22,8 @@ import com.glia.widgets.engagement.domain.DeclineMediaUpgradeOfferUseCase
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
 import com.glia.widgets.engagement.domain.MediaUpgradeOfferData
 import com.glia.widgets.engagement.domain.OperatorMediaUpgradeOfferUseCase
+import com.glia.widgets.engagement.domain.PrepareToScreenSharingUseCase
+import com.glia.widgets.engagement.domain.ReleaseScreenSharingResourcesUseCase
 import com.glia.widgets.engagement.domain.ScreenSharingUseCase
 import com.glia.widgets.helper.DialogHolderActivity
 import com.glia.widgets.helper.Logger
@@ -57,8 +57,6 @@ class OperatorRequestControllerTest {
     private lateinit var checkMediaUpgradePermissionsUseCase: CheckMediaUpgradePermissionsUseCase
     private lateinit var screenSharingUseCase: ScreenSharingUseCase
     private lateinit var currentOperatorUseCase: CurrentOperatorUseCase
-    private lateinit var showScreenSharingNotificationUseCase: ShowScreenSharingNotificationUseCase
-    private lateinit var removeScreenSharingNotificationUseCase: RemoveScreenSharingNotificationUseCase
     private lateinit var isShowOverlayPermissionRequestDialogUseCase: IsShowOverlayPermissionRequestDialogUseCase
     private lateinit var isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase
     private lateinit var setOverlayPermissionRequestDialogShownUseCase: SetOverlayPermissionRequestDialogShownUseCase
@@ -66,6 +64,8 @@ class OperatorRequestControllerTest {
     private lateinit var dialogCallbackSlot: CapturingSlot<DialogContract.Controller.Callback>
     private lateinit var gliaSdkConfigurationManager: GliaSdkConfigurationManager
     private lateinit var withNotificationPermissionUseCase: WithNotificationPermissionUseCase
+    private lateinit var prepareToScreenSharingUseCase: PrepareToScreenSharingUseCase
+    private lateinit var releaseScreenSharingResourcesUseCase: ReleaseScreenSharingResourcesUseCase
 
     private lateinit var controller: OperatorRequestContract.Controller
 
@@ -83,13 +83,13 @@ class OperatorRequestControllerTest {
         screenSharingUseCase = mockk(relaxUnitFun = true)
         every { screenSharingUseCase() } returns screenSharingProcessor
         currentOperatorUseCase = mockk(relaxUnitFun = true)
-        showScreenSharingNotificationUseCase = mockk(relaxUnitFun = true)
-        removeScreenSharingNotificationUseCase = mockk(relaxUnitFun = true)
         isShowOverlayPermissionRequestDialogUseCase = mockk(relaxUnitFun = true)
         isCurrentEngagementCallVisualizerUseCase = mockk(relaxUnitFun = true)
         setOverlayPermissionRequestDialogShownUseCase = mockk(relaxUnitFun = true)
         withNotificationPermissionUseCase = mockk(relaxUnitFun = true)
         dialogController = mockk(relaxUnitFun = true)
+        prepareToScreenSharingUseCase = mockk(relaxUnitFun = true)
+        releaseScreenSharingResourcesUseCase = mockk(relaxUnitFun = true)
 
         dialogCallbackSlot = slot()
 
@@ -102,14 +102,14 @@ class OperatorRequestControllerTest {
             checkMediaUpgradePermissionsUseCase,
             screenSharingUseCase,
             currentOperatorUseCase,
-            showScreenSharingNotificationUseCase,
-            removeScreenSharingNotificationUseCase,
             isShowOverlayPermissionRequestDialogUseCase,
             isCurrentEngagementCallVisualizerUseCase,
             setOverlayPermissionRequestDialogShownUseCase,
             dialogController,
             gliaSdkConfigurationManager,
-            withNotificationPermissionUseCase
+            withNotificationPermissionUseCase,
+            prepareToScreenSharingUseCase,
+            releaseScreenSharingResourcesUseCase
         )
 
         verify { operatorMediaUpgradeOfferUseCase() }
@@ -283,9 +283,9 @@ class OperatorRequestControllerTest {
     fun `screen-sharing state Ended will remove notification`() {
         screenSharingProcessor.onNext(ScreenSharingState.Ended)
 
-        verify { removeScreenSharingNotificationUseCase() }
+        verify { releaseScreenSharingResourcesUseCase() }
 
-        confirmVerified(removeScreenSharingNotificationUseCase, showScreenSharingNotificationUseCase)
+        confirmVerified(releaseScreenSharingResourcesUseCase, prepareToScreenSharingUseCase)
     }
 
     @Test
@@ -294,30 +294,24 @@ class OperatorRequestControllerTest {
         val state = controller.state.test()
         screenSharingProcessor.onNext(ScreenSharingState.FailedToAcceptRequest(message))
 
-        verify { removeScreenSharingNotificationUseCase() }
+        verify { releaseScreenSharingResourcesUseCase() }
 
         state.assertNotComplete().assertValue { it.value == OperatorRequestContract.State.DisplayToast(message) }
 
-        confirmVerified(removeScreenSharingNotificationUseCase, showScreenSharingNotificationUseCase)
+        confirmVerified(releaseScreenSharingResourcesUseCase, prepareToScreenSharingUseCase)
     }
 
     @Test
     fun `onScreenSharingDialogAccepted will produce AcquireMediaProjection state`() {
+        val activity: DialogHolderActivity = mockk(relaxUnitFun = true)
         val state = controller.state.test()
 
-        controller.onScreenSharingDialogAccepted()
+        controller.onScreenSharingDialogAccepted(activity)
         verify { dialogController.dismissCurrentDialog() }
-        state.assertNotComplete().assertValue { it.value == OperatorRequestContract.State.AcquireMediaProjectionToken }
-    }
-
-    @Test
-    fun `onMediaProjectionRequested  will accept request with acceptRequestWithAskedPermission`() {
-        val activity: DialogHolderActivity = mockk(relaxUnitFun = true)
-        controller.onMediaProjectionRequested(activity)
-        verify { showScreenSharingNotificationUseCase() }
         verify { gliaSdkConfigurationManager.screenSharingMode }
         verify { screenSharingUseCase.acceptRequestWithAskedPermission(eq(activity), any()) }
-        confirmVerified(showScreenSharingNotificationUseCase, screenSharingUseCase, gliaSdkConfigurationManager)
+        state.assertNotComplete().assertValue { it.value == OperatorRequestContract.State.AcquireMediaProjectionToken }
+        confirmVerified(releaseScreenSharingResourcesUseCase, prepareToScreenSharingUseCase, screenSharingUseCase, gliaSdkConfigurationManager)
     }
 
     @Test
@@ -424,10 +418,11 @@ class OperatorRequestControllerTest {
         verify { result.data }
         verify(exactly = 0) { activity.finish() }
 
+        verify { prepareToScreenSharingUseCase() }
         verify { screenSharingUseCase.onActivityResultSkipPermissionRequest(Activity.RESULT_OK, intent) }
         verify { dialogController.showCVOverlayPermissionDialog() }
 
-        confirmVerified(activity, intent, result, screenSharingUseCase)
+        confirmVerified(activity, intent, result, screenSharingUseCase, prepareToScreenSharingUseCase, releaseScreenSharingResourcesUseCase)
     }
 
     @Test
@@ -449,10 +444,11 @@ class OperatorRequestControllerTest {
 
         verify { activity.finish() }
 
+        verify { prepareToScreenSharingUseCase() }
         verify { screenSharingUseCase.onActivityResultSkipPermissionRequest(Activity.RESULT_OK, intent) }
         verify(exactly = 0) { dialogController.showCVOverlayPermissionDialog() }
 
-        confirmVerified(activity, intent, result, screenSharingUseCase)
+        confirmVerified(activity, intent, result, screenSharingUseCase, prepareToScreenSharingUseCase, releaseScreenSharingResourcesUseCase)
     }
 
     @Test
@@ -471,9 +467,9 @@ class OperatorRequestControllerTest {
         verify { activity.finish() }
 
         verify { screenSharingUseCase.declineRequest() }
-        verify { removeScreenSharingNotificationUseCase() }
+        verify(exactly = 0) { prepareToScreenSharingUseCase() }
 
-        confirmVerified(activity, result, screenSharingUseCase, removeScreenSharingNotificationUseCase)
+        confirmVerified(activity, result, screenSharingUseCase, prepareToScreenSharingUseCase, releaseScreenSharingResourcesUseCase)
     }
 
 }

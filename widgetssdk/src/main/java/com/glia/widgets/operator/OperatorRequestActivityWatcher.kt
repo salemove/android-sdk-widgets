@@ -71,10 +71,7 @@ internal class OperatorRequestActivityWatcher(
         enforceComponentActivity(activity) {
             consumeCallback()
 
-            val createScreenCaptureIntent = activity.getSystemService<MediaProjectionManager>()?.createScreenCaptureIntent()
-
-            mediaProjectionResultLauncher.launch(createScreenCaptureIntent)
-            controller.onMediaProjectionRequested(activity)
+            mediaProjectionResultLauncher.launch(activity.getSystemService<MediaProjectionManager>()?.createScreenCaptureIntent())
         }
     }
 
@@ -119,7 +116,7 @@ internal class OperatorRequestActivityWatcher(
         showAlertDialogWithStyledContext(activity) { context, uiTheme ->
             Dialogs.showScreenSharingDialog(context, uiTheme, operatorName, {
                 consumeCallback()
-                controller.onScreenSharingDialogAccepted()
+                controller.onScreenSharingDialogAccepted(activity)
             }) {
                 consumeCallback()
                 controller.onScreenSharingDialogDeclined(activity)

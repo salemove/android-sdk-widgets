@@ -101,28 +101,28 @@ afterEvaluate {
 }
 
 dependencies {
-    implementation "androidx.appcompat:appcompat:$appCompatVersion"
-    implementation "com.google.android.material:material:$materialVersion"
-    implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
-    implementation "androidx.navigation:navigation-fragment:$navVersion"
-    implementation "androidx.navigation:navigation-ui:$navVersion"
-    implementation "androidx.preference:preference:$preferenceVersion"
-    implementation platform("com.google.firebase:firebase-bom:$firebaseVersion")
-    implementation "com.google.firebase:firebase-messaging"
+    implementation libs.java.appcompat
+    implementation libs.java.material
+    implementation libs.java.constraintlayout
+    implementation libs.java.navigation.fargment
+    implementation libs.java.navigation.ui
+    implementation libs.java.preference
+    implementation platform(libs.firebase.bom)
+    implementation libs.firebase.messaging
 
     debugImplementation project(path: ':widgetssdk')
     // To test against properly compiled SDK, the SDK is auto-uploaded to local maven with '_snapshot' suffix
     releaseImplementation "com.glia:android-widgets:${widgetsVersionName}_snapshot"
 
-    implementation "androidx.core:core-ktx:$coreKtxVersion"
+    implementation libs.java.core.ktx
 
-    implementation "io.ktor:ktor-client-android:2.2.4"
-    implementation "io.ktor:ktor-client-logging:2.2.4"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4"
+    implementation libs.java.ktor.android
+    implementation libs.java.ktor.logging
+    implementation libs.java.coroutines
 
 
-//    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.10'
-    testImplementation "junit:junit:$junitVersion"
-    androidTestImplementation "androidx.test.ext:junit:$testLibraryVersion"
-    androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
+    //debugImplementation libs.test.leakcanary
+    testImplementation libs.test.junit
+    androidTestImplementation libs.test.ext.junit
+    androidTestImplementation libs.test.espresso.core
 }

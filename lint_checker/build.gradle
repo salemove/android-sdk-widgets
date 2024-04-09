@@ -19,11 +19,11 @@ lint {
 }
 
 dependencies {
-  compileOnly "com.android.tools.lint:lint-api:$lintVersion"
+  compileOnly libs.java.lint
 
-  testImplementation "com.android.tools.lint:lint-api:$lintVersion"
-  testImplementation "com.android.tools.lint:lint-tests:$lintVersion"
-  testImplementation "junit:junit:$junitVersion"
+  testImplementation libs.java.lint
+  testImplementation libs.java.lint.tests
+  testImplementation libs.test.junit
 }
 
 jar {

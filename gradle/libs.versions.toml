@@ -1,0 +1,113 @@
+[versions]
+gliaSdkVersion = "1.3.0"
+javaAnnotationVersion = "1.7.1"
+javaAndroidxAnnotationVersion = "1.5.0"
+javaAppCompatVersion = "1.3.1"
+javaConstraintLayoutVersion = "2.1.4"
+javaCoreKtxVersion = "1.8.0"
+javaFragmentVersion = "1.5.5"
+javaKotlinReflectVersion = "1.9.20"
+javaKtorVersion = "2.2.4"
+javaCoroutinesVersion = "1.6.4"
+javaDokkaVersion = "1.9.20"
+javaLifecycleProcessVersion = "2.3.1"
+javaLintVersion = "31.3.0"
+javaMaterialVersion = "1.6.1"
+javaPreferenceVersion = "1.1.1"
+javaRecyclerViewVersion = "1.2.1"
+javaRxAndroid3Version = "2.1.0"
+javaRxJava3Version = "2.2.6"
+javaRxLintRulesVersion = "0.19.0"
+javaNavVersion = "2.3.5"
+dataGsonVersion = "2.10.1"
+dataJsonVersion = "20220924"
+connectionPhoenixVersion = "1.2.0"
+connectionOkHttpVersion = "4.11.0"
+connectionOkioVersion = "3.4.0"
+connectionRetroFitVersion = "2.9.0"
+connectionGsonConverterVersion = "2.9.0"
+connectionRxAdapterVersion = "2.9.0"
+connectionLoggingInterceptorVersion = "4.11.0"
+connectionMockWebServerVersion = "4.11.0"
+firebaseBomVersion = "29.3.0"
+firebaseMessagingVersion = "22.0.0"
+firebaseVersion = "31.0.2"
+mediaAudioswitch = "1.1.8"
+mediaPicassoVersion = "2.8"
+mediaLottieVersion = "5.2.0"
+mediaTwilioVersion = "6.0.7"
+mediaSvgRendererVersion = "1.4"
+mediaGlideVersion = "4.12.0"
+testLeakCanaryVersion = "2.6"
+testEspressoVersion = "3.5.1"
+testLibraryVersion = "1.1.5"
+testAndroidXTestVersion = "1.1.5"
+testMockitoAndroidTestVersion = "5.8.0"
+archCoreVersion = "2.1.0"
+testMockkVersion = "1.13.9"
+testMockitoKotlinVersion = "5.2.1"
+testRulesVersion = "1.5.0"
+testRobolectricVersion = "4.9.2"
+testJunitVersion = "4.13.2"
+testMockitoVersion = "5.2.1"
+testKhronosVersion = "gl1.1-android-2.1_r1"
+testHamcrestVersion = "1.3"
+testJsonVersion = "20090211"
+
+[libraries]
+connection-phoenix = { module = "com.github.dsrees:JavaPhoenixClient", version.ref = "connectionPhoenixVersion"}
+connection-okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "connectionOkHttpVersion"}
+connection-okio = { module = "com.squareup.okhttp3:okhttp", version.ref = "connectionOkioVersion"}
+connection-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "connectionRetroFitVersion"}
+connection-gson-converter = { module = "com.squareup.retrofit2:converter-gson", version.ref = "connectionGsonConverterVersion"}
+connection-rxjava-adapter = { module = "com.squareup.retrofit2:adapter-rxjava3", version.ref = "connectionRxAdapterVersion"}
+connection-logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "connectionLoggingInterceptorVersion"}
+connection-mockwebserver = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "connectionMockWebServerVersion"}
+data-json = { module = "org.json:json", version.ref = "dataJsonVersion" }
+data-gson = { module = "com.google.code.gson:gson", version.ref = "dataGsonVersion" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBomVersion" }
+firebase-messaging = { module = "com.google.firebase:firebase-messaging", version.ref = "firebaseMessagingVersion" }
+java-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "javaAppCompatVersion"}
+java-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "javaConstraintLayoutVersion" }
+java-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "javaCoroutinesVersion" }
+java-core-ktx = { module = "androidx.core:core-ktx", version.ref = "javaCoreKtxVersion" }
+java-dokka = { module = "org.jetbrains.dokka:android-documentation-plugin", version.ref = "javaDokkaVersion"}
+java-androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "javaAndroidxAnnotationVersion"}
+java-fragment = { module = "androidx.fragment:fragment-ktx", version.ref = "javaFragmentVersion"}
+java-glia-core = { module = "com.glia:android-sdk", version.ref = "gliaSdkVersion" }
+java-lint = { module = "com.android.tools.lint:lint-api", version.ref = "javaLintVersion" }
+java-lint-tests = { module = "com.android.tools.lint:lint-tests", version.ref = "javaLintVersion" }
+java-ktor-android = { module = "io.ktor:ktor-client-android", version.ref = "javaKtorVersion" }
+java-ktor-logging = { module = "io.ktor:ktor-client-logging", version.ref = "javaKtorVersion" }
+java-material = { group = "com.google.android.material", name = "material", version.ref = "javaMaterialVersion" }
+java-navigation-fargment = { module = "androidx.navigation:navigation-fragment", version.ref = "javaNavVersion" }
+java-navigation-ui = { module = "androidx.navigation:navigation-ui", version.ref = "javaNavVersion" }
+java-preference = { module = "androidx.preference:preference", version.ref = "javaPreferenceVersion" }
+java-kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "javaKotlinReflectVersion" }
+java-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "javaRecyclerViewVersion" }
+java-rx-lintrules = { module = "com.vanniktech:lint-rules-rxjava2", version.ref = "javaRxLintRulesVersion" }
+java-rxandroid = { module = "io.reactivex.rxjava2:rxandroid", version.ref = "javaRxAndroid3Version" }
+java-rxjava = { module = "io.reactivex.rxjava2:rxjava", version.ref = "javaRxJava3Version" }
+lifecycle-compiler = { module = "androidx.lifecycle:lifecycle-compiler", version.ref = "javaLifecycleProcessVersion"}
+lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "javaLifecycleProcessVersion" }
+media-lottie = { module = "com.airbnb.android:lottie", version.ref = "mediaLottieVersion" }
+media-picasso = { module = "com.squareup.picasso:picasso", version.ref = "mediaPicassoVersion" }
+media-audioswitch = { module = "com.twilio:audioswitch", version.ref = "mediaAudioswitch" }
+media-glide = { module = "com.github.bumptech.glide:glide", version.ref = "mediaGlideVersion"}
+media-twilio = { module = "com.twilio:voice-android", version.ref = "mediaTwilioVersion" }
+media-svg-renderer = { module = "com.caverock:androidsvg-aar", version.ref = "mediaSvgRendererVersion" }
+test-core-testing = { module = "androidx.arch.core:core-testing", version.ref = "archCoreVersion" }
+test-junit = { module = "junit:junit", version.ref = "testJunitVersion" }
+test-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "testEspressoVersion" }
+test-leakcanary = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "testLeakCanaryVersion" }
+test-rules = { module = "androidx.test:rules", version.ref = "testRulesVersion" }
+test-ext-junit = { module = "androidx.test.ext:junit", version.ref = "testAndroidXTestVersion" }
+test-mockito = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "testMockitoVersion"}
+test-khronos = { module = "org.khronos:opengl-api", version.ref = "testKhronosVersion" }
+test-hamcrest = { module = "org.hamcrest:hamcrest-library", version.ref = "testHamcrestVersion" }
+test-json = { module = "org.json:json", version.ref = "testJsonVersion"}
+test-mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "testMockitoKotlinVersion" }
+test-robolectric = { module = "org.robolectric:robolectric", version.ref = "testRobolectricVersion" }
+test-mockk-android = { module = "io.mockk:mockk-android", version.ref = "testMockkVersion" }
+
+[plugins]

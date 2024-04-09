@@ -83,40 +83,40 @@ tasks.register('publishToLocalMaven') {
 }
 
 dependencies {
-  implementation "androidx.appcompat:appcompat:$appCompatVersion"
-  implementation "com.google.android.material:material:$materialVersion"
-  implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
-  implementation "androidx.lifecycle:lifecycle-process:$lifecycle_process"
-  implementation "com.squareup.picasso:picasso:$picassoVersion"
+  implementation libs.java.appcompat
+  implementation libs.java.material
+  implementation libs.java.constraintlayout
+  implementation libs.lifecycle.process
+  implementation libs.media.picasso
 
   // Used for audio and video permissions by CallActivity
-  implementation "io.reactivex.rxjava2:rxandroid:$rxAndroid"
-  implementation "io.reactivex.rxjava2:rxjava:$rxJava"
+  implementation libs.java.rxandroid
+  implementation libs.java.rxjava
 
-  api "com.glia:android-sdk:$gliaSdkVersion"
+  api libs.java.glia.core
   // Glia sdk aar
   // implementation(name: "glia-core-sdk-$gliaSdkVersion", ext: 'aar')
 //    api "com.glia:android-sdk:0.26.6-SNAPSHOT" // Used when testing local Core SDK snapshot releases
 
-  implementation "com.twilio:audioswitch:$audioswitch"
-  implementation "com.airbnb.android:lottie:$lottieVersion"
-  implementation "com.google.code.gson:gson:$gson"
-  implementation "androidx.core:core-ktx:$coreKtxVersion"
+  implementation libs.media.audioswitch
+  implementation libs.media.lottie
+  implementation libs.data.gson
+  implementation libs.java.core.ktx
 
-  testImplementation "junit:junit:$junitVersion"
-  testImplementation "org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion"
-  testImplementation "androidx.arch.core:core-testing:$archCoreVersion"
-  testImplementation "org.robolectric:robolectric:$robolectricVersion"
-  testImplementation "io.mockk:mockk-android:${mockkVersion}"
-  androidTestImplementation "io.mockk:mockk-android:${mockkVersion}"
-  androidTestImplementation "androidx.test.ext:junit:$androidXTestVersion"
-  androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
-  androidTestImplementation "androidx.test:rules:$testRulesVersion"
+  testImplementation libs.test.junit
+  testImplementation libs.test.mockito.kotlin
+  testImplementation libs.test.core.testing
+  testImplementation libs.test.robolectric
+  testImplementation libs.test.mockk.android
+  androidTestImplementation libs.test.mockk.android
+  androidTestImplementation libs.test.ext.junit
+  androidTestImplementation libs.test.espresso.core
+  androidTestImplementation libs.test.rules
 
   // Test dependencies to Android native libraries
   // To prevent unit tests firing errors like 'Method length in org.json.JSONObject not mocked'
-  testImplementation "org.json:json:20220924"
-  implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+  testImplementation libs.test.json
+  implementation libs.java.kotlin.reflect
 
   lintChecks project(':lint_checker')
 }

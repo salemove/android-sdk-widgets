@@ -233,7 +233,8 @@ public class ControllerFactory {
                 useCaseFactory.createIsCallVisualizerScreenSharingUseCase(),
                 useCaseFactory.getEngagementStateUseCase(),
                 useCaseFactory.getCurrentOperatorUseCase(),
-                useCaseFactory.getVisitorMediaUseCase()
+                useCaseFactory.getVisitorMediaUseCase(),
+                useCaseFactory.getScreenSharingUseCase()
             );
         }
         return serviceChatHeadController;
@@ -248,7 +249,8 @@ public class ControllerFactory {
                 useCaseFactory.createIsCallVisualizerScreenSharingUseCase(),
                 useCaseFactory.getEngagementStateUseCase(),
                 useCaseFactory.getCurrentOperatorUseCase(),
-                useCaseFactory.getVisitorMediaUseCase()
+                useCaseFactory.getVisitorMediaUseCase(),
+                useCaseFactory.getScreenSharingUseCase()
             );
         }
         return applicationChatHeadController;

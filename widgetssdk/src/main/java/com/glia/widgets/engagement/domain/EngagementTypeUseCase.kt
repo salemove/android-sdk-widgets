@@ -17,5 +17,5 @@ internal class EngagementTypeUseCaseImpl(
     private val hasAnyMedia: Boolean get() = visitorMediaUseCase.hasMedia || operatorMediaUseCase.hasMedia
     override val isMediaEngagement: Boolean get() = hasOngoingEngagement && isOperatorPresentUseCase() && hasAnyMedia
     override val isChatEngagement: Boolean get() = hasOngoingEngagement && !isCurrentEngagementCallVisualizerUseCase() && isOperatorPresentUseCase() && !hasAnyMedia
-    override val isCallVisualizerScreenSharing: Boolean get() = isCurrentEngagementCallVisualizerUseCase.invoke() && !hasAnyMedia
+    override val isCallVisualizerScreenSharing: Boolean get() = isCurrentEngagementCallVisualizerUseCase() && !hasAnyMedia
 }

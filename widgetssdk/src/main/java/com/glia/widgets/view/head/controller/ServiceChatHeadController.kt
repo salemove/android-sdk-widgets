@@ -11,6 +11,7 @@ import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.domain.CurrentOperatorUseCase
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
+import com.glia.widgets.engagement.domain.ScreenSharingUseCase
 import com.glia.widgets.engagement.domain.VisitorMediaUseCase
 import com.glia.widgets.helper.Logger.d
 import com.glia.widgets.helper.TAG
@@ -29,7 +30,8 @@ internal class ServiceChatHeadController(
     private val isCallVisualizerScreenSharingUseCase: IsCallVisualizerScreenSharingUseCase,
     engagementStateUseCase: EngagementStateUseCase,
     currentOperatorUseCase: CurrentOperatorUseCase,
-    visitorMediaUseCase: VisitorMediaUseCase
+    visitorMediaUseCase: VisitorMediaUseCase,
+    screenSharingUseCase: ScreenSharingUseCase
 ) : ChatHeadContract.Controller {
     private var chatHeadView: ChatHeadContract.View? = null
     private var state = State.ENDED
@@ -55,6 +57,9 @@ internal class ServiceChatHeadController(
         currentOperatorUseCase().unSafeSubscribe(::operatorDataLoaded)
         messagesNotSeenHandler.addListener(::onUnreadMessageCountChange)
         visitorMediaUseCase.onHoldState.unSafeSubscribe(::onHoldChanged)
+        screenSharingUseCase().filter { isCallVisualizerScreenSharingUseCase() }.unSafeSubscribe {
+            toggleChatHead()
+        }
     }
 
     override fun onResume(view: View?) {
@@ -62,7 +67,7 @@ internal class ServiceChatHeadController(
 
         // see the comment on the resumedViewName field declaration above
         if (!isResumedView(view)) return
-        toggleChatHeadServiceUseCase.invoke(view?.javaClass?.simpleName)
+        toggleChatHeadServiceUseCase(view?.javaClass?.simpleName)
     }
 
     override fun onPause(gliaOrRootView: View?) {
@@ -75,7 +80,7 @@ internal class ServiceChatHeadController(
 
     override fun onApplicationStop() {
         d(TAG, "onApplicationStop()")
-        toggleChatHeadServiceUseCase.invoke(null)
+        toggleChatHeadServiceUseCase(null)
     }
 
     override fun onChatHeadPositionChanged(x: Int, y: Int) {
@@ -129,7 +134,7 @@ internal class ServiceChatHeadController(
     }
 
     private fun toggleChatHead() {
-        toggleChatHeadServiceUseCase.invoke(resumedViewName)
+        toggleChatHeadServiceUseCase(resumedViewName)
     }
 
     override fun updateChatHeadView() {
@@ -158,7 +163,7 @@ internal class ServiceChatHeadController(
     private fun newEngagementLoaded() {
         isOnHold = false
         state = State.ENGAGEMENT
-        toggleChatHeadServiceUseCase.invoke(resumedViewName)
+        toggleChatHeadServiceUseCase(resumedViewName)
         if (sdkConfiguration == null) setSdkConfiguration(
             Dependencies.getSdkConfigurationManager().createWidgetsConfiguration()
         )
@@ -167,7 +172,7 @@ internal class ServiceChatHeadController(
 
     private fun queueingStarted() {
         state = State.QUEUEING
-        toggleChatHeadServiceUseCase.invoke(resumedViewName)
+        toggleChatHeadServiceUseCase(resumedViewName)
         if (sdkConfiguration == null) setSdkConfiguration(
             Dependencies.getSdkConfigurationManager().createWidgetsConfiguration()
         )

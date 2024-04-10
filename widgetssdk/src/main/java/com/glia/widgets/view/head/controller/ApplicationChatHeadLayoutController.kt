@@ -5,8 +5,10 @@ import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharing
 import com.glia.widgets.core.chathead.domain.IsDisplayApplicationChatHeadUseCase
 import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase
 import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase.Destinations
+import com.glia.widgets.engagement.ScreenSharingState
 import com.glia.widgets.engagement.domain.CurrentOperatorUseCase
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
+import com.glia.widgets.engagement.domain.ScreenSharingUseCase
 import com.glia.widgets.engagement.domain.VisitorMediaUseCase
 import com.glia.widgets.helper.imageUrl
 import com.glia.widgets.helper.unSafeSubscribe
@@ -21,7 +23,8 @@ internal class ApplicationChatHeadLayoutController(
     private val isCallVisualizerScreenSharingUseCase: IsCallVisualizerScreenSharingUseCase,
     private val engagementStateUseCase: EngagementStateUseCase,
     private val currentOperatorUseCase: CurrentOperatorUseCase,
-    private val visitorMediaUseCase: VisitorMediaUseCase
+    private val visitorMediaUseCase: VisitorMediaUseCase,
+    private val screenSharingUseCase: ScreenSharingUseCase
 ) : ChatHeadLayoutContract.Controller {
     private var chatHeadLayout: ChatHeadLayoutContract.View? = null
     private var state = State.ENDED
@@ -65,6 +68,15 @@ internal class ApplicationChatHeadLayoutController(
         }
         visitorMediaUseCase.onHoldState.unSafeSubscribe(::onHoldChanged)
         currentOperatorUseCase().unSafeSubscribe(::operatorDataLoaded)
+        screenSharingUseCase().filter { isCallVisualizerScreenSharingUseCase() }.unSafeSubscribe {
+            when (it) {
+                ScreenSharingState.Ended -> {
+                    chatHeadLayout?.hide()
+                    updateChatHeadView()
+                }
+                else -> updateChatHeadView()
+            }
+        }
     }
 
     override fun onChatHeadClicked() {

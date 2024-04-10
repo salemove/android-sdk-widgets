@@ -51,4 +51,11 @@
         android:visible="true"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/menu_broadcast_end_screen_sharing_event"
+        android:enabled="true"
+        android:title="Broadcast End Screen Sharing Event"
+        android:visible="true"
+        app:showAsAction="never" />
+
 </menu>

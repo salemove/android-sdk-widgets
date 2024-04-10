@@ -2,7 +2,7 @@ package com.glia.widgets.core.queue
 
 import com.glia.androidsdk.queuing.Queue
 import com.glia.widgets.di.GliaCore
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Single
 
 internal class GliaQueueRepository(private val gliaCore: GliaCore) {
     /**

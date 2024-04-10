@@ -2,8 +2,8 @@ package com.glia.widgets.filepreview.data
 
 import android.graphics.Bitmap
 import com.glia.androidsdk.chat.AttachmentFile
-import io.reactivex.Completable
-import io.reactivex.Maybe
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Maybe
 import java.io.InputStream
 
 internal interface GliaFileRepository {

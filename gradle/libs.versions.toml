@@ -15,8 +15,8 @@ javaLintVersion = "31.3.0"
 javaMaterialVersion = "1.6.1"
 javaPreferenceVersion = "1.1.1"
 javaRecyclerViewVersion = "1.2.1"
-javaRxAndroid3Version = "2.1.0"
-javaRxJava3Version = "2.2.6"
+javaRxAndroid3Version = "3.0.0"
+javaRxJava3Version = "3.1.4"
 javaRxLintRulesVersion = "0.19.0"
 javaNavVersion = "2.3.5"
 dataGsonVersion = "2.10.1"
@@ -86,8 +86,8 @@ java-preference = { module = "androidx.preference:preference", version.ref = "ja
 java-kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "javaKotlinReflectVersion" }
 java-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "javaRecyclerViewVersion" }
 java-rx-lintrules = { module = "com.vanniktech:lint-rules-rxjava2", version.ref = "javaRxLintRulesVersion" }
-java-rxandroid = { module = "io.reactivex.rxjava2:rxandroid", version.ref = "javaRxAndroid3Version" }
-java-rxjava = { module = "io.reactivex.rxjava2:rxjava", version.ref = "javaRxJava3Version" }
+java-rxandroid = { module = "io.reactivex.rxjava3:rxandroid", version.ref = "javaRxAndroid3Version" }
+java-rxjava = { module = "io.reactivex.rxjava3:rxjava", version.ref = "javaRxJava3Version" }
 lifecycle-compiler = { module = "androidx.lifecycle:lifecycle-compiler", version.ref = "javaLifecycleProcessVersion"}
 lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "javaLifecycleProcessVersion" }
 media-lottie = { module = "com.airbnb.android:lottie", version.ref = "mediaLottieVersion" }

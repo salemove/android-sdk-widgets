@@ -4,7 +4,7 @@ import android.content.Context
 import com.glia.widgets.core.audio.domain.OnAudioStartedUseCase
 import com.twilio.audioswitch.AudioDevice
 import com.twilio.audioswitch.AudioSwitch
-import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 internal class AudioControlManager(private val context: Context) {
     private val audioSwitch: AudioSwitch by lazy {

@@ -6,7 +6,7 @@ import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.widgets.core.notification.domain.RemoveScreenSharingNotificationUseCase
 import com.glia.widgets.engagement.EngagementRepository
 import com.glia.widgets.engagement.ScreenSharingState
-import io.reactivex.Flowable
+import io.reactivex.rxjava3.core.Flowable
 
 internal interface ScreenSharingUseCase {
     val isSharing: Boolean

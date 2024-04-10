@@ -18,7 +18,7 @@ import com.glia.widgets.core.secureconversations.domain.SendMessageButtonStateUs
 import com.glia.widgets.core.secureconversations.domain.SendSecureMessageUseCase
 import com.glia.widgets.core.secureconversations.domain.ShowMessageLimitErrorUseCase
 import com.glia.widgets.view.head.controller.ServiceChatHeadController
-import io.reactivex.Observable
+import io.reactivex.rxjava3.core.Observable
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.times

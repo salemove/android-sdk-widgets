@@ -3,7 +3,7 @@ package com.glia.widgets.core.secureconversations.domain
 import androidx.annotation.VisibleForTesting
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.helper.Logger
-import io.reactivex.Completable
+import io.reactivex.rxjava3.core.Completable
 import java.util.concurrent.TimeUnit
 
 private const val TAG = "MarkMessagesReadUseCase"

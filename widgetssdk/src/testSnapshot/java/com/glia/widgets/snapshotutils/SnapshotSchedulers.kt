@@ -3,7 +3,7 @@ package com.glia.widgets.snapshotutils
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.rx.GliaWidgetsSchedulers
 import com.glia.widgets.helper.rx.Schedulers
-import io.reactivex.schedulers.TestScheduler
+import io.reactivex.rxjava3.schedulers.TestScheduler
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever

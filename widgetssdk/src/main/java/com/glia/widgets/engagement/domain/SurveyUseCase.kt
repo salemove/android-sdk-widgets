@@ -2,7 +2,7 @@ package com.glia.widgets.engagement.domain
 
 import com.glia.widgets.engagement.EngagementRepository
 import com.glia.widgets.engagement.SurveyState
-import io.reactivex.Flowable
+import io.reactivex.rxjava3.core.Flowable
 
 internal interface SurveyUseCase {
     operator fun invoke(): Flowable<SurveyState>

@@ -31,8 +31,8 @@ import com.glia.widgets.helper.asOneTimeStateFlowable
 import com.glia.widgets.helper.isAudio
 import com.glia.widgets.helper.unSafeSubscribe
 import com.glia.widgets.operator.OperatorRequestContract.State
-import io.reactivex.Flowable
-import io.reactivex.processors.PublishProcessor
+import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.processors.PublishProcessor
 
 internal class OperatorRequestController(
     operatorMediaUpgradeOfferUseCase: OperatorMediaUpgradeOfferUseCase,

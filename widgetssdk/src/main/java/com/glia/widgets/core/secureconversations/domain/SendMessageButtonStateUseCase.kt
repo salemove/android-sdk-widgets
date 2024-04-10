@@ -5,7 +5,7 @@ import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.core.secureconversations.SendMessageRepository
 import com.glia.widgets.helper.rx.Schedulers
 import com.glia.widgets.messagecenter.MessageCenterState
-import io.reactivex.Observable
+import io.reactivex.rxjava3.core.Observable
 
 internal class SendMessageButtonStateUseCase(
     private val sendMessageRepository: SendMessageRepository,
@@ -16,7 +16,7 @@ internal class SendMessageButtonStateUseCase(
 ) {
 
     operator fun invoke(): Observable<MessageCenterState.ButtonState> {
-        val array = arrayOf(
+        val array = listOf(
             showMessageLimitObservable(),
             messageSendingObservable(),
             messageOrFilesReadyToSendObservable()
@@ -44,7 +44,7 @@ internal class SendMessageButtonStateUseCase(
         .map { buttonEnableStateMap(!it) }
 
     private fun messageOrFilesReadyToSendObservable(): Observable<MessageCenterState.ButtonState> {
-        val array = arrayOf(
+        val array = listOf(
             messageIsNotEmptyObservable(),
             filesObservable()
         )

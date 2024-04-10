@@ -8,8 +8,8 @@ import com.glia.widgets.engagement.domain.SurveyUseCase
 import com.glia.widgets.helper.OneTimeEvent
 import com.glia.widgets.helper.asOneTimeStateFlowable
 import com.glia.widgets.helper.unSafeSubscribe
-import io.reactivex.Flowable
-import io.reactivex.processors.BehaviorProcessor
+import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.processors.BehaviorProcessor
 
 internal interface EngagementCompletionContract {
 

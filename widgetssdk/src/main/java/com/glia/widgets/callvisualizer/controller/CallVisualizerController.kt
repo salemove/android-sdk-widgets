@@ -11,8 +11,8 @@ import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import com.glia.widgets.helper.OneTimeEvent
 import com.glia.widgets.helper.asOneTimeStateFlowable
 import com.glia.widgets.helper.unSafeSubscribe
-import io.reactivex.Flowable
-import io.reactivex.processors.PublishProcessor
+import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.processors.PublishProcessor
 import com.glia.widgets.engagement.State as EngagementState
 
 internal interface CallVisualizerContract {

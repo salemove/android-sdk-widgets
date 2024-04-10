@@ -14,7 +14,7 @@ import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.withRuntimeTheme
 import com.glia.widgets.survey.SurveyActivity
 import com.glia.widgets.view.Dialogs
-import io.reactivex.Flowable
+import io.reactivex.rxjava3.core.Flowable
 import java.lang.ref.WeakReference
 
 internal class EngagementCompletionActivityWatcher(controller: EngagementCompletionContract.Controller, gliaActivityManager: GliaActivityManager) :

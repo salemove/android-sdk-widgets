@@ -10,7 +10,7 @@ import com.glia.widgets.core.notification.NotificationFactory.createScreenSharin
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
-import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 private const val SERVICE_ID = 123
 const val ACTION_START = "EngagementMonitoringService:Start"

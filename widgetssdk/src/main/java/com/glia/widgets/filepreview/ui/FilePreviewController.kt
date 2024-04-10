@@ -3,7 +3,7 @@ package com.glia.widgets.filepreview.ui
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase
 import com.glia.widgets.filepreview.domain.usecase.PutImageFileToDownloadsUseCase
-import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 internal class FilePreviewController @JvmOverloads constructor(
     private val getImageFileFromDownloadsUseCase: GetImageFileFromDownloadsUseCase,

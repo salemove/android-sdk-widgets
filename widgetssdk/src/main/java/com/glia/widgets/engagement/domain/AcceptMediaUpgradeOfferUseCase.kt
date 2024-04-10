@@ -2,7 +2,7 @@ package com.glia.widgets.engagement.domain
 
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.widgets.engagement.EngagementRepository
-import io.reactivex.Flowable
+import io.reactivex.rxjava3.core.Flowable
 
 internal interface AcceptMediaUpgradeOfferUseCase {
     val result: Flowable<MediaUpgradeOffer>

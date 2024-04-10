@@ -2,7 +2,7 @@ package com.glia.widgets.chat.domain
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import io.reactivex.Maybe
+import io.reactivex.rxjava3.core.Maybe
 import java.io.IOException
 import java.io.InputStream
 import kotlin.math.roundToInt

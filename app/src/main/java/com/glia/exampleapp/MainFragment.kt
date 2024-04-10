@@ -35,6 +35,7 @@ import com.glia.widgets.UiTheme
 import com.glia.widgets.call.CallActivity
 import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.chat.ChatType
+import com.glia.widgets.core.notification.NotificationActionReceiver
 import com.glia.widgets.messagecenter.MessageCenterActivity
 import com.google.android.material.appbar.MaterialToolbar
 import kotlin.concurrent.thread
@@ -121,9 +122,19 @@ class MainFragment : Fragment() {
                 startActivity(Intent(requireContext(), LegacyActivity::class.java))
                 true
             }
+            findItem(R.id.menu_broadcast_end_screen_sharing_event).setOnMenuItemClickListener {
+                simulateEndScreenSharingFromNotification()
+                true
+            }
         }
 
         handleOpensFromPushNotification()
+    }
+
+    private fun simulateEndScreenSharingFromNotification() {
+        val intent = Intent(requireContext(), NotificationActionReceiver::class.java)
+            .setAction("com.glia.widgets.core.notification.NotificationActionReceiver.ACTION_ON_SCREEN_SHARING_END_PRESSED")
+        requireContext().sendBroadcast(intent)
     }
 
     private fun initMenu() {

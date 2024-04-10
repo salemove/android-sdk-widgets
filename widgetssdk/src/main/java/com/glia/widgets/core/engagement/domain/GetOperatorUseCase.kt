@@ -2,8 +2,7 @@ package com.glia.widgets.core.engagement.domain
 
 import com.glia.widgets.core.engagement.GliaOperatorRepository
 import com.glia.widgets.core.engagement.data.LocalOperator
-import io.reactivex.Single
-import io.reactivex.SingleEmitter
+import io.reactivex.rxjava3.core.Single
 import java.util.Optional
 
 internal class GetOperatorUseCase(private val gliaOperatorRepository: GliaOperatorRepository) {

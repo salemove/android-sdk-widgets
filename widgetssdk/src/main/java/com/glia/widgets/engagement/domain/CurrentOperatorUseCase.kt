@@ -4,7 +4,7 @@ import com.glia.androidsdk.Operator
 import com.glia.widgets.engagement.EngagementRepository
 import com.glia.widgets.helper.Data
 import com.glia.widgets.helper.formattedName
-import io.reactivex.Flowable
+import io.reactivex.rxjava3.core.Flowable
 
 internal interface CurrentOperatorUseCase {
     val formattedName: Flowable<String>

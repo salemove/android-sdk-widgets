@@ -6,11 +6,11 @@ import com.glia.widgets.core.callvisualizer.domain.VisitorCodeRepository
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
-import io.reactivex.Observable
-import io.reactivex.android.plugins.RxAndroidPlugins
-import io.reactivex.plugins.RxJavaPlugins
-import io.reactivex.processors.PublishProcessor
-import io.reactivex.schedulers.Schedulers
+import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.plugins.RxJavaPlugins
+import io.reactivex.rxjava3.processors.PublishProcessor
+import io.reactivex.rxjava3.schedulers.Schedulers
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.mock
@@ -67,9 +67,6 @@ internal class VisitorCodeControllerTest {
         verify(view).setTimer(vc.duration)
         verifyNoMoreInteractions(view, visitorCodeRepository)
         verifyNoInteractions(callVisualizerController)
-
-        RxJavaPlugins.setComputationSchedulerHandler { null }
-        RxAndroidPlugins.setInitMainThreadSchedulerHandler { null }
     }
 
     @Test
@@ -84,9 +81,6 @@ internal class VisitorCodeControllerTest {
         verify(view).showError(cause)
         verifyNoMoreInteractions(view, visitorCodeRepository)
         verifyNoInteractions(callVisualizerController)
-
-        RxJavaPlugins.setComputationSchedulerHandler { null }
-        RxAndroidPlugins.setInitMainThreadSchedulerHandler { null }
     }
 
     @Test

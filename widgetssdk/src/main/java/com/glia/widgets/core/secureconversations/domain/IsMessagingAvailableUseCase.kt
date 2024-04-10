@@ -6,8 +6,8 @@ import com.glia.androidsdk.queuing.QueueState
 import com.glia.widgets.core.queue.GliaQueueRepository
 import com.glia.widgets.helper.rx.Schedulers
 import com.glia.widgets.helper.supportMessaging
-import io.reactivex.Observable
-import io.reactivex.subjects.BehaviorSubject
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.subjects.BehaviorSubject
 
 internal class IsMessagingAvailableUseCase(
     private val queueRepository: GliaQueueRepository,

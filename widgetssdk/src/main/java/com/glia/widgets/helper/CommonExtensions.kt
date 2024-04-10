@@ -22,12 +22,12 @@ import com.glia.androidsdk.queuing.Queue
 import com.glia.widgets.UiTheme
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.view.unifiedui.deepMerge
-import io.reactivex.Completable
-import io.reactivex.Flowable
-import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.functions.Action
-import io.reactivex.processors.FlowableProcessor
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.functions.Action
+import io.reactivex.rxjava3.processors.FlowableProcessor
 import kotlin.jvm.optionals.getOrNull
 
 internal fun Drawable.setTintCompat(@ColorInt color: Int) = DrawableCompat.setTint(this, color)
@@ -80,12 +80,12 @@ internal val GliaException.isQueueUnavailable: Boolean
     get() = cause == GliaException.Cause.QUEUE_CLOSED || cause == GliaException.Cause.QUEUE_FULL
 
 @SuppressLint("CheckResult")
-internal fun <T> Flowable<out T>.unSafeSubscribe(onNextCallback: (T) -> Unit) {
+internal fun <T: Any> Flowable<out T>.unSafeSubscribe(onNextCallback: (T) -> Unit) {
     subscribe({ onNextCallback(it) }) { Logger.e("Observable<T>.unSafeSubscribe", "Unexpected local exception happened", it) }
 }
 
 @SuppressLint("CheckResult")
-internal fun <T> Single<out T>.unSafeSubscribe(onNextCallback: (T) -> Unit) {
+internal fun <T: Any> Single<out T>.unSafeSubscribe(onNextCallback: (T) -> Unit) {
     subscribe({ onNextCallback(it) }) { Logger.e("Single<T>.unSafeSubscribe", "Unexpected local exception happened", it) }
 }
 
@@ -94,6 +94,6 @@ internal fun Completable.unSafeSubscribe(onComplete: Action) {
     subscribe(onComplete) { Logger.e("Single<T>.unSafeSubscribe", "Unexpected local exception happened", it) }
 }
 
-internal fun <T> FlowableProcessor<T>.asStateFlowable(): Flowable<T> = onBackpressureBuffer().observeOn(AndroidSchedulers.mainThread())
-internal fun <T> FlowableProcessor<T>.asOneTimeStateFlowable(): Flowable<OneTimeEvent<T & Any>> =
+internal fun <T: Any> FlowableProcessor<T>.asStateFlowable(): Flowable<T> = onBackpressureBuffer().observeOn(AndroidSchedulers.mainThread())
+internal fun <T: Any> FlowableProcessor<T>.asOneTimeStateFlowable(): Flowable<OneTimeEvent<T>> =
     onBackpressureBuffer().map(::OneTimeEvent).observeOn(AndroidSchedulers.mainThread())

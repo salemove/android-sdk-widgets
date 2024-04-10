@@ -4,7 +4,7 @@ import android.graphics.Bitmap
 import com.glia.widgets.filepreview.data.GliaFileRepository
 import com.glia.widgets.filepreview.domain.exception.FileNameMissingException
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase
-import io.reactivex.Maybe
+import io.reactivex.rxjava3.core.Maybe
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any

@@ -25,13 +25,13 @@ import com.glia.widgets.core.engagement.domain.model.ChatHistoryResponse
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDelayUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
-import io.reactivex.Completable
-import io.reactivex.Observable
-import io.reactivex.Single
-import io.reactivex.android.plugins.RxAndroidPlugins
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.processors.BehaviorProcessor
-import io.reactivex.schedulers.Schedulers
+import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.processors.BehaviorProcessor
+import io.reactivex.rxjava3.schedulers.Schedulers
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -580,7 +580,7 @@ class ChatManagerTest {
         val testSubscriber = quickReplies.test()
         val callback: (List<GvaButton>) -> Unit = mock()
         subjectUnderTest.subscribeToQuickReplies(callback)
-        testSubscriber.assertSubscribed()
+        testSubscriber.hasSubscription()
 
         quickReplies.onNext(emptyList())
         shadowOf(Looper.getMainLooper()).idle()
@@ -604,7 +604,7 @@ class ChatManagerTest {
 
         verify(subjectUnderTestSpy).mapChatHistory(any(), any())
 
-        assertTrue(testFlowable.valueCount() == 1)
+        testFlowable.assertValueCount(1)
         historyLoadedTest.assertValues(false, true)
     }
 
@@ -624,7 +624,7 @@ class ChatManagerTest {
 
         verify(subjectUnderTestSpy).mapChatHistory(any(), any())
 
-        assertTrue(testFlowable.valueCount() == 1)
+        testFlowable.assertValueCount(1)
         historyLoadedTest.assertValues(false, true)
     }
 
@@ -645,7 +645,7 @@ class ChatManagerTest {
         verify(subjectUnderTestSpy, never()).mapChatHistory(any(), any())
         verify(loadHistoryCallback).invoke(false)
 
-        assertTrue(testFlowable.valueCount() == 1)
+        testFlowable.assertValueCount(1)
         historyLoadedTest.assertValue(false)
     }
 

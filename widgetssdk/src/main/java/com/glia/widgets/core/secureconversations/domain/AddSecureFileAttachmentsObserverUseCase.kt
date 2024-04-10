@@ -3,7 +3,7 @@ package com.glia.widgets.core.secureconversations.domain
 import com.glia.widgets.core.fileupload.SecureFileAttachmentRepository
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.helper.rx.Schedulers
-import io.reactivex.Observable
+import io.reactivex.rxjava3.core.Observable
 
 internal class AddSecureFileAttachmentsObserverUseCase(
     private val repository: SecureFileAttachmentRepository,

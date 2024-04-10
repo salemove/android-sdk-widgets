@@ -21,7 +21,7 @@ import com.glia.widgets.helper.fileName
 import com.glia.widgets.helper.rx.Schedulers
 import com.google.android.material.imageview.ShapeableImageView
 import com.squareup.picasso.Picasso
-import io.reactivex.disposables.Disposable
+import io.reactivex.rxjava3.disposables.Disposable
 
 internal open class ImageAttachmentViewHolder(
     itemView: View,
@@ -50,10 +50,10 @@ internal open class ImageAttachmentViewHolder(
         disposable = getImageFileFromCacheUseCase.invoke(imageName)
             .doOnError { error: Throwable -> e(TAG, "failed loading from cache: " + imageName + " reason: " + error.message) }
             .doOnSuccess { _: Bitmap? -> d(TAG, "loaded from cache: $imageName") }
-            .onErrorResumeNext(getImageFileFromDownloadsUseCase.invoke(imageName))
+            .onErrorResumeNext { getImageFileFromDownloadsUseCase.invoke(imageName) }
             .doOnError { error: Throwable -> e(TAG, imageName + " failed loading from downloads: " + error.message) }
             .doOnSuccess { _: Bitmap? -> d(TAG, "loaded from downloads: $imageName") }
-            .onErrorResumeNext(getImageFileFromNetworkUseCase.invoke(attachmentFile))
+            .onErrorResumeNext { getImageFileFromNetworkUseCase.invoke(attachmentFile)}
             .doOnError { error: Throwable -> e(TAG, imageName + " failed loading from network: " + error.message) }
             .doOnSuccess { _: Bitmap? -> d(TAG, "loaded from network: $imageName") }
             .subscribeOn(schedulers.computationScheduler)

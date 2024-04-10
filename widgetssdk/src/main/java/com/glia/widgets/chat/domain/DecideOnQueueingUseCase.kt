@@ -2,8 +2,8 @@ package com.glia.widgets.chat.domain
 
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
 import com.glia.widgets.core.dialog.domain.SetOverlayPermissionRequestDialogShownUseCase
-import io.reactivex.Completable
-import io.reactivex.subjects.CompletableSubject
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.subjects.CompletableSubject
 
 internal interface DecideOnQueueingUseCase {
     operator fun invoke(): Completable

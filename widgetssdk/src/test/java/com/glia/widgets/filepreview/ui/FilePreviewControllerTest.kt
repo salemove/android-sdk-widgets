@@ -5,8 +5,8 @@ import com.glia.widgets.filepreview.domain.exception.FileNameMissingException
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase
 import com.glia.widgets.filepreview.domain.usecase.PutImageFileToDownloadsUseCase
-import io.reactivex.Completable
-import io.reactivex.Maybe
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Maybe
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse

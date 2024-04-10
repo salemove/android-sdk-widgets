@@ -2,7 +2,7 @@ package com.glia.widgets.core.secureconversations.domain
 
 import com.glia.widgets.core.secureconversations.SendMessageRepository
 import com.glia.widgets.helper.rx.Schedulers
-import io.reactivex.Observable
+import io.reactivex.rxjava3.core.Observable
 
 internal class ShowMessageLimitErrorUseCase(
     private val sendMessageRepository: SendMessageRepository,

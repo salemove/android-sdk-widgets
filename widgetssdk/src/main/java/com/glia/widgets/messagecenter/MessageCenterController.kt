@@ -27,7 +27,7 @@ import com.glia.widgets.core.secureconversations.domain.ShowMessageLimitErrorUse
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.view.head.ChatHeadContract
-import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 internal class MessageCenterController(
     private var serviceChatHeadController: ChatHeadContract.Controller,

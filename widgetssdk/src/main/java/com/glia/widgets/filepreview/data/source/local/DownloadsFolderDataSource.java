@@ -1,10 +1,8 @@
 package com.glia.widgets.filepreview.data.source.local;
 
 import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -14,7 +12,6 @@ import android.provider.MediaStore;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-import androidx.core.content.FileProvider;
 
 import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.widgets.helper.FileHelper;
@@ -28,8 +25,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Objects;
 
-import io.reactivex.Completable;
-import io.reactivex.Maybe;
+import io.reactivex.rxjava3.core.Completable;
+import io.reactivex.rxjava3.core.Maybe;
 
 /**
  * @hide

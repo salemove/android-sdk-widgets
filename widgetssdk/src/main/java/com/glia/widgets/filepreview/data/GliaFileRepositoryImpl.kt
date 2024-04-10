@@ -11,8 +11,8 @@ import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource
 import com.glia.widgets.filepreview.data.source.local.InAppBitmapCache
 import com.glia.widgets.filepreview.domain.exception.CacheFileNotFoundException
 import com.glia.widgets.helper.fileName
-import io.reactivex.Completable
-import io.reactivex.Maybe
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Maybe
 import java.io.InputStream
 import kotlin.jvm.optionals.getOrNull
 

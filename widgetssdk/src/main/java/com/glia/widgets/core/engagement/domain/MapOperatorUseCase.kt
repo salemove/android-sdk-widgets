@@ -4,7 +4,7 @@ import com.glia.androidsdk.chat.Chat
 import com.glia.androidsdk.chat.ChatMessage
 import com.glia.androidsdk.chat.OperatorMessage
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Single
 import kotlin.jvm.optionals.getOrNull
 
 internal class MapOperatorUseCase(private val getOperatorUseCase: GetOperatorUseCase) {

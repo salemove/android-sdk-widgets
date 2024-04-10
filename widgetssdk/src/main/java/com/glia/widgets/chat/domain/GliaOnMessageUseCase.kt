@@ -5,7 +5,7 @@ import com.glia.widgets.chat.data.GliaChatRepository
 import com.glia.widgets.core.engagement.domain.MapOperatorUseCase
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 import com.glia.widgets.helper.isValid
-import io.reactivex.Observable
+import io.reactivex.rxjava3.core.Observable
 import java.util.function.Consumer
 
 internal class GliaOnMessageUseCase(

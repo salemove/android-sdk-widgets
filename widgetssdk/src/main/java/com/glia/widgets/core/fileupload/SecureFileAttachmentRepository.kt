@@ -8,8 +8,8 @@ import com.glia.androidsdk.secureconversations.SecureConversations
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.di.GliaCore
-import io.reactivex.Observable
-import io.reactivex.subjects.BehaviorSubject
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlin.jvm.optionals.getOrNull
 
 internal class SecureFileAttachmentRepository(private val gliaCore: GliaCore) {

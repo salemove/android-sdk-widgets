@@ -2,9 +2,9 @@ package com.glia.widgets.core.secureconversations.domain
 
 import com.glia.widgets.core.secureconversations.SendMessageRepository
 import com.glia.widgets.helper.rx.Schedulers
-import io.reactivex.plugins.RxJavaPlugins
-import io.reactivex.schedulers.TestScheduler
-import io.reactivex.subjects.BehaviorSubject
+import io.reactivex.rxjava3.plugins.RxJavaPlugins
+import io.reactivex.rxjava3.schedulers.TestScheduler
+import io.reactivex.rxjava3.subjects.BehaviorSubject
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse

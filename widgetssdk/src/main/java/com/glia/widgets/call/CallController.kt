@@ -50,7 +50,7 @@ import com.glia.widgets.helper.unSafeSubscribe
 import com.glia.widgets.view.MessagesNotSeenHandler
 import com.glia.widgets.view.MessagesNotSeenHandler.MessagesNotSeenHandlerListener
 import com.glia.widgets.view.MinimizeHandler
-import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import java.util.concurrent.TimeUnit
 
 private const val MAX_IDLE_TIME = 3200

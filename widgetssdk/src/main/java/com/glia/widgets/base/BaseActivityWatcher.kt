@@ -14,10 +14,11 @@ import com.glia.widgets.helper.asStateFlowable
 import com.glia.widgets.helper.isGlia
 import com.glia.widgets.helper.parentActivity
 import com.glia.widgets.helper.withRuntimeTheme
-import io.reactivex.Flowable
-import io.reactivex.Observable
-import io.reactivex.processors.PublishProcessor
-import io.reactivex.subjects.PublishSubject
+import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.processors.PublishProcessor
+import io.reactivex.rxjava3.subjects.PublishSubject
+
 import java.lang.ref.WeakReference
 import kotlin.reflect.KClass
 

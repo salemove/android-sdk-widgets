@@ -9,7 +9,7 @@ import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.androidsdk.screensharing.ScreenSharing.Mode
 import com.glia.widgets.helper.Data
-import io.reactivex.Flowable
+import io.reactivex.rxjava3.core.Flowable
 
 internal interface EngagementRepository {
     val engagementRequest: Flowable<IncomingEngagementRequest>

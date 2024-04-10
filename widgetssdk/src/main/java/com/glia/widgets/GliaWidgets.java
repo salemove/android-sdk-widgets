@@ -27,8 +27,9 @@ import com.glia.widgets.helper.Logger;
 import java.io.IOException;
 import java.util.function.Consumer;
 
-import io.reactivex.exceptions.UndeliverableException;
-import io.reactivex.plugins.RxJavaPlugins;
+import io.reactivex.rxjava3.exceptions.UndeliverableException;
+import io.reactivex.rxjava3.plugins.RxJavaPlugins;
+
 
 /**
  * This class is a starting point for integration with Glia Widgets SDK

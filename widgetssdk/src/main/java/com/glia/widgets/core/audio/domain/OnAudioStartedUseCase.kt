@@ -4,14 +4,14 @@ import com.glia.androidsdk.comms.MediaState
 import com.glia.widgets.engagement.domain.OperatorMediaUseCase
 import com.glia.widgets.engagement.domain.VisitorMediaUseCase
 import com.glia.widgets.helper.hasAudio
-import io.reactivex.Flowable
+import io.reactivex.rxjava3.core.Flowable
 
 internal class OnAudioStartedUseCase(
     private val operatorMediaUseCase: OperatorMediaUseCase,
     private val visitorMediaUseCase: VisitorMediaUseCase
 ) {
     operator fun invoke(): Flowable<Boolean> {
-        val array = arrayOf(
+        val array = listOf(
             operatorMediaObservable(),
             visitorMediaObservable()
         )

@@ -1,8 +1,9 @@
 package com.glia.widgets.helper.rx
 
-import io.reactivex.Scheduler
+import io.reactivex.rxjava3.core.Scheduler
+
 
 internal interface Schedulers {
-    val computationScheduler: Scheduler?
-    val mainScheduler: Scheduler?
+    val computationScheduler: Scheduler
+    val mainScheduler: Scheduler
 }

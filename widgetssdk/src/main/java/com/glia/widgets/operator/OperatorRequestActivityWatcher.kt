@@ -19,7 +19,7 @@ import com.glia.widgets.helper.OneTimeEvent
 import com.glia.widgets.helper.isGlia
 import com.glia.widgets.helper.showToast
 import com.glia.widgets.view.Dialogs
-import io.reactivex.Flowable
+import io.reactivex.rxjava3.core.Flowable
 import java.lang.ref.WeakReference
 import kotlin.properties.Delegates
 import com.glia.widgets.operator.OperatorRequestContract.State as ControllerState

@@ -1,6 +1,10 @@
 package com.glia.widgets.helper.rx;
 
-import io.reactivex.Scheduler;
+
+import static io.reactivex.rxjava3.android.schedulers.AndroidSchedulers.mainThread;
+import static io.reactivex.rxjava3.schedulers.Schedulers.io;
+
+import io.reactivex.rxjava3.core.Scheduler;
 
 /**
  * @hide
@@ -9,11 +13,11 @@ public class GliaWidgetsSchedulers implements Schedulers {
 
     @Override
     public Scheduler getComputationScheduler() {
-        return io.reactivex.schedulers.Schedulers.io();
+        return io();
     }
 
     @Override
     public Scheduler getMainScheduler() {
-        return io.reactivex.android.schedulers.AndroidSchedulers.mainThread();
+        return mainThread();
     }
 }

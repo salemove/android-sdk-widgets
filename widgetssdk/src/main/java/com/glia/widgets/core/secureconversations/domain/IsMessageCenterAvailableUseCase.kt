@@ -2,7 +2,7 @@ package com.glia.widgets.core.secureconversations.domain
 
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
-import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 internal class IsMessageCenterAvailableUseCase(
     private val queueId: String,

@@ -2,7 +2,7 @@ package com.glia.widgets.engagement.domain
 
 import com.glia.androidsdk.IncomingEngagementRequest
 import com.glia.widgets.engagement.EngagementRepository
-import io.reactivex.Flowable
+import io.reactivex.rxjava3.core.Flowable
 
 internal interface EngagementRequestUseCase {
     operator fun invoke(): Flowable<IncomingEngagementRequest>

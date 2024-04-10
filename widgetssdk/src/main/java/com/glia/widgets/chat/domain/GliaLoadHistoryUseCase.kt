@@ -7,8 +7,8 @@ import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.core.secureconversations.domain.GetUnreadMessagesCountWithTimeoutUseCase
 import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
-import io.reactivex.Flowable
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.core.Single
 
 internal class GliaLoadHistoryUseCase(
     private val gliaChatRepository: GliaChatRepository,

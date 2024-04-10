@@ -7,7 +7,7 @@ import com.glia.widgets.filepreview.data.GliaFileRepository
 import com.glia.widgets.filepreview.domain.exception.FileNameMissingException
 import com.glia.widgets.filepreview.domain.exception.RemoteFileIsDeletedException
 import com.glia.widgets.helper.fileName
-import io.reactivex.Maybe
+import io.reactivex.rxjava3.core.Maybe
 
 internal class GetImageFileFromNetworkUseCase(
     private val gliaFileRepository: GliaFileRepository,

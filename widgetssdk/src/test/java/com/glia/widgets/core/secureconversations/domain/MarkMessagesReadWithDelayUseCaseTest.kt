@@ -2,8 +2,8 @@ package com.glia.widgets.core.secureconversations.domain
 
 import com.glia.androidsdk.RequestCallback
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
-import io.reactivex.plugins.RxJavaPlugins
-import io.reactivex.schedulers.TestScheduler
+import io.reactivex.rxjava3.plugins.RxJavaPlugins
+import io.reactivex.rxjava3.schedulers.TestScheduler
 import org.junit.After
 import org.junit.Before
 import org.junit.Test

@@ -4,7 +4,7 @@ import com.glia.androidsdk.chat.Chat
 import com.glia.androidsdk.chat.ChatMessage
 import com.glia.androidsdk.chat.OperatorMessage
 import com.glia.widgets.core.engagement.data.LocalOperator
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Single
 import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -33,7 +33,7 @@ class MapOperatorUseCaseTest {
         mapOperatorUseCase(chatMessage)
             .test()
             .assertComplete()
-            .assertNever { it.operator != null }
+            .assertValue { it.operator == null }
     }
 
     @Test
@@ -46,6 +46,6 @@ class MapOperatorUseCaseTest {
             .doOnSuccess { assertEquals(it.operatorId, operator.id) }
             .test()
             .assertComplete()
-            .assertNever { it.operator == null }
+            .assertValue { it.operator != null }
     }
 }

@@ -4,7 +4,7 @@ import com.glia.androidsdk.comms.MediaState
 import com.glia.widgets.engagement.EngagementRepository
 import com.glia.widgets.helper.Data
 import com.glia.widgets.helper.hasMedia
-import io.reactivex.Flowable
+import io.reactivex.rxjava3.core.Flowable
 
 internal interface OperatorMediaUseCase {
     val hasMedia: Boolean

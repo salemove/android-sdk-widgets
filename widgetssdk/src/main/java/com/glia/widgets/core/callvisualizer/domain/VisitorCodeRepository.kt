@@ -3,7 +3,7 @@ package com.glia.widgets.core.callvisualizer.domain
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.omnibrowse.VisitorCode
 import com.glia.widgets.di.GliaCore
-import io.reactivex.Observable
+import io.reactivex.rxjava3.core.Observable
 
 internal class VisitorCodeRepository(private val gliaCore: GliaCore) {
 

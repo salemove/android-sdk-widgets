@@ -11,7 +11,7 @@ import com.glia.widgets.helper.OneTimeEvent
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.view.Dialogs
 import com.glia.widgets.webbrowser.WebBrowserActivity
-import io.reactivex.Flowable
+import io.reactivex.rxjava3.core.Flowable
 import java.lang.ref.WeakReference
 import com.glia.widgets.callvisualizer.controller.CallVisualizerContract.State as ControllerState
 

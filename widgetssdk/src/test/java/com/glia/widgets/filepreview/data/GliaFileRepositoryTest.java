@@ -23,8 +23,8 @@ import org.junit.Test;
 
 import java.io.InputStream;
 
-import io.reactivex.Completable;
-import io.reactivex.Maybe;
+import io.reactivex.rxjava3.core.Completable;
+import io.reactivex.rxjava3.core.Maybe;
 
 public class GliaFileRepositoryTest {
 

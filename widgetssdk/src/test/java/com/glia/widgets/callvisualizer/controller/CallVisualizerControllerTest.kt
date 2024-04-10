@@ -15,9 +15,9 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
-import io.reactivex.android.plugins.RxAndroidPlugins
-import io.reactivex.processors.PublishProcessor
-import io.reactivex.schedulers.Schedulers
+import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
+import io.reactivex.rxjava3.processors.PublishProcessor
+import io.reactivex.rxjava3.schedulers.Schedulers
 import junit.framework.TestCase.assertTrue
 import org.junit.After
 import org.junit.Before

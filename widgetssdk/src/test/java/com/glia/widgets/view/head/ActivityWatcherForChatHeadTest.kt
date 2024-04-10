@@ -15,9 +15,9 @@ import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadContract
 import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadController
 import com.glia.widgets.view.head.controller.ApplicationChatHeadLayoutController
 import com.glia.widgets.view.head.controller.ServiceChatHeadController
-import io.reactivex.android.plugins.RxAndroidPlugins
-import io.reactivex.processors.PublishProcessor
-import io.reactivex.schedulers.Schedulers
+import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
+import io.reactivex.rxjava3.processors.PublishProcessor
+import io.reactivex.rxjava3.schedulers.Schedulers
 import org.junit.After
 import org.junit.Before
 import org.junit.Test

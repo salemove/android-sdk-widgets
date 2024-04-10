@@ -1,7 +1,7 @@
 package com.glia.widgets.engagement.domain
 
 import com.glia.widgets.engagement.EngagementRepository
-import io.reactivex.Flowable
+import io.reactivex.rxjava3.core.Flowable
 
 internal interface OperatorTypingUseCase {
     operator fun invoke(): Flowable<Boolean>

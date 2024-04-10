@@ -4,7 +4,7 @@ import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
 import com.glia.androidsdk.site.SiteInfo
 import com.glia.widgets.chat.domain.SiteInfoUseCase
-import io.reactivex.subjects.PublishSubject
+import io.reactivex.rxjava3.subjects.PublishSubject
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any

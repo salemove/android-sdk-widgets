@@ -7,7 +7,7 @@ import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.widgets.engagement.domain.MediaUpgradeOfferData
 import com.glia.widgets.helper.OneTimeEvent
-import io.reactivex.Flowable
+import io.reactivex.rxjava3.core.Flowable
 
 internal interface OperatorRequestContract {
     sealed interface State {

@@ -83,6 +83,7 @@
 
         <service
             android:name=".core.screensharing.MediaProjectionService"
+            android:exported="false"
             android:foregroundServiceType="mediaProjection" />
 
         <service android:name=".core.notification.NotificationRemovalService" />

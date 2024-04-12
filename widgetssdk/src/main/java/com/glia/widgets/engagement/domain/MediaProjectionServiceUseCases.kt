@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
+import com.glia.widgets.core.screensharing.MEDIA_PROJECTION_SERVICE_ACTION_START
 import com.glia.widgets.core.screensharing.MediaProjectionService
 
 internal interface StartMediaProjectionServiceUseCase {
@@ -14,7 +15,7 @@ internal interface StartMediaProjectionServiceUseCase {
 internal class StartMediaProjectionServiceUseCaseImpl(private val context: Context) : StartMediaProjectionServiceUseCase {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun invoke() {
-        context.startForegroundService(Intent(context, MediaProjectionService::class.java))
+        context.startForegroundService(Intent(context, MediaProjectionService::class.java).setAction(MEDIA_PROJECTION_SERVICE_ACTION_START))
     }
 }
 
@@ -26,6 +27,6 @@ internal interface StopMediaProjectionServiceUseCase {
 internal class StopMediaProjectionServiceUseCaseImpl(private val context: Context) : StopMediaProjectionServiceUseCase {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun invoke() {
-        context.stopService(Intent(context, MediaProjectionService::class.java))
+        context.stopService(Intent(context, MediaProjectionService::class.java).setAction(MEDIA_PROJECTION_SERVICE_ACTION_START))
     }
 }

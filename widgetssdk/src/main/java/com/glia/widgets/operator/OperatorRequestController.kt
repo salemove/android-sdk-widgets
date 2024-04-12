@@ -90,9 +90,7 @@ internal class OperatorRequestController(
     }
 
     private fun onScreenSharingRequested() {
-        withNotificationPermissionUseCase {
-            dialogController.showStartScreenSharingDialog()
-        }
+        dialogController.showStartScreenSharingDialog()
     }
 
     private fun handleMediaUpgradeOfferAcceptResult(mediaUpgradeOffer: MediaUpgradeOffer) {
@@ -159,8 +157,11 @@ internal class OperatorRequestController(
      */
     override fun onScreenSharingDialogAccepted(activity: Activity) {
         dismissAlertDialog()
-        _state.onNext(State.AcquireMediaProjectionToken)
-        screenSharingUseCase.acceptRequestWithAskedPermission(activity, gliaSdkConfigurationManager.screenSharingMode)
+
+        withNotificationPermissionUseCase {
+            _state.onNext(State.AcquireMediaProjectionToken)
+            screenSharingUseCase.acceptRequestWithAskedPermission(activity, gliaSdkConfigurationManager.screenSharingMode)
+        }
     }
 
     override fun onScreenSharingDialogDeclined(activity: Activity) {

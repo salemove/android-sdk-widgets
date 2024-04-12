@@ -34,6 +34,8 @@ internal object NotificationFactory {
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .setOngoing(true)
+            .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
+            .setSilent(true) // No sound or vibration and no heads-up notification
             .addAction(
                 R.drawable.ic_baseline_close,
                 stringProvider.getRemoteString(R.string.android_notification_end_screen_sharing_title),
@@ -105,6 +107,7 @@ internal object NotificationFactory {
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setCategory(NotificationCompat.CATEGORY_CALL)
             .setOngoing(true)
+            .setSilent(true) // No sound or vibration and no heads-up notification
             .build()
     }
 }

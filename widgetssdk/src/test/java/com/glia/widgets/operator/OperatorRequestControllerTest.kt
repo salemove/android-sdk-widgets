@@ -133,11 +133,6 @@ class OperatorRequestControllerTest {
     @Test
     fun `screen-sharing state Requested will show StartScreenSharingDialog when notification permission callback triggered`() {
         screenSharingProcessor.onNext(ScreenSharingState.Requested)
-        val callbackSlot = slot<() -> Unit>()
-
-        verify { withNotificationPermissionUseCase(capture(callbackSlot)) }
-        verify(exactly = 0) { dialogController.showStartScreenSharingDialog() }
-        callbackSlot.captured.invoke()
         verify { dialogController.showStartScreenSharingDialog() }
     }
 
@@ -308,10 +303,27 @@ class OperatorRequestControllerTest {
 
         controller.onScreenSharingDialogAccepted(activity)
         verify { dialogController.dismissCurrentDialog() }
+
+        val callbackSlot = slot<() -> Unit>()
+
+        verify { withNotificationPermissionUseCase(capture(callbackSlot)) }
+
+        verify(exactly = 0) { gliaSdkConfigurationManager.screenSharingMode }
+        verify(exactly = 0) { screenSharingUseCase.acceptRequestWithAskedPermission(eq(activity), any()) }
+        state.assertNotComplete().assertNoValues()
+
+        callbackSlot.captured.invoke()
+
         verify { gliaSdkConfigurationManager.screenSharingMode }
         verify { screenSharingUseCase.acceptRequestWithAskedPermission(eq(activity), any()) }
         state.assertNotComplete().assertValue { it.value == OperatorRequestContract.State.AcquireMediaProjectionToken }
-        confirmVerified(releaseScreenSharingResourcesUseCase, prepareToScreenSharingUseCase, screenSharingUseCase, gliaSdkConfigurationManager)
+        confirmVerified(
+            releaseScreenSharingResourcesUseCase,
+            prepareToScreenSharingUseCase,
+            screenSharingUseCase,
+            gliaSdkConfigurationManager,
+            withNotificationPermissionUseCase
+        )
     }
 
     @Test

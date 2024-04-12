@@ -14,7 +14,7 @@ import com.glia.widgets.engagement.domain.InformThatReadyToShareScreenUseCase
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 private const val SERVICE_ID = 123
-const val ACTION_START = "EngagementMonitoringService:Start"
+internal const val MEDIA_PROJECTION_SERVICE_ACTION_START = "com.glia.widgets.core.screensharing.MediaProjectionService:Start"
 
 /**
  * Glia internal class.
@@ -52,9 +52,13 @@ class MediaProjectionService : Service() {
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        informThatReadyToShareScreenUseCase()
+        if (intent.action == null) {
+            return START_NOT_STICKY
+        }
 
-        if (ACTION_START == intent.action) {
+        if (MEDIA_PROJECTION_SERVICE_ACTION_START == intent.action) {
+            informThatReadyToShareScreenUseCase()
+
             engagementStateUseCase()
                 .filter { it is State.FinishedCallVisualizer || it is State.FinishedOmniCore }
                 .subscribe { stopSelf() }

@@ -30,7 +30,9 @@ internal class NotificationManager(private val applicationContext: Application) 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private fun createCallChannel() {
         if (notificationManager.getNotificationChannel(NotificationFactory.NOTIFICATION_CALL_CHANNEL_ID) == null) {
-            val importance = NotificationManager.IMPORTANCE_LOW
+            /* Screen sharing notification importance should have the possible highest value,
+            because it shows the ongoing audio/video streaming and it is preferable to be as high as possible in notifications list */
+            val importance = NotificationManager.IMPORTANCE_HIGH
             val notificationChannel = NotificationChannel(
                 NotificationFactory.NOTIFICATION_CALL_CHANNEL_ID,
                 applicationContext.getString(R.string.android_notification_audio_call_channel_name),
@@ -43,7 +45,9 @@ internal class NotificationManager(private val applicationContext: Application) 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private fun createScreenSharingChannel() {
         if (notificationManager.getNotificationChannel(NotificationFactory.NOTIFICATION_SCREEN_SHARING_CHANNEL_ID) == null) {
-            val importance = NotificationManager.IMPORTANCE_LOW
+            /* Screen sharing notification importance should have the possible highest value,
+            because it affects the Media projection service initialization and streaming timing */
+            val importance = NotificationManager.IMPORTANCE_HIGH
             val notificationChannel = NotificationChannel(
                 NotificationFactory.NOTIFICATION_SCREEN_SHARING_CHANNEL_ID,
                 applicationContext.getString(R.string.android_notification_screen_sharing_channel_name),

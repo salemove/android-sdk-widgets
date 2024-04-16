@@ -93,7 +93,7 @@ dependencies {
   implementation libs.java.rxandroid
   implementation libs.java.rxjava
 
-  api libs.java.glia.core
+  api "com.glia:android-sdk:$gliaSdkVersion"
   // Glia sdk aar
   // implementation(name: "glia-core-sdk-$gliaSdkVersion", ext: 'aar')
 //    api "com.glia:android-sdk:0.26.6-SNAPSHOT" // Used when testing local Core SDK snapshot releases

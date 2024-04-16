@@ -96,7 +96,7 @@ internal open class BaseSingleActivityWatcher(private val gliaActivityManager: G
     }
 
     @CallSuper
-    final override fun onActivityDestroyed(activity: Activity) {
+    override fun onActivityDestroyed(activity: Activity) {
 
         if (activity == alertDialog?.parentActivity) {
             dismissAlertDialogSilently()

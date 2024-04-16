@@ -7,6 +7,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.collection.ArrayMap
 import androidx.core.content.getSystemService
 import com.glia.androidsdk.Engagement
 import com.glia.widgets.base.BaseSingleActivityWatcher
@@ -21,7 +22,6 @@ import com.glia.widgets.helper.showToast
 import com.glia.widgets.view.Dialogs
 import io.reactivex.rxjava3.core.Flowable
 import java.lang.ref.WeakReference
-import kotlin.properties.Delegates
 import com.glia.widgets.operator.OperatorRequestContract.State as ControllerState
 
 private const val TAG = "RequestHandlerActivityWatcher"
@@ -32,7 +32,7 @@ internal class OperatorRequestActivityWatcher(
     gliaActivityManager: GliaActivityManager
 ) : BaseSingleActivityWatcher(gliaActivityManager) {
 
-    private var mediaProjectionResultLauncher: ActivityResultLauncher<Intent> by Delegates.notNull()
+    private val mediaProjectionResultLaunchers: ArrayMap<String, ActivityResultLauncher<Intent>> = ArrayMap()
 
     init {
         Flowable.combineLatest(resumedActivity, controller.state, ::handleState).subscribe()
@@ -44,6 +44,11 @@ internal class OperatorRequestActivityWatcher(
         if (activity !is ComponentActivity) return
 
         registerForMediaProjectionPermissionResult(activity)
+    }
+
+    override fun onActivityDestroyed(activity: Activity) {
+        super.onActivityDestroyed(activity)
+        mediaProjectionResultLaunchers.remove(activity.localClassName)
     }
 
     private fun handleState(activityReference: WeakReference<Activity>, event: OneTimeEvent<ControllerState>) {
@@ -78,7 +83,9 @@ internal class OperatorRequestActivityWatcher(
     private fun requestMediaProjection(activity: Activity, consumeCallback: () -> Unit) {
         enforceComponentActivity(activity) {
             consumeCallback()
-            mediaProjectionResultLauncher.launch(activity.getSystemService<MediaProjectionManager>()?.createScreenCaptureIntent())
+            mediaProjectionResultLaunchers[activity.localClassName]?.launch(
+                activity.getSystemService<MediaProjectionManager>()?.createScreenCaptureIntent()
+            )
         }
     }
 
@@ -102,9 +109,10 @@ internal class OperatorRequestActivityWatcher(
     }
 
     private fun registerForMediaProjectionPermissionResult(activity: ComponentActivity) {
-        mediaProjectionResultLauncher = activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            controller.onMediaProjectionResultReceived(it, activity)
-        }
+        mediaProjectionResultLaunchers[activity.localClassName] =
+            activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                controller.onMediaProjectionResultReceived(it, activity)
+            }
     }
 
     private fun openNotificationsScreen(activity: Activity) {

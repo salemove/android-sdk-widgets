@@ -49,4 +49,9 @@ internal class AuthenticationManager(
     }
 
     override fun isAuthenticated(): Boolean = authentication.isAuthenticated
+
+    override fun refresh(jwtToken: String?, externalAccessToken: String?, authCallback: RequestCallback<Void>?) {
+        Logger.i(TAG, "Refresh authentication")
+        authentication.refresh(jwtToken, externalAccessToken, authCallback)
+    }
 }

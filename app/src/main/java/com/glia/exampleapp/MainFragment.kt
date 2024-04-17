@@ -222,8 +222,8 @@ class MainFragment : Fragment() {
 
             if (authentication == null) {
                 prepareAuthentication()
-                setupAuthButtonsVisibility()
             }
+            setupAuthButtonsVisibility()
         }
     }
 

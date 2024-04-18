@@ -19,6 +19,7 @@ import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.chat.ChatView
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.filepreview.ui.FilePreviewView
+import com.glia.widgets.helper.DialogHolderView
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.WeakReferenceDelegate
@@ -157,6 +158,7 @@ internal class ActivityWatcherForChatHead(
                 ?: it.findViewById<ChatView>(R.id.chat_view)
                 ?: it.findViewById<EndScreenSharingView>(R.id.screen_sharing_screen_view)
                 ?: it.findViewById<MessageCenterView>(R.id.message_center_view)
+                ?: it.findViewById<DialogHolderView>(R.id.dialog_holder_activity_view_id)
                 ?: it.findViewById(android.R.id.content)
                 ?: it.window.decorView.findViewById(android.R.id.content)
         }

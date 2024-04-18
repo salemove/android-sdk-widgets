@@ -10,7 +10,7 @@ import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCa
 import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
 import com.glia.widgets.engagement.domain.ScreenSharingUseCase
 import com.glia.widgets.filepreview.ui.FilePreviewView
-import com.glia.widgets.helper.DialogHolderActivity
+import com.glia.widgets.helper.DialogHolderView
 import com.glia.widgets.messagecenter.MessageCenterView
 
 internal abstract class IsDisplayChatHeadUseCase(
@@ -53,7 +53,7 @@ internal abstract class IsDisplayChatHeadUseCase(
             viewName != FilePreviewView::class.java.simpleName &&
             viewName != EndScreenSharingView::class.java.simpleName &&
             viewName != MessageCenterView::class.java.simpleName &&
-            viewName != DialogHolderActivity::class.java.simpleName
+            viewName != DialogHolderView::class.java.simpleName
     }
 
     private fun isNotInListOfGliaViews(viewName: String?): Boolean {

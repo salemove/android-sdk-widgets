@@ -1,8 +1,14 @@
 package com.glia.widgets.helper
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.os.Bundle
+import android.view.View
+import com.glia.widgets.R
 import com.glia.widgets.base.FadeTransitionActivity
+import com.glia.widgets.core.chathead.domain.IsDisplayChatHeadUseCase
+import com.glia.widgets.view.head.ActivityWatcherForChatHead
 
 /**
  * Glia internal class.
@@ -15,10 +21,28 @@ import com.glia.widgets.base.FadeTransitionActivity
  */
 internal class DialogHolderActivity : FadeTransitionActivity() {
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(DialogHolderView(this))
+    }
+
     companion object {
         fun start(activity: Activity) {
             activity.startActivity(Intent(activity, DialogHolderActivity::class.java))
         }
     }
 
+}
+
+/**
+ * Glia internal class.
+ *
+ * This is a view used to make the [DialogHolderActivity] recognizable by the services that draw the chat bubble.
+ * @see [ActivityWatcherForChatHead.fetchGliaOrRootView]
+ * @see [IsDisplayChatHeadUseCase.isNotInListOfGliaViewsExceptChat]
+ */
+internal class DialogHolderView(context: Context) : View(context) {
+    init {
+        id = R.id.dialog_holder_activity_view_id
+    }
 }

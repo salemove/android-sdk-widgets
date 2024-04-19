@@ -170,6 +170,8 @@ public class ControllerFactory {
                 useCaseFactory.getVisitorMediaUseCase(),
                 useCaseFactory.getToggleVisitorAudioMediaStateUseCase(),
                 useCaseFactory.getToggleVisitorVideoMediaStateUseCase(),
+                useCaseFactory.getFlipVisitorCameraUseCase(),
+                useCaseFactory.getFlipCameraButtonStateUseCase(),
                 useCaseFactory.getIsQueueingOrEngagementUseCase(),
                 useCaseFactory.getQueueForEngagementUseCase(),
                 useCaseFactory.getDecideOnQueueingUseCase(),

@@ -19,6 +19,7 @@ internal interface CallContract {
         fun minimizeButtonClicked()
         fun muteButtonClicked()
         fun videoButtonClicked()
+        fun flipVideoButtonClicked()
         fun startCall(
             companyName: String,
             queueId: String?,

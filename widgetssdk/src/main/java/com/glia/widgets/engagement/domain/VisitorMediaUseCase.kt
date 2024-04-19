@@ -5,6 +5,7 @@ import com.glia.widgets.engagement.EngagementRepository
 import com.glia.widgets.helper.Data
 import com.glia.widgets.helper.hasMedia
 import io.reactivex.rxjava3.core.Flowable
+import java.util.concurrent.TimeUnit
 
 internal interface VisitorMediaUseCase {
     val hasMedia: Boolean
@@ -23,4 +24,5 @@ internal class VisitorMediaUseCaseImpl(private val engagementRepository: Engagem
     override val hasMedia: Boolean get() = engagementRepository.visitorCurrentMediaState?.hasMedia ?: false
 
     override fun invoke(): Flowable<MediaState> = visitorMediaState
+        .throttleLatest(1000, TimeUnit.MILLISECONDS)
 }

@@ -162,6 +162,9 @@ internal class CallView(
         minimizeButton.setOnClickListener { callController?.minimizeButtonClicked() }
         muteButton.setOnClickListener { callController?.muteButtonClicked() }
         videoButton.setOnClickListener { callController?.videoButtonClicked() }
+        floatingVisitorVideoContainer.onFlipButtonClickListener = OnClickListener {
+            callController?.flipVideoButtonClicked()
+        }
     }
 
     fun startCall(
@@ -303,7 +306,7 @@ internal class CallView(
 
     private fun handleVisitorVideoState(state: CallState) {
         if (state.showVisitorVideo()) {
-            showVisitorVideo(state.callStatus.visitorMediaState)
+            showVisitorVideo(state)
         } else {
             hideVisitorVideo()
         }
@@ -637,8 +640,9 @@ internal class CallView(
         Dependencies.destroyControllers()
     }
 
-    private fun showVisitorVideo(visitorMediaState: MediaState?) {
-        floatingVisitorVideoContainer.show(visitorMediaState)
+    private fun showVisitorVideo(state: CallState) {
+        floatingVisitorVideoContainer.show(state.callStatus.visitorMediaState)
+        floatingVisitorVideoContainer.showFlipCameraButton(state.flipButtonState)
     }
 
     private fun showOperatorVideo(operatorMediaState: MediaState?) {

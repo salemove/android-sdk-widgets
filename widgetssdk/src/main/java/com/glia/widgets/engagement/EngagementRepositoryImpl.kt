@@ -12,6 +12,7 @@ import com.glia.androidsdk.IncomingEngagementRequest
 import com.glia.androidsdk.Operator
 import com.glia.androidsdk.chat.Chat
 import com.glia.androidsdk.chat.OperatorTypingStatus
+import com.glia.androidsdk.comms.CameraDevice
 import com.glia.androidsdk.comms.Media
 import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.comms.MediaUpgradeOffer
@@ -95,6 +96,12 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
     override val operatorMediaState: Flowable<Data<MediaState>> = _operatorMediaState
     override val operatorCurrentMediaState: MediaState? get() = _operatorMediaState.value?.let { it as? Data.Value }?.result
 
+    private val _visitorCameraState: BehaviorProcessor<VisitorCamera> = BehaviorProcessor.create()
+    override val visitorCameraState: Flowable<VisitorCamera>
+        get() = _visitorCameraState.distinctUntilChanged()
+    override val currentVisitorCamera: VisitorCamera
+        get() = _visitorCameraState.value ?: VisitorCamera.NoCamera
+
     //--Chat--
     private val operatorTypingCallback: Consumer<OperatorTypingStatus> = Consumer(::handleOperatorTypingStatus)
 
@@ -132,6 +139,9 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
 
     override val isSharingScreen: Boolean
         get() = currentEngagement != null && _screenSharingState.run { value == ScreenSharingState.Started || value == ScreenSharingState.RequestAccepted }
+
+    override val cameras: List<CameraDevice>?
+        get() = currentEngagement?.media?.cameraDevices
 
     override fun initialize() {
         core.on(Glia.Events.ENGAGEMENT, omniCoreEngagementCallback)
@@ -351,6 +361,7 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
         subscribeToEngagementMediaEvents(engagement.media)
         subscribeToEngagementChatEvents(engagement.chat)
         subscribeToScreenSharingEvents(engagement.screenSharing)
+        handleVisitorCamera(engagement.media)
     }
 
     private fun handleCallVisualizerEngagement(engagement: OmnibrowseEngagement) {
@@ -368,7 +379,14 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
         subscribeToEngagementEvents(engagement)
         subscribeToEngagementMediaEvents(engagement.media)
         subscribeToScreenSharingEvents(engagement.screenSharing)
+        handleVisitorCamera(engagement.media)
         //No need for chat events here
+    }
+
+    private fun handleVisitorCamera(media: Media) {
+        _visitorCameraState.onNext(
+            media.currentCameraDevice?.let { VisitorCamera.Camera(it) } ?: VisitorCamera.NoCamera
+        )
     }
 
     private fun subscribeToEngagementEvents(engagement: Engagement) {
@@ -482,6 +500,7 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
     private fun handleVisitorMediaStateUpdate(visitorMediaState: VisitorMediaState) {
         _visitorMediaState.onNext(Data.Value(visitorMediaState))
         subscribeToOnHoldChanges(visitorMediaState)
+        currentEngagement?.also { handleVisitorCamera(it.media) }
     }
 
     private fun subscribeToOnHoldChanges(mediaState: MediaState) {
@@ -524,6 +543,11 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
         val mediaState = visitorCurrentMediaState ?: return
         mediaState.video?.resume() ?: return
         _visitorMediaState.onNext(Data.Value(mediaState))
+    }
+
+    override fun setVisitorCamera(camera: CameraDevice) {
+        _visitorCameraState.onNext(VisitorCamera.Switching)
+        currentEngagement?.media?.setCameraDevice(camera)
     }
 
     //--Chat--

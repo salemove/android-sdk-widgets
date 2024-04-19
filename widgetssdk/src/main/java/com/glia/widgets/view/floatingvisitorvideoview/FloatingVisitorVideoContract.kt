@@ -8,6 +8,7 @@ internal interface FloatingVisitorVideoContract {
 
     interface View {
         fun show(state: MediaState?)
+        fun showFlipCameraButton(flipButtonState: FloatingVisitorVideoView.FlipButtonState)
         fun hide()
         fun onResume()
         fun onPause()

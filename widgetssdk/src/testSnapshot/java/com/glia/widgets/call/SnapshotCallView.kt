@@ -184,10 +184,11 @@ internal interface SnapshotCallView : SnapshotContent, SnapshotTheme, SnapshotAc
         visitorContextAssetId: String = "visitorContextAssetId",
         requestedMediaType: Engagement.MediaType = Engagement.MediaType.AUDIO,
         visitorMediaState: VisitorMediaState? = null,
+        showFlipVisitorCameraButton: Boolean = false,
         isOnHold: Boolean = false
     ): CallState = this
         .initCall(companyName, queueId, visitorContextAssetId, requestedMediaType)
-        .visitorMediaStateChanged(visitorMediaState)
+        .visitorMediaStateChanged(visitorMediaState, showFlipVisitorCameraButton)
         .setOnHold(isOnHold)
         .landscapeControlsVisibleChanged(false)
 
@@ -212,6 +213,7 @@ internal interface SnapshotCallView : SnapshotContent, SnapshotTheme, SnapshotAc
     ): CallState = this.videoCallOperatorVideoStarted(operatorMediaState, formattedTime)
 
     fun CallState.visitorMediaStateChanged(
-        visitorMediaState: VisitorMediaState = visitorMediaState()
-    ): CallState = this.visitorMediaStateChanged(visitorMediaState)
+        visitorMediaState: VisitorMediaState = visitorMediaState(),
+        showFlipVisitorCameraButton: Boolean = false
+    ): CallState = this.visitorMediaStateChanged(visitorMediaState, showFlipVisitorCameraButton)
 }

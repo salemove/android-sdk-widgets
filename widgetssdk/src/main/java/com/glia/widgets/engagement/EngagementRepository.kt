@@ -5,6 +5,7 @@ import android.content.Intent
 import com.glia.androidsdk.Engagement.MediaType
 import com.glia.androidsdk.IncomingEngagementRequest
 import com.glia.androidsdk.Operator
+import com.glia.androidsdk.comms.CameraDevice
 import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.androidsdk.screensharing.ScreenSharing.Mode
@@ -25,6 +26,7 @@ internal interface EngagementRepository {
     val operatorMediaState: Flowable<Data<MediaState>>
     val operatorCurrentMediaState: MediaState?
     val screenSharingState: Flowable<ScreenSharingState>
+    val visitorCameraState: Flowable<VisitorCamera>
 
     val currentOperatorValue: Operator?
     val isQueueingOrEngagement: Boolean
@@ -34,6 +36,8 @@ internal interface EngagementRepository {
     val isCallVisualizerEngagement: Boolean
     val isOperatorPresent: Boolean
     val isSharingScreen: Boolean
+    val cameras: List<CameraDevice>?
+    val currentVisitorCamera: VisitorCamera
 
     fun initialize()
     fun reset()
@@ -50,6 +54,7 @@ internal interface EngagementRepository {
     fun unMuteVisitorAudio()
     fun pauseVisitorVideo()
     fun resumeVisitorVideo()
+    fun setVisitorCamera(camera: CameraDevice)
     fun endScreenSharing()
     fun declineScreenSharingRequest()
     fun acceptScreenSharingWithAskedPermission(activity: Activity, mode: Mode)

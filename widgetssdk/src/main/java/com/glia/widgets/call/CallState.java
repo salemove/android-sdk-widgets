@@ -8,6 +8,7 @@ import com.glia.androidsdk.comms.Media;
 import com.glia.androidsdk.comms.MediaState;
 import com.glia.androidsdk.comms.Video;
 import com.glia.widgets.helper.Logger;
+import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContract.FlipButtonState;
 
 import java.util.Objects;
 
@@ -33,6 +34,7 @@ class CallState {
     public final String visitorContextAssetId;
 
     public final boolean isSharingScreen;
+    public final FlipButtonState flipButtonState;
 
     private CallState(Builder builder) {
         this.integratorCallStarted = builder.integratorCallStarted;
@@ -51,6 +53,7 @@ class CallState {
         this.queueId = builder.queueId;
         this.visitorContextAssetId = builder.visitorContextAssetId;
         this.isSharingScreen = builder.isSharingScreen;
+        this.flipButtonState = builder.flipButtonState;
     }
 
     public static CallState initial(Boolean isCallVisualizer) {
@@ -85,14 +88,16 @@ class CallState {
             isOnHold == callState.isOnHold &&
             isOnlyTimeChanged == callState.isOnlyTimeChanged &&
             isCallVisualizer == callState.isCallVisualizer &&
-            isSharingScreen == callState.isSharingScreen;
+            isSharingScreen == callState.isSharingScreen &&
+            flipButtonState == callState.flipButtonState;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(integratorCallStarted, isVisible, messagesNotSeen,
             callStatus, landscapeLayoutControlsVisible, isMuted, hasVideo,
-            companyName, requestedMediaType, isSpeakerOn, isOnHold, isOnlyTimeChanged, isCallVisualizer, isSharingScreen);
+            companyName, requestedMediaType, isSpeakerOn, isOnHold, isOnlyTimeChanged,
+            isCallVisualizer, isSharingScreen, flipButtonState);
     }
 
     public boolean showOperatorStatusView() {
@@ -256,6 +261,13 @@ class CallState {
             .copyFrom(this)
             .setHasVideo(isVisitorVideoPlaying(visitorMediaState))
             .setIsMuted(isMuted(visitorMediaState))
+            .createCallState();
+    }
+
+    public CallState flipButtonStateChanged(FlipButtonState showFlipVisitorCameraButton) {
+        return new Builder()
+            .copyFrom(this)
+            .setFlipButtonState(showFlipVisitorCameraButton)
             .createCallState();
     }
 
@@ -502,8 +514,8 @@ class CallState {
         private boolean isCallVisualizer;
         private String queueId;
         private String visitorContextAssetId;
-
         private boolean isSharingScreen;
+        private FlipButtonState flipButtonState;
 
         public Builder setIntegratorCallStarted(boolean integratorCallStarted) {
             this.integratorCallStarted = integratorCallStarted;
@@ -585,6 +597,11 @@ class CallState {
             return this;
         }
 
+        public Builder setFlipButtonState(FlipButtonState flipButtonState) {
+            this.flipButtonState = flipButtonState;
+            return this;
+        }
+
         Builder copyFrom(CallState callState) {
             integratorCallStarted = callState.integratorCallStarted;
             isVisible = callState.isVisible;
@@ -603,6 +620,7 @@ class CallState {
             queueId = callState.queueId;
             visitorContextAssetId = callState.visitorContextAssetId;
             isSharingScreen = callState.isSharingScreen;
+            flipButtonState = callState.flipButtonState;
             return this;
         }
 

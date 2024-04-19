@@ -32,8 +32,10 @@ import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCase
 import com.glia.widgets.engagement.domain.EndEngagementUseCase
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import com.glia.widgets.engagement.domain.EnqueueForEngagementUseCase
+import com.glia.widgets.engagement.domain.FlipVisitorCameraUseCase
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
+import com.glia.widgets.engagement.domain.FlipCameraButtonStateUseCase
 import com.glia.widgets.engagement.domain.OperatorMediaUseCase
 import com.glia.widgets.engagement.domain.ScreenSharingUseCase
 import com.glia.widgets.engagement.domain.ToggleVisitorAudioMediaStateUseCase
@@ -48,8 +50,10 @@ import com.glia.widgets.helper.unSafeSubscribe
 import com.glia.widgets.view.MessagesNotSeenHandler
 import com.glia.widgets.view.MessagesNotSeenHandler.MessagesNotSeenHandlerListener
 import com.glia.widgets.view.MinimizeHandler
+import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContract
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Observable
+import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoView
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import org.reactivestreams.Publisher
 import java.util.Optional
@@ -84,6 +88,8 @@ internal class CallController(
     private val visitorMediaUseCase: VisitorMediaUseCase,
     private val toggleVisitorAudioMediaStateUseCase: ToggleVisitorAudioMediaStateUseCase,
     private val toggleVisitorVideoMediaStateUseCase: ToggleVisitorVideoMediaStateUseCase,
+    private val flipVisitorCameraUseCase: FlipVisitorCameraUseCase,
+    private val flipCameraButtonStateUseCase: FlipCameraButtonStateUseCase,
     private val isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase,
     private val enqueueForEngagementUseCase: EnqueueForEngagementUseCase,
     private val decideOnQueueingUseCase: DecideOnQueueingUseCase,
@@ -117,6 +123,7 @@ internal class CallController(
         engagementStateUseCase().unSafeSubscribe(::onEngagementStateChanged)
         subscribeToMediaState()
         visitorMediaUseCase.onHoldState.unSafeSubscribe(::onHoldChanged)
+        flipCameraButtonStateUseCase().unSafeSubscribe(::onNewFlipCameraButtonState)
     }
 
     // This method combines both visitor and operator media state updates so that they would be fired one after another.
@@ -152,6 +159,10 @@ internal class CallController(
 
     private fun onNewVisitorMediaState(visitorMediaState: MediaState?) {
         emitViewState(callState.visitorMediaStateChanged(visitorMediaState))
+    }
+
+    private fun onNewFlipCameraButtonState(flipButtonState: FloatingVisitorVideoContract.FlipButtonState) {
+        emitViewState(callState.flipButtonStateChanged(flipButtonState))
     }
 
     private fun onHoldChanged(isOnHold: Boolean) {
@@ -394,8 +405,12 @@ internal class CallController(
         toggleVisitorVideoMediaStateUseCase()
     }
 
-    private fun onNewOperatorMediaState(operatorMediaState: MediaState?) {
-        if (operatorMediaState == null || !isQueueingOrEngagementUseCase.hasOngoingEngagement) return
+    override fun flipVideoButtonClicked() {
+        flipVisitorCameraUseCase()
+    }
+
+    private fun onNewOperatorMediaState(operatorMediaState: MediaState) {
+        if (!isQueueingOrEngagementUseCase.hasOngoingEngagement) return
         d(TAG, "newOperatorMediaState: $operatorMediaState, timer task running: ${callTimer.isRunning}")
         if (operatorMediaState.video != null) {
             onOperatorMediaStateVideo(operatorMediaState)

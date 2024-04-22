@@ -34,7 +34,10 @@ internal data class CallRemoteConfig(
     val connect: EngagementStatesRemoteConfig?,
 
     @SerializedName("snackBar")
-    val snackBarRemoteConfig: SnackBarRemoteConfig?
+    val snackBarRemoteConfig: SnackBarRemoteConfig?,
+
+    @SerializedName("visitorVideo")
+    val visitorVideoRemoteConfig: VisitorVideoRemoteConfig?
 ) {
     fun toCallTheme(): CallTheme = CallTheme(
         background = background?.toLayerTheme(),
@@ -45,6 +48,7 @@ internal data class CallRemoteConfig(
         operator = operator?.toTextTheme(),
         topText = topTextRemoteConfig?.toTextTheme(),
         connect = connect?.toEngagementStatesTheme(),
-        snackBar = snackBarRemoteConfig?.toSnackBarTheme()
+        snackBar = snackBarRemoteConfig?.toSnackBarTheme(),
+        visitorVideo = visitorVideoRemoteConfig?.toVisitorVideoTheme()
     )
 }

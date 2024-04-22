@@ -8,6 +8,7 @@ import com.glia.widgets.view.unifiedui.theme.call.BarButtonStatesTheme
 import com.glia.widgets.view.unifiedui.theme.call.BarButtonStyleTheme
 import com.glia.widgets.view.unifiedui.theme.call.ButtonBarTheme
 import com.glia.widgets.view.unifiedui.theme.call.CallTheme
+import com.glia.widgets.view.unifiedui.theme.call.VisitorVideoTheme
 
 /**
  * Default theme for Call screen
@@ -24,7 +25,8 @@ internal fun CallTheme(pallet: ColorPallet) = pallet.run {
         operator = BaseLightColorTextTheme(this),
         topText = BaseLightColorTextTheme(this),
         connect = CallEngagementStatesTheme(this),
-        snackBar = CallSnackBarTheme(this)
+        snackBar = CallSnackBarTheme(this),
+        visitorVideo = VisitorVideoTheme(this)
     )
 }
 
@@ -59,6 +61,17 @@ private fun CallButtonBarButtonTheme(pallet: ColorPallet) = pallet.run {
             ),
             activated = BarButtonStyleTheme(
                 imageColor = baseDarkColorTheme,
+                title = BaseLightColorTextTheme(this)
+            )
+        )
+    }
+}
+
+private fun VisitorVideoTheme(pallet: ColorPallet) = pallet.run {
+    composeIfAtLeastOneNotNull(baseLightColorTheme) {
+        VisitorVideoTheme(
+            flipCameraButton = BarButtonStyleTheme(
+                imageColor = baseLightColorTheme,
                 title = BaseLightColorTextTheme(this)
             )
         )

@@ -1394,6 +1394,22 @@
           "#FFFFFF"
         ]
       }
+    },
+    "visitorVideo": {
+      "flipCameraButton": {
+        "background": {
+          "type": "fill",
+          "value": [
+            "#04728c"
+          ]
+        },
+        "imageColor": {
+          "type": "fill",
+          "value": [
+            "#FFFFFF"
+          ]
+        }
+      }
     }
   },
   "chatScreen": {

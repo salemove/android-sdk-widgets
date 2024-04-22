@@ -4,12 +4,15 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.core.view.get
 import androidx.core.view.isVisible
 import com.glia.androidsdk.comms.VideoView
 import com.glia.widgets.R
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.view.unifiedui.applyBarButtonStyleTheme
+import com.glia.widgets.view.unifiedui.theme.call.VisitorVideoTheme
 import com.google.android.material.card.MaterialCardView
 
 /**
@@ -24,15 +27,17 @@ class FloatingVisitorVideoView @JvmOverloads constructor(
 
     private var videoView: VideoView? = null
     private var onHoldOverlay: TextView
-    private var flipCameraButton: View
+    private var flipCameraButtonContainer: View
+    private var flipCameraImageButton: ImageButton
     private val stringProvider = Dependencies.getStringProvider()
 
     init {
         LayoutInflater.from(context).inflate(R.layout.visitor_video_floating_view, this)
         onHoldOverlay = findViewById(R.id.on_hold_textview)
         onHoldOverlay.text = stringProvider.getRemoteString(R.string.general_you)
-        flipCameraButton = findViewById<View>(R.id.flip_camera_button)
-        flipCameraButton.setOnClickListener { onFlipButtonClickListener?.onClick(it) }
+        flipCameraImageButton = findViewById(R.id.flip_camera_image_button)
+        flipCameraButtonContainer = findViewById(R.id.flip_camera_button)
+        flipCameraButtonContainer.setOnClickListener { onFlipButtonClickListener?.onClick(it) }
     }
 
     override fun onDetachedFromWindow() {
@@ -57,12 +62,12 @@ class FloatingVisitorVideoView @JvmOverloads constructor(
 
     fun showFlipCameraButton(flipButtonState: FlipButtonState) {
         when (flipButtonState) {
-            FlipButtonState.HIDE -> flipCameraButton.isVisible = false
+            FlipButtonState.HIDE -> flipCameraButtonContainer.isVisible = false
             FlipButtonState.SWITCH_TO_FACE_CAMERA -> {
-                flipCameraButton.isVisible = true
+                flipCameraButtonContainer.isVisible = true
             }
             FlipButtonState.SWITCH_TO_BACK_CAMERA -> {
-                flipCameraButton.isVisible = true
+                flipCameraButtonContainer.isVisible = true
             }
         }
     }
@@ -80,6 +85,10 @@ class FloatingVisitorVideoView @JvmOverloads constructor(
     fun hideOnHold() {
         resumeVideoStream()
         onHoldOverlay.visibility = GONE
+    }
+
+    internal fun setTheme(visitorVideo: VisitorVideoTheme?) {
+        flipCameraImageButton.applyBarButtonStyleTheme(visitorVideo?.flipCameraButton)
     }
 
     private fun removeVideoView() {

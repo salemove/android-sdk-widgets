@@ -12,6 +12,7 @@ import com.glia.widgets.R
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.asActivity
 import com.glia.widgets.view.ViewHelpers
+import com.glia.widgets.view.unifiedui.theme.call.VisitorVideoTheme
 
 /**
  * @hide
@@ -70,6 +71,10 @@ internal class FloatingVisitorVideoContainer @JvmOverloads constructor(
 
     override fun hideOnHold() {
         floatingVisitorVideoView.hideOnHold()
+    }
+
+    internal fun setTheme(visitorVideo: VisitorVideoTheme?) {
+        floatingVisitorVideoView.setTheme(visitorVideo)
     }
 
     @SuppressLint("ClickableViewAccessibility")

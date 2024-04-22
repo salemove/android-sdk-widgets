@@ -15,5 +15,6 @@ internal data class CallTheme(
     val operator: TextTheme? = null,
     val topText: TextTheme? = null,
     val connect: EngagementStatesTheme? = null,
-    val snackBar: SnackBarTheme? = null
+    val snackBar: SnackBarTheme? = null,
+    val visitorVideo: VisitorVideoTheme? = null
 )

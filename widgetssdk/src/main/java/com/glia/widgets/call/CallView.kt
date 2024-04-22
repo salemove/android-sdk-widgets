@@ -478,6 +478,9 @@ internal class CallView(
 
         // Background
         callTheme?.background?.fill.also(::applyColorTheme)
+
+        // Video
+        floatingVisitorVideoContainer.setTheme(callTheme?.visitorVideo)
     }
 
     private fun setAppBarTheme() {

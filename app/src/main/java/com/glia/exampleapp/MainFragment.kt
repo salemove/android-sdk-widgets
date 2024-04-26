@@ -93,7 +93,7 @@ class MainFragment : Fragment() {
         view.findViewById<View>(R.id.deauthenticationButton)
             .setOnClickListener { deAuthenticate() }
         view.findViewById<View>(R.id.refreshAuthButton)
-            .setOnClickListener { showRefreshAuthDialog(null) }
+            .setOnClickListener { showRefreshAuthDialog() }
         view.findViewById<View>(R.id.clear_session_button)
             .setOnClickListener { clearSession() }
         view.findViewById<View>(R.id.visitor_code_button).setOnClickListener {
@@ -382,8 +382,8 @@ class MainFragment : Fragment() {
     private fun showAuthenticationDialog(callback: OnAuthCallback?) {
         if (context == null) return
         val builder = AlertDialog.Builder(requireContext())
-        val jwtInput = prepareJwtInputViewEditText(builder)
-        val externalTokenInput = prepareExternalTokenInputViewEditText(builder)
+        val jwtInput = prepareJwtInputViewEditText(builder, R.string.authentication_dialog_title)
+        val externalTokenInput = prepareExternalTokenInputViewEditText(builder, R.string.authentication_dialog_title)
         jwtInput.setText(authToken)
         builder.setPositiveButton(
             getString(R.string.authentication_dialog_authenticate_button)
@@ -432,35 +432,37 @@ class MainFragment : Fragment() {
         return container
     }
 
-    private fun prepareJwtInputViewEditText(builder: AlertDialog.Builder): EditText {
+    private fun prepareJwtInputViewEditText(builder: AlertDialog.Builder,
+                                            dialogTitle: Int): EditText {
         val input = EditText(context)
         input.setHint(R.string.authentication_dialog_jwt_input_hint)
         input.setSingleLine()
         input.maxLines = 10
         input.setHorizontallyScrolling(false)
         input.inputType = InputType.TYPE_CLASS_TEXT
-        builder.setTitle(R.string.authentication_dialog_title)
+        builder.setTitle(dialogTitle)
         builder.setView(input)
         return input
     }
 
-    private fun prepareExternalTokenInputViewEditText(builder: AlertDialog.Builder): EditText {
+    private fun prepareExternalTokenInputViewEditText(builder: AlertDialog.Builder,
+                                                      dialogTitle: Int): EditText {
         val input = EditText(context)
         input.setHint(R.string.authentication_dialog_external_token_input_hint)
         input.setSingleLine()
         input.maxLines = 10
         input.setHorizontallyScrolling(false)
         input.inputType = InputType.TYPE_CLASS_TEXT
-        builder.setTitle(R.string.authentication_dialog_title)
+        builder.setTitle(dialogTitle)
         builder.setView(input)
         return input
     }
 
-    private fun showRefreshAuthDialog(callback: OnAuthCallback?) {
+    private fun showRefreshAuthDialog() {
         if (context == null) return
         val builder = AlertDialog.Builder(requireContext())
-        val jwtInput = prepareJwtInputViewEditText(builder)
-        val externalTokenInput = prepareExternalTokenInputViewEditText(builder)
+        val jwtInput = prepareJwtInputViewEditText(builder, R.string.refresh_auth_dialog_title)
+        val externalTokenInput = prepareExternalTokenInputViewEditText(builder, R.string.refresh_auth_dialog_title)
         jwtInput.setText(authToken)
         builder.setPositiveButton(
             getString(R.string.refresh_dialog_refresh_button)

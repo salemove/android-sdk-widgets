@@ -92,6 +92,8 @@ class MainFragment : Fragment() {
             .setOnClickListener { showAuthenticationDialog(null) }
         view.findViewById<View>(R.id.deauthenticationButton)
             .setOnClickListener { deAuthenticate() }
+        view.findViewById<View>(R.id.refreshAuthButton)
+            .setOnClickListener { showRefreshAuthDialog() }
         view.findViewById<View>(R.id.clear_session_button)
             .setOnClickListener { clearSession() }
         view.findViewById<View>(R.id.visitor_code_button).setOnClickListener {
@@ -251,12 +253,14 @@ class MainFragment : Fragment() {
                 containerView!!.findViewById<View>(R.id.initGliaWidgetsButton).visibility = View.GONE
                 containerView!!.findViewById<View>(R.id.authenticationButton).visibility = View.GONE
                 containerView!!.findViewById<View>(R.id.deauthenticationButton).visibility = View.VISIBLE
+                containerView!!.findViewById<View>(R.id.refreshAuthButton).visibility = View.VISIBLE
             }
         } else {
             requireActivity().runOnUiThread {
                 containerView!!.findViewById<View>(R.id.initGliaWidgetsButton).visibility = View.GONE
                 containerView!!.findViewById<View>(R.id.authenticationButton).visibility = View.VISIBLE
                 containerView!!.findViewById<View>(R.id.deauthenticationButton).visibility = View.GONE
+                containerView!!.findViewById<View>(R.id.refreshAuthButton).visibility = View.GONE
             }
         }
     }
@@ -378,8 +382,8 @@ class MainFragment : Fragment() {
     private fun showAuthenticationDialog(callback: OnAuthCallback?) {
         if (context == null) return
         val builder = AlertDialog.Builder(requireContext())
-        val jwtInput = prepareJwtInputViewEditText(builder)
-        val externalTokenInput = prepareExternalTokenInputViewEditText(builder)
+        val jwtInput = prepareJwtInputViewEditText(builder, R.string.authentication_dialog_title)
+        val externalTokenInput = prepareExternalTokenInputViewEditText(builder, R.string.authentication_dialog_title)
         jwtInput.setText(authToken)
         builder.setPositiveButton(
             getString(R.string.authentication_dialog_authenticate_button)
@@ -428,28 +432,75 @@ class MainFragment : Fragment() {
         return container
     }
 
-    private fun prepareJwtInputViewEditText(builder: AlertDialog.Builder): EditText {
+    private fun prepareJwtInputViewEditText(builder: AlertDialog.Builder,
+                                            dialogTitle: Int): EditText {
         val input = EditText(context)
         input.setHint(R.string.authentication_dialog_jwt_input_hint)
         input.setSingleLine()
         input.maxLines = 10
         input.setHorizontallyScrolling(false)
         input.inputType = InputType.TYPE_CLASS_TEXT
-        builder.setTitle(R.string.authentication_dialog_title)
+        builder.setTitle(dialogTitle)
         builder.setView(input)
         return input
     }
 
-    private fun prepareExternalTokenInputViewEditText(builder: AlertDialog.Builder): EditText {
+    private fun prepareExternalTokenInputViewEditText(builder: AlertDialog.Builder,
+                                                      dialogTitle: Int): EditText {
         val input = EditText(context)
         input.setHint(R.string.authentication_dialog_external_token_input_hint)
         input.setSingleLine()
         input.maxLines = 10
         input.setHorizontallyScrolling(false)
         input.inputType = InputType.TYPE_CLASS_TEXT
-        builder.setTitle(R.string.authentication_dialog_title)
+        builder.setTitle(dialogTitle)
         builder.setView(input)
         return input
+    }
+
+    private fun showRefreshAuthDialog() {
+        if (context == null) return
+        val builder = AlertDialog.Builder(requireContext())
+        val jwtInput = prepareJwtInputViewEditText(builder, R.string.refresh_auth_dialog_title)
+        val externalTokenInput = prepareExternalTokenInputViewEditText(builder, R.string.refresh_auth_dialog_title)
+        jwtInput.setText(authToken)
+        builder.setPositiveButton(
+            getString(R.string.refresh_dialog_refresh_button)
+        ) { _, _ ->
+            refresh(jwtInput, externalTokenInput)
+        }
+        builder.setNeutralButton(getString(R.string.authentication_dialog_clear_button), null)
+        builder.setNegativeButton(
+            R.string.authentication_dialog_cancel_button
+        ) { dialog: DialogInterface, _ -> dialog.cancel() }
+        builder.setView(prepareDialogLayout(jwtInput, externalTokenInput))
+        val alertDialog = builder.create()
+        alertDialog.setOnShowListener {
+            val button = alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL)
+            button.setOnClickListener {
+                jwtInput.setText("")
+                externalTokenInput.setText("")
+                clearAuthToken()
+            }
+        }
+        alertDialog.show()
+    }
+
+    private fun refresh(jwtInput: EditText, externalTokenInput: EditText) {
+        val jwt = jwtInput.text.toString()
+        var externalToken: String? = externalTokenInput.text.toString()
+        if (externalToken!!.isEmpty()) externalToken = null
+        authentication?.refresh(
+            jwt, externalToken
+        ) { response, exception ->
+            setupAuthButtonsVisibility()
+            if (exception != null || !authentication!!.isAuthenticated) {
+                showToast("Error: $exception")
+            } else {
+                showToast("Refreshed")
+            }
+        }
+        saveAuthToken(jwt)
     }
 
     private fun initGliaWidgets() {

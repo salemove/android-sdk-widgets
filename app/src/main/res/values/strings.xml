@@ -88,6 +88,7 @@
     <string name="main_init_glia">Init Glia Widgets SDK</string>
     <string name="main_authenticate">Authenticate</string>
     <string name="main_deauthenticate">De-authenticate</string>
+    <string name="main_refresh_auth">Refresh authentication</string>
     <string name="main_clear_visitor_session">Clear Session</string>
     <string name="main_show_visitor_code">Show Visitor Code</string>
 
@@ -97,6 +98,8 @@
     <string name="authentication_dialog_authenticate_button">Authenticate</string>
     <string name="authentication_dialog_clear_button">Clear</string>
     <string name="authentication_dialog_cancel_button">Cancel</string>
+    <string name="refresh_auth_dialog_title">Refresh authentication</string>
+    <string name="refresh_dialog_refresh_button">Refresh</string>
 
     <string name="visitor_info_name">Name</string>
     <string name="visitor_info_email">Email</string>

@@ -199,7 +199,6 @@ internal class CallView(
 
     fun onResume() {
         floatingVisitorVideoContainer.onResume()
-        floatingVisitorVideoContainer.contentDescription = stringProvider.getRemoteString(R.string.call_visitor_video_accessibility_label)
         callController?.onResume()
         operatorVideoView?.resumeRendering()
         dialogCallback?.also { dialogController?.addCallback(it) }

@@ -65,9 +65,13 @@ class FloatingVisitorVideoView @JvmOverloads constructor(
             FlipButtonState.HIDE -> flipCameraButtonContainer.isVisible = false
             FlipButtonState.SWITCH_TO_FACE_CAMERA -> {
                 flipCameraButtonContainer.isVisible = true
+                flipCameraButtonContainer.contentDescription =
+                    stringProvider.getRemoteString(R.string.call_visitor_video_front_camera_button_accessibility_label)
             }
             FlipButtonState.SWITCH_TO_BACK_CAMERA -> {
                 flipCameraButtonContainer.isVisible = true
+                flipCameraButtonContainer.contentDescription =
+                    stringProvider.getRemoteString(R.string.call_visitor_video_back_camera_button_accessibility_label)
             }
         }
     }

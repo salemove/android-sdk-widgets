@@ -28,7 +28,8 @@
             android:backgroundTint="@color/call_fab_bg_color_states"
             android:duplicateParentState="true"
             android:clickable="false"
-            android:focusable="false" />
+            android:focusable="false"
+            android:importantForAccessibility="no"/>
 
     </FrameLayout>
 

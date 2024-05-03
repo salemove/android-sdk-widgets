@@ -110,7 +110,7 @@ internal class ApplicationChatHeadLayoutController(
     }
 
     override fun shouldShow(gliaOrRootViewName: String?): Boolean {
-        return isDisplayApplicationChatHeadUseCase(gliaOrRootViewName)
+        return isDisplayApplicationChatHeadUseCase(gliaOrRootViewName, true)
     }
 
     override fun onResume(viewName: String) {

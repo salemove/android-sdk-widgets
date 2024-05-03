@@ -23,8 +23,12 @@ internal abstract class IsDisplayChatHeadUseCase(
 ) {
     abstract fun isDisplayBasedOnPermission(): Boolean
 
-    open operator fun invoke(viewName: String?): Boolean {
-        return isBubbleEnabled() && isDisplayBasedOnPermission() && isShowForEngagement(viewName)
+    open operator fun invoke(viewName: String?, internal: Boolean = false): Boolean {
+        return if (internal) {
+            isDisplayBasedOnPermission() && isShowForEngagement(viewName)
+        } else {
+            isBubbleEnabled() && isDisplayBasedOnPermission() && isShowForEngagement(viewName)
+        }
     }
 
     private fun isShowForEngagement(viewName: String?) =

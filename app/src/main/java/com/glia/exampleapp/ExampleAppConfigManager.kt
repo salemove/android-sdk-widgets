@@ -128,7 +128,7 @@ object ExampleAppConfigManager {
             context.getString(R.string.pref_company_name),
             context.getString(R.string.settings_value_default_company_name)
         )
-        val useOverlay = preferences.getBoolean(context.getString(R.string.pref_use_overlay), false)
+        val useOverlay = preferences.getBoolean(context.getString(R.string.pref_use_overlay), true)
         val bounded = context.getString(R.string.screen_sharing_mode_app_bounded)
         val unbounded = context.getString(R.string.screen_sharing_mode_unbounded)
         val screenSharingMode = if (

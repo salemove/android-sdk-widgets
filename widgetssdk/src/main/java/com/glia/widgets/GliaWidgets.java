@@ -73,9 +73,9 @@ public class GliaWidgets {
      * Use with {@link android.os.Bundle} to pass in a boolean which represents if you would like to
      * use the chat head bubble as an overlay outside your application for
      * navigating to {@link com.glia.widgets.chat.ChatActivity}
-     * If set to true then the sdk will ask for overlay permissions and try to always show the navigation bubble,
+     * If set to true then the SDK will ask for overlay permissions and try to always show the navigation bubble,
      * outside the application will be shown only if the user has accepted the permissions.
-     * If false, then overlay permissions are not requested, but the navigation bubble is still shown during your application being active.
+     * If false, then overlay permissions are not requested and the navigation bubble is shown when the application is active.
      * The {@link com.glia.widgets.view.head.controller.ApplicationChatHeadLayoutController} will notify any
      * listening {@link com.glia.widgets.view.head.ChatHeadLayout} of any visibility changes.
      * When this value is not passed then by default this value is true.

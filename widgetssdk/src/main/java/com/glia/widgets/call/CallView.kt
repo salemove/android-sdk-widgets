@@ -226,7 +226,7 @@ internal class CallView(
                     DialogState.OverlayPermission -> post { showOverlayPermissionsDialog() }
                     DialogState.EndEngagement -> post { showEndEngagementDialog() }
                     DialogState.Confirmation -> post { callController?.onLiveObservationDialogRequested() }
-                    else -> Logger.e(TAG, "DialogController callback in CallView with $it")
+                    else -> { /* noop */ }
                 }
             }
         }

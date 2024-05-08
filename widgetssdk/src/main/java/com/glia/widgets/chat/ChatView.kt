@@ -515,7 +515,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
                     DialogState.VisitorCode -> {
                         Logger.e(TAG, "DialogController callback in ChatView with MODE_VISITOR_CODE")
                     } // Should never happen inside ChatView
-                    else -> Logger.d(TAG, "Dialog mode $it not handled.")
+                    else -> { /* noop */ }
                 }
             }
         }

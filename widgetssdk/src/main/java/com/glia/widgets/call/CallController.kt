@@ -48,7 +48,11 @@ import com.glia.widgets.helper.unSafeSubscribe
 import com.glia.widgets.view.MessagesNotSeenHandler
 import com.glia.widgets.view.MessagesNotSeenHandler.MessagesNotSeenHandlerListener
 import com.glia.widgets.view.MinimizeHandler
+import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import org.reactivestreams.Publisher
+import java.util.Optional
 import java.util.concurrent.TimeUnit
 
 private const val MAX_IDLE_TIME = 3200
@@ -111,9 +115,27 @@ internal class CallController(
 
     private fun subscribeToEngagement() {
         engagementStateUseCase().unSafeSubscribe(::onEngagementStateChanged)
-        operatorMediaUseCase().unSafeSubscribe(::onNewOperatorMediaState)
-        visitorMediaUseCase().unSafeSubscribe(::onNewVisitorMediaState)
+        subscribeToMediaState()
         visitorMediaUseCase.onHoldState.unSafeSubscribe(::onHoldChanged)
+    }
+
+    // This method combines both visitor and operator media state updates so that they would be fired one after another.
+    // This is done to prevent errors such as "does not support one-way audio calls" only because the
+    // other participant media state is passed few milliseconds late.
+    private fun subscribeToMediaState() {
+        Flowable.combineLatest(
+            visitorMediaUseCase().map { Optional.of(it) }.startWithItem(Optional.empty()),
+            operatorMediaUseCase().map { Optional.of(it) }.startWithItem(Optional.empty())
+        ) { visitorState, operatorState ->
+            Pair(visitorState, operatorState)
+        }.debounce(200, TimeUnit.MILLISECONDS)
+            .unSafeSubscribe {
+                val visitorMedia = it.first.orElse(null)
+                val operatorMedia = it.second.orElse(null)
+                onNewVisitorMediaState(visitorMedia)
+                onNewOperatorMediaState(operatorMedia)
+                callNotificationUseCase(visitorMedia, operatorMedia)
+            }
     }
 
     private fun handleScreenSharingState(screenSharingState: ScreenSharingState) {
@@ -130,7 +152,6 @@ internal class CallController(
 
     private fun onNewVisitorMediaState(visitorMediaState: MediaState?) {
         emitViewState(callState.visitorMediaStateChanged(visitorMediaState))
-        callNotificationUseCase(visitorMediaState, callState.callStatus.operatorMediaState)
     }
 
     private fun onHoldChanged(isOnHold: Boolean) {
@@ -373,8 +394,8 @@ internal class CallController(
         toggleVisitorVideoMediaStateUseCase()
     }
 
-    private fun onNewOperatorMediaState(operatorMediaState: MediaState) {
-        if (!isQueueingOrEngagementUseCase.hasOngoingEngagement) return
+    private fun onNewOperatorMediaState(operatorMediaState: MediaState?) {
+        if (operatorMediaState == null || !isQueueingOrEngagementUseCase.hasOngoingEngagement) return
         d(TAG, "newOperatorMediaState: $operatorMediaState, timer task running: ${callTimer.isRunning}")
         if (operatorMediaState.video != null) {
             onOperatorMediaStateVideo(operatorMediaState)
@@ -386,7 +407,6 @@ internal class CallController(
         if (callState.isMediaEngagementStarted && !callTimer.isRunning && callTimerStatusListener != null) {
             callTimer.startNew(Constants.CALL_TIMER_DELAY, Constants.CALL_TIMER_INTERVAL_VALUE)
         }
-        callNotificationUseCase(callState.callStatus.visitorMediaState, operatorMediaState)
     }
 
     override fun onSpeakerButtonPressed() {

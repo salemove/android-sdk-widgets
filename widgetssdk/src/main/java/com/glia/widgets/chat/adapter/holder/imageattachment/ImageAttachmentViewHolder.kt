@@ -48,13 +48,13 @@ internal open class ImageAttachmentViewHolder(
         imageView.setImageResource(android.R.color.transparent) // clear the previous view state
         val imageName = attachmentFile.fileName
         disposable = getImageFileFromCacheUseCase.invoke(imageName)
-            .doOnError { error: Throwable -> e(TAG, "failed loading from cache: " + imageName + " reason: " + error.message) }
+            .doOnError { error: Throwable -> d(TAG, "failed loading from cache: " + imageName + " reason: " + error.message) }
             .doOnSuccess { _: Bitmap? -> d(TAG, "loaded from cache: $imageName") }
             .onErrorResumeNext { getImageFileFromDownloadsUseCase.invoke(imageName) }
-            .doOnError { error: Throwable -> e(TAG, imageName + " failed loading from downloads: " + error.message) }
+            .doOnError { error: Throwable -> d(TAG, imageName + " failed loading from downloads: " + error.message) }
             .doOnSuccess { _: Bitmap? -> d(TAG, "loaded from downloads: $imageName") }
             .onErrorResumeNext { getImageFileFromNetworkUseCase.invoke(attachmentFile)}
-            .doOnError { error: Throwable -> e(TAG, imageName + " failed loading from network: " + error.message) }
+            .doOnError { error: Throwable -> d(TAG, imageName + " failed loading from network: " + error.message) }
             .doOnSuccess { _: Bitmap? -> d(TAG, "loaded from network: $imageName") }
             .subscribeOn(schedulers.computationScheduler)
             .observeOn(schedulers.mainScheduler)

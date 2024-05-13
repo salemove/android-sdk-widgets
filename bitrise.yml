@@ -193,20 +193,6 @@ workflows:
       - install-missing-android-tools@3:
           inputs:
             - gradlew_path: $PROJECT_LOCATION/gradlew
-      - android-build@1:
-          inputs:
-            - variant: $INTEGRATOR_VARIANT
-            - module: $EXAMPLE_APP_MODULE
-      - android-unit-test@1:
-          inputs:
-            - module: $WIDGET_SDK_MODULE
-            - variant: $SDK_VARIANT
-            - project_location: $PROJECT_LOCATION
-      - android-unit-test@1:
-          inputs:
-            - module: $EXAMPLE_APP_MODULE
-            - variant: $DEBUG_VARIANT
-            - project_location: $PROJECT_LOCATION
       - gradle-runner@2:
           title: Generate JavaDoc
           inputs:
@@ -219,45 +205,6 @@ workflows:
             - acl_control: public-read
             - upload_local_path: $PROJECT_LOCATION/$WIDGET_SDK_MODULE/build/dokka
             - access_key_id: $AMAZON_AWS_KEY
-      - script@1:
-          title: Publish Android SDK to Nexus Repository Manager (Staging)
-          inputs:
-            - content: |-
-                #!/usr/bin/env bash
-                # fail if any commands fails
-                set -e
-                # debug log
-                set -x
-                
-                # this will run Gradle script to deploy library and related artifacts to Maven Central
-                ./gradlew clean widgetssdk:publishReleasePublicationToSonatypeRepository
-      - git-tag@1:
-          inputs:
-            - tag: $NEW_VERSION
-      - script@1:
-          title: Generate changelog
-          inputs:
-            - content: |-
-                #!/usr/bin/env bash
-                # fail if any commands fails
-                set -e
-                # debug log
-                set -x
-                
-                # run the local bash script
-                bash ./scripts/generate-changelog.sh
-      - github-release@0:
-          inputs:
-            - username: $GITHUB_USERNAME
-            - tag: $NEW_VERSION
-            - commit: $GIT_CLONE_COMMIT_HASH
-            - name: Glia Android Widgets $NEW_VERSION
-            - body: $BITRISE_CHANGELOG
-            - draft: "no"
-            - api_token: $GITHUB_API_TOKEN
-      - cache-push@2: { }
-    after_run:
-      - _increment_project_version
   pull_request:
     steps:
       - activate-ssh-key@4:

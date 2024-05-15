@@ -3,9 +3,11 @@ package com.glia.widgets.call
 import android.text.format.DateUtils
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.Operator
+import com.glia.androidsdk.comms.Audio
 import com.glia.androidsdk.comms.MediaDirection
 import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.comms.MediaUpgradeOffer
+import com.glia.androidsdk.comms.Video
 import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.widgets.Constants
 import com.glia.widgets.call.CallStatus.EngagementOngoingAudioCallStarted
@@ -130,9 +132,14 @@ internal class CallController(
     // This is done to prevent errors such as "does not support one-way audio calls" only because the
     // other participant media state is passed few milliseconds late.
     private fun subscribeToMediaState() {
+        val initialState = object : MediaState {
+            override fun getVideo(): Video? = null
+            override fun getAudio(): Audio? = null
+        }
+
         Flowable.combineLatest(
-            visitorMediaUseCase().map { Optional.of(it) }.startWithItem(Optional.empty()),
-            operatorMediaUseCase().map { Optional.of(it) }.startWithItem(Optional.empty())
+            visitorMediaUseCase().startWithItem(initialState).map { Optional.of(it) },
+            operatorMediaUseCase().startWithItem(initialState).map { Optional.of(it) }
         ) { visitorState, operatorState ->
             Pair(visitorState, operatorState)
         }.debounce(200, TimeUnit.MILLISECONDS)

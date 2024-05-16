@@ -515,7 +515,7 @@ class CallState {
         private String queueId;
         private String visitorContextAssetId;
         private boolean isSharingScreen;
-        private FlipButtonState flipButtonState;
+        private FlipButtonState flipButtonState = FlipButtonState.HIDE;
 
         public Builder setIntegratorCallStarted(boolean integratorCallStarted) {
             this.integratorCallStarted = integratorCallStarted;

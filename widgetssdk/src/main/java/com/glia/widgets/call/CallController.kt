@@ -131,17 +131,14 @@ internal class CallController(
     // This is done to prevent errors such as "does not support one-way audio calls" only because the
     // other participant media state is passed few milliseconds late.
     private fun subscribeToMediaState() {
-        val dummyState = object : MediaState {
-            override fun getVideo(): Video? {
-                return null
-            }
-            override fun getAudio(): Audio? {
-                return null
-            }
+        val initialState = object : MediaState {
+            override fun getVideo(): Video? = null
+            override fun getAudio(): Audio? = null
         }
+
         Flowable.combineLatest(
-            visitorMediaUseCase().startWithItem(dummyState).map { Optional.of(it) },
-            operatorMediaUseCase().startWithItem(dummyState).map { Optional.of(it) }
+            visitorMediaUseCase().startWithItem(initialState).map { Optional.of(it) },
+            operatorMediaUseCase().startWithItem(initialState).map { Optional.of(it) }
         ) { visitorState, operatorState ->
             Pair(visitorState, operatorState)
         }.debounce(200, TimeUnit.MILLISECONDS)

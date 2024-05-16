@@ -1,5 +1,6 @@
 package com.glia.widgets.call
 
+import android.graphics.Color
 import com.android.ide.common.rendering.api.SessionParams
 import com.glia.androidsdk.Engagement
 import com.glia.widgets.SnapshotTest
@@ -229,6 +230,66 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(
             setupView(
                 callState = video2WayCallStartedState(),
                 unifiedTheme = unifiedThemeWithoutCall()
+            ).root
+        )
+    }
+
+    // MARK: 2-way video call with the flip visitor camera button
+
+    private fun video2WayWithFlipButtonState(): CallState = video2WayCallStartedState()
+        .visitorMediaStateChanged(
+            visitorMediaState(video = video(title = "User camera", backgroundColor = Color.BLUE))
+        )
+        .videoCallOperatorVideoStarted(
+            operatorMediaState = operatorMediaState(video = video(title = "Operator camera", backgroundColor = Color.GREEN))
+        )
+        .flipButtonStateChanged()
+
+    @Test
+    fun video2WayWithFlipButton() {
+        snapshot(
+            setupView(
+                callState = video2WayWithFlipButtonState()
+            ).root
+        )
+    }
+
+    @Test
+    fun video2WayWithFlipButtonWithUiTheme() {
+        snapshot(
+            setupView(
+                callState = video2WayWithFlipButtonState(),
+                uiTheme = uiTheme()
+            ).root
+        )
+    }
+
+    @Test
+    fun video2WayWithFlipButtonWithGlobalColors() {
+        snapshot(
+            setupView(
+                callState = video2WayWithFlipButtonState(),
+                unifiedTheme = unifiedThemeWithGlobalColors()
+            ).root
+        )
+    }
+
+    @Test
+    fun video2WayWithFlipButtonWithUnifiedTheme() {
+        snapshot(
+            setupView(
+                callState = video2WayWithFlipButtonState(),
+                unifiedTheme = unifiedTheme()
+            ).root
+        )
+    }
+
+    @Test
+    fun video2WayWithFlipButtonWithUnifiedThemeWithoutFlipButton() {
+        snapshot(
+            setupView(
+                callState = video2WayWithFlipButtonState(),
+                unifiedTheme = unifiedThemeWithoutFlipButton()
             ).root
         )
     }

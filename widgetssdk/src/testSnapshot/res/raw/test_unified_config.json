@@ -2455,6 +2455,33 @@
           "#3769b6"
         ]
       }
+    },
+    "visitorVideo": {
+      "flipCameraButton": {
+        "background": {
+          "type": "gradient",
+          "value": ["#ffbf13", "#6978e7"]
+        },
+        "imageColor": {
+          "type": "gradient",
+          "value": ["#7e2607", "#ff3533"]
+        },
+        "title": {
+          "alignment": "center",
+          "background": {
+            "type": "gradient",
+            "value": ["#00fffe", "#3b38ff"]
+          },
+          "font": {
+            "size": 8,
+            "style": "bold_italic"
+          },
+          "foreground": {
+            "type": "fill",
+            "value": ["#ff6f19"]
+          }
+        }
+      }
     }
   },
   "alert": {

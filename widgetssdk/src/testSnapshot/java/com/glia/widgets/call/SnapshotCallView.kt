@@ -22,7 +22,9 @@ import com.glia.widgets.snapshotutils.SnapshotLottie
 import com.glia.widgets.snapshotutils.SnapshotProviders
 import com.glia.widgets.snapshotutils.SnapshotSchedulers
 import com.glia.widgets.snapshotutils.SnapshotTheme
+import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContract.FlipButtonState
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
+import com.google.gson.JsonObject
 import org.mockito.kotlin.KArgumentCaptor
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
@@ -123,6 +125,20 @@ internal interface SnapshotCallView : SnapshotContent, SnapshotTheme, SnapshotAc
         unifiedTheme.remove("callScreen")
     }
 
+    fun unifiedThemeWithoutFlipButton(): UnifiedTheme = unifiedTheme(R.raw.test_unified_config) { unifiedTheme ->
+        unifiedTheme.add(
+            "callScreen",
+            (unifiedTheme.remove("callScreen") as JsonObject).also { callScreen ->
+                callScreen.add(
+                    "visitorVideo",
+                    (callScreen.remove("visitorVideo") as JsonObject).also {
+                        it.remove("flipCameraButton")
+                    }
+                )
+            }
+        )
+    }
+
     fun visitorMediaState(
         audio: Audio? = audio(),
         video: Video? = video(title = "User Video")
@@ -146,19 +162,26 @@ internal interface SnapshotCallView : SnapshotContent, SnapshotTheme, SnapshotAc
     }
     fun video(
         status: Media.Status = Media.Status.PLAYING,
-        title: String
+        title: String,
+        backgroundColor: Int = Color.BLACK,
+        textColor: Int = Color.WHITE
     ) = mock<Video>().also {
         whenever(it.status).thenReturn(status)
-        whenever(it.createVideoView(any())).thenReturn(videoView(title))
+        val videoView = videoView(title, backgroundColor, textColor)
+        whenever(it.createVideoView(any())).thenReturn(videoView)
     }
 
-    fun videoView(title: String) = object:VideoView(context) {
+    fun videoView(
+        title: String,
+        backgroundColor: Int = Color.BLACK,
+        textColor: Int = Color.WHITE
+    ) = object:VideoView(context) {
         init {
             addView(
                 TextView(context).apply {
                     text = title
-                    setBackgroundColor(Color.BLACK)
-                    setTextColor(Color.WHITE)
+                    setBackgroundColor(backgroundColor)
+                    setTextColor(textColor)
                     gravity = Gravity.CENTER
                     layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
                 }
@@ -188,7 +211,7 @@ internal interface SnapshotCallView : SnapshotContent, SnapshotTheme, SnapshotAc
         isOnHold: Boolean = false
     ): CallState = this
         .initCall(companyName, queueId, visitorContextAssetId, requestedMediaType)
-        .visitorMediaStateChanged(visitorMediaState, showFlipVisitorCameraButton)
+        .visitorMediaStateChanged(visitorMediaState)
         .setOnHold(isOnHold)
         .landscapeControlsVisibleChanged(false)
 
@@ -213,7 +236,10 @@ internal interface SnapshotCallView : SnapshotContent, SnapshotTheme, SnapshotAc
     ): CallState = this.videoCallOperatorVideoStarted(operatorMediaState, formattedTime)
 
     fun CallState.visitorMediaStateChanged(
-        visitorMediaState: VisitorMediaState = visitorMediaState(),
-        showFlipVisitorCameraButton: Boolean = false
-    ): CallState = this.visitorMediaStateChanged(visitorMediaState, showFlipVisitorCameraButton)
+        visitorMediaState: VisitorMediaState = visitorMediaState()
+    ): CallState = this.visitorMediaStateChanged(visitorMediaState)
+
+    fun CallState.flipButtonStateChanged(
+        flipButtonState: FlipButtonState = FlipButtonState.SWITCH_TO_BACK_CAMERA
+    ): CallState = this.flipButtonStateChanged(flipButtonState)
 }

@@ -53,6 +53,7 @@ class FloatingVisitorVideoContainer @JvmOverloads constructor(
     }
 
     override fun hide() {
+        mediaStateId = null
         floatingVisitorVideoView.hideVisitorVideo()
         visibility = GONE
     }

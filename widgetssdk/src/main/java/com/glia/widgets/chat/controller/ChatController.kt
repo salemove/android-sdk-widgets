@@ -66,6 +66,7 @@ import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCa
 import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
 import com.glia.widgets.engagement.domain.OperatorMediaUseCase
 import com.glia.widgets.engagement.domain.OperatorTypingUseCase
+import com.glia.widgets.engagement.domain.ReleaseResourcesUseCase
 import com.glia.widgets.engagement.domain.ScreenSharingUseCase
 import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase
 import com.glia.widgets.filepreview.domain.usecase.IsFileReadyForPreviewUseCase
@@ -128,7 +129,8 @@ internal class ChatController(
     private val uriToFileAttachmentUseCase: UriToFileAttachmentUseCase,
     private val withCameraPermissionUseCase: WithCameraPermissionUseCase,
     private val withReadWritePermissionsUseCase: WithReadWritePermissionsUseCase,
-    private val requestNotificationPermissionIfPushNotificationsSetUpUseCase: RequestNotificationPermissionIfPushNotificationsSetUpUseCase
+    private val requestNotificationPermissionIfPushNotificationsSetUpUseCase: RequestNotificationPermissionIfPushNotificationsSetUpUseCase,
+    private val releaseResourcesUseCase: ReleaseResourcesUseCase
 ) : ChatContract.Controller {
     private var backClickedListener: ChatView.OnBackClickedListener? = null
     private var view: ChatContract.View? = null
@@ -551,7 +553,13 @@ internal class ChatController(
     }
 
     private fun error(error: Throwable?) {
-        error?.also { error(it.toString()) }
+        error?.also {
+            if ((it as? GliaException)?.cause == GliaException.Cause.AUTHENTICATION_ERROR) {
+                // Clear the state because visitor authentication has changed
+                releaseResourcesUseCase()
+            }
+            error(it.toString())
+        }
     }
 
     private fun error(error: String) {

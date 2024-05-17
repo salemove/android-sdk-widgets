@@ -44,6 +44,7 @@ import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCa
 import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
 import com.glia.widgets.engagement.domain.OperatorMediaUseCase
 import com.glia.widgets.engagement.domain.OperatorTypingUseCase
+import com.glia.widgets.engagement.domain.ReleaseResourcesUseCase
 import com.glia.widgets.engagement.domain.ScreenSharingUseCase
 import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase
 import com.glia.widgets.filepreview.domain.usecase.IsFileReadyForPreviewUseCase
@@ -108,6 +109,7 @@ class ChatControllerTest {
     private lateinit var withCameraPermissionUseCase: WithCameraPermissionUseCase
     private lateinit var withReadWritePermissionsUseCase: WithReadWritePermissionsUseCase
     private lateinit var requestNotificationPermissionIfPushNotificationsSetUpUseCase: RequestNotificationPermissionIfPushNotificationsSetUpUseCase
+    private lateinit var releaseResourcesUseCase: ReleaseResourcesUseCase
 
     private lateinit var chatController: ChatController
     private lateinit var isAuthenticatedUseCase: IsAuthenticatedUseCase
@@ -175,6 +177,7 @@ class ChatControllerTest {
         withCameraPermissionUseCase = mock()
         withReadWritePermissionsUseCase = mock()
         requestNotificationPermissionIfPushNotificationsSetUpUseCase = mock()
+        releaseResourcesUseCase = mock()
 
         chatController = ChatController(
             callTimer = callTimer,
@@ -220,7 +223,8 @@ class ChatControllerTest {
             uriToFileAttachmentUseCase = uriToFileAttachmentUseCase,
             withCameraPermissionUseCase = withCameraPermissionUseCase,
             withReadWritePermissionsUseCase = withReadWritePermissionsUseCase,
-            requestNotificationPermissionIfPushNotificationsSetUpUseCase = requestNotificationPermissionIfPushNotificationsSetUpUseCase
+            requestNotificationPermissionIfPushNotificationsSetUpUseCase = requestNotificationPermissionIfPushNotificationsSetUpUseCase,
+            releaseResourcesUseCase = releaseResourcesUseCase
         )
         chatController.setView(chatView)
     }

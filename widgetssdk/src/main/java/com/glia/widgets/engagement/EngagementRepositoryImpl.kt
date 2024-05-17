@@ -98,7 +98,7 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
 
     private val _visitorCameraState: BehaviorProcessor<VisitorCamera> = BehaviorProcessor.create()
     override val visitorCameraState: Flowable<VisitorCamera>
-        get() = _visitorCameraState.distinctUntilChanged()
+        get() = _visitorCameraState
     override val currentVisitorCamera: VisitorCamera
         get() = _visitorCameraState.value ?: VisitorCamera.NoCamera
 

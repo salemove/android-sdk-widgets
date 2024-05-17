@@ -30,5 +30,6 @@ internal class FlipCameraButtonStateUseCaseImpl(
                 }
                 else -> FlipButtonState.HIDE
             }
-    }
+        }
+        .distinctUntilChanged()
 }

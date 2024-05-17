@@ -135,7 +135,8 @@ public class ControllerFactory {
                 useCaseFactory.getUriToFileAttachmentUseCase(),
                 useCaseFactory.getWithCameraPermissionUseCase(),
                 useCaseFactory.getWithReadWritePermissionsUseCase(),
-                useCaseFactory.getRequestNotificationPermissionIfPushNotificationsSetUpUseCase()
+                useCaseFactory.getRequestNotificationPermissionIfPushNotificationsSetUpUseCase(),
+                useCaseFactory.getReleaseResourcesUseCase(getDialogController())
             );
         }
 

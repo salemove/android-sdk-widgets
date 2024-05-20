@@ -295,8 +295,9 @@ class EngagementRepositoryTest {
 
         visitorCameraTestObserver
             .assertNotComplete()
-            .assertValueCount(1)
+            .assertValueCount(2)
             .assertValuesOnly(
+                VisitorCamera.Camera(cameraDevice),
                 VisitorCamera.Camera(cameraDevice)
             )
     }

@@ -241,7 +241,7 @@ class CallActivityTest {
             .build()
         callView.emitState(callState.makeCallState())
         val expected = appContext.getString(R.string.call_visitor_video_accessibility_label)
-        Espresso.onView(ViewMatchers.withId(R.id.floating_visitor_video)).check(ViewAssertions.matches(ViewMatchers.withContentDescription(expected)))
+        Espresso.onView(ViewMatchers.withId(R.id.visitor_video_card)).check(ViewAssertions.matches(ViewMatchers.withContentDescription(expected)))
     }
 
     @Test

@@ -3,6 +3,8 @@ package com.glia.widgets.engagement.domain
 import com.glia.androidsdk.comms.CameraDevice
 import com.glia.widgets.engagement.EngagementRepository
 import com.glia.widgets.engagement.VisitorCamera
+import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.TAG
 
 internal interface FlipVisitorCameraUseCase {
     val nextCamera: CameraDevice?
@@ -44,6 +46,8 @@ internal class FlipVisitorCameraUseCaseImpl(private val repository: EngagementRe
      *         If the current camera is the last in the list, it will return the first camera device.
      */
     private fun getNextAvailableCamera(cameras: List<CameraDevice>, currentVisitorCamera: CameraDevice?): CameraDevice? {
+        Logger.w(TAG, "Getting the next available camera instead of the following camera according to the facing")
+
         if (cameras.isEmpty()) return null
         if (currentVisitorCamera == null) return cameras.firstOrNull()
 

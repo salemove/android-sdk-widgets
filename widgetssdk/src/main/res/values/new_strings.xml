@@ -73,7 +73,7 @@
     <string name="android_file_select_picture_title">@string/glia_chat_select_picture_title</string>
     <string name="android_file_select_file_title">@string/glia_chat_select_file_title</string>
     <string name="chat_download_failed">@string/glia_chat_file_download_failed_msg</string>
-    <string name="android_chat_download_complete">@string/glia_chat_file_download_success_message</string>
+    <string name="android_chat_download_complete_message">@string/glia_chat_file_download_success_message</string>
     <string name="android_file_view_error">@string/glia_view_file_error_message</string>
     <string name="android_app_bar_end_engagement_accessibility_label">@string/glia_top_app_bar_chat_end_content_description</string>
     <string name="chat_attachment_photo_library">@string/glia_chat_attachment_upload_menu_gallery</string>
@@ -99,7 +99,7 @@
     <string name="chat_file_upload_in_progress">@string/glia_chat_attachment_upload_uploading</string>
     <string name="engagement_connection_screen_message">@string/glia_chat_in_queue_message</string>
     <string name="chat_message_delivered">@string/glia_chat_delivered</string>
-    <string name="chat_message_delivery_failed_retry">Failed to deliver. Tap to retry.</string>
+    <string name="chat_message_failed_to_deliver_retry">Failed to deliver. Tap to retry.</string>
     <string name="chat_unread_message_divider">@string/glia_chat_new_messages</string>
     <string name="chat_attach_files">@string/glia_chat_add_attachment_description</string>
     <string name="android_chat_visitor_file_accessibility">@string/glia_chat_visitor_file_content_description</string>
@@ -112,7 +112,7 @@
     <string name="android_upload_error_invalid_input">@string/glia_chat_attachment_upload_error_invalid_input</string>
     <string name="android_upload_error_network">@string/glia_chat_attachment_upload_error_network_time_out</string>
     <string name="android_upload_error_permissions">@string/glia_chat_attachment_upload_error_read_access_permissions_denied</string>
-    <string name="chat_attachement_unsupported_file">@string/glia_chat_attachment_upload_error_file_type_invalid</string>
+    <string name="chat_attachment_unsupported_file">@string/glia_chat_attachment_upload_error_file_type_invalid</string>
     <string name="chat_file_size_limit_error">@string/glia_chat_attachment_upload_error_file_size_over_limit</string>
     <string name="chat_file_infected_file_error">@string/glia_chat_attachment_upload_error_failed_to_check_safety</string>
     <string name="error_internal">@string/glia_chat_attachment_upload_error_internal_error</string>
@@ -167,7 +167,7 @@
     <string name="message_center_welcome_subtitle">@string/message_center_description</string>
     <string name="general_sending">@string/message_center_progress_bar_content_description</string>
     <string name="general_send">@string/message_center_send_message_btn</string>
-    <string name="message_center_welcome_file_picker_label_accessibility_label">File picker</string>
+    <string name="message_center_welcome_file_picker_accessibility_label">File picker</string>
 
     <!-- General -->
     <string name="general_refresh">@string/glia_visitor_code_refresh_button</string>

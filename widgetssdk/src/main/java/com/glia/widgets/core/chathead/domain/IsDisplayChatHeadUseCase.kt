@@ -25,7 +25,7 @@ internal abstract class IsDisplayChatHeadUseCase(
 
     open operator fun invoke(viewName: String?, internal: Boolean = false): Boolean {
         return if (internal) {
-            isDisplayBasedOnPermission() && isShowForEngagement(viewName)
+            isShowForEngagement(viewName)
         } else {
             isBubbleEnabled() && isDisplayBasedOnPermission() && isShowForEngagement(viewName)
         }

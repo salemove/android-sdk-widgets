@@ -47,7 +47,7 @@ internal class VisitorImageAttachmentViewHolder(
 
     init {
         binding.deliveredView.text = stringProvider.getRemoteString(R.string.chat_message_delivered)
-        binding.errorView.text = stringProvider.getRemoteString(R.string.chat_message_delivery_failed_retry)
+        binding.errorView.text = stringProvider.getRemoteString(R.string.chat_message_failed_to_deliver_retry)
         setupTheme(uiTheme)
     }
 

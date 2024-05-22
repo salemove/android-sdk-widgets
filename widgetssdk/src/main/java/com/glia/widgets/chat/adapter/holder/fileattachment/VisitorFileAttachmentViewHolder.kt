@@ -83,7 +83,7 @@ internal class VisitorFileAttachmentViewHolder(
             ?.also(binding.errorView::setTextColor)
         binding.errorView.applyTextTheme(visitorTheme?.error)
 
-        binding.errorView.text = stringProvider.getRemoteString(R.string.chat_message_delivery_failed_retry)
+        binding.errorView.text = stringProvider.getRemoteString(R.string.chat_message_failed_to_deliver_retry)
     }
 
     private fun setShowDelivered(showDelivered: Boolean) {

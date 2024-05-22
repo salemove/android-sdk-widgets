@@ -808,7 +808,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     override fun fileDownloadSuccess(attachmentFile: AttachmentFile) {
         submitUpdatedItems(attachmentFile, isDownloading = false, isFileExists = true)
         showToast(
-            stringProvider.getRemoteString(R.string.android_chat_download_complete), Toast.LENGTH_LONG
+            stringProvider.getRemoteString(R.string.android_chat_download_complete_message), Toast.LENGTH_LONG
         )
     }
 

@@ -230,7 +230,7 @@ internal class ViewHolder(
         Status.ERROR_NETWORK_TIMEOUT -> R.string.android_upload_error_network
         Status.ERROR_INVALID_INPUT -> R.string.android_upload_error_invalid_input
         Status.ERROR_PERMISSIONS_DENIED -> R.string.android_upload_error_permissions
-        Status.ERROR_FORMAT_UNSUPPORTED -> R.string.chat_attachement_unsupported_file
+        Status.ERROR_FORMAT_UNSUPPORTED -> R.string.chat_attachment_unsupported_file
         Status.ERROR_FILE_TOO_LARGE -> R.string.chat_file_size_limit_error
         Status.ERROR_ENGAGEMENT_MISSING -> R.string.android_upload_error_engagement_missing
         Status.ERROR_SECURITY_SCAN_FAILED -> R.string.chat_file_infected_file_error

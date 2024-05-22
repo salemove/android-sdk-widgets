@@ -37,7 +37,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/glia_x_small"
-        tools:text="@string/chat_message_delivery_failed_retry"
+        tools:text="@string/chat_message_failed_to_deliver_retry"
         android:gravity="end"
         android:textAppearance="?attr/textAppearanceCaption"
         android:textColor="?attr/gliaSystemNegativeColor"

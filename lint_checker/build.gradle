@@ -5,9 +5,11 @@ plugins {
   id ("kotlin")
 }
 
+//Detailed information about advantages of Java toolchain https://developer.android.com/build/jdks#toolchain
 java {
-  sourceCompatibility = JavaVersion.VERSION_17
-  targetCompatibility = JavaVersion.VERSION_17
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(libs.versions.javaVersion.get().toInteger())
+  }
 }
 
 lint {

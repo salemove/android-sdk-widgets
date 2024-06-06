@@ -3,13 +3,18 @@ apply plugin: 'org.jetbrains.kotlin.android'
 apply plugin: 'kotlin-parcelize'
 apply plugin: 'app.cash.paparazzi'
 
+//Detailed information about advantages of Java toolchain https://developer.android.com/build/jdks#toolchain
+java {
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(libs.versions.javaVersion.get().toInteger())
+  }
+}
+
 android {
   compileSdk 33
-  defaultPublishConfig "debug"
   namespace 'com.glia.widgets'
   defaultConfig {
     minSdkVersion 24
-    targetSdkVersion 33
     versionCode widgetsVersionCode
     versionName widgetsVersionName
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -29,13 +34,7 @@ android {
       // Build type used for snapshot testing.
     }
   }
-  compileOptions {
-    sourceCompatibility JavaVersion.VERSION_11
-    targetCompatibility JavaVersion.VERSION_11
-  }
-  kotlinOptions {
-    jvmTarget = "11"
-  }
+
   lint {
     disable 'WrongLayoutName',
       'LayoutFileNameMatchesClass',
@@ -93,9 +92,6 @@ dependencies {
   implementation libs.java.rxjava
 
   api "com.glia:android-sdk:$gliaSdkVersion"
-  // Glia sdk aar
-  // implementation(name: "glia-core-sdk-$gliaSdkVersion", ext: 'aar')
-//    api "com.glia:android-sdk:0.26.6-SNAPSHOT" // Used when testing local Core SDK snapshot releases
 
   implementation libs.media.audioswitch
   implementation libs.media.lottie

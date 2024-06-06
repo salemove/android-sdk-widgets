@@ -197,7 +197,7 @@ internal class MessageCenterController(
                         false
                     }
 
-                    !isAvailable -> {
+                    isAvailable == false -> {
                         dialogController.showMessageCenterUnavailableDialog()
                         false
                     }

@@ -70,8 +70,8 @@ class AppendNewResponseCardOrTextItemUseCaseTest {
         whenever(chatMessage.attachment) doReturn attachment
         whenever(mapOperatorPlainTextUseCase(any(), any())) doReturn mock<OperatorMessageItem.PlainText>()
 
-        val operatorAttachmentItemTrue = mock<OperatorAttachmentItem>().apply { whenever(showChatHead) doReturn true }
-        val operatorAttachmentItemFalse = mock<OperatorAttachmentItem>().apply { whenever(showChatHead) doReturn false }
+        val operatorAttachmentItemTrue = mock<OperatorAttachmentItem.Image>().apply { whenever(showChatHead) doReturn true }
+        val operatorAttachmentItemFalse = mock<OperatorAttachmentItem.File>().apply { whenever(showChatHead) doReturn false }
         whenever(mapOperatorAttachmentUseCase(any(), any(), eq(true))) doReturn operatorAttachmentItemTrue
         whenever(mapOperatorAttachmentUseCase(any(), any(), eq(false))) doReturn operatorAttachmentItemFalse
 

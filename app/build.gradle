@@ -1,127 +1,128 @@
 apply plugin: 'com.android.application'
 apply plugin: 'org.jetbrains.kotlin.android'
 
+//Detailed information about advantages of Java toolchain https://developer.android.com/build/jdks#toolchain
+java {
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(libs.versions.javaVersion.get().toInteger())
+  }
+}
+
 android {
   compileSdk 34
-    defaultConfig {
-        applicationId "com.glia.exampleapp"
-        minSdkVersion 24
-      targetSdkVersion 34
-        versionCode 1
-        versionName "1.0"
+  defaultConfig {
+    applicationId "com.glia.exampleapp"
+    minSdkVersion 24
+    targetSdkVersion 34
+    versionCode 1
+    versionName "1.0"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-    }
+    testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+  }
 
-    buildTypes {
-        release {
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
+  buildTypes {
+    release {
+      minifyEnabled true
+      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
     }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
-    }
-    kotlinOptions {
-        jvmTarget = "11"
-    }
-    signingConfigs {
-        debug {
-            storeFile file('debug.keystore')
-        }
-    }
+  }
 
-    File propsFile = project.rootProject.file('local.properties')
-    if (propsFile.exists()) {
-        Properties p = new Properties()
-        new FileInputStream(propsFile).withCloseable { is -> p.load(is) }
-        p.each { name, value -> ext[name] = value }
+  signingConfigs {
+    debug {
+      storeFile file('debug.keystore')
     }
+  }
 
-    initEnvProperty('GLIA_REGION', "beta")
-    initEnvProperty('GLIA_API_KEY_SECRET')
-    initEnvProperty('GLIA_API_KEY_ID')
-    initEnvProperty('GLIA_SITE_ID')
-    initEnvProperty('GLIA_QUEUE_ID')
-    initEnvProperty('GLIA_JWT', "")
-    initEnvProperty('FIREBASE_PROJECT_ID')
-    initEnvProperty('FIREBASE_API_KEY')
-    initEnvProperty('FIREBASE_APP_ID', "")
-    initEnvProperty('FIREBASE_APP_ID_DEBUG', "")
+  File propsFile = project.rootProject.file('local.properties')
+  if (propsFile.exists()) {
+    Properties p = new Properties()
+    new FileInputStream(propsFile).withCloseable { is -> p.load(is) }
+    p.each { name, value -> ext[name] = value }
+  }
 
-    buildTypes {
-        all {
-            resValue("string", "environment", GLIA_REGION)
-            resValue("string", "site_id", GLIA_SITE_ID)
-            resValue("string", "glia_api_key_id", GLIA_API_KEY_ID)
-            resValue("string", "glia_api_key_secret", GLIA_API_KEY_SECRET)
-            resValue("string", "glia_queue_id", GLIA_QUEUE_ID)
-            resValue("string", "glia_jwt", GLIA_JWT)
-            resValue("string", "firebase_proj_id", FIREBASE_PROJECT_ID)
-            resValue("string", "firebase_api_key", FIREBASE_API_KEY)
-        }
-        debug {
-            signingConfig signingConfigs.debug
-            applicationIdSuffix '.debug'
-            resValue("string", "firebase_app_id", FIREBASE_APP_ID_DEBUG)
-        }
-        release {
-            initWith debug
-            applicationIdSuffix ''
-            resValue("string", "firebase_app_id", FIREBASE_APP_ID)
-        }
+  initEnvProperty('GLIA_REGION', "beta")
+  initEnvProperty('GLIA_API_KEY_SECRET')
+  initEnvProperty('GLIA_API_KEY_ID')
+  initEnvProperty('GLIA_SITE_ID')
+  initEnvProperty('GLIA_QUEUE_ID')
+  initEnvProperty('GLIA_JWT', "")
+  initEnvProperty('FIREBASE_PROJECT_ID')
+  initEnvProperty('FIREBASE_API_KEY')
+  initEnvProperty('FIREBASE_APP_ID', "")
+  initEnvProperty('FIREBASE_APP_ID_DEBUG', "")
+
+  buildTypes {
+    configureEach {
+      resValue("string", "environment", GLIA_REGION)
+      resValue("string", "site_id", GLIA_SITE_ID)
+      resValue("string", "glia_api_key_id", GLIA_API_KEY_ID)
+      resValue("string", "glia_api_key_secret", GLIA_API_KEY_SECRET)
+      resValue("string", "glia_queue_id", GLIA_QUEUE_ID)
+      resValue("string", "glia_jwt", GLIA_JWT)
+      resValue("string", "firebase_proj_id", FIREBASE_PROJECT_ID)
+      resValue("string", "firebase_api_key", FIREBASE_API_KEY)
     }
-    lint {
-        disable 'WrongLayoutName',
-                'LayoutFileNameMatchesClass',
-                'MatchingViewId',
-                'RawDimen',
-                'WrongAnnotationOrder',
-                'ColorCasing',
-                'WrongViewIdFormat',
-                'HardcodedText'
+    debug {
+      signingConfig signingConfigs.debug
+      applicationIdSuffix '.debug'
+      resValue("string", "firebase_app_id", FIREBASE_APP_ID_DEBUG)
     }
-    namespace 'com.glia.exampleapp'
+    release {
+      initWith debug
+      applicationIdSuffix ''
+      resValue("string", "firebase_app_id", FIREBASE_APP_ID)
+    }
+  }
+  lint {
+    disable 'WrongLayoutName',
+      'LayoutFileNameMatchesClass',
+      'MatchingViewId',
+      'RawDimen',
+      'WrongAnnotationOrder',
+      'ColorCasing',
+      'WrongViewIdFormat',
+      'HardcodedText'
+  }
+  namespace 'com.glia.exampleapp'
 }
 
 def initEnvProperty(String propertyName, String defaultValue = "UNDEFINED") {
-    if (!project.hasProperty(propertyName)) {
-        ext[propertyName] = System.getenv(propertyName) as String ?: defaultValue
-    }
+  if (!project.hasProperty(propertyName)) {
+    ext[propertyName] = System.getenv(propertyName) as String ?: defaultValue
+  }
 }
 
 afterEvaluate {
-    // This line is needed to generate AAR file for project dependency.
-    // We generate the local Widgets SDK dependency to ensure the testing application
-    // can work with the SDK interfaces the same as it will on a release.
-    // This build is used for acceptance tests
-    preReleaseBuild.dependsOn ':widgetssdk:publishToLocalMaven'
+  // This line is needed to generate AAR file for project dependency.
+  // We generate the local Widgets SDK dependency to ensure the testing application
+  // can work with the SDK interfaces the same as it will on a release.
+  // This build is used for acceptance tests
+  preReleaseBuild.dependsOn ':widgetssdk:publishToLocalMaven'
 }
 
 dependencies {
-    implementation libs.java.appcompat
-    implementation libs.java.material
-    implementation libs.java.constraintlayout
-    implementation libs.java.navigation.fargment
-    implementation libs.java.navigation.ui
-    implementation libs.java.preference
-    implementation platform(libs.firebase.bom)
-    implementation libs.firebase.messaging
+  implementation libs.java.appcompat
+  implementation libs.java.material
+  implementation libs.java.constraintlayout
+  implementation libs.java.navigation.fargment
+  implementation libs.java.navigation.ui
+  implementation libs.java.preference
+  implementation platform(libs.firebase.bom)
+  implementation libs.firebase.messaging
 
-    debugImplementation project(path: ':widgetssdk')
-    // To test against properly compiled SDK, the SDK is auto-uploaded to local maven with '_snapshot' suffix
-    releaseImplementation "com.glia:android-widgets:${widgetsVersionName}_snapshot"
+  debugImplementation project(path: ':widgetssdk')
+  // To test against properly compiled SDK, the SDK is auto-uploaded to local maven with '_snapshot' suffix
+  releaseImplementation "com.glia:android-widgets:${widgetsVersionName}_snapshot"
 
-    implementation libs.java.core.ktx
+  implementation libs.java.core.ktx
 
-    implementation libs.java.ktor.android
-    implementation libs.java.ktor.logging
-    implementation libs.java.coroutines
+  implementation libs.java.ktor.android
+  implementation libs.java.ktor.logging
+  implementation libs.java.coroutines
 
 
-    //debugImplementation libs.test.leakcanary
-    testImplementation libs.test.junit
-    androidTestImplementation libs.test.ext.junit
-    androidTestImplementation libs.test.espresso.core
+  //debugImplementation libs.test.leakcanary
+  testImplementation libs.test.junit
+  androidTestImplementation libs.test.ext.junit
+  androidTestImplementation libs.test.espresso.core
 }

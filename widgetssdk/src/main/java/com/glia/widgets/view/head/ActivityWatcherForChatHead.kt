@@ -121,7 +121,11 @@ internal class ActivityWatcherForChatHead(
     override fun removeChatHeadLayoutIfPresent() {
         Logger.d(TAG, "Bubble: remove application-only bubble")
         saveBubblePosition()
-        (fetchGliaOrRootView() as? ViewGroup)?.removeView(chatHeadLayout)
+        (fetchGliaOrRootView() as? ViewGroup)?.let { gliaOrRootView ->
+            gliaOrRootView.post {
+                gliaOrRootView.removeView(chatHeadLayout)
+            }
+        }
         chatHeadLayout = null
     }
 

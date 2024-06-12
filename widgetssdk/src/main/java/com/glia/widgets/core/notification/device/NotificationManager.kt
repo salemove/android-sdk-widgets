@@ -58,6 +58,11 @@ internal class NotificationManager(private val applicationContext: Application) 
     }
 
     override fun showAudioCallNotification() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            // Android APIs 31+ have built in privacy indicators for microphone and camera
+            // See https://source.android.com/docs/core/permissions/privacy-indicators
+            return
+        }
         if (areNotificationsEnabledForChannel(NotificationFactory.NOTIFICATION_CALL_CHANNEL_ID)) {
             notificationManager.notify(
                 NotificationFactory.CALL_NOTIFICATION_ID,
@@ -67,6 +72,11 @@ internal class NotificationManager(private val applicationContext: Application) 
     }
 
     override fun showVideoCallNotification(isTwoWayVideo: Boolean, hasAudio: Boolean) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            // Android APIs 31+ have built in privacy indicators for microphone and camera
+            // See https://source.android.com/docs/core/permissions/privacy-indicators
+            return
+        }
         if (areNotificationsEnabledForChannel(NotificationFactory.NOTIFICATION_CALL_CHANNEL_ID)) {
             notificationManager.notify(
                 NotificationFactory.CALL_NOTIFICATION_ID,

@@ -9,6 +9,7 @@ import androidx.annotation.VisibleForTesting;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Lifecycle;
 
+import com.glia.androidsdk.Glia;
 import com.glia.widgets.GliaWidgetsConfig;
 import com.glia.widgets.StringProvider;
 import com.glia.widgets.StringProviderImpl;
@@ -251,7 +252,9 @@ public class Dependencies {
         lifecycleManager.addObserver((source, event) -> {
             if (event == Lifecycle.Event.ON_STOP) {
                 chatBubbleController.onApplicationStop();
-                notificationManager.startNotificationRemovalService();
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S && Glia.isInitialized()) {
+                    notificationManager.startNotificationRemovalService();
+                }
             } else if (event == Lifecycle.Event.ON_DESTROY) {
                 chatBubbleController.onDestroy();
             }

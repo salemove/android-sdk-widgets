@@ -40,6 +40,9 @@ subprojects {
 
   repositories {
     mavenCentral()
+    // Added for running acceptance tests before Core SDK release
+    // Will remove via a separate PR after acceptance tests succeed
+    maven { url 'https://s01.oss.sonatype.org/content/repositories/comglia-1292' }
   }
 
   ktlint {

@@ -67,11 +67,12 @@ internal class ServiceChatHeadController(
 
         // see the comment on the resumedViewName field declaration above
         if (!isResumedView(view)) return
-        toggleChatHeadServiceUseCase(view?.javaClass?.simpleName)
+
     }
 
     override fun onPause(gliaOrRootView: View?) {
         clearResumedViewName(gliaOrRootView)
+        toggleChatHeadServiceUseCase(gliaOrRootView?.javaClass?.simpleName)
     }
 
     override fun onSetChatHeadView(view: ChatHeadContract.View) {

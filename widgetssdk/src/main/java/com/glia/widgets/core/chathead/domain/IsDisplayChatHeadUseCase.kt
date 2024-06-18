@@ -23,12 +23,16 @@ internal abstract class IsDisplayChatHeadUseCase(
 ) {
     abstract fun isDisplayBasedOnPermission(): Boolean
 
-    open operator fun invoke(viewName: String?, internal: Boolean = false): Boolean {
-        return if (internal) {
-            isShowForEngagement(viewName)
-        } else {
-            isBubbleEnabled() && isDisplayBasedOnPermission() && isShowForEngagement(viewName)
+    open operator fun invoke(viewName: String?, type: ChatHeadType): Boolean {
+        return when (type) {
+            ChatHeadType.INTERNAL -> isShowForEngagement(viewName)
+            ChatHeadType.GLOBAL -> isBubbleEnabled() && isDisplayBasedOnPermission() && isShowForEngagement(viewName)
         }
+    }
+
+    open operator fun invoke(viewName: String?): Boolean {
+        val a = isBubbleEnabled() && isDisplayBasedOnPermission() && isShowForEngagement(viewName)
+        return a
     }
 
     private fun isShowForEngagement(viewName: String?) =
@@ -60,7 +64,7 @@ internal abstract class IsDisplayChatHeadUseCase(
             viewName != DialogHolderView::class.java.simpleName
     }
 
-    private fun isNotInListOfGliaViews(viewName: String?): Boolean {
+    fun isNotInListOfGliaViews(viewName: String?): Boolean {
         return viewName != ChatView::class.java.simpleName && isNotInListOfGliaViewsExceptChat(viewName)
     }
 
@@ -70,4 +74,9 @@ internal abstract class IsDisplayChatHeadUseCase(
     private val isMediaEngagementOngoing: Boolean get() = engagementTypeUseCase.isMediaEngagement
     private val isChatQueueingOngoing: Boolean get() = isQueueingOrEngagementUseCase.isQueueingForChat
     private val isChatEngagementOngoing: Boolean get() = engagementTypeUseCase.isChatEngagement
+
+    enum class ChatHeadType {
+        INTERNAL,
+        GLOBAL
+    }
 }

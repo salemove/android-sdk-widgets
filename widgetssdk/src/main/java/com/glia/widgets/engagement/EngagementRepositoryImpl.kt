@@ -31,6 +31,7 @@ import com.glia.widgets.core.engagement.GliaOperatorRepository
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.Data
 import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.isAudioOrVideo
 import com.glia.widgets.helper.isQueueUnavailable
 import com.glia.widgets.helper.unSafeSubscribe
 import io.reactivex.rxjava3.core.Completable
@@ -129,7 +130,7 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
     override val isQueueing: Boolean
         get() = currentState is State.Queuing || currentState is State.PreQueuing
     override val isQueueingForMedia: Boolean
-        get() = (currentState as? State.Queuing)?.mediaType != null || (currentState as? State.PreQueuing)?.mediaType != null
+        get() = currentState?.queueingMediaType?.isAudioOrVideo() == true
 
     override val isCallVisualizerEngagement: Boolean
         get() = currentEngagement is OmnibrowseEngagement
@@ -189,21 +190,12 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
         }
     }
 
-    override fun queueForChatEngagement(queueId: String, visitorContextAssetId: String?) {
-        if (isQueueingOrEngagement) return
-
-        Logger.i(TAG, "Start queueing for chat engagement")
-        core.queueForEngagement(queueId, visitorContextAssetId) {
-            handleQueueingResponse(it, queueId)
-        }
-    }
-
-    override fun queueForMediaEngagement(queueId: String, mediaType: MediaType, visitorContextAssetId: String?) {
+    override fun queueForEngagement(queueIds: List<String>, mediaType: MediaType, visitorContextAssetId: String?) {
         if (isQueueingOrEngagement) return
 
         Logger.i(TAG, "Start queueing for media engagement")
-        core.queueForEngagement(queueId, mediaType, visitorContextAssetId, null, MEDIA_PERMISSION_REQUEST_CODE) {
-            handleQueueingResponse(it, queueId, mediaType)
+        core.queueForEngagement(queueIds.toTypedArray(), mediaType, visitorContextAssetId, null, MEDIA_PERMISSION_REQUEST_CODE) {
+            handleQueueingResponse(it, queueIds, mediaType)
         }
     }
 
@@ -314,7 +306,7 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
         }
 
         if (currentState is State.PreQueuing) {
-            _engagementState.onNext(State.Queuing(currentState.queueId, ticket.id, currentState.mediaType))
+            _engagementState.onNext(State.Queuing(currentState.queueIds, ticket.id, currentState.mediaType))
             trackQueueTicketUpdates(ticket)
         }
     }
@@ -328,10 +320,10 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
         }
     }
 
-    private fun handleQueueingResponse(exception: GliaException?, queueId: String, mediaType: MediaType? = null) {
+    private fun handleQueueingResponse(exception: GliaException?, queueIds: List<String>, mediaType: MediaType) {
         when {
             exception == null || exception.cause == GliaException.Cause.ALREADY_QUEUED ->
-                _engagementState.onNext(State.PreQueuing(queueId, mediaType))
+                _engagementState.onNext(State.PreQueuing(queueIds, mediaType))
 
             exception.isQueueUnavailable -> {
                 _engagementState.onNext(State.QueueUnstaffed)

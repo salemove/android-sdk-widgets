@@ -7,8 +7,8 @@ import com.glia.androidsdk.engagement.Survey
 
 internal sealed interface State {
     object NoEngagement : State
-    data class PreQueuing(val queueId: String, val mediaType: MediaType? = null) : State
-    data class Queuing(val queueId: String, val queueTicketId: String, val mediaType: MediaType? = null) : State
+    data class PreQueuing(val queueIds: List<String>, val mediaType: MediaType) : State
+    data class Queuing(val queueIds: List<String>, val queueTicketId: String, val mediaType: MediaType) : State
     object QueueUnstaffed : State
     object UnexpectedErrorHappened : State
     object QueueingCanceled : State
@@ -17,6 +17,13 @@ internal sealed interface State {
     object FinishedOmniCore : State
     object FinishedCallVisualizer : State
     data class Update(val state: EngagementState, val updateState: EngagementUpdateState) : State
+
+    val queueingMediaType: MediaType?
+        get() = when (this) {
+            is PreQueuing -> mediaType
+            is Queuing -> mediaType
+            else -> null
+        }
 }
 
 internal sealed interface EngagementUpdateState {

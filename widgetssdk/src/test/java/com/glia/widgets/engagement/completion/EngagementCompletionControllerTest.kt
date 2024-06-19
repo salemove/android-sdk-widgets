@@ -1,5 +1,6 @@
 package com.glia.widgets.engagement.completion
 
+import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.engagement.Survey
 import com.glia.widgets.engagement.EngagementUpdateState
 import com.glia.widgets.engagement.State
@@ -102,8 +103,8 @@ class EngagementCompletionControllerTest {
         val testState = controller.state.test()
 
         engagementStateProcessor.onNext(State.NoEngagement)
-        engagementStateProcessor.onNext(State.PreQueuing("queueId"))
-        engagementStateProcessor.onNext(State.Queuing("queueId", "queueTicketId"))
+        engagementStateProcessor.onNext(State.PreQueuing(listOf("queueId"), Engagement.MediaType.TEXT))
+        engagementStateProcessor.onNext(State.Queuing(listOf("queueId"), "queueTicketId", Engagement.MediaType.TEXT))
         engagementStateProcessor.onNext(State.QueueingCanceled)
         engagementStateProcessor.onNext(State.StartedOmniCore)
         engagementStateProcessor.onNext(State.StartedCallVisualizer)

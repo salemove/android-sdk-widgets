@@ -225,7 +225,7 @@ internal class CallController(
         emitViewState(callState.initCall(companyName, queueId, visitorContextAssetId, mediaType))
         createNewTimerStatusCallback()
         initMessagesNotSeenCallback()
-        tryToQueueForEngagement(queueId)
+        tryToQueueForEngagement()
         val newInactiveTimerListener = createInactivityTimerStatusListener()
         inactivityTimeCounter.addRawValueListener(newInactiveTimerListener)
         inactivityTimerStatusListener = newInactiveTimerListener
@@ -236,8 +236,8 @@ internal class CallController(
         messagesNotSeenHandler.addListener(messagesNotSeenHandlerListener)
     }
 
-    private fun tryToQueueForEngagement(queueId: String?) {
-        if (!isQueueingOrEngagementUseCase() && queueId != null) {
+    private fun tryToQueueForEngagement() {
+        if (!isQueueingOrEngagementUseCase()) {
             confirmationDialogUseCase { shouldShow: Boolean ->
                 if (shouldShow) {
                     dialogController.showEngagementConfirmationDialog()

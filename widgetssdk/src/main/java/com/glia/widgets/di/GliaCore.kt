@@ -43,10 +43,9 @@ internal interface GliaCore {
     fun fetchFile(attachmentFile: AttachmentFile, callback: RequestCallback<InputStream?>)
     fun getChatHistory(callback: RequestCallback<Array<ChatMessage>?>)
     fun getQueues(requestCallback: RequestCallback<Array<Queue>?>)
-    fun queueForEngagement(queueId: String, visitorContextAssetId: String?, callback: Consumer<GliaException?>)
 
     fun queueForEngagement(
-        queueId: String,
+        queueIds: Array<String>,
         mediaType: Engagement.MediaType,
         visitorContextAssetId: String?,
         engagementOptions: EngagementOptions?,

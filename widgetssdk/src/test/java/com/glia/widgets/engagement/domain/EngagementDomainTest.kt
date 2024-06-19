@@ -318,12 +318,11 @@ class EngagementDomainTest {
         val useCase: EnqueueForEngagementUseCase = EnqueueForEngagementUseCaseImpl(engagementRepository = repository)
         useCase(queueId, mediaType, visitorContextAssetId)
 
-        verify { repository.queueForChatEngagement(queueId, visitorContextAssetId) }
-        verify(exactly = 0) { repository.queueForMediaEngagement(queueId, any(), visitorContextAssetId) }
+        verify { repository.queueForEngagement(listOf(queueId), Engagement.MediaType.TEXT, visitorContextAssetId) }
     }
 
     @Test
-    fun `EnqueueForEngagementUseCase invoke enqueues for media engagement when media type is present`() {
+    fun `EnqueueForEngagementUseCase invoke enqueues with selected type engagement when media type is present`() {
         val repository: EngagementRepository = mockk(relaxUnitFun = true)
         val queueId = "queueId"
         val mediaType: Engagement.MediaType = mockk(relaxUnitFun = true)
@@ -332,8 +331,7 @@ class EngagementDomainTest {
         val useCase: EnqueueForEngagementUseCase = EnqueueForEngagementUseCaseImpl(engagementRepository = repository)
         useCase(queueId, mediaType, visitorContextAssetId)
 
-        verify(exactly = 0) { repository.queueForChatEngagement(queueId, visitorContextAssetId) }
-        verify { repository.queueForMediaEngagement(queueId, mediaType, visitorContextAssetId) }
+        verify { repository.queueForEngagement(listOf(queueId), mediaType, visitorContextAssetId) }
     }
 
     @Test

@@ -61,6 +61,7 @@
     <string name="settings_manual_locale_override">Manual locale override</string>
     <string name="settings_authorization">Authorization type (needs restart)</string>
     <string name="settings_authorization_summary">Authorization type</string>
+    <string name="settings_default_queues">Default Queues</string>
     <string name="settings_queue_id">Queue id</string>
     <string name="settings_white_label">White label</string>
     <string name="settings_use_overlay">Use Overlay (needs restart)</string>

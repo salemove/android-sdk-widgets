@@ -29,7 +29,7 @@ import java.util.Objects;
  * <p>
  * Before this activity is launched, make sure that Glia Widgets SDK is set up correctly.
  * <p>
- * Required data that should be passed together with the Activity intent:
+ * Data that can be passed together with the Activity intent:
  * - {@link GliaWidgets#QUEUE_ID}: ID of the queue you would like to use for your engagements.
  * For a full list of optional parameters, see the constants defined in {@link GliaWidgets}.
  * <p>

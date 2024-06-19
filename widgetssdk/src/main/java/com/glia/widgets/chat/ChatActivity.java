@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.glia.widgets.GliaWidgets;
@@ -31,7 +32,7 @@ import java.util.Objects;
  * <p>
  * Before this activity is launched, make sure that Glia Widgets SDK is set up correctly.
  * <p>
- * Required data that should be passed together with the Activity intent:
+ * Data that can be passed together with the Activity intent:
  * - {@link GliaWidgets#QUEUE_ID}: ID of the queue you would like to use for your engagements.
  * For a full list of optional parameters, see the constants defined in {@link GliaWidgets}.
  * <p>
@@ -52,13 +53,13 @@ public final class ChatActivity extends FadeTransitionActivity {
      * Creates and fills out Intent for starting ChatActivity
      * @param context   - Context object
      * @param contextId - Context asset ID
-     * @param queueId   - Queue ID
+     * @param queueId   - Queue ID or `null` to use the default queues
      * @return - Intent for Starting ChatActivity
      */
     public static Intent getIntent(
-        Context context,
-        String contextId,
-        String queueId
+        @NonNull Context context,
+        @Nullable String contextId,
+        @Nullable String queueId
     ) {
         return new Intent(context, ChatActivity.class)
             .putExtra(GliaWidgets.CONTEXT_ASSET_ID, contextId)
@@ -70,15 +71,15 @@ public final class ChatActivity extends FadeTransitionActivity {
      *
      * @param context   - Context object
      * @param contextId - Context asset ID
-     * @param queueId   - Queue ID
+     * @param queueId   - Queue ID or `null` to use the default queues
      * @param chatType  - Type of chat screen
      * @return - Intent for Starting ChatActivity
      */
     public static Intent getIntent(
-        Context context,
-        String contextId,
-        String queueId,
-        ChatType chatType
+        @NonNull Context context,
+        @Nullable String contextId,
+        @Nullable String queueId,
+        @Nullable ChatType chatType
     ) {
         return new Intent(context, ChatActivity.class)
             .putExtra(GliaWidgets.CONTEXT_ASSET_ID, contextId)

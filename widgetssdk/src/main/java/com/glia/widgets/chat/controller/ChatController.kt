@@ -287,10 +287,8 @@ internal class ChatController(
     }
 
     private fun enqueueForEngagement() {
-        chatState.queueId?.let {
-            requestNotificationPermissionIfPushNotificationsSetUpUseCase {
-                enqueueForEngagementUseCase(queueId = it, visitorContextAssetId = chatState.visitorContextAssetId)
-            }
+        requestNotificationPermissionIfPushNotificationsSetUpUseCase {
+            enqueueForEngagementUseCase(queueId = chatState.queueId, visitorContextAssetId = chatState.visitorContextAssetId)
         }
     }
 

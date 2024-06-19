@@ -28,6 +28,7 @@
     <string name="pref_company_name">company_name</string>
     <string name="pref_manual_locale_override">manual_locale_override</string>
     <string name="pref_auth_token">auth_token</string>
+    <string name="pref_default_queues">use_default_queues</string>
     <string name="pref_queue_id">queue_id</string>
     <string name="pref_context_asset_id">context_asset_id</string>
     <string name="pref_environment">environment</string>

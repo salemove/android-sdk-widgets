@@ -9,6 +9,7 @@ import android.text.format.DateUtils
 import androidx.annotation.ColorInt
 import androidx.core.graphics.drawable.DrawableCompat
 import com.glia.androidsdk.Engagement
+import com.glia.androidsdk.Engagement.MediaType
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.Operator
 import com.glia.androidsdk.chat.AttachmentFile
@@ -39,6 +40,8 @@ internal fun ColorStateList?.colorForState(state: IntArray): Int? = this?.getCol
 internal fun String.separateStringWithSymbol(symbol: String): String = asSequence().joinToString(symbol)
 
 internal fun Queue.supportMessaging() = state.medias.contains(Engagement.MediaType.MESSAGING)
+
+internal fun MediaType.isAudioOrVideo() = this == MediaType.AUDIO || this == MediaType.VIDEO
 
 internal fun formatElapsedTime(elapsedMilliseconds: Long) = DateUtils.formatElapsedTime(elapsedMilliseconds / DateUtils.SECOND_IN_MILLIS)
 

@@ -275,7 +275,7 @@ class MainFragment : Fragment() {
     private fun navigateToChat(chatType: ChatType) {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
         val intent = ChatActivity.getIntent(
-            context,
+            requireContext(),
             getContextAssetIdFromPrefs(sharedPreferences),
             getQueueIdFromPrefs(sharedPreferences),
             chatType
@@ -322,7 +322,11 @@ class MainFragment : Fragment() {
         return Utils.getRunTimeThemeByPrefs(sharedPreferences, resources)
     }
 
-    private fun getQueueIdFromPrefs(sharedPreferences: SharedPreferences): String {
+    private fun getQueueIdFromPrefs(sharedPreferences: SharedPreferences): String? {
+        val defaultQueues = sharedPreferences.getBoolean(resources.getString(R.string.pref_default_queues), false)
+        if (defaultQueues) {
+            return null
+        }
         return Utils.getStringFromPrefs(
             R.string.pref_queue_id,
             getString(R.string.glia_queue_id),

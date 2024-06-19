@@ -70,6 +70,11 @@
 
     <PreferenceCategory app:title="Engagement settings">
 
+        <SwitchPreference
+            app:defaultValue="false"
+            app:key="@string/pref_default_queues"
+            app:title="@string/settings_default_queues" />
+
         <EditTextPreference
             app:defaultValue="@string/glia_queue_id"
             app:key="@string/pref_queue_id"

@@ -124,9 +124,9 @@ internal class ActivityWatcherForChatHead(
         (fetchGliaOrRootView() as? ViewGroup)?.let { gliaOrRootView ->
             gliaOrRootView.post {
                 gliaOrRootView.removeView(chatHeadLayout)
+                chatHeadLayout = null
             }
         }
-        chatHeadLayout = null
     }
 
     private fun saveBubblePosition() {

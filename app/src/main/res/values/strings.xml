@@ -63,7 +63,7 @@
     <string name="settings_authorization_summary">Authorization type</string>
     <string name="settings_queue_id">Queue id</string>
     <string name="settings_white_label">White label</string>
-    <string name="settings_use_overlay">Use Overlay</string>
+    <string name="settings_use_overlay">Use Overlay (needs restart)</string>
     <string name="settings_remote_theme">Enable Remote Theme</string>
     <string name="settings_runtime_theme">Enable Runtime Theme</string>
     <string name="settings_visitor_context_asset_id">Visitor context asset id</string>

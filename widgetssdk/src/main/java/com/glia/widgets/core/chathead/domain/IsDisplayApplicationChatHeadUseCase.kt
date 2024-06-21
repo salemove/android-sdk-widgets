@@ -22,7 +22,13 @@ internal class IsDisplayApplicationChatHeadUseCase(
     configurationManager,
     engagementTypeUseCase
 ) {
-    override fun isDisplayBasedOnPermission(): Boolean {
-        return !permissionManager.hasOverlayPermission()
+    override fun isBubbleEnabled(): Boolean {
+        // Bubble should always be displayed inside the app.
+        //
+        // So, isBubbleEnabled() for IsDisplayApplicationChatHeadUseCase returns true when:
+        // global device bubble is turned off by integrator (turned ON by default)
+        // OR
+        // global device bubble is not allowed by visitor
+        return (!configurationManager.isUseOverlay || !permissionManager.hasOverlayPermission())
     }
 }

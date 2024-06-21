@@ -38,8 +38,14 @@ internal class ToggleChatHeadServiceUseCase(
         return isDisplayDeviceBubble
     }
 
-    override fun isDisplayBasedOnPermission(): Boolean {
-        return permissionManager.hasOverlayPermission()
+    override fun isBubbleEnabled(): Boolean {
+        // "Global" device bubble should be displayed only when allowed.
+        //
+        // So, isBubbleEnabled() for ToggleChatHeadServiceUseCase returns true when:
+        // global device bubble is NOT turned off by integrator (turned ON by default)
+        // AND
+        // global device bubble is allowed by visitor.
+        return configurationManager.isUseOverlay && permissionManager.hasOverlayPermission()
     }
 
     fun onDestroy() {

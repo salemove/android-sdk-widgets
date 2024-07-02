@@ -34,10 +34,10 @@ import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCase
 import com.glia.widgets.engagement.domain.EndEngagementUseCase
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import com.glia.widgets.engagement.domain.EnqueueForEngagementUseCase
+import com.glia.widgets.engagement.domain.FlipCameraButtonStateUseCase
 import com.glia.widgets.engagement.domain.FlipVisitorCameraUseCase
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
-import com.glia.widgets.engagement.domain.FlipCameraButtonStateUseCase
 import com.glia.widgets.engagement.domain.OperatorMediaUseCase
 import com.glia.widgets.engagement.domain.ScreenSharingUseCase
 import com.glia.widgets.engagement.domain.ToggleVisitorAudioMediaStateUseCase
@@ -54,10 +54,7 @@ import com.glia.widgets.view.MessagesNotSeenHandler.MessagesNotSeenHandlerListen
 import com.glia.widgets.view.MinimizeHandler
 import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContract
 import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.core.Observable
-import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoView
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import org.reactivestreams.Publisher
 import java.util.Optional
 import java.util.concurrent.TimeUnit
 
@@ -215,8 +212,10 @@ internal class CallController(
     ) {
         sdkConfigurationManager.isUseOverlay = useOverlays
         sdkConfigurationManager.screenSharingMode = screenSharingMode
-        if (isShowOverlayPermissionRequestDialogUseCase.invoke()) {
+        if (isShowOverlayPermissionRequestDialogUseCase()) {
             dialogController.showOverlayPermissionsDialog()
+        } else {
+            decideOnQueueingUseCase.markOverlayStepCompleted()
         }
         messagesNotSeenHandler.onNavigatedToCall()
         if (callState.integratorCallStarted || dialogController.isShowingUnexpectedErrorDialog) {

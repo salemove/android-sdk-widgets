@@ -1,6 +1,5 @@
 package com.glia.widgets.chat.domain
 
-import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
 import com.glia.widgets.core.dialog.domain.SetOverlayPermissionRequestDialogShownUseCase
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.subjects.CompletableSubject
@@ -9,37 +8,30 @@ internal interface DecideOnQueueingUseCase {
     operator fun invoke(): Completable
     fun onOverlayDialogShown()
     fun onQueueingRequested()
-
+    fun markOverlayStepCompleted()
 }
 
 internal class DecideOnQueueingUseCaseImpl(
-    private val isShowOverlayPermissionRequestDialogUseCase: IsShowOverlayPermissionRequestDialogUseCase,
     private val setOverlayPermissionRequestDialogShownUseCase: SetOverlayPermissionRequestDialogShownUseCase
 ) : DecideOnQueueingUseCase {
 
-    private val overlayShown: CompletableSubject = CompletableSubject.create()
-    private val queueingRequested: CompletableSubject = CompletableSubject.create()
+    private val overlayStep: CompletableSubject = CompletableSubject.create()
+    private val queueingStep: CompletableSubject = CompletableSubject.create()
 
-    override fun invoke(): Completable = Completable.concat(listOf(overlayShown, queueingRequested))
-
-    init {
-        checkOverlayShown()
-    }
-
-    private fun checkOverlayShown() {
-        if (!isShowOverlayPermissionRequestDialogUseCase()) {
-            overlayShown.onComplete()
-        }
-    }
+    override fun invoke(): Completable = Completable.concat(listOf(overlayStep, queueingStep))
 
     override fun onOverlayDialogShown() {
-        overlayShown.onComplete()
+        markOverlayStepCompleted()
 
         setOverlayPermissionRequestDialogShownUseCase()
     }
 
     override fun onQueueingRequested() {
-        queueingRequested.onComplete()
+        queueingStep.onComplete()
+    }
+
+    override fun markOverlayStepCompleted() {
+        overlayStep.onComplete()
     }
 
 }

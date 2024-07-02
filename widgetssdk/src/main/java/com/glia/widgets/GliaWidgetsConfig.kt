@@ -36,7 +36,7 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
 
     @JvmField
     val screenSharingMode: ScreenSharing.Mode?
-    val isUseOverlay: Boolean
+    val isUseOverlay: Boolean?
 
     @JvmField
     val uiTheme: UiTheme?
@@ -53,9 +53,8 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
         requestCode = builder.requestCode
         uiJsonRemoteConfig = builder.uiJsonRemoteConfig
         companyName = builder.companyName
-        screenSharingMode =
-            if (builder.screenSharingMode != null) builder.screenSharingMode else DEFAULT_SCREEN_SHARING_MODE
-        isUseOverlay = if (builder.useOverlay != null) builder.useOverlay!! else DEFAULT_USE_OVERLAY
+        screenSharingMode = builder.screenSharingMode ?: DEFAULT_SCREEN_SHARING_MODE
+        isUseOverlay = builder.useOverlay
         uiTheme = builder.uiTheme
         manualLocaleOverride = builder.manualLocaleOverride
     }
@@ -249,7 +248,6 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
     }
 
     internal companion object {
-        const val DEFAULT_USE_OVERLAY = true
         val DEFAULT_SCREEN_SHARING_MODE = ScreenSharing.Mode.APP_BOUNDED
     }
 }

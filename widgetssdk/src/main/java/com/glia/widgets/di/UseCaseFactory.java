@@ -140,18 +140,18 @@ import com.glia.widgets.engagement.domain.EngagementTypeUseCase;
 import com.glia.widgets.engagement.domain.EngagementTypeUseCaseImpl;
 import com.glia.widgets.engagement.domain.EnqueueForEngagementUseCase;
 import com.glia.widgets.engagement.domain.EnqueueForEngagementUseCaseImpl;
-import com.glia.widgets.engagement.domain.InformThatReadyToShareScreenUseCase;
-import com.glia.widgets.engagement.domain.InformThatReadyToShareScreenUseCaseImpl;
+import com.glia.widgets.engagement.domain.FlipCameraButtonStateUseCase;
+import com.glia.widgets.engagement.domain.FlipCameraButtonStateUseCaseImpl;
 import com.glia.widgets.engagement.domain.FlipVisitorCameraUseCase;
 import com.glia.widgets.engagement.domain.FlipVisitorCameraUseCaseImpl;
+import com.glia.widgets.engagement.domain.InformThatReadyToShareScreenUseCase;
+import com.glia.widgets.engagement.domain.InformThatReadyToShareScreenUseCaseImpl;
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase;
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCaseImpl;
 import com.glia.widgets.engagement.domain.IsOperatorPresentUseCase;
 import com.glia.widgets.engagement.domain.IsOperatorPresentUseCaseImpl;
 import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase;
 import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCaseImpl;
-import com.glia.widgets.engagement.domain.FlipCameraButtonStateUseCase;
-import com.glia.widgets.engagement.domain.FlipCameraButtonStateUseCaseImpl;
 import com.glia.widgets.engagement.domain.OperatorMediaUpgradeOfferUseCase;
 import com.glia.widgets.engagement.domain.OperatorMediaUpgradeOfferUseCaseImpl;
 import com.glia.widgets.engagement.domain.OperatorMediaUseCase;
@@ -970,10 +970,7 @@ public class UseCaseFactory {
 
     @NonNull
     public DecideOnQueueingUseCase getDecideOnQueueingUseCase() {
-        return new DecideOnQueueingUseCaseImpl(
-            createIsShowOverlayPermissionRequestDialogUseCase(),
-            createSetOverlayPermissionRequestDialogShownUseCase()
-        );
+        return new DecideOnQueueingUseCaseImpl(createSetOverlayPermissionRequestDialogShownUseCase());
     }
 
     @NonNull

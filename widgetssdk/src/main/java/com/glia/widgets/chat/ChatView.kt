@@ -223,11 +223,11 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         companyName: String?,
         queueId: String?,
         visitorContextAssetId: String?,
-        useOverlays: Boolean = false,
+        useOverlays: Boolean? = null,
         screenSharingMode: ScreenSharing.Mode? = null,
         chatType: ChatType = ChatType.LIVE_CHAT
     ) {
-        Dependencies.getSdkConfigurationManager().isUseOverlay = useOverlays
+        useOverlays?.also { Dependencies.getSdkConfigurationManager().isUseOverlay = it }
         Dependencies.getSdkConfigurationManager().screenSharingMode = screenSharingMode
         dialogCallback?.also { dialogController?.addCallback(it) }
         controller?.initChat(companyName, queueId, visitorContextAssetId, chatType)

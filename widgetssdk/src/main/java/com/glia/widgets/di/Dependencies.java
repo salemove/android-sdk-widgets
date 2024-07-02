@@ -183,13 +183,10 @@ public class Dependencies {
         return UNIFIED_THEME_MANAGER;
     }
 
-    public static void init(GliaWidgetsConfig gliaWidgetsConfig) {
+    public static void init(@NonNull GliaWidgetsConfig gliaWidgetsConfig) {
         controllerFactory.init();
         repositoryFactory.getEngagementRepository().initialize();
-        sdkConfigurationManager.setScreenSharingMode(gliaWidgetsConfig.screenSharingMode);
-        sdkConfigurationManager.setUseOverlay(gliaWidgetsConfig.isUseOverlay());
-        sdkConfigurationManager.setCompanyName(gliaWidgetsConfig.companyName);
-        sdkConfigurationManager.setUiTheme(gliaWidgetsConfig.uiTheme);
+        sdkConfigurationManager.fromConfiguration(gliaWidgetsConfig);
     }
 
     public static ControllerFactory getControllerFactory() {

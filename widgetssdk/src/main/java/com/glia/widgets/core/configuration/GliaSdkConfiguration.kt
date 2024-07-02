@@ -16,7 +16,7 @@ internal class GliaSdkConfiguration private constructor(builder: Builder) {
     private val contextUrl: String?
     val runTimeTheme: UiTheme?
         get() = field ?: Dependencies.getSdkConfigurationManager().uiTheme
-    val useOverlay: Boolean
+    val useOverlay: Boolean?
     val screenSharingMode: ScreenSharing.Mode?
         get() = field ?: Dependencies.getSdkConfigurationManager().screenSharingMode
     val chatType: ChatType?
@@ -46,7 +46,7 @@ internal class GliaSdkConfiguration private constructor(builder: Builder) {
         var contextAssetId: String? = null
         var contextUrl: String? = null
         var runTimeTheme: UiTheme? = null
-        var useOverlay = false
+        var useOverlay: Boolean? = null
         var screenSharingMode: ScreenSharing.Mode? = null
         var chatType: ChatType? = null
         var manualLocaleOverride: String? = null

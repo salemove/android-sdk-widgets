@@ -92,7 +92,7 @@ class AppendNewOperatorMessageUseCaseTest {
         doAnswer {
             state.chatItems.add(mock<ServerChatItem>())
             state.chatItems.add(mock<VisitorMessageItem>())
-            state.chatItems.add(mock<MediaUpgradeStartedTimerItem>())
+            state.chatItems.add(mock<MediaUpgradeStartedTimerItem.Audio>())
         }.whenever(appendNewResponseCardOrTextItemUseCase).invoke(any(), any())
 
         useCase(state, chatMessageInternal)

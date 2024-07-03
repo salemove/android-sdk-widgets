@@ -205,13 +205,7 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
         }
 
         /**
-         * Use this function to pass in a boolean which represents if you would like to use the chat head bubble as an overlay outside
-         * your application for navigating to {@link com.glia.widgets.chat.ChatActivity}.
-         * If set to true then the SDK will ask for overlay permissions and try to always show the navigation bubble outside
-         * the application. However, it will be shown only if the user has accepted the permissions.
-         * If false, then overlay permission is not requested and the navigation bubble is shown when the application is active.
-         * Default value is true.
-         * @param useOverlay - is it allowed to overlay the application
+         * @param useOverlay - Is it allowed to overlay the application
          * @return Builder instance
          */
         fun setUseOverlay(useOverlay: Boolean): Builder {

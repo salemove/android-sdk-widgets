@@ -18,11 +18,13 @@ internal abstract class IsDisplayChatHeadUseCase(
     private val isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase,
     private val screenSharingUseCase: ScreenSharingUseCase,
     val permissionManager: PermissionManager,
-    internal val configurationManager: GliaSdkConfigurationManager,
+    private val configurationManager: GliaSdkConfigurationManager,
     private val engagementTypeUseCase: EngagementTypeUseCase
 ) {
+    abstract fun isDisplayBasedOnPermission(): Boolean
+
     open operator fun invoke(viewName: String?): Boolean {
-        return isBubbleEnabled() && isShowForEngagement(viewName)
+        return isBubbleEnabled() && isDisplayBasedOnPermission() && isShowForEngagement(viewName)
     }
 
     private fun isShowForEngagement(viewName: String?) =
@@ -30,7 +32,9 @@ internal abstract class IsDisplayChatHeadUseCase(
             isShowForChatEngagement(viewName) ||
             isCallVisualizerScreenSharing(viewName)
 
-    abstract fun isBubbleEnabled(): Boolean
+    private fun isBubbleEnabled(): Boolean {
+        return configurationManager.isUseOverlay
+    }
 
     private fun isCallVisualizerScreenSharing(viewName: String?): Boolean {
         return isCurrentEngagementCallVisualizerUseCase() && screenSharingUseCase.isSharing && isNotInListOfGliaViews(viewName)

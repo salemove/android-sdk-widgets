@@ -10,7 +10,7 @@ import com.glia.widgets.view.unifiedui.config.secureconversations.SecureConversa
 import com.glia.widgets.view.unifiedui.config.snackbar.SnackBarRemoteConfig
 import com.glia.widgets.view.unifiedui.config.survey.SurveyRemoteConfig
 import com.glia.widgets.view.unifiedui.config.webbrowser.WebBrowserRemoteConfig
-import com.glia.widgets.view.unifiedui.deepMerge
+import com.glia.widgets.view.unifiedui.merge
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.glia.widgets.view.unifiedui.theme.defaulttheme.DefaultTheme
 import com.google.gson.annotations.SerializedName
@@ -66,6 +66,6 @@ internal data class RemoteConfiguration(
             webBrowserTheme = webBrowserRemoteConfig?.toWebBrowserTheme()
         )
 
-        return defaultTheme deepMerge unifiedTheme
+        return defaultTheme merge unifiedTheme
     }
 }

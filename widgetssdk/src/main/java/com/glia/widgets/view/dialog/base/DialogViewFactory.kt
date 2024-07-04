@@ -16,13 +16,13 @@ import com.glia.widgets.view.dialog.screensharing.ScreenSharingDialogViewInflate
 import com.glia.widgets.view.dialog.screensharing.VerticalScreenSharingDialogViewInflater
 import com.glia.widgets.view.dialog.update.UpgradeDialogViewInflater
 import com.glia.widgets.view.dialog.update.VerticalUpgradeDialogViewInflater
-import com.glia.widgets.view.unifiedui.deepMerge
+import com.glia.widgets.view.unifiedui.nullSafeMerge
 import com.glia.widgets.view.unifiedui.theme.AlertDialogConfiguration
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 
 internal class DialogViewFactory(context: Context, uiTheme: UiTheme, unifiedTheme: UnifiedTheme?) {
     private val configuration: AlertDialogConfiguration = uiTheme.alertTheme(context).run {
-        copy(theme = this.theme.deepMerge(unifiedTheme?.alertTheme)!!)
+        copy(theme = theme nullSafeMerge unifiedTheme?.alertTheme)
     }
 
     private val layoutInflater: LayoutInflater = LayoutInflater.from(context)

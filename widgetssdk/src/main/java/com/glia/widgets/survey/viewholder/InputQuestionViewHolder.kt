@@ -17,7 +17,7 @@ import com.glia.widgets.view.configuration.survey.InputQuestionConfiguration
 import com.glia.widgets.view.configuration.survey.SurveyStyle
 import com.glia.widgets.view.unifiedui.applyLayerTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
-import com.glia.widgets.view.unifiedui.deepMerge
+import com.glia.widgets.view.unifiedui.nullSafeMerge
 import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
 import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
 import com.glia.widgets.view.unifiedui.theme.base.TextTheme
@@ -82,28 +82,17 @@ internal class InputQuestionViewHolder(
         val backgroundColor =
             ColorTheme(Color.parseColor(optionButtonConfiguration.normalLayer.backgroundColor))
 
-        val baseTheme = OptionButtonTheme(
+        return OptionButtonTheme(
             normalText = TextTheme(),
-            normalLayer = LayerTheme(
-                fill = backgroundColor,
-                stroke = normalStrokeColor,
-                borderWidth = strokeWidth
-            ),
+            normalLayer = LayerTheme(fill = backgroundColor, stroke = normalStrokeColor, borderWidth = strokeWidth),
             selectedText = TextTheme(),
             selectedLayer = LayerTheme(),
             highlightedText = TextTheme(),
-            highlightedLayer = LayerTheme(
-                fill = backgroundColor,
-                stroke = highlightedStrokeColor,
-                borderWidth = strokeWidth
-            ),
+            highlightedLayer = LayerTheme(fill = backgroundColor, stroke = highlightedStrokeColor, borderWidth = strokeWidth),
             fontSize = null,
             fontStyle = null
-        )
+        ) nullSafeMerge inputTheme?.option
 
-        return inputTheme?.option?.let {
-            baseTheme deepMerge it
-        } ?: baseTheme
     }
 
     private fun setupTitle(inputQuestionConfig: InputQuestionConfiguration) {

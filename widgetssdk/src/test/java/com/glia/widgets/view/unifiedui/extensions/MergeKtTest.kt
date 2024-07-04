@@ -1,101 +1,107 @@
 package com.glia.widgets.view.unifiedui.extensions
 
-import com.glia.widgets.view.unifiedui.deepMerge
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotEquals
+import com.glia.widgets.view.unifiedui.Mergeable
+import com.glia.widgets.view.unifiedui.merge
+import com.glia.widgets.view.unifiedui.nullSafeMerge
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
+import io.mockk.verify
+import junit.framework.TestCase.assertEquals
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
+
+val mergedUser = MergeableUser(
+    "merged_name",
+    -1,
+    Address("merged_street", "merged_zip"),
+    null,
+    mapOf("merged_key" to "merged_value"),
+    listOf(-1)
+)
+
+enum class Gender {
+    MALE,
+    FEMALE
+}
+
+data class Address(val street: String? = null, val zip: String? = null)
+data class User(
+    val name: String? = null,
+    val age: Int? = null,
+    val address: Address? = null,
+    val gender: Gender? = null,
+    val map: Map<String, String>? = null,
+    val list: List<Int>? = null
+)
+
+data class MergeableUser(
+    val name: String? = null,
+    val age: Int? = null,
+    val address: Address? = null,
+    val gender: Gender? = null,
+    val map: Map<String, String>? = null,
+    val list: List<Int>? = null
+) : Mergeable<MergeableUser> {
+    override fun merge(other: MergeableUser): MergeableUser = mergedUser
+}
 
 class MergeKtTest {
 
-    enum class Gender {
-        MALE,
-        FEMALE
+    @Before
+    fun setUp() {
+        mockkStatic("com.glia.widgets.view.unifiedui.MergeKt")
     }
 
-    data class Address(val street: String? = null, val zip: String? = null)
-    data class User(
-        val name: String? = null,
-        val age: Int? = null,
-        val address: Address? = null,
-        val gender: Gender? = null,
-        val map: Map<String, String>? = null,
-        val list: List<Int>? = null
-    )
-
-    @Test(expected = UnsupportedOperationException::class)
-    fun `deepMerge throws exception when called on non data class type`() {
-        val class1: Any? = null
-        val class2 = Any()
-
-        class1 deepMerge class2
+    @After
+    fun tearDown() {
+        unmockkStatic("com.glia.widgets.view.unifiedui.MergeKt")
     }
 
     @Test
-    fun `deepMerge takes non data class values from the right property when it is not null`() {
-        val left = User(
-            name = "name_left",
-            age = 17,
-            address = Address(street = "street_left", zip = "654321"),
-            gender = Gender.FEMALE,
-            map = mapOf("1" to "2"),
-            list = listOf(1, 2, 3)
-        )
-        val right = User(
-            name = "name",
-            age = 18,
-            address = Address(street = "street", zip = "123456"),
-            gender = Gender.MALE,
-            map = mapOf("2" to "3"),
-            list = listOf(2, 3, 4)
-        )
-
-        val result = left deepMerge right
-
-        assertEquals(result, right)
+    fun `merge returns other when this is null`() {
+        val other = User()
+        val user: User? = null
+        val result = user merge other
+        assertEquals(other, result)
     }
 
     @Test
-    fun `deepMerge takes non data class values from the left property when it is null on the right`() {
-        val left = User(
-            name = "name_left",
-            age = 17,
-            address = Address(street = "street_left", zip = "654321"),
-            gender = Gender.FEMALE,
-            map = mapOf("1" to "2")
-        )
-        val right = User(
-            age = 18,
-            address = Address(street = "street"),
-            gender = Gender.MALE
-        )
+    fun `merge calls nullSafeMerge when this is not null`() {
+        mockkStatic("com.glia.widgets.view.unifiedui.MergeKt")
+        val user = User("User")
+        val other = User("Other")
+        val result = user merge other
 
-        val result = left deepMerge right
-
-        assertEquals(result.name, left.name)
-        assertEquals(result.address?.zip, left.address?.zip)
-        assertEquals(result.map!!["1"], "2")
+        verify { user.nullSafeMerge(other) }
+        assertEquals(other, result)
     }
 
     @Test
-    fun `deepMerge deep merges data class properties`() {
-        val left = User(
-            name = "name_left",
-            age = 17,
-            address = Address(street = "street_left", zip = "654321"),
-            gender = Gender.FEMALE,
-            map = mapOf("1" to "2")
-        )
-        val right = User(
-            age = 18,
-            address = Address(street = "street"),
-            gender = Gender.MALE
-        )
+    fun `nullSafeMerge returns this when other is null`() {
+        val user = User("User")
+        val other: User? = null
+        val result = user.nullSafeMerge(other)
+        assertEquals(user, result)
+    }
 
-        val result = left deepMerge right
+    @Test
+    fun `nullSafeMerge calls merge when this is Mergeable`() {
+        val other = MergeableUser("Other")
+        val user = mockk<MergeableUser>()
+        every { user.merge(other) } returns mergedUser
+        val result = user.nullSafeMerge(other)
+        verify { user.merge(other) }
+        assertEquals(mergedUser, result)
+    }
 
-        assertNotEquals(result.address, left.address)
-        assertNotEquals(result.address, right.address)
-        assertEquals(result.address?.street, right.address?.street)
-        assertEquals(result.address?.zip, left.address?.zip)
+    @Test
+    fun `nullSafeMerge returns other when this is not Mergeable`() {
+        val user = User("User")
+        val other = User("Other")
+        val result = user.nullSafeMerge(other)
+        assertEquals(other, result)
     }
 }

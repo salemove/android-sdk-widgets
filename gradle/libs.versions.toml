@@ -12,7 +12,6 @@ ktlintVersion = "11.5.0"
 # https://github.com/cashapp/paparazzi/releases
 paparazziVersion = "1.3.1"
 
-javaKotlinReflectVersion = "1.8.22" # Kotlin, Kotlin Reflect and Dokka versions should have the same minor version to support the same kotlin version
 javaAppCompatVersion = "1.6.1" # This dependency higher versions require compileSDK 34
 javaConstraintLayoutVersion = "2.1.4"
 javaCoreKtxVersion = "1.10.1" # This dependency higher versions require compileSDK 34
@@ -60,7 +59,6 @@ java-material = { group = "com.google.android.material", name = "material", vers
 java-navigation-fargment = { module = "androidx.navigation:navigation-fragment", version.ref = "javaNavVersion" }
 java-navigation-ui = { module = "androidx.navigation:navigation-ui", version.ref = "javaNavVersion" }
 java-preference = { module = "androidx.preference:preference", version.ref = "javaPreferenceVersion" }
-java-kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "javaKotlinReflectVersion" }
 java-rxandroid = { module = "io.reactivex.rxjava3:rxandroid", version.ref = "javaRxAndroid3Version" }
 java-rxjava = { module = "io.reactivex.rxjava3:rxjava", version.ref = "javaRxJava3Version" }
 lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "javaLifecycleProcessVersion" }

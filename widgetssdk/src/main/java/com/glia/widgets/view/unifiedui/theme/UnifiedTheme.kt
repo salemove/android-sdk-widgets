@@ -1,5 +1,7 @@
 package com.glia.widgets.view.unifiedui.theme
 
+import com.glia.widgets.view.unifiedui.Mergeable
+import com.glia.widgets.view.unifiedui.merge
 import com.glia.widgets.view.unifiedui.theme.alert.AlertTheme
 import com.glia.widgets.view.unifiedui.theme.bubble.BubbleTheme
 import com.glia.widgets.view.unifiedui.theme.call.CallTheme
@@ -21,4 +23,18 @@ internal data class UnifiedTheme(
     val secureConversationsConfirmationScreenTheme: SecureConversationsConfirmationScreenTheme? = null,
     val snackBarTheme: SnackBarTheme? = null,
     val webBrowserTheme: WebBrowserTheme? = null
-)
+) : Mergeable<UnifiedTheme> {
+    override fun merge(other: UnifiedTheme): UnifiedTheme = UnifiedTheme(
+        alertTheme = alertTheme merge other.alertTheme,
+        bubbleTheme = bubbleTheme merge other.bubbleTheme,
+        callTheme = callTheme merge other.callTheme,
+        chatTheme = chatTheme merge other.chatTheme,
+        surveyTheme = surveyTheme merge other.surveyTheme,
+        callVisualizerTheme = callVisualizerTheme merge other.callVisualizerTheme,
+        secureConversationsWelcomeScreenTheme = secureConversationsWelcomeScreenTheme merge other.secureConversationsWelcomeScreenTheme,
+        secureConversationsConfirmationScreenTheme = secureConversationsConfirmationScreenTheme merge other.secureConversationsConfirmationScreenTheme,
+        snackBarTheme = snackBarTheme merge other.snackBarTheme,
+        webBrowserTheme = webBrowserTheme merge other.webBrowserTheme
+    )
+
+}

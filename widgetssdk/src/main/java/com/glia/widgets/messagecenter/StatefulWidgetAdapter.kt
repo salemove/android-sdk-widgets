@@ -1,6 +1,7 @@
 package com.glia.widgets.messagecenter
 
-import com.glia.widgets.view.unifiedui.unsafeMerge
+import com.glia.widgets.view.unifiedui.Mergeable
+import com.glia.widgets.view.unifiedui.merge
 import kotlin.properties.Delegates
 
 /**
@@ -8,7 +9,7 @@ import kotlin.properties.Delegates
  * [S] - State
  * [T] - Theme
  */
-internal interface StatefulWidgetAdapter<S : Enum<S>, T> {
+internal interface StatefulWidgetAdapter<S : Enum<S>, T : Mergeable<T>> {
 
     val callback: StatefulWidgetAdapterCallback<S, T>
 
@@ -20,12 +21,12 @@ internal interface StatefulWidgetAdapter<S : Enum<S>, T> {
 /**
  * Callback to get Theme and State updates from [StatefulWidgetAdapter]
  */
-internal fun interface StatefulWidgetAdapterCallback<S : Enum<S>, T> {
+internal fun interface StatefulWidgetAdapterCallback<S : Enum<S>, T : Mergeable<T>> {
     fun onNewTheme(theme: T)
     fun onNewState(newState: S) {}
 }
 
-internal class SimpleStatefulWidgetAdapter<S : Enum<S>, T>(
+internal class SimpleStatefulWidgetAdapter<S : Enum<S>, T : Mergeable<T>>(
     defaultState: S,
     override val callback: StatefulWidgetAdapterCallback<S, T>
 ) : StatefulWidgetAdapter<S, T> {
@@ -82,5 +83,5 @@ internal class SimpleStatefulWidgetAdapter<S : Enum<S>, T>(
         states.associate { composeThemeForState(it, newStatefulTheme) }
 
     private fun composeThemeForState(state: S, newStatefulTheme: Map<out S, T?>): Pair<S, T?> =
-        state to statefulTheme[state].unsafeMerge(newStatefulTheme[state])
+        state to statefulTheme[state].merge(newStatefulTheme[state])
 }

@@ -8,7 +8,6 @@ import android.text.Spanned
 import android.text.format.DateUtils
 import androidx.annotation.ColorInt
 import androidx.core.graphics.drawable.DrawableCompat
-import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.Engagement.MediaType
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.Operator
@@ -22,7 +21,7 @@ import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.androidsdk.queuing.Queue
 import com.glia.widgets.UiTheme
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.view.unifiedui.deepMerge
+import com.glia.widgets.view.unifiedui.merge
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
@@ -39,7 +38,7 @@ internal fun ColorStateList?.colorForState(state: IntArray): Int? = this?.getCol
 // Common
 internal fun String.separateStringWithSymbol(symbol: String): String = asSequence().joinToString(symbol)
 
-internal fun Queue.supportMessaging() = state.medias.contains(Engagement.MediaType.MESSAGING)
+internal fun Queue.supportMessaging() = state.medias.contains(MediaType.MESSAGING)
 
 internal fun MediaType.isAudioOrVideo() = this == MediaType.AUDIO || this == MediaType.VIDEO
 
@@ -55,7 +54,7 @@ internal val Operator.imageUrl: String? get() = picture?.url?.getOrNull()
 
 internal fun UiTheme?.isAlertDialogButtonUseVerticalAlignment(): Boolean = this?.gliaAlertDialogButtonUseVerticalAlignment ?: false
 
-internal fun UiTheme?.getFullHybridTheme(newTheme: UiTheme?): UiTheme = deepMerge(newTheme) ?: UiTheme.UiThemeBuilder().build()
+internal fun UiTheme?.getFullHybridTheme(newTheme: UiTheme?): UiTheme = merge(newTheme) ?: UiTheme.UiThemeBuilder().build()
 
 internal val UiTheme?.withConfigurationTheme: UiTheme
     get() = getFullHybridTheme(Dependencies.getSdkConfigurationManager().uiTheme)

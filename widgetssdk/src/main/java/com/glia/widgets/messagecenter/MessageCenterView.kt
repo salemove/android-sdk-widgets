@@ -42,7 +42,7 @@ import com.glia.widgets.view.Dialogs
 import com.glia.widgets.view.dialog.base.DialogDelegate
 import com.glia.widgets.view.dialog.base.DialogDelegateImpl
 import com.glia.widgets.view.header.AppBarView
-import com.glia.widgets.view.unifiedui.deepMerge
+import com.glia.widgets.view.unifiedui.merge
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
 import com.glia.widgets.view.unifiedui.theme.base.HeaderTheme
@@ -234,7 +234,7 @@ internal class MessageCenterView(
             ColorTheme(getColorCompat(primaryColorId)),
             ColorTheme(getColorCompat(baseLightColorId)),
             null
-        ) deepMerge unifiedTheme?.secureConversationsConfirmationScreenTheme?.headerTheme
+        ) merge unifiedTheme?.secureConversationsConfirmationScreenTheme?.headerTheme
 
         appBar?.resetTheme()
         setupAppBarUnifiedTheme(appBarTheme)

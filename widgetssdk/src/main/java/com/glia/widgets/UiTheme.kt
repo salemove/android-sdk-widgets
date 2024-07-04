@@ -11,6 +11,8 @@ import com.glia.widgets.view.configuration.ButtonConfiguration
 import com.glia.widgets.view.configuration.ChatHeadConfiguration
 import com.glia.widgets.view.configuration.TextConfiguration
 import com.glia.widgets.view.configuration.survey.SurveyStyle
+import com.glia.widgets.view.unifiedui.Mergeable
+import com.glia.widgets.view.unifiedui.merge
 import com.glia.widgets.view.unifiedui.theme.AlertDialogConfiguration
 import com.glia.widgets.view.unifiedui.theme.ColorPallet
 import com.glia.widgets.view.unifiedui.theme.Icons
@@ -366,7 +368,7 @@ data class UiTheme(
     @ColorRes
     val gvaQuickReplyTextColor: Int? = null
 
-) : Parcelable {
+) : Parcelable, Mergeable<UiTheme> {
 
     private constructor(builder: UiThemeBuilder) : this(
         appBarTitle = builder.appBarTitle,
@@ -433,6 +435,72 @@ data class UiTheme(
         gvaQuickReplyBackgroundColor = builder.gvaQuickReplyBackgroundColor,
         gvaQuickReplyStrokeColor = builder.gvaQuickReplyStrokeColor,
         gvaQuickReplyTextColor = builder.gvaQuickReplyTextColor
+    )
+
+    override fun merge(other: UiTheme): UiTheme = UiTheme(
+        appBarTitle = appBarTitle merge other.appBarTitle,
+        brandPrimaryColor = brandPrimaryColor merge other.brandPrimaryColor,
+        baseLightColor = baseLightColor merge other.baseLightColor,
+        baseDarkColor = baseDarkColor merge other.baseDarkColor,
+        baseNormalColor = baseNormalColor merge other.baseNormalColor,
+        baseShadeColor = baseShadeColor merge other.baseShadeColor,
+        systemAgentBubbleColor = systemAgentBubbleColor merge other.systemAgentBubbleColor,
+        systemNegativeColor = systemNegativeColor merge other.systemNegativeColor,
+        visitorMessageBackgroundColor = visitorMessageBackgroundColor merge other.visitorMessageBackgroundColor,
+        visitorMessageTextColor = visitorMessageTextColor merge other.visitorMessageTextColor,
+        operatorMessageBackgroundColor = operatorMessageBackgroundColor merge other.operatorMessageBackgroundColor,
+        operatorMessageTextColor = operatorMessageTextColor merge other.operatorMessageTextColor,
+        newMessageDividerColor = newMessageDividerColor merge other.newMessageDividerColor,
+        newMessageDividerTextColor = newMessageDividerTextColor merge other.newMessageDividerTextColor,
+        botActionButtonBackgroundColor = botActionButtonBackgroundColor merge other.botActionButtonBackgroundColor,
+        botActionButtonTextColor = botActionButtonTextColor merge other.botActionButtonTextColor,
+        botActionButtonSelectedBackgroundColor = botActionButtonSelectedBackgroundColor merge other.botActionButtonSelectedBackgroundColor,
+        botActionButtonSelectedTextColor = botActionButtonSelectedTextColor merge other.botActionButtonSelectedTextColor,
+        sendMessageButtonTintColor = sendMessageButtonTintColor merge other.sendMessageButtonTintColor,
+        gliaChatBackgroundColor = gliaChatBackgroundColor merge other.gliaChatBackgroundColor,
+        gliaChatHeaderTitleTintColor = gliaChatHeaderTitleTintColor merge other.gliaChatHeaderTitleTintColor,
+        gliaChatHeaderHomeButtonTintColor = gliaChatHeaderHomeButtonTintColor merge other.gliaChatHeaderHomeButtonTintColor,
+        gliaChatHeaderExitQueueButtonTintColor = gliaChatHeaderExitQueueButtonTintColor merge other.gliaChatHeaderExitQueueButtonTintColor,
+        visitorCodeTextColor = visitorCodeTextColor merge other.visitorCodeTextColor,
+        visitorCodeBackgroundColor = visitorCodeBackgroundColor merge other.visitorCodeBackgroundColor,
+        visitorCodeBorderColor = visitorCodeBorderColor merge other.visitorCodeBorderColor,
+        fontRes = fontRes merge other.fontRes,
+        iconAppBarBack = iconAppBarBack merge other.iconAppBarBack,
+        iconLeaveQueue = iconLeaveQueue merge other.iconLeaveQueue,
+        iconSendMessage = iconSendMessage merge other.iconSendMessage,
+        iconChatAudioUpgrade = iconChatAudioUpgrade merge other.iconChatAudioUpgrade,
+        iconUpgradeAudioDialog = iconUpgradeAudioDialog merge other.iconUpgradeAudioDialog,
+        iconCallAudioOn = iconCallAudioOn merge other.iconCallAudioOn,
+        iconChatVideoUpgrade = iconChatVideoUpgrade merge other.iconChatVideoUpgrade,
+        iconUpgradeVideoDialog = iconUpgradeVideoDialog merge other.iconUpgradeVideoDialog,
+        iconScreenSharingDialog = iconScreenSharingDialog merge other.iconScreenSharingDialog,
+        iconCallVideoOn = iconCallVideoOn merge other.iconCallVideoOn,
+        iconCallAudioOff = iconCallAudioOff merge other.iconCallAudioOff,
+        iconCallVideoOff = iconCallVideoOff merge other.iconCallVideoOff,
+        iconCallChat = iconCallChat merge other.iconCallChat,
+        iconCallSpeakerOn = iconCallSpeakerOn merge other.iconCallSpeakerOn,
+        iconCallSpeakerOff = iconCallSpeakerOff merge other.iconCallSpeakerOff,
+        iconCallMinimize = iconCallMinimize merge other.iconCallMinimize,
+        iconPlaceholder = iconPlaceholder merge other.iconPlaceholder,
+        iconOnHold = iconOnHold merge other.iconOnHold,
+        iconEndScreenShare = iconEndScreenShare merge other.iconEndScreenShare,
+        endScreenShareTintColor = endScreenShareTintColor merge other.endScreenShareTintColor,
+        gliaChatStartingHeadingTextColor = gliaChatStartingHeadingTextColor merge other.gliaChatStartingHeadingTextColor,
+        gliaChatStartingCaptionTextColor = gliaChatStartingCaptionTextColor merge other.gliaChatStartingCaptionTextColor,
+        gliaChatStartedHeadingTextColor = gliaChatStartedHeadingTextColor merge other.gliaChatStartedHeadingTextColor,
+        gliaChatStartedCaptionTextColor = gliaChatStartedCaptionTextColor merge other.gliaChatStartedCaptionTextColor,
+        whiteLabel = whiteLabel merge other.whiteLabel,
+        gliaAlertDialogButtonUseVerticalAlignment = gliaAlertDialogButtonUseVerticalAlignment merge other.gliaAlertDialogButtonUseVerticalAlignment,
+        gliaChoiceCardContentTextConfiguration = gliaChoiceCardContentTextConfiguration merge other.gliaChoiceCardContentTextConfiguration,
+        gliaEndButtonConfiguration = gliaEndButtonConfiguration merge other.gliaEndButtonConfiguration,
+        gliaPositiveButtonConfiguration = gliaPositiveButtonConfiguration merge other.gliaPositiveButtonConfiguration,
+        gliaNegativeButtonConfiguration = gliaNegativeButtonConfiguration merge other.gliaNegativeButtonConfiguration,
+        gliaNeutralButtonConfiguration = gliaNeutralButtonConfiguration merge other.gliaNeutralButtonConfiguration,
+        chatHeadConfiguration = chatHeadConfiguration merge other.chatHeadConfiguration,
+        surveyStyle = surveyStyle merge other.surveyStyle,
+        gvaQuickReplyBackgroundColor = gvaQuickReplyBackgroundColor merge other.gvaQuickReplyBackgroundColor,
+        gvaQuickReplyStrokeColor = gvaQuickReplyStrokeColor merge other.gvaQuickReplyStrokeColor,
+        gvaQuickReplyTextColor = gvaQuickReplyTextColor merge other.gvaQuickReplyTextColor
     )
 
     private fun toColorPallet(context: Context): ColorPallet = context.run {

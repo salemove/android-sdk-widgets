@@ -1,5 +1,7 @@
 package com.glia.widgets.view.unifiedui.theme.chat
 
+import com.glia.widgets.view.unifiedui.Mergeable
+import com.glia.widgets.view.unifiedui.merge
 import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
 import com.glia.widgets.view.unifiedui.theme.base.HeaderTheme
 import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
@@ -24,4 +26,23 @@ internal data class ChatTheme(
     val newMessagesDividerColorTheme: ColorTheme? = null,
     val newMessagesDividerTextTheme: TextTheme? = null,
     val gva: GvaTheme? = null
-)
+) : Mergeable<ChatTheme> {
+    override fun merge(other: ChatTheme): ChatTheme = ChatTheme(
+        background = background merge other.background,
+        header = header merge other.header,
+        operatorMessage = operatorMessage merge other.operatorMessage,
+        visitorMessage = visitorMessage merge other.visitorMessage,
+        connect = connect merge other.connect,
+        input = input merge other.input,
+        responseCard = responseCard merge other.responseCard,
+        audioUpgrade = audioUpgrade merge other.audioUpgrade,
+        videoUpgrade = videoUpgrade merge other.videoUpgrade,
+        bubble = bubble merge other.bubble,
+        attachmentsPopup = attachmentsPopup merge other.attachmentsPopup,
+        unreadIndicator = unreadIndicator merge other.unreadIndicator,
+        typingIndicator = typingIndicator merge other.typingIndicator,
+        newMessagesDividerColorTheme = newMessagesDividerColorTheme merge other.newMessagesDividerColorTheme,
+        newMessagesDividerTextTheme = newMessagesDividerTextTheme merge other.newMessagesDividerTextTheme,
+        gva = gva merge other.gva
+    )
+}

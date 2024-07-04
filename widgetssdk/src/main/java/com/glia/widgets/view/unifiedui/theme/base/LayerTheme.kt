@@ -2,6 +2,8 @@ package com.glia.widgets.view.unifiedui.theme.base
 
 import androidx.annotation.ColorInt
 import androidx.annotation.Px
+import com.glia.widgets.view.unifiedui.Mergeable
+import com.glia.widgets.view.unifiedui.merge
 import kotlin.math.roundToInt
 
 internal data class LayerTheme(
@@ -13,7 +15,7 @@ internal data class LayerTheme(
     val borderWidth: Float? = null, // width in pixels
     @Px
     val cornerRadius: Float? = null // radius in pixels
-) {
+) : Mergeable<LayerTheme> {
 
     @get:Px
     val borderWidthInt: Int?
@@ -22,4 +24,11 @@ internal data class LayerTheme(
     @get:Px
     val cornerRadiusInt: Int?
         get() = cornerRadius?.roundToInt()
+
+    override fun merge(other: LayerTheme): LayerTheme = LayerTheme(
+        fill = fill merge other.fill,
+        stroke = stroke merge other.stroke,
+        borderWidth = borderWidth merge other.borderWidth,
+        cornerRadius = cornerRadius merge other.cornerRadius
+    )
 }

@@ -1,10 +1,14 @@
 package com.glia.widgets.view.unifiedui
 
-import kotlin.reflect.KClass
-import kotlin.reflect.KParameter
-import kotlin.reflect.KProperty1
-import kotlin.reflect.full.declaredMemberProperties
-import kotlin.reflect.full.primaryConstructor
+/**
+ * Interface for classes that can be merged with another instance of the same class
+ */
+internal interface Mergeable<T : Any> {
+    /**
+     * The other should always have priority over the current object
+     */
+    infix fun merge(other: T): T
+}
 
 /**
  * Deep merge two data classes
@@ -16,73 +20,23 @@ import kotlin.reflect.full.primaryConstructor
  * The function is immutable, the original data classes are not changed,
  * and a new data class instance is returned.
  *
- *@throws UnsupportedOperationException when called on classes different from data classes, or
- * data classes with attributes different from 'data class', 'primitive' or 'enum' type
- *
  * Example usage:
  *
  *     val a = MyDataClass(...)
  *     val b = MyDataClass(...)
- *     val c = a deepMerge b
+ *     val c = a merge b
  */
-internal inline infix fun <reified T : Any?> T.deepMerge(other: T): T {
-    if (!T::class.isData) throw UnsupportedOperationException("Merge supports only data classes, ${T::class.simpleName} is not a data class")
-    return unsafeMerge(other)
-}
-
-internal fun <T : Any?> T.unsafeMerge(other: T): T {
+internal infix fun <T : Any?> T.merge(other: T): T {
     if (this == null) return other
-    if (other == null) return this
-    return mergeNonNull(other)
+    return nullSafeMerge(other)
 }
 
-private fun <T : Any> T.mergeNonNull(other: T): T {
-    // group properties by 'name'
-    val nameToProperty = this::class.declaredMemberProperties.associateBy { it.name }
-    // primary constructor of a current type
-    val primaryConstructor = this::class.primaryConstructor!!
-    val mergedProperties: Map<KParameter, Any?> =
-        mergeProperties(primaryConstructor.parameters, nameToProperty, this, other)
-    return primaryConstructor.callBy(mergedProperties)
+@Suppress("UNCHECKED_CAST")
+internal infix fun <T : Any> T.nullSafeMerge(other: T?): T = when {
+    other == null -> this
+    this is Mergeable<*> -> (this as Mergeable<T>).merge(other)
+    else -> other
 }
-
-private fun <T : Any?> mergeProperties(
-    primaryConstructorParams: List<KParameter>,
-    currentClassNameToProperty: Map<String, KProperty1<out T & Any, *>>,
-    current: T & Any, /* T & Any means that 'T' here is non-null */
-    other: T
-) = primaryConstructorParams.associateWith { parameter ->
-    val property = currentClassNameToProperty[parameter.name]!!
-    // current field type
-    val type = property.returnType.classifier as KClass<*>
-
-    when {
-        type.isData -> mergeDataProperties(property, current, other)
-        else -> mergeEndValues(property, current, other)
-    }
-}
-
-/**
- * Deep merge two data properties
- */
-private fun <T> mergeDataProperties(
-    property: KProperty1<out T, T>,
-    current: T,
-    other: T
-): Any? = property.getter.run {
-    val currentValue: T? = call(current)
-    val otherValue: T? = call(other)
-    currentValue.unsafeMerge(otherValue)
-}
-
-/**
- * Deep merge two primitive properties
- */
-private fun <T : Any?> mergeEndValues(
-    property: KProperty1<out T, Any?>,
-    current: T,
-    other: T
-): Any? = property.getter.run { call(other) ?: call(current) }
 
 /**
  * `Checks that at least one 'non-null' item preset

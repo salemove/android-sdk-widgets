@@ -1,6 +1,8 @@
 package com.glia.widgets.messagecenter
 
 import android.graphics.Color
+import com.glia.widgets.view.unifiedui.Mergeable
+import com.glia.widgets.view.unifiedui.merge
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -26,7 +28,9 @@ class SimpleStatefulWidgetAdapterTest {
         State.FOCUSED to null
     )
 
-    data class Theme(val color: Int? = null, val size: Int? = null)
+    data class Theme(val color: Int? = null, val size: Int? = null) : Mergeable<Theme> {
+        override fun merge(other: Theme): Theme = Theme(color merge other.color, size merge other.size)
+    }
     enum class State {
         ENABLED,
         DISABLED,

@@ -111,7 +111,6 @@ dependencies {
   // Test dependencies to Android native libraries
   // To prevent unit tests firing errors like 'Method length in org.json.JSONObject not mocked'
   testImplementation libs.test.json
-  implementation libs.java.kotlin.reflect
 
   lintChecks project(':lint_checker')
 }

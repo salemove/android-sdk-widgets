@@ -3,7 +3,7 @@ package com.glia.widgets
 import android.content.Context
 import com.glia.androidsdk.SiteApiKey
 import com.glia.androidsdk.screensharing.ScreenSharing
-import com.glia.widgets.helper.Logger.i
+import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 
 /**
@@ -180,8 +180,7 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
         }
 
         fun setUiJsonRemoteConfig(uiJsonRemoteConfig: String?): Builder {
-            // Log
-            i(TAG, "Setting Unified UI Config")
+            Logger.i(TAG, "Setting Unified UI Config")
             this.uiJsonRemoteConfig = uiJsonRemoteConfig
             return this
         }
@@ -217,6 +216,10 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
          * @param uiTheme - uiTheme resource for UI configuration
          * @return Builder instance
          */
+        @Deprecated(
+            "While UiTheme can still be used for UI customization, we strongly encourage adopting remote configurations(GliaWidgetsConfig.Builder.setUiJsonRemoteConfig). " +
+                "The remote configurations approach is more versatile and better suited for future development."
+        )
         fun setUiTheme(uiTheme: UiTheme?): Builder {
             this.uiTheme = uiTheme
             return this

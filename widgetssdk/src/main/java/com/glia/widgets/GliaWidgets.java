@@ -39,7 +39,12 @@ public class GliaWidgets {
     /**
      * Use with {@link android.os.Bundle} to pass in a {@link UiTheme} as a navigation argument when
      * navigating to {@link com.glia.widgets.chat.ChatActivity}
+     *
+     * @deprecated While UiTheme can still be used for UI customization,
+     * we strongly encourage adopting remote configurations {@link GliaWidgetsConfig.Builder#setUiJsonRemoteConfig(String)}.
+     * The remote configurations approach is more versatile and better suited for future development.
      */
+    @Deprecated
     public static final String UI_THEME = "ui_theme";
     /**
      * Use with {@link android.os.Bundle} to pass in the name of your company as a navigation

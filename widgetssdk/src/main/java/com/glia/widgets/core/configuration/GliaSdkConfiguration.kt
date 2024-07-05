@@ -72,6 +72,10 @@ internal class GliaSdkConfiguration private constructor(builder: Builder) {
             return this
         }
 
+        @Deprecated(
+            "While UiTheme can still be used for UI customization, we strongly encourage adopting remote configurations(GliaWidgetsConfig.Builder.setUiJsonRemoteConfig). " +
+                "The remote configurations approach is more versatile and better suited for future development."
+        )
         fun runTimeTheme(runTimeTheme: UiTheme?): Builder {
             this.runTimeTheme = runTimeTheme
             return this

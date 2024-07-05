@@ -23,11 +23,12 @@ import kotlinx.parcelize.Parcelize
 
 /**
  * Customize Glia UI at runtime.
- *
- * Please use the remote configurations which is newer and more flexible solution for
- * Widgets UI customization [GliaWidgetsConfig.Builder.setUiJsonRemoteConfig]
  */
 @Parcelize
+@Deprecated(
+    "While this class can still be used for UI customization, we strongly encourage adopting remote configurations(GliaWidgetsConfig.Builder.setUiJsonRemoteConfig). " +
+        "The remote configurations approach is more versatile and better suited for future development."
+)
 data class UiTheme(
     /**
      * Text to be shown on the top of the app bar in the chat
@@ -538,6 +539,10 @@ data class UiTheme(
      * Please use the remote configurations which is newer and more flexible solution for
      * Widgets UI customization [GliaWidgetsConfig.Builder.setUiJsonRemoteConfig]
      */
+    @Deprecated(
+        "While this class can still be used for UI customization, we strongly encourage adopting remote configurations(GliaWidgetsConfig.Builder.setUiJsonRemoteConfig). " +
+            "The remote configurations approach is more versatile and better suited for future development."
+    )
     class UiThemeBuilder {
         /**
          * Text to be shown on the top of the app bar in the chat

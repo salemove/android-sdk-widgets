@@ -22,8 +22,8 @@ internal class IsMessagingAvailableUseCase(
             .observeOn(schedulers.mainScheduler)
     }
 
-    operator fun invoke(queueIds: Array<String>): Observable<Boolean> {
-        queueIdsSubject.onNext(queueIds)
+    operator fun invoke(queueIds: List<String>): Observable<Boolean> {
+        queueIdsSubject.onNext(queueIds.toTypedArray())
         return isMessagingAvailable
     }
 

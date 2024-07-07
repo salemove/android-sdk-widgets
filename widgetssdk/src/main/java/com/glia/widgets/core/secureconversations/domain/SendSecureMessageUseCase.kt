@@ -11,7 +11,7 @@ import com.glia.widgets.core.secureconversations.SendMessageRepository
 import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
 
 internal class SendSecureMessageUseCase(
-    private val queueId: String,
+    private val queueIds: List<String>,
     private val sendMessageRepository: SendMessageRepository,
     private val secureConversationsRepository: SecureConversationsRepository,
     private val fileAttachmentRepository: SecureFileAttachmentRepository,
@@ -26,14 +26,13 @@ internal class SendSecureMessageUseCase(
         callback: RequestCallback<VisitorMessage?>
     ) {
         val message = sendMessageRepository.value
-        val queueIds = arrayOf(queueId)
         val fileAttachments = fileAttachmentRepository.getReadyToSendFileAttachments()
         sendMessage(message, queueIds, fileAttachments, callback)
     }
 
     private fun sendMessage(
         message: String,
-        queueIds: Array<String>,
+        queueIds: List<String>,
         fileAttachments: List<FileAttachment>,
         callback: RequestCallback<VisitorMessage?>
     ) {
@@ -52,7 +51,7 @@ internal class SendSecureMessageUseCase(
 
     private fun sendMessage(
         message: String,
-        queueIds: Array<String>,
+        queueIds: List<String>,
         callback: RequestCallback<VisitorMessage?>
     ) {
         val payload = SendMessagePayload(content = message)
@@ -66,7 +65,7 @@ internal class SendSecureMessageUseCase(
 
     private fun sendMessageWithAttachments(
         message: String,
-        queueIds: Array<String>,
+        queueIds: List<String>,
         fileAttachments: List<FileAttachment>,
         callback: RequestCallback<VisitorMessage?>
     ) {

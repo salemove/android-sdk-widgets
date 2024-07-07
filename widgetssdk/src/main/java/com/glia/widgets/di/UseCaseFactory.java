@@ -191,6 +191,8 @@ import com.glia.widgets.view.snackbar.LiveObservationPopupUseCase;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.util.List;
+
 /**
  * @hide
  */
@@ -546,9 +548,9 @@ public class UseCaseFactory {
     }
 
     @NonNull
-    public SendSecureMessageUseCase createSendSecureMessageUseCase(String queueId) {
+    public SendSecureMessageUseCase createSendSecureMessageUseCase(List<String> queueIds) {
         return new SendSecureMessageUseCase(
-            queueId,
+            queueIds,
             repositoryFactory.getSendMessageRepository(),
             repositoryFactory.getSecureConversationsRepository(),
             repositoryFactory.getSecureFileAttachmentRepository(),
@@ -558,8 +560,8 @@ public class UseCaseFactory {
     }
 
     @NonNull
-    public IsMessageCenterAvailableUseCase createIsMessageCenterAvailableUseCase(String queueId) {
-        return new IsMessageCenterAvailableUseCase(queueId, createIsMessagingAvailableUseCase());
+    public IsMessageCenterAvailableUseCase createIsMessageCenterAvailableUseCase(List<String> queueIds) {
+        return new IsMessageCenterAvailableUseCase(queueIds, createIsMessagingAvailableUseCase());
     }
 
     @NonNull

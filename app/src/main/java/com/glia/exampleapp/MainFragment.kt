@@ -277,7 +277,7 @@ class MainFragment : Fragment() {
         val intent = ChatActivity.getIntent(
             requireContext(),
             getContextAssetIdFromPrefs(sharedPreferences),
-            getQueueIdFromPrefs(sharedPreferences),
+            getQueueIdsFromPrefs(sharedPreferences),
             chatType
         )
         startActivity(intent)
@@ -292,7 +292,7 @@ class MainFragment : Fragment() {
     private fun navigateToCall(mediaType: String) {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
         val intent = Intent(context, CallActivity::class.java)
-            .putExtra(GliaWidgets.QUEUE_ID, getQueueIdFromPrefs(sharedPreferences))
+            .putExtra(GliaWidgets.QUEUE_IDS, ArrayList(getQueueIdsFromPrefs(sharedPreferences)))
             .putExtra(GliaWidgets.CONTEXT_ASSET_ID, getContextAssetIdFromPrefs(sharedPreferences))
             .putExtra(GliaWidgets.UI_THEME, getRuntimeThemeFromPrefs(sharedPreferences))
             .putExtra(GliaWidgets.USE_OVERLAY, getUseOverlay(sharedPreferences))
@@ -303,7 +303,7 @@ class MainFragment : Fragment() {
 
     private fun setNavigationIntentData(intent: Intent) {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-        intent.putExtra(GliaWidgets.QUEUE_ID, getQueueIdFromPrefs(sharedPreferences))
+        intent.putExtra(GliaWidgets.QUEUE_IDS, ArrayList(getQueueIdsFromPrefs(sharedPreferences)))
             .putExtra(GliaWidgets.CONTEXT_ASSET_ID, getContextAssetIdFromPrefs(sharedPreferences))
             .putExtra(GliaWidgets.UI_THEME, getRuntimeThemeFromPrefs(sharedPreferences))
             .putExtra(GliaWidgets.USE_OVERLAY, getUseOverlay(sharedPreferences))
@@ -322,11 +322,15 @@ class MainFragment : Fragment() {
         return Utils.getRunTimeThemeByPrefs(sharedPreferences, resources)
     }
 
-    private fun getQueueIdFromPrefs(sharedPreferences: SharedPreferences): String? {
+    private fun getQueueIdsFromPrefs(sharedPreferences: SharedPreferences): List<String> {
         val defaultQueues = sharedPreferences.getBoolean(resources.getString(R.string.pref_default_queues), false)
         if (defaultQueues) {
-            return null
+            return emptyList()
         }
+        return listOf(getQueueIdFromPrefs(sharedPreferences))
+    }
+
+    private fun getQueueIdFromPrefs(sharedPreferences: SharedPreferences): String {
         return Utils.getStringFromPrefs(
             R.string.pref_queue_id,
             getString(R.string.glia_queue_id),

@@ -212,7 +212,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
      * Used to start the chat functionality.
      *
      * @param companyName Text shown in the chat while waiting in a queue.
-     * @param queueId     The queue id to which you would like to queue to and speak to operators from.
+     * @param queueIds    The queue ids to which you would like to queue to and speak to operators from.
      * @param visitorContextAssetId  Provide some context asset ID as to from where are you initiating the chat from.
      * @param useOverlays Used to set if the user opted to use overlays or not.
      * @see [com.glia.widgets.GliaWidgets].USE_OVERLAY to see its full usage description.
@@ -221,7 +221,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     @JvmOverloads
     fun startChat(
         companyName: String?,
-        queueId: String?,
+        queueIds: List<String>?,
         visitorContextAssetId: String?,
         useOverlays: Boolean? = null,
         screenSharingMode: ScreenSharing.Mode? = null,
@@ -230,7 +230,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         useOverlays?.also { Dependencies.getSdkConfigurationManager().isUseOverlay = it }
         Dependencies.getSdkConfigurationManager().screenSharingMode = screenSharingMode
         dialogCallback?.also { dialogController?.addCallback(it) }
-        controller?.initChat(companyName, queueId, visitorContextAssetId, chatType)
+        controller?.initChat(companyName, queueIds, visitorContextAssetId, chatType)
     }
 
     /**

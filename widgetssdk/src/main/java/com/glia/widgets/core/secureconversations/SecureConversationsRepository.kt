@@ -21,12 +21,12 @@ internal class SecureConversationsRepository(private val secureConversations: Se
         secureConversations.fetchChatTranscript(listener::loaded)
     }
 
-    fun send(payload: SendMessagePayload, queueIds: Array<String>, callback: RequestCallback<VisitorMessage?>) {
+    fun send(payload: SendMessagePayload, queueIds: List<String>, callback: RequestCallback<VisitorMessage?>) {
         _messageSendingObservable.onNext(true)
-        secureConversations.send(payload.payload, queueIds, handleResult(callback))
+        secureConversations.send(payload.payload, queueIds.toTypedArray(), handleResult(callback))
     }
 
-    fun send(payload: SendMessagePayload, queueIds: Array<String>, listener: GliaSendMessageUseCase.Listener) {
+    fun send(payload: SendMessagePayload, queueIds: List<String>, listener: GliaSendMessageUseCase.Listener) {
         send(payload, queueIds) { visitorMessage, ex ->
             onMessageReceived(visitorMessage, ex, listener, payload)
         }

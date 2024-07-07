@@ -30,7 +30,7 @@ import com.glia.widgets.helper.TAG
  * Before this activity is launched, make sure that Glia Widgets SDK is set up correctly.
  *
  * Required data that should be passed together with the Activity intent:
- * - {@link GliaWidgets#QUEUE_ID}: ID of the queue you would like to use for your engagements.
+ * - {@link GliaWidgets#QUEUE_IDS}: IDs of the queues you would like to use for your engagements.
  * For a full list of optional parameters, see the constants defined in {@link GliaWidgets}.
  *
  * Code example:
@@ -51,7 +51,7 @@ class MessageCenterActivity :
     private var configuration: GliaSdkConfiguration? = null
 
     private val controller: MessageCenterContract.Controller by lazy {
-        Dependencies.getControllerFactory().getMessageCenterController(configuration?.queueId)
+        Dependencies.getControllerFactory().getMessageCenterController(configuration?.queueIds)
     }
 
     private val getContent = registerForActivityResult(GetContent()) { uri: Uri? ->

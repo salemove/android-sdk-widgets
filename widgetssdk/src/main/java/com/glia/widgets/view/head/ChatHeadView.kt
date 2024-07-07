@@ -332,7 +332,7 @@ internal class ChatHeadView @JvmOverloads constructor(
             cls: Class<*>,
             sdkConfiguration: GliaSdkConfiguration
         ): Intent = Intent(context, cls)
-            .putExtra(GliaWidgets.QUEUE_ID, sdkConfiguration.queueId)
+            .putExtra(GliaWidgets.QUEUE_IDS, sdkConfiguration.queueIds?.let { ArrayList(it) })
             .putExtra(GliaWidgets.CONTEXT_ASSET_ID, sdkConfiguration.contextAssetId)
             .putExtra(GliaWidgets.UI_THEME, sdkConfiguration.runTimeTheme)
             .putExtra(GliaWidgets.USE_OVERLAY, sdkConfiguration.useOverlay)

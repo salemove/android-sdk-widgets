@@ -1,6 +1,7 @@
 package com.glia.widgets.di;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.glia.widgets.call.CallContract;
 import com.glia.widgets.call.CallController;
@@ -40,6 +41,8 @@ import com.glia.widgets.view.head.controller.ApplicationChatHeadLayoutController
 import com.glia.widgets.view.head.controller.ServiceChatHeadController;
 import com.glia.widgets.view.snackbar.ActivityWatcherForLiveObservationContract;
 import com.glia.widgets.view.snackbar.ActivityWatcherForLiveObservationController;
+
+import java.util.List;
 
 /**
  * @hide
@@ -284,11 +287,11 @@ public class ControllerFactory {
         return callVisualizerController;
     }
 
-    public MessageCenterContract.Controller getMessageCenterController(String queueId) {
+    public MessageCenterContract.Controller getMessageCenterController(@Nullable List<String> queueIds) {
         return new MessageCenterController(
             serviceChatHeadController,
-            useCaseFactory.createSendSecureMessageUseCase(queueId),
-            useCaseFactory.createIsMessageCenterAvailableUseCase(queueId),
+            useCaseFactory.createSendSecureMessageUseCase(queueIds),
+            useCaseFactory.createIsMessageCenterAvailableUseCase(queueIds),
             useCaseFactory.createAddSecureFileAttachmentsObserverUseCase(),
             useCaseFactory.createAddSecureFileToAttachmentAndUploadUseCase(),
             useCaseFactory.createGetSecureFileAttachmentsUseCase(),

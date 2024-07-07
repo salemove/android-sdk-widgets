@@ -18,6 +18,8 @@ import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -33,13 +35,13 @@ import java.util.Objects;
  * Before this activity is launched, make sure that Glia Widgets SDK is set up correctly.
  * <p>
  * Data that can be passed together with the Activity intent:
- * - {@link GliaWidgets#QUEUE_ID}: ID of the queue you would like to use for your engagements.
+ * - {@link GliaWidgets#QUEUE_IDS}: IDs list of the queues you would like to use for your engagements.
  * For a full list of optional parameters, see the constants defined in {@link GliaWidgets}.
  * <p>
  * Code example:
  * <pre>
  * Intent intent = new Intent(requireContext(), ChatActivity.class);
- * intent.putExtra(GliaWidgets.QUEUE_ID, "CHAT_QUEUE_ID");
+ * intent.putExtra(GliaWidgets.QUEUE_IDS, new ArrayList<>(List.of("CHAT_QUEUE_ID")));
  * startActivity(intent);
  * <pre/>
  */
@@ -51,11 +53,14 @@ public final class ChatActivity extends FadeTransitionActivity {
 
     /**
      * Creates and fills out Intent for starting ChatActivity
-     * @param context   - Context object
-     * @param contextId - Context asset ID
+     * @deprecated use {@link #getIntent(Context, String, List)} instead.
+     *
+     * @param context   - Android Context object
+     * @param contextId - Glia visitor context asset ID
      * @param queueId   - Queue ID or `null` to use the default queues
      * @return - Intent for Starting ChatActivity
      */
+    @Deprecated
     public static Intent getIntent(
         @NonNull Context context,
         @Nullable String contextId,
@@ -68,13 +73,32 @@ public final class ChatActivity extends FadeTransitionActivity {
 
     /**
      * Creates and fills out Intent for starting ChatActivity
+     * @param context   - Android Context object
+     * @param contextId - Glia visitor context asset ID
+     * @param queueIds  - Queue IDs of the queues you would like to use for your engagements
+     * @return - Intent for Starting ChatActivity
+     */
+    public static Intent getIntent(
+        @NonNull Context context,
+        @Nullable String contextId,
+        @NonNull List<String> queueIds
+    ) {
+        return new Intent(context, ChatActivity.class)
+            .putExtra(GliaWidgets.CONTEXT_ASSET_ID, contextId)
+            .putStringArrayListExtra(GliaWidgets.QUEUE_IDS, new ArrayList<>(queueIds));
+    }
+
+    /**
+     * Creates and fills out Intent for starting ChatActivity
+     * @deprecated use {@link #getIntent(Context, String, List, ChatType)} instead.
      *
-     * @param context   - Context object
-     * @param contextId - Context asset ID
+     * @param context   - Android Context object
+     * @param contextId - Glia visitor context asset ID
      * @param queueId   - Queue ID or `null` to use the default queues
      * @param chatType  - Type of chat screen
      * @return - Intent for Starting ChatActivity
      */
+    @Deprecated
     public static Intent getIntent(
         @NonNull Context context,
         @Nullable String contextId,
@@ -84,6 +108,28 @@ public final class ChatActivity extends FadeTransitionActivity {
         return new Intent(context, ChatActivity.class)
             .putExtra(GliaWidgets.CONTEXT_ASSET_ID, contextId)
             .putExtra(GliaWidgets.QUEUE_ID, queueId)
+            .putExtra(GliaWidgets.COMPANY_NAME, "Legacy company")
+            .putExtra(GliaWidgets.CHAT_TYPE, (Parcelable) chatType);
+    }
+
+    /**
+     * Creates and fills out Intent for starting ChatActivity
+     *
+     * @param context   - Android Context object
+     * @param contextId - Glia visitor context asset ID
+     * @param queueIds  - Queue IDs of the queues you would like to use for your engagements
+     * @param chatType  - Type of chat screen
+     * @return - Intent for Starting ChatActivity
+     */
+    public static Intent getIntent(
+        @NonNull Context context,
+        @Nullable String contextId,
+        @NonNull List<String> queueIds,
+        @Nullable ChatType chatType
+    ) {
+        return new Intent(context, ChatActivity.class)
+            .putExtra(GliaWidgets.CONTEXT_ASSET_ID, contextId)
+            .putExtra(GliaWidgets.QUEUE_IDS, new ArrayList<>(queueIds))
             .putExtra(GliaWidgets.COMPANY_NAME, "Legacy company")
             .putExtra(GliaWidgets.CHAT_TYPE, (Parcelable) chatType);
     }
@@ -120,7 +166,7 @@ public final class ChatActivity extends FadeTransitionActivity {
         chatView.setOnNavigateToCallListener(this::startCallScreen);
         chatView.startChat(
             configuration.getCompanyName(),
-            configuration.getQueueId(),
+            configuration.getQueueIds(),
             configuration.getContextAssetId(),
             configuration.getUseOverlay(),
             configuration.getScreenSharingMode(),

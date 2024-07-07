@@ -22,7 +22,7 @@ internal interface CallContract {
         fun flipVideoButtonClicked()
         fun startCall(
             companyName: String,
-            queueId: String?,
+            queueIds: List<String>?,
             visitorContextAssetId: String?,
             mediaType: Engagement.MediaType?,
             useOverlays: Boolean,

@@ -169,7 +169,7 @@ internal class CallView(
 
     fun startCall(
         companyName: String,
-        queueId: String?,
+        queueIds: List<String>?,
         visitorContextAssetId: String?,
         useOverlays: Boolean,
         screenSharingMode: ScreenSharing.Mode,
@@ -178,7 +178,7 @@ internal class CallView(
     ) {
         callController?.startCall(
             companyName,
-            queueId,
+            queueIds,
             visitorContextAssetId,
             mediaType,
             useOverlays,

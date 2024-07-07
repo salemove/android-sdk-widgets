@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.glia.androidsdk.Engagement
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.core.configuration.GliaSdkConfiguration
+import java.util.ArrayList
 
 internal object CallActivityIntentHelper {
 
@@ -14,7 +15,7 @@ internal object CallActivityIntentHelper {
         val sdkConfiguration = configuration.sdkConfiguration ?: throw NullPointerException("WidgetsSdk Configuration can't be null")
 
         return Intent(context, CallActivity::class.java)
-            .putExtra(GliaWidgets.QUEUE_ID, sdkConfiguration.queueId)
+            .putExtra(GliaWidgets.QUEUE_IDS, sdkConfiguration.queueIds?.let { ArrayList(it) })
             .putExtra(GliaWidgets.CONTEXT_ASSET_ID, sdkConfiguration.contextAssetId)
             .putExtra(GliaWidgets.UI_THEME, sdkConfiguration.runTimeTheme)
             .putExtra(GliaWidgets.USE_OVERLAY, sdkConfiguration.useOverlay)

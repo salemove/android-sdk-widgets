@@ -10,6 +10,7 @@ import com.glia.androidsdk.comms.Video;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContract.FlipButtonState;
 
+import java.util.List;
 import java.util.Objects;
 
 class CallState {
@@ -30,7 +31,7 @@ class CallState {
     //    Need this to not update all views when only time is changed.
     public final boolean isOnlyTimeChanged;
     public final boolean isCallVisualizer;
-    public final String queueId;
+    public final List<String> queueIds;
     public final String visitorContextAssetId;
 
     public final boolean isSharingScreen;
@@ -50,7 +51,7 @@ class CallState {
         this.isOnHold = builder.isOnHold;
         this.isOnlyTimeChanged = builder.isOnlyTimeChanged;
         this.isCallVisualizer = builder.isCallVisualizer;
-        this.queueId = builder.queueId;
+        this.queueIds = builder.queueIds;
         this.visitorContextAssetId = builder.visitorContextAssetId;
         this.isSharingScreen = builder.isSharingScreen;
         this.flipButtonState = builder.flipButtonState;
@@ -480,14 +481,14 @@ class CallState {
             visitorMediaState.getAudio().getStatus() != Media.Status.PLAYING;
     }
 
-    public CallState initCall(String companyName, String queueId, String visitorContextAssetId, @Nullable Engagement.MediaType requestedMediaType) {
+    public CallState initCall(String companyName, List<String> queueIds, String visitorContextAssetId, @Nullable Engagement.MediaType requestedMediaType) {
         return new Builder()
             .copyFrom(this)
             .setIntegratorCallStarted(true)
             .setVisible(true)
             .setIsOnHold(false)
             .setCompanyName(companyName)
-            .setQueueId(queueId)
+            .setQueueIds(queueIds)
             .setVisitorContextAssetId(visitorContextAssetId)
             .setRequestedMediaType(requestedMediaType)
             .createCallState();
@@ -512,7 +513,7 @@ class CallState {
         //Maybe helpful when converting to Kotlin, as an android studio makes fields nullable.
         private boolean isOnlyTimeChanged = false;
         private boolean isCallVisualizer;
-        private String queueId;
+        private List<String> queueIds;
         private String visitorContextAssetId;
         private boolean isSharingScreen;
         private FlipButtonState flipButtonState = FlipButtonState.HIDE;
@@ -582,8 +583,8 @@ class CallState {
             return this;
         }
 
-        public Builder setQueueId(String queueId) {
-            this.queueId = queueId;
+        public Builder setQueueIds(List<String> queueIds) {
+            this.queueIds = queueIds;
             return this;
         }
 
@@ -617,7 +618,7 @@ class CallState {
             //as we are updating this field only when only time is changed, so needs to make it false every time.
             isOnlyTimeChanged = false;
             isCallVisualizer = callState.isCallVisualizer;
-            queueId = callState.queueId;
+            queueIds = callState.queueIds;
             visitorContextAssetId = callState.visitorContextAssetId;
             isSharingScreen = callState.isSharingScreen;
             flipButtonState = callState.flipButtonState;

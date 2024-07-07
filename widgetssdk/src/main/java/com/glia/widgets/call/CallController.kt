@@ -182,7 +182,7 @@ internal class CallController(
 
     override fun startCall(
         companyName: String,
-        queueId: String?,
+        queueIds: List<String>?,
         visitorContextAssetId: String?,
         mediaType: Engagement.MediaType?,
         useOverlays: Boolean,
@@ -190,12 +190,12 @@ internal class CallController(
         upgradeToCall: Boolean
     ) {
         if (upgradeToCall || mediaType == null) {
-            initCall(companyName, queueId, visitorContextAssetId, mediaType, useOverlays, screenSharingMode)
+            initCall(companyName, queueIds, visitorContextAssetId, mediaType, useOverlays, screenSharingMode)
             return
         }
         handleCallPermissionsUseCase.invoke(mediaType) { isPermissionsGranted: Boolean ->
             if (isPermissionsGranted) {
-                initCall(companyName, queueId, visitorContextAssetId, mediaType, useOverlays, screenSharingMode)
+                initCall(companyName, queueIds, visitorContextAssetId, mediaType, useOverlays, screenSharingMode)
             } else {
                 view?.showMissingPermissionsDialog()
             }
@@ -204,7 +204,7 @@ internal class CallController(
 
     private fun initCall(
         companyName: String,
-        queueId: String?,
+        queueIds: List<String>?,
         visitorContextAssetId: String?,
         mediaType: Engagement.MediaType?,
         useOverlays: Boolean,
@@ -221,7 +221,7 @@ internal class CallController(
         if (callState.integratorCallStarted || dialogController.isShowingUnexpectedErrorDialog) {
             return
         }
-        emitViewState(callState.initCall(companyName, queueId, visitorContextAssetId, mediaType))
+        emitViewState(callState.initCall(companyName, queueIds, visitorContextAssetId, mediaType))
         createNewTimerStatusCallback()
         initMessagesNotSeenCallback()
         tryToQueueForEngagement()
@@ -273,7 +273,7 @@ internal class CallController(
     }
 
     private fun enqueueForEngagement() {
-        enqueueForEngagementUseCase(callState.queueId, callState.requestedMediaType, callState.visitorContextAssetId)
+        enqueueForEngagementUseCase(callState.queueIds, callState.requestedMediaType, callState.visitorContextAssetId)
     }
 
     override fun onDestroy(retained: Boolean) {

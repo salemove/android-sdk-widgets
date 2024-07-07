@@ -57,10 +57,21 @@ public class GliaWidgets {
     public static final String COMPANY_NAME = "company_name";
 
     /**
-     * Use with {@link android.os.Bundle} to pass in the id of the queue you wish to enroll in
+     * Use with {@link android.os.Bundle} to pass in the ID of the queue you wish to enroll in
      * as a navigation argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
+     * or {@link com.glia.widgets.call.CallActivity}
+     *
+     * @deprecated Use {QUEUE_IDS} instead.
      */
+    @Deprecated
     public static final String QUEUE_ID = "queue_id";
+
+    /**
+     * Use with {@link android.os.Bundle} to pass in an {@link java.util.ArrayList} of {@link String} of the queues IDs
+     * you wish to enroll in as a navigation argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
+     * or {@link com.glia.widgets.call.CallActivity}
+     */
+    public static final String QUEUE_IDS = "queue_ids";
     /**
      * Use with {@link android.os.Bundle} to pass in a context url as a navigation
      * argument when navigating to {@link com.glia.widgets.chat.ChatActivity}

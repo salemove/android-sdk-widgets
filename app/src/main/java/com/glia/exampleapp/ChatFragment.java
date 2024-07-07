@@ -1,5 +1,7 @@
 package com.glia.exampleapp;
 
+import static java.util.Collections.singletonList;
+
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,6 +17,8 @@ import androidx.preference.PreferenceManager;
 
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.ChatView;
+
+import java.util.Collections;
 
 public class ChatFragment extends Fragment {
 
@@ -42,7 +46,7 @@ public class ChatFragment extends Fragment {
         chatView.setOnEndListener(onEndListener);
         chatView.startChat(
                 Utils.getStringFromPrefs(R.string.pref_company_name, getString(R.string.settings_value_default_company_name), sharedPreferences, getResources()),
-                Utils.getStringFromPrefs(R.string.pref_queue_id, getString(R.string.glia_queue_id), sharedPreferences, getResources()),
+                singletonList(Utils.getStringFromPrefs(R.string.pref_queue_id, getString(R.string.glia_queue_id), sharedPreferences, getResources())),
                 Utils.getStringFromPrefs(R.string.pref_context_asset_id, null, sharedPreferences, getResources()));
     }
 

@@ -47,7 +47,7 @@ internal interface ChatContract {
         fun onLinkClicked(link: Link)
         fun getConfirmationDialogLinks(): ConfirmationDialogLinks
         fun onEngagementConfirmationDialogRequested()
-        fun initChat(companyName: String?, queueId: String?, visitorContextAssetId: String?, chatType: ChatType)
+        fun initChat(companyName: String?, queueIds: List<String>?, visitorContextAssetId: String?, chatType: ChatType)
         fun show()
         fun onPause()
         fun onResume()

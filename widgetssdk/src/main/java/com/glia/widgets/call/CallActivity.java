@@ -16,6 +16,7 @@ import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.webbrowser.WebBrowserActivity;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 /**
@@ -30,13 +31,13 @@ import java.util.Objects;
  * Before this activity is launched, make sure that Glia Widgets SDK is set up correctly.
  * <p>
  * Data that can be passed together with the Activity intent:
- * - {@link GliaWidgets#QUEUE_ID}: ID of the queue you would like to use for your engagements.
+ * - {@link GliaWidgets#QUEUE_IDS}: IDs list of the queues you would like to use for your engagements.
  * For a full list of optional parameters, see the constants defined in {@link GliaWidgets}.
  * <p>
  * Code example:
  * <pre>
  * Intent intent = new Intent(requireContext(), CallActivity.class);
- * intent.putExtra(GliaWidgets.QUEUE_ID, "AUDIO_QUEUE_ID");
+ * intent.putExtra(GliaWidgets.QUEUE_IDS, new ArrayList<>(List.of("AUDIO_QUEUE_ID")));
  * intent.putExtra(GliaWidgets.MEDIA_TYPE, Engagement.MediaType.VIDEO);
  * startActivity(intent);
  * </pre>
@@ -121,7 +122,7 @@ public final class CallActivity extends FadeTransitionActivity {
         GliaSdkConfiguration sdkConfiguration = Objects.requireNonNull(configuration.sdkConfiguration);
         callView.startCall(
             Objects.requireNonNull(sdkConfiguration.getCompanyName()),
-            sdkConfiguration.getQueueId(),
+            sdkConfiguration.getQueueIds(),
             sdkConfiguration.getContextAssetId(),
             sdkConfiguration.getUseOverlay(),
             Objects.requireNonNull(sdkConfiguration.getScreenSharingMode()),
@@ -133,8 +134,14 @@ public final class CallActivity extends FadeTransitionActivity {
     private void navigateToChat() {
         Logger.d(TAG, "navigateToChat");
         GliaSdkConfiguration sdkConfiguration = Objects.requireNonNull(configuration.sdkConfiguration);
+        ArrayList<String> queueIds;
+        if (sdkConfiguration.getQueueIds() != null) {
+            queueIds = new ArrayList<>(sdkConfiguration.getQueueIds());
+        } else {
+            queueIds = null;
+        }
         Intent newIntent = new Intent(getApplicationContext(), ChatActivity.class)
-            .putExtra(GliaWidgets.QUEUE_ID, sdkConfiguration.getQueueId())
+            .putExtra(GliaWidgets.QUEUE_IDS, queueIds)
             .putExtra(GliaWidgets.CONTEXT_ASSET_ID, sdkConfiguration.getContextAssetId())
             .putExtra(GliaWidgets.UI_THEME, sdkConfiguration.getRunTimeTheme())
             .putExtra(GliaWidgets.USE_OVERLAY, sdkConfiguration.getUseOverlay())

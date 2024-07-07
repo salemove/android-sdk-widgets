@@ -11,7 +11,7 @@ import com.glia.widgets.helper.TAG
 
 internal class GliaSdkConfiguration private constructor(builder: Builder) {
     val companyName: String?
-    val queueId: String?
+    val queueIds: List<String>?
     val contextAssetId: String?
     private val contextUrl: String?
     val runTimeTheme: UiTheme?
@@ -24,7 +24,7 @@ internal class GliaSdkConfiguration private constructor(builder: Builder) {
 
     init {
         companyName = builder.companyName
-        queueId = builder.queueId
+        queueIds = builder.queueIds
         contextAssetId = builder.contextAssetId
         contextUrl = builder.contextUrl
         runTimeTheme = builder.runTimeTheme
@@ -42,7 +42,7 @@ internal class GliaSdkConfiguration private constructor(builder: Builder) {
 
     class Builder {
         var companyName: String? = null
-        var queueId: String? = null
+        var queueIds: List<String>? = null
         var contextAssetId: String? = null
         var contextUrl: String? = null
         var runTimeTheme: UiTheme? = null
@@ -55,8 +55,14 @@ internal class GliaSdkConfiguration private constructor(builder: Builder) {
             return this
         }
 
+        @Deprecated("")
         fun queueId(queueId: String?): Builder {
-            this.queueId = queueId
+            this.queueIds = queueId?.let { listOf(queueId) }
+            return this
+        }
+
+        fun queueIds(queueIds: List<String>?): Builder {
+            this.queueIds = queueIds
             return this
         }
 
@@ -98,7 +104,11 @@ internal class GliaSdkConfiguration private constructor(builder: Builder) {
 
         fun intent(intent: Intent): Builder {
             companyName = Dependencies.getSdkConfigurationManager().companyName
-            queueId = intent.getStringExtra(GliaWidgets.QUEUE_ID)
+            val queueId = intent.getStringExtra(GliaWidgets.QUEUE_ID)
+            queueIds = intent.getStringArrayListExtra(GliaWidgets.QUEUE_IDS)
+            if (queueIds == null && queueId != null) {
+                queueIds = listOf(queueId)
+            }
             val tempTheme = intent.getParcelableExtra<UiTheme>(GliaWidgets.UI_THEME)
             runTimeTheme = tempTheme ?: Dependencies.getSdkConfigurationManager().uiTheme
             contextAssetId = intent.getStringExtra(GliaWidgets.CONTEXT_ASSET_ID)

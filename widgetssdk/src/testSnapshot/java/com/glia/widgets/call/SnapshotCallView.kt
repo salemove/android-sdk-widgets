@@ -203,14 +203,14 @@ internal interface SnapshotCallView : SnapshotContent, SnapshotTheme, SnapshotAc
 
     fun CallState.initCall(
         companyName: String = "Snapshot tests",
-        queueId: String = "queueId",
+        queueIds: List<String> = listOf("queueId"),
         visitorContextAssetId: String = "visitorContextAssetId",
         requestedMediaType: Engagement.MediaType = Engagement.MediaType.AUDIO,
         visitorMediaState: VisitorMediaState? = null,
         showFlipVisitorCameraButton: Boolean = false,
         isOnHold: Boolean = false
     ): CallState = this
-        .initCall(companyName, queueId, visitorContextAssetId, requestedMediaType)
+        .initCall(companyName, queueIds, visitorContextAssetId, requestedMediaType)
         .visitorMediaStateChanged(visitorMediaState)
         .setOnHold(isOnHold)
         .landscapeControlsVisibleChanged(false)

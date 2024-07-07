@@ -209,9 +209,8 @@ internal class ChatController(
         screenSharingUseCase.end()
     }
 
-    override fun initChat(companyName: String?, queueId: String?, visitorContextAssetId: String?, chatType: ChatType) {
-        val queueIds = if (queueId != null) arrayOf(queueId) else emptyArray()
-        engagementConfigUseCase(chatType, queueIds)
+    override fun initChat(companyName: String?, queueIds: List<String>?, visitorContextAssetId: String?, chatType: ChatType) {
+        engagementConfigUseCase(chatType, queueIds ?: emptyList())
         updateOperatorDefaultImageUrlUseCase()
 
         ensureSecureMessagingAvailable()
@@ -224,7 +223,7 @@ internal class ChatController(
             return
         }
 
-        emitViewState { chatState.initChat(companyName, queueId, visitorContextAssetId) }
+        emitViewState { chatState.initChat(companyName, queueIds, visitorContextAssetId) }
         initChatManager()
     }
 
@@ -288,7 +287,7 @@ internal class ChatController(
 
     private fun enqueueForEngagement() {
         requestNotificationPermissionIfPushNotificationsSetUpUseCase {
-            enqueueForEngagementUseCase(queueId = chatState.queueId, visitorContextAssetId = chatState.visitorContextAssetId)
+            enqueueForEngagementUseCase(queueIds = chatState.queueIds, visitorContextAssetId = chatState.visitorContextAssetId)
         }
     }
 

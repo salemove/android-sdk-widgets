@@ -64,7 +64,7 @@ class SystemMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen, 
         unifiedTheme: UnifiedTheme? = null,
         uiTheme: UiTheme = UiTheme()
     ): SystemMessageViewHolder {
-        stringProviderMock()
+        localeProviderMock()
         unifiedTheme?.let { Dependencies.getGliaThemeManager().theme = it }
 
         setOnEndListener {

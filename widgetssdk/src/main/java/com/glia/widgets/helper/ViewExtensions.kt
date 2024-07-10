@@ -20,7 +20,9 @@ import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.FontRes
+import androidx.annotation.StringRes
 import androidx.annotation.StyleableRes
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.children
@@ -28,10 +30,15 @@ import androidx.core.widget.TextViewCompat
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.model.KeyPath
+import com.glia.widgets.locale.LocaleString
+import com.glia.widgets.di.Dependencies
+import com.glia.widgets.locale.StringKeyPair
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Observable
 
 internal fun View.getColorCompat(@ColorRes resId: Int) = ContextCompat.getColor(context, resId)
 internal fun View.getColorStateListCompat(@ColorRes resId: Int) =
@@ -144,4 +151,81 @@ internal fun ImageView.load(
 internal val View.layoutInflater: LayoutInflater get() = LayoutInflater.from(this.context)
 internal fun TextView.setCompoundDrawableTintListCompat(tint: ColorStateList?) {
     TextViewCompat.setCompoundDrawableTintList(this, tint)
+}
+
+internal fun TextView.setLocaleText(@StringRes stringKey: Int, vararg values: StringKeyPair) {
+    registerLocaleListener(stringKey, *values) { upToDateTranslation ->
+        text = upToDateTranslation
+    }
+}
+
+internal fun TextView.setText(locale: LocaleString?) {
+    if (locale == null) {
+        text = ""
+        return
+    }
+    registerLocaleListener(locale.stringKey, *locale.values.toTypedArray()) { upToDateTranslation ->
+        text = upToDateTranslation
+    }
+}
+
+internal fun TextView.setLocaleHint(@StringRes stringKey: Int, vararg values: StringKeyPair) {
+    registerLocaleListener(stringKey, *values) { upToDateTranslation ->
+        hint = upToDateTranslation
+    }
+}
+
+internal fun TextView.setHint(locale: LocaleString?) {
+    if (locale == null) {
+        hint = ""
+        return
+    }
+    registerLocaleListener(locale.stringKey, *locale.values.toTypedArray()) { upToDateTranslation ->
+        hint = upToDateTranslation
+    }
+}
+
+internal fun View.setLocaleContentDescription(@StringRes stringKey: Int, vararg values: StringKeyPair) {
+    registerLocaleListener(stringKey, *values) { upToDateTranslation ->
+        contentDescription = upToDateTranslation
+    }
+}
+
+internal fun View.setContentDescription(locale: LocaleString?) {
+    if (locale == null) {
+        contentDescription = ""
+        return
+    }
+    registerLocaleListener(locale.stringKey, *locale.values.toTypedArray()) { upToDateTranslation ->
+        contentDescription = upToDateTranslation
+    }
+}
+
+internal fun Toolbar.setLocaleNavigationContentDescription(@StringRes stringKey: Int, vararg values: StringKeyPair) {
+    registerLocaleListener(stringKey, *values) { upToDateTranslation ->
+        navigationContentDescription = upToDateTranslation
+    }
+}
+
+private fun View.registerLocaleListener(@StringRes stringKey: Int, vararg values: StringKeyPair, listener: (String) -> Unit) {
+    val localeManager = Dependencies.getLocaleProvider()
+    val disposable = localeManager.getLocaleObservable()
+        .startWithItem("stub")
+        .map { localeManager.getString(stringKey, values.toList()) }
+        .distinctUntilChanged()
+        .subscribe(
+            { listener(it) },
+            { /* no-op */ }
+        )
+
+    addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+        override fun onViewAttachedToWindow(v: View) {
+            /* no-op */
+        }
+
+        override fun onViewDetachedFromWindow(v: View) {
+            disposable.dispose()
+            removeOnAttachStateChangeListener(this)
+        }
+    })
 }

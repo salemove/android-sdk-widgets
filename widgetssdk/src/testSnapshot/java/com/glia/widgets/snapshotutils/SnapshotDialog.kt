@@ -5,42 +5,45 @@ import android.view.View
 import androidx.annotation.DrawableRes
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
+import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.view.dialog.base.DialogType
 import com.glia.widgets.view.dialog.base.DialogViewFactory
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.google.gson.JsonObject
 
-internal interface SnapshotDialog: SnapshotTheme {
-    val title: String
-        get() = "This is a title"
+internal interface SnapshotDialog: SnapshotTheme, SnapshotProviders {
+    val title: LocaleString
+        get() = LocaleString(R.string.dialog_title)
 
-    val message: String
-        get() = "This is a much longer message that will provide more detailed information."
+    val message: LocaleString
+        get() = LocaleString(R.string.dialog_message)
 
-    val positiveButtonText: String
-        get() = "Confirm"
+    val positiveButtonText: LocaleString
+        get() = LocaleString(R.string.dialog_positive_button)
 
-    val negativeButtonText: String
-        get() = "Cancel"
+    val negativeButtonText: LocaleString
+        get() = LocaleString(R.string.dialog_negative_button)
 
-    val poweredByText: String
-        get() = "Powered by Glia"
+    val poweredByText: LocaleString
+        get() = LocaleString(R.string.general_powered_by_glia)
 
-    val link1Text: String
-        get() = "Terms and Conditions"
+    val link1Text: LocaleString
+        get() = LocaleString(R.string.dialog_link1_text)
 
-    val link2Text: String
-        get() = "Privacy Policies"
+    val link2Text: LocaleString
+        get() = LocaleString(R.string.dialog_link2_text)
 
     @get:DrawableRes
     val icon: Int
         get() = R.drawable.test_ic_placeholder
 
-    val buttonDescription: String
-        get() = "button description"
+    val buttonDescription: LocaleString
+        get() = LocaleString(R.string.dialog_button_description)
 
-    fun inflateView(context: Context, uiTheme: UiTheme = UiTheme(), unifiedTheme: UnifiedTheme? = null, dialogType: DialogType): View =
-        DialogViewFactory(context, uiTheme, unifiedTheme).createView(dialogType)
+    fun inflateView(context: Context, uiTheme: UiTheme = UiTheme(), unifiedTheme: UnifiedTheme? = null, dialogType: DialogType): View {
+        localeProviderMock()
+        return DialogViewFactory(context, uiTheme, unifiedTheme).createView(dialogType)
+    }
 
     fun unifiedThemeWithoutDialog(): UnifiedTheme = unifiedTheme(R.raw.test_unified_config) { unifiedTheme ->
         unifiedTheme.remove("alert")

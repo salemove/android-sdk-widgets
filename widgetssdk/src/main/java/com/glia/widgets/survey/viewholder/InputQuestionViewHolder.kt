@@ -10,6 +10,7 @@ import com.glia.widgets.R
 import com.glia.widgets.databinding.SurveyInputQuestionItemBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.getColorCompat
+import com.glia.widgets.helper.setLocaleHint
 import com.glia.widgets.survey.QuestionItem
 import com.glia.widgets.survey.SurveyAdapter
 import com.glia.widgets.view.configuration.OptionButtonConfiguration
@@ -31,7 +32,7 @@ internal class InputQuestionViewHolder(
     private val inputTheme: SurveyInputQuestionTheme? by lazy {
         Dependencies.getGliaThemeManager().theme?.surveyTheme?.inputQuestion
     }
-    private val stringProvider = Dependencies.getStringProvider()
+    private val localeProvider = Dependencies.getLocaleProvider()
     private val comment: EditText get() = binding.etComment
 
     private val optionButtonTheme: OptionButtonTheme by lazy {
@@ -106,7 +107,7 @@ internal class InputQuestionViewHolder(
     }
 
     private fun setupInputBoxText(optionButtonStyle: OptionButtonConfiguration) {
-        comment.hint = stringProvider.getRemoteString(R.string.general_comment)
+        comment.setLocaleHint(R.string.general_comment)
         comment.setTextColor(optionButtonStyle.normalText.textColor)
         if (optionButtonStyle.normalText.isBold) comment.typeface = Typeface.DEFAULT_BOLD
         comment.setHintTextColor(itemView.getColorCompat(R.color.glia_base_shade_color))

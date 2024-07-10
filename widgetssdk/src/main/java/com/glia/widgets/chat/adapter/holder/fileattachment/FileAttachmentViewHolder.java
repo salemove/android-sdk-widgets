@@ -11,11 +11,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.widgets.R;
-import com.glia.widgets.StringProvider;
 import com.glia.widgets.chat.adapter.ChatAdapter;
 import com.glia.widgets.chat.model.Attachment;
 import com.glia.widgets.core.fileupload.model.FileAttachment;
 import com.glia.widgets.helper.FileHelper;
+import com.glia.widgets.locale.LocaleProvider;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 
 /**
@@ -27,17 +27,17 @@ public class FileAttachmentViewHolder extends RecyclerView.ViewHolder {
     private final LinearProgressIndicator progressIndicator;
     private final TextView titleText;
     private final TextView statusIndicator;
-    private final StringProvider stringProvider;
+    private final LocaleProvider localeProvider;
 
-    public FileAttachmentViewHolder(@NonNull View itemView, @NonNull StringProvider stringProvider) {
+    public FileAttachmentViewHolder(@NonNull View itemView, @NonNull LocaleProvider localeProvider) {
         super(itemView);
-        this.stringProvider = stringProvider;
+        this.localeProvider = localeProvider;
         extensionContainerView = itemView.findViewById(R.id.type_indicator_view);
         extensionTypeText = itemView.findViewById(R.id.type_indicator_text);
         progressIndicator = itemView.findViewById(R.id.progress_indicator);
         titleText = itemView.findViewById(R.id.item_title);
         statusIndicator = itemView.findViewById(R.id.status_indicator);
-        statusIndicator.setContentDescription(stringProvider.getRemoteString(R.string.general_download));
+        statusIndicator.setContentDescription(localeProvider.getRemoteString(R.string.general_download));
 
         setupExtensionContainer(itemView);
     }
@@ -128,11 +128,11 @@ public class FileAttachmentViewHolder extends RecyclerView.ViewHolder {
         statusIndicator.setVisibility(isLocalFile ? View.GONE : View.VISIBLE);
 
         if (isDownloading) {
-            statusIndicator.setText(stringProvider.getRemoteString(R.string.chat_download_downloading));
+            statusIndicator.setText(localeProvider.getRemoteString(R.string.chat_download_downloading));
         } else if (isFileExists) {
-            statusIndicator.setText(stringProvider.getRemoteString(R.string.general_open));
+            statusIndicator.setText(localeProvider.getRemoteString(R.string.general_open));
         } else {
-            statusIndicator.setText(stringProvider.getRemoteString(R.string.general_download));
+            statusIndicator.setText(localeProvider.getRemoteString(R.string.general_download));
         }
     }
 

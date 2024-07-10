@@ -165,7 +165,7 @@ class GvaGalleryViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, SnapshotPr
         unifiedTheme: UnifiedTheme? = null,
         uiTheme: UiTheme = UiTheme()
     ): ViewData {
-        stringProviderMock()
+        localeProviderMock()
 
         val heightManager = ChatItemHeightManager(uiTheme, layoutInflater, resources, unifiedTheme)
         heightManager.measureHeight(listOf(galleryCards))

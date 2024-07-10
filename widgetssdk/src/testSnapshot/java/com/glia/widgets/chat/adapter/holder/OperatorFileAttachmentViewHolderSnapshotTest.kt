@@ -185,7 +185,7 @@ class OperatorFileAttachmentViewHolderSnapshotTest : SnapshotTest(
         unifiedTheme: UnifiedTheme? = null,
         uiTheme: UiTheme = UiTheme()
     ): OperatorFileAttachmentViewHolder {
-        stringProviderMock()
+        localeProviderMock()
         picassoMock(listOf(R.drawable.test_launcher2))
         unifiedTheme?.let { Dependencies.getGliaThemeManager().theme = it }
 

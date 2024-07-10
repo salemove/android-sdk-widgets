@@ -7,21 +7,22 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat
 import com.glia.widgets.R
-import com.glia.widgets.StringKey
-import com.glia.widgets.StringKeyPair
-import com.glia.widgets.StringProvider
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.adapter.ChatAdapter.OnFileItemClickListener
 import com.glia.widgets.chat.model.OperatorAttachmentItem
 import com.glia.widgets.databinding.ChatAttachmentOperatorFileLayoutBinding
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.helper.setLocaleContentDescription
+import com.glia.widgets.locale.LocaleProvider
+import com.glia.widgets.locale.StringKey
+import com.glia.widgets.locale.StringKeyPair
 import com.glia.widgets.view.unifiedui.theme.chat.MessageBalloonTheme
 
 internal class OperatorFileAttachmentViewHolder @JvmOverloads constructor(
     private val binding: ChatAttachmentOperatorFileLayoutBinding,
     uiTheme: UiTheme,
-    private val stringProvider: StringProvider = Dependencies.getStringProvider()
-) : FileAttachmentViewHolder(binding.root, stringProvider) {
+    private val localeProvider: LocaleProvider = Dependencies.getLocaleProvider()
+) : FileAttachmentViewHolder(binding.root, localeProvider) {
     private val operatorTheme: MessageBalloonTheme? by lazy {
         Dependencies.getGliaThemeManager().theme?.chatTheme?.operatorMessage
     }
@@ -51,7 +52,7 @@ internal class OperatorFileAttachmentViewHolder @JvmOverloads constructor(
         val name = getAttachmentName(item.attachment)
         val size = getAttachmentSize(item.attachment)
         val byteSize = Formatter.formatFileSize(itemView.context, size)
-        itemView.contentDescription = stringProvider.getRemoteString(
+        itemView.setLocaleContentDescription(
             R.string.android_chat_operator_file_accessibility,
             StringKeyPair(StringKey.NAME, name),
             StringKeyPair(StringKey.SIZE, byteSize)
@@ -63,7 +64,7 @@ internal class OperatorFileAttachmentViewHolder @JvmOverloads constructor(
             ) {
                 super.onInitializeAccessibilityNodeInfo(host, info)
                 val actionLabel =
-                    stringProvider.getRemoteString(if (item.isFileExists) R.string.general_open else R.string.general_download)
+                    localeProvider.getString(if (item.isFileExists) R.string.general_open else R.string.general_download)
                 val actionClick = AccessibilityActionCompat(
                     AccessibilityNodeInfoCompat.ACTION_CLICK, actionLabel
                 )

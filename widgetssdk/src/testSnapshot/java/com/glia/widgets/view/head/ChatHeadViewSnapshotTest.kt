@@ -309,7 +309,7 @@ class ChatHeadViewSnapshotTest : SnapshotTest(
         isCallVisualizerScreenSharingUseCase: Boolean = false
     ): ChatHeadView {
         lottieMock()
-        stringProviderMock()
+        localeProviderMock()
         resourceProviderMock()
         picassoMock(listOf(R.drawable.test_launcher2))
 

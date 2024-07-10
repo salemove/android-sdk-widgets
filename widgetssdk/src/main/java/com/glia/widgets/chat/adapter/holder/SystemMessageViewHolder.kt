@@ -5,14 +5,14 @@ import android.widget.TextView
 import androidx.core.view.MarginLayoutParamsCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
-import com.glia.widgets.StringKey
-import com.glia.widgets.StringKeyPair
 import com.glia.widgets.UiTheme
 import com.glia.widgets.databinding.ChatReceiveMessageContentBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getColorStateListCompat
 import com.glia.widgets.helper.getFontCompat
+import com.glia.widgets.locale.StringKey
+import com.glia.widgets.locale.StringKeyPair
 import com.glia.widgets.view.unifiedui.applyLayerTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.chat.MessageBalloonTheme
@@ -23,7 +23,7 @@ internal class SystemMessageViewHolder(
     uiTheme: UiTheme
 ) : RecyclerView.ViewHolder(binding.root) {
     private val content: TextView by lazy { binding.root }
-    private val stringProvider = Dependencies.getStringProvider()
+    private val localeProvider = Dependencies.getLocaleProvider()
     private val operatorTheme: MessageBalloonTheme? by lazy {
         Dependencies.getGliaThemeManager().theme?.chatTheme?.operatorMessage
     }
@@ -64,7 +64,7 @@ internal class SystemMessageViewHolder(
     fun bind(message: String) {
         content.apply {
             text = message
-            stringProvider.getRemoteString(
+            localeProvider.getString(
                 R.string.android_chat_operator_message_accessibility,
                 StringKeyPair(StringKey.MESSAGE, message)
             )

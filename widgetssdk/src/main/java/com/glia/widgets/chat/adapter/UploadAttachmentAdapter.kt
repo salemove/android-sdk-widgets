@@ -13,8 +13,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
-import com.glia.widgets.StringKey
-import com.glia.widgets.StringKeyPair
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.fileupload.model.FileAttachment.Status
 import com.glia.widgets.databinding.ChatAttachmentUploadedItemBinding
@@ -22,7 +20,11 @@ import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getColorStateListCompat
 import com.glia.widgets.helper.layoutInflater
+import com.glia.widgets.helper.setLocaleContentDescription
+import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.helper.toFileExtensionOrEmpty
+import com.glia.widgets.locale.StringKey
+import com.glia.widgets.locale.StringKeyPair
 import com.glia.widgets.view.unifiedui.applyCardLayerTheme
 import com.glia.widgets.view.unifiedui.applyColorTheme
 import com.glia.widgets.view.unifiedui.applyImageColorTheme
@@ -52,7 +54,6 @@ internal class UploadAttachmentItemCallback : DiffUtil.ItemCallback<FileAttachme
 internal class UploadAttachmentAdapter(private val isMessageCenter: Boolean = false) :
     ListAdapter<FileAttachment, ViewHolder>(UploadAttachmentItemCallback()) {
     private var callback: ItemCallback? = null
-    private val stringProvider = Dependencies.getStringProvider()
     fun setItemCallback(callback: ItemCallback?) {
         this.callback = callback
     }
@@ -88,7 +89,7 @@ internal class ViewHolder(
     private val removeItemButton: ImageButton get() = binding.removeItemButton
 
     private val context: Context get() = itemView.context
-    private val stringProvider = Dependencies.getStringProvider()
+    private val localeProvider = Dependencies.getLocaleProvider()
 
     private val theme: FileUploadBarTheme? by lazy {
         Dependencies.getGliaThemeManager().theme?.run {
@@ -179,14 +180,14 @@ internal class ViewHolder(
         size: String?,
         attachment: FileAttachment
     ) {
-        removeItemButton.contentDescription = stringProvider.getRemoteString(
+        removeItemButton.setLocaleContentDescription(
             R.string.chat_file_remove_upload_accessibility_label,
             StringKeyPair(StringKey.NAME, displayName)
         )
-        itemView.contentDescription = stringProvider.getRemoteString(
+        itemView.setLocaleContentDescription(
             R.string.android_chat_file_accessibility,
             StringKeyPair(StringKey.NAME, displayName),
-            StringKeyPair(StringKey.SIZE, size ?: stringProvider.getRemoteString(R.string.general_unknown)),
+            StringKeyPair(StringKey.SIZE, size ?: localeProvider.getRemoteString(R.string.general_unknown)),
             StringKeyPair(StringKey.STATUS, getStatusIndicatorText(attachment.attachmentStatus))
         )
     }
@@ -197,7 +198,7 @@ internal class ViewHolder(
         titleText.setTextColor(itemView.getColorCompat(textColorRes))
 
         titleText.text =
-            if (status.isError) stringProvider.getRemoteString(getTitleErrorStringRes(status)) else "$fileName • $byteSize"
+            if (status.isError) localeProvider.getString(getTitleErrorStringRes(status)) else "$fileName • $byteSize"
 
         statusText.text = getStatusIndicatorText(status)
 
@@ -286,7 +287,7 @@ internal class ViewHolder(
     }
 
     private fun getStatusIndicatorText(status: Status): String =
-        stringProvider.getRemoteString(
+        localeProvider.getString(
             when {
                 status == Status.SECURITY_SCAN -> R.string.chat_file_upload_scanning
                 status == Status.READY_TO_SEND -> R.string.chat_file_upload_success

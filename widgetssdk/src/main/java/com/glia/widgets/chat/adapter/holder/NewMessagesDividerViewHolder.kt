@@ -7,6 +7,7 @@ import com.glia.widgets.databinding.ChatNewMessagesDividerLayoutBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getFontCompat
+import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.view.unifiedui.applyColorTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.chat.ChatTheme
@@ -20,7 +21,6 @@ internal class NewMessagesDividerViewHolder(
     private val theme: ChatTheme? by lazy {
         Dependencies.getGliaThemeManager().theme?.chatTheme
     }
-    private val stringProvider = Dependencies.getStringProvider()
 
     init {
         setupUiTheme(uiTheme, binding)
@@ -52,7 +52,7 @@ internal class NewMessagesDividerViewHolder(
     }
 
     private fun setupUnifiedUiTheme(binding: ChatNewMessagesDividerLayoutBinding) {
-        binding.newMessagesTv.text = stringProvider.getRemoteString(R.string.chat_unread_message_divider)
+        binding.newMessagesTv.setLocaleText(R.string.chat_unread_message_divider)
         theme?.apply {
             newMessagesDividerColorTheme.also {
                 binding.newMessagesDividerLeft.applyColorTheme(it)

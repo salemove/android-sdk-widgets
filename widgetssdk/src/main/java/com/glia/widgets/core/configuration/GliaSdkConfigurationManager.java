@@ -48,42 +48,12 @@ public class GliaSdkConfigurationManager {
         this.legacyCompanyName = companyName;
     }
 
-    /** @noinspection StatementWithEmptyBody*/
     public String getCompanyName() {
-        String remoteCompanyName = fetchRemoteCompanyName();
-        boolean isCompanyNameSetFromGliaHub = remoteCompanyName != null && !remoteCompanyName.trim().isEmpty();
-
-        if (isCompanyNameSetFromGliaHub) {
-            // Apply company name from Glia Hub
-            companyName = remoteCompanyName;
-        } else if (isCompanyNameSetFromWidgetsConfig()){
-            // No need to replace company name. Continue using it.
-        } else if (legacyCompanyName != null) {
-            // Legacy company name configuration method used before local default
-            companyName = legacyCompanyName;
-        } else {
-            // Company name was not set neither from Glia Hub nor from GliaWidgetsConfig.
-            // Apply local default company name.
-            companyName = getResourceProvider().getString(R.string.general_company_name);
+        if (companyName == null && legacyCompanyName != null) {
+                // Legacy company name configuration method used before local default
+                companyName = legacyCompanyName;
         }
         return companyName;
-    }
-
-    @VisibleForTesting
-    public boolean isCompanyNameSetFromWidgetsConfig() {
-        return companyName != null;
-    }
-
-    @VisibleForTesting
-    public @Nullable String fetchRemoteCompanyName() {
-        String remoteCompanyName = null;
-        try {
-            remoteCompanyName = Glia.getRemoteString(getResourceProvider().getResourceKey(R.string.general_company_name));
-        } catch (Exception e) {
-            // Falling back on SDK configuration
-            Dependencies.getStringProvider().reportImproperInitialisation(e);
-        }
-        return remoteCompanyName;
     }
 
     @VisibleForTesting

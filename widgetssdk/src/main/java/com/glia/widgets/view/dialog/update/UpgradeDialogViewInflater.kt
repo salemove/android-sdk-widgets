@@ -2,6 +2,7 @@ package com.glia.widgets.view.dialog.update
 
 import android.view.LayoutInflater
 import androidx.core.view.isGone
+import com.glia.widgets.helper.setText
 import com.glia.widgets.view.dialog.base.DialogPayload
 import com.glia.widgets.view.dialog.base.DialogViewInflater
 import com.glia.widgets.view.unifiedui.applyImageColorTheme
@@ -16,7 +17,7 @@ internal open class BaseUpgradeDialogViewInflater<T : BaseUpgradeDialogViewBindi
         val theme = configuration.theme
 
         binding.logoContainer.isGone = configuration.properties.whiteLabel ?: false
-        binding.poweredByTv.text = payload.poweredByText
+        binding.poweredByTv.setText(payload.poweredByText)
 
         setupButton(
             binding.positiveBtn,

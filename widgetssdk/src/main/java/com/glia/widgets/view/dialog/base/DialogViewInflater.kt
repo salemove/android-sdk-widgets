@@ -4,6 +4,8 @@ import android.graphics.Typeface
 import android.view.View
 import android.widget.TextView
 import androidx.viewbinding.ViewBinding
+import com.glia.widgets.locale.LocaleString
+import com.glia.widgets.helper.setText
 import com.glia.widgets.view.unifiedui.applyButtonTheme
 import com.glia.widgets.view.unifiedui.applyColorTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
@@ -37,21 +39,21 @@ internal abstract class DialogViewInflater<T : DialogViewBinding<out ViewBinding
         typeface?.also { tv.typeface = it }
     }
 
-    protected fun setupText(tv: TextView, text: String, textTheme: TextTheme?, typeface: Typeface?) {
+    protected fun setupText(tv: TextView, text: LocaleString, textTheme: TextTheme?, typeface: Typeface?) {
         tv.apply {
-            this.text = text
+            this.setText(text)
             applyTextTheme(textTheme)
             setupTypeface(this, typeface)
         }
     }
 
-    protected fun setupButton(btn: MaterialButton, text: String?, btnTheme: ButtonTheme?, typeface: Typeface?, onClickListener: View.OnClickListener?) {
+    protected fun setupButton(btn: MaterialButton, text: LocaleString?, btnTheme: ButtonTheme?, typeface: Typeface?, onClickListener: View.OnClickListener?) {
         btn.apply {
-            if (text.isNullOrEmpty() || onClickListener == null) {
+            if (text == null || onClickListener == null) {
                 this.visibility = View.GONE
                 return@apply
             }
-            this.text = text
+            this.setText(text)
             applyButtonTheme(btnTheme)
             setupTypeface(this, typeface)
             setOnClickListener(onClickListener)

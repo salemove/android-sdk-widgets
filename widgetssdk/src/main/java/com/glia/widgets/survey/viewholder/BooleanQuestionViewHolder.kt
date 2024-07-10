@@ -5,6 +5,7 @@ import com.glia.androidsdk.engagement.Survey
 import com.glia.widgets.R
 import com.glia.widgets.databinding.SurveyBooleanQuestionItemBinding
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.survey.QuestionItem
 import com.glia.widgets.survey.SurveyAdapter
 import com.glia.widgets.view.button.GliaSurveyOptionButton
@@ -21,7 +22,6 @@ internal class BooleanQuestionViewHolder(
     private val booleanTheme: SurveyBooleanQuestionTheme? by lazy {
         Dependencies.getGliaThemeManager().theme?.surveyTheme?.booleanQuestion
     }
-    private val stringProvider = Dependencies.getStringProvider()
     private val yesButton: GliaSurveyOptionButton get() = binding.yesButton
     private val noButton: GliaSurveyOptionButton get() = binding.noButton
 
@@ -40,13 +40,13 @@ internal class BooleanQuestionViewHolder(
     }
 
     private fun setupYesButton(buttonConfiguration: OptionButtonConfiguration?) {
-        yesButton.text = stringProvider.getRemoteString(R.string.general_yes)
+        yesButton.setLocaleText(R.string.general_yes)
         yesButton.setStyle(buttonConfiguration)
         yesButton.setOnClickListener { setAnswer(true) }
     }
 
     private fun setupNoButton(buttonConfiguration: OptionButtonConfiguration?) {
-        noButton.text = stringProvider.getRemoteString(R.string.general_no)
+        noButton.setLocaleText(R.string.general_no)
         noButton.setStyle(buttonConfiguration)
         noButton.setOnClickListener { setAnswer(false) }
     }

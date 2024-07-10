@@ -11,6 +11,7 @@ import androidx.core.view.children
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.TextViewCompat
+import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.databinding.AppBarBinding
@@ -26,7 +27,11 @@ import com.glia.widgets.helper.getColorStateListCompat
 import com.glia.widgets.helper.getFontCompat
 import com.glia.widgets.helper.getTypedArrayResId
 import com.glia.widgets.helper.layoutInflater
+import com.glia.widgets.helper.setLocaleContentDescription
+import com.glia.widgets.helper.setLocaleNavigationContentDescription
+import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.helper.setTintCompat
+import com.glia.widgets.helper.setText
 import com.glia.widgets.view.unifiedui.applyButtonTheme
 import com.glia.widgets.view.unifiedui.applyColorTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
@@ -46,7 +51,7 @@ internal class AppBarView @JvmOverloads constructor(
 
     @DrawableRes
     private var iconAppBarBackRes: Int? = null
-    private val stringProvider = Dependencies.getStringProvider()
+    private val localeProvider = Dependencies.getLocaleProvider()
 
     init {
         setDefaults(attrs)
@@ -65,9 +70,9 @@ internal class AppBarView @JvmOverloads constructor(
             ).also {
                 binding.toolbar.setNavigationIcon(it)
             }
-            binding.endButton.text = stringProvider.getRemoteString(R.string.general_end)
-            binding.endButton.contentDescription = stringProvider.getRemoteString(R.string.android_app_bar_end_engagement_accessibility_label)
-            binding.endScreenSharingButton.contentDescription = stringProvider.getRemoteString(R.string.screen_sharing_visitor_screen_end_title)
+            binding.endButton.setLocaleText(R.string.general_end)
+            binding.endButton.setLocaleContentDescription(R.string.android_app_bar_end_engagement_accessibility_label)
+            binding.endScreenSharingButton.setLocaleContentDescription(R.string.screen_sharing_visitor_screen_end_title)
 
             val titleColorRes = getTypedArrayResId(
                 this,
@@ -82,7 +87,7 @@ internal class AppBarView @JvmOverloads constructor(
                 R.attr.gliaChatHeaderHomeButtonTintColor
             )
             binding.toolbar.navigationIcon?.setTint(getColorCompat(homeButtonTintColor))
-            binding.toolbar.navigationContentDescription = stringProvider.getRemoteString(R.string.android_app_bar_nav_up_accessibility)
+            binding.toolbar.setLocaleNavigationContentDescription(R.string.android_app_bar_nav_up_accessibility)
             val backgroundTintList = getTypedArrayResId(
                 this,
                 R.styleable.AppBarView_android_backgroundTint,
@@ -103,7 +108,7 @@ internal class AppBarView @JvmOverloads constructor(
                 R.attr.gliaChatHeaderExitQueueButtonTintColor
             )
             leaveQueueIcon.icon?.setTint(getColorCompat(leaveIconTint))
-            leaveQueueIcon.title = stringProvider.getRemoteString(R.string.general_close)
+            leaveQueueIcon.title = localeProvider.getString(R.string.general_close)
         }
     }
 
@@ -149,8 +154,8 @@ internal class AppBarView @JvmOverloads constructor(
         iconAppBarBackRes?.let { binding.toolbar.setNavigationIcon(it) }
     }
 
-    fun setTitle(title: String?) {
-        binding.title.text = title
+    fun setTitle(title: LocaleString?) {
+        binding.title.setText(title)
     }
 
     fun setVisibility(visibility: Boolean = true) {

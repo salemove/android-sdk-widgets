@@ -4,6 +4,7 @@ import com.android.ide.common.rendering.api.SessionParams
 import com.glia.widgets.R
 import com.glia.widgets.SnapshotTest
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.snapshotutils.SnapshotProviders
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import org.junit.Test
@@ -45,10 +46,10 @@ class WebBrowserViewSnapshotTest : SnapshotTest(
     // MARK: utils for tests
 
     private fun setupView(
-        title: String = "Privacy policy",
+        title: LocaleString = LocaleString(R.string.dialog_link2_text),
         unifiedTheme: UnifiedTheme? = null
     ): WebBrowserView {
-        stringProviderMock()
+        localeProviderMock()
         resourceProviderMock()
 
         unifiedTheme?.let { Dependencies.getGliaThemeManager().theme = it }

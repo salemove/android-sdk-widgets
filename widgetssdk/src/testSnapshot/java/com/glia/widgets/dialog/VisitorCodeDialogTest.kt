@@ -220,7 +220,7 @@ class VisitorCodeDialogTest : SnapshotTest(
         unifiedTheme: UnifiedTheme? = null,
         executor: Executor? = Executor(Runnable::run)
     ): VisitorCodeView {
-        stringProviderMock()
+        localeProviderMock()
         resourceProviderMock()
 
         unifiedTheme?.let { Dependencies.getGliaThemeManager().theme = it }

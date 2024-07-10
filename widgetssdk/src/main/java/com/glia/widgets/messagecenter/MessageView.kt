@@ -30,6 +30,9 @@ import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getColorStateListCompat
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.setCompoundDrawableTintListCompat
+import com.glia.widgets.helper.setLocaleContentDescription
+import com.glia.widgets.helper.setLocaleHint
+import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.helper.wrapWithMaterialThemeOverlay
 import com.glia.widgets.view.unifiedui.applyColorTheme
 import com.glia.widgets.view.unifiedui.applyImageColorTheme
@@ -86,7 +89,7 @@ internal class MessageView(
     private var onRemoveAttachmentListener: ((FileAttachment) -> Unit)? = null
 
     private var uploadAttachmentAdapter by Delegates.notNull<UploadAttachmentAdapter>()
-    private var stringProvider = Dependencies.getStringProvider()
+    private var localeProvider = Dependencies.getLocaleProvider()
 
     init {
         isFillViewport = true
@@ -107,7 +110,7 @@ internal class MessageView(
     ) : this(context, attrs, defStyleAttr, R.style.Application_Glia_Chat)
 
     private fun readTypedArray(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
-        messageErrorTextView.text = stringProvider.getRemoteString(R.string.message_center_welcome_message_length_error)
+        messageErrorTextView.setLocaleText(R.string.message_center_welcome_message_length_error)
         context.withStyledAttributes(attrs, R.styleable.GliaView, defStyleAttr, defStyleRes) {
             setDefaultTheme(this)
         }
@@ -162,13 +165,13 @@ internal class MessageView(
     }
 
     private fun setupViewAppearance() {
-        title.text = stringProvider.getRemoteString(R.string.message_center_welcome_title)
-        description.text = stringProvider.getRemoteString(R.string.message_center_welcome_subtitle)
-        checkMessagesButton.text = stringProvider.getRemoteString(R.string.message_center_welcome_check_messages)
-        checkMessagesButton.contentDescription = stringProvider.getRemoteString(R.string.message_center_welcome_check_messages_accessibility_hint)
-        messageTitle.text = stringProvider.getRemoteString(R.string.message_center_welcome_message_title)
-        messageEditText.hint = stringProvider.getRemoteString(R.string.message_center_welcome_message_input_placeholder)
-        addAttachmentButton.contentDescription = stringProvider.getRemoteString(R.string.message_center_welcome_file_picker_accessibility_label)
+        title.setLocaleText(R.string.message_center_welcome_title)
+        description.setLocaleText(R.string.message_center_welcome_subtitle)
+        checkMessagesButton.setLocaleText(R.string.message_center_welcome_check_messages)
+        checkMessagesButton.setLocaleContentDescription(R.string.message_center_welcome_check_messages_accessibility_hint)
+        messageTitle.setLocaleText(R.string.message_center_welcome_message_title)
+        messageEditText.setLocaleHint(R.string.message_center_welcome_message_input_placeholder)
+        addAttachmentButton.setLocaleContentDescription(R.string.message_center_welcome_file_picker_accessibility_label)
         uploadAttachmentAdapter = UploadAttachmentAdapter(isMessageCenter = true)
         uploadAttachmentAdapter.setItemCallback { onRemoveAttachmentListener?.invoke(it) }
         uploadAttachmentAdapter.registerAdapterDataObserver(

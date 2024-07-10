@@ -6,10 +6,8 @@ import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
+import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.R
-import com.glia.widgets.StringKey
-import com.glia.widgets.StringKeyPair
-import com.glia.widgets.StringProvider
 import com.glia.widgets.UiTheme
 import com.glia.widgets.core.dialog.model.ConfirmationDialogLinks
 import com.glia.widgets.core.dialog.model.Link
@@ -17,6 +15,9 @@ import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.domain.MediaUpgradeOfferData
 import com.glia.widgets.helper.isOneWayVideo
 import com.glia.widgets.helper.isTwoWayVideo
+import com.glia.widgets.locale.LocaleProvider
+import com.glia.widgets.locale.StringKey
+import com.glia.widgets.locale.StringKeyPair
 import com.glia.widgets.view.dialog.base.DialogPayload
 import com.glia.widgets.view.dialog.base.DialogService
 import com.glia.widgets.view.dialog.base.DialogType
@@ -25,23 +26,23 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 internal object Dialogs {
     private val dialogService: DialogService by lazy { DialogService(Dependencies.getGliaThemeManager().theme) }
 
-    private val stringProvider: StringProvider by lazy { Dependencies.getStringProvider() }
+    private val localeProvider: LocaleProvider by lazy { Dependencies.getLocaleProvider() }
 
-    private val poweredByText: String by lazy { stringProvider.getRemoteString(R.string.general_powered) }
-    private val closeBtnAccessibility: String by lazy { stringProvider.getRemoteString(R.string.general_close_accessibility) }
-    private val yes: String by lazy { stringProvider.getRemoteString(R.string.general_yes) }
-    private val ok: String by lazy { stringProvider.getRemoteString(R.string.general_ok) }
-    private val no: String by lazy { stringProvider.getRemoteString(R.string.general_no) }
-    private val allow: String by lazy { stringProvider.getRemoteString(R.string.general_allow) }
-    private val cancel: String by lazy { stringProvider.getRemoteString(R.string.general_cancel) }
-    private val accept: String by lazy { stringProvider.getRemoteString(R.string.general_accept) }
-    private val decline: String by lazy { stringProvider.getRemoteString(R.string.general_decline) }
-    private val backingOperatorName: String by lazy { stringProvider.getRemoteString(R.string.engagement_default_operator) }
+    private val poweredByText: LocaleString by lazy { LocaleString(R.string.general_powered) }
+    private val closeBtnAccessibility: LocaleString by lazy { LocaleString(R.string.general_close_accessibility) }
+    private val yes: LocaleString by lazy { LocaleString(R.string.general_yes) }
+    private val ok: LocaleString by lazy { LocaleString(R.string.general_ok) }
+    private val no: LocaleString by lazy { LocaleString(R.string.general_no) }
+    private val allow: LocaleString by lazy { LocaleString(R.string.general_allow) }
+    private val cancel: LocaleString by lazy { LocaleString(R.string.general_cancel) }
+    private val accept: LocaleString by lazy { LocaleString(R.string.general_accept) }
+    private val decline: LocaleString by lazy { LocaleString(R.string.general_decline) }
+    private val backingOperatorName: Int by lazy { R.string.engagement_default_operator }
 
     fun showNoMoreOperatorsAvailableDialog(context: Context, uiTheme: UiTheme, buttonClickListener: View.OnClickListener): AlertDialog {
         val payload = DialogPayload.AlertDialog(
-            title = stringProvider.getRemoteString(R.string.engagement_queue_closed_header),
-            message = stringProvider.getRemoteString(R.string.engagement_queue_closed_message),
+            title = LocaleString(R.string.engagement_queue_closed_header),
+            message = LocaleString(R.string.engagement_queue_closed_message),
             buttonVisible = true,
             buttonDescription = closeBtnAccessibility,
             buttonClickListener = buttonClickListener
@@ -52,8 +53,8 @@ internal object Dialogs {
 
     fun showUnexpectedErrorDialog(context: Context, uiTheme: UiTheme, buttonClickListener: View.OnClickListener): AlertDialog {
         val payload = DialogPayload.AlertDialog(
-            title = stringProvider.getRemoteString(R.string.error_general),
-            message = stringProvider.getRemoteString(R.string.engagement_queue_reconnection_failed),
+            title = LocaleString(R.string.error_general),
+            message = LocaleString(R.string.engagement_queue_reconnection_failed),
             buttonVisible = true,
             buttonDescription = closeBtnAccessibility,
             buttonClickListener = buttonClickListener
@@ -63,8 +64,8 @@ internal object Dialogs {
 
     fun showMissingPermissionsDialog(context: Context, uiTheme: UiTheme, buttonClickListener: View.OnClickListener): AlertDialog {
         val payload = DialogPayload.AlertDialog(
-            title = stringProvider.getRemoteString(R.string.android_permissions_title),
-            message = stringProvider.getRemoteString(R.string.android_permissions_message),
+            title = LocaleString(R.string.android_permissions_title),
+            message = LocaleString(R.string.android_permissions_message),
             buttonVisible = true,
             buttonDescription = closeBtnAccessibility,
             buttonClickListener = buttonClickListener
@@ -79,14 +80,13 @@ internal object Dialogs {
         negativeButtonClickListener: View.OnClickListener
     ): AlertDialog {
         val payload = DialogPayload.Option(
-            title = stringProvider.getRemoteString(R.string.android_overlay_permission_title),
-            message = stringProvider.getRemoteString(R.string.android_overlay_permission_message),
+            title = LocaleString(R.string.android_overlay_permission_title),
+            message = LocaleString(R.string.android_overlay_permission_message),
             positiveButtonText = ok,
             negativeButtonText = no,
             poweredByText = poweredByText,
             positiveButtonClickListener = positiveButtonClickListener,
             negativeButtonClickListener = negativeButtonClickListener
-
         )
 
         return dialogService.showDialog(context, uiTheme, DialogType.Option(payload))
@@ -99,8 +99,8 @@ internal object Dialogs {
         negativeButtonClickListener: View.OnClickListener
     ): AlertDialog {
         val payload = DialogPayload.Option(
-            title = stringProvider.getRemoteString(R.string.engagement_end_confirmation_header),
-            message = stringProvider.getRemoteString(R.string.engagement_end_message),
+            title = LocaleString(R.string.engagement_end_confirmation_header),
+            message = LocaleString(R.string.engagement_end_message),
             positiveButtonText = yes,
             negativeButtonText = no,
             poweredByText = poweredByText,
@@ -118,8 +118,8 @@ internal object Dialogs {
         negativeButtonClickListener: View.OnClickListener
     ): AlertDialog {
         val payload = DialogPayload.Option(
-            title = stringProvider.getRemoteString(R.string.engagement_queue_leave_header),
-            message = stringProvider.getRemoteString(R.string.engagement_queue_leave_message),
+            title = LocaleString(R.string.engagement_queue_leave_header),
+            message = LocaleString(R.string.engagement_queue_leave_message),
             positiveButtonText = yes,
             negativeButtonText = no,
             poweredByText = poweredByText,
@@ -133,8 +133,8 @@ internal object Dialogs {
 
     fun showUnAuthenticatedDialog(context: Context, uiTheme: UiTheme, buttonClickListener: View.OnClickListener): AlertDialog {
         val payload = DialogPayload.AlertDialog(
-            title = stringProvider.getRemoteString(R.string.message_center_unavailable_title),
-            message = stringProvider.getRemoteString(R.string.message_center_not_authenticated_message),
+            title = LocaleString(R.string.message_center_unavailable_title),
+            message = LocaleString(R.string.message_center_not_authenticated_message),
             buttonVisible = true,
             buttonDescription = closeBtnAccessibility,
             buttonClickListener = buttonClickListener
@@ -151,8 +151,8 @@ internal object Dialogs {
         negativeButtonClickListener: View.OnClickListener
     ): AlertDialog {
         val payload = DialogPayload.Confirmation(
-            title = stringProvider.getRemoteString(R.string.engagement_confirm_title),
-            message = stringProvider.getRemoteString(R.string.engagement_confirm_message),
+            title = LocaleString(R.string.engagement_confirm_title),
+            message = LocaleString(R.string.engagement_confirm_message),
             link1Text = links.link1?.title,
             link2Text = links.link2?.title,
             positiveButtonText = allow,
@@ -169,8 +169,8 @@ internal object Dialogs {
 
     fun showOperatorEndedEngagementDialog(context: Context, theme: UiTheme, buttonClickListener: View.OnClickListener): AlertDialog {
         val payload = DialogPayload.OperatorEndedEngagement(
-            title = stringProvider.getRemoteString(R.string.engagement_ended_header),
-            message = stringProvider.getRemoteString(R.string.engagement_ended_message),
+            title = LocaleString(R.string.engagement_ended_header),
+            message = LocaleString(R.string.engagement_ended_message),
             buttonText = ok,
             buttonClickListener = buttonClickListener
         )
@@ -199,7 +199,7 @@ internal object Dialogs {
         }
 
         val payload = DialogPayload.Upgrade(
-            title = stringProvider.getRemoteString(titleIconResPair.first, StringKeyPair(StringKey.OPERATOR_NAME, data.operatorName)),
+            title = LocaleString(titleIconResPair.first, StringKeyPair(StringKey.OPERATOR_NAME, data.operatorName)),
             positiveButtonText = accept,
             negativeButtonText = decline,
             poweredByText = poweredByText,
@@ -219,10 +219,10 @@ internal object Dialogs {
         negativeButtonClickListener: View.OnClickListener
     ): AlertDialog {
         val payload = DialogPayload.ScreenSharing(
-            title = stringProvider.getRemoteString(R.string.alert_screen_sharing_start_header),
-            message = stringProvider.getRemoteString(
+            title = LocaleString(R.string.alert_screen_sharing_start_header),
+            message = LocaleString(
                 R.string.alert_screen_sharing_start_message,
-                StringKeyPair(StringKey.OPERATOR_NAME, operatorName ?: backingOperatorName)
+                StringKeyPair(StringKey.OPERATOR_NAME, (operatorName ?: localeProvider.getString(backingOperatorName)))
             ),
             positiveButtonText = accept,
             negativeButtonText = decline,
@@ -240,8 +240,8 @@ internal object Dialogs {
         onShow: ((AlertDialog) -> Unit)? = null
     ): AlertDialog {
         val payload = DialogPayload.AlertDialog(
-            title = stringProvider.getRemoteString(R.string.message_center_unavailable_title),
-            message = stringProvider.getRemoteString(R.string.message_center_unavailable_message)
+            title = LocaleString(R.string.message_center_unavailable_title),
+            message = LocaleString(R.string.message_center_unavailable_message)
         )
 
         return dialogService.showDialog(context, theme, DialogType.AlertDialog(payload), onShow = onShow) {

@@ -27,7 +27,7 @@ internal class FilePreviewTest : SnapshotTest(
         showShareIcon: Boolean = false,
         @DrawableRes imageRes: Int? = R.drawable.test_banner
     ): FilePreviewActivityBinding {
-        stringProviderMock()
+        localeProviderMock()
 
         val filePreviewActivityBinding = FilePreviewActivityBinding.inflate(layoutInflater)
 

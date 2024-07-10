@@ -30,7 +30,7 @@ internal interface SnapshotMessageCenterView : SnapshotTestLifecycle, SnapshotCo
     fun messageCenterViewMock(): Mock {
         val activityMock = activityWindowMock()
 
-        stringProviderMock()
+        localeProviderMock()
         resourceProviderMock()
 
         val messageCenterControllerMock = mock<MessageCenterController>()

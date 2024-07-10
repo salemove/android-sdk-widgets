@@ -3,6 +3,7 @@ package com.glia.widgets.view.dialog.confirmation
 import android.view.LayoutInflater
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import com.glia.widgets.helper.setText
 import com.glia.widgets.view.dialog.base.DialogPayload
 import com.glia.widgets.view.dialog.base.DialogViewInflater
 import com.glia.widgets.view.unifiedui.theme.AlertDialogConfiguration
@@ -16,7 +17,7 @@ internal abstract class BaseConfirmationDialogViewInflater<T : BaseConfirmationD
         val theme = configuration.theme
 
         binding.logoContainer.isGone = configuration.properties.whiteLabel ?: false
-        binding.poweredByTv.text = payload.poweredByText
+        binding.poweredByTv.setText(payload.poweredByText)
 
         setupText(binding.messageTv, payload.message, theme.message, configuration.properties.typeface)
     }

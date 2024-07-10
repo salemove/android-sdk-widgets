@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dialog_title">This is a title</string>
+    <string name="dialog_message">This is a much longer message that will provide more detailed information.</string>
+    <string name="dialog_positive_button">Confirm</string>
+    <string name="dialog_negative_button">Cancel</string>
+    <string name="dialog_link1_text">Terms and Conditions</string>
+    <string name="dialog_link2_text">Privacy Policies</string>
+    <string name="dialog_button_description">button description</string>
+    <string name="general_powered_by_glia">Powered by Glia</string>
+</resources>

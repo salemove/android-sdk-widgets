@@ -12,7 +12,7 @@ import androidx.lifecycle.Lifecycle;
 import com.glia.androidsdk.Glia;
 import com.glia.widgets.GliaWidgetsConfig;
 import com.glia.widgets.StringProvider;
-import com.glia.widgets.StringProviderImpl;
+import com.glia.widgets.locale.LocaleProvider;
 import com.glia.widgets.callvisualizer.CallVisualizerActivityWatcher;
 import com.glia.widgets.core.audio.AudioControlManager;
 import com.glia.widgets.core.audio.domain.OnAudioStartedUseCase;
@@ -55,7 +55,7 @@ public class Dependencies {
     private static ManagerFactory managerFactory;
     private static GliaCore gliaCore = new GliaCoreImpl();
     private static ResourceProvider resourceProvider;
-    private static StringProvider stringProvider;
+    private static LocaleProvider localeProvider;
     private static Schedulers schedulers;
     private static GliaSdkConfigurationManager sdkConfigurationManager = new GliaSdkConfigurationManager();
     private static IntentConfigurationHelper intentConfigurationHelper = new IntentConfigurationHelperImpl();
@@ -64,7 +64,7 @@ public class Dependencies {
     public static void onAppCreate(Application application) {
         schedulers = new GliaWidgetsSchedulers();
         resourceProvider = new ResourceProvider(application.getBaseContext());
-        stringProvider = new StringProviderImpl(resourceProvider);
+        localeProvider = new LocaleProvider(resourceProvider, sdkConfigurationManager.getCompanyName());
         notificationManager = new NotificationManager(application);
         DownloadsFolderDataSource downloadsFolderDataSource = new DownloadsFolderDataSource(application);
         repositoryFactory = new RepositoryFactory(gliaCore, downloadsFolderDataSource);
@@ -86,7 +86,7 @@ public class Dependencies {
             audioControlManager,
             authenticationManagerProvider,
             schedulers,
-            stringProvider,
+            localeProvider,
             gliaCore,
             application
         );
@@ -110,7 +110,7 @@ public class Dependencies {
         application.registerActivityLifecycleCallbacks(activityWatcherForChatHead);
 
         ActivityWatcherForLiveObservation activityWatcherForLiveObservation = new ActivityWatcherForLiveObservation(
-            stringProvider,
+            localeProvider,
             getGliaThemeManager(),
             controllerFactory.getActivityWatcherForLiveObservationController()
         );
@@ -150,13 +150,22 @@ public class Dependencies {
         Dependencies.schedulers = schedulers;
     }
 
+    /**
+     * @deprecated
+     * This feature is not public anymore
+     */
+    @Deprecated
     public static StringProvider getStringProvider() {
-        return stringProvider;
+        return localeProvider;
+    }
+
+    public static LocaleProvider getLocaleProvider() {
+        return localeProvider;
     }
 
     @VisibleForTesting
-    public static void setStringProvider(StringProvider sp) {
-        stringProvider = sp;
+    public static void setLocaleProvider(LocaleProvider localeProvider) {
+        Dependencies.localeProvider = localeProvider;
     }
 
     public static UseCaseFactory getUseCaseFactory() {

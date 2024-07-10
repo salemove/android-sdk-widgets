@@ -15,6 +15,7 @@ import com.glia.widgets.helper.addColorFilter
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getColorStateListCompat
 import com.glia.widgets.helper.load
+import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.view.unifiedui.applyImageColorTheme
 import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
 import com.glia.widgets.view.unifiedui.theme.chat.OnHoldOverlayTheme
@@ -51,7 +52,7 @@ internal class OperatorStatusView @JvmOverloads constructor(
 
     private var operatorImageSize: Int by Delegates.notNull()
     private var operatorImageContentPadding: Int by Delegates.notNull()
-    private var stringProvider = Dependencies.getStringProvider()
+    private var localeProvider = Dependencies.getLocaleProvider()
 
     private val operatorImageLargeSize by lazy {
         resources.getDimensionPixelSize(R.dimen.glia_chat_profile_picture_large_size)
@@ -101,7 +102,7 @@ internal class OperatorStatusView @JvmOverloads constructor(
         theme.brandPrimaryColor?.let(::getColorCompat)
             ?.also(binding.rippleAnimation::addColorFilter)
 
-        profilePictureView.contentDescription = stringProvider.getRemoteString(R.string.call_operator_avatar_accessibility_label)
+        profilePictureView.setLocaleContentDescription(R.string.call_operator_avatar_accessibility_label)
         profilePictureView.setImageDrawable(profilePictureBackgroundColorDrawable)
         theme.baseLightColor?.let(::getColorStateListCompat)
             ?.also(placeholderView::setImageTintList)
@@ -142,7 +143,7 @@ internal class OperatorStatusView @JvmOverloads constructor(
     }
 
     internal fun applyOnHoldOverlayTheme(onHoldOverlayTheme: OnHoldOverlayTheme?) {
-        onHoldOverlayView.contentDescription = stringProvider.getRemoteString(R.string.android_call_on_hold_icon_accessibility)
+        onHoldOverlayView.setLocaleContentDescription(R.string.android_call_on_hold_icon_accessibility)
         onHoldOverlayView.applyImageColorTheme(onHoldOverlayTheme?.tintColor)
         onHoldOverlayTheme?.backgroundColor?.primaryColorStateList?.also(onHoldOverlayView::setBackgroundTintList)
     }

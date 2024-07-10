@@ -9,6 +9,7 @@ import com.glia.widgets.core.engagement.domain.ConfirmationDialogUseCase
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementRequestUseCase
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
+import com.glia.widgets.locale.LocaleString
 import io.mockk.CapturingSlot
 import io.mockk.confirmVerified
 import io.mockk.every
@@ -143,7 +144,7 @@ class CallVisualizerControllerTest {
 
     @Test
     fun `onLinkClicked will produce OpenWebBrowserScreen state`() {
-        val link = Link("title", "url")
+        val link = Link(mockk<LocaleString>(), "url")
 
         val testState = controller.state.test()
 

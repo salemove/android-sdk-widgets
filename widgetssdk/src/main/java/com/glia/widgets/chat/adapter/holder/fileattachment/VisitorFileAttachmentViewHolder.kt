@@ -8,9 +8,6 @@ import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat
 import androidx.core.view.isVisible
 import com.glia.widgets.R
-import com.glia.widgets.StringKey
-import com.glia.widgets.StringKeyPair
-import com.glia.widgets.StringProvider
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.adapter.ChatAdapter.OnFileItemClickListener
 import com.glia.widgets.chat.adapter.ChatAdapter.OnMessageClickListener
@@ -19,6 +16,12 @@ import com.glia.widgets.databinding.ChatAttachmentVisitorFileLayoutBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getFontCompat
+import com.glia.widgets.helper.setContentDescription
+import com.glia.widgets.helper.setLocaleContentDescription
+import com.glia.widgets.helper.setLocaleText
+import com.glia.widgets.locale.LocaleProvider
+import com.glia.widgets.locale.StringKey
+import com.glia.widgets.locale.StringKeyPair
 import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.glia.widgets.view.unifiedui.theme.chat.MessageBalloonTheme
@@ -27,8 +30,8 @@ internal class VisitorFileAttachmentViewHolder(
     private val binding: ChatAttachmentVisitorFileLayoutBinding,
     uiTheme: UiTheme,
     unifiedTheme: UnifiedTheme? = Dependencies.getGliaThemeManager().theme,
-    private val stringProvider: StringProvider = Dependencies.getStringProvider()
-) : FileAttachmentViewHolder(binding.root, stringProvider) {
+    private val localeProvider: LocaleProvider = Dependencies.getLocaleProvider()
+) : FileAttachmentViewHolder(binding.root, localeProvider) {
     private val visitorTheme: MessageBalloonTheme? by lazy {
         unifiedTheme?.chatTheme?.visitorMessage
     }
@@ -71,7 +74,7 @@ internal class VisitorFileAttachmentViewHolder(
             ?.also(binding.deliveredView::setTextColor)
         binding.deliveredView.applyTextTheme(visitorTheme?.status)
 
-        binding.deliveredView.text = stringProvider.getRemoteString(R.string.chat_message_delivered)
+        binding.deliveredView.setLocaleText(R.string.chat_message_delivered)
     }
 
     private fun setupErrorView(uiTheme: UiTheme) {
@@ -83,7 +86,7 @@ internal class VisitorFileAttachmentViewHolder(
             ?.also(binding.errorView::setTextColor)
         binding.errorView.applyTextTheme(visitorTheme?.error)
 
-        binding.errorView.text = stringProvider.getRemoteString(R.string.chat_message_failed_to_deliver_retry)
+        binding.errorView.setLocaleText(R.string.chat_message_failed_to_deliver_retry)
     }
 
     private fun setShowDelivered(showDelivered: Boolean) {
@@ -105,7 +108,7 @@ internal class VisitorFileAttachmentViewHolder(
         } else {
             R.string.android_chat_visitor_file_accessibility
         }
-        itemView.contentDescription = stringProvider.getRemoteString(
+        itemView.setLocaleContentDescription(
             stringKey,
             StringKeyPair(StringKey.NAME, name),
             StringKeyPair(StringKey.SIZE, byteSize)
@@ -117,11 +120,11 @@ internal class VisitorFileAttachmentViewHolder(
             ) {
                 super.onInitializeAccessibilityNodeInfo(host, info)
                 val actionLabel = if (item.showError) {
-                    stringProvider.getRemoteString(R.string.general_retry)
+                    localeProvider.getString(R.string.general_retry)
                 } else if (item.isFileExists) {
-                    stringProvider.getRemoteString(R.string.general_open)
+                    localeProvider.getString(R.string.general_open)
                 } else {
-                    stringProvider.getRemoteString(R.string.general_download)
+                    localeProvider.getString(R.string.general_download)
                 }
                 val actionClick = AccessibilityActionCompat(
                     AccessibilityNodeInfoCompat.ACTION_CLICK, actionLabel

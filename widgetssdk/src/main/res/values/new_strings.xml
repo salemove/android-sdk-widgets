@@ -179,7 +179,7 @@
     <string name="general_accept">@string/glia_dialog_accept</string>
     <string name="general_decline">@string/glia_dialog_decline</string>
     <string name="general_close">@string/glia_top_app_bar_close</string>
-    <string name="general_company_name">@string/glia_call_company_name_hint</string>
+    <string name="general_company_name"></string>
     <string name="general_thank_you">@string/message_center_confirmation_screen_title</string>
     <string name="general_cancel">@string/glia_dialog_cancel</string>
     <string name="general_submit">@string/glia_survey_submit_label</string>

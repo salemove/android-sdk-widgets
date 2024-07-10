@@ -22,6 +22,7 @@ import com.glia.widgets.helper.getFullHybridTheme
 import com.glia.widgets.helper.hideKeyboard
 import com.glia.widgets.helper.insetsController
 import com.glia.widgets.helper.layoutInflater
+import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.helper.showToast
 import com.glia.widgets.helper.wrapWithMaterialThemeOverlay
 import com.glia.widgets.survey.SurveyAdapter.SurveyAdapterListener
@@ -59,7 +60,7 @@ internal class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: 
     private val binding: SurveyViewBinding by lazy {
         SurveyViewBinding.inflate(layoutInflater, this)
     }
-    private val stringProvider = Dependencies.getStringProvider()
+    private val localeProvider = Dependencies.getLocaleProvider()
 
     private val cardView: CardView get() = binding.cardView
     private val title: TextView get() = binding.surveyTitle
@@ -90,8 +91,8 @@ internal class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: 
     }
 
     private fun setupViewAppearance() {
-        submitButton.text = stringProvider.getRemoteString(R.string.general_submit)
-        cancelButton.text = stringProvider.getRemoteString(R.string.general_cancel)
+        submitButton.setLocaleText(R.string.general_submit)
+        cancelButton.setLocaleText(R.string.general_cancel)
     }
 
     fun setOnTitleUpdatedListener(onTitleUpdatedListener: OnTitleUpdatedListener?) {
@@ -257,7 +258,7 @@ internal class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: 
     }
 
     override fun onNetworkTimeout() {
-        context.showToast(stringProvider.getRemoteString(R.string.glia_survey_network_unavailable))
+        context.showToast(localeProvider.getString(R.string.glia_survey_network_unavailable))
     }
 
     override fun finish() {

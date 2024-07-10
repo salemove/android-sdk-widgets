@@ -15,6 +15,8 @@ import com.glia.widgets.R
 import com.glia.widgets.databinding.MessageCenterConfirmationViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.layoutInflater
+import com.glia.widgets.helper.setLocaleContentDescription
+import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.helper.wrapWithMaterialThemeOverlay
 import com.glia.widgets.view.unifiedui.applyButtonTheme
 import com.glia.widgets.view.unifiedui.applyColorTheme
@@ -35,7 +37,6 @@ internal class ConfirmationScreenView(
     defStyleRes
 ) {
 
-    private val stringProvider = Dependencies.getStringProvider()
     private val unifiedTheme: SecureConversationsConfirmationScreenTheme? by lazy {
         Dependencies.getGliaThemeManager().theme?.secureConversationsConfirmationScreenTheme
     }
@@ -53,10 +54,10 @@ internal class ConfirmationScreenView(
         orientation = VERTICAL
         setBackgroundColor(ContextCompat.getColor(this.context, R.color.glia_chat_background_color))
         checkMessagesButton.setOnClickListener { onCheckMessagesButtonClickListener?.onClick(it) }
-        binding.title.text = stringProvider.getRemoteString(R.string.general_thank_you)
-        binding.subtitle.text = stringProvider.getRemoteString(R.string.message_center_confirmation_subtitle)
-        binding.btnCheckMessagesConfirmationScreen.text = stringProvider.getRemoteString(R.string.message_center_welcome_check_messages)
-        binding.btnCheckMessagesConfirmationScreen.contentDescription = stringProvider.getRemoteString(
+        binding.title.setLocaleText(R.string.general_thank_you)
+        binding.subtitle.setLocaleText(R.string.message_center_confirmation_subtitle)
+        binding.btnCheckMessagesConfirmationScreen.setLocaleText(R.string.message_center_welcome_check_messages)
+        binding.btnCheckMessagesConfirmationScreen.setLocaleContentDescription(
             R.string.message_center_confirmation_check_messages_accessibility_hint
         )
         setupUnifiedTheme()

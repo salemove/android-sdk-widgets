@@ -4,7 +4,7 @@
     <string name="app_name">Glia SDK Widget Example App</string>
 
     <string name="settings_value_default">Default</string>
-    <string name="settings_value_default_company_name">Init company name</string>
+    <string name="settings_value_default_company_name"></string>
     <string name="settings_value_default_restart">Default (needs restart)</string>
     <string name="settings_color_blue">Blue</string>
     <string name="settings_color_grey">Grey</string>

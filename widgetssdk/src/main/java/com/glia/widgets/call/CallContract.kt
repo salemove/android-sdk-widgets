@@ -2,6 +2,7 @@ package com.glia.widgets.call
 
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.screensharing.ScreenSharing
+import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.base.BaseController
 import com.glia.widgets.base.BaseView
 import com.glia.widgets.core.dialog.model.ConfirmationDialogLinks
@@ -55,7 +56,7 @@ internal interface CallContract {
         fun minimizeView()
         fun showMissingPermissionsDialog()
         fun showEngagementConfirmationDialog()
-        fun navigateToWebBrowserActivity(title: String, url: String)
+        fun navigateToWebBrowserActivity(title: LocaleString, url: String)
         fun showToast(message: String)
     }
 }

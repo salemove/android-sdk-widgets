@@ -190,7 +190,7 @@ internal class MessageCenterController(
 
     override fun ensureMessageCenterAvailability() {
         isMessageCenterAvailableUseCase(
-            RequestCallback { isAvailable, exception ->
+            RequestCallback { isAvailable: Boolean?, exception ->
                 val showSendMessageGroup = when {
                     exception != null -> {
                         dialogController.showUnexpectedErrorDialog()

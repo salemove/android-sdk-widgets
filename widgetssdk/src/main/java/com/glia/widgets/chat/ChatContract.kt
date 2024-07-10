@@ -4,6 +4,7 @@ import android.net.Uri
 import android.widget.Toast
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.androidsdk.chat.SingleChoiceOption
+import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.base.BaseController
 import com.glia.widgets.base.BaseView
 import com.glia.widgets.chat.model.ChatItem
@@ -76,7 +77,7 @@ internal interface ChatContract {
         fun requestOpenDialer(uri: Uri)
         fun requestOpenEmailClient(uri: Uri)
         fun showEngagementConfirmationDialog()
-        fun navigateToWebBrowserActivity(title: String, url: String)
+        fun navigateToWebBrowserActivity(title: LocaleString, url: String)
         fun showToast(message: String, duration: Int = Toast.LENGTH_SHORT)
         fun dispatchImageCapture(uri: Uri)
         fun onFileDownload(attachmentFile: AttachmentFile)

@@ -13,6 +13,7 @@ import android.widget.LinearLayout
 import androidx.core.content.withStyledAttributes
 import androidx.core.view.ViewCompat
 import com.glia.widgets.Constants
+import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.databinding.WebBrowserViewBinding
@@ -75,7 +76,7 @@ internal class WebBrowserView(
         defStyleAttr: Int = R.attr.gliaChatStyle
     ) : this(context, attrs, defStyleAttr, R.style.Application_Glia_Chat)
 
-    fun setTitle(title: String) {
+    fun setTitle(title: LocaleString?) {
         appBar?.setTitle(title)
     }
 

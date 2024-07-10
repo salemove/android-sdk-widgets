@@ -12,6 +12,8 @@ import androidx.core.view.isVisible
 import com.glia.androidsdk.comms.VideoView
 import com.glia.widgets.R
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.helper.setLocaleContentDescription
+import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContract.FlipButtonState
 import com.glia.widgets.view.unifiedui.applyBarButtonStyleTheme
 import com.glia.widgets.view.unifiedui.theme.call.VisitorVideoTheme
@@ -31,13 +33,12 @@ internal class FloatingVisitorVideoView @JvmOverloads constructor(
     private var onHoldOverlay: TextView
     private var flipCameraButtonContainer: View
     private var flipCameraImageButton: ImageButton
-    private val stringProvider = Dependencies.getStringProvider()
     private var sendFlipButtonAccessibilityEvent = false
 
     init {
         LayoutInflater.from(context).inflate(R.layout.visitor_video_floating_view, this)
         onHoldOverlay = findViewById(R.id.on_hold_textview)
-        onHoldOverlay.text = stringProvider.getRemoteString(R.string.general_you)
+        onHoldOverlay.setLocaleText(R.string.general_you)
         flipCameraImageButton = findViewById(R.id.flip_camera_image_button)
         flipCameraButtonContainer = findViewById(R.id.flip_camera_button)
         flipCameraButtonContainer.setOnClickListener {
@@ -70,21 +71,17 @@ internal class FloatingVisitorVideoView @JvmOverloads constructor(
         when (flipButtonState) {
             FlipButtonState.HIDE -> flipCameraButtonContainer.isVisible = false
             FlipButtonState.SWITCH_TO_FACE_CAMERA -> {
-                setFlipCameraButton(
-                    stringProvider.getRemoteString(R.string.call_visitor_video_front_camera_button_accessibility_label)
-                )
+                setFlipCameraButton(R.string.call_visitor_video_front_camera_button_accessibility_label)
             }
             FlipButtonState.SWITCH_TO_BACK_CAMERA -> {
-                setFlipCameraButton(
-                    stringProvider.getRemoteString(R.string.call_visitor_video_back_camera_button_accessibility_label)
-                )
+                setFlipCameraButton(R.string.call_visitor_video_back_camera_button_accessibility_label)
             }
         }
     }
 
-    private fun setFlipCameraButton(contentDescription: String) {
+    private fun setFlipCameraButton(contentDescriptionRes: Int) {
         flipCameraButtonContainer.isVisible = true
-        flipCameraButtonContainer.contentDescription = contentDescription
+        flipCameraButtonContainer.setLocaleContentDescription(contentDescriptionRes)
         if (sendFlipButtonAccessibilityEvent) {
             sendFlipButtonAccessibilityEvent = false
             flipCameraButtonContainer.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUSED)

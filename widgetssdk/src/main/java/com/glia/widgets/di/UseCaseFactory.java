@@ -5,7 +5,6 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 
 import com.glia.widgets.GliaWidgets;
-import com.glia.widgets.StringProvider;
 import com.glia.widgets.call.domain.HandleCallPermissionsUseCase;
 import com.glia.widgets.chat.domain.AddNewMessagesDividerUseCase;
 import com.glia.widgets.chat.domain.AppendGvaMessageItemUseCase;
@@ -185,6 +184,7 @@ import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromNetworkUseCas
 import com.glia.widgets.filepreview.domain.usecase.IsFileReadyForPreviewUseCase;
 import com.glia.widgets.filepreview.domain.usecase.PutImageFileToDownloadsUseCase;
 import com.glia.widgets.helper.rx.Schedulers;
+import com.glia.widgets.locale.LocaleProvider;
 import com.glia.widgets.push.notifications.IsPushNotificationsSetUpUseCase;
 import com.glia.widgets.push.notifications.IsPushNotificationsSetUpUseCaseImpl;
 import com.glia.widgets.view.snackbar.LiveObservationPopupUseCase;
@@ -213,7 +213,7 @@ public class UseCaseFactory {
     private final AudioControlManager audioControlManager;
     private final Dependencies.AuthenticationManagerProvider authenticationManagerProvider;
     private final Schedulers schedulers;
-    private final StringProvider stringProvider;
+    private final LocaleProvider localeProvider;
     private final GliaCore gliaCore;
     private final Context applicationContext;
     private Gson gvaGson;
@@ -227,7 +227,7 @@ public class UseCaseFactory {
                    AudioControlManager audioControlManager,
                    Dependencies.AuthenticationManagerProvider authenticationManagerProvider,
                    Schedulers schedulers,
-                   StringProvider stringProvider,
+                   LocaleProvider localeProvider,
                    GliaCore gliaCore,
                    Context applicationContext) {
         this.repositoryFactory = repositoryFactory;
@@ -238,7 +238,7 @@ public class UseCaseFactory {
         this.chatHeadManager = chatHeadManager;
         this.audioControlManager = audioControlManager;
         this.schedulers = schedulers;
-        this.stringProvider = stringProvider;
+        this.localeProvider = localeProvider;
         this.gliaCore = gliaCore;
         this.authenticationManagerProvider = authenticationManagerProvider;
         this.applicationContext = applicationContext;
@@ -855,7 +855,7 @@ public class UseCaseFactory {
 
     @NonNull
     public ConfirmationDialogLinksUseCase createConfirmationDialogLinksUseCase() {
-        return new ConfirmationDialogLinksUseCase(stringProvider);
+        return new ConfirmationDialogLinksUseCase(localeProvider);
     }
 
     public LiveObservationPopupUseCase createLiveObservationPopupUseCase() {

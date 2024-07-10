@@ -260,7 +260,7 @@ class OperatorStatusViewHolderSnapshotTest : SnapshotTest(
         uiTheme: UiTheme = UiTheme()
     ): ViewData {
         lottieMock()
-        stringProviderMock()
+        localeProviderMock()
         picassoMock(imageLoadError = imageLoadError)
 
         unifiedTheme?.let { Dependencies.getGliaThemeManager().theme = it }

@@ -9,8 +9,8 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.util.Pair
 import com.glia.androidsdk.comms.MediaState
 import com.glia.widgets.R
-import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.asActivity
+import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.view.ViewHelpers
 import com.glia.widgets.view.unifiedui.theme.call.VisitorVideoTheme
 
@@ -23,7 +23,6 @@ internal class FloatingVisitorVideoContainer @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr), FloatingVisitorVideoContract.View {
     private var floatingVisitorVideoView: FloatingVisitorVideoView
-    private val stringProvider = Dependencies.getStringProvider()
     private var mediaStateId: Int? = null
     internal var onFlipButtonClickListener: OnClickListener?
         set(value) {
@@ -34,7 +33,7 @@ internal class FloatingVisitorVideoContainer @JvmOverloads constructor(
     init {
         LayoutInflater.from(context).inflate(R.layout.visitor_video_layout_view, this)
         floatingVisitorVideoView = findViewById(R.id.visitor_video_card)
-        floatingVisitorVideoView.contentDescription = stringProvider.getRemoteString(R.string.call_visitor_video_accessibility_label)
+        floatingVisitorVideoView.setLocaleContentDescription(R.string.call_visitor_video_accessibility_label)
         setVisitorVideoContainerTouchListener()
         hide()
     }

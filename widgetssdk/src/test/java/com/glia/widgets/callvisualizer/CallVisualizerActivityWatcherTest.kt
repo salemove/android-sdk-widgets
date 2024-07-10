@@ -17,6 +17,7 @@ import com.glia.widgets.helper.GliaActivityManager
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.OneTimeEvent
 import com.glia.widgets.helper.withRuntimeTheme
+import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.view.Dialogs
 import com.glia.widgets.webbrowser.WebBrowserActivity
 import io.mockk.Runs
@@ -44,6 +45,7 @@ class CallVisualizerActivityWatcherTest {
     private lateinit var gliaActivityManager: GliaActivityManager
 
     private lateinit var watcher: CallVisualizerActivityWatcher
+    private lateinit var mockLocale: LocaleString
 
     @Before
     fun setUp() {
@@ -57,6 +59,7 @@ class CallVisualizerActivityWatcherTest {
             every { state } returns controllerState
         }
         gliaActivityManager = mockk(relaxed = true)
+        mockLocale = mockk(relaxed = true)
 
         watcher = CallVisualizerActivityWatcher(controller, gliaActivityManager)
         verify { controller.state }
@@ -73,7 +76,7 @@ class CallVisualizerActivityWatcherTest {
     @Test
     fun `resuming WebBrowserActivity will notify web browser opened when current state is OpenWebBrowserScreen`() {
         emitActivity<WebBrowserActivity>()
-        val event = createMockEvent(CallVisualizerContract.State.OpenWebBrowserScreen("Title", "url"))
+        val event = createMockEvent(CallVisualizerContract.State.OpenWebBrowserScreen(mockLocale, "url"))
         emitState(event)
 
         verify { event.consume(any()) }
@@ -169,8 +172,8 @@ class CallVisualizerActivityWatcherTest {
         every { Dialogs.showEngagementConfirmationDialog(any(), any(), any(), any(), any(), any()) } returns dialog
 
         val links = ConfirmationDialogLinks(
-            link1 = Link("title1", "url1"),
-            link2 = Link("title2", "url2")
+            link1 = Link(mockLocale, "url1"),
+            link2 = Link(mockLocale, "url2")
         )
 
         val activity = emitActivity<ChatActivity>()
@@ -213,8 +216,8 @@ class CallVisualizerActivityWatcherTest {
         every { Dialogs.showEngagementConfirmationDialog(any(), any(), any(), any(), any(), any()) } returns dialog
 
         val links = ConfirmationDialogLinks(
-            link1 = Link("title1", "url1"),
-            link2 = Link("title2", "url2")
+            link1 = Link(mockLocale, "url1"),
+            link2 = Link(mockLocale, "url2")
         )
 
         val activity = emitActivity<ChatActivity>()
@@ -257,8 +260,8 @@ class CallVisualizerActivityWatcherTest {
         every { Dialogs.showEngagementConfirmationDialog(any(), any(), any(), any(), any(), any()) } returns dialog
 
         val links = ConfirmationDialogLinks(
-            link1 = Link("title1", "url1"),
-            link2 = Link("title2", "url2")
+            link1 = Link(mockLocale, "url1"),
+            link2 = Link(mockLocale, "url2")
         )
 
         val activity = emitActivity<ChatActivity>()
@@ -310,7 +313,7 @@ class CallVisualizerActivityWatcherTest {
 
     @Test
     fun `WebBrowserActivity should be shown when current state is OpenWebBrowserScreen`() {
-        val title = "title"
+        val title = mockLocale
         val url = "url"
         val intent: Intent = mockk(relaxed = true)
         mockkObject(WebBrowserActivity)

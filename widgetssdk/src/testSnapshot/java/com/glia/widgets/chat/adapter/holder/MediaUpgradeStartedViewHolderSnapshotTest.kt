@@ -119,7 +119,7 @@ class MediaUpgradeStartedViewHolderSnapshotTest : SnapshotTest(), SnapshotChatSc
         unifiedTheme: UnifiedTheme? = null,
         uiTheme: UiTheme = UiTheme(iconChatVideoUpgrade = R.drawable.ic_baseline_videocam)
     ): MediaUpgradeStartedViewHolder {
-        stringProviderMock()
+        localeProviderMock()
         unifiedTheme?.let { Dependencies.getGliaThemeManager().theme = it }
 
         setOnEndListener {

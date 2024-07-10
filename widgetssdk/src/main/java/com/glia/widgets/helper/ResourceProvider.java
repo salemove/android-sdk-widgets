@@ -18,31 +18,6 @@ import java.lang.ref.WeakReference;
 /**
  * @hide
  */
-interface IResourceProvider {
-
-    String getString(@StringRes int id);
-
-    String getString(@StringRes int id, @Nullable Object... formatArgs);
-
-    @ColorInt
-    Integer getColor(@ColorRes int id);
-
-    ColorStateList getColorStateList(int id);
-
-    int getDimension(int dimensionId);
-
-    float convertDpToPixel(float dp);
-
-    float convertSpToPixel(float sp);
-
-    int convertDpToIntPixel(float dp);
-
-    String getResourceKey(@StringRes int stringKey);
-}
-
-/**
- * @hide
- */
 public class ResourceProvider implements IResourceProvider {
 
     @VisibleForTesting

@@ -189,7 +189,7 @@ class OperatorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotCh
         picassoMock(listOf(R.drawable.test_launcher2))
         val imageFileMock = getImageFileMock(R.drawable.test_banner)
         val schedulersMock = schedulersMock()
-        stringProviderMock()
+        localeProviderMock()
 
         val binding = ChatAttachmentOperatorImageLayoutBinding.inflate(layoutInflater)
 

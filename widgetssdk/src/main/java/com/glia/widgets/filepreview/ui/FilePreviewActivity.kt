@@ -24,6 +24,8 @@ import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.fileProviderAuthority
+import com.glia.widgets.helper.setContentDescription
+import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.showToast
 import java.io.File
 
@@ -35,7 +37,7 @@ import java.io.File
  * This activity is used to preview images shared in chat in full-screen.
  */
 internal class FilePreviewActivity : AppCompatActivity(), FilePreviewContract.View {
-    private val stringProvider = Dependencies.getStringProvider()
+    private val localeProvider = Dependencies.getLocaleProvider()
 
     private val binding: FilePreviewActivityBinding by lazy {
         FilePreviewActivityBinding.inflate(
@@ -64,13 +66,13 @@ internal class FilePreviewActivity : AppCompatActivity(), FilePreviewContract.Vi
         super.onCreate(savedInstanceState)
         Logger.i(TAG, "Create File Preview screen")
         setContentView(binding.root)
-        title = stringProvider.getRemoteString(R.string.android_preview_title)
+        title = localeProvider.getString(R.string.android_preview_title)
 
         applyInsets()
         onImageDataReceived(intent)
 
         setSupportActionBar(binding.toolbar)
-        binding.toolbar.contentDescription = stringProvider.getRemoteString(R.string.android_preview_title)
+        binding.toolbar.setLocaleContentDescription(R.string.android_preview_title)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
@@ -88,11 +90,11 @@ internal class FilePreviewActivity : AppCompatActivity(), FilePreviewContract.Vi
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         menu.findItem(R.id.save_item).also {
-            it.title = stringProvider.getRemoteString(R.string.android_preview_menu_save)
+            it.title = localeProvider.getString(R.string.android_preview_menu_save)
             it.isVisible = showDownloadIcon
         }
         menu.findItem(R.id.share_item).also {
-            it.title = stringProvider.getRemoteString(R.string.android_preview_menu_share)
+            it.title = localeProvider.getString(R.string.android_preview_menu_share)
             it.isVisible = showShareIcon
         }
         return true
@@ -189,15 +191,15 @@ internal class FilePreviewActivity : AppCompatActivity(), FilePreviewContract.Vi
     }
 
     override fun showOnImageSaveSuccess() {
-        showToast(stringProvider.getRemoteString(R.string.android_preview_save_success))
+        showToast(localeProvider.getString(R.string.android_preview_save_success))
     }
 
     override fun showOnImageSaveFailed() {
-        showToast(stringProvider.getRemoteString(R.string.android_preview_save_error))
+        showToast(localeProvider.getString(R.string.android_preview_save_error))
     }
 
     override fun showOnImageLoadingFailed() {
-        showToast(stringProvider.getRemoteString(R.string.android_image_preview_fetch_error))
+        showToast(localeProvider.getString(R.string.android_image_preview_fetch_error))
     }
 
     override fun engagementEnded() {

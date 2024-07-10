@@ -185,7 +185,7 @@ class OperatorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen
         unifiedTheme: UnifiedTheme? = null,
         uiTheme: UiTheme = UiTheme()
     ): OperatorMessageViewHolder {
-        stringProviderMock()
+        localeProviderMock()
         picassoMock(listOf(R.drawable.test_banner, R.drawable.test_launcher2))
         unifiedTheme?.let { Dependencies.getGliaThemeManager().theme = it }
 

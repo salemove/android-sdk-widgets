@@ -1,18 +1,21 @@
 package com.glia.widgets.chat.adapter.holder
 
 import android.graphics.Typeface
+import android.view.View
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
-import com.glia.widgets.StringKey
-import com.glia.widgets.StringKeyPair
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.model.OperatorStatusItem
 import com.glia.widgets.databinding.ChatOperatorStatusLayoutBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getFontCompat
+import com.glia.widgets.helper.setLocaleContentDescription
+import com.glia.widgets.helper.setLocaleText
+import com.glia.widgets.locale.StringKey
+import com.glia.widgets.locale.StringKeyPair
 import com.glia.widgets.view.OperatorStatusView
 import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.chat.EngagementStateTheme
@@ -31,7 +34,7 @@ internal class OperatorStatusViewHolder(
     private val engagementStatesTheme: EngagementStatesTheme? by lazy {
         Dependencies.getGliaThemeManager().theme?.chatTheme?.connect
     }
-    private val stringProvider = Dependencies.getStringProvider()
+    private val localeProvider = Dependencies.getLocaleProvider()
 
     init {
         applyBaseConfig(uiTheme)
@@ -39,7 +42,7 @@ internal class OperatorStatusViewHolder(
     }
 
     private fun setBaseStrings() {
-        chatStartingCaptionView.text = stringProvider.getRemoteString(R.string.engagement_connection_screen_message)
+        chatStartingCaptionView.setLocaleText(R.string.engagement_connection_screen_message)
     }
 
     private fun applyBaseConfig(uiTheme: UiTheme) {
@@ -54,7 +57,7 @@ internal class OperatorStatusViewHolder(
             chatStartingCaptionView.typeface = it
             chatStartedNameView.setTypeface(it, Typeface.BOLD)
             chatStartedCaptionView.typeface = it
-            chatStartedCaptionView.text = stringProvider.getRemoteString(R.string.engagement_connection_screen_message)
+            chatStartedCaptionView.setLocaleText(R.string.engagement_connection_screen_message)
         }
         engagementStatesTheme?.operator.also(statusPictureView::applyOperatorTheme)
     }
@@ -80,7 +83,7 @@ internal class OperatorStatusViewHolder(
     }
 
     fun bind(item: OperatorStatusItem) {
-        chatStartingHeadingView.text = item.companyName
+        chatStartingHeadingView.setLocaleText(R.string.general_company_name)
         when (item) {
             is OperatorStatusItem.Connected -> applyConnectedState(item.operatorName, item.profileImgUrl)
             is OperatorStatusItem.InQueue -> applyInQueueState(item.companyName)
@@ -95,7 +98,7 @@ internal class OperatorStatusViewHolder(
         statusPictureView.showPlaceholder()
         applyChatStartingViewsVisibility()
         applyChatStartedViewsVisibility(false)
-        itemView.contentDescription = stringProvider.getRemoteString(
+        itemView.setLocaleContentDescription(
             R.string.android_chat_queue_message_accessibility_label,
             StringKeyPair(StringKey.COMPANY_NAME, companyName ?: "")
         )
@@ -110,10 +113,14 @@ internal class OperatorStatusViewHolder(
         applyChatStartedViewsVisibility()
 
         chatStartedNameView.text = operatorName
-        stringProvider.getRemoteString(R.string.chat_operator_joined_system_message, StringKeyPair(StringKey.OPERATOR_NAME, operatorName)).apply {
-            chatStartedCaptionView.text = this
-            itemView.contentDescription = this
-        }
+        chatStartedCaptionView.setLocaleText(
+            R.string.chat_operator_joined_system_message,
+            StringKeyPair(StringKey.OPERATOR_NAME, operatorName)
+        )
+        itemView.setLocaleContentDescription(
+            R.string.chat_operator_joined_system_message,
+            StringKeyPair(StringKey.OPERATOR_NAME, operatorName)
+        )
 
         engagementStatesTheme?.connected.also(::applyEngagementState)
     }
@@ -122,9 +129,10 @@ internal class OperatorStatusViewHolder(
         profileImgUrl?.let { statusPictureView.showProfileImage(it) }
             ?: statusPictureView.showPlaceholder()
         chatStartedNameView.text = operatorName
-        chatStartedCaptionView.text =
-            stringProvider.getRemoteString(R.string.chat_operator_joined_system_message, StringKeyPair(StringKey.OPERATOR_NAME, operatorName))
-        itemView.contentDescription = stringProvider.getRemoteString(
+        chatStartedCaptionView.setLocaleText(
+            R.string.chat_operator_joined_system_message, StringKeyPair(StringKey.OPERATOR_NAME, operatorName)
+        )
+        itemView.setLocaleContentDescription(
             R.string.chat_operator_joined_system_message,
             StringKeyPair(StringKey.OPERATOR_NAME, operatorName)
         )
@@ -137,11 +145,12 @@ internal class OperatorStatusViewHolder(
 
     private fun applyTransferringState() {
         statusPictureView.showPlaceholder()
-        applyChatStartingViewsVisibility()
+        chatStartingCaptionView.isVisible = true
         chatStartedNameView.isVisible = true
         chatStartedCaptionView.isVisible = false
+        chatStartingHeadingView.visibility = View.INVISIBLE
 
-        chatStartedNameView.text = stringProvider.getRemoteString(R.string.engagement_queue_transferring)
+        chatStartedNameView.setLocaleText(R.string.engagement_queue_transferring)
 
         engagementStatesTheme?.transferring.also(::applyEngagementState)
     }

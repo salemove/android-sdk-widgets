@@ -18,6 +18,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.isVisible
 import com.glia.widgets.Constants
+import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.core.configuration.GliaSdkConfiguration
@@ -88,7 +89,6 @@ internal class MessageCenterView(
     private val dialogCallback: DialogContract.Controller.Callback = DialogContract.Controller.Callback {
         onDialogState(it)
     }
-    private val stringProvider = Dependencies.getStringProvider()
 
     init {
         isSaveEnabled = true
@@ -128,7 +128,7 @@ internal class MessageCenterView(
         controller?.ensureMessageCenterAvailability()
         setupAppBarUnifiedTheme(unifiedTheme?.secureConversationsWelcomeScreenTheme?.headerTheme)
         appBar?.hideBackButton()
-        appBar?.setTitle(stringProvider.getRemoteString(R.string.engagement_secure_messaging_title))
+        appBar?.setTitle(LocaleString(R.string.engagement_secure_messaging_title))
         initCallbacks()
     }
 

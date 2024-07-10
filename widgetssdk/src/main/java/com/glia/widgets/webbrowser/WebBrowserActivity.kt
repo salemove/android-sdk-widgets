@@ -4,8 +4,10 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.base.FadeTransitionActivity
 import com.glia.widgets.databinding.WebBrowserAvtivityBinding
+import com.glia.widgets.helper.getParcelable
 
 /**
  * Glia internal class.
@@ -31,7 +33,7 @@ internal class WebBrowserActivity :
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        val title = intent.getStringExtra(TITLE_KEY).orEmpty()
+        val title = intent.getParcelable<LocaleString>(TITLE_KEY)
         val url = intent.getStringExtra(URL_KEY).orEmpty()
 
         webBrowserView.onLinkClickListener = this
@@ -48,7 +50,7 @@ internal class WebBrowserActivity :
         private const val TITLE_KEY = "title"
         private const val URL_KEY = "url"
 
-        fun intent(context: Context, title: String, url: String): Intent {
+        fun intent(context: Context, title: LocaleString, url: String): Intent {
             return Intent(context, WebBrowserActivity::class.java)
                 .putExtra(TITLE_KEY, title)
                 .putExtra(URL_KEY, url)

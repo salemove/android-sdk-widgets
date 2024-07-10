@@ -15,7 +15,7 @@ internal object NotificationFactory {
     const val NOTIFICATION_CALL_CHANNEL_ID = "call_channel"
     const val SCREEN_SHARING_NOTIFICATION_ID = 1
     const val CALL_NOTIFICATION_ID = 2
-    private val stringProvider by lazy { Dependencies.getStringProvider() }
+    private val localeProvider by lazy { Dependencies.getLocaleProvider() }
 
     @JvmStatic
     fun createScreenSharingNotification(context: Context): Notification {
@@ -28,8 +28,8 @@ internal object NotificationFactory {
 
         return NotificationCompat.Builder(context, NOTIFICATION_SCREEN_SHARING_CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_screensharing)
-            .setContentTitle(stringProvider.getRemoteString(R.string.android_notification_screen_sharing_title))
-            .setContentText(stringProvider.getRemoteString(R.string.android_notification_screen_sharing_message))
+            .setContentTitle(localeProvider.getString(R.string.android_notification_screen_sharing_title))
+            .setContentText(localeProvider.getString(R.string.android_notification_screen_sharing_message))
             //Screen-sharing notification should be the highest in the app notifications list, because it contains action item
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
@@ -38,7 +38,7 @@ internal object NotificationFactory {
             .setSilent(true) // No sound or vibration and no heads-up notification
             .addAction(
                 R.drawable.ic_baseline_close,
-                stringProvider.getRemoteString(R.string.android_notification_end_screen_sharing_title),
+                localeProvider.getString(R.string.android_notification_end_screen_sharing_title),
                 pendingIntent
             ).build()
     }
@@ -47,8 +47,8 @@ internal object NotificationFactory {
         createCallNotification(
             context = context,
             icon = R.drawable.ic_baseline_mic,
-            title = stringProvider.getRemoteString(R.string.android_notification_audio_call_title),
-            message = stringProvider.getRemoteString(R.string.android_notification_audio_call_message)
+            title = localeProvider.getString(R.string.android_notification_audio_call_title),
+            message = localeProvider.getString(R.string.android_notification_audio_call_message)
         )
 
     fun createVideoCallNotification(
@@ -66,14 +66,14 @@ internal object NotificationFactory {
     private fun createOneWayVideoNotification(context: Context, hasAudio: Boolean): Notification {
         val message =
             if (hasAudio) {
-                stringProvider.getRemoteString(R.string.android_notification_one_way_video_message)
+                localeProvider.getString(R.string.android_notification_one_way_video_message)
             } else {
-                stringProvider.getRemoteString(R.string.android_notification_one_way_video_no_audio_message)
+                localeProvider.getString(R.string.android_notification_one_way_video_no_audio_message)
             }
         return createCallNotification(
             context = context,
             icon = R.drawable.ic_baseline_videocam,
-            title = stringProvider.getRemoteString(R.string.android_notification_one_way_video_title),
+            title = localeProvider.getString(R.string.android_notification_one_way_video_title),
             message = message
         )
     }
@@ -81,14 +81,14 @@ internal object NotificationFactory {
     private fun createTwoWayVideoNotification(context: Context, hasAudio: Boolean): Notification {
         val message =
             if (hasAudio) {
-                stringProvider.getRemoteString(R.string.android_notification_two_way_video_message)
+                localeProvider.getString(R.string.android_notification_two_way_video_message)
             } else {
-                stringProvider.getRemoteString(R.string.android_notification_two_way_video_no_audio_message)
+                localeProvider.getString(R.string.android_notification_two_way_video_no_audio_message)
             }
         return createCallNotification(
             context = context,
             icon = R.drawable.ic_baseline_videocam,
-            title = stringProvider.getRemoteString(R.string.android_notification_two_way_video_title),
+            title = localeProvider.getString(R.string.android_notification_two_way_video_title),
             message = message
         )
     }

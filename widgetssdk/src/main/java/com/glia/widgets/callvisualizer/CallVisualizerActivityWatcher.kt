@@ -1,6 +1,7 @@
 package com.glia.widgets.callvisualizer
 
 import android.app.Activity
+import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.base.BaseSingleActivityWatcher
 import com.glia.widgets.callvisualizer.controller.CallVisualizerContract
 import com.glia.widgets.core.dialog.model.ConfirmationDialogLinks
@@ -82,7 +83,7 @@ internal class CallVisualizerActivityWatcher(
         }
     }
 
-    private fun openWebBrowser(activity: Activity, title: String, url: String) {
+    private fun openWebBrowser(activity: Activity, title: LocaleString, url: String) {
         val intent = WebBrowserActivity.intent(activity, title, url)
         activity.startActivity(intent)
     }

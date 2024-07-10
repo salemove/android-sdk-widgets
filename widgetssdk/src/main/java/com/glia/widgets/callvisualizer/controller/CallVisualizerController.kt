@@ -1,5 +1,6 @@
 package com.glia.widgets.callvisualizer.controller
 
+import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.dialog.domain.ConfirmationDialogLinksUseCase
 import com.glia.widgets.core.dialog.model.ConfirmationDialogLinks
@@ -22,7 +23,7 @@ internal interface CallVisualizerContract {
         data class DisplayConfirmationDialog(val links: ConfirmationDialogLinks) : State
         object DismissDialog : State
         object CloseHolderActivity : State
-        data class OpenWebBrowserScreen(val title: String, val url: String) : State
+        data class OpenWebBrowserScreen(val title: LocaleString, val url: String) : State
     }
 
     interface Controller {

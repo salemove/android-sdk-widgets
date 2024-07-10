@@ -14,7 +14,6 @@ import androidx.core.content.withStyledAttributes
 import androidx.core.view.isVisible
 import com.glia.androidsdk.omnibrowse.VisitorCode
 import com.glia.widgets.R
-import com.glia.widgets.StringProvider
 import com.glia.widgets.UiTheme
 import com.glia.widgets.callvisualizer.VisitorCodeContract
 import com.glia.widgets.core.callvisualizer.domain.CallVisualizer
@@ -32,7 +31,10 @@ import com.glia.widgets.helper.getFontCompat
 import com.glia.widgets.helper.getFullHybridTheme
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.separateStringWithSymbol
+import com.glia.widgets.helper.setLocaleContentDescription
+import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.helper.wrapWithMaterialThemeOverlay
+import com.glia.widgets.locale.LocaleProvider
 import com.glia.widgets.view.button.GliaPositiveButton
 import com.glia.widgets.view.unifiedui.applyButtonTheme
 import com.glia.widgets.view.unifiedui.applyImageColorTheme
@@ -69,7 +71,7 @@ internal class VisitorCodeView internal constructor(
     private var logoView: ImageView
     private var logoText: TextView
     private var logoContainer: View
-    private var stringProvider: StringProvider = Dependencies.getStringProvider()
+    private var localeProvider: LocaleProvider = Dependencies.getLocaleProvider()
 
     init {
         layoutInflater.inflate(R.layout.visitor_code_view, this, true)
@@ -85,7 +87,7 @@ internal class VisitorCodeView internal constructor(
         closeButton.setOnClickListener { controller.onCloseButtonClicked() }
         logoContainer = findViewById(R.id.logo_container)
         logoText = findViewById(R.id.powered_by_text)
-        logoText.text = stringProvider.getRemoteString(R.string.general_powered)
+        logoText.setLocaleText(R.string.general_powered)
         logoView = findViewById(R.id.logo_view)
         readTypedArray()
         applyRemoteThemeConfig(Dependencies.getGliaThemeManager().theme)
@@ -147,9 +149,9 @@ internal class VisitorCodeView internal constructor(
         runOnUi {
             showProgressBar(true)
             showSuccess()
-            successTitle.contentDescription = stringProvider.getRemoteString(R.string.android_visitor_code_loading)
+            successTitle.setLocaleContentDescription(R.string.android_visitor_code_loading)
             successTitle.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUSED)
-            closeButton.contentDescription = stringProvider.getRemoteString(R.string.call_visualizer_visitor_code_close_accessibility_hint)
+            closeButton.setLocaleContentDescription(R.string.call_visualizer_visitor_code_close_accessibility_hint)
         }
     }
 
@@ -162,15 +164,15 @@ internal class VisitorCodeView internal constructor(
     }
 
     private fun showSuccess() {
-        successTitle.text = stringProvider.getRemoteString(R.string.call_visualizer_visitor_code_title)
+        successTitle.setLocaleText(R.string.call_visualizer_visitor_code_title)
         successContainer.visibility = VISIBLE
         failureContainer.visibility = GONE
     }
 
     private fun showFailure() {
-        failureTitle.text = stringProvider.getRemoteString(R.string.visitor_code_failed)
-        refreshButton.contentDescription = stringProvider.getRemoteString(R.string.call_visualizer_visitor_code_refresh_accessibility_hint)
-        refreshButton.text = stringProvider.getRemoteString(R.string.general_refresh)
+        failureTitle.setLocaleText(R.string.visitor_code_failed)
+        refreshButton.setLocaleContentDescription(R.string.call_visualizer_visitor_code_refresh_accessibility_hint)
+        refreshButton.setLocaleText(R.string.general_refresh)
         failureContainer.visibility = VISIBLE
         successContainer.visibility = GONE
     }
@@ -178,7 +180,7 @@ internal class VisitorCodeView internal constructor(
     override fun showVisitorCode(visitorCode: VisitorCode) {
         runOnUi {
             showProgressBar(false)
-            successTitle.contentDescription = stringProvider.getRemoteString(R.string.call_visualizer_visitor_code_title_accessibility_hint)
+            successTitle.contentDescription = localeProvider.getString(R.string.call_visualizer_visitor_code_title_accessibility_hint)
                 .combineStringWith(visitorCode.code.separateStringWithSymbol("-"), " ")
             successTitle.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUSED)
             charCodeView.setText(visitorCode.code)

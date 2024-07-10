@@ -19,6 +19,8 @@ import com.glia.widgets.core.configuration.GliaSdkConfigurationManager
 import com.glia.widgets.di.ControllerFactory
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.ResourceProvider
+import com.glia.widgets.locale.LocaleProvider
+import com.glia.widgets.locale.StringKeyPair
 import com.glia.widgets.view.head.ChatHeadContract
 import io.mockk.CapturingSlot
 import io.mockk.every
@@ -76,8 +78,8 @@ class CallActivityTest {
         Dependencies.setResourceProvider(resourceProvider)
 
         // set up StringProvider
-        val stringProvider: StringProvider = AndroidTestStringProvider(appContext)
-        Dependencies.setStringProvider(stringProvider)
+        val localeProvider = LocaleProvider(resourceProvider, sdkConfigurationManager.companyName)
+        Dependencies.setLocaleProvider(localeProvider)
 
         callStatus = mockk(relaxed = true)
         every { callStatus.formattedOperatorName } answers { "FormattedOperatorName" }

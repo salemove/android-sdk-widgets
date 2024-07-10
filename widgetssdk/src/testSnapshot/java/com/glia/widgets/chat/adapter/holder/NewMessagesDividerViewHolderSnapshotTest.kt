@@ -65,7 +65,7 @@ class NewMessagesDividerViewHolderSnapshotTest : SnapshotTest(
         unifiedTheme: UnifiedTheme? = null,
         uiTheme: UiTheme = UiTheme()
     ): NewMessagesDividerViewHolder {
-        stringProviderMock()
+        localeProviderMock()
         unifiedTheme?.let { Dependencies.getGliaThemeManager().theme = it }
 
         setOnEndListener {

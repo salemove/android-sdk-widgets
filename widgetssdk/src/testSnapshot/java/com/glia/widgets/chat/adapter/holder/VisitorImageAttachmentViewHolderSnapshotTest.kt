@@ -186,7 +186,7 @@ class VisitorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotCha
 
         val viewHolder = VisitorImageAttachmentViewHolder(
             binding, imageFileMock.getImageFileFromCacheUseCaseMock, imageFileMock.getImageFileFromDownloadsUseCaseMock,
-            imageFileMock.getImageFileFromNetworkUseCaseMock, schedulersMock.schedulers, uiTheme, unifiedTheme, stringProviderMock()
+            imageFileMock.getImageFileFromNetworkUseCaseMock, schedulersMock.schedulers, uiTheme, unifiedTheme, localeProviderMock()
         )
 
         viewHolder.bind(item, { _, _ -> }) {}

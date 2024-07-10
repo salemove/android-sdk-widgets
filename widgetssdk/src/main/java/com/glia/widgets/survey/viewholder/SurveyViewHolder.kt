@@ -9,6 +9,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.glia.androidsdk.engagement.Survey
 import com.glia.widgets.R
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.helper.setLocaleContentDescription
+import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.survey.QuestionItem
 import com.glia.widgets.survey.SurveyAdapter
 import com.glia.widgets.survey.SurveyController
@@ -21,10 +23,10 @@ internal abstract class SurveyViewHolder(
     SurveyController.AnswerCallback {
     var questionItem: QuestionItem? = null
     var listener: SurveyAdapter.SurveyAdapterListener? = null
-    private val stringProvider = Dependencies.getStringProvider()
+    private val localeProvider = Dependencies.getLocaleProvider()
 
     init {
-        (requiredError as? TextView)?.text = stringProvider.getRemoteString(
+        (requiredError as? TextView)?.setLocaleText(
             R.string.survey_action_validation_error
         )
     }
@@ -50,7 +52,7 @@ internal abstract class SurveyViewHolder(
                 colorString
             )
             title.text = Html.fromHtml(source, Html.FROM_HTML_MODE_LEGACY)
-            title.contentDescription = stringProvider.getRemoteString(R.string.survey_question_required_accessibility_label)
+            title.setLocaleContentDescription(R.string.survey_question_required_accessibility_label)
         } else {
             title.text = questionText
             title.contentDescription = null
@@ -61,7 +63,7 @@ internal abstract class SurveyViewHolder(
         requiredError.isVisible = error
         itemView.takeIf { error }
             ?.apply {
-                announceForAccessibility(stringProvider.getRemoteString(R.string.survey_action_validation_error))
+                announceForAccessibility(localeProvider.getString(R.string.survey_action_validation_error))
             }
     }
 

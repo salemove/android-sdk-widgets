@@ -2,16 +2,16 @@ package com.glia.widgets.view.snackbar
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import com.glia.widgets.StringProvider
 import com.glia.widgets.base.BaseActivityStackWatcher
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.WeakReferenceDelegate
+import com.glia.widgets.locale.LocaleProvider
 import com.glia.widgets.view.unifiedui.theme.UnifiedThemeManager
 
 @SuppressLint("CheckResult")
 internal class ActivityWatcherForLiveObservation(
-    private val stringProvider: StringProvider,
+    private val localeProvider: LocaleProvider,
     private val themeManager: UnifiedThemeManager,
     controller: ActivityWatcherForLiveObservationContract.Controller
 ) : BaseActivityStackWatcher(), ActivityWatcherForLiveObservationContract.Watcher {
@@ -34,6 +34,6 @@ internal class ActivityWatcherForLiveObservation(
     }
 
     private fun makeSnackBar(activity: Activity): SnackBarDelegate =
-        SnackBarDelegateFactory(activity, stringProvider, themeManager.theme).createDelegate()
+        SnackBarDelegateFactory(activity, localeProvider, themeManager.theme).createDelegate()
 
 }

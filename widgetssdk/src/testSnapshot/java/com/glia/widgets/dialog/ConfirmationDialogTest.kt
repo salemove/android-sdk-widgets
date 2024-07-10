@@ -1,6 +1,7 @@
 package com.glia.widgets.dialog
 
 import com.glia.widgets.SnapshotTest
+import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.snapshotutils.SnapshotDialog
 import com.glia.widgets.view.dialog.base.DialogPayload
 import com.glia.widgets.view.dialog.base.DialogType
@@ -11,8 +12,8 @@ class ConfirmationDialogTest : SnapshotTest(
 ), SnapshotDialog {
 
     private fun dialogType(
-        link1Text: String? = this.link1Text,
-        link2Text: String? = this.link2Text,
+        link1Text: LocaleString? = this.link1Text,
+        link2Text: LocaleString? = this.link2Text,
     ) = DialogType.Confirmation(
         DialogPayload.Confirmation(
             title = title,

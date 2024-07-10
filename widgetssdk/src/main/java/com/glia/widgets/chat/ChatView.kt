@@ -29,6 +29,7 @@ import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.widgets.Constants
 import com.glia.widgets.GliaWidgets
+import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.adapter.ChatAdapter
@@ -66,6 +67,8 @@ import com.glia.widgets.helper.hideKeyboard
 import com.glia.widgets.helper.insetsController
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.requireActivity
+import com.glia.widgets.helper.setLocaleContentDescription
+import com.glia.widgets.helper.setLocaleHint
 import com.glia.widgets.view.Dialogs
 import com.glia.widgets.view.SingleChoiceCardView.OnOptionClickedListener
 import com.glia.widgets.view.dialog.base.DialogDelegate
@@ -103,7 +106,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     private var uploadAttachmentAdapter by Delegates.notNull<UploadAttachmentAdapter>()
     private var adapter by Delegates.notNull<ChatAdapter>()
 
-    private var stringProvider = Dependencies.getStringProvider()
+    private var localeProvider = Dependencies.getLocaleProvider()
     private var isInBottom = true
     private var theme: UiTheme by Delegates.notNull()
 
@@ -418,14 +421,14 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     }
 
     override fun fileIsNotReadyForPreview() {
-        showToast(stringProvider.getRemoteString(R.string.android_file_not_ready_for_preview))
+        showToast(localeProvider.getString(R.string.android_file_not_ready_for_preview))
     }
 
     override fun showBroadcastNotSupportedToast() {
-        showToast(stringProvider.getRemoteString(R.string.gva_unsupported_action_error))
+        showToast(localeProvider.getString(R.string.gva_unsupported_action_error))
     }
 
-    override fun navigateToWebBrowserActivity(title: String, url: String) {
+    override fun navigateToWebBrowserActivity(title: LocaleString, url: String) {
         context.startActivity(
             WebBrowserActivity.intent(context, title, url)
         )
@@ -464,7 +467,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             context.startActivity(intent)
         } else {
             Logger.e(TAG, "No email client, uri - $uri")
-            showToast(stringProvider.getRemoteString(R.string.error_general))
+            showToast(localeProvider.getString(R.string.error_general))
         }
     }
 
@@ -475,7 +478,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             context.startActivity(intent)
         } else {
             Logger.e(TAG, "No dialer uri - $uri")
-            showToast(stringProvider.getRemoteString(R.string.error_general))
+            showToast(localeProvider.getString(R.string.error_general))
         }
     }
 
@@ -485,7 +488,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
                 context.startActivity(it)
             } else {
                 Logger.e(TAG, "No app to open url - $uri")
-                showToast(stringProvider.getRemoteString(R.string.error_general))
+                showToast(localeProvider.getString(R.string.error_general))
             }
         }
     }
@@ -539,11 +542,11 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
 
     private fun updateChatEditText(chatState: ChatState) {
         when (chatState.chatInputMode) {
-            ChatInputMode.ENABLED_NO_ENGAGEMENT -> binding.chatEditText.hint = stringProvider.getRemoteString(
+            ChatInputMode.ENABLED_NO_ENGAGEMENT -> binding.chatEditText.setLocaleHint(
                 R.string.chat_message_start_engagement_placeholder
             )
 
-            else -> binding.chatEditText.hint = stringProvider.getRemoteString(R.string.chat_input_placeholder)
+            else -> binding.chatEditText.setLocaleHint(R.string.chat_input_placeholder)
         }
         binding.chatEditText.isEnabled = chatState.chatInputMode.isEnabled
     }
@@ -562,11 +565,11 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             binding.appBarView.hideEndScreenSharingButton()
         }
         if (chatState.isSecureMessaging) {
-            showToolbar(stringProvider.getRemoteString(R.string.message_center_header))
+            showToolbar(LocaleString(R.string.message_center_header))
             binding.appBarView.hideBackButton()
             binding.appBarView.showXButton()
         } else {
-            showToolbar(stringProvider.getRemoteString(R.string.engagement_chat_title))
+            showToolbar(LocaleString(R.string.engagement_chat_title))
             binding.appBarView.showBackButton()
         }
     }
@@ -585,7 +588,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         insetsController?.hideKeyboard()
     }
 
-    private fun showToolbar(title: String?) {
+    private fun showToolbar(title: LocaleString?) {
         onTitleUpdatedListener?.onTitleUpdated(title)
 
         binding.appBarView.setTitle(title)
@@ -646,11 +649,11 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
                 binding.addAttachmentQueue.smoothScrollToPosition(uploadAttachmentAdapter.itemCount)
             }
         })
-        binding.addAttachmentButton.contentDescription = stringProvider.getRemoteString(R.string.chat_attach_files)
+        binding.addAttachmentButton.setLocaleContentDescription(R.string.chat_attach_files)
         binding.addAttachmentQueue.layoutManager = LinearLayoutManager(this.context)
         binding.addAttachmentQueue.adapter = uploadAttachmentAdapter
         binding.appBarView.setTheme(theme)
-        binding.appBarView.setTitle(stringProvider.getRemoteString(R.string.engagement_chat_title))
+        binding.appBarView.setTitle(LocaleString(R.string.engagement_chat_title))
         // icons
         theme.iconSendMessage?.also(binding.sendButton::setImageResource)
 
@@ -687,7 +690,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         }
 
         binding.gvaQuickRepliesLayout.updateTheme(theme)
-        binding.sendButton.contentDescription = stringProvider.getRemoteString(R.string.general_send)
+        binding.sendButton.setLocaleContentDescription(R.string.general_send)
         applyTheme(Dependencies.getGliaThemeManager().theme)
     }
 
@@ -802,13 +805,13 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
 
     override fun fileDownloadError(attachmentFile: AttachmentFile, error: Throwable) {
         submitUpdatedItems(attachmentFile, isDownloading = false, isFileExists = false)
-        showToast(stringProvider.getRemoteString(R.string.chat_download_failed))
+        showToast(localeProvider.getString(R.string.chat_download_failed))
     }
 
     override fun fileDownloadSuccess(attachmentFile: AttachmentFile) {
         submitUpdatedItems(attachmentFile, isDownloading = false, isFileExists = true)
         showToast(
-            stringProvider.getRemoteString(R.string.android_chat_download_complete_message), Toast.LENGTH_LONG
+            localeProvider.getString(R.string.android_chat_download_complete_message), Toast.LENGTH_LONG
         )
     }
 
@@ -840,7 +843,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
             setDataAndType(contentUri, file.contentType)
             resolveActivity(context.packageManager)?.also { context.startActivity(this) }
-        } ?: showToast(message = stringProvider.getRemoteString(R.string.android_file_view_error))
+        } ?: showToast(message = localeProvider.getString(R.string.android_file_view_error))
     }
 
     override fun onImageItemClick(item: AttachmentFile, view: View) {
@@ -950,6 +953,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     }
 
     fun interface OnTitleUpdatedListener {
-        fun onTitleUpdated(title: String?)
+        fun onTitleUpdated(title: LocaleString?)
     }
 }

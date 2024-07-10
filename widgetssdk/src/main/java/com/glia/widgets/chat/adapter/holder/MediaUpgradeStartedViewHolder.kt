@@ -10,6 +10,7 @@ import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getColorStateListCompat
 import com.glia.widgets.helper.getFontCompat
+import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.view.unifiedui.applyCardLayerTheme
 import com.glia.widgets.view.unifiedui.applyImageColorTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
@@ -26,8 +27,6 @@ internal class MediaUpgradeStartedViewHolder(
 
     @DrawableRes
     private val upgradeVideoIcon: Int? = uiTheme.iconChatVideoUpgrade
-
-    private val stringProvider = Dependencies.getStringProvider()
 
     private val chatTheme: ChatTheme? by lazy {
         Dependencies.getGliaThemeManager().theme?.chatTheme
@@ -70,13 +69,13 @@ internal class MediaUpgradeStartedViewHolder(
         when (chatItem) {
             is MediaUpgradeStartedTimerItem.Audio -> {
                 upgradeAudioIcon?.also(binding.iconView::setImageResource)
-                binding.titleView.text = stringProvider.getRemoteString(R.string.chat_media_upgrade_audio_system_message)
+                binding.titleView.setLocaleText(R.string.chat_media_upgrade_audio_system_message)
                 setMediaUpgradeTheme(chatTheme?.audioUpgrade)
             }
 
             is MediaUpgradeStartedTimerItem.Video -> {
                 upgradeVideoIcon?.also(binding.iconView::setImageResource)
-                binding.titleView.text = stringProvider.getRemoteString(R.string.chat_media_upgrade_video_system_message)
+                binding.titleView.setLocaleText(R.string.chat_media_upgrade_video_system_message)
                 setMediaUpgradeTheme(chatTheme?.videoUpgrade)
             }
         }

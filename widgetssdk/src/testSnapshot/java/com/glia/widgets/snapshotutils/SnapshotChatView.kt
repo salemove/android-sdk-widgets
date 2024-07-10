@@ -40,7 +40,7 @@ internal interface SnapshotChatView : SnapshotContent, SnapshotTheme, SnapshotAc
         val schedulersMock = schedulersMock()
 
         lottieMock()
-        stringProviderMock()
+        localeProviderMock()
         resourceProviderMock()
 
         val controllerFactoryMock = mock<ControllerFactory>()

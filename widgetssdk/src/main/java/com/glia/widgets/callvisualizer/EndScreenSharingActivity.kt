@@ -15,7 +15,7 @@ import com.glia.widgets.helper.TAG
  * This activity is used only to display screen-sharing controls during
  * ongoing Call Visualizer engagements without video.
  */
-class EndScreenSharingActivity : FadeTransitionActivity(), EndScreenSharingView.OnFinishListener {
+internal class EndScreenSharingActivity : FadeTransitionActivity(), EndScreenSharingView.OnFinishListener {
 
     private lateinit var binding: EndScreenSharingActivityBinding
 

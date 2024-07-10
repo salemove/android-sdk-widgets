@@ -32,6 +32,8 @@ import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getColorStateListCompat
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.load
+import com.glia.widgets.helper.setContentDescription
+import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.view.configuration.ChatHeadConfiguration
 import com.glia.widgets.view.unifiedui.applyColorTheme
 import com.glia.widgets.view.unifiedui.applyImageColorTheme
@@ -53,7 +55,6 @@ internal class ChatHeadView @JvmOverloads constructor(
     defStyleRes
 ), ChatHeadContract.View {
     private val binding by lazy { ChatHeadViewBinding.inflate(layoutInflater, this) }
-    private val stringProvider = Dependencies.getStringProvider()
     private var sdkConfiguration: GliaSdkConfiguration? = null
     private var configuration: ChatHeadConfiguration by Delegates.notNull()
 
@@ -175,7 +176,7 @@ internal class ChatHeadView @JvmOverloads constructor(
     private fun applyBubbleTheme() {
         bubbleTheme?.badge?.also(binding.chatBubbleBadge::applyBadgeTheme)
         bubbleTheme?.onHoldOverlay?.also {
-            binding.onHoldIcon.contentDescription = stringProvider.getRemoteString(R.string.android_call_on_hold_icon_accessibility)
+            binding.onHoldIcon.setLocaleContentDescription(R.string.android_call_on_hold_icon_accessibility)
             it.tintColor.also(binding.onHoldIcon::applyImageColorTheme)
             it.backgroundColor?.primaryColorStateList?.also(binding.onHoldIcon::setBackgroundTintList)
         }
@@ -249,7 +250,7 @@ internal class ChatHeadView @JvmOverloads constructor(
     private fun setAccessibilityLabels() {
         val view = binding.root
         view.isFocusable = true
-        view.contentDescription = stringProvider.getRemoteString(R.string.android_bubble_accessibility)
+        view.setLocaleContentDescription(R.string.android_bubble_accessibility)
         ViewCompat.setAccessibilityDelegate(
             view,
             object : AccessibilityDelegateCompat() {

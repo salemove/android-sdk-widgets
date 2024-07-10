@@ -174,7 +174,7 @@ class VisitorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen,
         uiTheme: UiTheme = UiTheme()
     ): ViewData {
         val binding = ChatVisitorMessageLayoutBinding.inflate(layoutInflater)
-        val viewHolder = VisitorMessageViewHolder(binding, {}, uiTheme, unifiedTheme, stringProviderMock())
+        val viewHolder = VisitorMessageViewHolder(binding, {}, uiTheme, unifiedTheme, localeProviderMock())
 
         viewHolder.bind(item)
 

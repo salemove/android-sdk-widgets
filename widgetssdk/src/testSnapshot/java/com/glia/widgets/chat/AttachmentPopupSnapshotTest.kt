@@ -53,7 +53,7 @@ class AttachmentPopupSnapshotTest : SnapshotTest(), SnapshotTheme, SnapshotProvi
         unifiedTheme: AttachmentsPopupTheme? = null,
         viewCallback: (View) -> Unit
     ) : AttachmentPopup {
-        stringProviderMock()
+        localeProviderMock()
 
         val anchor = LinearLayout(context)
         return AttachmentPopup(

@@ -17,6 +17,7 @@ import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getDimenRes
 import com.glia.widgets.helper.getDrawableCompat
 import com.glia.widgets.helper.layoutInflater
+import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.view.unifiedui.applyIndicatorColorTheme
 import com.glia.widgets.view.unifiedui.applyLayerTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
@@ -54,7 +55,7 @@ internal class ProgressButton @JvmOverloads constructor(context: Context, attrs:
     private val progressBar get() = binding.progressBar
 
     // End Widgets + Binding
-    private val stringProvider = Dependencies.getStringProvider()
+    private val localeProvider = Dependencies.getLocaleProvider()
 
     @get:ColorInt
     private val gliaBrandPrimaryColor: Int by lazy { // btn bg
@@ -85,7 +86,7 @@ internal class ProgressButton @JvmOverloads constructor(context: Context, attrs:
         isFocusable = true
         isClickable = true
         accessibilityLiveRegion = ACCESSIBILITY_LIVE_REGION_POLITE
-        contentDescription = stringProvider.getRemoteString(R.string.general_send)
+        contentDescription = localeProvider.getString(R.string.general_send)
         foreground = getDrawableCompat(getAttr(android.R.attr.selectableItemBackground, android.R.color.transparent))
         applyDefaultTheme()
     }
@@ -99,7 +100,7 @@ internal class ProgressButton @JvmOverloads constructor(context: Context, attrs:
         buttonTheme.elevation?.also { elevation = it }
         buttonTheme.shadowColor?.also(::applyShadow)
         title.applyTextTheme(buttonTheme.text)
-        title.text = stringProvider.getRemoteString(R.string.general_send)
+        title.text = localeProvider.getString(R.string.general_send)
     }
 
     internal fun updateProgressTheme(colorTheme: ColorTheme?) {
@@ -128,7 +129,7 @@ internal class ProgressButton @JvmOverloads constructor(context: Context, attrs:
     private fun showIndicator(show: Boolean) {
         TransitionManager.beginDelayedTransition(this, MaterialFade())
         progressBar.isVisible = show
-        progressBar.contentDescription = stringProvider.getRemoteString(R.string.general_sending)
+        progressBar.setLocaleContentDescription(R.string.general_sending)
     }
 
     private fun applyDefaultTheme() {

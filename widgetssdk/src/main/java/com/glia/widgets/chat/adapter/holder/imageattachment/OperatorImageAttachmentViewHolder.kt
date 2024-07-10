@@ -6,7 +6,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat
 import com.glia.widgets.R
-import com.glia.widgets.StringProvider
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.adapter.ChatAdapter.OnImageItemClickListener
 import com.glia.widgets.chat.model.OperatorAttachmentItem
@@ -16,6 +15,8 @@ import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromNetworkUseCase
 import com.glia.widgets.helper.rx.Schedulers
+import com.glia.widgets.helper.setLocaleContentDescription
+import com.glia.widgets.locale.LocaleProvider
 import com.glia.widgets.view.unifiedui.theme.chat.MessageBalloonTheme
 
 internal class OperatorImageAttachmentViewHolder(
@@ -25,7 +26,7 @@ internal class OperatorImageAttachmentViewHolder(
     getImageFileFromNetworkUseCase: GetImageFileFromNetworkUseCase,
     schedulers: Schedulers,
     uiTheme: UiTheme,
-    private val stringProvider: StringProvider = Dependencies.getStringProvider()
+    private val localeProvider: LocaleProvider = Dependencies.getLocaleProvider()
 ) : ImageAttachmentViewHolder(
     binding.root,
     getImageFileFromCacheUseCase,
@@ -65,14 +66,14 @@ internal class OperatorImageAttachmentViewHolder(
     }
 
     private fun setAccessibilityLabels() {
-        itemView.contentDescription = stringProvider.getRemoteString(R.string.android_chat_operator_image_attachment_accessibility)
+        itemView.setLocaleContentDescription(R.string.android_chat_operator_image_attachment_accessibility)
         ViewCompat.setAccessibilityDelegate(itemView, object : AccessibilityDelegateCompat() {
             override fun onInitializeAccessibilityNodeInfo(
                 host: View,
                 info: AccessibilityNodeInfoCompat
             ) {
                 super.onInitializeAccessibilityNodeInfo(host, info)
-                val actionLabel = stringProvider.getRemoteString(R.string.general_open)
+                val actionLabel = localeProvider.getString(R.string.general_open)
                 val actionClick = AccessibilityActionCompat(
                     AccessibilityNodeInfoCompat.ACTION_CLICK, actionLabel
                 )

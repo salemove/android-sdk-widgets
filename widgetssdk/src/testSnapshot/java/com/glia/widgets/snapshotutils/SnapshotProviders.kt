@@ -1,20 +1,27 @@
 package com.glia.widgets.snapshotutils
 
-import com.glia.widgets.StringProvider
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.ResourceProvider
+import com.glia.widgets.locale.LocaleProvider
+import com.glia.widgets.locale.StringKeyPair
 
-interface SnapshotProviders: SnapshotContent, SnapshotTestLifecycle {
+internal interface SnapshotProviders: SnapshotContent, SnapshotTestLifecycle {
 
-    fun stringProviderMock(): StringProvider {
-        val stringProvider: StringProvider = SnapshotStringProvider(context)
-        Dependencies.setStringProvider(stringProvider)
-
-        setOnEndListener {
-            Dependencies.setStringProvider(null)
+    fun localeProviderMock(): LocaleProvider {
+        val resourceProvider = resourceProviderMock()
+        val localeProvider = object: LocaleProvider(resourceProvider, null) {
+            override fun getStringInternal(stringKey: Int, values: List<StringKeyPair>): String {
+                return context.resources.getResourceName(stringKey).split("/")[1]
+            }
         }
 
-        return stringProvider
+        Dependencies.setLocaleProvider(localeProvider)
+
+        setOnEndListener {
+            Dependencies.setLocaleProvider(null)
+        }
+
+        return localeProvider
     }
 
     fun resourceProviderMock(): ResourceProvider {

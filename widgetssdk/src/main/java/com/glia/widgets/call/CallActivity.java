@@ -7,6 +7,7 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 
 import com.glia.widgets.GliaWidgets;
+import com.glia.widgets.locale.LocaleString;
 import com.glia.widgets.R;
 import com.glia.widgets.base.FadeTransitionActivity;
 import com.glia.widgets.chat.ChatActivity;
@@ -149,7 +150,7 @@ public final class CallActivity extends FadeTransitionActivity {
         startActivity(newIntent);
     }
 
-    private void navigateToWebBrowser(String title, String url) {
+    private void navigateToWebBrowser(LocaleString title, String url) {
         Intent newIntent = WebBrowserActivity.Companion.intent(this, title, url);
         startActivity(newIntent);
     }

@@ -5,6 +5,7 @@ import android.util.AttributeSet
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.content.withStyledAttributes
+import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.databinding.EndScreenSharingViewBinding
@@ -20,6 +21,7 @@ import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getFontCompat
 import com.glia.widgets.helper.getFullHybridTheme
 import com.glia.widgets.helper.layoutInflater
+import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.view.unifiedui.applyButtonTheme
 import com.glia.widgets.view.unifiedui.applyLayerTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
@@ -44,7 +46,6 @@ internal class EndScreenSharingView(
     private var controller: EndScreenSharingContract.Controller? = null
     private var statusBarColor: Int by Delegates.notNull()
     private var defaultStatusBarColor: Int? = null
-    private var stringProvider = Dependencies.getStringProvider()
 
     private val binding: EndScreenSharingViewBinding by lazy {
         EndScreenSharingViewBinding.inflate(layoutInflater, this)
@@ -66,9 +67,9 @@ internal class EndScreenSharingView(
     }
 
     private fun setupViewTextResources() {
-        binding.appBarView.setTitle(stringProvider.getRemoteString(R.string.call_visualizer_screen_sharing_header_title))
-        binding.screenSharingLabel.text = stringProvider.getRemoteString(R.string.call_visualizer_screen_sharing_message)
-        binding.endSharingButton.text = stringProvider.getRemoteString(R.string.screen_sharing_visitor_screen_end_title)
+        binding.appBarView.setTitle(LocaleString(R.string.call_visualizer_screen_sharing_header_title))
+        binding.screenSharingLabel.setLocaleText(R.string.call_visualizer_screen_sharing_message)
+        binding.endSharingButton.setLocaleText(R.string.screen_sharing_visitor_screen_end_title)
     }
 
     private fun applyDefaultTheme(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {

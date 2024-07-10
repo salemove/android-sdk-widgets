@@ -5,7 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.annotation.IdRes
-import com.glia.widgets.StringProvider
+import com.glia.widgets.locale.LocaleProvider
 import com.glia.widgets.view.snackbar.SnackBarDelegateFactory
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.google.android.apps.common.testing.accessibility.framework.replacements.LayoutParams
@@ -17,13 +17,13 @@ import kotlin.reflect.KClass
 internal interface SnapshotSnackBar : SnapshotContent, SnapshotTestLifecycle, SnapshotProviders {
 
     data class Mock<T>(
-        val stringProvider: StringProvider,
+        val localeProvider: LocaleProvider,
         val rootLayout: FrameLayout,
         val mockActivity: T
     )
 
     fun <T : Activity> snackBarMock(kClass: KClass<T>): Mock<T> {
-        val stringProvider = stringProviderMock()
+        val stringProvider = localeProviderMock()
 
         val rootLayout = FrameLayout(context).apply {
             layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
@@ -44,7 +44,7 @@ internal interface SnapshotSnackBar : SnapshotContent, SnapshotTestLifecycle, Sn
         kClass: KClass<T>,
         unifiedTheme: UnifiedTheme? = null
     ): View = snackBarMock(kClass).run {
-        SnackBarDelegateFactory(mockActivity, stringProvider, unifiedTheme)
+        SnackBarDelegateFactory(mockActivity, localeProvider, unifiedTheme)
             .createDelegate()
             .apply { addViewToRoot(anchorViewId ?: return@apply, rootLayout) }
             .snackBar

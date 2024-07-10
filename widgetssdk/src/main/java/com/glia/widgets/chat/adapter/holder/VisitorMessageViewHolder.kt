@@ -8,9 +8,6 @@ import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.Accessibilit
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
-import com.glia.widgets.StringKey
-import com.glia.widgets.StringKeyPair
-import com.glia.widgets.StringProvider
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.adapter.ChatAdapter
 import com.glia.widgets.chat.model.VisitorMessageItem
@@ -19,6 +16,11 @@ import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getColorStateListCompat
 import com.glia.widgets.helper.getFontCompat
+import com.glia.widgets.helper.setLocaleContentDescription
+import com.glia.widgets.helper.setLocaleText
+import com.glia.widgets.locale.LocaleProvider
+import com.glia.widgets.locale.StringKey
+import com.glia.widgets.locale.StringKeyPair
 import com.glia.widgets.view.unifiedui.applyLayerTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
@@ -29,7 +31,7 @@ internal class VisitorMessageViewHolder(
     private val onMessageClickListener: ChatAdapter.OnMessageClickListener,
     uiTheme: UiTheme,
     unifiedTheme: UnifiedTheme? = Dependencies.getGliaThemeManager().theme,
-    private val stringProvider: StringProvider = Dependencies.getStringProvider()
+    private val localeProvider: LocaleProvider = Dependencies.getLocaleProvider()
 ) : RecyclerView.ViewHolder(binding.root) {
 
     private val visitorTheme: MessageBalloonTheme? by lazy {
@@ -64,8 +66,8 @@ internal class VisitorMessageViewHolder(
         binding.content.applyTextTheme(visitorTheme?.text)
         binding.deliveredView.applyTextTheme(visitorTheme?.status)
         binding.errorView.applyTextTheme(visitorTheme?.error)
-        binding.deliveredView.text = stringProvider.getRemoteString(R.string.chat_message_delivered)
-        binding.errorView.text = stringProvider.getRemoteString(R.string.chat_message_failed_to_deliver_retry)
+        binding.deliveredView.setLocaleText(R.string.chat_message_delivered)
+        binding.errorView.setLocaleText(R.string.chat_message_failed_to_deliver_retry)
     }
 
     fun bind(item: VisitorMessageItem) {
@@ -97,7 +99,7 @@ internal class VisitorMessageViewHolder(
     }
 
     private fun setAccessibilityLabels() {
-        itemView.contentDescription = stringProvider.getRemoteString(
+        itemView.setLocaleContentDescription(
             if (showError) {
                 R.string.android_chat_visitor_message_not_delivered_accessibility
             } else if (showDelivered) {
@@ -112,7 +114,7 @@ internal class VisitorMessageViewHolder(
             override fun onInitializeAccessibilityNodeInfo(host: View, info: AccessibilityNodeInfoCompat) {
                 super.onInitializeAccessibilityNodeInfo(host, info)
                 if (showError) {
-                    val actionLabel = stringProvider.getRemoteString(R.string.general_retry)
+                    val actionLabel = localeProvider.getString(R.string.general_retry)
                     val actionClick = AccessibilityActionCompat(
                         AccessibilityNodeInfoCompat.ACTION_CLICK, actionLabel
                     )

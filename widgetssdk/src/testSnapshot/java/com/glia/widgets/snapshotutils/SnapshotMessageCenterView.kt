@@ -35,7 +35,7 @@ internal interface SnapshotMessageCenterView : SnapshotTestLifecycle, SnapshotCo
 
         val messageCenterControllerMock = mock<MessageCenterController>()
         val controllerFactoryMock = mock<ControllerFactory>()
-        whenever(controllerFactoryMock.getMessageCenterController(any())).thenReturn(messageCenterControllerMock)
+        whenever(controllerFactoryMock.messageCenterController).thenReturn(messageCenterControllerMock)
         Dependencies.setControllerFactory(controllerFactoryMock)
 
         setOnEndListener {

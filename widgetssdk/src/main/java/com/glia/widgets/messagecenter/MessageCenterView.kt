@@ -196,6 +196,10 @@ internal class MessageCenterView(
         }
     }
 
+    fun initialize() {
+        controller?.initialize()
+    }
+
     override fun showAttachmentPopup() {
         messageView?.showAttachmentPopup(
             { controller?.onGalleryClicked() },

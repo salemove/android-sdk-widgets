@@ -36,7 +36,7 @@ import com.glia.widgets.helper.TAG
  * Code example:
  * ```
  * Intent intent = new Intent(requireContext(), MessageCenterActivity.class);
- * intent.putExtra(GliaWidgets.QUEUE_ID, "MESSAGING_QUEUE_ID");
+ * intent.putExtra(GliaWidgets.QUEUE_IDS, new ArrayList<>(List.of("MESSAGING_QUEUE_ID")));
  * startActivity(intent);
  * ```
  */
@@ -51,7 +51,7 @@ class MessageCenterActivity :
     private var configuration: GliaSdkConfiguration? = null
 
     private val controller: MessageCenterContract.Controller by lazy {
-        Dependencies.getControllerFactory().getMessageCenterController(configuration?.queueIds)
+        Dependencies.getControllerFactory().getMessageCenterController()
     }
 
     private val getContent = registerForActivityResult(GetContent()) { uri: Uri? ->
@@ -89,6 +89,8 @@ class MessageCenterActivity :
                 finishAndRemoveTask()
             }
         })
+
+        messageCenterView.initialize()
     }
 
     override fun onResume() {

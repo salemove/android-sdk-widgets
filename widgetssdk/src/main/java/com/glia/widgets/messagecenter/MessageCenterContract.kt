@@ -12,6 +12,7 @@ internal interface MessageCenterContract {
     interface Controller : BaseController {
         fun setConfiguration(uiTheme: UiTheme?, configuration: GliaSdkConfiguration?)
         fun setView(view: View)
+        fun initialize()
         fun onCheckMessagesClicked()
         fun onMessageChanged(message: String)
         fun onSendMessageClicked()

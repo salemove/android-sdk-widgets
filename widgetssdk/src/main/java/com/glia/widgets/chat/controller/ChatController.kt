@@ -21,7 +21,6 @@ import com.glia.widgets.chat.domain.GliaSendMessagePreviewUseCase
 import com.glia.widgets.chat.domain.GliaSendMessageUseCase
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
-import com.glia.widgets.chat.domain.IsSecureConversationsChatAvailableUseCase
 import com.glia.widgets.chat.domain.IsShowSendButtonUseCase
 import com.glia.widgets.chat.domain.SiteInfoUseCase
 import com.glia.widgets.chat.domain.TakePictureUseCase
@@ -54,6 +53,7 @@ import com.glia.widgets.core.permissions.domain.RequestNotificationPermissionIfP
 import com.glia.widgets.core.permissions.domain.WithCameraPermissionUseCase
 import com.glia.widgets.core.permissions.domain.WithReadWritePermissionsUseCase
 import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
+import com.glia.widgets.core.secureconversations.domain.GetAvailableQueueIdsForSecureMessagingUseCase
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.EngagementUpdateState
 import com.glia.widgets.engagement.ScreenSharingState
@@ -109,7 +109,7 @@ internal class ChatController(
     private val updateFromCallScreenUseCase: UpdateFromCallScreenUseCase,
     private val isSecureEngagementUseCase: IsSecureEngagementUseCase,
     private val engagementConfigUseCase: SetEngagementConfigUseCase,
-    private val isSecureEngagementAvailableUseCase: IsSecureConversationsChatAvailableUseCase,
+    private val getAvailableQueueIdsForSecureMessagingUseCase: GetAvailableQueueIdsForSecureMessagingUseCase,
     private val isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase,
     private val isFileReadyForPreviewUseCase: IsFileReadyForPreviewUseCase,
     private val determineGvaButtonTypeUseCase: DetermineGvaButtonTypeUseCase,
@@ -237,9 +237,10 @@ internal class ChatController(
         if (!isSecureEngagement) return
 
         disposable.add(
-            isSecureEngagementAvailableUseCase().subscribe({
-                if (it) {
+            getAvailableQueueIdsForSecureMessagingUseCase().subscribe({
+                if (it.result != null) {
                     Logger.d(TAG, "Messaging is available")
+                    engagementConfigUseCase(ChatType.SECURE_MESSAGING, it.result)
                 } else {
                     Logger.d(TAG, "Messaging is unavailable")
                     dialogController.showMessageCenterUnavailableDialog()

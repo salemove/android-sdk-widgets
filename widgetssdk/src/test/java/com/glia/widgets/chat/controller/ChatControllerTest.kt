@@ -4,12 +4,12 @@ import android.net.Uri
 import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.widgets.chat.ChatContract
 import com.glia.widgets.chat.ChatManager
+import com.glia.widgets.chat.ChatType
 import com.glia.widgets.chat.domain.DecideOnQueueingUseCase
 import com.glia.widgets.chat.domain.GliaSendMessagePreviewUseCase
 import com.glia.widgets.chat.domain.GliaSendMessageUseCase
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
-import com.glia.widgets.chat.domain.IsSecureConversationsChatAvailableUseCase
 import com.glia.widgets.chat.domain.IsShowSendButtonUseCase
 import com.glia.widgets.chat.domain.SiteInfoUseCase
 import com.glia.widgets.chat.domain.TakePictureUseCase
@@ -35,6 +35,7 @@ import com.glia.widgets.core.permissions.domain.RequestNotificationPermissionIfP
 import com.glia.widgets.core.permissions.domain.WithCameraPermissionUseCase
 import com.glia.widgets.core.permissions.domain.WithReadWritePermissionsUseCase
 import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
+import com.glia.widgets.core.secureconversations.domain.GetAvailableQueueIdsForSecureMessagingUseCase
 import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCase
 import com.glia.widgets.engagement.domain.DeclineMediaUpgradeOfferUseCase
 import com.glia.widgets.engagement.domain.EndEngagementUseCase
@@ -48,11 +49,13 @@ import com.glia.widgets.engagement.domain.ReleaseResourcesUseCase
 import com.glia.widgets.engagement.domain.ScreenSharingUseCase
 import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase
 import com.glia.widgets.filepreview.domain.usecase.IsFileReadyForPreviewUseCase
+import com.glia.widgets.helper.Data
 import com.glia.widgets.helper.TimeCounter
 import com.glia.widgets.view.MessagesNotSeenHandler
 import com.glia.widgets.view.MinimizeHandler
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.core.Single
 import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -87,7 +90,7 @@ class ChatControllerTest {
     private lateinit var updateFromCallScreenUseCase: UpdateFromCallScreenUseCase
     private lateinit var isSecureEngagementUseCase: IsSecureEngagementUseCase
     private lateinit var engagementConfigUseCase: SetEngagementConfigUseCase
-    private lateinit var isSecureConversationsChatAvailableUseCase: IsSecureConversationsChatAvailableUseCase
+    private lateinit var getAvailableQueueIdsForSecureMessagingUseCase: GetAvailableQueueIdsForSecureMessagingUseCase
     private lateinit var isFileReadyForPreviewUseCase: IsFileReadyForPreviewUseCase
     private lateinit var determineGvaButtonTypeUseCase: DetermineGvaButtonTypeUseCase
     private lateinit var updateOperatorDefaultImageUrlUseCase: UpdateOperatorDefaultImageUrlUseCase
@@ -140,7 +143,7 @@ class ChatControllerTest {
         updateFromCallScreenUseCase = mock()
         isSecureEngagementUseCase = mock()
         engagementConfigUseCase = mock()
-        isSecureConversationsChatAvailableUseCase = mock()
+        getAvailableQueueIdsForSecureMessagingUseCase = mock()
         isFileReadyForPreviewUseCase = mock()
         determineGvaButtonTypeUseCase = mock()
         isAuthenticatedUseCase = mock()
@@ -201,7 +204,7 @@ class ChatControllerTest {
             updateFromCallScreenUseCase = updateFromCallScreenUseCase,
             isSecureEngagementUseCase = isSecureEngagementUseCase,
             engagementConfigUseCase = engagementConfigUseCase,
-            isSecureEngagementAvailableUseCase = isSecureConversationsChatAvailableUseCase,
+            getAvailableQueueIdsForSecureMessagingUseCase = getAvailableQueueIdsForSecureMessagingUseCase,
             isFileReadyForPreviewUseCase = isFileReadyForPreviewUseCase,
             determineGvaButtonTypeUseCase = determineGvaButtonTypeUseCase,
             isAuthenticatedUseCase = isAuthenticatedUseCase,
@@ -227,6 +230,71 @@ class ChatControllerTest {
             releaseResourcesUseCase = releaseResourcesUseCase
         )
         chatController.setView(chatView)
+    }
+
+    @Test
+    fun initChat_setsConfiguration_withInitialParams() {
+        val queueIds = listOf("QueueId1", "QueueId2")
+        whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.never()
+
+        chatController.initChat(
+            "CompanyName",
+            queueIds,
+            "VisitorId",
+            ChatType.SECURE_MESSAGING
+        )
+
+        verify(engagementConfigUseCase).invoke(ChatType.SECURE_MESSAGING, queueIds)
+    }
+
+    @Test
+    fun initChat_setsConfiguration_withAvailableQueues() {
+        val queueIds = listOf("QueueId1", "QueueId2")
+        whenever(isSecureEngagementUseCase.invoke()) doReturn true
+        whenever(getAvailableQueueIdsForSecureMessagingUseCase.invoke()) doReturn Single.just(Data.Value(queueIds))
+        whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.never()
+
+        chatController.initChat(
+            "CompanyName",
+            emptyList(),
+            "VisitorId",
+            ChatType.SECURE_MESSAGING
+        )
+
+        verify(engagementConfigUseCase).invoke(ChatType.SECURE_MESSAGING, emptyList())
+        verify(engagementConfigUseCase).invoke(ChatType.SECURE_MESSAGING, queueIds)
+    }
+
+    @Test
+    fun initChat_showsMessageCenterUnavailableDialog_whenNoAvailableQueues() {
+        whenever(isSecureEngagementUseCase.invoke()) doReturn true
+        whenever(getAvailableQueueIdsForSecureMessagingUseCase.invoke()) doReturn Single.just(Data.Value(null))
+        whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.never()
+
+        chatController.initChat(
+            "CompanyName",
+            emptyList(),
+            "VisitorId",
+            ChatType.SECURE_MESSAGING
+        )
+
+        verify(dialogController).showMessageCenterUnavailableDialog()
+    }
+
+    @Test
+    fun initChat_showsUnexpectedErrorDialog_onException() {
+        whenever(isSecureEngagementUseCase.invoke()) doReturn true
+        whenever(getAvailableQueueIdsForSecureMessagingUseCase.invoke()) doReturn Single.error(Exception())
+        whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.never()
+
+        chatController.initChat(
+            "CompanyName",
+            emptyList(),
+            "VisitorId",
+            ChatType.SECURE_MESSAGING
+        )
+
+        verify(dialogController).showUnexpectedErrorDialog()
     }
 
     @Test

@@ -36,7 +36,6 @@ import com.glia.widgets.chat.domain.GliaSendMessageUseCase;
 import com.glia.widgets.chat.domain.HandleCustomCardClickUseCase;
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase;
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase;
-import com.glia.widgets.chat.domain.IsSecureConversationsChatAvailableUseCase;
 import com.glia.widgets.chat.domain.IsShowSendButtonUseCase;
 import com.glia.widgets.chat.domain.MapOperatorAttachmentUseCase;
 import com.glia.widgets.chat.domain.MapOperatorPlainTextUseCase;
@@ -108,13 +107,13 @@ import com.glia.widgets.core.secureconversations.domain.AddSecureFileAttachments
 import com.glia.widgets.core.secureconversations.domain.AddSecureFileToAttachmentAndUploadUseCase;
 import com.glia.widgets.core.secureconversations.domain.GetSecureFileAttachmentsUseCase;
 import com.glia.widgets.core.secureconversations.domain.GetUnreadMessagesCountWithTimeoutUseCase;
-import com.glia.widgets.core.secureconversations.domain.IsMessageCenterAvailableUseCase;
 import com.glia.widgets.core.secureconversations.domain.IsMessagingAvailableUseCase;
 import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase;
 import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDelayUseCase;
 import com.glia.widgets.core.secureconversations.domain.OnNextMessageUseCase;
 import com.glia.widgets.core.secureconversations.domain.RemoveSecureFileAttachmentUseCase;
 import com.glia.widgets.core.secureconversations.domain.ResetMessageCenterUseCase;
+import com.glia.widgets.core.secureconversations.domain.GetAvailableQueueIdsForSecureMessagingUseCase;
 import com.glia.widgets.core.secureconversations.domain.SendMessageButtonStateUseCase;
 import com.glia.widgets.core.secureconversations.domain.SendSecureMessageUseCase;
 import com.glia.widgets.core.secureconversations.domain.ShowMessageLimitErrorUseCase;
@@ -190,8 +189,6 @@ import com.glia.widgets.push.notifications.IsPushNotificationsSetUpUseCaseImpl;
 import com.glia.widgets.view.snackbar.LiveObservationPopupUseCase;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
-import java.util.List;
 
 /**
  * @hide
@@ -548,9 +545,9 @@ public class UseCaseFactory {
     }
 
     @NonNull
-    public SendSecureMessageUseCase createSendSecureMessageUseCase(List<String> queueIds) {
+    public SendSecureMessageUseCase createSendSecureMessageUseCase() {
         return new SendSecureMessageUseCase(
-            queueIds,
+            repositoryFactory.getEngagementConfigRepository(),
             repositoryFactory.getSendMessageRepository(),
             repositoryFactory.getSecureConversationsRepository(),
             repositoryFactory.getSecureFileAttachmentRepository(),
@@ -560,8 +557,13 @@ public class UseCaseFactory {
     }
 
     @NonNull
-    public IsMessageCenterAvailableUseCase createIsMessageCenterAvailableUseCase(List<String> queueIds) {
-        return new IsMessageCenterAvailableUseCase(queueIds, createIsMessagingAvailableUseCase());
+    public GetAvailableQueueIdsForSecureMessagingUseCase createSecureMessagingAvailableQueueIdsUseCase() {
+        return new GetAvailableQueueIdsForSecureMessagingUseCase(
+            repositoryFactory.getEngagementConfigRepository(),
+            repositoryFactory.getGliaQueueRepository(),
+            createIsMessagingAvailableUseCase(),
+            schedulers
+        );
     }
 
     @NonNull
@@ -607,15 +609,7 @@ public class UseCaseFactory {
 
     @NonNull
     public IsMessagingAvailableUseCase createIsMessagingAvailableUseCase() {
-        return new IsMessagingAvailableUseCase(repositoryFactory.getGliaQueueRepository(), schedulers);
-    }
-
-    @NonNull
-    public IsSecureConversationsChatAvailableUseCase createIsSecureConversationsChatAvailableUseCase() {
-        return new IsSecureConversationsChatAvailableUseCase(
-            repositoryFactory.getEngagementConfigRepository(),
-            createIsMessagingAvailableUseCase()
-        );
+        return new IsMessagingAvailableUseCase();
     }
 
     @NonNull

@@ -4,6 +4,7 @@ import com.glia.androidsdk.RequestCallback
 import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.widgets.chat.data.GliaChatRepository
 import com.glia.widgets.chat.model.SendMessagePayload
+import com.glia.widgets.core.engagement.GliaEngagementConfigRepository
 import com.glia.widgets.core.fileupload.SecureFileAttachmentRepository
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
@@ -11,7 +12,7 @@ import com.glia.widgets.core.secureconversations.SendMessageRepository
 import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
 
 internal class SendSecureMessageUseCase(
-    private val queueIds: List<String>,
+    private val engagementConfigRepository: GliaEngagementConfigRepository,
     private val sendMessageRepository: SendMessageRepository,
     private val secureConversationsRepository: SecureConversationsRepository,
     private val fileAttachmentRepository: SecureFileAttachmentRepository,
@@ -27,7 +28,7 @@ internal class SendSecureMessageUseCase(
     ) {
         val message = sendMessageRepository.value
         val fileAttachments = fileAttachmentRepository.getReadyToSendFileAttachments()
-        sendMessage(message, queueIds, fileAttachments, callback)
+        sendMessage(message, engagementConfigRepository.queueIds, fileAttachments, callback)
     }
 
     private fun sendMessage(

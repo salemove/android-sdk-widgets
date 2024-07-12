@@ -9,22 +9,24 @@ import com.glia.androidsdk.engagement.EngagementFile
 import com.glia.androidsdk.site.SiteInfo
 import com.glia.widgets.Constants
 import com.glia.widgets.UiTheme
+import com.glia.widgets.chat.ChatType
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.chat.domain.SiteInfoUseCase
 import com.glia.widgets.chat.domain.TakePictureUseCase
 import com.glia.widgets.chat.domain.UriToFileAttachmentUseCase
 import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.core.dialog.DialogContract
+import com.glia.widgets.core.engagement.domain.SetEngagementConfigUseCase
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.permissions.domain.RequestNotificationPermissionIfPushNotificationsSetUpUseCase
 import com.glia.widgets.core.secureconversations.domain.AddSecureFileAttachmentsObserverUseCase
 import com.glia.widgets.core.secureconversations.domain.AddSecureFileToAttachmentAndUploadUseCase
 import com.glia.widgets.core.secureconversations.domain.GetSecureFileAttachmentsUseCase
-import com.glia.widgets.core.secureconversations.domain.IsMessageCenterAvailableUseCase
 import com.glia.widgets.core.secureconversations.domain.OnNextMessageUseCase
 import com.glia.widgets.core.secureconversations.domain.RemoveSecureFileAttachmentUseCase
 import com.glia.widgets.core.secureconversations.domain.ResetMessageCenterUseCase
+import com.glia.widgets.core.secureconversations.domain.GetAvailableQueueIdsForSecureMessagingUseCase
 import com.glia.widgets.core.secureconversations.domain.SendMessageButtonStateUseCase
 import com.glia.widgets.core.secureconversations.domain.SendSecureMessageUseCase
 import com.glia.widgets.core.secureconversations.domain.ShowMessageLimitErrorUseCase
@@ -35,8 +37,9 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 internal class MessageCenterController(
     private var serviceChatHeadController: ChatHeadContract.Controller,
+    private val engagementConfigUseCase: SetEngagementConfigUseCase,
     private val sendSecureMessageUseCase: SendSecureMessageUseCase,
-    private val isMessageCenterAvailableUseCase: IsMessageCenterAvailableUseCase,
+    private val getAvailableQueueIdsForSecureMessagingUseCase: GetAvailableQueueIdsForSecureMessagingUseCase,
     private val addFileAttachmentsObserverUseCase: AddSecureFileAttachmentsObserverUseCase,
     private val addFileToAttachmentAndUploadUseCase: AddSecureFileToAttachmentAndUploadUseCase,
     private val getFileAttachmentsUseCase: GetSecureFileAttachmentsUseCase,
@@ -59,17 +62,26 @@ internal class MessageCenterController(
     private var state = MessageCenterState()
 
     override fun setConfiguration(uiTheme: UiTheme?, configuration: GliaSdkConfiguration?) {
+        setQueueIds(configuration?.queueIds)
+
         serviceChatHeadController.setBuildTimeTheme(uiTheme)
         serviceChatHeadController.setSdkConfiguration(configuration)
     }
 
+    private fun setQueueIds(queueIds: List<String>?) {
+        engagementConfigUseCase(ChatType.SECURE_MESSAGING, queueIds ?: emptyList())
+    }
+
     override fun setView(view: MessageCenterContract.View) {
         this.view = view
+    }
 
+    override fun initialize() {
         if (isAuthenticatedUseCase()) {
             initComponents()
         } else {
             dialogController.showUnauthenticatedDialog()
+            Logger.i(TAG, "Secure Messaging is unavailable because the visitor is not authenticated.")
         }
     }
 
@@ -189,15 +201,17 @@ internal class MessageCenterController(
     }
 
     override fun ensureMessageCenterAvailability() {
-        isMessageCenterAvailableUseCase(
-            RequestCallback { isAvailable: Boolean?, exception ->
+        getAvailableQueueIdsForSecureMessagingUseCase(
+            RequestCallback { queueIds, exception ->
+                setQueueIds(queueIds)
+
                 val showSendMessageGroup = when {
                     exception != null -> {
                         dialogController.showUnexpectedErrorDialog()
                         false
                     }
 
-                    isAvailable == false -> {
+                    queueIds == null -> {
                         dialogController.showMessageCenterUnavailableDialog()
                         false
                     }
@@ -243,7 +257,7 @@ internal class MessageCenterController(
     }
 
     override fun onDestroy() {
-        isMessageCenterAvailableUseCase.dispose()
+        getAvailableQueueIdsForSecureMessagingUseCase.dispose()
         disposables.dispose()
     }
 

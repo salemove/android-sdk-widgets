@@ -1,7 +1,6 @@
 package com.glia.widgets.di;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.glia.widgets.call.CallContract;
 import com.glia.widgets.call.CallController;
@@ -41,8 +40,6 @@ import com.glia.widgets.view.head.controller.ApplicationChatHeadLayoutController
 import com.glia.widgets.view.head.controller.ServiceChatHeadController;
 import com.glia.widgets.view.snackbar.ActivityWatcherForLiveObservationContract;
 import com.glia.widgets.view.snackbar.ActivityWatcherForLiveObservationController;
-
-import java.util.List;
 
 /**
  * @hide
@@ -118,7 +115,7 @@ public class ControllerFactory {
                 useCaseFactory.createUpdateFromCallScreenUseCase(),
                 useCaseFactory.createIsSecureEngagementUseCase(),
                 useCaseFactory.createSetEngagementConfigUseCase(),
-                useCaseFactory.createIsSecureConversationsChatAvailableUseCase(),
+                useCaseFactory.createSecureMessagingAvailableQueueIdsUseCase(),
                 useCaseFactory.getIsCurrentEngagementCallVisualizer(),
                 useCaseFactory.createIsFileReadyForPreviewUseCase(),
                 useCaseFactory.createDetermineGvaButtonTypeUseCase(),
@@ -287,11 +284,12 @@ public class ControllerFactory {
         return callVisualizerController;
     }
 
-    public MessageCenterContract.Controller getMessageCenterController(@Nullable List<String> queueIds) {
+    public MessageCenterContract.Controller getMessageCenterController() {
         return new MessageCenterController(
             serviceChatHeadController,
-            useCaseFactory.createSendSecureMessageUseCase(queueIds),
-            useCaseFactory.createIsMessageCenterAvailableUseCase(queueIds),
+            useCaseFactory.createSetEngagementConfigUseCase(),
+            useCaseFactory.createSendSecureMessageUseCase(),
+            useCaseFactory.createSecureMessagingAvailableQueueIdsUseCase(),
             useCaseFactory.createAddSecureFileAttachmentsObserverUseCase(),
             useCaseFactory.createAddSecureFileToAttachmentAndUploadUseCase(),
             useCaseFactory.createGetSecureFileAttachmentsUseCase(),

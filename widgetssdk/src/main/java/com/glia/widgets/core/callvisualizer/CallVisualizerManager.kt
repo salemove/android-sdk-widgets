@@ -14,22 +14,12 @@ internal class CallVisualizerManager(
     private val buildVisitorCodeUseCase: VisitorCodeViewBuilderUseCase,
     private val callVisualizerController: CallVisualizerContract.Controller
 ) : CallVisualizer {
-    private fun checkForProperInit() {
-        if (Dependencies.getSdkConfigurationManager().companyName.isNullOrEmpty()) {
-            throw GliaException(
-                "companyName not set during GliaWidgets.init(GliaWidgetsConfig gliaWidgetsConfig)",
-                GliaException.Cause.INVALID_INPUT
-            )
-        }
-    }
 
     override fun createVisitorCodeView(context: Context): View {
-        checkForProperInit()
         return buildVisitorCodeUseCase(context, false)
     }
 
     override fun showVisitorCodeDialog() {
-        checkForProperInit()
         callVisualizerController.showVisitorCodeDialog()
     }
 

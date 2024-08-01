@@ -6,6 +6,8 @@ import android.content.Intent
 import androidx.annotation.VisibleForTesting
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.Engagement.MediaType
+import com.glia.androidsdk.EngagementRequest
+import com.glia.androidsdk.EngagementRequest.Outcome
 import com.glia.androidsdk.Glia
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.IncomingEngagementRequest
@@ -50,6 +52,7 @@ internal const val SKIP_ASKING_SCREEN_SHARING_PERMISSION_RESULT_CODE = 0x1995
 
 internal class EngagementRepositoryImpl(private val core: GliaCore, private val operatorRepository: GliaOperatorRepository) : EngagementRepository {
     private val engagementRequestCallback = Consumer<IncomingEngagementRequest>(::handleIncomingEngagementRequest)
+    private val engagementOutcomeCallback = Consumer<Outcome>(::handleEngagementOutcome)
 
     private val omniCoreEngagementCallback = Consumer<OmnicoreEngagement>(::handleOmniCoreEngagement)
     private val callVisualizerEngagementCallback = Consumer<OmnibrowseEngagement>(::handleCallVisualizerEngagement)
@@ -60,6 +63,9 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
 
     private val _engagementRequest: BehaviorProcessor<IncomingEngagementRequest> = BehaviorProcessor.create()
     override val engagementRequest: Flowable<IncomingEngagementRequest> = _engagementRequest.onBackpressureLatest()
+
+    private val _engagementOutcome: BehaviorProcessor<Outcome> = BehaviorProcessor.create()
+    override val engagementOutcome: Flowable<Outcome> = _engagementOutcome.onBackpressureLatest()
 
     private val queueTicketCallback = Consumer<QueueTicket>(::handleQueueTicket)
 
@@ -294,7 +300,15 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
     }
 
     private fun handleIncomingEngagementRequest(engagementRequest: IncomingEngagementRequest) {
+        engagementRequest.on(EngagementRequest.Events.OUTCOME, engagementOutcomeCallback)
         _engagementRequest.onNext(engagementRequest)
+    }
+
+    private fun handleEngagementOutcome(outcome: Outcome) {
+        _engagementOutcome.onNext(outcome)
+        _engagementRequest.firstOrError().unSafeSubscribe { request ->
+            request.off(EngagementRequest.Events.OUTCOME, engagementOutcomeCallback)
+        }
     }
 
     private fun handleQueueTicket(ticket: QueueTicket) {

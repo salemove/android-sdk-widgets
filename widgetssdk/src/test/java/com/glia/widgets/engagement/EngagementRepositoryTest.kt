@@ -4,6 +4,7 @@ import android.LOGGER_PATH
 import android.app.Activity
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.Engagement.MediaType
+import com.glia.androidsdk.EngagementRequest
 import com.glia.androidsdk.Glia
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.IncomingEngagementRequest
@@ -407,6 +408,7 @@ class EngagementRepositoryTest {
     @Test
     fun `engagementRequest will emit value when engagement is requested`() {
         val incomingEngagementRequest: IncomingEngagementRequest = mockk()
+        every { incomingEngagementRequest.on(EngagementRequest.Events.OUTCOME, any()) } returns Unit
         val incomingEngagementRequestTest = repository.engagementRequest.test()
 
         engagementRequestCallbackSlot.captured.accept(incomingEngagementRequest)
@@ -417,10 +419,13 @@ class EngagementRepositoryTest {
     fun `acceptCurrentEngagementRequest will accept current IncomingEngagementRequest`() {
         val exceptionCallbackSlot = slot<Consumer<GliaException?>>()
         val incomingEngagementRequest: IncomingEngagementRequest = mockk(relaxUnitFun = true)
+        every { incomingEngagementRequest.on(EngagementRequest.Events.OUTCOME, any()) } returns Unit
         val incomingEngagementRequestTest = repository.engagementRequest.test()
 
         engagementRequestCallbackSlot.captured.accept(incomingEngagementRequest)
         incomingEngagementRequestTest.assertNoErrors().assertValue(incomingEngagementRequest)
+
+        verify { incomingEngagementRequest.on(EngagementRequest.Events.OUTCOME, any()) }
 
         val contextAssetId = "asset_id"
 
@@ -439,10 +444,13 @@ class EngagementRepositoryTest {
     fun `declineCurrentEngagementRequest() will decline current IncomingEngagementRequest and log info if succeed`() {
         val exceptionCallbackSlot = slot<Consumer<GliaException?>>()
         val incomingEngagementRequest: IncomingEngagementRequest = mockk(relaxUnitFun = true)
+        every { incomingEngagementRequest.on(EngagementRequest.Events.OUTCOME, any()) } returns Unit
         val incomingEngagementRequestTest = repository.engagementRequest.test()
 
         engagementRequestCallbackSlot.captured.accept(incomingEngagementRequest)
         incomingEngagementRequestTest.assertNoErrors().assertValue(incomingEngagementRequest)
+
+        verify { incomingEngagementRequest.on(EngagementRequest.Events.OUTCOME, any()) }
 
         repository.declineCurrentEngagementRequest()
         verify { incomingEngagementRequest.decline(capture(exceptionCallbackSlot)) }
@@ -458,10 +466,13 @@ class EngagementRepositoryTest {
     fun `declineCurrentEngagementRequest() will decline current IncomingEngagementRequest and log error if failed`() {
         val exceptionCallbackSlot = slot<Consumer<GliaException?>>()
         val incomingEngagementRequest: IncomingEngagementRequest = mockk(relaxUnitFun = true)
+        every { incomingEngagementRequest.on(EngagementRequest.Events.OUTCOME, any()) } returns Unit
         val incomingEngagementRequestTest = repository.engagementRequest.test()
 
         engagementRequestCallbackSlot.captured.accept(incomingEngagementRequest)
         incomingEngagementRequestTest.assertNoErrors().assertValue(incomingEngagementRequest)
+
+        verify { incomingEngagementRequest.on(EngagementRequest.Events.OUTCOME, any()) }
 
         repository.declineCurrentEngagementRequest()
         verify { incomingEngagementRequest.decline(capture(exceptionCallbackSlot)) }
@@ -475,6 +486,31 @@ class EngagementRepositoryTest {
         verify { Logger.e(any(), any()) }
 
         confirmVerified(incomingEngagementRequest)
+    }
+
+    @Test
+    fun `engagementOutcome will emit value when outcome is requested`() {
+        val incomingEngagementRequest: IncomingEngagementRequest = mockk()
+        val outcomeSlot = slot<Consumer<EngagementRequest.Outcome>>()
+        every { incomingEngagementRequest.on(EngagementRequest.Events.OUTCOME, capture(outcomeSlot)) } returns Unit
+        val engagementOutcomeTest = repository.engagementOutcome.test()
+
+        engagementRequestCallbackSlot.captured.accept(incomingEngagementRequest)
+        outcomeSlot.captured.accept(EngagementRequest.Outcome.ACCEPTED)
+
+        engagementOutcomeTest.assertNoErrors().assertValue(EngagementRequest.Outcome.ACCEPTED)
+    }
+
+    @Test
+    fun `unsubscribe from engagement outcome event will happen when the outcome is come`() {
+        val incomingEngagementRequest: IncomingEngagementRequest = mockk()
+        val outcomeSlot = slot<Consumer<EngagementRequest.Outcome>>()
+        every { incomingEngagementRequest.on(EngagementRequest.Events.OUTCOME, capture(outcomeSlot)) } returns Unit
+
+        engagementRequestCallbackSlot.captured.accept(incomingEngagementRequest)
+        outcomeSlot.captured.accept(EngagementRequest.Outcome.ACCEPTED)
+
+        verify { incomingEngagementRequest.off(EngagementRequest.Events.OUTCOME, any()) }
     }
 
     @Test

@@ -34,7 +34,10 @@ internal class CallVisualizerActivityWatcher(
             activity == null || activity.isFinishing -> Logger.d(TAG, "skipping.. activity is null or finishing")
             activity is WebBrowserActivity && state is ControllerState.DisplayConfirmationDialog -> Logger.d(TAG, "skipping.. WebBrowser is open")
             activity is WebBrowserActivity && state is ControllerState.OpenWebBrowserScreen -> event.consume { controller.onWebBrowserOpened() }
-            state is ControllerState.DismissDialog -> event.consume { dismissAlertDialogSilently() }
+            state is ControllerState.DismissDialog -> event.consume {
+                dismissAlertDialogSilently()
+                closeHolderActivity(activity)
+            }
             //Ensure this state remains unconsumed until the opening of the WebBrowserActivity.
             state is ControllerState.OpenWebBrowserScreen -> openWebBrowser(activity, state.title, state.url)
             state is ControllerState.CloseHolderActivity -> event.consume { closeHolderActivity(activity) }

@@ -281,7 +281,8 @@ public class ControllerFactory {
                 useCaseFactory.getEngagementRequestUseCase(),
                 useCaseFactory.getEngagementStateUseCase(),
                 useCaseFactory.createConfirmationDialogLinksUseCase(),
-                useCaseFactory.createGetUrlFromLinkUseCase()
+                useCaseFactory.createGetUrlFromLinkUseCase(),
+                useCaseFactory.getOnIncomingEngagementRequestTimeoutUseCase()
             );
         }
         return callVisualizerController;

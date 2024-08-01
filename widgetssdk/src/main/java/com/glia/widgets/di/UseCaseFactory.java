@@ -156,6 +156,8 @@ import com.glia.widgets.engagement.domain.OperatorMediaUseCase;
 import com.glia.widgets.engagement.domain.OperatorMediaUseCaseImpl;
 import com.glia.widgets.engagement.domain.OperatorTypingUseCase;
 import com.glia.widgets.engagement.domain.OperatorTypingUseCaseImpl;
+import com.glia.widgets.engagement.domain.OnIncomingEngagementRequestTimeoutUseCase;
+import com.glia.widgets.engagement.domain.OnIncomingEngagementRequestTimeoutUseCaseImpl;
 import com.glia.widgets.engagement.domain.PrepareToScreenSharingUseCase;
 import com.glia.widgets.engagement.domain.PrepareToScreenSharingUseCaseImpl;
 import com.glia.widgets.engagement.domain.ReleaseResourcesUseCase;
@@ -949,6 +951,11 @@ public class UseCaseFactory {
     @NonNull
     public EngagementRequestUseCase getEngagementRequestUseCase() {
         return new EngagementRequestUseCaseImpl(repositoryFactory.getEngagementRepository());
+    }
+
+    @NonNull
+    public OnIncomingEngagementRequestTimeoutUseCase getOnIncomingEngagementRequestTimeoutUseCase() {
+        return new OnIncomingEngagementRequestTimeoutUseCaseImpl(repositoryFactory.getEngagementRepository());
     }
 
     @NonNull

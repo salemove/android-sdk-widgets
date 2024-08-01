@@ -9,6 +9,7 @@ import com.glia.widgets.core.engagement.domain.ConfirmationDialogUseCase
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementRequestUseCase
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
+import com.glia.widgets.engagement.domain.OnIncomingEngagementRequestTimeoutUseCase
 import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.webbrowser.domain.GetUrlFromLinkUseCase
 import io.mockk.CapturingSlot
@@ -27,6 +28,7 @@ import org.junit.Test
 
 class CallVisualizerControllerTest {
     private val incomingEngagementProcessor: PublishProcessor<IncomingEngagementRequest> = PublishProcessor.create()
+    private val incomingEngagementRequestTimeoutProcessor: PublishProcessor<Unit> = PublishProcessor.create()
     private val engagementStateProcessor: PublishProcessor<State> = PublishProcessor.create()
 
     private lateinit var dialogController: DialogContract.Controller
@@ -35,6 +37,7 @@ class CallVisualizerControllerTest {
     private lateinit var engagementStateUseCase: EngagementStateUseCase
     private lateinit var confirmationDialogLinksUseCase: ConfirmationDialogLinksUseCase
     private lateinit var getUrlFromLinkUseCase: GetUrlFromLinkUseCase
+    private lateinit var onIncomingEngagementRequestTimeoutUseCase: OnIncomingEngagementRequestTimeoutUseCase
 
     private lateinit var dialogCallback: CapturingSlot<DialogContract.Controller.Callback>
 
@@ -59,13 +62,17 @@ class CallVisualizerControllerTest {
 
         dialogCallback = slot()
 
+        onIncomingEngagementRequestTimeoutUseCase = mockk()
+        every { onIncomingEngagementRequestTimeoutUseCase() } returns incomingEngagementRequestTimeoutProcessor
+
         controller = CallVisualizerController(
             dialogController,
             confirmationDialogUseCase,
             engagementRequestUseCase,
             engagementStateUseCase,
             confirmationDialogLinksUseCase,
-            getUrlFromLinkUseCase
+            getUrlFromLinkUseCase,
+            onIncomingEngagementRequestTimeoutUseCase
         )
 
         verify { dialogController.addCallback(capture(dialogCallback)) }
@@ -210,6 +217,14 @@ class CallVisualizerControllerTest {
         verify { dialogController.showCVEngagementConfirmationDialog() }
     }
 
+    @Test
+    fun `incoming engagement request timeout will request to dismiss CV dialog`() {
+        verify(exactly = 0) { dialogController.dismissCVEngagementConfirmationDialog() }
+
+        incomingEngagementRequestTimeoutProcessor.onNext(Unit)
+
+        verify { dialogController.dismissCVEngagementConfirmationDialog() }
+    }
 
     private fun emitDialogState(state: DialogState) {
         dialogCallback.captured.emitDialogState(state)

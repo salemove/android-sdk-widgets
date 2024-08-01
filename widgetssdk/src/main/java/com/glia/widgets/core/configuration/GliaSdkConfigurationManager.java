@@ -15,6 +15,9 @@ import org.jetbrains.annotations.Nullable;
 /**
  * @hide
  */
+// Is used for starting chat, call in bubble (ActivityWatcherForChatHead)).
+// I think this class adds mess. Why don't we use the same config object that is passed on SDK init?
+// However, it's rather difficult to get rid of this now.
 public class GliaSdkConfigurationManager {
 
     private static final String TAG = GliaSdkConfigurationManager.class.getSimpleName();

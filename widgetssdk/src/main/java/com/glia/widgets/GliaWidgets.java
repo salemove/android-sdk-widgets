@@ -24,6 +24,7 @@ import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.function.Consumer;
 
 import io.reactivex.rxjava3.exceptions.UndeliverableException;
@@ -299,6 +300,11 @@ public class GliaWidgets {
      */
     public static CallVisualizer getCallVisualizer() {
         return Dependencies.getCallVisualizerManager();
+    }
+
+    public static Navigator getNavigator(@Nullable ArrayList<String> queues,
+                                         @Nullable String contextAssetId) { // TODO: 01.08.2024 Wrap all params to some object? Ideally existing one, not new because there are to many config classes already.
+        return Dependencies.getNavigator(queues, contextAssetId);
     }
 
     /**

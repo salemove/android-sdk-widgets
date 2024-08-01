@@ -32,11 +32,11 @@ import com.glia.exampleapp.ExampleAppConfigManager.createDefaultConfig
 import com.glia.exampleapp.Utils.getAuthenticationBehaviorFromPrefs
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.UiTheme
-import com.glia.widgets.call.CallActivity
 import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.chat.ChatType
 import com.glia.widgets.core.notification.NotificationActionReceiver
 import com.glia.widgets.messagecenter.MessageCenterActivity
+import com.glia.widgets.view.entrywidget.EntryWidget
 import com.google.android.material.appbar.MaterialToolbar
 import kotlin.concurrent.thread
 import kotlin.properties.Delegates
@@ -291,14 +291,20 @@ class MainFragment : Fragment() {
 
     private fun navigateToCall(mediaType: String) {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-        val intent = Intent(context, CallActivity::class.java)
-            .putExtra(GliaWidgets.QUEUE_IDS, ArrayList(getQueueIdsFromPrefs(sharedPreferences)))
-            .putExtra(GliaWidgets.CONTEXT_ASSET_ID, getContextAssetIdFromPrefs(sharedPreferences))
-            .putExtra(GliaWidgets.UI_THEME, getRuntimeThemeFromPrefs(sharedPreferences))
-//            .putExtra(GliaWidgets.USE_OVERLAY, true) // Use it to make sure this deprecated approach is still working
-            .putExtra(GliaWidgets.SCREEN_SHARING_MODE, getScreenSharingModeFromPrefs(sharedPreferences))
-            .putExtra(GliaWidgets.MEDIA_TYPE, Utils.toMediaType(mediaType))
-        startActivity(intent)
+        context?.let {
+            GliaWidgets.getNavigator(
+                ArrayList(getQueueIdsFromPrefs(sharedPreferences)),
+                getContextAssetIdFromPrefs(sharedPreferences)
+            ).startAudioCall(it)
+        }
+//        val intent = Intent(context, CallActivity::class.java)
+//            .putExtra(GliaWidgets.QUEUE_IDS, ArrayList(getQueueIdsFromPrefs(sharedPreferences)))
+//            .putExtra(GliaWidgets.CONTEXT_ASSET_ID, getContextAssetIdFromPrefs(sharedPreferences))
+//            .putExtra(GliaWidgets.UI_THEME, getRuntimeThemeFromPrefs(sharedPreferences))
+////            .putExtra(GliaWidgets.USE_OVERLAY, true) // Use it to make sure this deprecated approach is still working
+//            .putExtra(GliaWidgets.SCREEN_SHARING_MODE, getScreenSharingModeFromPrefs(sharedPreferences))
+//            .putExtra(GliaWidgets.MEDIA_TYPE, Utils.toMediaType(mediaType))
+//        startActivity(intent)
     }
 
     private fun setNavigationIntentData(intent: Intent) {
@@ -587,12 +593,21 @@ class MainFragment : Fragment() {
 
     private fun showVisitorCode() {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-        val visitorContext = getContextAssetIdFromPrefs(sharedPreferences)
-        val cv = GliaWidgets.getCallVisualizer()
-        if (!visitorContext.isNullOrBlank()) {
-            cv.addVisitorContext(visitorContext)
+//        val visitorContext = getContextAssetIdFromPrefs(sharedPreferences)
+//        val cv = GliaWidgets.getCallVisualizer()
+//        if (!visitorContext.isNullOrBlank()) {
+//            cv.addVisitorContext(visitorContext)
+//        }
+//        cv.showVisitorCodeDialog()
+
+        context?.let {
+            val navigator = GliaWidgets.getNavigator(
+                ArrayList(getQueueIdsFromPrefs(sharedPreferences)),
+                getContextAssetIdFromPrefs(sharedPreferences)
+            )
+            val entryWidget = EntryWidget(navigator)
+            entryWidget.show(getParentFragmentManager())
         }
-        cv.showVisitorCodeDialog()
     }
 
     // For testing the integrated Visitor Code solution

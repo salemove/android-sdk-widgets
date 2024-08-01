@@ -17,7 +17,7 @@ import androidx.core.view.isVisible
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
-import com.glia.widgets.call.CallActivity
+import com.glia.widgets.call.CallActivityIntentHelper
 import com.glia.widgets.call.CallConfiguration
 import com.glia.widgets.callvisualizer.EndScreenSharingActivity
 import com.glia.widgets.chat.ChatActivity
@@ -198,7 +198,7 @@ internal class ChatHeadView @JvmOverloads constructor(
         val activityConfig =
             CallConfiguration.Builder().setEngagementConfiguration(engagementConfiguration).build()
 
-        val intent = CallActivity.getIntent(context, activityConfig)
+        val intent = CallActivityIntentHelper.createIntent(context, activityConfig)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         context.startActivity(intent)
     }

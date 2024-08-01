@@ -14,7 +14,7 @@ import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.base.FadeTransitionActivity;
-import com.glia.widgets.call.CallActivity;
+import com.glia.widgets.call.CallActivityIntentHelper;
 import com.glia.widgets.call.CallConfiguration;
 import com.glia.widgets.core.configuration.EngagementConfiguration;
 import com.glia.widgets.di.Dependencies;
@@ -217,7 +217,7 @@ public final class ChatActivity extends FadeTransitionActivity {
 
     private void startCallScreen(UiTheme theme, String mediaType) {
         startActivity(
-            CallActivity.getIntent(
+            CallActivityIntentHelper.createIntent(
                 getApplicationContext(),
                 getConfigurationBuilder().setMediaType(mediaType)
                     .setIsUpgradeToCall(true)
@@ -228,7 +228,7 @@ public final class ChatActivity extends FadeTransitionActivity {
     }
 
     private void backToCallScreen() {
-        startActivity(CallActivity.getIntent(getApplicationContext(), getConfigurationBuilder().build()));
+        startActivity(CallActivityIntentHelper.createIntent(getApplicationContext(), getConfigurationBuilder().build()));
         finish();
     }
 

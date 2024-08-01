@@ -1,0 +1,35 @@
+<!-- res/layout/bottom_sheet_layout.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <Button
+        android:id="@+id/liveChat"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Live Chat"
+        android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/audio"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Audio"
+        android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/video"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Video"
+        android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/secureMessaging"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Secure Messaging"
+        android:textSize="18sp" />
+</LinearLayout>

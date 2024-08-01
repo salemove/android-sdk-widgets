@@ -206,7 +206,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_m"
-                android:text="@string/main_show_visitor_code"
+                android:text="Contact us"
                 app:layout_constraintEnd_toStartOf="@+id/end_guideline"
                 app:layout_constraintStart_toStartOf="@+id/start_guideline"
                 app:layout_constraintTop_toBottomOf="@+id/clear_session_button" />

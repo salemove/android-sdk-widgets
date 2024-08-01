@@ -8,7 +8,7 @@ import com.glia.widgets.GliaWidgets
 import com.glia.widgets.core.configuration.EngagementConfiguration
 import java.util.ArrayList
 
-internal object CallActivityIntentHelper {
+internal object CallActivityIntentHelper { // Is needed internally only
 
     @JvmStatic
     fun createIntent(context: Context, callConfiguration: CallConfiguration): Intent {

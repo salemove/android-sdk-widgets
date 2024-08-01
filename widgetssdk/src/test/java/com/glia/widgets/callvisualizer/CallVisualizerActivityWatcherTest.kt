@@ -140,6 +140,7 @@ class CallVisualizerActivityWatcherTest {
         verify { dismissDialogEvent.value }
         verify { dismissDialogEvent.consume(any()) }
         verify { dialog.dismiss() }
+        verify { activity.finish() }
 
         confirmVerified(dialog, activity, event, dismissDialogEvent)
 

@@ -9,6 +9,7 @@ import com.glia.widgets.core.dialog.model.Link
 import com.glia.widgets.core.engagement.domain.ConfirmationDialogUseCase
 import com.glia.widgets.engagement.domain.EngagementRequestUseCase
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
+import com.glia.widgets.engagement.domain.OnIncomingEngagementRequestTimeoutUseCase
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.OneTimeEvent
 import com.glia.widgets.helper.TAG
@@ -50,7 +51,8 @@ internal class CallVisualizerController(
     private val engagementRequestUseCase: EngagementRequestUseCase,
     private val engagementStateUseCase: EngagementStateUseCase,
     private val confirmationDialogLinksUseCase: ConfirmationDialogLinksUseCase,
-    private val getUrlFromLinkUseCase: GetUrlFromLinkUseCase
+    private val getUrlFromLinkUseCase: GetUrlFromLinkUseCase,
+    private val onIncomingEngagementRequestTimeoutUseCase: OnIncomingEngagementRequestTimeoutUseCase
 ) : CallVisualizerContract.Controller {
 
     private val _state: PublishProcessor<CallVisualizerContract.State> = PublishProcessor.create()
@@ -66,6 +68,7 @@ internal class CallVisualizerController(
 
     private fun registerCallVisualizerListeners() {
         engagementRequestUseCase().unSafeSubscribe { onEngagementRequested() }
+        onIncomingEngagementRequestTimeoutUseCase().unSafeSubscribe { onIncomingEngagementRequestTimeout() }
         dialogController.addCallback(::handleDialogState)
         engagementStartFlow.unSafeSubscribe { dismissVisitorCodeDialog() }
     }
@@ -100,6 +103,11 @@ internal class CallVisualizerController(
                 engagementRequestUseCase.accept(visitorContextAssetId.orEmpty())
             }
         }
+    }
+
+    private fun onIncomingEngagementRequestTimeout() {
+        closeHolderActivity()
+        dialogController.dismissCVEngagementConfirmationDialog()
     }
 
     override fun onLinkClicked(link: Link) {

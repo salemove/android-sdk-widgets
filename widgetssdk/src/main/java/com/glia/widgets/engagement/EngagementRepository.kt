@@ -3,6 +3,7 @@ package com.glia.widgets.engagement
 import android.app.Activity
 import android.content.Intent
 import com.glia.androidsdk.Engagement.MediaType
+import com.glia.androidsdk.EngagementRequest.Outcome
 import com.glia.androidsdk.IncomingEngagementRequest
 import com.glia.androidsdk.Operator
 import com.glia.androidsdk.comms.CameraDevice
@@ -14,6 +15,7 @@ import io.reactivex.rxjava3.core.Flowable
 
 internal interface EngagementRepository {
     val engagementRequest: Flowable<IncomingEngagementRequest>
+    val engagementOutcome: Flowable<Outcome>
     val engagementState: Flowable<State>
     val survey: Flowable<SurveyState>
     val currentOperator: Flowable<Data<Operator>>

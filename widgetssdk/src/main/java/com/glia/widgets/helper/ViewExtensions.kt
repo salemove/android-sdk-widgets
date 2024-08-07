@@ -39,6 +39,7 @@ import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.schedulers.Schedulers
 
 internal fun View.getColorCompat(@ColorRes resId: Int) = ContextCompat.getColor(context, resId)
 internal fun View.getColorStateListCompat(@ColorRes resId: Int) =
@@ -159,13 +160,14 @@ internal fun TextView.setLocaleText(@StringRes stringKey: Int, vararg values: St
     }
 }
 
-internal fun TextView.setText(locale: LocaleString?) {
+internal fun TextView.setText(locale: LocaleString?, listener: ((String) -> Unit)? = null) {
     if (locale == null) {
         text = ""
         return
     }
     registerLocaleListener(locale.stringKey, *locale.values.toTypedArray()) { upToDateTranslation ->
         text = upToDateTranslation
+        listener?.invoke(upToDateTranslation)
     }
 }
 

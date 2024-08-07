@@ -10,6 +10,7 @@ import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementRequestUseCase
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import com.glia.widgets.locale.LocaleString
+import com.glia.widgets.webbrowser.domain.GetUrlFromLinkUseCase
 import io.mockk.CapturingSlot
 import io.mockk.confirmVerified
 import io.mockk.every
@@ -33,6 +34,7 @@ class CallVisualizerControllerTest {
     private lateinit var engagementRequestUseCase: EngagementRequestUseCase
     private lateinit var engagementStateUseCase: EngagementStateUseCase
     private lateinit var confirmationDialogLinksUseCase: ConfirmationDialogLinksUseCase
+    private lateinit var getUrlFromLinkUseCase: GetUrlFromLinkUseCase
 
     private lateinit var dialogCallback: CapturingSlot<DialogContract.Controller.Callback>
 
@@ -53,6 +55,8 @@ class CallVisualizerControllerTest {
 
         confirmationDialogLinksUseCase = mockk(relaxed = true)
 
+        getUrlFromLinkUseCase = mockk()
+
         dialogCallback = slot()
 
         controller = CallVisualizerController(
@@ -60,7 +64,8 @@ class CallVisualizerControllerTest {
             confirmationDialogUseCase,
             engagementRequestUseCase,
             engagementStateUseCase,
-            confirmationDialogLinksUseCase
+            confirmationDialogLinksUseCase,
+            getUrlFromLinkUseCase
         )
 
         verify { dialogController.addCallback(capture(dialogCallback)) }
@@ -144,16 +149,22 @@ class CallVisualizerControllerTest {
 
     @Test
     fun `onLinkClicked will produce OpenWebBrowserScreen state`() {
-        val link = Link(mockk<LocaleString>(), "url")
+        val urlStringKey = 123
+        val url = "https://glia.com"
+        val urlLocaleString = LocaleString(urlStringKey, emptyList())
+        val link = Link(mockk<LocaleString>(), urlLocaleString)
+
+        every { getUrlFromLinkUseCase(link) } returns url
 
         val testState = controller.state.test()
 
         controller.onLinkClicked(link)
 
         verify { dialogController.dismissCurrentDialog() }
+        verify { getUrlFromLinkUseCase(link) }
 
         testState.assertNotComplete().assertValue {
-            it.value == CallVisualizerContract.State.OpenWebBrowserScreen(link.title, link.url)
+            it.value == CallVisualizerContract.State.OpenWebBrowserScreen(link.title, url)
         }
     }
 

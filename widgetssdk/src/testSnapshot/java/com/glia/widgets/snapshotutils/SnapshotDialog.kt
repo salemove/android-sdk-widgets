@@ -5,6 +5,7 @@ import android.view.View
 import androidx.annotation.DrawableRes
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
+import com.glia.widgets.core.dialog.model.Link
 import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.view.dialog.base.DialogType
 import com.glia.widgets.view.dialog.base.DialogViewFactory
@@ -30,8 +31,20 @@ internal interface SnapshotDialog: SnapshotTheme, SnapshotProviders {
     val link1Text: LocaleString
         get() = LocaleString(R.string.dialog_link1_text)
 
+    val link1Url: LocaleString
+        get() = LocaleString(R.string.dialog_link1_url)
+
+    val link1: Link
+        get() = Link(link1Text, link1Url)
+
     val link2Text: LocaleString
         get() = LocaleString(R.string.dialog_link2_text)
+
+    val link2Url: LocaleString
+        get() = LocaleString(R.string.dialog_link2_url)
+
+    val link2: Link
+        get() = Link(link2Text, link2Url)
 
     @get:DrawableRes
     val icon: Int

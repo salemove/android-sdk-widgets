@@ -9,9 +9,12 @@ import com.glia.widgets.core.dialog.model.Link
 import com.glia.widgets.core.engagement.domain.ConfirmationDialogUseCase
 import com.glia.widgets.engagement.domain.EngagementRequestUseCase
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
+import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.OneTimeEvent
+import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.asOneTimeStateFlowable
 import com.glia.widgets.helper.unSafeSubscribe
+import com.glia.widgets.webbrowser.domain.GetUrlFromLinkUseCase
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.processors.PublishProcessor
 import com.glia.widgets.engagement.State as EngagementState
@@ -46,7 +49,8 @@ internal class CallVisualizerController(
     private val confirmationDialogUseCase: ConfirmationDialogUseCase,
     private val engagementRequestUseCase: EngagementRequestUseCase,
     private val engagementStateUseCase: EngagementStateUseCase,
-    private val confirmationDialogLinksUseCase: ConfirmationDialogLinksUseCase
+    private val confirmationDialogLinksUseCase: ConfirmationDialogLinksUseCase,
+    private val getUrlFromLinkUseCase: GetUrlFromLinkUseCase
 ) : CallVisualizerContract.Controller {
 
     private val _state: PublishProcessor<CallVisualizerContract.State> = PublishProcessor.create()
@@ -100,7 +104,11 @@ internal class CallVisualizerController(
 
     override fun onLinkClicked(link: Link) {
         dialogController.dismissCurrentDialog()
-        _state.onNext(CallVisualizerContract.State.OpenWebBrowserScreen(link.title, link.url))
+        getUrlFromLinkUseCase(link)?.let {
+            _state.onNext(CallVisualizerContract.State.OpenWebBrowserScreen(link.title, it))
+        } ?: run {
+            Logger.e(TAG, "The URL is missing after the confirmation dialog link is clicked")
+        }
     }
 
     override fun onEngagementConfirmationDialogAllowed() {

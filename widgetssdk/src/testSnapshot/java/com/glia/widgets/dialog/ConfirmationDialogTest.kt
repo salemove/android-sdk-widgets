@@ -1,7 +1,7 @@
 package com.glia.widgets.dialog
 
 import com.glia.widgets.SnapshotTest
-import com.glia.widgets.locale.LocaleString
+import com.glia.widgets.core.dialog.model.Link
 import com.glia.widgets.snapshotutils.SnapshotDialog
 import com.glia.widgets.view.dialog.base.DialogPayload
 import com.glia.widgets.view.dialog.base.DialogType
@@ -11,10 +11,7 @@ class ConfirmationDialogTest : SnapshotTest(
     renderingMode = fullWidthRenderMode
 ), SnapshotDialog {
 
-    private fun dialogType(
-        link1Text: LocaleString? = this.link1Text,
-        link2Text: LocaleString? = this.link2Text,
-    ) = DialogType.Confirmation(
+    private fun dialogType() = DialogType.Confirmation(
         DialogPayload.Confirmation(
             title = title,
             message = message,
@@ -23,12 +20,18 @@ class ConfirmationDialogTest : SnapshotTest(
             poweredByText = poweredByText,
             positiveButtonClickListener = {},
             negativeButtonClickListener = {},
-            link1Text = link1Text,
-            link2Text = link2Text,
+            link1 = link1,
+            link2 = link2,
             link1ClickListener = {},
             link2ClickListener = {}
         )
     )
+
+    private fun disableLinkButton(vararg links: Link) {
+        links.forEach {
+            snapshotLocales[it.url.stringKey] = ""
+        }
+    }
 
     // MARK: tests with links
 
@@ -87,19 +90,21 @@ class ConfirmationDialogTest : SnapshotTest(
 
     @Test
     fun withLink1WithDefaultTheme() {
+        disableLinkButton(link2)
         val view = inflateView(
             context = context,
-            dialogType = dialogType(link2Text = null)
+            dialogType = dialogType()
         )
         snapshot(view)
     }
 
     @Test
     fun withLink1WithGlobalColors() {
+        disableLinkButton(link2)
         val view = inflateView(
             context = context,
             unifiedTheme = unifiedThemeWithGlobalColors(),
-            dialogType = dialogType(link2Text = null)
+            dialogType = dialogType()
         )
         snapshot(view)
     }
@@ -108,19 +113,21 @@ class ConfirmationDialogTest : SnapshotTest(
 
     @Test
     fun withLink2WithDefaultTheme() {
+        disableLinkButton(link1)
         val view = inflateView(
             context = context,
-            dialogType = dialogType(link1Text = null)
+            dialogType = dialogType()
         )
         snapshot(view)
     }
 
     @Test
     fun withLink2WithGlobalColors() {
+        disableLinkButton(link1)
         val view = inflateView(
             context = context,
             unifiedTheme = unifiedThemeWithGlobalColors(),
-            dialogType = dialogType(link1Text = null)
+            dialogType = dialogType()
         )
         snapshot(view)
     }
@@ -129,19 +136,21 @@ class ConfirmationDialogTest : SnapshotTest(
 
     @Test
     fun withoutLinksWithDefaultTheme() {
+        disableLinkButton(link1, link2)
         val view = inflateView(
             context = context,
-            dialogType = dialogType(null, null)
+            dialogType = dialogType()
         )
         snapshot(view)
     }
 
     @Test
     fun withoutLinksWithGlobalColors() {
+        disableLinkButton(link1, link2)
         val view = inflateView(
             context = context,
             unifiedTheme = unifiedThemeWithGlobalColors(),
-            dialogType = dialogType(null, null)
+            dialogType = dialogType()
         )
         snapshot(view)
     }

@@ -33,14 +33,14 @@ internal open class DefaultConfirmationDialogViewInflater<T : DefaultConfirmatio
         val theme = configuration.theme
         setupButton(
             binding.link1Button,
-            payload.link1Text,
+            payload.link1,
             theme.linkButton,
             configuration.properties.typeface,
             payload.link1ClickListener
         )
         setupButton(
             binding.link2Button,
-            payload.link2Text,
+            payload.link2,
             theme.linkButton,
             configuration.properties.typeface,
             payload.link2ClickListener

@@ -10,11 +10,11 @@ import com.glia.widgets.R
 import com.glia.widgets.StringProvider
 import com.glia.widgets.helper.IResourceProvider
 import com.glia.widgets.helper.Logger
-import com.glia.widgets.helper.ResourceProvider
 import com.glia.widgets.helper.TAG
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Observer
+import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.PublishSubject
 import kotlinx.parcelize.Parcelize
 import java.lang.Exception
@@ -47,7 +47,8 @@ internal open class LocaleProvider @JvmOverloads constructor(
     init {
         val localeSubject = PublishSubject.create<String>()
         localeObservable = localeSubject
-            .subscribeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.computation())
+            .observeOn(AndroidSchedulers.mainThread())
             .share()
         localeEmitter = localeSubject
     }
@@ -90,6 +91,10 @@ internal open class LocaleProvider @JvmOverloads constructor(
         } else {
             return getStringInternal(stringKey, values)
         }
+    }
+
+    fun getString(localeString: LocaleString): String {
+        return getString(localeString.stringKey, localeString.values)
     }
 
     @OpenForTesting

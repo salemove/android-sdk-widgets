@@ -2,6 +2,7 @@ package com.glia.widgets.view.dialog.base
 
 import android.view.View
 import androidx.annotation.DrawableRes
+import com.glia.widgets.core.dialog.model.Link
 import com.glia.widgets.locale.LocaleString
 
 internal sealed interface DialogPayload {
@@ -25,10 +26,10 @@ internal sealed interface DialogPayload {
         val poweredByText: LocaleString,
         val positiveButtonClickListener: View.OnClickListener,
         val negativeButtonClickListener: View.OnClickListener,
-        val link1Text: LocaleString? = null,
-        val link2Text: LocaleString? = null,
-        val link1ClickListener: View.OnClickListener? = null,
-        val link2ClickListener: View.OnClickListener? = null,
+        val link1: Link,
+        val link2: Link,
+        val link1ClickListener: View.OnClickListener,
+        val link2ClickListener: View.OnClickListener,
     ) : DialogPayload
 
     data class ScreenSharing(

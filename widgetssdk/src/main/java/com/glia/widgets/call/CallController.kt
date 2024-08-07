@@ -43,7 +43,9 @@ import com.glia.widgets.engagement.domain.ScreenSharingUseCase
 import com.glia.widgets.engagement.domain.ToggleVisitorAudioMediaStateUseCase
 import com.glia.widgets.engagement.domain.ToggleVisitorVideoMediaStateUseCase
 import com.glia.widgets.engagement.domain.VisitorMediaUseCase
+import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.Logger.d
+import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.TimeCounter
 import com.glia.widgets.helper.TimeCounter.FormattedTimerStatusListener
 import com.glia.widgets.helper.TimeCounter.RawTimerStatusListener
@@ -53,6 +55,7 @@ import com.glia.widgets.view.MessagesNotSeenHandler
 import com.glia.widgets.view.MessagesNotSeenHandler.MessagesNotSeenHandlerListener
 import com.glia.widgets.view.MinimizeHandler
 import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContract
+import com.glia.widgets.webbrowser.domain.GetUrlFromLinkUseCase
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import java.util.Optional
@@ -92,7 +95,8 @@ internal class CallController(
     private val isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase,
     private val enqueueForEngagementUseCase: EnqueueForEngagementUseCase,
     private val decideOnQueueingUseCase: DecideOnQueueingUseCase,
-    private val screenSharingUseCase: ScreenSharingUseCase
+    private val screenSharingUseCase: ScreenSharingUseCase,
+    private val getUrlFromLinkUseCase: GetUrlFromLinkUseCase
 ) : CallContract.Controller {
     private val disposable = CompositeDisposable()
     private val mediaUpgradeDisposable = CompositeDisposable()
@@ -257,7 +261,11 @@ internal class CallController(
 
     override fun onLinkClicked(link: Link) {
         d(TAG, "onLinkClicked")
-        view?.navigateToWebBrowserActivity(link.title, link.url)
+        getUrlFromLinkUseCase(link)?.let {
+            view?.navigateToWebBrowserActivity(link.title, it)
+        } ?: run {
+            Logger.e(TAG, "The URL is missing after the confirmation dialog link is clicked")
+        }
     }
 
     override fun onLiveObservationDialogAllowed() {

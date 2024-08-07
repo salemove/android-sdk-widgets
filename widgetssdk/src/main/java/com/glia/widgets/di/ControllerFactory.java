@@ -136,7 +136,8 @@ public class ControllerFactory {
                 useCaseFactory.getWithCameraPermissionUseCase(),
                 useCaseFactory.getWithReadWritePermissionsUseCase(),
                 useCaseFactory.getRequestNotificationPermissionIfPushNotificationsSetUpUseCase(),
-                useCaseFactory.getReleaseResourcesUseCase(getDialogController())
+                useCaseFactory.getReleaseResourcesUseCase(getDialogController()),
+                useCaseFactory.createGetUrlFromLinkUseCase()
             );
         }
 
@@ -175,7 +176,8 @@ public class ControllerFactory {
                 useCaseFactory.getIsQueueingOrEngagementUseCase(),
                 useCaseFactory.getQueueForEngagementUseCase(),
                 useCaseFactory.getDecideOnQueueingUseCase(),
-                useCaseFactory.getScreenSharingUseCase()
+                useCaseFactory.getScreenSharingUseCase(),
+                useCaseFactory.createGetUrlFromLinkUseCase()
             );
         }
 
@@ -278,7 +280,8 @@ public class ControllerFactory {
                 useCaseFactory.createConfirmationDialogUseCase(),
                 useCaseFactory.getEngagementRequestUseCase(),
                 useCaseFactory.getEngagementStateUseCase(),
-                useCaseFactory.createConfirmationDialogLinksUseCase()
+                useCaseFactory.createConfirmationDialogLinksUseCase(),
+                useCaseFactory.createGetUrlFromLinkUseCase()
             );
         }
         return callVisualizerController;

@@ -153,8 +153,8 @@ internal object Dialogs {
         val payload = DialogPayload.Confirmation(
             title = LocaleString(R.string.engagement_confirm_title),
             message = LocaleString(R.string.engagement_confirm_message),
-            link1Text = links.link1?.title,
-            link2Text = links.link2?.title,
+            link1 = links.link1,
+            link2 = links.link2,
             positiveButtonText = allow,
             negativeButtonText = cancel,
             poweredByText = poweredByText,

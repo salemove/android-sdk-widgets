@@ -7,11 +7,13 @@ import com.glia.widgets.locale.StringKeyPair
 
 internal interface SnapshotProviders: SnapshotContent, SnapshotTestLifecycle {
 
+    val snapshotLocales: Map<Int, String>
+
     fun localeProviderMock(): LocaleProvider {
         val resourceProvider = resourceProviderMock()
         val localeProvider = object: LocaleProvider(resourceProvider, null) {
             override fun getStringInternal(stringKey: Int, values: List<StringKeyPair>): String {
-                return context.resources.getResourceName(stringKey).split("/")[1]
+                return snapshotLocales[stringKey] ?: context.resources.getResourceName(stringKey).split("/")[1]
             }
         }
 

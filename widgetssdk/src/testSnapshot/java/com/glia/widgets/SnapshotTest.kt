@@ -9,20 +9,16 @@ import app.cash.paparazzi.DeviceConfig
 import app.cash.paparazzi.InstantAnimationsRule
 import app.cash.paparazzi.Paparazzi
 import com.android.ide.common.rendering.api.SessionParams.RenderingMode
-import com.android.ide.common.symbols.readAarRTxt
 import com.glia.widgets.snapshotutils.OnTestEnded
 import com.glia.widgets.snapshotutils.SnapshotContent
 import com.glia.widgets.snapshotutils.SnapshotProviders
 import com.glia.widgets.snapshotutils.SnapshotStrings
 import com.glia.widgets.snapshotutils.SnapshotTheme
 import com.glia.widgets.snapshotutils.SnapshotTestLifecycle
-import io.mockk.every
-import io.mockk.mockk
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.rules.TestRule
-import org.mockito.kotlin.anyVararg
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.io.BufferedReader
@@ -62,6 +58,8 @@ open class SnapshotTest(
         }
     }
 
+    override val snapshotLocales: MutableMap<Int, String> = mutableMapOf()
+
     fun snapshot(
         view: View,
         name: String? = null,
@@ -83,6 +81,7 @@ open class SnapshotTest(
     open fun tearDown() {
         onEndListeners.forEach { it() }
         onEndListeners.clear()
+        snapshotLocales.clear()
     }
 
     private val onEndListeners: MutableList<OnTestEnded> = mutableListOf()

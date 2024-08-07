@@ -80,6 +80,7 @@ import com.glia.widgets.helper.isValid
 import com.glia.widgets.helper.unSafeSubscribe
 import com.glia.widgets.view.MessagesNotSeenHandler
 import com.glia.widgets.view.MinimizeHandler
+import com.glia.widgets.webbrowser.domain.GetUrlFromLinkUseCase
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -130,7 +131,8 @@ internal class ChatController(
     private val withCameraPermissionUseCase: WithCameraPermissionUseCase,
     private val withReadWritePermissionsUseCase: WithReadWritePermissionsUseCase,
     private val requestNotificationPermissionIfPushNotificationsSetUpUseCase: RequestNotificationPermissionIfPushNotificationsSetUpUseCase,
-    private val releaseResourcesUseCase: ReleaseResourcesUseCase
+    private val releaseResourcesUseCase: ReleaseResourcesUseCase,
+    private val getUrlFromLinkUseCase: GetUrlFromLinkUseCase
 ) : ChatContract.Controller {
     private var backClickedListener: ChatView.OnBackClickedListener? = null
     private var view: ChatContract.View? = null
@@ -271,7 +273,11 @@ internal class ChatController(
 
     override fun onLinkClicked(link: Link) {
         Logger.d(TAG, "onLinkClicked")
-        view?.navigateToWebBrowserActivity(link.title, link.url)
+        getUrlFromLinkUseCase(link)?.let {
+            view?.navigateToWebBrowserActivity(link.title, it)
+        } ?: run {
+            Logger.e(TAG, "The URL is missing after the confirmation dialog link is clicked")
+        }
     }
 
     override fun onLiveObservationDialogAllowed() {

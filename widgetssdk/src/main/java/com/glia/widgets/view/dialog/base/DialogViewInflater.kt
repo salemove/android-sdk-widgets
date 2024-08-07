@@ -3,7 +3,10 @@ package com.glia.widgets.view.dialog.base
 import android.graphics.Typeface
 import android.view.View
 import android.widget.TextView
+import androidx.core.view.isVisible
 import androidx.viewbinding.ViewBinding
+import com.glia.widgets.core.dialog.model.Link
+import com.glia.widgets.di.Dependencies
 import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.helper.setText
 import com.glia.widgets.view.unifiedui.applyButtonTheme
@@ -47,13 +50,25 @@ internal abstract class DialogViewInflater<T : DialogViewBinding<out ViewBinding
         }
     }
 
-    protected fun setupButton(btn: MaterialButton, text: LocaleString?, btnTheme: ButtonTheme?, typeface: Typeface?, onClickListener: View.OnClickListener?) {
+    protected fun setupButton(btn: MaterialButton, text: LocaleString, btnTheme: ButtonTheme?, typeface: Typeface?, onClickListener: View.OnClickListener) {
         btn.apply {
-            if (text == null || onClickListener == null) {
-                this.visibility = View.GONE
-                return@apply
+            setText(text)
+            applyButtonTheme(btnTheme)
+            setupTypeface(this, typeface)
+            setOnClickListener(onClickListener)
+        }
+    }
+
+    protected fun setupButton(btn: MaterialButton, link: Link, btnTheme: ButtonTheme?, typeface: Typeface?, onClickListener: View.OnClickListener) {
+        btn.apply {
+            setText(link.title) { upToDateTitle ->
+                this.text = upToDateTitle
+
+                val localeManager = Dependencies.getLocaleProvider()
+                val upToDateUrl = localeManager.getString(link.url)
+
+                this.isVisible = upToDateTitle.isNotBlank() && upToDateUrl.isNotBlank()
             }
-            this.setText(text)
             applyButtonTheme(btnTheme)
             setupTypeface(this, typeface)
             setOnClickListener(onClickListener)

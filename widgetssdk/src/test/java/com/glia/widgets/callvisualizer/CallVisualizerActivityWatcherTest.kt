@@ -172,8 +172,8 @@ class CallVisualizerActivityWatcherTest {
         every { Dialogs.showEngagementConfirmationDialog(any(), any(), any(), any(), any(), any()) } returns dialog
 
         val links = ConfirmationDialogLinks(
-            link1 = Link(mockLocale, "url1"),
-            link2 = Link(mockLocale, "url2")
+            link1 = Link(mockLocale, mockLocale),
+            link2 = Link(mockLocale, mockLocale)
         )
 
         val activity = emitActivity<ChatActivity>()
@@ -216,8 +216,8 @@ class CallVisualizerActivityWatcherTest {
         every { Dialogs.showEngagementConfirmationDialog(any(), any(), any(), any(), any(), any()) } returns dialog
 
         val links = ConfirmationDialogLinks(
-            link1 = Link(mockLocale, "url1"),
-            link2 = Link(mockLocale, "url2")
+            link1 = Link(mockLocale, mockLocale),
+            link2 = Link(mockLocale, mockLocale)
         )
 
         val activity = emitActivity<ChatActivity>()
@@ -260,8 +260,8 @@ class CallVisualizerActivityWatcherTest {
         every { Dialogs.showEngagementConfirmationDialog(any(), any(), any(), any(), any(), any()) } returns dialog
 
         val links = ConfirmationDialogLinks(
-            link1 = Link(mockLocale, "url1"),
-            link2 = Link(mockLocale, "url2")
+            link1 = Link(mockLocale, mockLocale),
+            link2 = Link(mockLocale, mockLocale)
         )
 
         val activity = emitActivity<ChatActivity>()

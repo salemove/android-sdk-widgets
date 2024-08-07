@@ -53,6 +53,7 @@ import com.glia.widgets.helper.Data
 import com.glia.widgets.helper.TimeCounter
 import com.glia.widgets.view.MessagesNotSeenHandler
 import com.glia.widgets.view.MinimizeHandler
+import com.glia.widgets.webbrowser.domain.GetUrlFromLinkUseCase
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Single
@@ -113,6 +114,7 @@ class ChatControllerTest {
     private lateinit var withReadWritePermissionsUseCase: WithReadWritePermissionsUseCase
     private lateinit var requestNotificationPermissionIfPushNotificationsSetUpUseCase: RequestNotificationPermissionIfPushNotificationsSetUpUseCase
     private lateinit var releaseResourcesUseCase: ReleaseResourcesUseCase
+    private lateinit var getUrlFromLinkUseCase: GetUrlFromLinkUseCase
 
     private lateinit var chatController: ChatController
     private lateinit var isAuthenticatedUseCase: IsAuthenticatedUseCase
@@ -181,6 +183,7 @@ class ChatControllerTest {
         withReadWritePermissionsUseCase = mock()
         requestNotificationPermissionIfPushNotificationsSetUpUseCase = mock()
         releaseResourcesUseCase = mock()
+        getUrlFromLinkUseCase = mock()
 
         chatController = ChatController(
             callTimer = callTimer,
@@ -227,7 +230,8 @@ class ChatControllerTest {
             withCameraPermissionUseCase = withCameraPermissionUseCase,
             withReadWritePermissionsUseCase = withReadWritePermissionsUseCase,
             requestNotificationPermissionIfPushNotificationsSetUpUseCase = requestNotificationPermissionIfPushNotificationsSetUpUseCase,
-            releaseResourcesUseCase = releaseResourcesUseCase
+            releaseResourcesUseCase = releaseResourcesUseCase,
+            getUrlFromLinkUseCase = getUrlFromLinkUseCase
         )
         chatController.setView(chatView)
     }

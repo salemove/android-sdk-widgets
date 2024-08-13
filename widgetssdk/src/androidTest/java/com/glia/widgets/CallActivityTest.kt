@@ -78,7 +78,7 @@ class CallActivityTest {
         Dependencies.setResourceProvider(resourceProvider)
 
         // set up StringProvider
-        val localeProvider = LocaleProvider(resourceProvider, sdkConfigurationManager.companyName)
+        val localeProvider = LocaleProvider(resourceProvider)
         Dependencies.setLocaleProvider(localeProvider)
 
         callStatus = mockk(relaxed = true)

@@ -11,7 +11,7 @@ internal interface SnapshotProviders: SnapshotContent, SnapshotTestLifecycle {
 
     fun localeProviderMock(): LocaleProvider {
         val resourceProvider = resourceProviderMock()
-        val localeProvider = object: LocaleProvider(resourceProvider, null) {
+        val localeProvider = object: LocaleProvider(resourceProvider) {
             override fun getStringInternal(stringKey: Int, values: List<StringKeyPair>): String {
                 return snapshotLocales[stringKey] ?: context.resources.getResourceName(stringKey).split("/")[1]
             }

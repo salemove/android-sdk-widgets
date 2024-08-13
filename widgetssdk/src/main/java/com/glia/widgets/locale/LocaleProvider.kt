@@ -35,10 +35,10 @@ data class LocaleString(
 
 @OpenForTesting
 internal open class LocaleProvider @JvmOverloads constructor(
-    private val resourceProvider: IResourceProvider,
-    private val hardcodedCompanyName: String?
+    private val resourceProvider: IResourceProvider
 ) : StringProvider {
 
+    private var hardcodedCompanyName: String? = null
     private val regex = "(\\{[a-zA-Z\\d]*\\})".toRegex()
     private val localeObservable: Observable<String>
     private val localeEmitter: Observer<String>
@@ -112,6 +112,10 @@ internal open class LocaleProvider @JvmOverloads constructor(
 
     fun getLocaleObservable(): Observable<String> {
         return localeObservable
+    }
+
+    fun setCompanyName(companyName: String?) {
+        hardcodedCompanyName = companyName
     }
 
     // Priority for remote company name but not found or no locales it will fall back to hardcoded one or "" if no hardcoded one

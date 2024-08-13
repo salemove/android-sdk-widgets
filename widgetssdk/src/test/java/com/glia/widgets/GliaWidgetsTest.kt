@@ -43,6 +43,7 @@ class GliaWidgetsTest {
         Dependencies.setControllerFactory(controllerFactory)
         repositoryFactory = mock()
         Dependencies.setRepositoryFactory(repositoryFactory)
+        Dependencies.setLocaleProvider(mock())
     }
 
     @Test

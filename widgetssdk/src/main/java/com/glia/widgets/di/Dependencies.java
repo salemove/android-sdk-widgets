@@ -64,7 +64,7 @@ public class Dependencies {
     public static void onAppCreate(Application application) {
         schedulers = new GliaWidgetsSchedulers();
         resourceProvider = new ResourceProvider(application.getBaseContext());
-        localeProvider = new LocaleProvider(resourceProvider, sdkConfigurationManager.getCompanyName());
+        localeProvider = new LocaleProvider(resourceProvider);
         notificationManager = new NotificationManager(application);
         DownloadsFolderDataSource downloadsFolderDataSource = new DownloadsFolderDataSource(application);
         repositoryFactory = new RepositoryFactory(gliaCore, downloadsFolderDataSource);
@@ -196,6 +196,7 @@ public class Dependencies {
         controllerFactory.init();
         repositoryFactory.getEngagementRepository().initialize();
         sdkConfigurationManager.fromConfiguration(gliaWidgetsConfig);
+        localeProvider.setCompanyName(gliaWidgetsConfig.companyName);
     }
 
     public static ControllerFactory getControllerFactory() {

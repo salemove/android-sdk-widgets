@@ -105,15 +105,16 @@ import com.glia.widgets.core.permissions.domain.WithReadWritePermissionsUseCase;
 import com.glia.widgets.core.permissions.domain.WithReadWritePermissionsUseCaseImpl;
 import com.glia.widgets.core.secureconversations.domain.AddSecureFileAttachmentsObserverUseCase;
 import com.glia.widgets.core.secureconversations.domain.AddSecureFileToAttachmentAndUploadUseCase;
+import com.glia.widgets.core.secureconversations.domain.GetAvailableQueueIdsForSecureMessagingUseCase;
 import com.glia.widgets.core.secureconversations.domain.GetSecureFileAttachmentsUseCase;
 import com.glia.widgets.core.secureconversations.domain.GetUnreadMessagesCountWithTimeoutUseCase;
 import com.glia.widgets.core.secureconversations.domain.IsMessagingAvailableUseCase;
 import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase;
+import com.glia.widgets.core.secureconversations.domain.IsTransferredSecureEngagementUseCase;
 import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDelayUseCase;
 import com.glia.widgets.core.secureconversations.domain.OnNextMessageUseCase;
 import com.glia.widgets.core.secureconversations.domain.RemoveSecureFileAttachmentUseCase;
 import com.glia.widgets.core.secureconversations.domain.ResetMessageCenterUseCase;
-import com.glia.widgets.core.secureconversations.domain.GetAvailableQueueIdsForSecureMessagingUseCase;
 import com.glia.widgets.core.secureconversations.domain.SendMessageButtonStateUseCase;
 import com.glia.widgets.core.secureconversations.domain.SendSecureMessageUseCase;
 import com.glia.widgets.core.secureconversations.domain.ShowMessageLimitErrorUseCase;
@@ -150,14 +151,14 @@ import com.glia.widgets.engagement.domain.IsOperatorPresentUseCase;
 import com.glia.widgets.engagement.domain.IsOperatorPresentUseCaseImpl;
 import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase;
 import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCaseImpl;
+import com.glia.widgets.engagement.domain.OnIncomingEngagementRequestTimeoutUseCase;
+import com.glia.widgets.engagement.domain.OnIncomingEngagementRequestTimeoutUseCaseImpl;
 import com.glia.widgets.engagement.domain.OperatorMediaUpgradeOfferUseCase;
 import com.glia.widgets.engagement.domain.OperatorMediaUpgradeOfferUseCaseImpl;
 import com.glia.widgets.engagement.domain.OperatorMediaUseCase;
 import com.glia.widgets.engagement.domain.OperatorMediaUseCaseImpl;
 import com.glia.widgets.engagement.domain.OperatorTypingUseCase;
 import com.glia.widgets.engagement.domain.OperatorTypingUseCaseImpl;
-import com.glia.widgets.engagement.domain.OnIncomingEngagementRequestTimeoutUseCase;
-import com.glia.widgets.engagement.domain.OnIncomingEngagementRequestTimeoutUseCaseImpl;
 import com.glia.widgets.engagement.domain.PrepareToScreenSharingUseCase;
 import com.glia.widgets.engagement.domain.PrepareToScreenSharingUseCaseImpl;
 import com.glia.widgets.engagement.domain.ReleaseResourcesUseCase;
@@ -378,7 +379,8 @@ public class UseCaseFactory {
             getIsOperatorPresentUseCase(),
             repositoryFactory.getEngagementConfigRepository(),
             repositoryFactory.getSecureConversationsRepository(),
-            createIsSecureEngagementUseCase()
+            createIsSecureEngagementUseCase(),
+            getIsTransferredSecureEngagementUseCase()
         );
     }
 
@@ -924,7 +926,8 @@ public class UseCaseFactory {
             getIsCurrentEngagementCallVisualizer(),
             getOperatorMediaUseCase(),
             getVisitorMediaUseCase(),
-            getIsOperatorPresentUseCase()
+            getIsOperatorPresentUseCase(),
+            getIsTransferredSecureEngagementUseCase()
         );
     }
 
@@ -1098,6 +1101,11 @@ public class UseCaseFactory {
             repositoryFactory.getEngagementRepository(),
             getFlipVisitorCameraUseCase()
         );
+    }
+
+    @NonNull
+    public IsTransferredSecureEngagementUseCase getIsTransferredSecureEngagementUseCase() {
+        return new IsTransferredSecureEngagementUseCase(repositoryFactory.getEngagementRepository());
     }
 
 }

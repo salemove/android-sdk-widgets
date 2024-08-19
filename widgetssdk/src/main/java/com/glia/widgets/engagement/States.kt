@@ -17,6 +17,7 @@ internal sealed interface State {
     object FinishedOmniCore : State
     object FinishedCallVisualizer : State
     data class Update(val state: EngagementState, val updateState: EngagementUpdateState) : State
+    object TransferredSecureConversation : State
 
     val queueingMediaType: MediaType?
         get() = when (this) {

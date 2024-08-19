@@ -52,8 +52,9 @@ import com.glia.widgets.core.notification.domain.CallNotificationUseCase
 import com.glia.widgets.core.permissions.domain.RequestNotificationPermissionIfPushNotificationsSetUpUseCase
 import com.glia.widgets.core.permissions.domain.WithCameraPermissionUseCase
 import com.glia.widgets.core.permissions.domain.WithReadWritePermissionsUseCase
-import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
 import com.glia.widgets.core.secureconversations.domain.GetAvailableQueueIdsForSecureMessagingUseCase
+import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
+import com.glia.widgets.core.secureconversations.domain.IsTransferredSecureEngagementUseCase
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.EngagementUpdateState
 import com.glia.widgets.engagement.ScreenSharingState
@@ -132,7 +133,8 @@ internal class ChatController(
     private val withReadWritePermissionsUseCase: WithReadWritePermissionsUseCase,
     private val requestNotificationPermissionIfPushNotificationsSetUpUseCase: RequestNotificationPermissionIfPushNotificationsSetUpUseCase,
     private val releaseResourcesUseCase: ReleaseResourcesUseCase,
-    private val getUrlFromLinkUseCase: GetUrlFromLinkUseCase
+    private val getUrlFromLinkUseCase: GetUrlFromLinkUseCase,
+    private val isTransferredSecureEngagementUseCase: IsTransferredSecureEngagementUseCase
 ) : ChatContract.Controller {
     private var backClickedListener: ChatView.OnBackClickedListener? = null
     private var view: ChatContract.View? = null
@@ -181,6 +183,8 @@ internal class ChatController(
 
     private val isSecureEngagement get() = isSecureEngagementUseCase()
 
+    private val isTransferredSecureEngagement get() = isTransferredSecureEngagementUseCase()
+
     private val isQueueingOrOngoingEngagement get() = isQueueingOrEngagementUseCase()
 
     override val isChatVisible: Boolean
@@ -218,7 +222,7 @@ internal class ChatController(
         ensureSecureMessagingAvailable()
 
         if (chatState.integratorChatStarted || dialogController.isShowingUnexpectedErrorDialog) {
-            if (isSecureEngagement) {
+            if (isSecureEngagement || isTransferredSecureEngagement) {
                 emitViewState { chatState.setSecureMessagingState() }
             }
             chatManager.onChatAction(ChatManager.Action.ChatRestored)
@@ -236,22 +240,22 @@ internal class ChatController(
     }
 
     private fun ensureSecureMessagingAvailable() {
-        if (!isSecureEngagement) return
-
-        disposable.add(
-            getAvailableQueueIdsForSecureMessagingUseCase().subscribe({
-                if (it.result != null) {
-                    Logger.d(TAG, "Messaging is available")
-                    engagementConfigUseCase(ChatType.SECURE_MESSAGING, it.result)
-                } else {
-                    Logger.d(TAG, "Messaging is unavailable")
-                    dialogController.showMessageCenterUnavailableDialog()
-                }
-            }, {
-                Logger.e(TAG, "Checking for Messaging availability failed", it)
-                dialogController.showUnexpectedErrorDialog()
-            })
-        )
+        if (isSecureEngagement) {
+            disposable.add(
+                getAvailableQueueIdsForSecureMessagingUseCase().subscribe({
+                    if (it.result != null) {
+                        Logger.d(TAG, "Messaging is available")
+                        engagementConfigUseCase(ChatType.SECURE_MESSAGING, it.result)
+                    } else {
+                        Logger.d(TAG, "Messaging is unavailable")
+                        dialogController.showMessageCenterUnavailableDialog()
+                    }
+                }, {
+                    Logger.e(TAG, "Checking for Messaging availability failed", it)
+                    dialogController.showUnexpectedErrorDialog()
+                })
+            )
+        }
     }
 
     private fun prepareChatComponents() {
@@ -357,7 +361,7 @@ internal class ChatController(
     }
 
     private fun sendMessagePreview(message: String) {
-        if (chatState.isOperatorOnline) {
+        if (chatState.isOperatorOnline && !isTransferredSecureEngagement) {
             sendMessagePreviewUseCase(message)
         }
     }
@@ -449,7 +453,7 @@ internal class ChatController(
 
     override fun onXButtonClicked() {
         Logger.d(TAG, "onXButtonClicked")
-        if (isQueueingOrOngoingEngagement) {
+        if (isQueueingOrOngoingEngagement && !isTransferredSecureEngagement) {
             dialogController.showExitQueueDialog()
         } else {
             navigateBack()
@@ -513,6 +517,7 @@ internal class ChatController(
             is State.Update -> handleEngagementStateUpdate(state.updateState)
             is State.PreQueuing, is State.Queuing -> queueForEngagementStarted()
             is State.QueueUnstaffed, is State.UnexpectedErrorHappened, is State.QueueingCanceled -> emitViewState { chatState.stop() }
+            is State.TransferredSecureConversation -> onTransferringToSecureConversation()
 
             else -> {
                 // no op
@@ -520,7 +525,12 @@ internal class ChatController(
         }
     }
 
+    private fun onTransferringToSecureConversation() {
+        emitViewState { chatState.setSecureMessagingState() }
+    }
+
     private fun handleEngagementStateUpdate(state: EngagementUpdateState) {
+        println("*********************************** -> $state")
         when (state) {
             is EngagementUpdateState.Ongoing -> onEngagementOngoing(state.operator)
             is EngagementUpdateState.OperatorChanged -> onOperatorChanged(state.operator)
@@ -726,7 +736,7 @@ internal class ChatController(
         }
 
         when {
-            isSecureEngagement -> emitViewState { chatState.setSecureMessagingState() }
+            isSecureEngagement || isTransferredSecureEngagement -> emitViewState { chatState.setSecureMessagingState() }
             isQueueingOrEngagementUseCase.hasOngoingEngagement -> emitViewState { chatState.engagementStarted() }
             else -> emitViewState { chatState.historyLoaded() }
         }

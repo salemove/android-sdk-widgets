@@ -29,7 +29,9 @@ import com.glia.androidsdk.screensharing.LocalScreen
 import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.androidsdk.screensharing.ScreenSharingRequest
 import com.glia.androidsdk.screensharing.VisitorScreenSharingState
+import com.glia.widgets.chat.ChatType
 import com.glia.widgets.core.engagement.GliaOperatorRepository
+import com.glia.widgets.di.Dependencies
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.Data
 import com.glia.widgets.helper.Logger
@@ -108,6 +110,11 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
         get() = _visitorCameraState
     override val currentVisitorCamera: VisitorCamera
         get() = _visitorCameraState.value ?: VisitorCamera.NoCamera
+    override val isTransferredSecureConversation: Boolean
+        get() = currentState is State.TransferredSecureConversation
+            && Dependencies.getRepositoryFactory().engagementConfigRepository.run {
+            chatType == ChatType.TRANSFERRED_SECURE_MESSAGING || chatType == ChatType.SECURE_MESSAGING
+        }
 
     //--Chat--
     private val operatorTypingCallback: Consumer<OperatorTypingStatus> = Consumer(::handleOperatorTypingStatus)
@@ -352,13 +359,26 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
     }
 
     private fun handleOmniCoreEngagement(engagement: OmnicoreEngagement) {
-        Logger.i(TAG, "Omnicore Engagement started")
 
-        currentEngagement?.also {
-            unsubscribeFromEvents(it)
-            currentEngagement = null
-            resetState()
-        } ?: _engagementState.onNext(State.StartedOmniCore)
+        when {
+            currentEngagement != null -> {
+                unsubscribeFromEvents(currentEngagement!!)
+                currentEngagement = null
+                resetState()
+                Logger.i(TAG, "Engagement updated, most probably authentication during engagement")
+            }
+
+            engagement.state.visitorStatus == EngagementState.VisitorStatus.TRANSFERRING && engagement.state.capabilities.isText -> {
+                _engagementState.onNext(State.TransferredSecureConversation)
+                Logger.i(TAG, "Transfer to Secure Conversations")
+            }
+
+            else -> {
+                _engagementState.onNext(State.StartedOmniCore)
+                Logger.i(TAG, "Omnicore Engagement started")
+            }
+
+        }
 
         currentEngagement = engagement
         operatorRepository.emit(engagement.state.operator)
@@ -446,6 +466,13 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
         operatorRepository.emit(state.operator)
 
         val updateState = when {
+            state.visitorStatus == EngagementState.VisitorStatus.TRANSFERRING && state.capabilities.isText -> {
+                Dependencies.getRepositoryFactory().engagementConfigRepository.chatType = ChatType.TRANSFERRED_SECURE_MESSAGING
+                _engagementState.onNext(State.TransferredSecureConversation)
+                Logger.i(TAG, "Transfer to Secure Conversations")
+                return
+            }
+
             state.visitorStatus == EngagementState.VisitorStatus.TRANSFERRING -> {
                 Logger.i(TAG, "Transfer engagement")
                 EngagementUpdateState.Transferring

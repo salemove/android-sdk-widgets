@@ -11,6 +11,7 @@ import com.glia.widgets.core.fileupload.FileAttachmentRepository
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
+import com.glia.widgets.core.secureconversations.domain.IsTransferredSecureEngagementUseCase
 import com.glia.widgets.engagement.domain.IsOperatorPresentUseCase
 
 internal class GliaSendMessageUseCase(
@@ -19,7 +20,8 @@ internal class GliaSendMessageUseCase(
     private val isOperatorPresentUseCase: IsOperatorPresentUseCase,
     private val engagementConfigRepository: GliaEngagementConfigRepository,
     private val secureConversationsRepository: SecureConversationsRepository,
-    private val isSecureEngagementUseCase: IsSecureEngagementUseCase
+    private val isSecureEngagementUseCase: IsSecureEngagementUseCase,
+    private val isTransferredSecureEngagementUseCase: IsTransferredSecureEngagementUseCase
 ) {
     interface Listener {
         fun messageSent(message: VisitorMessage?)
@@ -34,6 +36,8 @@ internal class GliaSendMessageUseCase(
 
     private val isSecureEngagement: Boolean
         get() = isSecureEngagementUseCase()
+    private val isTransferredSecureEngagement: Boolean
+        get() = isTransferredSecureEngagementUseCase()
 
     private fun hasFileAttachments(fileAttachments: List<FileAttachment>): Boolean {
         return fileAttachments.isNotEmpty()
@@ -67,11 +71,11 @@ internal class GliaSendMessageUseCase(
 
     fun execute(singleChoiceAttachment: SingleChoiceAttachment, listener: Listener) {
         val payload = SendMessagePayload(attachment = singleChoiceAttachment)
+
         when {
             isSecureEngagement -> secureConversationsRepository.send(payload, engagementConfigRepository.queueIds, listener)
-
-            isOperatorOnline -> chatRepository.sendMessage(payload, listener)
-
+            isTransferredSecureEngagement -> chatRepository.sendMessage(payload, listener)
+            isOperatorOnline && !isTransferredSecureEngagement -> chatRepository.sendMessage(payload, listener)
             else -> listener.errorOperatorNotOnline(Unsent(payload = payload))
         }
     }

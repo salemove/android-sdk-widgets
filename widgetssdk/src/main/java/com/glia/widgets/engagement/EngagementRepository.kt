@@ -40,6 +40,7 @@ internal interface EngagementRepository {
     val isSharingScreen: Boolean
     val cameras: List<CameraDevice>?
     val currentVisitorCamera: VisitorCamera
+    val isTransferredSecureConversation: Boolean
 
     fun initialize()
     fun reset()

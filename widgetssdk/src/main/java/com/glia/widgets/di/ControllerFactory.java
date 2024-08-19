@@ -137,7 +137,8 @@ public class ControllerFactory {
                 useCaseFactory.getWithReadWritePermissionsUseCase(),
                 useCaseFactory.getRequestNotificationPermissionIfPushNotificationsSetUpUseCase(),
                 useCaseFactory.getReleaseResourcesUseCase(getDialogController()),
-                useCaseFactory.createGetUrlFromLinkUseCase()
+                useCaseFactory.createGetUrlFromLinkUseCase(),
+                useCaseFactory.getIsTransferredSecureEngagementUseCase()
             );
         }
 

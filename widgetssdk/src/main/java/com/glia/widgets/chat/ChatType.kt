@@ -28,5 +28,7 @@ enum class ChatType : Parcelable {
      *
      * @see <a href="https://docs.glia.com/glia-impl/docs/secure-conversations">Secure conversations</a>
      */
-    SECURE_MESSAGING;
+    SECURE_MESSAGING,
+
+    TRANSFERRED_SECURE_MESSAGING;
 }

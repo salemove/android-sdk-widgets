@@ -26,6 +26,7 @@ internal interface CallVisualizerContract {
         object DisplayVisitorCodeDialog : State
         data class DisplayConfirmationDialog(val links: ConfirmationDialogLinks) : State
         object DismissDialog : State
+        object ShowTimeoutSnackBar : State
         object CloseHolderActivity : State
         data class OpenWebBrowserScreen(val title: LocaleString, val url: String) : State
     }
@@ -108,6 +109,7 @@ internal class CallVisualizerController(
     private fun onIncomingEngagementRequestTimeout() {
         dialogController.dismissCVEngagementConfirmationDialog()
         closeHolderActivity()
+        _state.onNext(CallVisualizerContract.State.ShowTimeoutSnackBar)
     }
 
     override fun onLinkClicked(link: Link) {

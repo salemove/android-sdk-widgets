@@ -99,7 +99,9 @@ public class Dependencies {
 
         CallVisualizerActivityWatcher callVisualizerActivityWatcher = new CallVisualizerActivityWatcher(
             getControllerFactory().getCallVisualizerController(),
-            new GliaActivityManagerImpl()
+            new GliaActivityManagerImpl(),
+            getLocaleProvider(),
+            getGliaThemeManager()
         );
 
         application.registerActivityLifecycleCallbacks(callVisualizerActivityWatcher);

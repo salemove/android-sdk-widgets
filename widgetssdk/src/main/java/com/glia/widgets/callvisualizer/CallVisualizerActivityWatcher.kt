@@ -1,6 +1,8 @@
 package com.glia.widgets.callvisualizer
 
 import android.app.Activity
+import com.glia.widgets.R
+import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.base.BaseSingleActivityWatcher
 import com.glia.widgets.callvisualizer.controller.CallVisualizerContract
 import com.glia.widgets.core.dialog.model.ConfirmationDialogLinks
@@ -9,8 +11,11 @@ import com.glia.widgets.helper.GliaActivityManager
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.OneTimeEvent
 import com.glia.widgets.helper.TAG
-import com.glia.widgets.locale.LocaleString
+import com.glia.widgets.locale.LocaleProvider
 import com.glia.widgets.view.Dialogs
+import com.glia.widgets.view.snackbar.SnackBarDelegate
+import com.glia.widgets.view.snackbar.SnackBarDelegateFactory
+import com.glia.widgets.view.unifiedui.theme.UnifiedThemeManager
 import com.glia.widgets.webbrowser.WebBrowserActivity
 import io.reactivex.rxjava3.core.Flowable
 import java.lang.ref.WeakReference
@@ -18,7 +23,9 @@ import com.glia.widgets.callvisualizer.controller.CallVisualizerContract.State a
 
 internal class CallVisualizerActivityWatcher(
     private val controller: CallVisualizerContract.Controller,
-    gliaActivityManager: GliaActivityManager
+    gliaActivityManager: GliaActivityManager,
+    private val localeProvider: LocaleProvider,
+    private val themeManager: UnifiedThemeManager
 ) : BaseSingleActivityWatcher(gliaActivityManager) {
 
     init {
@@ -31,13 +38,14 @@ internal class CallVisualizerActivityWatcher(
 
         when {
             event.consumed -> Logger.d(TAG, "skipping.., event is already consumed")
+            state is ControllerState.DismissDialog -> event.consume { dismissAlertDialogSilently() }
+            state is ControllerState.CloseHolderActivity -> event.consume { closeHolderActivity() }
             activity == null || activity.isFinishing -> Logger.d(TAG, "skipping.. activity is null or finishing")
             activity is WebBrowserActivity && state is ControllerState.DisplayConfirmationDialog -> Logger.d(TAG, "skipping.. WebBrowser is open")
             activity is WebBrowserActivity && state is ControllerState.OpenWebBrowserScreen -> event.consume { controller.onWebBrowserOpened() }
-            state is ControllerState.DismissDialog -> event.consume { dismissAlertDialogSilently() }
+            state is ControllerState.ShowTimeoutSnackBar -> event.consume { showSnackBar(activity) }
             //Ensure this state remains unconsumed until the opening of the WebBrowserActivity.
             state is ControllerState.OpenWebBrowserScreen -> openWebBrowser(activity, state.title, state.url)
-            state is ControllerState.CloseHolderActivity -> event.consume { closeHolderActivity() }
             state is ControllerState.DisplayVisitorCodeDialog -> displayVisitorCodeDialog(activity)
             state is ControllerState.DisplayConfirmationDialog -> displayConfirmationDialog(
                 activity,
@@ -84,4 +92,16 @@ internal class CallVisualizerActivityWatcher(
         val intent = WebBrowserActivity.intent(activity, title, url)
         activity.startActivity(intent)
     }
+
+    private fun showSnackBar(activity: Activity) {
+        makeSnackBar(activity).show()
+    }
+
+    private fun makeSnackBar(activity: Activity): SnackBarDelegate =
+        SnackBarDelegateFactory(
+            activity,
+            R.string.engagement_incoming_request_timed_out_message,
+            localeProvider,
+            themeManager.theme
+        ).createDelegate()
 }

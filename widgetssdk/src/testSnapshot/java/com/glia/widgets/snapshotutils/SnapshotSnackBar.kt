@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.annotation.IdRes
+import com.glia.widgets.R
 import com.glia.widgets.locale.LocaleProvider
 import com.glia.widgets.view.snackbar.SnackBarDelegateFactory
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
@@ -44,7 +45,7 @@ internal interface SnapshotSnackBar : SnapshotContent, SnapshotTestLifecycle, Sn
         kClass: KClass<T>,
         unifiedTheme: UnifiedTheme? = null
     ): View = snackBarMock(kClass).run {
-        SnackBarDelegateFactory(mockActivity, localeProvider, unifiedTheme)
+        SnackBarDelegateFactory(mockActivity, R.string.live_observation_indicator_message, localeProvider, unifiedTheme)
             .createDelegate()
             .apply { addViewToRoot(anchorViewId ?: return@apply, rootLayout) }
             .snackBar

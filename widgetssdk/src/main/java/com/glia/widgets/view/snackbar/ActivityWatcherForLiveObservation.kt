@@ -2,6 +2,7 @@ package com.glia.widgets.view.snackbar
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import com.glia.widgets.R
 import com.glia.widgets.base.BaseActivityStackWatcher
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
@@ -34,6 +35,11 @@ internal class ActivityWatcherForLiveObservation(
     }
 
     private fun makeSnackBar(activity: Activity): SnackBarDelegate =
-        SnackBarDelegateFactory(activity, localeProvider, themeManager.theme).createDelegate()
+        SnackBarDelegateFactory(
+            activity,
+            R.string.live_observation_indicator_message,
+            localeProvider,
+            themeManager.theme
+        ).createDelegate()
 
 }

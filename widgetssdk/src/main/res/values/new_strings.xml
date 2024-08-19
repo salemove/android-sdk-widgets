@@ -24,7 +24,6 @@
     <string name="call_visualizer_visitor_code_refresh_accessibility_hint">Generates a new visitor code</string>
     <string name="call_visualizer_visitor_code_close_accessibility_hint">Closes the visitor code</string>
 
-
     <!-- File preview -->
     <string name="android_preview_title">@string/glia_preview_activity_toolbar_title</string>
     <string name="android_preview_save_success">@string/glia_preview_activity_image_save_success_msg</string>
@@ -209,6 +208,7 @@
     <string name="engagement_confirm_link2_text">Privacy Policies</string>
     <string name="engagement_confirm_link2_url"/>
     <string name="live_observation_indicator_message">Your app screen is visible to the operator.</string>
+    <string name="engagement_incoming_request_timed_out_message">The engagement request is timed out.</string>
 
     <!--    GVA -->
     <string name="gva_unsupported_action_error">This action is not currently supported on mobile.</string>

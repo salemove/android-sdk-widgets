@@ -17,8 +17,10 @@ import com.glia.widgets.helper.GliaActivityManager
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.OneTimeEvent
 import com.glia.widgets.helper.withRuntimeTheme
+import com.glia.widgets.locale.LocaleProvider
 import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.view.Dialogs
+import com.glia.widgets.view.unifiedui.theme.UnifiedThemeManager
 import com.glia.widgets.webbrowser.WebBrowserActivity
 import io.mockk.Runs
 import io.mockk.confirmVerified
@@ -43,6 +45,8 @@ class CallVisualizerActivityWatcherTest {
 
     private lateinit var controller: CallVisualizerContract.Controller
     private lateinit var gliaActivityManager: GliaActivityManager
+    private lateinit var localeProvider: LocaleProvider
+    private lateinit var themeManager: UnifiedThemeManager
 
     private lateinit var watcher: CallVisualizerActivityWatcher
     private lateinit var mockLocale: LocaleString
@@ -59,9 +63,11 @@ class CallVisualizerActivityWatcherTest {
             every { state } returns controllerState
         }
         gliaActivityManager = mockk(relaxed = true)
+        localeProvider = mockk(relaxed = true)
+        themeManager = mockk(relaxed = true)
         mockLocale = mockk(relaxed = true)
 
-        watcher = CallVisualizerActivityWatcher(controller, gliaActivityManager)
+        watcher = CallVisualizerActivityWatcher(controller, gliaActivityManager, localeProvider, themeManager)
         verify { controller.state }
     }
 
@@ -96,7 +102,7 @@ class CallVisualizerActivityWatcherTest {
     @Test
     fun `event will be skipped when activity is null or finishing`() {
         emitActivity<ChatActivity>(finishing = true)
-        val event = createMockEvent(CallVisualizerContract.State.DismissDialog)
+        val event = createMockEvent(CallVisualizerContract.State.ShowTimeoutSnackBar)
         emitState(event)
 
         verify { event.consumed }
@@ -303,7 +309,6 @@ class CallVisualizerActivityWatcherTest {
         val event = createMockEvent(CallVisualizerContract.State.CloseHolderActivity)
         emitState(event)
 
-        verify { activity.isFinishing }
         verify { event.consumed }
         verify { event.value }
         verify { event.consume(any()) }

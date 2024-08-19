@@ -31,6 +31,7 @@ class SnackBarDelegateTest {
     private val mockResources: Resources = mock {
         on { getDimensionPixelSize(any()) } doReturn bottomMargin
     }
+    private val titleStringKey: Int = 123
 
     private val mockViewWithResources: View = mock<CoordinatorLayout> {
         on { context } doReturn mockContext
@@ -59,41 +60,41 @@ class SnackBarDelegateTest {
 
     @Test
     fun `ChatActivitySnackBarDelegate passes the corresponding view when initialized`() {
-        ChatActivitySnackBarDelegate(chatActivity, mock(), mock())
+        ChatActivitySnackBarDelegate(chatActivity, titleStringKey, mock(), mock())
         verify(chatActivity).findViewById<View>(R.id.chat_view)
     }
 
     @Test
     fun `CallActivitySnackBarDelegate passes the corresponding view when initialized`() {
-        CallActivitySnackBarDelegate(callActivity, mock(), mock())
+        CallActivitySnackBarDelegate(callActivity, titleStringKey, mock(), mock())
         verify(callActivity).findViewById<View>(R.id.call_view)
     }
 
     @Test
     fun `CommonSnackBarDelegate passes the root view when initialized`() {
-        CommonSnackBarDelegate(commonActivity, mock(), mock())
+        CommonSnackBarDelegate(commonActivity, titleStringKey, mock(), mock())
         verify(commonActivity, times(2)).rootView
     }
 
     @Test
     fun `anchorViewId returns corresponding ids when chat or call activity is passed`() {
-        CommonSnackBarDelegate(commonActivity, mock(), mock()).apply { assertNull(anchorViewId) }
-        CallActivitySnackBarDelegate(callActivity, mock(), mock()).apply { assertEquals(R.id.buttons_layout_bg, anchorViewId) }
-        ChatActivitySnackBarDelegate(chatActivity, mock(), mock()).apply { assertEquals(R.id.chat_message_layout, anchorViewId) }
+        CommonSnackBarDelegate(commonActivity, titleStringKey, mock(), mock()).apply { assertNull(anchorViewId) }
+        CallActivitySnackBarDelegate(callActivity, titleStringKey, mock(), mock()).apply { assertEquals(R.id.buttons_layout_bg, anchorViewId) }
+        ChatActivitySnackBarDelegate(chatActivity, titleStringKey, mock(), mock()).apply { assertEquals(R.id.chat_message_layout, anchorViewId) }
     }
 
     @Test
     fun `marginBottom margin is calculated when the passed activity is not a call or chat activity`() {
-        CommonSnackBarDelegate(commonActivity, mock(), mock()).apply { assertEquals(bottomMargin, marginBottom) }
-        CallActivitySnackBarDelegate(callActivity, mock(), mock()).apply { assertNull(marginBottom) }
-        ChatActivitySnackBarDelegate(chatActivity, mock(), mock()).apply { assertNull(marginBottom) }
+        CommonSnackBarDelegate(commonActivity, titleStringKey, mock(), mock()).apply { assertEquals(bottomMargin, marginBottom) }
+        CallActivitySnackBarDelegate(callActivity, titleStringKey, mock(), mock()).apply { assertNull(marginBottom) }
+        ChatActivitySnackBarDelegate(chatActivity, titleStringKey, mock(), mock()).apply { assertNull(marginBottom) }
     }
 
     @Test
     fun `background and text colors are inverse in CallActivitySnackBarDelegate`() {
-        val common = CommonSnackBarDelegate(commonActivity, mock(), mock())
-        val call = CallActivitySnackBarDelegate(callActivity, mock(), mock())
-        val chat = ChatActivitySnackBarDelegate(chatActivity, mock(), mock())
+        val common = CommonSnackBarDelegate(commonActivity, titleStringKey, mock(), mock())
+        val call = CallActivitySnackBarDelegate(callActivity, titleStringKey, mock(), mock())
+        val chat = ChatActivitySnackBarDelegate(chatActivity, titleStringKey, mock(), mock())
 
         assertEquals(common.fallbackBackgroundColor, chat.fallbackBackgroundColor)
         assertEquals(common.fallbackTextColor, chat.fallbackTextColor)
@@ -103,9 +104,9 @@ class SnackBarDelegateTest {
 
     @Test
     fun `snackBarDelegateFactory creates appropriate instance`() {
-        SnackBarDelegateFactory(callActivity, mock(), mock()).apply { assertTrue(createDelegate() is CallActivitySnackBarDelegate) }
-        SnackBarDelegateFactory(chatActivity, mock(), mock()).apply { assertTrue(createDelegate() is ChatActivitySnackBarDelegate) }
-        SnackBarDelegateFactory(commonActivity, mock(), mock()).apply { assertTrue(createDelegate() is CommonSnackBarDelegate) }
+        SnackBarDelegateFactory(callActivity, titleStringKey, mock(), mock()).apply { assertTrue(createDelegate() is CallActivitySnackBarDelegate) }
+        SnackBarDelegateFactory(chatActivity, titleStringKey, mock(), mock()).apply { assertTrue(createDelegate() is ChatActivitySnackBarDelegate) }
+        SnackBarDelegateFactory(commonActivity, titleStringKey, mock(), mock()).apply { assertTrue(createDelegate() is CommonSnackBarDelegate) }
     }
 
 }

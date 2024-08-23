@@ -140,7 +140,7 @@ class CallVisualizerActivityWatcherTest {
         verify { dismissDialogEvent.value }
         verify { dismissDialogEvent.consume(any()) }
         verify { dialog.dismiss() }
-        verify { activity.finish() }
+        verify(exactly = 0) { activity.finish() }
 
         confirmVerified(dialog, activity, event, dismissDialogEvent)
 
@@ -198,7 +198,7 @@ class CallVisualizerActivityWatcherTest {
             )
         }
 
-        onLinkClickedSlot.captured.invoke(links.link1!!)
+        onLinkClickedSlot.captured.invoke(links.link1)
 
         verify { event.markConsumed() }
         verify { dialog.dismiss() }
@@ -307,7 +307,7 @@ class CallVisualizerActivityWatcherTest {
         verify { event.consumed }
         verify { event.value }
         verify { event.consume(any()) }
-        verify { activity.finish() }
+        verify { gliaActivityManager.finishActivity(DialogHolderActivity::class) }
 
         confirmVerified(activity, event)
     }

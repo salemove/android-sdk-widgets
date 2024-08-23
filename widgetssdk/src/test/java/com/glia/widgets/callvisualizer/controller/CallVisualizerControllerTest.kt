@@ -219,9 +219,11 @@ class CallVisualizerControllerTest {
 
     @Test
     fun `incoming engagement request timeout will request to dismiss CV dialog`() {
+        val testState = controller.state.test()
         verify(exactly = 0) { dialogController.dismissCVEngagementConfirmationDialog() }
 
         incomingEngagementRequestTimeoutProcessor.onNext(Unit)
+        testState.assertNotComplete().assertValue { it.value is CallVisualizerContract.State.CloseHolderActivity }
 
         verify { dialogController.dismissCVEngagementConfirmationDialog() }
     }

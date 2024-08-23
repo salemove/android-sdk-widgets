@@ -1,6 +1,5 @@
 package com.glia.widgets.callvisualizer.controller
 
-import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.dialog.domain.ConfirmationDialogLinksUseCase
 import com.glia.widgets.core.dialog.model.ConfirmationDialogLinks
@@ -15,6 +14,7 @@ import com.glia.widgets.helper.OneTimeEvent
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.asOneTimeStateFlowable
 import com.glia.widgets.helper.unSafeSubscribe
+import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.webbrowser.domain.GetUrlFromLinkUseCase
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.processors.PublishProcessor
@@ -106,8 +106,8 @@ internal class CallVisualizerController(
     }
 
     private fun onIncomingEngagementRequestTimeout() {
-        closeHolderActivity()
         dialogController.dismissCVEngagementConfirmationDialog()
+        closeHolderActivity()
     }
 
     override fun onLinkClicked(link: Link) {

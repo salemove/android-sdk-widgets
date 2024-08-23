@@ -64,7 +64,8 @@
     <string name="settings_default_queues">Default Queues</string>
     <string name="settings_queue_id">Queue id</string>
     <string name="settings_white_label">White label</string>
-    <string name="settings_use_overlay">Use Overlay</string>
+    <string name="settings_enable_bubble_outside_app">Enable bubble outside app \n (needs restart)</string>
+    <string name="settings_enable_bubble_inside_app">Enable bubble inside app \n (needs restart)</string>
     <string name="settings_remote_theme">Enable Remote Theme</string>
     <string name="settings_runtime_theme">Enable Runtime Theme</string>
     <string name="settings_visitor_context_asset_id">Visitor context asset id</string>

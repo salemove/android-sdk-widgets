@@ -22,7 +22,13 @@ internal class IsDisplayApplicationChatHeadUseCase(
     configurationManager,
     engagementTypeUseCase
 ) {
-    override fun isDisplayBasedOnPermission(): Boolean {
-        return !permissionManager.hasOverlayPermission()
+    override fun isBubbleEnabled(): Boolean {
+        return configurationManager.isEnableBubbleInsideApp
+    }
+
+    override fun isShowBasedOnForegroundBackground(viewName: String?): Boolean {
+        return viewName != null && // App is in foreground
+            // Use only ChatHeadService instead of ChatHeadService + app bubble if bubble is enabled outside and inside
+            (!configurationManager.isEnableBubbleOutsideApp || !configurationManager.isEnableBubbleInsideApp || !permissionManager.hasOverlayPermission())
     }
 }

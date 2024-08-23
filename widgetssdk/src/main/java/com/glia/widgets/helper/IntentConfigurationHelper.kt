@@ -6,7 +6,7 @@ import android.provider.Settings
 import androidx.core.net.toUri
 import com.glia.androidsdk.Engagement.MediaType
 import com.glia.widgets.call.CallActivity
-import com.glia.widgets.call.Configuration
+import com.glia.widgets.call.CallConfiguration
 import com.glia.widgets.di.Dependencies
 
 internal interface IntentConfigurationHelper {
@@ -16,10 +16,10 @@ internal interface IntentConfigurationHelper {
 }
 
 internal class IntentConfigurationHelperImpl : IntentConfigurationHelper {
-    private val defaultBuilder: Configuration.Builder
+    private val defaultBuilder: CallConfiguration.Builder
         get() = Dependencies.sdkConfigurationManager
-            .createWidgetsConfiguration()
-            .let(Configuration.Builder()::setWidgetsConfiguration)
+            .buildEngagementConfiguration()
+            .let(CallConfiguration.Builder()::setEngagementConfiguration)
 
     override fun createForCall(context: Context, mediaType: MediaType, upgradeToCall: Boolean): Intent = defaultBuilder
         .setMediaType(mediaType)

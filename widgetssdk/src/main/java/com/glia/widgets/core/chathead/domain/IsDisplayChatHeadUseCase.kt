@@ -18,46 +18,44 @@ internal abstract class IsDisplayChatHeadUseCase(
     private val isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase,
     private val screenSharingUseCase: ScreenSharingUseCase,
     val permissionManager: PermissionManager,
-    private val configurationManager: GliaSdkConfigurationManager,
+    internal val configurationManager: GliaSdkConfigurationManager,
     private val engagementTypeUseCase: EngagementTypeUseCase
 ) {
-    abstract fun isDisplayBasedOnPermission(): Boolean
-
     open operator fun invoke(viewName: String?): Boolean {
-        return isBubbleEnabled() && isDisplayBasedOnPermission() && isShowForEngagement(viewName)
+
+        val result = ((isOnChatScreenDuringMediaEngagement(viewName))
+            || (isShowForEngagement() && isShowBasedOnForegroundBackground(viewName) && !isGliaView(viewName) && isBubbleEnabled()))
+        return result
     }
 
-    private fun isShowForEngagement(viewName: String?) =
-        isShowForMediaEngagement(viewName) ||
-            isShowForChatEngagement(viewName) ||
-            isCallVisualizerScreenSharing(viewName)
+    abstract fun isBubbleEnabled(): Boolean
+    abstract fun isShowBasedOnForegroundBackground(viewName: String?): Boolean
 
-    private fun isBubbleEnabled(): Boolean {
-        return configurationManager.isUseOverlay
+    /*
+    * The exception to all of the above is: If we’re looking at the chat screen during an A/V engagement, show the Bubble always irrespective of
+    * Integrator settings. Clicking it takes you back to A/V.
+    * */
+    private fun isOnChatScreenDuringMediaEngagement(viewName: String?) =
+        isMediaEngagementOngoing &&
+            viewName == ChatView::class.java.simpleName &&
+            isShowBasedOnForegroundBackground(viewName) // To avoid showing two bubbles, true on Chat screen only for app bubble
+
+    private fun isShowForEngagement() =
+        isMediaEngagementOrQueueingOngoing ||
+            isChatEngagementOrQueueingOngoing ||
+            isCallVisualizerScreenSharing()
+
+    private fun isCallVisualizerScreenSharing(): Boolean {
+        return isCurrentEngagementCallVisualizerUseCase() && screenSharingUseCase.isSharing
     }
 
-    private fun isCallVisualizerScreenSharing(viewName: String?): Boolean {
-        return isCurrentEngagementCallVisualizerUseCase() && screenSharingUseCase.isSharing && isNotInListOfGliaViews(viewName)
-    }
-
-    private fun isShowForMediaEngagement(viewName: String?): Boolean {
-        return isMediaEngagementOrQueueingOngoing && isNotInListOfGliaViewsExceptChat(viewName)
-    }
-
-    private fun isShowForChatEngagement(viewName: String?): Boolean {
-        return isChatEngagementOrQueueingOngoing && isNotInListOfGliaViews(viewName)
-    }
-
-    private fun isNotInListOfGliaViewsExceptChat(viewName: String?): Boolean {
-        return viewName != CallView::class.java.simpleName &&
-            viewName != FilePreviewView::class.java.simpleName &&
-            viewName != EndScreenSharingView::class.java.simpleName &&
-            viewName != MessageCenterView::class.java.simpleName &&
-            viewName != DialogHolderView::class.java.simpleName
-    }
-
-    private fun isNotInListOfGliaViews(viewName: String?): Boolean {
-        return viewName != ChatView::class.java.simpleName && isNotInListOfGliaViewsExceptChat(viewName)
+    private fun isGliaView(viewName: String?): Boolean {
+        return viewName == ChatView::class.java.simpleName ||
+            viewName == CallView::class.java.simpleName ||
+            viewName == FilePreviewView::class.java.simpleName ||
+            viewName == EndScreenSharingView::class.java.simpleName ||
+            viewName == MessageCenterView::class.java.simpleName ||
+            viewName == DialogHolderView::class.java.simpleName
     }
 
     private val isChatEngagementOrQueueingOngoing: Boolean get() = isChatEngagementOngoing || isChatQueueingOngoing

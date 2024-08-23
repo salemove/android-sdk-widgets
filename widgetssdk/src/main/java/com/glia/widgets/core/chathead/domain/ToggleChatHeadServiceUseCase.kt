@@ -10,6 +10,11 @@ import com.glia.widgets.engagement.domain.ScreenSharingUseCase
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 
+/**
+ * This use case:
+ * 1) determines whether the chat head (bubble) should be displayed
+ * 2) starts or stops the chat head service (bubble outside the app)
+ */
 internal class ToggleChatHeadServiceUseCase(
     isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase,
     isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase,
@@ -38,8 +43,20 @@ internal class ToggleChatHeadServiceUseCase(
         return isDisplayDeviceBubble
     }
 
-    override fun isDisplayBasedOnPermission(): Boolean {
-        return permissionManager.hasOverlayPermission()
+    override fun isBubbleEnabled(): Boolean {
+        // "Global" device bubble should be displayed only when allowed.
+        //
+        // So, isBubbleEnabled() for ToggleChatHeadServiceUseCase returns true when:
+        // global device bubble is NOT turned off by integrator (turned ON by default)
+        // AND
+        // global device bubble is allowed by visitor (overlay permission).
+        return configurationManager.isEnableBubbleOutsideApp && permissionManager.hasOverlayPermission()
+    }
+
+    override fun isShowBasedOnForegroundBackground(viewName: String?): Boolean {
+        return viewName == null || // true when app is in background
+            // Use only ChatHeadService instead of ChatHeadService + app bubble if bubble is enabled outside and inside
+            (configurationManager.isEnableBubbleOutsideApp && configurationManager.isEnableBubbleInsideApp && permissionManager.hasOverlayPermission())
     }
 
     fun onDestroy() {

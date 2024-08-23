@@ -9,7 +9,7 @@ import androidx.core.view.ViewCompat
 import com.glia.widgets.Constants
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
-import com.glia.widgets.core.configuration.GliaSdkConfiguration
+import com.glia.widgets.core.configuration.EngagementConfiguration
 import com.glia.widgets.databinding.ChatHeadLayoutBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Utils
@@ -195,9 +195,9 @@ internal class ChatHeadLayout @JvmOverloads constructor(
 
     private fun updateChatHeadConfiguration(
         buildTimeTheme: UiTheme,
-        sdkConfiguration: GliaSdkConfiguration? = null
+        engagementConfiguration: EngagementConfiguration? = null
     ) {
-        chatHeadView.updateConfiguration(buildTimeTheme, sdkConfiguration)
+        chatHeadView.updateConfiguration(buildTimeTheme, engagementConfiguration)
     }
 
     private fun onChatHeadDragged(x: Float, y: Float) {
@@ -221,7 +221,7 @@ internal class ChatHeadLayout @JvmOverloads constructor(
     }
 
     fun interface OnChatHeadClickedListener {
-        fun onClicked(chatHeadInput: GliaSdkConfiguration?)
+        fun onClicked(engagementConfiguration: EngagementConfiguration?)
     }
 
     interface NavigationCallback {

@@ -9,7 +9,6 @@ import android.content.Intent;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.glia.androidsdk.GliaConfig;
 import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.RequestCallback;
 import com.glia.androidsdk.visitor.Authentication;
@@ -86,16 +85,17 @@ public class GliaWidgets {
      */
     public static final String CONTEXT_ASSET_ID = "context_asset_id";
     /**
-     * Use with {@link android.os.Bundle} to pass in a boolean which represents if you would like to
-     * use the chat head bubble as an overlay as a navigation argument when
-     * navigating to {@link com.glia.widgets.chat.ChatActivity}
-     * If set to true then the chat head will appear in the overlay and the sdk will ask for
-     * overlay permissions. If false, then the {@link com.glia.widgets.view.head.controller.ApplicationChatHeadLayoutController} will notify any
-     * listening {@link com.glia.widgets.view.head.ChatHeadLayout} of any visibility changes.
-     * It is up to the integrator to integrate {@link com.glia.widgets.view.head.ChatHeadLayout} in their
-     * application.
-     * When this value is not passed then by default this value is true.
+     * It's recommended to use {@link GliaWidgetsConfig.Builder#setUseOverlay(boolean)} ()} instead of this constant directly.
+     * Use with {@link android.os.Bundle}  to pass in a boolean which represents if you would like to use the chat head bubble
+     * as an overlay outside your application for navigating to {@link com.glia.widgets.chat.ChatActivity}.
+     * If set to true then the SDK will ask for overlay permissions and try to always show the navigation bubble outside
+     * the application. However, it will be shown only if the user has accepted the permissions.
+     * If false, then overlay permission is not requested and the navigation bubble is shown when the application is active.
+     * Default value is true.
+     * @deprecated Use {@link com.glia.widgets.GliaWidgetsConfig#isEnableBubbleOutsideApp() and
+     * @link GliaWidgetsConfig#isEnableBubbleInsideApp()}
      */
+    @Deprecated
     public static final String USE_OVERLAY = "use_overlay";
     /**
      * Use with {@link android.os.Bundle} to pass an input parameter to the call activity to

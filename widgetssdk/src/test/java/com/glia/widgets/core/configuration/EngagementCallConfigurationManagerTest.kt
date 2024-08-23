@@ -15,7 +15,7 @@ import org.junit.Test
 
 private const val DEFAULT_LOCAL_COMPANY_NAME = "Local Company Name"
 
-class GliaSdkConfigurationManagerTest {
+class EngagementCallConfigurationManagerTest {
 
     private val configurationManager: GliaSdkConfigurationManager = GliaSdkConfigurationManager()
     private val resourceProvider: ResourceProvider = mockk()

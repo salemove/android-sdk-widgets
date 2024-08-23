@@ -7,7 +7,7 @@ import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharing
 import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase
 import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase.Destinations
 import com.glia.widgets.core.chathead.domain.ToggleChatHeadServiceUseCase
-import com.glia.widgets.core.configuration.GliaSdkConfiguration
+import com.glia.widgets.core.configuration.EngagementConfiguration
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.domain.CurrentOperatorUseCase
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
@@ -38,7 +38,7 @@ internal class ServiceChatHeadController(
     private var operatorProfileImgUrl: String? = null
     private var unreadMessagesCount = 0
     private var isOnHold = false
-    private var sdkConfiguration: GliaSdkConfiguration? = null
+    private var engagementConfiguration: EngagementConfiguration? = null
     private var buildTimeTheme: UiTheme? = null
 
     /*
@@ -101,8 +101,8 @@ internal class ServiceChatHeadController(
         updateChatHeadView()
     }
 
-    override fun setSdkConfiguration(configuration: GliaSdkConfiguration?) {
-        sdkConfiguration = configuration
+    override fun setEngagementConfiguration(engagementConfiguration: EngagementConfiguration?) {
+        this.engagementConfiguration = engagementConfiguration
     }
 
     private fun handleEngagementState(state: com.glia.widgets.engagement.State) {
@@ -142,7 +142,7 @@ internal class ServiceChatHeadController(
             updateChatHeadViewState()
             updateOnHold()
             chatHeadView!!.showUnreadMessageCount(unreadMessagesCount)
-            chatHeadView!!.updateConfiguration(buildTimeTheme!!, sdkConfiguration)
+            chatHeadView!!.updateConfiguration(buildTimeTheme!!, engagementConfiguration)
         }
     }
 
@@ -164,8 +164,8 @@ internal class ServiceChatHeadController(
         isOnHold = false
         state = State.ENGAGEMENT
         toggleChatHeadServiceUseCase(resumedViewName)
-        if (sdkConfiguration == null) setSdkConfiguration(
-            Dependencies.sdkConfigurationManager.createWidgetsConfiguration()
+        if (engagementConfiguration == null) setEngagementConfiguration(
+            Dependencies.sdkConfigurationManager.buildEngagementConfiguration()
         )
         updateChatHeadView()
     }
@@ -173,8 +173,8 @@ internal class ServiceChatHeadController(
     private fun queueingStarted() {
         state = State.QUEUEING
         toggleChatHeadServiceUseCase(resumedViewName)
-        if (sdkConfiguration == null) setSdkConfiguration(
-            Dependencies.sdkConfigurationManager.createWidgetsConfiguration()
+        if (engagementConfiguration == null) setEngagementConfiguration(
+            Dependencies.sdkConfigurationManager.buildEngagementConfiguration()
         )
         updateChatHeadView()
     }

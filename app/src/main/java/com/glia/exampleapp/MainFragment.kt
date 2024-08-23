@@ -295,7 +295,7 @@ class MainFragment : Fragment() {
             .putExtra(GliaWidgets.QUEUE_IDS, ArrayList(getQueueIdsFromPrefs(sharedPreferences)))
             .putExtra(GliaWidgets.CONTEXT_ASSET_ID, getContextAssetIdFromPrefs(sharedPreferences))
             .putExtra(GliaWidgets.UI_THEME, getRuntimeThemeFromPrefs(sharedPreferences))
-            .putExtra(GliaWidgets.USE_OVERLAY, getUseOverlay(sharedPreferences))
+//            .putExtra(GliaWidgets.USE_OVERLAY, true) // Use it to make sure this deprecated approach is still working
             .putExtra(GliaWidgets.SCREEN_SHARING_MODE, getScreenSharingModeFromPrefs(sharedPreferences))
             .putExtra(GliaWidgets.MEDIA_TYPE, Utils.toMediaType(mediaType))
         startActivity(intent)
@@ -306,12 +306,8 @@ class MainFragment : Fragment() {
         intent.putExtra(GliaWidgets.QUEUE_IDS, ArrayList(getQueueIdsFromPrefs(sharedPreferences)))
             .putExtra(GliaWidgets.CONTEXT_ASSET_ID, getContextAssetIdFromPrefs(sharedPreferences))
             .putExtra(GliaWidgets.UI_THEME, getRuntimeThemeFromPrefs(sharedPreferences))
-            .putExtra(GliaWidgets.USE_OVERLAY, getUseOverlay(sharedPreferences))
+//            .putExtra(GliaWidgets.USE_OVERLAY, true) // Use it to make sure this deprecated approach is still working
             .putExtra(GliaWidgets.SCREEN_SHARING_MODE, getScreenSharingModeFromPrefs(sharedPreferences))
-    }
-
-    private fun getUseOverlay(sharedPreferences: SharedPreferences): Boolean {
-        return Utils.getUseOverlay(sharedPreferences, resources)
     }
 
     private fun getScreenSharingModeFromPrefs(sharedPreferences: SharedPreferences): ScreenSharing.Mode {

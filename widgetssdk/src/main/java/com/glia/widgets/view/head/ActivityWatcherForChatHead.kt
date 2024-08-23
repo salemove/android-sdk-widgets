@@ -12,7 +12,7 @@ import androidx.core.view.contains
 import com.glia.widgets.R
 import com.glia.widgets.base.BaseActivityStackWatcher
 import com.glia.widgets.call.CallActivity
-import com.glia.widgets.call.Configuration
+import com.glia.widgets.call.CallConfiguration
 import com.glia.widgets.callvisualizer.EndScreenSharingActivity
 import com.glia.widgets.callvisualizer.EndScreenSharingView
 import com.glia.widgets.chat.ChatActivity
@@ -60,7 +60,12 @@ internal class ActivityWatcherForChatHead(
         super.onActivityPaused(activity)
         screenOrientation = activity.resources.configuration.orientation
         controller.onActivityPaused()
-        removeChatHeadLayoutIfPresent()
+        if (activity === resumedActivity) {
+            // MOB-3516: Android emulator with API 29 calls onActivityPaused() AFTER onActivityResumed().
+            // activity === resumedActivity prevents hiding a bubble when onActivityPaused() is called for
+            // an activity that is not resumed at the moment
+            removeChatHeadLayoutIfPresent()
+        }
     }
 
     private fun createChatHeadLayout(activity: Activity) {
@@ -168,9 +173,9 @@ internal class ActivityWatcherForChatHead(
         }
     }
 
-    private fun getConfigurationBuilder(): Configuration.Builder {
-        val configuration = Dependencies.sdkConfigurationManager.createWidgetsConfiguration()
-        return Configuration.Builder().setWidgetsConfiguration(configuration)
+    private fun geCallConfigurationBuilder(): CallConfiguration.Builder {
+        val configuration = Dependencies.sdkConfigurationManager.buildEngagementConfiguration()
+        return CallConfiguration.Builder().setEngagementConfiguration(configuration)
     }
 
     private fun navigateToChat(activity: Activity?) {
@@ -194,7 +199,7 @@ internal class ActivityWatcherForChatHead(
         activity?.let {
             val intent = CallActivity.getIntent(
                 it,
-                getConfigurationBuilder().setIsUpgradeToCall(true).build()
+                geCallConfigurationBuilder().setIsUpgradeToCall(true).build()
             )
             it.startActivity(intent)
         }

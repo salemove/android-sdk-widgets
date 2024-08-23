@@ -11,7 +11,7 @@ import com.glia.widgets.locale.LocaleString;
 import com.glia.widgets.R;
 import com.glia.widgets.base.FadeTransitionActivity;
 import com.glia.widgets.chat.ChatActivity;
-import com.glia.widgets.core.configuration.GliaSdkConfiguration;
+import com.glia.widgets.core.configuration.EngagementConfiguration;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
@@ -46,7 +46,7 @@ import java.util.Objects;
 public final class CallActivity extends FadeTransitionActivity {
     private static final String TAG = CallActivity.class.getSimpleName();
 
-    private Configuration configuration;
+    private CallConfiguration callConfiguration;
 
     private CallView callView;
     private CallView.OnBackClickedListener onBackClickedListener = this::finish;
@@ -66,16 +66,22 @@ public final class CallActivity extends FadeTransitionActivity {
         // Legacy company name support
         Dependencies.getSdkConfigurationManager().setLegacyCompanyName(getIntent().getStringExtra(GliaWidgets.COMPANY_NAME));
 
-        configuration = CallActivityIntentHelper.readConfiguration(this);
+        callConfiguration = CallActivityIntentHelper.readConfiguration(this);
+        if (this.getIntent().hasExtra(GliaWidgets.USE_OVERLAY)) {
+            // Integrator has passed a deprecated GliaWidgets.USE_OVERLAY parameter with Intent
+            // Override bubble configuration with USE_OVERLAY value
+            boolean useOverlay = this.getIntent().getBooleanExtra(GliaWidgets.USE_OVERLAY, true);
+            Dependencies.getSdkConfigurationManager().setLegacyUseOverlay(useOverlay);
+        }
 
-        if (!callView.shouldShowMediaEngagementView(configuration.isUpgradeToCall)) {
+        if (!callView.shouldShowMediaEngagementView(callConfiguration.isUpgradeToCall)) {
             finishAndRemoveTask();
             return;
         }
 
         callView.setOnTitleUpdatedListener(this::setTitle);
-        callView.setConfiguration(configuration.sdkConfiguration);
-        callView.setUiTheme(configuration.sdkConfiguration.getRunTimeTheme());
+        callView.setEngagementConfiguration(callConfiguration.engagementConfiguration);
+        callView.setUiTheme(callConfiguration.engagementConfiguration.getRunTimeTheme());
         callView.setOnBackClickedListener(onBackClickedListener);
 
         // In case the engagement ends, Activity is removed from the device's Recents menu
@@ -120,21 +126,20 @@ public final class CallActivity extends FadeTransitionActivity {
     }
 
     private void startCall() {
-        GliaSdkConfiguration sdkConfiguration = Objects.requireNonNull(configuration.sdkConfiguration);
+        EngagementConfiguration engagementConfiguration = Objects.requireNonNull(callConfiguration.engagementConfiguration);
         callView.startCall(
-            Objects.requireNonNull(sdkConfiguration.getCompanyName()),
-            sdkConfiguration.getQueueIds(),
-            sdkConfiguration.getContextAssetId(),
-            sdkConfiguration.getUseOverlay(),
-            Objects.requireNonNull(sdkConfiguration.getScreenSharingMode()),
-            configuration.isUpgradeToCall,
-            configuration.mediaType
+            Objects.requireNonNull(engagementConfiguration.getCompanyName()),
+            engagementConfiguration.getQueueIds(),
+            engagementConfiguration.getContextAssetId(),
+            Objects.requireNonNull(engagementConfiguration.getScreenSharingMode()),
+            callConfiguration.isUpgradeToCall,
+            callConfiguration.mediaType
         );
     }
 
     private void navigateToChat() {
         Logger.d(TAG, "navigateToChat");
-        GliaSdkConfiguration sdkConfiguration = Objects.requireNonNull(configuration.sdkConfiguration);
+        EngagementConfiguration sdkConfiguration = Objects.requireNonNull(callConfiguration.engagementConfiguration);
         ArrayList<String> queueIds;
         if (sdkConfiguration.getQueueIds() != null) {
             queueIds = new ArrayList<>(sdkConfiguration.getQueueIds());
@@ -145,7 +150,6 @@ public final class CallActivity extends FadeTransitionActivity {
             .putExtra(GliaWidgets.QUEUE_IDS, queueIds)
             .putExtra(GliaWidgets.CONTEXT_ASSET_ID, sdkConfiguration.getContextAssetId())
             .putExtra(GliaWidgets.UI_THEME, sdkConfiguration.getRunTimeTheme())
-            .putExtra(GliaWidgets.USE_OVERLAY, sdkConfiguration.getUseOverlay())
             .putExtra(GliaWidgets.SCREEN_SHARING_MODE, sdkConfiguration.getScreenSharingMode());
         startActivity(newIntent);
     }
@@ -157,7 +161,7 @@ public final class CallActivity extends FadeTransitionActivity {
 
     /**
      * Creates and fills out Intent for starting CallActivity
-     * @deprecated use {@link #getIntent(Context, Configuration)} since 1.8.2
+     * @deprecated use {@link #getIntent(Context, EngagementConfiguration)} since 1.8.2
      * @param applicationContext - application context
      * @param sdkConfiguration - widgets sdk configuration
      * @param mediaType - media type that should be started (in case media engagement not ongoing)
@@ -165,14 +169,14 @@ public final class CallActivity extends FadeTransitionActivity {
      */
     @Deprecated
     public static Intent getIntent(
-            Context applicationContext,
-            GliaSdkConfiguration sdkConfiguration,
-            String mediaType
+        Context applicationContext,
+        EngagementConfiguration engagementConfiguration,
+        String mediaType
     ) {
         Logger.logDeprecatedMethodUse(TAG, "getIntent(Context, GliaSdkConfiguration, String)");
         return getIntent(applicationContext,
-                new Configuration.Builder()
-                        .setWidgetsConfiguration(sdkConfiguration)
+                new CallConfiguration.Builder()
+                        .setEngagementConfiguration(engagementConfiguration)
                         .setMediaType(Utils.toMediaType(mediaType))
                         .build()
         );
@@ -181,13 +185,13 @@ public final class CallActivity extends FadeTransitionActivity {
     /**
      * Creates and fills out Intent for starting CallActivity
      * @param context - Context object
-     * @param configuration - CallActivity configuration
+     * @param callConfiguration - CallActivity configuration
      * @return - Intent for Starting CallActivity
      */
     public static Intent getIntent(
-            Context context,
-            Configuration configuration
+        Context context,
+        CallConfiguration callConfiguration
     ) {
-        return CallActivityIntentHelper.createIntent(context, configuration);
+        return CallActivityIntentHelper.createIntent(context, callConfiguration);
     }
 }

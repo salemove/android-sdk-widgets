@@ -189,17 +189,26 @@ internal class CallController(
         queueIds: List<String>?,
         visitorContextAssetId: String?,
         mediaType: Engagement.MediaType?,
-        useOverlays: Boolean,
         screenSharingMode: ScreenSharing.Mode,
         upgradeToCall: Boolean
     ) {
         if (upgradeToCall || mediaType == null) {
-            initCall(companyName, queueIds, visitorContextAssetId, mediaType, useOverlays, screenSharingMode)
+            initCall(
+                companyName,
+                queueIds,
+                visitorContextAssetId,
+                mediaType,
+                screenSharingMode)
             return
         }
         handleCallPermissionsUseCase.invoke(mediaType) { isPermissionsGranted: Boolean ->
             if (isPermissionsGranted) {
-                initCall(companyName, queueIds, visitorContextAssetId, mediaType, useOverlays, screenSharingMode)
+                initCall(
+                    companyName,
+                    queueIds,
+                    visitorContextAssetId,
+                    mediaType,
+                    screenSharingMode)
             } else {
                 view?.showMissingPermissionsDialog()
             }
@@ -211,10 +220,8 @@ internal class CallController(
         queueIds: List<String>?,
         visitorContextAssetId: String?,
         mediaType: Engagement.MediaType?,
-        useOverlays: Boolean,
         screenSharingMode: ScreenSharing.Mode
     ) {
-        sdkConfigurationManager.isUseOverlay = useOverlays
         sdkConfigurationManager.screenSharingMode = screenSharingMode
         if (isShowOverlayPermissionRequestDialogUseCase()) {
             dialogController.showOverlayPermissionsDialog()

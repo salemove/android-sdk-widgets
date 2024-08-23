@@ -28,7 +28,7 @@ import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.UiTheme.UiThemeBuilder
 import com.glia.widgets.call.CallState.ViewState
-import com.glia.widgets.core.configuration.GliaSdkConfiguration
+import com.glia.widgets.core.configuration.EngagementConfiguration
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.databinding.CallButtonsLayoutBinding
@@ -174,7 +174,6 @@ internal class CallView(
         companyName: String,
         queueIds: List<String>?,
         visitorContextAssetId: String?,
-        useOverlays: Boolean,
         screenSharingMode: ScreenSharing.Mode,
         isUpgradeToCall: Boolean,
         mediaType: Engagement.MediaType?
@@ -184,7 +183,6 @@ internal class CallView(
             queueIds,
             visitorContextAssetId,
             mediaType,
-            useOverlays,
             screenSharingMode,
             isUpgradeToCall
         )
@@ -685,9 +683,9 @@ internal class CallView(
         callController?.onUserInteraction()
     }
 
-    fun setConfiguration(configuration: GliaSdkConfiguration?) {
+    fun setEngagementConfiguration(engagementConfiguration: EngagementConfiguration?) {
         serviceChatHeadController?.setBuildTimeTheme(theme)
-        serviceChatHeadController?.setSdkConfiguration(configuration)
+        serviceChatHeadController?.setEngagementConfiguration(engagementConfiguration)
     }
 
     override fun showToast(message: String) {

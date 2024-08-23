@@ -9,11 +9,12 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts.GetContent
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.activity.result.contract.ActivityResultContracts.TakePicture
+import com.glia.widgets.GliaWidgets
 import com.glia.widgets.GliaWidgets.CHAT_TYPE
 import com.glia.widgets.base.FadeTransitionActivity
 import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.chat.ChatType
-import com.glia.widgets.core.configuration.GliaSdkConfiguration
+import com.glia.widgets.core.configuration.EngagementConfiguration
 import com.glia.widgets.databinding.MessageCenterActivityBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
@@ -48,7 +49,7 @@ class MessageCenterActivity :
 
     private lateinit var binding: MessageCenterActivityBinding
     private val messageCenterView get() = binding.messageCenterView
-    private var configuration: GliaSdkConfiguration? = null
+    private var engagementConfiguration: EngagementConfiguration? = null
 
     private val controller: MessageCenterContract.Controller by lazy {
         Dependencies.controllerFactory.messageCenterController
@@ -75,14 +76,20 @@ class MessageCenterActivity :
         binding = MessageCenterActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        configuration = createConfiguration(intent)
+        engagementConfiguration = createConfiguration(intent)
+        if (intent.hasExtra(GliaWidgets.USE_OVERLAY)) {
+            // Integrator has passed a deprecated GliaWidgets.USE_OVERLAY parameter with Intent
+            // Override bubble configuration with USE_OVERLAY value
+            val useOverlay = intent.getBooleanExtra(GliaWidgets.USE_OVERLAY, true)
+            Dependencies.sdkConfigurationManager.setLegacyUseOverlay(useOverlay)
+        }
 
         messageCenterView.onFinishListener = this
         messageCenterView.onNavigateToMessagingListener = this
         messageCenterView.onAttachFileListener = this
 
         messageCenterView.setController(controller)
-        messageCenterView.setConfiguration(configuration)
+        messageCenterView.setConfiguration(engagementConfiguration)
         onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 messageCenterView.onSystemBack()
@@ -130,8 +137,8 @@ class MessageCenterActivity :
         finish()
     }
 
-    private fun createConfiguration(intent: Intent): GliaSdkConfiguration {
-        return GliaSdkConfiguration.Builder()
+    private fun createConfiguration(intent: Intent): EngagementConfiguration {
+        return EngagementConfiguration.Builder()
             .intent(intent)
             .build()
     }

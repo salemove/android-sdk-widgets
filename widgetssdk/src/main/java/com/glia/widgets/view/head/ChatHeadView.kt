@@ -18,11 +18,11 @@ import com.glia.widgets.GliaWidgets
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.call.CallActivity
-import com.glia.widgets.call.Configuration
+import com.glia.widgets.call.CallConfiguration
 import com.glia.widgets.callvisualizer.EndScreenSharingActivity
 import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase
-import com.glia.widgets.core.configuration.GliaSdkConfiguration
+import com.glia.widgets.core.configuration.EngagementConfiguration
 import com.glia.widgets.databinding.ChatHeadViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
@@ -32,7 +32,6 @@ import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getColorStateListCompat
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.load
-import com.glia.widgets.helper.setContentDescription
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.view.configuration.ChatHeadConfiguration
 import com.glia.widgets.view.unifiedui.applyColorTheme
@@ -55,7 +54,7 @@ internal class ChatHeadView @JvmOverloads constructor(
     defStyleRes
 ), ChatHeadContract.View {
     private val binding by lazy { ChatHeadViewBinding.inflate(layoutInflater, this) }
-    private var sdkConfiguration: GliaSdkConfiguration? = null
+    private var engagementConfiguration: EngagementConfiguration? = null
     private var configuration: ChatHeadConfiguration by Delegates.notNull()
 
     private val isService by lazy { context is Service }
@@ -165,11 +164,11 @@ internal class ChatHeadView @JvmOverloads constructor(
 
     override fun updateConfiguration(
         buildTimeTheme: UiTheme,
-        sdkConfiguration: GliaSdkConfiguration?
+        engagementConfiguration: EngagementConfiguration?
     ) {
-        this.sdkConfiguration = sdkConfiguration
+        this.engagementConfiguration = engagementConfiguration
         serviceChatHeadController.setBuildTimeTheme(buildTimeTheme)
-        createHybridConfiguration(buildTimeTheme, sdkConfiguration)
+        createHybridConfiguration(buildTimeTheme, engagementConfiguration)
         post { updateView() }
     }
 
@@ -190,14 +189,14 @@ internal class ChatHeadView @JvmOverloads constructor(
     }
 
     override fun navigateToChat() {
-        sdkConfiguration?.let {
+        engagementConfiguration?.let {
             context.startActivity(getNavigationIntent(context, ChatActivity::class.java, it))
         }
     }
 
     override fun navigateToCall() {
         val activityConfig =
-            Configuration.Builder().setWidgetsConfiguration(sdkConfiguration).build()
+            CallConfiguration.Builder().setEngagementConfiguration(engagementConfiguration).build()
 
         val intent = CallActivity.getIntent(context, activityConfig)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -226,10 +225,10 @@ internal class ChatHeadView @JvmOverloads constructor(
 
     private fun createHybridConfiguration(
         buildTimeTheme: UiTheme,
-        sdkConfiguration: GliaSdkConfiguration?
+        engagementConfiguration: com.glia.widgets.core.configuration.EngagementConfiguration?
     ) {
         configuration = createBuildTimeConfiguration(buildTimeTheme)
-        val runTimeTheme = sdkConfiguration?.runTimeTheme ?: return
+        val runTimeTheme = engagementConfiguration?.runTimeTheme ?: return
 
         val builder = ChatHeadConfiguration.builder(configuration)
 
@@ -331,13 +330,12 @@ internal class ChatHeadView @JvmOverloads constructor(
         private fun getNavigationIntent(
             context: Context,
             cls: Class<*>,
-            sdkConfiguration: GliaSdkConfiguration
+            engagementConfiguration: EngagementConfiguration
         ): Intent = Intent(context, cls)
-            .putExtra(GliaWidgets.QUEUE_IDS, sdkConfiguration.queueIds?.let { ArrayList(it) })
-            .putExtra(GliaWidgets.CONTEXT_ASSET_ID, sdkConfiguration.contextAssetId)
-            .putExtra(GliaWidgets.UI_THEME, sdkConfiguration.runTimeTheme)
-            .putExtra(GliaWidgets.USE_OVERLAY, sdkConfiguration.useOverlay)
-            .putExtra(GliaWidgets.SCREEN_SHARING_MODE, sdkConfiguration.screenSharingMode)
+            .putExtra(GliaWidgets.QUEUE_IDS, engagementConfiguration.queueIds?.let { ArrayList(it) })
+            .putExtra(GliaWidgets.CONTEXT_ASSET_ID, engagementConfiguration.contextAssetId)
+            .putExtra(GliaWidgets.UI_THEME, engagementConfiguration.runTimeTheme)
+            .putExtra(GliaWidgets.SCREEN_SHARING_MODE, engagementConfiguration.screenSharingMode)
             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
 }

@@ -4,13 +4,13 @@ import android.net.Uri
 import com.glia.widgets.UiTheme
 import com.glia.widgets.base.BaseController
 import com.glia.widgets.base.BaseView
-import com.glia.widgets.core.configuration.GliaSdkConfiguration
+import com.glia.widgets.core.configuration.EngagementConfiguration
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.fileupload.model.FileAttachment
 
 internal interface MessageCenterContract {
     interface Controller : BaseController {
-        fun setConfiguration(uiTheme: UiTheme?, configuration: GliaSdkConfiguration?)
+        fun setConfiguration(uiTheme: UiTheme?, configuration: EngagementConfiguration?)
         fun setView(view: View)
         fun initialize()
         fun onCheckMessagesClicked()

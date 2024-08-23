@@ -21,7 +21,7 @@ import com.glia.widgets.Constants
 import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
-import com.glia.widgets.core.configuration.GliaSdkConfiguration
+import com.glia.widgets.core.configuration.EngagementConfiguration
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.fileupload.model.FileAttachment
@@ -182,7 +182,7 @@ internal class MessageCenterView(
         }
     }
 
-    fun setConfiguration(configuration: GliaSdkConfiguration?) {
+    fun setConfiguration(configuration: EngagementConfiguration?) {
         controller?.setConfiguration(theme, configuration)
     }
 

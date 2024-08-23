@@ -287,10 +287,6 @@ class Utils {
         return null;
     }
 
-    public static boolean getUseOverlay(SharedPreferences sharedPreferences, Resources resources) {
-        return sharedPreferences.getBoolean(resources.getString(R.string.pref_use_overlay), true);
-    }
-
     public static ScreenSharing.Mode getScreenSharingModeFromPrefs(
             SharedPreferences sharedPreferences,
             Resources resources

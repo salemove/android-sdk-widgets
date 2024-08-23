@@ -4,7 +4,7 @@ import com.glia.widgets.R
 import com.glia.widgets.SnapshotTest
 import com.glia.widgets.UiTheme
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase
-import com.glia.widgets.core.configuration.GliaSdkConfiguration
+import com.glia.widgets.core.configuration.EngagementConfiguration
 import com.glia.widgets.di.ControllerFactory
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.di.UseCaseFactory
@@ -305,7 +305,7 @@ class ChatHeadViewSnapshotTest : SnapshotTest(
         unifiedTheme: UnifiedTheme? = null,
         uiTheme: UiTheme = UiTheme(),
         executor: Executor? = Executor(Runnable::run),
-        sdkConfiguration: GliaSdkConfiguration? = sdkConfiguration(uiTheme),
+        sdkConfiguration: EngagementConfiguration? = sdkConfiguration(uiTheme),
         isCallVisualizerScreenSharingUseCase: Boolean = false
     ): ChatHeadView {
         lottieMock()
@@ -341,7 +341,7 @@ class ChatHeadViewSnapshotTest : SnapshotTest(
     private fun sdkConfiguration(
         uiTheme: UiTheme = UiTheme(),
         chatHeadConfiguration: ChatHeadConfiguration = chatHeadConfiguration()
-    ) = mock<GliaSdkConfiguration>().also {
+    ) = mock<EngagementConfiguration>().also {
         whenever(it.runTimeTheme).thenReturn(uiTheme.copy(chatHeadConfiguration = chatHeadConfiguration))
     }
     private fun chatHeadConfiguration() = ChatHeadConfiguration.Builder()

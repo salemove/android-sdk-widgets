@@ -128,7 +128,14 @@ object ExampleAppConfigManager {
             context.getString(R.string.pref_company_name),
             context.getString(R.string.settings_value_default_company_name)
         )
-        val useOverlay = preferences.getBoolean(context.getString(R.string.pref_use_overlay), true)
+        val enableBubbleOutsideApp = preferences.getBoolean(
+            context.getString(R.string.settings_enable_bubble_outside_app),
+            true
+        )
+        val enableBubbleInsideApp = preferences.getBoolean(
+            context.getString(R.string.settings_enable_bubble_inside_app),
+            true
+        )
         val bounded = context.getString(R.string.screen_sharing_mode_app_bounded)
         val unbounded = context.getString(R.string.screen_sharing_mode_unbounded)
         val screenSharingMode = if (
@@ -145,7 +152,8 @@ object ExampleAppConfigManager {
             .setRegion(siteRegion)
             .setBaseDomain(baseDomain)
             .setCompanyName(companyName)
-            .setUseOverlay(useOverlay)
+            .enableBubbleOutsideApp(enableBubbleOutsideApp)
+            .enableBubbleInsideApp(enableBubbleInsideApp)
             .setScreenSharingMode(screenSharingMode)
             .setContext(context)
             .setUiJsonRemoteConfig(uiJsonRemoteConfig ?: Utils.getRemoteThemeByPrefs(preferences, context.resources))

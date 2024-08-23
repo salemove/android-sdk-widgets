@@ -35,8 +35,13 @@
 
         <SwitchPreference
             app:defaultValue="true"
-            app:key="@string/pref_use_overlay"
-            app:title="@string/settings_use_overlay" />
+            app:key="@string/settings_enable_bubble_outside_app"
+            app:title="@string/settings_enable_bubble_outside_app" />
+
+        <SwitchPreference
+            app:defaultValue="true"
+            app:key="@string/settings_enable_bubble_inside_app"
+            app:title="@string/settings_enable_bubble_inside_app" />
 
         <SwitchPreference
             app:defaultValue="false"

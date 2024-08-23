@@ -8,7 +8,7 @@ import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.chat.domain.SiteInfoUseCase
 import com.glia.widgets.chat.domain.TakePictureUseCase
 import com.glia.widgets.chat.domain.UriToFileAttachmentUseCase
-import com.glia.widgets.core.configuration.GliaSdkConfiguration
+import com.glia.widgets.core.configuration.EngagementConfiguration
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.engagement.domain.SetEngagementConfigUseCase
 import com.glia.widgets.core.fileupload.model.FileAttachment
@@ -110,11 +110,11 @@ internal class MessageCenterControllerTest {
     }
 
     @Test
-    fun setConfiguration_setSdkConfiguration_onTrigger() {
-        val configuration = mock<GliaSdkConfiguration>()
+    fun setConfiguration_setEngagementConfiguration_onTrigger() {
+        val configuration = mock<EngagementConfiguration>()
         messageCenterController.setConfiguration(mock(), configuration)
 
-        verify(serviceChatHeadController, times(1)).setSdkConfiguration(configuration)
+        verify(serviceChatHeadController, times(1)).setEngagementConfiguration(configuration)
     }
 
     @Test

@@ -14,7 +14,7 @@ import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.chat.domain.SiteInfoUseCase
 import com.glia.widgets.chat.domain.TakePictureUseCase
 import com.glia.widgets.chat.domain.UriToFileAttachmentUseCase
-import com.glia.widgets.core.configuration.GliaSdkConfiguration
+import com.glia.widgets.core.configuration.EngagementConfiguration
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.engagement.domain.SetEngagementConfigUseCase
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase
@@ -61,11 +61,11 @@ internal class MessageCenterController(
     @Volatile
     private var state = MessageCenterState()
 
-    override fun setConfiguration(uiTheme: UiTheme?, configuration: GliaSdkConfiguration?) {
+    override fun setConfiguration(uiTheme: UiTheme?, configuration: EngagementConfiguration?) {
         setQueueIds(configuration?.queueIds)
 
         serviceChatHeadController.setBuildTimeTheme(uiTheme)
-        serviceChatHeadController.setSdkConfiguration(configuration)
+        serviceChatHeadController.setEngagementConfiguration(configuration)
     }
 
     private fun setQueueIds(queueIds: List<String>?) {

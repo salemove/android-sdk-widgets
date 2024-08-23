@@ -3,12 +3,11 @@ package com.glia.widgets.core.configuration;
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 
-import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.screensharing.ScreenSharing;
 import com.glia.widgets.GliaWidgetsConfig;
-import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.di.Dependencies;
+import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.ResourceProvider;
 
 import org.jetbrains.annotations.Nullable;
@@ -18,10 +17,13 @@ import org.jetbrains.annotations.Nullable;
  */
 public class GliaSdkConfigurationManager {
 
+    private static final String TAG = GliaSdkConfigurationManager.class.getSimpleName();
+
     private ScreenSharing.Mode screenSharingMode = null;
     private String companyName = null;
     private String legacyCompanyName = null;
-    private boolean useOverlay = true;
+    private boolean enableBubbleOutsideApp = true; // default values
+    private boolean enableBubbleInsideApp = true; // default values
 
     private UiTheme uiTheme = null;
 
@@ -30,18 +32,33 @@ public class GliaSdkConfigurationManager {
         this.companyName = configuration.companyName;
         this.uiTheme = configuration.uiTheme;
 
-        Boolean useOverlay = configuration.isUseOverlay();
-        if (useOverlay != null) {
-            this.useOverlay = useOverlay;
+        Boolean enableBubbleOutsideApp = configuration.enableBubbleOutsideApp;
+        if (enableBubbleOutsideApp != null) {
+            this.enableBubbleOutsideApp = enableBubbleOutsideApp;
+        }
+
+        Boolean enableBubbleInsideApp = configuration.enableBubbleInsideApp;
+        if (enableBubbleInsideApp != null) {
+            this.enableBubbleInsideApp = enableBubbleInsideApp;
         }
     }
 
-    public boolean isUseOverlay() {
-        return this.useOverlay;
+    public boolean isEnableBubbleOutsideApp() {
+        return this.enableBubbleOutsideApp;
     }
 
-    public void setUseOverlay(boolean useOverlay) {
-        this.useOverlay = useOverlay;
+    public boolean isEnableBubbleInsideApp() {
+        return this.enableBubbleInsideApp;
+    }
+
+    /**
+     * @deprecated Should be removed together with GliaWidgetsConfig.USE_OVERLAY
+     */
+    @Deprecated
+    public void setLegacyUseOverlay(boolean useOverlay) {
+        Logger.logDeprecatedMethodUse(TAG, "setLegacyUseOverlay()");
+        this.enableBubbleOutsideApp = useOverlay;
+        this.enableBubbleInsideApp = useOverlay;
     }
 
     public void setLegacyCompanyName(String companyName) {
@@ -82,11 +99,10 @@ public class GliaSdkConfigurationManager {
     }
 
     @Nullable
-    public GliaSdkConfiguration createWidgetsConfiguration() {
-        return new GliaSdkConfiguration.Builder()
+    public EngagementConfiguration buildEngagementConfiguration() {
+        return new EngagementConfiguration.Builder()
                 .companyName(companyName)
                 .screenSharingMode(screenSharingMode)
-                .useOverlay(useOverlay)
                 .runTimeTheme(uiTheme)
                 .build();
     }

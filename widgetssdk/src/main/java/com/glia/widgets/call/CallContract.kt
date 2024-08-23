@@ -26,7 +26,6 @@ internal interface CallContract {
             queueIds: List<String>?,
             visitorContextAssetId: String?,
             mediaType: Engagement.MediaType?,
-            useOverlays: Boolean,
             screenSharingMode: ScreenSharing.Mode,
             upgradeToCall: Boolean
         )

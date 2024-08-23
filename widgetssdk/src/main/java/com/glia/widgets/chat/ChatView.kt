@@ -43,7 +43,7 @@ import com.glia.widgets.chat.model.ChatInputMode
 import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.ChatState
 import com.glia.widgets.chat.model.CustomCardChatItem
-import com.glia.widgets.core.configuration.GliaSdkConfiguration
+import com.glia.widgets.core.configuration.EngagementConfiguration
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.fileupload.model.FileAttachment
@@ -217,7 +217,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
      * @param companyName Text shown in the chat while waiting in a queue.
      * @param queueIds    The queue ids to which you would like to queue to and speak to operators from.
      * @param visitorContextAssetId  Provide some context asset ID as to from where are you initiating the chat from.
-     * @param useOverlays Used to set if the user opted to use overlays or not.
      * @see [com.glia.widgets.GliaWidgets].USE_OVERLAY to see its full usage description.
      * Important! This parameter is ignored if the view is not used in the sdk's [ChatActivity]
      */
@@ -226,11 +225,9 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         companyName: String?,
         queueIds: List<String>?,
         visitorContextAssetId: String?,
-        useOverlays: Boolean? = null,
         screenSharingMode: ScreenSharing.Mode? = null,
         chatType: ChatType = ChatType.LIVE_CHAT
     ) {
-        useOverlays?.also { Dependencies.sdkConfigurationManager.isUseOverlay = it }
         Dependencies.sdkConfigurationManager.screenSharingMode = screenSharingMode
         dialogCallback?.also { dialogController?.addCallback(it) }
         controller?.initChat(companyName, queueIds, visitorContextAssetId, chatType)
@@ -850,9 +847,9 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         controller?.onImageItemClick(item, view)
     }
 
-    fun setConfiguration(configuration: GliaSdkConfiguration?) {
+    fun setConfiguration(configuration: EngagementConfiguration?) {
         serviceChatHeadController?.setBuildTimeTheme(theme)
-        serviceChatHeadController?.setSdkConfiguration(configuration)
+        serviceChatHeadController?.setEngagementConfiguration(configuration)
     }
 
     override fun showToast(message: String, duration: Int) {

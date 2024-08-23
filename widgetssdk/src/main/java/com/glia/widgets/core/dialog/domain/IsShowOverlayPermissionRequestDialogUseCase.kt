@@ -15,7 +15,7 @@ internal class IsShowOverlayPermissionRequestDialogUseCaseImpl(
 ) : IsShowOverlayPermissionRequestDialogUseCase {
     private val hasNoOverlayPermissions: Boolean get() = !permissionManager.hasOverlayPermission()
     private val hasNotShownOverlayPermissionRequest: Boolean get() = !permissionDialogManager.hasOverlayPermissionDialogShown()
-    private val isUseOverlay: Boolean get() = gliaSdkConfigurationManager.isUseOverlay
+    private val isUseOverlay: Boolean get() = gliaSdkConfigurationManager.isEnableBubbleOutsideApp
 
     override fun invoke(): Boolean = hasNoOverlayPermissions && hasNotShownOverlayPermissionRequest && isUseOverlay
 }

@@ -13,8 +13,8 @@ import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.base.FadeTransitionActivity;
 import com.glia.widgets.call.CallActivity;
-import com.glia.widgets.call.Configuration;
-import com.glia.widgets.core.configuration.GliaSdkConfiguration;
+import com.glia.widgets.call.CallConfiguration;
+import com.glia.widgets.core.configuration.EngagementConfiguration;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
 
@@ -49,7 +49,7 @@ public final class ChatActivity extends FadeTransitionActivity {
     private static final String TAG = ChatActivity.class.getSimpleName();
     private ChatView chatView;
 
-    private GliaSdkConfiguration configuration;
+    private EngagementConfiguration engagementConfiguration;
 
     /**
      * Creates and fills out Intent for starting ChatActivity
@@ -145,15 +145,21 @@ public final class ChatActivity extends FadeTransitionActivity {
         Dependencies.getSdkConfigurationManager().setLegacyCompanyName(getIntent().getStringExtra(GliaWidgets.COMPANY_NAME));
 
         chatView.setOnTitleUpdatedListener(this::setTitle);
-        configuration = createConfiguration(getIntent());
+        engagementConfiguration = createGliaSdkConfigurationFromIntent(getIntent());
+        if (getIntent().hasExtra(GliaWidgets.USE_OVERLAY)) {
+            // Integrator has passed a deprecated GliaWidgets.USE_OVERLAY parameter with Intent
+            // Override bubble configuration with USE_OVERLAY value
+            boolean useOverlay = getIntent().getBooleanExtra(GliaWidgets.USE_OVERLAY, true);
+            Dependencies.getSdkConfigurationManager().setLegacyUseOverlay(useOverlay);
+        }
 
         if (!chatView.shouldShow()) {
             finishAndRemoveTask();
             return;
         }
 
-        chatView.setConfiguration(configuration);
-        chatView.setUiTheme(configuration.getRunTimeTheme());
+        chatView.setConfiguration(engagementConfiguration);
+        chatView.setUiTheme(engagementConfiguration.getRunTimeTheme());
         chatView.setOnBackClickedListener(this::finish);
         chatView.setOnBackToCallListener(this::backToCallScreen);
 
@@ -165,12 +171,11 @@ public final class ChatActivity extends FadeTransitionActivity {
         chatView.setOnMinimizeListener(this::finish);
         chatView.setOnNavigateToCallListener(this::startCallScreen);
         chatView.startChat(
-            configuration.getCompanyName(),
-            configuration.getQueueIds(),
-            configuration.getContextAssetId(),
-            configuration.getUseOverlay(),
-            configuration.getScreenSharingMode(),
-            Objects.requireNonNull(configuration.getChatType())
+            engagementConfiguration.getCompanyName(),
+            engagementConfiguration.getQueueIds(),
+            engagementConfiguration.getContextAssetId(),
+            engagementConfiguration.getScreenSharingMode(),
+            Objects.requireNonNull(engagementConfiguration.getChatType())
         );
     }
 
@@ -198,8 +203,8 @@ public final class ChatActivity extends FadeTransitionActivity {
         chatView.onBackPressed();
     }
 
-    private GliaSdkConfiguration createConfiguration(Intent intent) {
-        return new GliaSdkConfiguration.Builder()
+    private EngagementConfiguration createGliaSdkConfigurationFromIntent(Intent intent) {
+        return new EngagementConfiguration.Builder()
             .intent(intent)
             .build();
     }
@@ -221,7 +226,7 @@ public final class ChatActivity extends FadeTransitionActivity {
         finish();
     }
 
-    private Configuration.Builder getConfigurationBuilder() {
-        return new Configuration.Builder().setWidgetsConfiguration(configuration);
+    private CallConfiguration.Builder getConfigurationBuilder() {
+        return new CallConfiguration.Builder().setEngagementConfiguration(engagementConfiguration);
     }
 }

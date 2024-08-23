@@ -36,7 +36,12 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
 
     @JvmField
     val screenSharingMode: ScreenSharing.Mode?
-    val isUseOverlay: Boolean?
+
+    @JvmField
+    val enableBubbleOutsideApp: Boolean?
+
+    @JvmField
+    val enableBubbleInsideApp: Boolean?
 
     @JvmField
     val uiTheme: UiTheme?
@@ -54,7 +59,8 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
         uiJsonRemoteConfig = builder.uiJsonRemoteConfig
         companyName = builder.companyName
         screenSharingMode = builder.screenSharingMode ?: DEFAULT_SCREEN_SHARING_MODE
-        isUseOverlay = builder.useOverlay
+        enableBubbleOutsideApp = builder.enableBubbleOutsideApp
+        enableBubbleInsideApp = builder.enableBubbleInsideApp
         uiTheme = builder.uiTheme
         manualLocaleOverride = builder.manualLocaleOverride
     }
@@ -124,7 +130,9 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
             private set
         var screenSharingMode: ScreenSharing.Mode? = null
             private set
-        var useOverlay: Boolean? = null
+        var enableBubbleOutsideApp: Boolean? = null
+            private set
+        var enableBubbleInsideApp: Boolean? = null
             private set
         var uiTheme: UiTheme? = null
             private set
@@ -204,11 +212,35 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
         }
 
         /**
-         * @param useOverlay - Is it allowed to overlay the application
+         * @param useOverlay - is it allowed to overlay the application
+         * @return Builder instance
+         * @deprecated Use [GliaWidgetsConfig.enableBubbleOutsideApp] and [GliaWidgetsConfig.enableBubbleInsideApp]
+         */
+        @Deprecated("Please use GliaWidgetsConfig.enableBubbleOutsideApp and GliaWidgetsConfig.enableBubbleInsideApp")
+        fun setUseOverlay(useOverlay: Boolean): Builder {
+            Logger.logDeprecatedMethodUse(TAG, "GliaWidgetsConfig.setUseOverlay()")
+            this.enableBubbleOutsideApp = useOverlay
+            this.enableBubbleInsideApp = useOverlay
+            return this
+        }
+
+        /**
+         * @param enableBubbleOutsideApp - is bubble enabled outside the app
          * @return Builder instance
          */
-        fun setUseOverlay(useOverlay: Boolean): Builder {
-            this.useOverlay = useOverlay
+        fun enableBubbleOutsideApp(enableBubbleOutsideApp: Boolean): Builder {
+            Logger.i(TAG, "Bubble: enable outside app $enableBubbleOutsideApp")
+            this.enableBubbleOutsideApp = enableBubbleOutsideApp
+            return this
+        }
+
+        /**
+         * @param enableBubbleInsideApp - is bubble enabled inside the app
+         * @return Builder instance
+         */
+        fun enableBubbleInsideApp(enableBubbleInsideApp: Boolean): Builder {
+            Logger.i(TAG, "Bubble: enable inside app $enableBubbleInsideApp")
+            this.enableBubbleInsideApp = enableBubbleInsideApp
             return this
         }
 

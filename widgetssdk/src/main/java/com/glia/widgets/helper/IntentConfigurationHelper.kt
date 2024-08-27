@@ -17,7 +17,7 @@ internal interface IntentConfigurationHelper {
 
 internal class IntentConfigurationHelperImpl : IntentConfigurationHelper {
     private val defaultBuilder: Configuration.Builder
-        get() = Dependencies.getSdkConfigurationManager()
+        get() = Dependencies.sdkConfigurationManager
             .createWidgetsConfiguration()
             .let(Configuration.Builder()::setWidgetsConfiguration)
 

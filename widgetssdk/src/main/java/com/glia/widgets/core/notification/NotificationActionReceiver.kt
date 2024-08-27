@@ -17,7 +17,7 @@ import com.glia.widgets.helper.TAG
  */
 class NotificationActionReceiver : BroadcastReceiver() {
     private val endScreenSharingUseCase: EndScreenSharingUseCase by lazy {
-        Dependencies.getUseCaseFactory().endScreenSharingUseCase
+        Dependencies.useCaseFactory.endScreenSharingUseCase
     }
 
     override fun onReceive(context: Context, intent: Intent) {

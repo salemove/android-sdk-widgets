@@ -31,7 +31,7 @@ internal class OperatorMessageViewHolder(
     private val uiTheme: UiTheme
 ) : RecyclerView.ViewHolder(binding.root) {
     private val operatorTheme: MessageBalloonTheme? by lazy {
-        Dependencies.getGliaThemeManager().theme?.chatTheme?.operatorMessage
+        Dependencies.gliaThemeManager.theme?.chatTheme?.operatorMessage
     }
     private val messageContentView: TextView by lazy {
         ChatReceiveMessageContentBinding.inflate(

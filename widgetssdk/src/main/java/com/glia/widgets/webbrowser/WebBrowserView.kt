@@ -42,7 +42,7 @@ internal class WebBrowserView(
 ) {
 
     private var theme: UiTheme by Delegates.notNull()
-    private val unifiedTheme: UnifiedTheme? by lazy { Dependencies.getGliaThemeManager().theme }
+    private val unifiedTheme: UnifiedTheme? by lazy { Dependencies.gliaThemeManager.theme }
 
     var onFinishListener: OnFinishListener? = null
     var onLinkClickListener: OnLinkClickListener? = null

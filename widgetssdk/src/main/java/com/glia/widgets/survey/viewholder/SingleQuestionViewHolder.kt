@@ -28,7 +28,7 @@ internal class SingleQuestionViewHolder(
     var style: SurveyStyle
 ) : SurveyViewHolder(binding.root, binding.tvTitle, binding.requiredError) {
     private val singleTheme: SurveySingleQuestionTheme? by lazy {
-        Dependencies.getGliaThemeManager().theme?.surveyTheme?.singleQuestion
+        Dependencies.gliaThemeManager.theme?.surveyTheme?.singleQuestion
     }
     private val containerView: LinearLayout get() = binding.singleChoiceView
     private val radioGroup: RadioGroup get() = binding.radioGroup

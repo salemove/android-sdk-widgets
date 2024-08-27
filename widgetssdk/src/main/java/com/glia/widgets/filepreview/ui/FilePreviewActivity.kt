@@ -37,7 +37,7 @@ import java.io.File
  * This activity is used to preview images shared in chat in full-screen.
  */
 internal class FilePreviewActivity : AppCompatActivity(), FilePreviewContract.View {
-    private val localeProvider = Dependencies.getLocaleProvider()
+    private val localeProvider = Dependencies.localeProvider
 
     private val binding: FilePreviewActivityBinding by lazy {
         FilePreviewActivityBinding.inflate(
@@ -59,7 +59,7 @@ internal class FilePreviewActivity : AppCompatActivity(), FilePreviewContract.Vi
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(newBase)
 
-        setController(Dependencies.getControllerFactory().imagePreviewController)
+        setController(Dependencies.controllerFactory.imagePreviewController)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

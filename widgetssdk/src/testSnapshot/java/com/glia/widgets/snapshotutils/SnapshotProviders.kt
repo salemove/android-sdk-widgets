@@ -17,22 +17,18 @@ internal interface SnapshotProviders: SnapshotContent, SnapshotTestLifecycle {
             }
         }
 
-        Dependencies.setLocaleProvider(localeProvider)
-
-        setOnEndListener {
-            Dependencies.setLocaleProvider(null)
-        }
+        Dependencies.localeProvider = localeProvider
 
         return localeProvider
     }
 
     fun resourceProviderMock(): ResourceProvider {
         val resourceProvider = ResourceProvider(context)
-        Dependencies.setResourceProvider(resourceProvider)
+        Dependencies.resourceProvider = resourceProvider
 
-        setOnEndListener {
-            Dependencies.setResourceProvider(null)
-        }
+//        setOnEndListener {
+//            Dependencies.resourceProvider = null
+//        }
 
         return resourceProvider
     }

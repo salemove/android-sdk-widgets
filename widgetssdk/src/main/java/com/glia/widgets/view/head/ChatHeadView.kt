@@ -61,7 +61,7 @@ internal class ChatHeadView @JvmOverloads constructor(
     private val isService by lazy { context is Service }
 
     private val bubbleTheme: BubbleTheme?
-        get() = Dependencies.getGliaThemeManager().theme?.run {
+        get() = Dependencies.gliaThemeManager.theme?.run {
             if (isService) bubbleTheme else chatTheme?.bubble
         }
 
@@ -72,9 +72,9 @@ internal class ChatHeadView @JvmOverloads constructor(
     private var theme: UiTheme? = null
 
     init {
-        serviceChatHeadController = Dependencies.getControllerFactory().chatHeadController
-        isCallVisualizerScreenSharingUseCase = Dependencies.getUseCaseFactory().createIsCallVisualizerScreenSharingUseCase()
-        isCallVisualizerUseCase = Dependencies.getUseCaseFactory().isCurrentEngagementCallVisualizer
+        serviceChatHeadController = Dependencies.controllerFactory.chatHeadController
+        isCallVisualizerScreenSharingUseCase = Dependencies.useCaseFactory.createIsCallVisualizerScreenSharingUseCase()
+        isCallVisualizerUseCase = Dependencies.useCaseFactory.isCurrentEngagementCallVisualizer
         setAccessibilityLabels()
         readTypedArray()
     }

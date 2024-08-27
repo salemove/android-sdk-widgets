@@ -65,21 +65,21 @@ class CallActivityTest {
         every { controllerFactory.callController } answers { callController }
 
         every { controllerFactory.chatHeadController } answers { serviceChatHeadController }
-        Dependencies.setControllerFactory(controllerFactory)
+        Dependencies.controllerFactory = controllerFactory
 
         // set up SdkConfigurationManager
         sdkConfigurationManager = mockk(relaxed = true)
         every { sdkConfigurationManager.uiTheme } answers { UiTheme() }
         every { sdkConfigurationManager.companyName } answers { "Test Company" }
-        Dependencies.setSdkConfigurationManager(sdkConfigurationManager)
+        Dependencies.sdkConfigurationManager = sdkConfigurationManager
 
         // set up ResourceProvider
         resourceProvider = ResourceProvider(appContext)
-        Dependencies.setResourceProvider(resourceProvider)
+        Dependencies.resourceProvider = resourceProvider
 
         // set up StringProvider
         val localeProvider = LocaleProvider(resourceProvider)
-        Dependencies.setLocaleProvider(localeProvider)
+        Dependencies.localeProvider = localeProvider
 
         callStatus = mockk(relaxed = true)
         every { callStatus.formattedOperatorName } answers { "FormattedOperatorName" }

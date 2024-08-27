@@ -52,7 +52,6 @@ internal class OperatorStatusView @JvmOverloads constructor(
 
     private var operatorImageSize: Int by Delegates.notNull()
     private var operatorImageContentPadding: Int by Delegates.notNull()
-    private var localeProvider = Dependencies.getLocaleProvider()
 
     private val operatorImageLargeSize by lazy {
         resources.getDimensionPixelSize(R.dimen.glia_chat_profile_picture_large_size)

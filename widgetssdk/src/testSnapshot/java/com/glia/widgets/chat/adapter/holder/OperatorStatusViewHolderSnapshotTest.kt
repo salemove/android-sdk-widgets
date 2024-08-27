@@ -263,7 +263,7 @@ class OperatorStatusViewHolderSnapshotTest : SnapshotTest(
         localeProviderMock()
         picassoMock(imageLoadError = imageLoadError)
 
-        unifiedTheme?.let { Dependencies.getGliaThemeManager().theme = it }
+        unifiedTheme?.let { Dependencies.gliaThemeManager.theme = it }
 
         val binding = ChatOperatorStatusLayoutBinding.inflate(layoutInflater)
         val viewHolder = OperatorStatusViewHolder(binding, uiTheme)
@@ -271,7 +271,7 @@ class OperatorStatusViewHolderSnapshotTest : SnapshotTest(
         viewHolder.bind(item)
 
         setOnEndListener {
-            Dependencies.getGliaThemeManager().theme = null
+            Dependencies.gliaThemeManager.theme = null
         }
 
         return ViewData(binding, viewHolder)

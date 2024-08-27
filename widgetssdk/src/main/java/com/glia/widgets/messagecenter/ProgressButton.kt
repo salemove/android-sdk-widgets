@@ -55,7 +55,7 @@ internal class ProgressButton @JvmOverloads constructor(context: Context, attrs:
     private val progressBar get() = binding.progressBar
 
     // End Widgets + Binding
-    private val localeProvider = Dependencies.getLocaleProvider()
+    private val localeProvider = Dependencies.localeProvider
 
     @get:ColorInt
     private val gliaBrandPrimaryColor: Int by lazy { // btn bg

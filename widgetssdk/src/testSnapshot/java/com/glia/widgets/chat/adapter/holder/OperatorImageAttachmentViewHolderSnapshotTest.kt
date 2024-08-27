@@ -184,7 +184,7 @@ class OperatorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotCh
         unifiedTheme: UnifiedTheme? = null,
         uiTheme: UiTheme = UiTheme()
     ): OperatorImageAttachmentViewHolder {
-        unifiedTheme?.let { Dependencies.getGliaThemeManager().theme = it }
+        unifiedTheme?.let { Dependencies.gliaThemeManager.theme = it }
 
         picassoMock(listOf(R.drawable.test_launcher2))
         val imageFileMock = getImageFileMock(R.drawable.test_banner)
@@ -203,7 +203,7 @@ class OperatorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotCh
         schedulersMock.triggerActions()
 
         setOnEndListener {
-            Dependencies.getGliaThemeManager().theme = null
+            Dependencies.gliaThemeManager.theme = null
         }
 
         return viewHolder

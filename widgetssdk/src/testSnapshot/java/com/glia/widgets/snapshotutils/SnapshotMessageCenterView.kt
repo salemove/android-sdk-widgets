@@ -36,11 +36,7 @@ internal interface SnapshotMessageCenterView : SnapshotTestLifecycle, SnapshotCo
         val messageCenterControllerMock = mock<MessageCenterController>()
         val controllerFactoryMock = mock<ControllerFactory>()
         whenever(controllerFactoryMock.messageCenterController).thenReturn(messageCenterControllerMock)
-        Dependencies.setControllerFactory(controllerFactoryMock)
-
-        setOnEndListener {
-            Dependencies.setControllerFactory(null)
-        }
+        Dependencies.controllerFactory = controllerFactoryMock
 
         return Mock(activityMock, controllerFactoryMock, messageCenterControllerMock)
     }
@@ -62,7 +58,7 @@ internal interface SnapshotMessageCenterView : SnapshotTestLifecycle, SnapshotCo
     ): ViewData {
         val mock = messageCenterViewMock()
 
-        unifiedTheme?.let { Dependencies.getGliaThemeManager().theme = it }
+        unifiedTheme?.let { Dependencies.gliaThemeManager.theme = it }
 
         imageResources?.let { picassoMock(imageResources) }
 
@@ -81,7 +77,7 @@ internal interface SnapshotMessageCenterView : SnapshotTestLifecycle, SnapshotCo
         callback?.invoke(messageCenterView)
 
         setOnEndListener {
-            Dependencies.getGliaThemeManager().theme = null
+            Dependencies.gliaThemeManager.theme = null
         }
 
         return ViewData(messageCenterView, mock)

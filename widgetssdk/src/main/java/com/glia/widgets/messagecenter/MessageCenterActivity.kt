@@ -51,7 +51,7 @@ class MessageCenterActivity :
     private var configuration: GliaSdkConfiguration? = null
 
     private val controller: MessageCenterContract.Controller by lazy {
-        Dependencies.getControllerFactory().getMessageCenterController()
+        Dependencies.controllerFactory.messageCenterController
     }
 
     private val getContent = registerForActivityResult(GetContent()) { uri: Uri? ->

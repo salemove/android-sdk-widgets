@@ -71,7 +71,7 @@ internal class MessageView(
     private val bottomSpace: Space get() = binding.bottomSpace
 
     private val unifiedTheme: SecureConversationsWelcomeScreenTheme? by lazy {
-        Dependencies.getGliaThemeManager().theme?.secureConversationsWelcomeScreenTheme
+        Dependencies.gliaThemeManager.theme?.secureConversationsWelcomeScreenTheme
     }
 
     private var theme: UiTheme by Delegates.notNull()
@@ -89,7 +89,6 @@ internal class MessageView(
     private var onRemoveAttachmentListener: ((FileAttachment) -> Unit)? = null
 
     private var uploadAttachmentAdapter by Delegates.notNull<UploadAttachmentAdapter>()
-    private var localeProvider = Dependencies.getLocaleProvider()
 
     init {
         isFillViewport = true

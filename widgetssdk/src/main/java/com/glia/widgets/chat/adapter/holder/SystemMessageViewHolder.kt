@@ -23,9 +23,9 @@ internal class SystemMessageViewHolder(
     uiTheme: UiTheme
 ) : RecyclerView.ViewHolder(binding.root) {
     private val content: TextView by lazy { binding.root }
-    private val localeProvider = Dependencies.getLocaleProvider()
+    private val localeProvider = Dependencies.localeProvider
     private val operatorTheme: MessageBalloonTheme? by lazy {
-        Dependencies.getGliaThemeManager().theme?.chatTheme?.operatorMessage
+        Dependencies.gliaThemeManager.theme?.chatTheme?.operatorMessage
     }
 
     init {

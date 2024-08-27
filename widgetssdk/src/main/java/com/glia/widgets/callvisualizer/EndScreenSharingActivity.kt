@@ -28,7 +28,7 @@ internal class EndScreenSharingActivity : FadeTransitionActivity(), EndScreenSha
         val screenSharingView = binding.screenSharingScreenView
         screenSharingView.onFinishListener = this
 
-        val controller = Dependencies.getControllerFactory().endScreenSharingController
+        val controller = Dependencies.controllerFactory.endScreenSharingController
         controller.onActivityCreate()
         screenSharingView.setController(controller)
     }

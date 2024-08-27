@@ -44,7 +44,7 @@ class CharCodeView @JvmOverloads constructor(
     private val charViewProps: ViewDefaultProperties
     private var runtimeTheme: UiTheme? = null
     private val remoteTheme: VisitorCodeTheme? by lazy {
-        Dependencies.getGliaThemeManager().theme?.callVisualizerTheme?.visitorCodeTheme
+        Dependencies.gliaThemeManager.theme?.callVisualizerTheme?.visitorCodeTheme
     }
 
     init {

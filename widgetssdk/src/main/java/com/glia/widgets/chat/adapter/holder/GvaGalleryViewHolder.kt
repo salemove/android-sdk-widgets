@@ -16,7 +16,7 @@ internal class GvaGalleryViewHolder(
     private val contentBinding: ChatGvaGalleryLayoutBinding,
     buttonsClickListener: ChatAdapter.OnGvaButtonsClickListener,
     uiTheme: UiTheme,
-    unifiedTheme: UnifiedTheme? = Dependencies.getGliaThemeManager().theme
+    unifiedTheme: UnifiedTheme? = Dependencies.gliaThemeManager.theme
 ) : OperatorBaseViewHolder(contentBinding.root, contentBinding.chatHeadView, uiTheme, unifiedTheme) {
     private val adapter = GvaGalleryAdapter(buttonsClickListener, uiTheme, unifiedTheme)
 

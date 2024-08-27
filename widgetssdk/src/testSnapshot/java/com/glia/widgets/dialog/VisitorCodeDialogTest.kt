@@ -223,20 +223,20 @@ class VisitorCodeDialogTest : SnapshotTest(
         localeProviderMock()
         resourceProviderMock()
 
-        unifiedTheme?.let { Dependencies.getGliaThemeManager().theme = it }
+        unifiedTheme?.let { Dependencies.gliaThemeManager.theme = it }
         val configurationManager = GliaSdkConfigurationManager().also {
             it.uiTheme = uiTheme
         }
         val controllerFactoryMock: ControllerFactory = mock<ControllerFactory>().also {
             whenever(it.visitorCodeController).thenReturn(mock())
         }
-        Dependencies.setSdkConfigurationManager(configurationManager)
-        Dependencies.setControllerFactory(controllerFactoryMock)
+        Dependencies.sdkConfigurationManager = configurationManager
+        Dependencies.controllerFactory = controllerFactoryMock
 
         setOnEndListener {
-            Dependencies.getGliaThemeManager().theme = null
-            Dependencies.setSdkConfigurationManager(GliaSdkConfigurationManager())
-            Dependencies.setControllerFactory(null)
+            Dependencies.gliaThemeManager.theme = null
+            Dependencies.sdkConfigurationManager = GliaSdkConfigurationManager()
+//            Dependencies.controllerFactory = null
         }
 
         return VisitorCodeView(context, executor).apply {

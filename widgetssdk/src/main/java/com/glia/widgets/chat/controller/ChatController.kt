@@ -414,7 +414,7 @@ internal class ChatController(
         } else {
             backClickedListener?.onBackClicked()
             onDestroy(isQueueingOrOngoingEngagement || isAuthenticatedUseCase())
-            Dependencies.getControllerFactory().destroyCallController()
+            Dependencies.controllerFactory.destroyCallController()
         }
         updateFromCallScreenUseCase(false)
     }

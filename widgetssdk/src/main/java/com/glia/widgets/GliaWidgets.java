@@ -149,35 +149,10 @@ public class GliaWidgets {
      * @param gliaWidgetsConfig Glia configuration
      */
     public synchronized static void init(GliaWidgetsConfig gliaWidgetsConfig) {
-        GliaConfig gliaConfig = createGliaConfig(gliaWidgetsConfig);
-        Dependencies.glia().init(gliaConfig);
-        Dependencies.init(gliaWidgetsConfig);
+        Dependencies.onSdkInit(gliaWidgetsConfig);
         setupLoggingMetadata(gliaWidgetsConfig);
         Logger.i(TAG, "Initialize Glia Widgets SDK");
         Dependencies.getGliaThemeManager().applyJsonConfig(gliaWidgetsConfig.uiJsonRemoteConfig);
-    }
-
-    private static GliaConfig createGliaConfig(GliaWidgetsConfig gliaWidgetsConfig) {
-        GliaConfig.Builder builder = new GliaConfig.Builder();
-        setAuthorization(gliaWidgetsConfig, builder);
-        return builder
-            .setSiteId(gliaWidgetsConfig.siteId)
-            .setRegion(gliaWidgetsConfig.region)
-            .setBaseDomain(gliaWidgetsConfig.baseDomain)
-            .setContext(gliaWidgetsConfig.context)
-            .setManualLocaleOverride(gliaWidgetsConfig.manualLocaleOverride)
-            .build();
-    }
-
-    private static void setAuthorization(
-        GliaWidgetsConfig widgetsConfig,
-        GliaConfig.Builder builder
-    ) {
-        if (widgetsConfig.siteApiKey != null) {
-            builder.setSiteApiKey(widgetsConfig.siteApiKey);
-        } else {
-            throw new RuntimeException("Site key or app token is missing");
-        }
     }
 
     /**

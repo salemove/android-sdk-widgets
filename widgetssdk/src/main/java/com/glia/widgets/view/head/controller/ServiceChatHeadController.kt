@@ -165,7 +165,7 @@ internal class ServiceChatHeadController(
         state = State.ENGAGEMENT
         toggleChatHeadServiceUseCase(resumedViewName)
         if (sdkConfiguration == null) setSdkConfiguration(
-            Dependencies.getSdkConfigurationManager().createWidgetsConfiguration()
+            Dependencies.sdkConfigurationManager.createWidgetsConfiguration()
         )
         updateChatHeadView()
     }
@@ -174,7 +174,7 @@ internal class ServiceChatHeadController(
         state = State.QUEUEING
         toggleChatHeadServiceUseCase(resumedViewName)
         if (sdkConfiguration == null) setSdkConfiguration(
-            Dependencies.getSdkConfigurationManager().createWidgetsConfiguration()
+            Dependencies.sdkConfigurationManager.createWidgetsConfiguration()
         )
         updateChatHeadView()
     }

@@ -20,7 +20,7 @@ internal class BooleanQuestionViewHolder(
     style: SurveyStyle
 ) : SurveyViewHolder(binding.root, binding.tvTitle, binding.requiredError) {
     private val booleanTheme: SurveyBooleanQuestionTheme? by lazy {
-        Dependencies.getGliaThemeManager().theme?.surveyTheme?.booleanQuestion
+        Dependencies.gliaThemeManager.theme?.surveyTheme?.booleanQuestion
     }
     private val yesButton: GliaSurveyOptionButton get() = binding.yesButton
     private val noButton: GliaSurveyOptionButton get() = binding.noButton

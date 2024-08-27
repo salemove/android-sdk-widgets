@@ -26,8 +26,8 @@ internal const val MEDIA_PROJECTION_SERVICE_ACTION_START = "com.glia.widgets.cor
 @RequiresApi(api = Build.VERSION_CODES.O)
 class MediaProjectionService : Service() {
     private val compositeDisposable: CompositeDisposable by lazy { CompositeDisposable() }
-    private val engagementStateUseCase: EngagementStateUseCase by lazy { Dependencies.getUseCaseFactory().engagementStateUseCase }
-    private val informThatReadyToShareScreenUseCase: InformThatReadyToShareScreenUseCase by lazy { Dependencies.getUseCaseFactory().readyToShareScreenUseCase }
+    private val engagementStateUseCase: EngagementStateUseCase by lazy { Dependencies.useCaseFactory.engagementStateUseCase }
+    private val informThatReadyToShareScreenUseCase: InformThatReadyToShareScreenUseCase by lazy { Dependencies.useCaseFactory.readyToShareScreenUseCase }
 
     override fun onBind(intent: Intent): IBinder? {
         return null

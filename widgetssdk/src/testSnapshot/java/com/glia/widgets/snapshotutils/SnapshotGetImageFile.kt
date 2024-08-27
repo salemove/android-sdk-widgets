@@ -38,11 +38,7 @@ internal interface SnapshotGetImageFile : SnapshotTestLifecycle, SnapshotContent
         whenever(useCaseFactoryMock.createGetImageFileFromDownloadsUseCase()).thenReturn(getImageFileFromDownloadsUseCaseMock)
         whenever(useCaseFactoryMock.createGetImageFileFromNetworkUseCase()).thenReturn(getImageFileFromNetworkUseCaseMock)
 
-        Dependencies.setUseCaseFactory(useCaseFactoryMock)
-
-        setOnEndListener {
-            Dependencies.setUseCaseFactory(null)
-        }
+        Dependencies.useCaseFactory = useCaseFactoryMock
 
         return Mock(useCaseFactoryMock, getImageFileFromCacheUseCaseMock, getImageFileFromDownloadsUseCaseMock, getImageFileFromNetworkUseCaseMock)
     }

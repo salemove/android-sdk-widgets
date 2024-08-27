@@ -603,7 +603,7 @@ public class UseCaseFactory {
 
     @NonNull
     public IsAuthenticatedUseCase createIsAuthenticatedUseCase() {
-        return new IsAuthenticatedUseCase(authenticationManagerProvider.getAuthenticationManager());
+        return new IsAuthenticatedUseCase(authenticationManagerProvider.authenticationManager);
     }
 
     @NonNull

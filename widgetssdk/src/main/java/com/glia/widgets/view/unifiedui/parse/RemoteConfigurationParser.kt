@@ -15,7 +15,7 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 
 internal class RemoteConfigurationParser(
-    resourceProvider: ResourceProvider = Dependencies.getResourceProvider()
+    resourceProvider: ResourceProvider = Dependencies.resourceProvider
 ) {
     /**
      * @return [Gson] instance with applied deserializers to parse remote config.

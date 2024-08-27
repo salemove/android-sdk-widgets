@@ -18,7 +18,7 @@ internal class GvaResponseTextViewHolder(
     operatorMessageBinding: ChatOperatorMessageLayoutBinding,
     private val messageContentBinding: ChatReceiveMessageContentBinding,
     private val uiTheme: UiTheme,
-    unifiedTheme: UnifiedTheme? = Dependencies.getGliaThemeManager().theme
+    unifiedTheme: UnifiedTheme? = Dependencies.gliaThemeManager.theme
 ) : OperatorBaseViewHolder(operatorMessageBinding.root, operatorMessageBinding.chatHeadView, uiTheme, unifiedTheme) {
 
     init {

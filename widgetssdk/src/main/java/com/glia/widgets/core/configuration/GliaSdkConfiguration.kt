@@ -15,10 +15,10 @@ internal class GliaSdkConfiguration private constructor(builder: Builder) {
     val contextAssetId: String?
     private val contextUrl: String?
     val runTimeTheme: UiTheme?
-        get() = field ?: Dependencies.getSdkConfigurationManager().uiTheme
+        get() = field ?: Dependencies.sdkConfigurationManager.uiTheme
     val useOverlay: Boolean?
     val screenSharingMode: ScreenSharing.Mode?
-        get() = field ?: Dependencies.getSdkConfigurationManager().screenSharingMode
+        get() = field ?: Dependencies.sdkConfigurationManager.screenSharingMode
     val chatType: ChatType?
     private val manualStringOverrideL: String?
 
@@ -103,25 +103,25 @@ internal class GliaSdkConfiguration private constructor(builder: Builder) {
         }
 
         fun intent(intent: Intent): Builder {
-            companyName = Dependencies.getSdkConfigurationManager().companyName
+            companyName = Dependencies.sdkConfigurationManager.companyName
             val queueId = intent.getStringExtra(GliaWidgets.QUEUE_ID)
             queueIds = intent.getStringArrayListExtra(GliaWidgets.QUEUE_IDS)
             if (queueIds == null && queueId != null) {
                 queueIds = listOf(queueId)
             }
             val tempTheme = intent.getParcelableExtra<UiTheme>(GliaWidgets.UI_THEME)
-            runTimeTheme = tempTheme ?: Dependencies.getSdkConfigurationManager().uiTheme
+            runTimeTheme = tempTheme ?: Dependencies.sdkConfigurationManager.uiTheme
             contextAssetId = intent.getStringExtra(GliaWidgets.CONTEXT_ASSET_ID)
             useOverlay = intent.getBooleanExtra(
                 GliaWidgets.USE_OVERLAY,
-                Dependencies.getSdkConfigurationManager().isUseOverlay
+                Dependencies.sdkConfigurationManager.isUseOverlay
             )
             val tempMode =
                 if (intent.hasExtra(GliaWidgets.SCREEN_SHARING_MODE)) intent.getSerializableExtra(
                     GliaWidgets.SCREEN_SHARING_MODE
-                ) as ScreenSharing.Mode? else Dependencies.getSdkConfigurationManager().screenSharingMode
+                ) as ScreenSharing.Mode? else Dependencies.sdkConfigurationManager.screenSharingMode
             screenSharingMode =
-                tempMode ?: Dependencies.getSdkConfigurationManager().screenSharingMode
+                tempMode ?: Dependencies.sdkConfigurationManager.screenSharingMode
             chatType =
                 if (intent.hasExtra(GliaWidgets.CHAT_TYPE)) intent.getParcelableExtra(GliaWidgets.CHAT_TYPE) else DEFAULT_CHAT_TYPE
             return this

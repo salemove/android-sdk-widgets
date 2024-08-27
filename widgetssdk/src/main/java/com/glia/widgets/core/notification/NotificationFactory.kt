@@ -15,7 +15,7 @@ internal object NotificationFactory {
     const val NOTIFICATION_CALL_CHANNEL_ID = "call_channel"
     const val SCREEN_SHARING_NOTIFICATION_ID = 1
     const val CALL_NOTIFICATION_ID = 2
-    private val localeProvider by lazy { Dependencies.getLocaleProvider() }
+    private val localeProvider by lazy { Dependencies.localeProvider }
 
     @JvmStatic
     fun createScreenSharingNotification(context: Context): Notification {

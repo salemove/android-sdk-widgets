@@ -29,7 +29,7 @@ internal class MediaUpgradeStartedViewHolder(
     private val upgradeVideoIcon: Int? = uiTheme.iconChatVideoUpgrade
 
     private val chatTheme: ChatTheme? by lazy {
-        Dependencies.getGliaThemeManager().theme?.chatTheme
+        Dependencies.gliaThemeManager.theme?.chatTheme
     }
 
     init {

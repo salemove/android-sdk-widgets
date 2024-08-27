@@ -61,7 +61,7 @@ internal class EndScreenSharingView(
     init {
         initCallbacks()
         applyDefaultTheme(attrs, defStyleAttr, defStyleRes)
-        applyRemoteTheme(Dependencies.getGliaThemeManager().theme)
+        applyRemoteTheme(Dependencies.gliaThemeManager.theme)
         setupViewTextResources()
         prepareView()
     }
@@ -79,7 +79,7 @@ internal class EndScreenSharingView(
             theme.iconEndScreenShare?.let {
                 binding.endSharingButton.icon = ResourcesCompat.getDrawable(context.resources, it, null)
             }
-            theme = theme.getFullHybridTheme(Dependencies.getSdkConfigurationManager().uiTheme)
+            theme = theme.getFullHybridTheme(Dependencies.sdkConfigurationManager.uiTheme)
             applyRuntimeTheme(theme)
         }
     }

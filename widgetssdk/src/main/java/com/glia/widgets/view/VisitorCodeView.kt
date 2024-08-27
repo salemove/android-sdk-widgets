@@ -71,7 +71,7 @@ internal class VisitorCodeView internal constructor(
     private var logoView: ImageView
     private var logoText: TextView
     private var logoContainer: View
-    private var localeProvider: LocaleProvider = Dependencies.getLocaleProvider()
+    private var localeProvider: LocaleProvider = Dependencies.localeProvider
 
     init {
         layoutInflater.inflate(R.layout.visitor_code_view, this, true)
@@ -90,9 +90,9 @@ internal class VisitorCodeView internal constructor(
         logoText.setLocaleText(R.string.general_powered)
         logoView = findViewById(R.id.logo_view)
         readTypedArray()
-        applyRemoteThemeConfig(Dependencies.getGliaThemeManager().theme)
+        applyRemoteThemeConfig(Dependencies.gliaThemeManager.theme)
 
-        setController(Dependencies.getControllerFactory().visitorCodeController)
+        setController(Dependencies.controllerFactory.visitorCodeController)
     }
 
     override fun notifySetupComplete() {
@@ -140,7 +140,7 @@ internal class VisitorCodeView internal constructor(
 
     private fun setDefaultTheme(typedArray: TypedArray) {
         val typedArrayTheme = Utils.getThemeFromTypedArray(typedArray, this.context)
-        val runtimeGlobalTheme = Dependencies.getSdkConfigurationManager().uiTheme
+        val runtimeGlobalTheme = Dependencies.sdkConfigurationManager.uiTheme
         theme = typedArrayTheme.getFullHybridTheme(runtimeGlobalTheme)
         applyRuntimeThemeConfig(theme)
     }

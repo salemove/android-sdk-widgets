@@ -27,7 +27,7 @@ internal class GvaChip @JvmOverloads constructor(
 ) : Chip(context.wrapWithMaterialThemeOverlay(attrs, defStyleAttr), attrs, defStyleAttr) {
 
     private val quickReplyTheme: ButtonTheme? by lazy {
-        Dependencies.getGliaThemeManager().theme?.chatTheme?.gva?.quickReplyTheme
+        Dependencies.gliaThemeManager.theme?.chatTheme?.gva?.quickReplyTheme
     }
 
     init {

@@ -14,7 +14,7 @@ import io.reactivex.rxjava3.disposables.Disposable
 open class FadeTransitionActivity : AppCompatActivity() {
 
     private var disposable: Disposable? = null
-    private val localeProvider = Dependencies.getLocaleProvider()
+    private val localeProvider = Dependencies.localeProvider
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

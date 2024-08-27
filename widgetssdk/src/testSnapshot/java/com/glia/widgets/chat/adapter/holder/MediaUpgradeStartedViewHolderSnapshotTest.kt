@@ -120,10 +120,10 @@ class MediaUpgradeStartedViewHolderSnapshotTest : SnapshotTest(), SnapshotChatSc
         uiTheme: UiTheme = UiTheme(iconChatVideoUpgrade = R.drawable.ic_baseline_videocam)
     ): MediaUpgradeStartedViewHolder {
         localeProviderMock()
-        unifiedTheme?.let { Dependencies.getGliaThemeManager().theme = it }
+        unifiedTheme?.let { Dependencies.gliaThemeManager.theme = it }
 
         setOnEndListener {
-            Dependencies.getGliaThemeManager().theme = null
+            Dependencies.gliaThemeManager.theme = null
         }
 
         return MediaUpgradeStartedViewHolder(

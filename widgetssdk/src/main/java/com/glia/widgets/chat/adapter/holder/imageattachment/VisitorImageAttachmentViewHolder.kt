@@ -33,8 +33,8 @@ internal class VisitorImageAttachmentViewHolder(
     getImageFileFromNetworkUseCase: GetImageFileFromNetworkUseCase,
     schedulers: Schedulers,
     uiTheme: UiTheme,
-    unifiedTheme: UnifiedTheme? = Dependencies.getGliaThemeManager().theme,
-    private val localeProvider: LocaleProvider = Dependencies.getLocaleProvider()
+    unifiedTheme: UnifiedTheme? = Dependencies.gliaThemeManager.theme,
+    private val localeProvider: LocaleProvider = Dependencies.localeProvider
 ) : ImageAttachmentViewHolder(
     binding.root,
     getImageFileFromCacheUseCase,

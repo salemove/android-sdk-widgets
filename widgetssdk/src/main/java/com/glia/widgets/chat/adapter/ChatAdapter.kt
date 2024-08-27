@@ -70,7 +70,7 @@ internal class ChatAdapter(
     private val getImageFileFromCacheUseCase: GetImageFileFromCacheUseCase,
     private val getImageFileFromDownloadsUseCase: GetImageFileFromDownloadsUseCase,
     private val getImageFileFromNetworkUseCase: GetImageFileFromNetworkUseCase,
-    private val schedulers: Schedulers = Dependencies.getSchedulers()
+    private val schedulers: Schedulers = Dependencies.schedulers
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val differ = AsyncListDiffer(this, ChatAdapterDiffCallback())
 

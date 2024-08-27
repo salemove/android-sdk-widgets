@@ -30,8 +30,8 @@ internal class VisitorMessageViewHolder(
     private val binding: ChatVisitorMessageLayoutBinding,
     private val onMessageClickListener: ChatAdapter.OnMessageClickListener,
     uiTheme: UiTheme,
-    unifiedTheme: UnifiedTheme? = Dependencies.getGliaThemeManager().theme,
-    private val localeProvider: LocaleProvider = Dependencies.getLocaleProvider()
+    unifiedTheme: UnifiedTheme? = Dependencies.gliaThemeManager.theme,
+    private val localeProvider: LocaleProvider = Dependencies.localeProvider
 ) : RecyclerView.ViewHolder(binding.root) {
 
     private val visitorTheme: MessageBalloonTheme? by lazy {

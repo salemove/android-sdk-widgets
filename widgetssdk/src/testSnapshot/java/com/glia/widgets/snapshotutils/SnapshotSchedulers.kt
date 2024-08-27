@@ -28,10 +28,10 @@ internal interface SnapshotSchedulers : SnapshotTestLifecycle {
         val schedulers = mock<Schedulers>()
         whenever(schedulers.computationScheduler) doReturn computationScheduler
         whenever(schedulers.mainScheduler) doReturn mainScheduler
-        Dependencies.setSchedulers(schedulers)
+        Dependencies.schedulers = schedulers
 
         setOnEndListener {
-            Dependencies.setSchedulers(GliaWidgetsSchedulers())
+            Dependencies.schedulers = GliaWidgetsSchedulers()
         }
 
         return Mock(schedulers, computationScheduler, mainScheduler)

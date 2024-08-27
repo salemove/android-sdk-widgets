@@ -24,9 +24,9 @@ import com.glia.widgets.view.dialog.base.DialogType
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 internal object Dialogs {
-    private val dialogService: DialogService by lazy { DialogService(Dependencies.getGliaThemeManager().theme) }
+    private val dialogService: DialogService by lazy { DialogService(Dependencies.gliaThemeManager.theme) }
 
-    private val localeProvider: LocaleProvider by lazy { Dependencies.getLocaleProvider() }
+    private val localeProvider: LocaleProvider by lazy { Dependencies.localeProvider }
 
     private val poweredByText: LocaleString by lazy { LocaleString(R.string.general_powered) }
     private val closeBtnAccessibility: LocaleString by lazy { LocaleString(R.string.general_close_accessibility) }
@@ -255,14 +255,14 @@ internal object Dialogs {
     fun showVisitorCodeDialog(
         context: Context
     ): AlertDialog {
-        val view = Dependencies.getUseCaseFactory().visitorCodeViewBuilderUseCase(context, true)
+        val view = Dependencies.useCaseFactory.visitorCodeViewBuilderUseCase(context, true)
 
         return MaterialAlertDialogBuilder(context)
             .setView(view)
             .setBackgroundInsetStart(0)
             .setBackgroundInsetEnd(0)
             .setCancelable(true)
-            .setOnCancelListener { Dependencies.getControllerFactory().callVisualizerController.dismissVisitorCodeDialog() }
+            .setOnCancelListener { Dependencies.controllerFactory.callVisualizerController.dismissVisitorCodeDialog() }
             .show()
     }
 

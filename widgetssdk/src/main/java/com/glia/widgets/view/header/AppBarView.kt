@@ -51,7 +51,7 @@ internal class AppBarView @JvmOverloads constructor(
 
     @DrawableRes
     private var iconAppBarBackRes: Int? = null
-    private val localeProvider = Dependencies.getLocaleProvider()
+    private val localeProvider = Dependencies.localeProvider
 
     init {
         setDefaults(attrs)

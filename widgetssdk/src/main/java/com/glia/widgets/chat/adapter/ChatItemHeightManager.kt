@@ -18,7 +18,7 @@ internal class ChatItemHeightManager(
     private val uiTheme: UiTheme,
     private val layoutInflater: LayoutInflater,
     private val resources: Resources,
-    private val unifiedTheme: UnifiedTheme? = Dependencies.getGliaThemeManager().theme
+    private val unifiedTheme: UnifiedTheme? = Dependencies.gliaThemeManager.theme
 ) {
     private val measuredHeightsMap = ArrayMap<ChatItem, Int>()
 

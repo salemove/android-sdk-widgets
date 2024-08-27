@@ -316,7 +316,7 @@ class ChatHeadViewSnapshotTest : SnapshotTest(
         val controllerFactoryMock = mock<ControllerFactory>()
         val chatHeadControllerMock = mock<ChatHeadContract.Controller>()
         whenever(controllerFactoryMock.chatHeadController).thenReturn(chatHeadControllerMock)
-        Dependencies.setControllerFactory(controllerFactoryMock)
+        Dependencies.controllerFactory = controllerFactoryMock
 
         val useCaseFactoryMock = mock<UseCaseFactory>()
         val isCallVisualizerScreenSharingUseCaseMock = mock<IsCallVisualizerScreenSharingUseCase>()
@@ -324,12 +324,12 @@ class ChatHeadViewSnapshotTest : SnapshotTest(
         whenever(useCaseFactoryMock.createIsCallVisualizerScreenSharingUseCase()).thenReturn(isCallVisualizerScreenSharingUseCaseMock)
         val isCurrentEngagementCallVisualizerUseCaseMock = mock<IsCurrentEngagementCallVisualizerUseCase>()
         whenever(useCaseFactoryMock.isCurrentEngagementCallVisualizer).thenReturn(isCurrentEngagementCallVisualizerUseCaseMock)
-        Dependencies.setUseCaseFactory(useCaseFactoryMock)
+        Dependencies.useCaseFactory = useCaseFactoryMock
 
-        unifiedTheme?.let { Dependencies.getGliaThemeManager().theme = it }
+        unifiedTheme?.let { Dependencies.gliaThemeManager.theme = it }
 
         setOnEndListener {
-            Dependencies.getGliaThemeManager().theme = null
+            Dependencies.gliaThemeManager.theme = null
         }
 
         return ChatHeadView(context).also {

@@ -24,9 +24,8 @@ class GliaSdkConfigurationManagerTest {
     @Before
     fun setup() {
         mockkStatic(Glia::class)
-        mockkStatic(Dependencies::class)
-        every { Dependencies.getResourceProvider() } returns resourceProvider
-        every { Dependencies.getLocaleProvider() } returns localeProvider
+        Dependencies.resourceProvider = resourceProvider
+        Dependencies.localeProvider = localeProvider
         every { resourceProvider.getResourceKey(R.string.general_company_name)} returns "key"
         every { resourceProvider.getString(any()) } returns DEFAULT_LOCAL_COMPANY_NAME
         justRun { localeProvider.reportImproperInitialisation(any())}

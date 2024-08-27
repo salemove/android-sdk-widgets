@@ -11,7 +11,7 @@ internal class FilePreviewView @JvmOverloads constructor(
     attrs: AttributeSet? = null
 ) : AppCompatImageView(context, attrs) {
 
-    private val localeProvider = Dependencies.getLocaleProvider()
+    private val localeProvider = Dependencies.localeProvider
 
     init {
         contentDescription = localeProvider.getString(R.string.android_image_preview_accessibility)

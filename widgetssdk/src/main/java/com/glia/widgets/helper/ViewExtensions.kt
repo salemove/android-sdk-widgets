@@ -210,7 +210,7 @@ internal fun Toolbar.setLocaleNavigationContentDescription(@StringRes stringKey:
 }
 
 private fun View.registerLocaleListener(@StringRes stringKey: Int, vararg values: StringKeyPair, listener: (String) -> Unit) {
-    val localeManager = Dependencies.getLocaleProvider()
+    val localeManager = Dependencies.localeProvider
     val disposable = localeManager.getLocaleObservable()
         .startWithItem("stub")
         .map { localeManager.getString(stringKey, values.toList()) }

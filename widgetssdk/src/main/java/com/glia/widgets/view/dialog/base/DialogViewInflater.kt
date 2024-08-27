@@ -64,7 +64,7 @@ internal abstract class DialogViewInflater<T : DialogViewBinding<out ViewBinding
             setText(link.title) { upToDateTitle ->
                 this.text = upToDateTitle
 
-                val localeManager = Dependencies.getLocaleProvider()
+                val localeManager = Dependencies.localeProvider
                 val upToDateUrl = localeManager.getString(link.url)
 
                 this.isVisible = upToDateTitle.isNotBlank() && upToDateUrl.isNotBlank()

@@ -32,9 +32,8 @@ internal class OperatorStatusViewHolder(
     private val chatStartedCaptionView: TextView by lazy { binding.chatStartedCaptionView }
 
     private val engagementStatesTheme: EngagementStatesTheme? by lazy {
-        Dependencies.getGliaThemeManager().theme?.chatTheme?.connect
+        Dependencies.gliaThemeManager.theme?.chatTheme?.connect
     }
-    private val localeProvider = Dependencies.getLocaleProvider()
 
     init {
         applyBaseConfig(uiTheme)

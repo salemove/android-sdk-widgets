@@ -54,13 +54,13 @@ internal class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: 
     private var uiTheme: UiTheme by Delegates.notNull()
 
     private val surveyTheme: SurveyTheme? by lazy {
-        Dependencies.getGliaThemeManager().theme?.surveyTheme
+        Dependencies.gliaThemeManager.theme?.surveyTheme
     }
 
     private val binding: SurveyViewBinding by lazy {
         SurveyViewBinding.inflate(layoutInflater, this)
     }
-    private val localeProvider = Dependencies.getLocaleProvider()
+    private val localeProvider = Dependencies.localeProvider
 
     private val cardView: CardView get() = binding.cardView
     private val title: TextView get() = binding.surveyTitle
@@ -133,7 +133,7 @@ internal class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: 
         val cornerRadiusFloat = surveyTheme?.layer?.cornerRadius
             ?: surveyStyle?.layer?.cornerRadius?.toFloat()
             ?: SurveyStyle.Builder().build().layer.cornerRadius.toFloat() // default value
-        val resourceProvider = Dependencies.getResourceProvider()
+        val resourceProvider = Dependencies.resourceProvider
         val cornerRadius = resourceProvider.convertDpToPixel(cornerRadiusFloat)
 
         surveyTheme?.layer?.fill?.also {

@@ -38,7 +38,7 @@ internal class ConfirmationScreenView(
 ) {
 
     private val unifiedTheme: SecureConversationsConfirmationScreenTheme? by lazy {
-        Dependencies.getGliaThemeManager().theme?.secureConversationsConfirmationScreenTheme
+        Dependencies.gliaThemeManager.theme?.secureConversationsConfirmationScreenTheme
     }
 
     private val binding: MessageCenterConfirmationViewBinding by lazy {

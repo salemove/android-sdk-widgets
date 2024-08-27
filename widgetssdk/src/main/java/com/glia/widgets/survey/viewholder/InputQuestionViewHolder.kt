@@ -30,9 +30,8 @@ internal class InputQuestionViewHolder(
     val style: SurveyStyle
 ) : SurveyViewHolder(binding.root, binding.tvTitle, binding.requiredError) {
     private val inputTheme: SurveyInputQuestionTheme? by lazy {
-        Dependencies.getGliaThemeManager().theme?.surveyTheme?.inputQuestion
+        Dependencies.gliaThemeManager.theme?.surveyTheme?.inputQuestion
     }
-    private val localeProvider = Dependencies.getLocaleProvider()
     private val comment: EditText get() = binding.etComment
 
     private val optionButtonTheme: OptionButtonTheme by lazy {

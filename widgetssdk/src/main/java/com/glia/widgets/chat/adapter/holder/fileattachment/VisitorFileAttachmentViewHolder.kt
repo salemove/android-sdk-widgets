@@ -29,8 +29,8 @@ import com.glia.widgets.view.unifiedui.theme.chat.MessageBalloonTheme
 internal class VisitorFileAttachmentViewHolder(
     private val binding: ChatAttachmentVisitorFileLayoutBinding,
     uiTheme: UiTheme,
-    unifiedTheme: UnifiedTheme? = Dependencies.getGliaThemeManager().theme,
-    private val localeProvider: LocaleProvider = Dependencies.getLocaleProvider()
+    unifiedTheme: UnifiedTheme? = Dependencies.gliaThemeManager.theme,
+    private val localeProvider: LocaleProvider = Dependencies.localeProvider
 ) : FileAttachmentViewHolder(binding.root, localeProvider) {
     private val visitorTheme: MessageBalloonTheme? by lazy {
         unifiedTheme?.chatTheme?.visitorMessage

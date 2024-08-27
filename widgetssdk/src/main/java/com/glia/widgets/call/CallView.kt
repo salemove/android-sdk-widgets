@@ -84,7 +84,7 @@ internal class CallView(
 ), CallContract.View, DialogDelegate by DialogDelegateImpl() {
 
     private val callTheme: CallTheme? by lazy {
-        Dependencies.getGliaThemeManager().theme?.callTheme
+        Dependencies.gliaThemeManager.theme?.callTheme
     }
 
     private val binding: CallViewBinding by lazy {
@@ -222,7 +222,7 @@ internal class CallView(
     }
 
     private fun setupControllers() {
-        setController(Dependencies.getControllerFactory().callController)
+        setController(Dependencies.controllerFactory.callController)
         dialogCallback = DialogContract.Controller.Callback {
             if (updateDialogState(it)) {
                 when (it) {
@@ -235,8 +235,8 @@ internal class CallView(
                 }
             }
         }
-        dialogController = Dependencies.getControllerFactory().dialogController
-        serviceChatHeadController = Dependencies.getControllerFactory().chatHeadController
+        dialogController = Dependencies.controllerFactory.dialogController
+        serviceChatHeadController = Dependencies.controllerFactory.chatHeadController
     }
 
     override fun setController(controller: CallContract.Controller) {
@@ -514,7 +514,7 @@ internal class CallView(
 
     private fun setDefaultTheme(typedArray: TypedArray) {
         theme = Utils.getThemeFromTypedArray(typedArray, this.context)
-            .getFullHybridTheme(Dependencies.getSdkConfigurationManager().uiTheme)
+            .getFullHybridTheme(Dependencies.sdkConfigurationManager.uiTheme)
     }
 
     fun setUiTheme(uiTheme: UiTheme?) {
@@ -631,7 +631,7 @@ internal class CallView(
             positiveButtonClickListener = {
                 resetDialogStateAndDismiss()
                 callController?.overlayPermissionsDialogDismissed()
-                val overlayIntent = Dependencies.getIntentConfigurationHelper().createForOverlayPermissionScreen(context)
+                val overlayIntent = Dependencies.intentConfigurationHelper.createForOverlayPermissionScreen(context)
                 this.context.startActivity(overlayIntent)
             },
             negativeButtonClickListener = {

@@ -19,7 +19,7 @@ internal class NewMessagesDividerViewHolder(
     RecyclerView.ViewHolder(binding.root) {
 
     private val theme: ChatTheme? by lazy {
-        Dependencies.getGliaThemeManager().theme?.chatTheme
+        Dependencies.gliaThemeManager.theme?.chatTheme
     }
 
     init {

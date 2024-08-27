@@ -46,11 +46,7 @@ internal interface SnapshotChatView : SnapshotContent, SnapshotTheme, SnapshotAc
         val controllerFactoryMock = mock<ControllerFactory>()
         val chatControllerMock = mock<ChatController>()
         whenever(controllerFactoryMock.chatController).thenReturn(chatControllerMock)
-        Dependencies.setControllerFactory(controllerFactoryMock)
-
-        setOnEndListener {
-            Dependencies.setControllerFactory(null)
-        }
+        Dependencies.controllerFactory = controllerFactoryMock
 
         return Mock(activityMock, imageFileMock, schedulersMock, controllerFactoryMock, chatControllerMock)
     }
@@ -74,7 +70,7 @@ internal interface SnapshotChatView : SnapshotContent, SnapshotTheme, SnapshotAc
         val mock = chatViewMock()
 
         imageResources?.let { picassoMock(imageResources) }
-        unifiedTheme?.let { Dependencies.getGliaThemeManager().theme = it }
+        unifiedTheme?.let { Dependencies.gliaThemeManager.theme = it }
 
         val chatViewCaptor: KArgumentCaptor<ChatContract.View> = argumentCaptor()
         val chatActivityBinding = ChatActivityBinding.inflate(layoutInflater)
@@ -93,7 +89,7 @@ internal interface SnapshotChatView : SnapshotContent, SnapshotTheme, SnapshotAc
         message?.let { chatView.findViewById<EditText>(R.id.chat_edit_text).setText(it) }
 
         setOnEndListener {
-            Dependencies.getGliaThemeManager().theme = null
+            Dependencies.gliaThemeManager.theme = null
         }
 
         return ViewData(root, chatView, mock)

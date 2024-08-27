@@ -160,7 +160,7 @@ internal class ChatHeadLayout @JvmOverloads constructor(
         initConfigurations()
         setupViewActions()
         readTypedArray(attrs, defStyleAttr, defStyleRes)
-        setController(Dependencies.getControllerFactory().chatHeadLayoutController)
+        setController(Dependencies.controllerFactory.chatHeadLayoutController)
         chatHeadController.setView(this)
     }
 

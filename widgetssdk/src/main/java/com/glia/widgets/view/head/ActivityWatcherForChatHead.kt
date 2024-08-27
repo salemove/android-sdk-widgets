@@ -169,7 +169,7 @@ internal class ActivityWatcherForChatHead(
     }
 
     private fun getConfigurationBuilder(): Configuration.Builder {
-        val configuration = Dependencies.getSdkConfigurationManager().createWidgetsConfiguration()
+        val configuration = Dependencies.sdkConfigurationManager.createWidgetsConfiguration()
         return Configuration.Builder().setWidgetsConfiguration(configuration)
     }
 

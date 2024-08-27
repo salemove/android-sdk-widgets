@@ -106,7 +106,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     private var uploadAttachmentAdapter by Delegates.notNull<UploadAttachmentAdapter>()
     private var adapter by Delegates.notNull<ChatAdapter>()
 
-    private var localeProvider = Dependencies.getLocaleProvider()
+    private var localeProvider = Dependencies.localeProvider
     private var isInBottom = true
     private var theme: UiTheme by Delegates.notNull()
 
@@ -170,7 +170,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     private var binding by Delegates.notNull<ChatViewBinding>()
     private val attachmentPopup by lazy {
         AttachmentPopup(
-            binding.chatMessageLayout, Dependencies.getGliaThemeManager().theme?.chatTheme?.attachmentsPopup
+            binding.chatMessageLayout, Dependencies.gliaThemeManager.theme?.chatTheme?.attachmentsPopup
         )
     }
 
@@ -230,8 +230,8 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         screenSharingMode: ScreenSharing.Mode? = null,
         chatType: ChatType = ChatType.LIVE_CHAT
     ) {
-        useOverlays?.also { Dependencies.getSdkConfigurationManager().isUseOverlay = it }
-        Dependencies.getSdkConfigurationManager().screenSharingMode = screenSharingMode
+        useOverlays?.also { Dependencies.sdkConfigurationManager.isUseOverlay = it }
+        Dependencies.sdkConfigurationManager.screenSharingMode = screenSharingMode
         dialogCallback?.also { dialogController?.addCallback(it) }
         controller?.initChat(companyName, queueIds, visitorContextAssetId, chatType)
     }
@@ -332,10 +332,10 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     }
 
     private fun setupControllers() {
-        setController(Dependencies.getControllerFactory().chatController)
+        setController(Dependencies.controllerFactory.chatController)
         setupDialogCallback()
-        dialogController = Dependencies.getControllerFactory().dialogController
-        serviceChatHeadController = Dependencies.getControllerFactory().chatHeadController
+        dialogController = Dependencies.controllerFactory.dialogController
+        serviceChatHeadController = Dependencies.controllerFactory.chatHeadController
     }
 
     override fun setController(controller: ChatContract.Controller) {
@@ -608,7 +608,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
 
     private fun setDefaultTheme(typedArray: TypedArray) {
         theme = Utils.getThemeFromTypedArray(typedArray, this.context)
-        theme = theme.getFullHybridTheme(Dependencies.getSdkConfigurationManager().uiTheme)
+        theme = theme.getFullHybridTheme(Dependencies.sdkConfigurationManager.uiTheme)
         theme.brandPrimaryColor?.let(::getColorCompat)?.also { statusBarColor = it }
     }
 
@@ -633,9 +633,9 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             onGvaButtonsClickListener,
             ChatItemHeightManager(theme, layoutInflater, resources),
             GliaWidgets.getCustomCardAdapter(),
-            Dependencies.getUseCaseFactory().createGetImageFileFromCacheUseCase(),
-            Dependencies.getUseCaseFactory().createGetImageFileFromDownloadsUseCase(),
-            Dependencies.getUseCaseFactory().createGetImageFileFromNetworkUseCase()
+            Dependencies.useCaseFactory.createGetImageFileFromCacheUseCase(),
+            Dependencies.useCaseFactory.createGetImageFileFromDownloadsUseCase(),
+            Dependencies.useCaseFactory.createGetImageFileFromNetworkUseCase()
         )
         binding.chatRecyclerView.layoutManager = LinearLayoutManager(this.context)
         adapter.registerAdapterDataObserver(dataObserver)
@@ -691,7 +691,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
 
         binding.gvaQuickRepliesLayout.updateTheme(theme)
         binding.sendButton.setLocaleContentDescription(R.string.general_send)
-        applyTheme(Dependencies.getGliaThemeManager().theme)
+        applyTheme(Dependencies.gliaThemeManager.theme)
     }
 
     private fun handleStatusBarColor() {

@@ -17,7 +17,7 @@ internal class ScaleQuestionViewHolder(
     private var style: SurveyStyle
 ) : SurveyViewHolder(binding.root, binding.tvTitle, binding.requiredError) {
     private val questionTheme: SurveyScaleQuestionTheme? by lazy {
-        Dependencies.getGliaThemeManager().theme?.surveyTheme?.scaleQuestion
+        Dependencies.gliaThemeManager.theme?.surveyTheme?.scaleQuestion
     }
     private val buttons: List<GliaSurveyOptionButton>
         get() = listOf(

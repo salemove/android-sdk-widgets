@@ -26,7 +26,7 @@ internal class OperatorImageAttachmentViewHolder(
     getImageFileFromNetworkUseCase: GetImageFileFromNetworkUseCase,
     schedulers: Schedulers,
     uiTheme: UiTheme,
-    private val localeProvider: LocaleProvider = Dependencies.getLocaleProvider()
+    private val localeProvider: LocaleProvider = Dependencies.localeProvider
 ) : ImageAttachmentViewHolder(
     binding.root,
     getImageFileFromCacheUseCase,
@@ -35,7 +35,7 @@ internal class OperatorImageAttachmentViewHolder(
     schedulers
 ) {
     private val operatorTheme: MessageBalloonTheme? by lazy {
-        Dependencies.getGliaThemeManager().theme?.chatTheme?.operatorMessage
+        Dependencies.gliaThemeManager.theme?.chatTheme?.operatorMessage
     }
 
     init {

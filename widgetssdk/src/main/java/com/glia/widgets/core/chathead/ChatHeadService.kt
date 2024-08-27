@@ -86,7 +86,7 @@ class ChatHeadService : Service() {
         super.onCreate()
 
         Logger.d(TAG, "onCreate")
-        val controller = Dependencies.getControllerFactory().chatHeadController
+        val controller = Dependencies.controllerFactory.chatHeadController
         val layoutParams = layoutParams
         initChatHeadPosition(layoutParams, controller.chatHeadPosition)
         initChatHeadView(controller, windowManager, layoutParams)

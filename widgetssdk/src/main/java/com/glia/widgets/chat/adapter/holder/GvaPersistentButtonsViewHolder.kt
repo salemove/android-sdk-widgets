@@ -23,7 +23,7 @@ internal class GvaPersistentButtonsViewHolder(
     private val contentBinding: ChatGvaPersistentButtonsContentBinding,
     buttonsClickListener: ChatAdapter.OnGvaButtonsClickListener,
     private val uiTheme: UiTheme,
-    unifiedTheme: UnifiedTheme? = Dependencies.getGliaThemeManager().theme
+    unifiedTheme: UnifiedTheme? = Dependencies.gliaThemeManager.theme
 ) : OperatorBaseViewHolder(operatorMessageBinding.root, operatorMessageBinding.chatHeadView, uiTheme, unifiedTheme) {
 
     private var adapter: GvaButtonsAdapter by Delegates.notNull()

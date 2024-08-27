@@ -21,10 +21,10 @@ import com.glia.widgets.view.unifiedui.theme.chat.MessageBalloonTheme
 internal class OperatorFileAttachmentViewHolder @JvmOverloads constructor(
     private val binding: ChatAttachmentOperatorFileLayoutBinding,
     uiTheme: UiTheme,
-    private val localeProvider: LocaleProvider = Dependencies.getLocaleProvider()
+    private val localeProvider: LocaleProvider = Dependencies.localeProvider
 ) : FileAttachmentViewHolder(binding.root, localeProvider) {
     private val operatorTheme: MessageBalloonTheme? by lazy {
-        Dependencies.getGliaThemeManager().theme?.chatTheme?.operatorMessage
+        Dependencies.gliaThemeManager.theme?.chatTheme?.operatorMessage
     }
 
     init {

@@ -38,7 +38,7 @@ internal class SingleChoiceCardView @JvmOverloads constructor(
     private var binding: SingleChoiceCardViewBinding by Delegates.notNull()
     private val bgDrawable: GradientDrawable by lazy { GradientDrawable() }
     private val responseCardTheme: ResponseCardTheme? by lazy {
-        Dependencies.getGliaThemeManager().theme?.chatTheme?.responseCard
+        Dependencies.gliaThemeManager.theme?.chatTheme?.responseCard
     }
 
     init {

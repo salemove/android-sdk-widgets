@@ -56,11 +56,11 @@ internal interface SnapshotCallView : SnapshotContent, SnapshotTheme, SnapshotAc
         val controllerFactoryMock = mock<ControllerFactory>()
         val callControllerMock = mock<CallContract.Controller>()
         whenever(controllerFactoryMock.callController).thenReturn(callControllerMock)
-        Dependencies.setControllerFactory(controllerFactoryMock)
+        Dependencies.controllerFactory = controllerFactoryMock
 
-        setOnEndListener {
-            Dependencies.setControllerFactory(null)
-        }
+//        setOnEndListener {
+//            Dependencies.controllerFactory = null
+//        }
 
         return Mock(activityMock, schedulersMock, controllerFactoryMock, callControllerMock)
     }
@@ -81,8 +81,8 @@ internal interface SnapshotCallView : SnapshotContent, SnapshotTheme, SnapshotAc
     ): ViewData {
         val mock = callViewMock()
 
-        unifiedTheme?.let { Dependencies.getGliaThemeManager().theme = it }
-        Dependencies.getSdkConfigurationManager().companyName = companyName
+        unifiedTheme?.let { Dependencies.gliaThemeManager.theme = it }
+        Dependencies.sdkConfigurationManager.companyName = companyName
 
         val callViewCaptor: KArgumentCaptor<CallContract.View> = argumentCaptor()
 
@@ -100,8 +100,8 @@ internal interface SnapshotCallView : SnapshotContent, SnapshotTheme, SnapshotAc
         callViewCallback?.invoke(callViewContract, callState)
 
         setOnEndListener {
-            Dependencies.getGliaThemeManager().theme = null
-            Dependencies.getSdkConfigurationManager().companyName = null
+            Dependencies.gliaThemeManager.theme = null
+            Dependencies.sdkConfigurationManager.companyName = null
         }
 
         return ViewData(root, callView, mock)

@@ -89,10 +89,10 @@ internal class ViewHolder(
     private val removeItemButton: ImageButton get() = binding.removeItemButton
 
     private val context: Context get() = itemView.context
-    private val localeProvider = Dependencies.getLocaleProvider()
+    private val localeProvider = Dependencies.localeProvider
 
     private val theme: FileUploadBarTheme? by lazy {
-        Dependencies.getGliaThemeManager().theme?.run {
+        Dependencies.gliaThemeManager.theme?.run {
             if (isMessageCenter) {
                 secureConversationsWelcomeScreenTheme?.attachmentListTheme
             } else {

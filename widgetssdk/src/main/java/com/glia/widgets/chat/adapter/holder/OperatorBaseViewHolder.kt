@@ -18,7 +18,7 @@ internal open class OperatorBaseViewHolder(
     itemView: View,
     private val chatHeadView: OperatorStatusView,
     private val uiTheme: UiTheme,
-    unifiedTheme: UnifiedTheme? = Dependencies.getGliaThemeManager().theme
+    unifiedTheme: UnifiedTheme? = Dependencies.gliaThemeManager.theme
 ) : RecyclerView.ViewHolder(itemView) {
 
     val operatorTheme: MessageBalloonTheme? by lazy {

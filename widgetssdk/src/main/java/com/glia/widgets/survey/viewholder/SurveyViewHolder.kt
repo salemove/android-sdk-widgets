@@ -23,7 +23,7 @@ internal abstract class SurveyViewHolder(
     SurveyController.AnswerCallback {
     var questionItem: QuestionItem? = null
     var listener: SurveyAdapter.SurveyAdapterListener? = null
-    private val localeProvider = Dependencies.getLocaleProvider()
+    private val localeProvider = Dependencies.localeProvider
 
     init {
         (requiredError as? TextView)?.setLocaleText(

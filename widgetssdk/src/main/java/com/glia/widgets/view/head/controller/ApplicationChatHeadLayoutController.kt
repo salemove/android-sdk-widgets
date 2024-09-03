@@ -2,7 +2,7 @@ package com.glia.widgets.view.head.controller
 
 import com.glia.androidsdk.Operator
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase
-import com.glia.widgets.core.chathead.domain.IsDisplayApplicationChatHeadUseCase
+import com.glia.widgets.core.chathead.domain.IsDisplayBubbleInsideAppUseCase
 import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase
 import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase.Destinations
 import com.glia.widgets.engagement.ScreenSharingState
@@ -17,7 +17,7 @@ import com.glia.widgets.view.head.ChatHeadLayoutContract
 import com.glia.widgets.engagement.State as EngagementState
 
 internal class ApplicationChatHeadLayoutController(
-    private val isDisplayApplicationChatHeadUseCase: IsDisplayApplicationChatHeadUseCase,
+    private val isDisplayBubbleInsideAppUseCase: IsDisplayBubbleInsideAppUseCase,
     private val navigationDestinationUseCase: ResolveChatHeadNavigationUseCase,
     private val messagesNotSeenHandler: MessagesNotSeenHandler,
     private val isCallVisualizerScreenSharingUseCase: IsCallVisualizerScreenSharingUseCase,
@@ -110,7 +110,7 @@ internal class ApplicationChatHeadLayoutController(
     }
 
     override fun shouldShow(gliaOrRootViewName: String?): Boolean {
-        return isDisplayApplicationChatHeadUseCase(gliaOrRootViewName)
+        return isDisplayBubbleInsideAppUseCase(gliaOrRootViewName)
     }
 
     override fun onResume(viewName: String) {

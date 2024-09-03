@@ -7,14 +7,14 @@ import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCa
 import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
 import com.glia.widgets.engagement.domain.ScreenSharingUseCase
 
-internal class IsDisplayApplicationChatHeadUseCase(
+internal class IsDisplayBubbleInsideAppUseCase(
     isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase,
     isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase,
     screenSharingUseCase: ScreenSharingUseCase,
     permissionManager: PermissionManager,
     configurationManager: GliaSdkConfigurationManager,
     engagementTypeUseCase: EngagementTypeUseCase
-) : IsDisplayChatHeadUseCase(
+) : IsDisplayBubbleUseCase(
     isQueueingOrEngagementUseCase,
     isCurrentEngagementCallVisualizerUseCase,
     screenSharingUseCase,

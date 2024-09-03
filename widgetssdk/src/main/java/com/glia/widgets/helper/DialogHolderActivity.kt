@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.View
 import com.glia.widgets.R
 import com.glia.widgets.base.FadeTransitionActivity
-import com.glia.widgets.core.chathead.domain.IsDisplayChatHeadUseCase
 import com.glia.widgets.view.head.ActivityWatcherForChatHead
 
 /**
@@ -39,7 +38,6 @@ internal class DialogHolderActivity : FadeTransitionActivity() {
  *
  * This is a view used to make the [DialogHolderActivity] recognizable by the services that draw the chat bubble.
  * @see [ActivityWatcherForChatHead.fetchGliaOrRootView]
- * @see [IsDisplayChatHeadUseCase.isNotInListOfGliaViewsExceptChat]
  */
 internal class DialogHolderView(context: Context) : View(context) {
     init {

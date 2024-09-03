@@ -13,7 +13,7 @@ import com.glia.widgets.filepreview.ui.FilePreviewView
 import com.glia.widgets.helper.DialogHolderView
 import com.glia.widgets.messagecenter.MessageCenterView
 
-internal abstract class IsDisplayChatHeadUseCase(
+internal abstract class IsDisplayBubbleUseCase(
     private val isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase,
     private val isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase,
     private val screenSharingUseCase: ScreenSharingUseCase,

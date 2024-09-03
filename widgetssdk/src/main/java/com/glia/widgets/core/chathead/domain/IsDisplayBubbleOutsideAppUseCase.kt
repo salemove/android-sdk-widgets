@@ -15,7 +15,7 @@ import com.glia.widgets.helper.TAG
  * 1) determines whether the chat head (bubble) should be displayed
  * 2) starts or stops the chat head service (bubble outside the app)
  */
-internal class ToggleChatHeadServiceUseCase(
+internal class IsDisplayBubbleOutsideAppUseCase(
     isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase,
     isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase,
     screenSharingUseCase: ScreenSharingUseCase,
@@ -23,7 +23,7 @@ internal class ToggleChatHeadServiceUseCase(
     permissionManager: PermissionManager,
     configurationManager: GliaSdkConfigurationManager,
     engagementTypeUseCase: EngagementTypeUseCase
-) : IsDisplayChatHeadUseCase(
+) : IsDisplayBubbleUseCase(
     isQueueingOrEngagementUseCase,
     isCurrentEngagementCallVisualizerUseCase,
     screenSharingUseCase,

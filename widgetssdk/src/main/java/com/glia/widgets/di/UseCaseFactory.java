@@ -65,9 +65,9 @@ import com.glia.widgets.core.audio.domain.TurnSpeakerphoneUseCase;
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase;
 import com.glia.widgets.core.callvisualizer.domain.VisitorCodeViewBuilderUseCase;
 import com.glia.widgets.core.chathead.ChatHeadManager;
-import com.glia.widgets.core.chathead.domain.IsDisplayApplicationChatHeadUseCase;
+import com.glia.widgets.core.chathead.domain.IsDisplayBubbleInsideAppUseCase;
 import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase;
-import com.glia.widgets.core.chathead.domain.ToggleChatHeadServiceUseCase;
+import com.glia.widgets.core.chathead.domain.IsDisplayBubbleOutsideAppUseCase;
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
 import com.glia.widgets.core.dialog.DialogContract;
 import com.glia.widgets.core.dialog.PermissionDialogManager;
@@ -201,8 +201,8 @@ public class UseCaseFactory {
     private static CallNotificationUseCase callNotificationUseCase;
     private static ShowScreenSharingNotificationUseCase showScreenSharingNotificationUseCase;
     private static RemoveScreenSharingNotificationUseCase removeScreenSharingNotificationUseCase;
-    private static ToggleChatHeadServiceUseCase toggleChatHeadServiceUseCase;
-    private static IsDisplayApplicationChatHeadUseCase isDisplayApplicationChatHeadUseCase;
+    private static IsDisplayBubbleOutsideAppUseCase isDisplayBubbleOutsideAppUseCase;
+    private static IsDisplayBubbleInsideAppUseCase isDisplayBubbleInsideAppUseCase;
     private static ResolveChatHeadNavigationUseCase resolveChatHeadNavigationUseCase;
     private static VisitorCodeViewBuilderUseCase visitorCodeViewBuilderUseCase;
     private final RepositoryFactory repositoryFactory;
@@ -270,9 +270,9 @@ public class UseCaseFactory {
     }
 
     @NonNull
-    public ToggleChatHeadServiceUseCase getToggleChatHeadServiceUseCase() {
-        if (toggleChatHeadServiceUseCase == null) {
-            toggleChatHeadServiceUseCase = new ToggleChatHeadServiceUseCase(
+    public IsDisplayBubbleOutsideAppUseCase getToggleChatHeadServiceUseCase() {
+        if (isDisplayBubbleOutsideAppUseCase == null) {
+            isDisplayBubbleOutsideAppUseCase = new IsDisplayBubbleOutsideAppUseCase(
                 getIsQueueingOrEngagementUseCase(),
                 getIsCurrentEngagementCallVisualizer(),
                 getScreenSharingUseCase(),
@@ -282,13 +282,13 @@ public class UseCaseFactory {
                 getEngagementTypeUseCase()
             );
         }
-        return toggleChatHeadServiceUseCase;
+        return isDisplayBubbleOutsideAppUseCase;
     }
 
     @NonNull
-    public IsDisplayApplicationChatHeadUseCase getIsDisplayApplicationChatHeadUseCase() {
-        if (isDisplayApplicationChatHeadUseCase == null) {
-            isDisplayApplicationChatHeadUseCase = new IsDisplayApplicationChatHeadUseCase(
+    public IsDisplayBubbleInsideAppUseCase getIsDisplayApplicationChatHeadUseCase() {
+        if (isDisplayBubbleInsideAppUseCase == null) {
+            isDisplayBubbleInsideAppUseCase = new IsDisplayBubbleInsideAppUseCase(
                 getIsQueueingOrEngagementUseCase(),
                 getIsCurrentEngagementCallVisualizer(),
                 getScreenSharingUseCase(),
@@ -297,7 +297,7 @@ public class UseCaseFactory {
                 getEngagementTypeUseCase()
             );
         }
-        return isDisplayApplicationChatHeadUseCase;
+        return isDisplayBubbleInsideAppUseCase;
     }
 
     @NonNull

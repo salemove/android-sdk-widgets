@@ -302,9 +302,8 @@ public class GliaWidgets {
         return Dependencies.getCallVisualizerManager();
     }
 
-    public static Navigator getNavigator(@Nullable ArrayList<String> queues,
-                                         @Nullable String contextAssetId) { // TODO: 01.08.2024 Wrap all params to some object? Ideally existing one, not new because there are to many config classes already.
-        return Dependencies.getNavigator(queues, contextAssetId);
+    public static Navigator getNavigator(@Nullable ArrayList<String> queues) { // TODO: 01.08.2024 Wrap all params to some object? Ideally existing one, not new because there are to many config classes already.
+        return Dependencies.getNavigator(queues);
     }
 
     /**

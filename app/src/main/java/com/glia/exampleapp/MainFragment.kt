@@ -293,8 +293,7 @@ class MainFragment : Fragment() {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
         context?.let {
             GliaWidgets.getNavigator(
-                ArrayList(getQueueIdsFromPrefs(sharedPreferences)),
-                getContextAssetIdFromPrefs(sharedPreferences)
+                ArrayList(getQueueIdsFromPrefs(sharedPreferences))
             ).startAudioCall(it)
         }
 //        val intent = Intent(context, CallActivity::class.java)
@@ -602,8 +601,7 @@ class MainFragment : Fragment() {
 
         context?.let {
             val navigator = GliaWidgets.getNavigator(
-                ArrayList(getQueueIdsFromPrefs(sharedPreferences)),
-                getContextAssetIdFromPrefs(sharedPreferences)
+                ArrayList(getQueueIdsFromPrefs(sharedPreferences))
             )
             val entryWidget = EntryWidget(navigator)
             entryWidget.show(getParentFragmentManager())

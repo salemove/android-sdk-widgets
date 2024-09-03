@@ -11,7 +11,7 @@ import com.glia.widgets.di.Dependencies
  */
 class Navigator(private val queueIds: ArrayList<String>?, private val contextAssetId: String?) {
 
-    private val gliaWidgetsConfig = Dependencies.getSdkConfigurationManager().createWidgetsConfiguration()
+    private val gliaWidgetsConfig = Dependencies.sdkConfigurationManager.buildEngagementConfiguration()
 
     fun startChat(context: Context) {
         // Navigate to chat
@@ -22,8 +22,7 @@ class Navigator(private val queueIds: ArrayList<String>?, private val contextAss
         val intent = Intent(context, CallActivity::class.java)
             .putExtra(GliaWidgets.QUEUE_IDS, queueIds)
             .putExtra(GliaWidgets.CONTEXT_ASSET_ID, contextAssetId)
-            .putExtra(GliaWidgets.UI_THEME, Dependencies.getSdkConfigurationManager().uiTheme)
-            .putExtra(GliaWidgets.USE_OVERLAY, gliaWidgetsConfig?.useOverlay)
+            .putExtra(GliaWidgets.UI_THEME, Dependencies.sdkConfigurationManager.uiTheme)
             .putExtra(GliaWidgets.SCREEN_SHARING_MODE, gliaWidgetsConfig?.screenSharingMode)
             .putExtra(GliaWidgets.MEDIA_TYPE, Engagement.MediaType.AUDIO)
         context.startActivity(intent)

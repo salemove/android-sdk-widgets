@@ -5,6 +5,7 @@ import android.content.Intent
 import android.provider.Settings
 import androidx.core.net.toUri
 import com.glia.androidsdk.Engagement.MediaType
+import com.glia.widgets.call.CallActivityIntentHelper
 import com.glia.widgets.call.CallConfiguration
 import com.glia.widgets.di.Dependencies
 

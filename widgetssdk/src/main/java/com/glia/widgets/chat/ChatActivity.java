@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -53,12 +54,12 @@ public final class ChatActivity extends FadeTransitionActivity {
 
     /**
      * Creates and fills out Intent for starting ChatActivity
-     * @deprecated use {@link #getIntent(Context, String, List)} instead.
      *
      * @param context   - Android Context object
      * @param contextId - Glia visitor context asset ID
      * @param queueId   - Queue ID or `null` to use the default queues
      * @return - Intent for Starting ChatActivity
+     * @deprecated use {@link #getIntent(Context, String, List)} instead.
      */
     @Deprecated
     public static Intent getIntent(
@@ -73,6 +74,7 @@ public final class ChatActivity extends FadeTransitionActivity {
 
     /**
      * Creates and fills out Intent for starting ChatActivity
+     *
      * @param context   - Android Context object
      * @param contextId - Glia visitor context asset ID
      * @param queueIds  - Queue IDs of the queues you would like to use for your engagements
@@ -90,13 +92,13 @@ public final class ChatActivity extends FadeTransitionActivity {
 
     /**
      * Creates and fills out Intent for starting ChatActivity
-     * @deprecated use {@link #getIntent(Context, String, List, ChatType)} instead.
      *
      * @param context   - Android Context object
      * @param contextId - Glia visitor context asset ID
      * @param queueId   - Queue ID or `null` to use the default queues
      * @param chatType  - Type of chat screen
      * @return - Intent for Starting ChatActivity
+     * @deprecated use {@link #getIntent(Context, String, List, ChatType)} instead.
      */
     @Deprecated
     public static Intent getIntent(
@@ -140,6 +142,13 @@ public final class ChatActivity extends FadeTransitionActivity {
         Logger.i(TAG, "Create Chat screen");
         setContentView(R.layout.chat_activity);
         chatView = findViewById(R.id.chat_view);
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                chatView.onBackPressed();
+            }
+        });
 
         // Legacy company name support
         Dependencies.getSdkConfigurationManager().setLegacyCompanyName(getIntent().getStringExtra(GliaWidgets.COMPANY_NAME));
@@ -196,11 +205,6 @@ public final class ChatActivity extends FadeTransitionActivity {
         chatView.onDestroyView();
         Logger.i(TAG, "Destroy Chat screen");
         super.onDestroy();
-    }
-
-    @Override
-    public void onBackPressed() {
-        chatView.onBackPressed();
     }
 
     private EngagementConfiguration createGliaSdkConfigurationFromIntent(Intent intent) {

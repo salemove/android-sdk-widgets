@@ -21,6 +21,7 @@ internal interface ChatContract {
         val isChatVisible: Boolean
 
         fun setView(view: View)
+        fun getView(): View?
         fun onDestroy(retain: Boolean)
         fun onMessageClicked(messageId: String)
         fun onGvaButtonClicked(button: GvaButton)

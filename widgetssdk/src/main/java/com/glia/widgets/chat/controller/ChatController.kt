@@ -470,6 +470,11 @@ internal class ChatController(
         view.scrollToBottomImmediate()
     }
 
+    @Synchronized
+    override fun getView(): ChatContract.View? {
+        return this.view
+    }
+
     override fun setOnBackClickedListener(finishCallback: ChatView.OnBackClickedListener?) {
         this.backClickedListener = finishCallback
     }

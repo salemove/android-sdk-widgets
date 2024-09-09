@@ -593,7 +593,11 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     }
 
     private fun destroyController() {
-        controller?.onDestroy(context.asActivity() is ChatActivity)
+        controller?.let {
+            if (it.getView() == this) {
+                it.onDestroy(context.asActivity() is ChatActivity)
+            }
+        }
         controller = null
     }
 

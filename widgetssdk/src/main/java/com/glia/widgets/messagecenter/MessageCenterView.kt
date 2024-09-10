@@ -4,21 +4,17 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.TypedArray
-import android.graphics.Color
 import android.net.Uri
 import android.os.Parcelable
 import android.util.AttributeSet
-import android.view.Window
 import android.widget.LinearLayout
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
 import androidx.core.content.withStyledAttributes
 import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
-import androidx.core.view.WindowCompat
 import androidx.core.view.isVisible
 import com.glia.widgets.Constants
-import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.core.configuration.EngagementConfiguration
@@ -31,14 +27,13 @@ import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.SimpleWindowInsetsAndAnimationHandler
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.Utils
-import com.glia.widgets.helper.asActivity
-import com.glia.widgets.helper.changeStatusBarColor
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.hideKeyboard
 import com.glia.widgets.helper.insetsController
 import com.glia.widgets.helper.isKeyboardVisible
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.rootWindowInsetsCompat
+import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.view.Dialogs
 import com.glia.widgets.view.dialog.base.DialogDelegate
 import com.glia.widgets.view.dialog.base.DialogDelegateImpl
@@ -80,12 +75,6 @@ internal class MessageCenterView(
     private val messageView: MessageView? get() = binding?.messageView
     private val confirmationView: ConfirmationScreenView? get() = binding?.confirmationView
 
-    // Is needed for setting status bar color back when the view is gone
-    private var defaultStatusBarColor: Int? = null
-    private var statusBarColor: Int by Delegates.notNull()
-
-    private val window: Window? by lazy { context.asActivity()?.window }
-
     private val dialogCallback: DialogContract.Controller.Callback = DialogContract.Controller.Callback {
         onDialogState(it)
     }
@@ -93,17 +82,9 @@ internal class MessageCenterView(
     init {
         isSaveEnabled = true
         orientation = VERTICAL
-        defaultStatusBarColor = window?.statusBarColor
         // Is needed to overlap existing app bar in existing view with this view's app bar.
         ViewCompat.setElevation(this, Constants.WIDGETS_SDK_LAYER_ELEVATION)
         readTypedArray(attrs, defStyleAttr, defStyleRes)
-
-        handleInsetChanges()
-    }
-
-    private fun handleInsetChanges() {
-        WindowCompat.setDecorFitsSystemWindows(window ?: return, false)
-        SimpleWindowInsetsAndAnimationHandler(this) { onKeyboardAnimation(it) }
     }
 
     private fun onKeyboardAnimation(insets: Insets) {
@@ -124,6 +105,7 @@ internal class MessageCenterView(
     override fun setupViewAppearance() {
         // This is done to avoid view appearance when a visitor is not authenticated.
         binding = MessageCenterViewBinding.inflate(layoutInflater, this)
+        SimpleWindowInsetsAndAnimationHandler(this, appBar) { onKeyboardAnimation(it) }
 
         controller?.ensureMessageCenterAvailability()
         setupAppBarUnifiedTheme(unifiedTheme?.secureConversationsWelcomeScreenTheme?.headerTheme)
@@ -134,12 +116,6 @@ internal class MessageCenterView(
 
     private fun setupAppBarUnifiedTheme(headerTheme: HeaderTheme?) {
         appBar?.applyHeaderTheme(headerTheme)
-
-        headerTheme?.background?.fill?.primaryColor?.also {
-            statusBarColor = it
-        }
-
-        changeStatusBarColor(statusBarColor)
     }
 
     private fun readTypedArray(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
@@ -150,7 +126,6 @@ internal class MessageCenterView(
 
     private fun setDefaultTheme(typedArray: TypedArray) {
         theme = Utils.getThemeFromTypedArray(typedArray, this.context)
-        statusBarColor = theme.brandPrimaryColor?.let(::getColorCompat) ?: Color.TRANSPARENT
     }
 
     private fun initCallbacks() {
@@ -187,7 +162,6 @@ internal class MessageCenterView(
     }
 
     private fun showUnAuthenticatedDialog() {
-        changeStatusBarColor(Color.TRANSPARENT)
         showDialog {
             Dialogs.showUnAuthenticatedDialog(context, theme) {
                 controller?.dismissCurrentDialog()
@@ -306,11 +280,6 @@ internal class MessageCenterView(
 
     fun onPause() {
         detachDialogController()
-    }
-
-    override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
-        changeStatusBarColor(defaultStatusBarColor ?: return)
     }
 
     private fun attachDialogController() {

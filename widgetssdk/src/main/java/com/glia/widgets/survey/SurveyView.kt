@@ -17,6 +17,7 @@ import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.databinding.SurveyViewBinding
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.helper.SimpleWindowInsetsAndAnimationHandler
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.helper.getFullHybridTheme
 import com.glia.widgets.helper.hideKeyboard
@@ -83,6 +84,7 @@ internal class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: 
         setupViewAppearance()
         initCallbacks()
         initAdapter()
+        SimpleWindowInsetsAndAnimationHandler(this)
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
@@ -223,6 +225,14 @@ internal class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: 
     private fun initAdapter() {
         surveyAdapter = SurveyAdapter(this)
         recyclerView.adapter = surveyAdapter
+
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+
+                insetsController?.hideKeyboard()
+            }
+        })
     }
 
     private fun initCallbacks() {

@@ -29,12 +29,12 @@ interface SnapshotActivityWindow: SnapshotTestLifecycle {
         mockkStatic("com.glia.widgets.helper.ContextExtensionsKt")
         every { any<Context>().requireActivity() } returns activityMock
         every { any<Context>().asActivity() } returns activityMock
-        mockkStatic("com.glia.widgets.helper.InsetsKt")
+        mockkStatic("com.glia.widgets.helper.Insets")
         every { any<WindowInsetsControllerCompat>().hideKeyboard() } returns Unit
 
         setOnEndListener {
             unmockkStatic("com.glia.widgets.helper.ContextExtensionsKt")
-            unmockkStatic("com.glia.widgets.helper.InsetsKt")
+            unmockkStatic("com.glia.widgets.helper.Insets")
         }
 
         return Mock(activityMock, windowMock)

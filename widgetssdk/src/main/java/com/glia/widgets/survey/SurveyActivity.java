@@ -2,6 +2,7 @@ package com.glia.widgets.survey;
 
 import android.os.Bundle;
 
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
@@ -11,14 +12,14 @@ import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.di.Dependencies;
-import com.glia.widgets.helper.InsetsKt;
+import com.glia.widgets.helper.Insets;
 import com.glia.widgets.helper.Logger;
 
 /**
  * Glia internal class.
- *
+ * <p>
  * It will be automatically added to the integrator's manifest file by the manifest merger during compilation.
- *
+ * <p>
  * This activity is used to display post-engagement surveys.
  */
 public class SurveyActivity extends AppCompatActivity implements SurveyView.OnFinishListener {
@@ -28,6 +29,8 @@ public class SurveyActivity extends AppCompatActivity implements SurveyView.OnFi
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        EdgeToEdge.enable(this);
+        Insets.insetsControllerCompat(getWindow()).setAppearanceLightStatusBars(false);
         super.onCreate(savedInstanceState);
         Logger.i(TAG, "Create Survey screen");
         setContentView(R.layout.survey_activity);
@@ -69,7 +72,7 @@ public class SurveyActivity extends AppCompatActivity implements SurveyView.OnFi
 
     private void hideSoftKeyboard() {
         WindowInsetsControllerCompat insetsController = WindowCompat.getInsetsController(getWindow(), findViewById(R.id.survey_view));
-        InsetsKt.hideKeyboard(insetsController);
+        Insets.hideKeyboard(insetsController);
     }
 
     private void prepareSurveyView() {

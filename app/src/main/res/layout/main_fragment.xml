@@ -24,15 +24,20 @@
 
             <com.google.android.material.appbar.AppBarLayout
                 android:id="@+id/tool_bar_layout"
+                style="@style/Widget.MaterialComponents.AppBarLayout.Primary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:fitsSystemWindows="true"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <com.google.android.material.appbar.MaterialToolbar
                     android:id="@+id/top_app_bar"
+                    android:layout_height="wrap_content"
+                    android:elevation="0dp"
                     style="@style/Widget.MaterialComponents.Toolbar.Primary"
                     android:layout_width="match_parent"
-                    android:layout_height="?attr/actionBarSize"
+                    android:minHeight="?attr/actionBarSize"
+                    app:elevation="0dp"
                     app:menu="@menu/menu_main_fragment"
                     app:title="@string/app_name" />
 

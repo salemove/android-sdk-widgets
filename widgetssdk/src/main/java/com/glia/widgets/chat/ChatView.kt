@@ -29,7 +29,6 @@ import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.widgets.Constants
 import com.glia.widgets.GliaWidgets
-import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.adapter.ChatAdapter
@@ -52,11 +51,11 @@ import com.glia.widgets.di.Dependencies
 import com.glia.widgets.filepreview.ui.FilePreviewActivity
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.SimpleTextWatcher
+import com.glia.widgets.helper.SimpleWindowInsetsAndAnimationHandler
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.helper.addColorFilter
 import com.glia.widgets.helper.asActivity
-import com.glia.widgets.helper.changeStatusBarColor
 import com.glia.widgets.helper.fileName
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getColorStateListCompat
@@ -69,6 +68,7 @@ import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.requireActivity
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.setLocaleHint
+import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.view.Dialogs
 import com.glia.widgets.view.SingleChoiceCardView.OnOptionClickedListener
 import com.glia.widgets.view.dialog.base.DialogDelegate
@@ -110,9 +110,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     private var isInBottom = true
     private var theme: UiTheme by Delegates.notNull()
 
-    // needed for setting status bar color back when view is gone
-    private var defaultStatusBarColor: Int? = null
-    private var statusBarColor: Int by Delegates.notNull()
     private var onTitleUpdatedListener: OnTitleUpdatedListener? = null
     private var onEndListener: OnEndListener? = null
     private var onMinimizeListener: OnMinimizeListener? = null
@@ -195,6 +192,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         setupViewAppearance()
         setupViewActions()
         setupControllers()
+        SimpleWindowInsetsAndAnimationHandler(this, appBarOrToolBar = binding.appBarView)
     }
 
     /**
@@ -204,11 +202,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     fun setUiTheme(uiTheme: UiTheme?) {
         if (uiTheme == null) return
         theme = theme.getFullHybridTheme(uiTheme)
-        theme.brandPrimaryColor?.let(::getColorCompat)?.also { statusBarColor = it }
         setupViewAppearance()
-        if (isVisible) {
-            handleStatusBarColor()
-        }
     }
 
     /**
@@ -415,6 +409,8 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         context.startActivity(
             FilePreviewActivity.intent(context, attachmentFile), options.toBundle()
         )
+
+        insetsController?.hideKeyboard()
     }
 
     override fun fileIsNotReadyForPreview() {
@@ -515,7 +511,8 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
                     DialogState.VisitorCode -> {
                         Logger.e(TAG, "DialogController callback in ChatView with MODE_VISITOR_CODE")
                     } // Should never happen inside ChatView
-                    else -> { /* noop */ }
+                    else -> { /* noop */
+                    }
                 }
             }
         }
@@ -573,15 +570,10 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
 
     private fun showChat() {
         visibility = VISIBLE
-        handleStatusBarColor()
     }
 
     private fun hideChat() {
         visibility = INVISIBLE
-        if (defaultStatusBarColor != null) {
-            changeStatusBarColor(defaultStatusBarColor!!)
-            defaultStatusBarColor = null
-        }
         insetsController?.hideKeyboard()
     }
 
@@ -610,7 +602,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     private fun setDefaultTheme(typedArray: TypedArray) {
         theme = Utils.getThemeFromTypedArray(typedArray, this.context)
         theme = theme.getFullHybridTheme(Dependencies.sdkConfigurationManager.uiTheme)
-        theme.brandPrimaryColor?.let(::getColorCompat)?.also { statusBarColor = it }
     }
 
     private fun initConfigurations() {
@@ -693,16 +684,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         binding.gvaQuickRepliesLayout.updateTheme(theme)
         binding.sendButton.setLocaleContentDescription(R.string.general_send)
         applyTheme(Dependencies.gliaThemeManager.theme)
-    }
-
-    private fun handleStatusBarColor() {
-        val activity = context.requireActivity()
-        if (defaultStatusBarColor == null) {
-            defaultStatusBarColor = activity.window.statusBarColor
-            if (controller != null && controller!!.isChatVisible) {
-                changeStatusBarColor(statusBarColor)
-            }
-        }
     }
 
     private fun setupViewActions() {
@@ -876,9 +857,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
 
     private fun applyHeaderTheme(headerTheme: HeaderTheme) {
         binding.appBarView.applyHeaderTheme(headerTheme)
-        headerTheme.background?.fill?.primaryColor?.also { color ->
-            statusBarColor = color
-        }
     }
 
     private fun applyInputTheme(inputTheme: InputTheme) {

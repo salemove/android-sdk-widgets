@@ -36,6 +36,5 @@ internal class EndScreenSharingActivity : FadeTransitionActivity(), EndScreenSha
     override fun onDestroy() {
         super.onDestroy()
         Logger.i(TAG, "Destroy End Screen Sharing screen")
-        binding.screenSharingScreenView.onDestroy()
     }
 }

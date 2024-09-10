@@ -30,16 +30,12 @@ import androidx.core.widget.TextViewCompat
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.model.KeyPath
-import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.locale.StringKeyPair
-import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.schedulers.Schedulers
 
 internal fun View.getColorCompat(@ColorRes resId: Int) = ContextCompat.getColor(context, resId)
 internal fun View.getColorStateListCompat(@ColorRes resId: Int) =
@@ -76,26 +72,10 @@ internal fun ProgressBar.applyProgressColorTheme(@ColorInt progressColor: Int?) 
     progressColor?.also { indeterminateTintList = ColorStateList.valueOf(it) }
 }
 
-internal fun View.changeStatusBarColor(color: Int?) {
-    color?.run { context.asActivity()?.window?.statusBarColor = this }
-}
-
 internal fun View.applyShadow(@ColorInt color: Int?) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && color != null) {
         outlineSpotShadowColor = color
         outlineAmbientShadowColor = color
-    }
-}
-
-internal fun MaterialToolbar.applyToolbarTheme(
-    @ColorInt backgroundColor: Int?,
-    @ColorInt navigationIconColor: Int?
-) {
-    backgroundColor?.let {
-        backgroundTintList = ColorStateList.valueOf(it)
-    }
-    navigationIconColor?.let {
-        navigationIcon?.setTint(navigationIconColor)
     }
 }
 

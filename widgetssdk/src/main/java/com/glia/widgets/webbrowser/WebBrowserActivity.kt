@@ -4,10 +4,10 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.base.FadeTransitionActivity
 import com.glia.widgets.databinding.WebBrowserAvtivityBinding
 import com.glia.widgets.helper.getParcelable
+import com.glia.widgets.locale.LocaleString
 
 /**
  * Glia internal class.

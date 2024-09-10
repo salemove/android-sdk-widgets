@@ -31,14 +31,10 @@
         <item name="iconEndScreenShare">?attr/gliaIconEndScreenShare</item>
         <item name="iconScreenSharingDialog">?attr/gliaIconScreenSharingDialog</item>
         <item name="chatSendMessageButtonTintColor">?attr/gliaSendMessageButtonTintColor</item>
-
         <item name="gliaChatBackgroundColor">?attr/gliaChatBackgroundColor</item>
         <item name="chatHeaderTitleTintColor">?attr/gliaChatHeaderTitleTintColor</item>
         <item name="chatHeaderHomeButtonTintColor">?attr/gliaChatHeaderHomeButtonTintColor</item>
-        <item name="chatHeaderExitQueueButtonTintColor">
-            ?attr/gliaChatHeaderExitQueueButtonTintColor
-        </item>
-
+        <item name="chatHeaderExitQueueButtonTintColor">?attr/gliaChatHeaderExitQueueButtonTintColor</item>
         <item name="chatStartingHeadingTextColor">?attr/gliaChatStartingHeadingTextColor</item>
         <item name="chatStartingCaptionTextColor">?attr/gliaChatStartingCaptionTextColor</item>
         <item name="chatStartedHeadingTextColor">?attr/gliaChatStartedHeadingTextColor</item>
@@ -52,12 +48,8 @@
         <item name="newMessagesDividerTextColor">?attr/gliaNewMessagesDividerTextColor</item>
         <item name="botActionButtonBackgroundColor">?attr/gliaBotActionButtonBackgroundColor</item>
         <item name="botActionButtonTextColor">?attr/gliaBotActionButtonTextColor</item>
-        <item name="botActionButtonSelectedBackgroundColor">
-            ?attr/gliaBotActionButtonSelectedBackgroundColor
-        </item>
-        <item name="botActionButtonSelectedTextColor">?attr/gliaBotActionButtonSelectedTextColor
-        </item>
-
+        <item name="botActionButtonSelectedBackgroundColor">?attr/gliaBotActionButtonSelectedBackgroundColor</item>
+        <item name="botActionButtonSelectedTextColor">?attr/gliaBotActionButtonSelectedTextColor</item>
         <item name="gliaHeaderEndButtonStyle">?attr/gliaHeaderEndButtonStyle</item>
         <item name="buttonBarPositiveButtonStyle">?attr/buttonBarPositiveButtonStyle</item>
         <item name="buttonBarNegativeButtonStyle">?attr/buttonBarNegativeButtonStyle</item>
@@ -66,9 +58,7 @@
 
         <item name="chatHeadStyle">?attr/chatHeadStyle</item>
 
-        <item name="gliaAlertDialogButtonUseVerticalAlignment">
-            ?attr/gliaAlertDialogButtonUseVerticalAlignment
-        </item>
+        <item name="gliaAlertDialogButtonUseVerticalAlignment">?attr/gliaAlertDialogButtonUseVerticalAlignment</item>
         <item name="whiteLabel">?attr/whiteLabel</item>
 
         <item name="materialThemeOverlay">@style/ThemeOverlay.Glia.Chat</item>
@@ -82,13 +72,11 @@
 
     </style>
 
-    <style name="Application.Glia.Call.Activity" parent="Application.Glia.Translucent.Activity">
+    <style name="Application.Glia.Call.Activity" parent="Application.Glia.Activity.Style">
 
     </style>
 
     <style name="Application.Glia.FilePreview.Activity" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:windowTranslucentNavigation">true</item>
         <item name="android:windowBackground">@color/glia_black_color</item>
         <item name="gliaIconAppBarBack">@drawable/ic_baseline_arrow_back</item>
         <item name="colorPrimary">@color/glia_black_color</item>

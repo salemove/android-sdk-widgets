@@ -7,8 +7,11 @@
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:backgroundTint="@android:color/transparent"
         android:elevation="0dp"
+        android:minHeight="?attr/actionBarSize"
         app:elevation="0dp"
         app:menu="@menu/top_app_bar"
         app:navigationIcon="?attr/gliaIconAppBarBack">
@@ -22,22 +25,22 @@
 
         <LinearLayout
             android:id="@+id/button_layout"
-            android:orientation="horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:layout_marginEnd="@dimen/glia_large">
+            android:layout_marginEnd="@dimen/glia_large"
+            android:orientation="horizontal">
 
             <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/end_screen_sharing_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:src="@drawable/ic_screensharing_off"
+                android:layout_marginEnd="@dimen/glia_medium"
                 android:background="@null"
                 android:padding="@dimen/glia_medium"
-                android:layout_marginEnd="@dimen/glia_medium"
-                android:visibility="gone"/>
+                android:src="@drawable/ic_screensharing_off"
+                android:visibility="gone" />
 
             <com.glia.widgets.view.header.button.GliaEndButton
                 android:id="@+id/end_button"
@@ -45,8 +48,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:minWidth="@dimen/glia_app_bar_end_button_width"
-                tools:text="@string/general_end"
-                android:visibility="gone" />
+                android:visibility="gone"
+                tools:text="@string/general_end" />
 
         </LinearLayout>
 

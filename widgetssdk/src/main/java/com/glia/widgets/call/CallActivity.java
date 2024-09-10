@@ -7,7 +7,6 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 
 import com.glia.widgets.GliaWidgets;
-import com.glia.widgets.locale.LocaleString;
 import com.glia.widgets.R;
 import com.glia.widgets.base.FadeTransitionActivity;
 import com.glia.widgets.chat.ChatActivity;
@@ -15,6 +14,7 @@ import com.glia.widgets.core.configuration.EngagementConfiguration;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
+import com.glia.widgets.locale.LocaleString;
 import com.glia.widgets.webbrowser.WebBrowserActivity;
 
 import java.util.ArrayList;
@@ -161,9 +161,9 @@ public final class CallActivity extends FadeTransitionActivity {
 
     /**
      * Creates and fills out Intent for starting CallActivity
-     * @deprecated use {@link #getIntent(Context, EngagementConfiguration)} since 1.8.2
+     * @deprecated use {@link #getIntent(Context, CallConfiguration)} since 1.8.2
      * @param applicationContext - application context
-     * @param sdkConfiguration - widgets sdk configuration
+     * @param engagementConfiguration - widgets sdk configuration
      * @param mediaType - media type that should be started (in case media engagement not ongoing)
      * @return Intent for starting CallActivity
      */

@@ -7,6 +7,7 @@ import android.util.AttributeSet
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.OnClickListener
 import android.widget.FrameLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -23,7 +24,6 @@ import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.comms.VideoView
 import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.widgets.Constants
-import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.UiTheme.UiThemeBuilder
@@ -35,9 +35,9 @@ import com.glia.widgets.databinding.CallButtonsLayoutBinding
 import com.glia.widgets.databinding.CallViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.SimpleWindowInsetsAndAnimationHandler
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.Utils
-import com.glia.widgets.helper.changeStatusBarColor
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getColorStateListCompat
 import com.glia.widgets.helper.getFontCompat
@@ -45,11 +45,12 @@ import com.glia.widgets.helper.getFullHybridTheme
 import com.glia.widgets.helper.hideKeyboard
 import com.glia.widgets.helper.insetsController
 import com.glia.widgets.helper.requireActivity
-import com.glia.widgets.helper.showToast
 import com.glia.widgets.helper.setContentDescription
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.setLocaleHint
 import com.glia.widgets.helper.setLocaleText
+import com.glia.widgets.helper.showToast
+import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.locale.StringKey
 import com.glia.widgets.locale.StringKeyPair
 import com.glia.widgets.view.Dialogs
@@ -70,6 +71,9 @@ import com.google.android.material.transition.MaterialFade
 import com.google.android.material.transition.SlideDistanceProvider
 import java.util.concurrent.Executor
 import kotlin.properties.Delegates
+
+private const val CONTROLS_ALPHA_SEMI_TRANSPARENT = 0.9f
+private const val CONTROLS_ALPHA = 1f
 
 internal class CallView(
     context: Context,
@@ -133,7 +137,6 @@ internal class CallView(
     private var onNavigateToChatListener: OnNavigateToChatListener? = null
     private var onNavigateToWebBrowserListener: OnNavigateToWebBrowserListener? = null
     private var onTitleUpdatedListener: OnTitleUpdatedListener? = null
-    private var defaultStatusBarColor: Int? = null
 
     private var operatorVideoView: VideoView? = null
 
@@ -150,6 +153,7 @@ internal class CallView(
         setupViewAppearance()
         setupViewActions()
         setupControllers()
+        SimpleWindowInsetsAndAnimationHandler(this, appBarOrToolBar = appBar)
     }
 
     private fun setupViewActions() {
@@ -229,7 +233,8 @@ internal class CallView(
                     DialogState.OverlayPermission -> post { showOverlayPermissionsDialog() }
                     DialogState.EndEngagement -> post { showEndEngagementDialog() }
                     DialogState.Confirmation -> post { callController?.onLiveObservationDialogRequested() }
-                    else -> { /* noop */ }
+                    else -> { /* noop */
+                    }
                 }
             }
         }
@@ -381,9 +386,7 @@ internal class CallView(
                 animateControls(fadeIn = false)
             }
             appBar.isVisible = callState.landscapeLayoutControlsVisible
-            buttonsLayoutBackground.isVisible =
-                callState.landscapeLayoutControlsVisible && callState.isVideoCall
-
+            buttonsLayoutBackground.isVisible = callState.landscapeLayoutControlsVisible && callState.isVideoCall
             buttonsLayout.isVisible = callState.landscapeLayoutControlsVisible
         } else {
             appBar.isVisible = true
@@ -395,12 +398,10 @@ internal class CallView(
     private fun animateControls(fadeIn: Boolean) {
         val transitionSet = TransitionSet()
         val appBarFade = MaterialFade()
-        appBarFade.secondaryAnimatorProvider =
-            SlideDistanceProvider(if (fadeIn) Gravity.TOP else Gravity.BOTTOM)
+        appBarFade.secondaryAnimatorProvider = SlideDistanceProvider(if (fadeIn) Gravity.TOP else Gravity.BOTTOM)
         transitionSet.addTransition(appBarFade.addTarget(appBar))
         val buttonsFade = MaterialFade()
-        buttonsFade.secondaryAnimatorProvider =
-            SlideDistanceProvider(if (fadeIn) Gravity.BOTTOM else Gravity.TOP)
+        buttonsFade.secondaryAnimatorProvider = SlideDistanceProvider(if (fadeIn) Gravity.BOTTOM else Gravity.TOP)
         transitionSet.addTransition(buttonsFade.addTarget(buttonsLayoutBackground))
         transitionSet.addTransition(buttonsFade.addTarget(buttonsLayout))
         TransitionManager.beginDelayedTransition(this, transitionSet)
@@ -488,7 +489,7 @@ internal class CallView(
         builder.setTheme(theme)
         builder.setSystemNegativeColor(R.color.glia_system_negative_color)
         builder.setBaseLightColor(R.color.glia_base_light_color)
-        builder.setBrandPrimaryColor(android.R.color.transparent)
+        builder.setBrandPrimaryColor(R.color.glia_call_view_background_color)
         builder.setGliaChatHeaderTitleTintColor(android.R.color.white)
         builder.setGliaChatHeaderHomeButtonTintColor(android.R.color.white)
         builder.setGliaChatHeaderExitQueueButtonTintColor(android.R.color.white)
@@ -518,9 +519,6 @@ internal class CallView(
     fun setUiTheme(uiTheme: UiTheme?) {
         theme = theme.getFullHybridTheme(uiTheme ?: return)
         setupViewAppearance()
-        if (isVisible) {
-            handleStatusBarColor()
-        }
     }
 
     fun setOnBackClickedListener(onBackClicked: OnBackClickedListener) {
@@ -549,7 +547,6 @@ internal class CallView(
 
     private fun showUIOnCallOngoing() {
         visibility = VISIBLE
-        handleStatusBarColor()
     }
 
     private fun hideUIOnCallEnd() {
@@ -557,23 +554,6 @@ internal class CallView(
         hideOperatorVideo()
         hideVisitorVideo()
         insetsController?.hideKeyboard()
-    }
-
-    private fun handleStatusBarColor() {
-        val activity = context.requireActivity()
-        if (defaultStatusBarColor == null) {
-            defaultStatusBarColor = activity.window.statusBarColor
-            changeStatusBarColor(getColorCompat(R.color.glia_call_view_background_color))
-        }
-    }
-
-    override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
-
-        defaultStatusBarColor?.also {
-            changeStatusBarColor(it)
-            defaultStatusBarColor = null
-        }
     }
 
     private fun showEndEngagementDialog() = showDialog {
@@ -807,13 +787,14 @@ internal class CallView(
             companyNameView.setLocaleHint(R.string.general_company_name)
             msrView.setLocaleText(R.string.android_call_queue_message)
             chatButtonBadgeView.text = callState.messagesNotSeen.toString()
-            if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE &&
-                callState.isVideoCall
-            ) {
-                appBar.backgroundTintList =
-                    getColorStateListCompat(R.color.glia_call_view_background_color)
+
+            //according to design, in Landscape mode + video call, the controls should be semi-transparent
+            if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE && callState.isVideoCall) {
+                buttonsLayoutBackground.alpha = CONTROLS_ALPHA_SEMI_TRANSPARENT
+                appBar.alpha = CONTROLS_ALPHA_SEMI_TRANSPARENT
             } else {
-                appBar.backgroundTintList = getColorStateListCompat(android.R.color.transparent)
+                buttonsLayoutBackground.alpha = CONTROLS_ALPHA
+                appBar.alpha = CONTROLS_ALPHA
             }
 
             callState.isVideoButtonEnabled.also {

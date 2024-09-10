@@ -517,7 +517,7 @@ class MainFragment : Fragment() {
         GliaWidgets.init(
             createDefaultConfig(
                 context = requireActivity().applicationContext,
-//                uiJsonRemoteConfig = UnifiedUiConfigurationLoader.fetchLocalGlobalColors(requireContext()),
+//                uiJsonRemoteConfig = UnifiedUiConfigurationLoader.fetchRemoteConfiguration(),
 //                runtimeConfig = createSampleRuntimeConfig(),
 //                region = "us"
             )
@@ -526,14 +526,13 @@ class MainFragment : Fragment() {
         setupAuthButtonsVisibility()
         listenForCallVisualizerEngagements()
 
-        view?.post {
-            initMenu()
-        }
+        view?.post { initMenu() }
     }
 
     private fun createSampleRuntimeConfig(): UiTheme = UiTheme(
         gvaQuickReplyTextColor = android.R.color.holo_green_dark,
-        gvaQuickReplyStrokeColor = android.R.color.holo_green_dark
+        gvaQuickReplyStrokeColor = android.R.color.holo_green_dark,
+        brandPrimaryColor = android.R.color.holo_green_dark
     )
 
     private fun prepareAuthentication() {

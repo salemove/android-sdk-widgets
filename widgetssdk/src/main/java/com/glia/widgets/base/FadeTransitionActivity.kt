@@ -1,10 +1,13 @@
 package com.glia.widgets.base
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import com.glia.androidsdk.Glia
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.helper.insetsControllerCompat
 import com.glia.widgets.locale.LocaleString
 import io.reactivex.rxjava3.disposables.Disposable
 
@@ -16,30 +19,50 @@ open class FadeTransitionActivity : AppCompatActivity() {
     private var disposable: Disposable? = null
     private val localeProvider = Dependencies.localeProvider
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+
+    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+    private fun overrideAnimation() {
+        overrideActivityTransition(OVERRIDE_TRANSITION_OPEN, android.R.anim.fade_in, android.R.anim.fade_out)
+        overrideActivityTransition(OVERRIDE_TRANSITION_CLOSE, android.R.anim.fade_in, android.R.anim.fade_out)
     }
 
-    override fun finish() {
-        super.finish()
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+    private fun overrideAnimationCompat() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            overrideAnimation()
+            return
+        }
+
+        overrideAnimationApi33()
+    }
+
+    @Suppress("DEPRECATION")
+    private fun overrideAnimationApi33() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
+        window.insetsControllerCompat.isAppearanceLightStatusBars = false
+        overrideAnimationCompat()
+        super.onCreate(savedInstanceState)
     }
 
     override fun finishAndRemoveTask() {
         super.finishAndRemoveTask()
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+        overrideAnimationApi33()
         disposable?.dispose()
     }
 
     override fun startActivity(intent: Intent?) {
         super.startActivity(intent)
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+        overrideAnimationApi33()
     }
 
     override fun startActivity(intent: Intent?, options: Bundle?) {
         super.startActivity(intent, options)
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+        overrideAnimationApi33()
     }
 
     fun setTitle(locale: LocaleString?) {
@@ -56,7 +79,7 @@ open class FadeTransitionActivity : AppCompatActivity() {
             .subscribe(
                 { super.setTitle(it) },
                 { /* no-op */ }
-        )
+            )
     }
 
 }

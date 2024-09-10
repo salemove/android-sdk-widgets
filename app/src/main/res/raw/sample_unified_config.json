@@ -1134,9 +1134,10 @@
           },
           "borderWidth": 2,
           "color": {
-            "type": "fill",
+            "type": "gradient",
             "value": [
-              "#000000"
+              "#fdd42b",
+              "#ff0000"
             ]
           },
           "cornerRadius": 8
@@ -1187,9 +1188,10 @@
         },
         "borderWidth": 2,
         "color": {
-          "type": "fill",
+          "type": "gradient",
           "value": [
-            "#f9d12b"
+            "#fdd42b",
+            "#ff0000"
           ]
         },
         "cornerRadius": 8
@@ -1962,9 +1964,10 @@
         },
         "borderWidth": 2,
         "color": {
-          "type": "fill",
+          "type": "gradient",
           "value": [
-            "#fdd42b"
+            "#fdd42b",
+            "#ff0000"
           ]
         },
         "cornerRadius": 8
@@ -3990,9 +3993,10 @@
           },
           "borderWidth": 2,
           "color": {
-            "type": "fill",
+            "type": "gradient",
             "value": [
-              "#fdd42b"
+              "#fdd42b",
+              "#ff0000"
             ]
           },
           "cornerRadius": 8
@@ -4413,9 +4417,10 @@
           },
           "borderWidth": 2,
           "color": {
-            "type": "fill",
+            "type": "gradient",
             "value": [
-              "#000000"
+              "#fdd42b",
+              "#ff0000"
             ]
           },
           "cornerRadius": 8
@@ -4466,9 +4471,10 @@
         },
         "borderWidth": 2,
         "color": {
-          "type": "fill",
+          "type": "gradient",
           "value": [
-            "#f9d12b"
+            "#fdd42b",
+            "#ff0000"
           ]
         },
         "cornerRadius": 8
@@ -4790,9 +4796,10 @@
           },
           "borderWidth": 2,
           "color": {
-            "type": "fill",
+            "type": "gradient",
             "value": [
-              "#000000"
+              "#fdd42b",
+              "#ff0000"
             ]
           },
           "cornerRadius": 8
@@ -4843,9 +4850,10 @@
         },
         "borderWidth": 2,
         "color": {
-          "type": "fill",
+          "type": "gradient",
           "value": [
-            "#f9d12b"
+            "#fdd42b",
+            "#ff0000"
           ]
         },
         "cornerRadius": 8
@@ -5212,9 +5220,10 @@
         },
         "borderWidth": 2,
         "color": {
-          "type": "fill",
+          "type": "gradient",
           "value": [
-            "#fdd42b"
+            "#fdd42b",
+            "#ff0000"
           ]
         },
         "cornerRadius": 8

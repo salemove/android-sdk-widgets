@@ -11,6 +11,7 @@ import android.os.Environment
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -22,9 +23,9 @@ import com.glia.widgets.R
 import com.glia.widgets.databinding.FilePreviewActivityBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.SimpleWindowInsetsAndAnimationHandler
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.fileProviderAuthority
-import com.glia.widgets.helper.setContentDescription
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.showToast
 import java.io.File
@@ -63,7 +64,9 @@ internal class FilePreviewActivity : AppCompatActivity(), FilePreviewContract.Vi
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        SimpleWindowInsetsAndAnimationHandler(binding.root, binding.toolbar)
         Logger.i(TAG, "Create File Preview screen")
         setContentView(binding.root)
         title = localeProvider.getString(R.string.android_preview_title)
@@ -111,7 +114,7 @@ internal class FilePreviewActivity : AppCompatActivity(), FilePreviewContract.Vi
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        onBackPressed()
+        onBackPressedDispatcher.onBackPressed()
         return true
     }
 

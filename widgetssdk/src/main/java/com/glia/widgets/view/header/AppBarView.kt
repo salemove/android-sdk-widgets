@@ -1,6 +1,7 @@
 package com.glia.widgets.view.header
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.util.AttributeSet
 import android.view.MenuItem
 import android.widget.TextView
@@ -11,7 +12,6 @@ import androidx.core.view.children
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.TextViewCompat
-import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.databinding.AppBarBinding
@@ -21,7 +21,6 @@ import com.glia.widgets.helper.applyButtonTheme
 import com.glia.widgets.helper.applyIconColorTheme
 import com.glia.widgets.helper.applyImageColorTheme
 import com.glia.widgets.helper.applyTextTheme
-import com.glia.widgets.helper.applyToolbarTheme
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getColorStateListCompat
 import com.glia.widgets.helper.getFontCompat
@@ -30,8 +29,9 @@ import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.setLocaleNavigationContentDescription
 import com.glia.widgets.helper.setLocaleText
-import com.glia.widgets.helper.setTintCompat
 import com.glia.widgets.helper.setText
+import com.glia.widgets.helper.setTintCompat
+import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.view.unifiedui.applyButtonTheme
 import com.glia.widgets.view.unifiedui.applyColorTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
@@ -93,7 +93,7 @@ internal class AppBarView @JvmOverloads constructor(
                 R.styleable.AppBarView_android_backgroundTint,
                 R.attr.gliaBrandPrimaryColor
             )
-            binding.toolbar.backgroundTintList = getColorStateListCompat(backgroundTintList)
+            this@AppBarView.backgroundTintList = getColorStateListCompat(backgroundTintList)
 
             Utils.getTypedArrayStringValue(this, R.styleable.AppBarView_titleText)?.also {
                 binding.title.text = it
@@ -117,25 +117,21 @@ internal class AppBarView @JvmOverloads constructor(
         // icons
         uiTheme.iconAppBarBack?.also(binding.toolbar::setNavigationIcon)
         uiTheme.iconLeaveQueue?.also(leaveQueueIcon::setIcon)
-        uiTheme.iconEndScreenShare?.also {
-            endScreenShareButton.setImageResource(it)
-        }
+        uiTheme.iconEndScreenShare?.also(endScreenShareButton::setImageResource)
 
         // colors
         val brandPrimaryColor = uiTheme.brandPrimaryColor?.let(::getColorCompat)
         val baseLightColor = uiTheme.baseLightColor?.let(::getColorCompat)
         val systemNegativeColor = uiTheme.systemNegativeColor?.let(::getColorCompat)
-        val exitQueueButtonColor = uiTheme.gliaChatHeaderExitQueueButtonTintColor?.let(::getColorCompat)
-            ?: baseLightColor
+        val exitQueueButtonColor = uiTheme.gliaChatHeaderExitQueueButtonTintColor?.let(::getColorCompat) ?: baseLightColor
         val endScreenShareButtonColor = uiTheme.endScreenShareTintColor?.let(::getColorCompat)
         val chatHeaderTitleColor = uiTheme.gliaChatHeaderTitleTintColor?.let(::getColorCompat)
         val chatHeaderHomeButtonColor = uiTheme.gliaChatHeaderHomeButtonTintColor?.let(::getColorCompat)
         val textFont = uiTheme.fontRes?.let(::getFontCompat)
 
-        binding.toolbar.applyToolbarTheme(
-            backgroundColor = brandPrimaryColor,
-            navigationIconColor = chatHeaderHomeButtonColor
-        )
+        chatHeaderHomeButtonColor?.also { binding.toolbar.setNavigationIconTint(it) }
+        brandPrimaryColor?.also { backgroundTintList = ColorStateList.valueOf(it) }
+
         leaveQueueIcon.applyIconColorTheme(exitQueueButtonColor)
         endScreenShareButton.applyImageColorTheme(endScreenShareButtonColor)
         binding.title.applyTextTheme(chatHeaderTitleColor, textFont)
@@ -220,7 +216,7 @@ internal class AppBarView @JvmOverloads constructor(
 
     internal fun applyHeaderTheme(headerTheme: HeaderTheme?) {
         headerTheme?.apply {
-            binding.toolbar.applyColorTheme(background?.fill)
+            applyColorTheme(background?.fill)
             backButton?.iconColor?.also { binding.toolbar.setNavigationIconTint(it.primaryColor) }
             text?.also(::applyTitleTheme)
             closeButton?.iconColor?.also { leaveQueueIcon.icon?.setTintCompat(it.primaryColor) }

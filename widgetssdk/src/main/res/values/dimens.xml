@@ -92,4 +92,7 @@
 
     <!-- Live Observation -->
     <dimen name="glia_snack_bar_bottom_margin">72dp</dimen>
+
+    <!-- Entry Widget -->
+    <dimen name="entry_widget_error_item_default_padding">40dp</dimen>
 </resources>

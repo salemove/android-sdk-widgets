@@ -71,6 +71,11 @@
             android:theme="@style/Application.Glia.Call.Activity" />
 
         <activity
+            android:name=".entrywidget.EntryWidgetActivity"
+            android:launchMode="singleTask"
+            android:theme="@style/Application.Glia.Translucent.Activity" />
+
+        <activity
             android:name=".helper.DialogHolderActivity"
             android:launchMode="singleTask"
             android:theme="@style/Application.Glia.Translucent.Activity" />

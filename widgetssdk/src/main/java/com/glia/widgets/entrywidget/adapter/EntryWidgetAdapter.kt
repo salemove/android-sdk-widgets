@@ -9,7 +9,9 @@ import com.glia.widgets.databinding.EntryWidgetPoweredByItemBinding
 import com.glia.widgets.entrywidget.EntryWidgetContract
 import com.glia.widgets.helper.layoutInflater
 
-internal class EntryWidgetAdapter : RecyclerView.Adapter<EntryWidgetAdapter.ViewHolder>() {
+internal class EntryWidgetAdapter(
+    private val viewType: EntryWidgetContract.ViewType
+) : RecyclerView.Adapter<EntryWidgetAdapter.ViewHolder>() {
 
     enum class ViewType {
         CONTACT_ITEM,
@@ -28,7 +30,8 @@ internal class EntryWidgetAdapter : RecyclerView.Adapter<EntryWidgetAdapter.View
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return when (viewType) {
             ViewType.ERROR_ITEM.ordinal -> EntryWidgetErrorStateViewHolder(
-                EntryWidgetErrorItemBinding.inflate(parent.layoutInflater, parent, false)
+                EntryWidgetErrorItemBinding.inflate(parent.layoutInflater, parent, false),
+                viewType = this.viewType
             )
             ViewType.PROVIDED_BY_ITEM.ordinal -> EntryWidgetPoweredByViewHolder(
                 EntryWidgetPoweredByItemBinding.inflate(parent.layoutInflater, parent, false)

@@ -183,4 +183,13 @@
         <item name="android:backgroundTint">?attr/gliaBaseLightColor</item>
     </style>
 
+    <style name="ThemeOverlay.Glia.BottomSheetDialog" parent="ThemeOverlay.MaterialComponents.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/ThemeOverlay.Glia.BottomSheetModal</item>
+    </style>
+
+    <style name="ThemeOverlay.Glia.BottomSheetModal" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
+
 </resources>

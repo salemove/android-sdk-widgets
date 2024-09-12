@@ -5,6 +5,12 @@ import com.glia.widgets.base.BaseView
 
 internal interface EntryWidgetContract {
 
+    enum class ViewType {
+        BOTTOM_SHEET,
+        EMBEDDED_VIEW,
+        MESSAGING_LIVE_SUPPORT
+    }
+
     enum class ItemType {
         VIDEO_CALL,
         AUDIO_CALL,

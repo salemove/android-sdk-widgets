@@ -8,7 +8,8 @@ import com.glia.widgets.entrywidget.EntryWidgetContract
 import com.glia.widgets.helper.setLocaleText
 
 internal class EntryWidgetErrorStateViewHolder(
-    private val binding: EntryWidgetErrorItemBinding
+    private val binding: EntryWidgetErrorItemBinding,
+    private val viewType: EntryWidgetContract.ViewType
 ) : EntryWidgetAdapter.ViewHolder(binding.root) {
 
     override fun bind(itemType: EntryWidgetContract.ItemType, onClickListener: View.OnClickListener) {
@@ -28,6 +29,10 @@ internal class EntryWidgetErrorStateViewHolder(
             else -> {
                 // Do nothing
             }
+        }
+
+        if (viewType == EntryWidgetContract.ViewType.BOTTOM_SHEET) {
+            binding.root.minHeight = binding.root.resources.getDimensionPixelSize(R.dimen.entry_widget_error_item_min_height)
         }
     }
 }

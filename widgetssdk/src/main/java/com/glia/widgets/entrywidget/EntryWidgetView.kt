@@ -9,17 +9,21 @@ import com.glia.widgets.entrywidget.adapter.EntryWidgetAdapter
 import com.glia.widgets.entrywidget.adapter.EntryWidgetItemDecoration
 import com.glia.widgets.helper.getDrawableCompat
 
+/**
+ * EntryWidgetView provides a way to display the entry points for the user to start a chat, audio call, video call, or secure messaging.
+ */
 internal class EntryWidgetView(
-    context: Context
+    context: Context,
+    viewType: EntryWidgetContract.ViewType
 ) : RecyclerView(context, null, 0), EntryWidgetContract.View {
     var onDismissListener: (() -> Unit)? = null
 
     private lateinit var controller: EntryWidgetContract.Controller
-    private val adapter = EntryWidgetAdapter().also { setAdapter(it) }
+    private val adapter = EntryWidgetAdapter(viewType).also { setAdapter(it) }
 
     init {
         layoutManager = LinearLayoutManager(context)
-        getDrawableCompat(R.drawable.bg_separator_gray)?.let {
+        getDrawableCompat(R.drawable.bg_entry_widget_divider)?.let {
             addItemDecoration(EntryWidgetItemDecoration(it))
         }
         adapter.onItemClickListener = {

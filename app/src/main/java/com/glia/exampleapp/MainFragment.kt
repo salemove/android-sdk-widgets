@@ -37,6 +37,7 @@ import com.glia.widgets.call.CallActivity
 import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.chat.ChatType
 import com.glia.widgets.core.notification.NotificationActionReceiver
+import com.glia.widgets.entrywidget.EntryWidgetActivity
 import com.glia.widgets.messagecenter.MessageCenterActivity
 import com.google.android.material.appbar.MaterialToolbar
 import kotlin.concurrent.thread
@@ -74,6 +75,10 @@ class MainFragment : Fragment() {
 
         view.findViewById<View>(R.id.settings_button)
             .setOnClickListener { navController.navigate(R.id.settings) }
+        view.findViewById<View>(R.id.entry_widget_button)
+            .setOnClickListener {
+                startActivity(Intent(requireContext(), EntryWidgetActivity::class.java))
+            }
         view.findViewById<View>(R.id.chat_activity_button)
             .setOnClickListener { navigateToChat(ChatType.LIVE_CHAT) }
         view.findViewById<View>(R.id.audio_call_button)

@@ -17,6 +17,8 @@ import com.glia.widgets.core.dialog.DialogContract;
 import com.glia.widgets.core.dialog.DialogController;
 import com.glia.widgets.engagement.completion.EngagementCompletionContract;
 import com.glia.widgets.engagement.completion.EngagementCompletionController;
+import com.glia.widgets.entrywidget.EntryWidgetContract;
+import com.glia.widgets.entrywidget.EntryWidgetController;
 import com.glia.widgets.filepreview.ui.FilePreviewContract;
 import com.glia.widgets.filepreview.ui.FilePreviewController;
 import com.glia.widgets.helper.Logger;
@@ -384,5 +386,9 @@ public class ControllerFactory {
             useCaseFactory.getPrepareToScreenSharingUseCase(),
             useCaseFactory.getReleaseScreenSharingResourcesUseCase()
         );
+    }
+
+    public EntryWidgetContract.Controller getEntryWidgetController() {
+        return new EntryWidgetController();
     }
 }

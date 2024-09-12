@@ -95,4 +95,5 @@
 
     <!-- Entry Widget -->
     <dimen name="entry_widget_error_item_default_padding">40dp</dimen>
+    <dimen name="entry_widget_error_item_min_height">257dp</dimen>
 </resources>

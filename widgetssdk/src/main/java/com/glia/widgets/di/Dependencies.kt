@@ -9,6 +9,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.glia.androidsdk.Glia
 import com.glia.androidsdk.GliaConfig
 import com.glia.widgets.GliaWidgetsConfig
+import com.glia.widgets.Navigator
 import com.glia.widgets.StringProvider
 import com.glia.widgets.callvisualizer.CallVisualizerActivityWatcher
 import com.glia.widgets.core.audio.AudioControlManager
@@ -196,6 +197,11 @@ internal object Dependencies {
     @JvmStatic
     fun setAuthenticationManager(authenticationManager: AuthenticationManager) {
         authenticationManagerProvider.authenticationManager = authenticationManager
+    }
+
+    @JvmStatic
+    fun getNavigator(queues: ArrayList<String>?): Navigator {
+        return Navigator(queues, null)
     }
 
     private fun initApplicationLifecycleObserver(

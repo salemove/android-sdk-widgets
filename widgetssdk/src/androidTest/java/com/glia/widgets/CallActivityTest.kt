@@ -20,7 +20,6 @@ import com.glia.widgets.di.ControllerFactory
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.ResourceProvider
 import com.glia.widgets.locale.LocaleProvider
-import com.glia.widgets.locale.StringKeyPair
 import com.glia.widgets.view.head.ChatHeadContract
 import io.mockk.CapturingSlot
 import io.mockk.every

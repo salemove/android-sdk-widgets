@@ -11,7 +11,7 @@ import androidx.core.util.Pair
 import androidx.core.view.contains
 import com.glia.widgets.R
 import com.glia.widgets.base.BaseActivityStackWatcher
-import com.glia.widgets.call.CallActivity
+import com.glia.widgets.call.CallActivityIntentHelper.createIntent
 import com.glia.widgets.call.CallConfiguration
 import com.glia.widgets.callvisualizer.EndScreenSharingActivity
 import com.glia.widgets.callvisualizer.EndScreenSharingView
@@ -197,7 +197,7 @@ internal class ActivityWatcherForChatHead(
 
     private fun navigateToCall(activity: Activity?) {
         activity?.let {
-            val intent = CallActivity.getIntent(
+            val intent = createIntent(
                 it,
                 geCallConfigurationBuilder().setIsUpgradeToCall(true).build()
             )

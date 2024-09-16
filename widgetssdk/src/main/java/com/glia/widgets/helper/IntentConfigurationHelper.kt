@@ -16,15 +16,15 @@ internal interface IntentConfigurationHelper {
 }
 
 internal class IntentConfigurationHelperImpl : IntentConfigurationHelper {
-    private val defaultBuilder: CallConfiguration.Builder
+    private val defaultConfiguration: CallConfiguration
         get() = Dependencies.sdkConfigurationManager
             .buildEngagementConfiguration()
-            .let(CallConfiguration.Builder()::setEngagementConfiguration)
+            .let(::CallConfiguration)
 
-    override fun createForCall(context: Context, mediaType: MediaType, upgradeToCall: Boolean): Intent = defaultBuilder
-        .setMediaType(mediaType)
-        .setIsUpgradeToCall(upgradeToCall)
-        .run { CallActivity.getIntent(context, build()) }
+    override fun createForCall(context: Context, mediaType: MediaType, upgradeToCall: Boolean): Intent = CallActivity.getIntent(
+        context,
+        defaultConfiguration.copy(mediaType = mediaType, isUpgradeToCall = upgradeToCall)
+    )
 
     override fun createForOverlayPermissionScreen(context: Context): Intent = context.run {
         Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, "package:${packageName}".toUri()).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)

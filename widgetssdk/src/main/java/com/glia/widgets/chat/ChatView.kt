@@ -915,7 +915,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
          * @param theme Used to pass the finalized [UiTheme]
          * to the activity which is being navigated to.
          */
-        fun call(theme: UiTheme?, mediaType: String?)
+        fun call(theme: UiTheme, mediaType: String)
     }
 
     fun interface OnBackToCallListener {

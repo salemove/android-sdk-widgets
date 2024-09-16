@@ -92,14 +92,14 @@ internal class ChatHeadView @JvmOverloads constructor(
         serviceChatHeadController.setBuildTimeTheme(theme)
     }
 
-    override fun showUnreadMessageCount(unreadMessageCount: Int) {
+    override fun showUnreadMessageCount(count: Int) {
         post {
             if (isCallVisualizerUseCase.invoke()) {
                 binding.chatBubbleBadge.isVisible = false
             } else {
                 binding.chatBubbleBadge.apply {
-                    text = unreadMessageCount.toString()
-                    isVisible = isDisplayUnreadMessageBadge(unreadMessageCount)
+                    text = count.toString()
+                    isVisible = isDisplayUnreadMessageBadge(count)
                 }
             }
         }
@@ -109,12 +109,12 @@ internal class ChatHeadView @JvmOverloads constructor(
         // Unused
     }
 
-    override fun showOperatorImage(operatorProfileImgUrl: String) {
+    override fun showOperatorImage(operatorImgUrl: String) {
         post {
             binding.apply {
                 queueingLottieAnimation.visibility = GONE
                 placeholderView.visibility = GONE
-                profilePictureView.load(operatorProfileImgUrl)
+                profilePictureView.load(operatorImgUrl)
             }
         }
     }
@@ -195,8 +195,7 @@ internal class ChatHeadView @JvmOverloads constructor(
     }
 
     override fun navigateToCall() {
-        val activityConfig =
-            CallConfiguration.Builder().setEngagementConfiguration(engagementConfiguration).build()
+        val activityConfig = CallConfiguration(engagementConfiguration)
 
         val intent = CallActivity.getIntent(context, activityConfig)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -225,7 +224,7 @@ internal class ChatHeadView @JvmOverloads constructor(
 
     private fun createHybridConfiguration(
         buildTimeTheme: UiTheme,
-        engagementConfiguration: com.glia.widgets.core.configuration.EngagementConfiguration?
+        engagementConfiguration: EngagementConfiguration?
     ) {
         configuration = createBuildTimeConfiguration(buildTimeTheme)
         val runTimeTheme = engagementConfiguration?.runTimeTheme ?: return

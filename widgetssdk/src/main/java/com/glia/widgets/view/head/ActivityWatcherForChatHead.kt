@@ -69,7 +69,7 @@ internal class ActivityWatcherForChatHead(
     }
 
     private fun createChatHeadLayout(activity: Activity) {
-        val chatHeadLayout = ChatHeadLayout(activity.baseContext)
+        val chatHeadLayout = ChatHeadLayout(activity)
         chatHeadLayout.layoutParams = ConstraintLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.MATCH_PARENT
@@ -173,17 +173,16 @@ internal class ActivityWatcherForChatHead(
         }
     }
 
-    private fun geCallConfigurationBuilder(): CallConfiguration.Builder {
-        val configuration = Dependencies.sdkConfigurationManager.buildEngagementConfiguration()
-        return CallConfiguration.Builder().setEngagementConfiguration(configuration)
-    }
+    private fun getDefaultCallConfiguration(): CallConfiguration = Dependencies.sdkConfigurationManager
+        .buildEngagementConfiguration()
+        .let(::CallConfiguration)
 
     private fun navigateToChat(activity: Activity?) {
         activity?.let {
             val intent = ChatActivity.getIntent(
                 it,
                 null, // No need to set contextId because engagement is already ongoing
-                null // No need to set queueId because engagement is already ongoing
+                emptyList() // No need to set queueId because engagement is already ongoing
             )
             it.startActivity(intent)
         }
@@ -199,7 +198,7 @@ internal class ActivityWatcherForChatHead(
         activity?.let {
             val intent = CallActivity.getIntent(
                 it,
-                geCallConfigurationBuilder().setIsUpgradeToCall(true).build()
+                getDefaultCallConfiguration().copy(isUpgradeToCall = true)
             )
             it.startActivity(intent)
         }

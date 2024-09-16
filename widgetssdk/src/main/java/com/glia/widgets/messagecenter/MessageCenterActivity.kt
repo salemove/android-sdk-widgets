@@ -137,9 +137,5 @@ class MessageCenterActivity :
         finish()
     }
 
-    private fun createConfiguration(intent: Intent): EngagementConfiguration {
-        return EngagementConfiguration.Builder()
-            .intent(intent)
-            .build()
-    }
+    private fun createConfiguration(intent: Intent): EngagementConfiguration = EngagementConfiguration(intent)
 }

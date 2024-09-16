@@ -67,8 +67,8 @@ public class GliaSdkConfigurationManager {
 
     public String getCompanyName() {
         if (companyName == null && legacyCompanyName != null) {
-                // Legacy company name configuration method used before local default
-                companyName = legacyCompanyName;
+            // Legacy company name configuration method used before local default
+            companyName = legacyCompanyName;
         }
         return companyName;
     }
@@ -100,10 +100,13 @@ public class GliaSdkConfigurationManager {
 
     @Nullable
     public EngagementConfiguration buildEngagementConfiguration() {
-        return new EngagementConfiguration.Builder()
-                .companyName(companyName)
-                .screenSharingMode(screenSharingMode)
-                .runTimeTheme(uiTheme)
-                .build();
+        return new EngagementConfiguration(
+            companyName,
+            null,
+            null,
+            null,
+            uiTheme,
+            screenSharingMode
+        );
     }
 }

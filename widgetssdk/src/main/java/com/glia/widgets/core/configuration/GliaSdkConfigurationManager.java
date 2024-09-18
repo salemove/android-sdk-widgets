@@ -10,8 +10,6 @@ import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.ResourceProvider;
 
-import org.jetbrains.annotations.Nullable;
-
 /**
  * @hide
  */
@@ -98,7 +96,7 @@ public class GliaSdkConfigurationManager {
         this.screenSharingMode = screenSharingMode;
     }
 
-    @Nullable
+    @NonNull
     public EngagementConfiguration buildEngagementConfiguration() {
         return new EngagementConfiguration(
             companyName,

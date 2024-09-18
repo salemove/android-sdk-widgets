@@ -1,19 +1,16 @@
 package com.glia.widgets.call
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.R
 import com.glia.widgets.base.FadeTransitionActivity
 import com.glia.widgets.call.CallView.OnNavigateToChatListener
 import com.glia.widgets.call.CallView.OnNavigateToWebBrowserListener
-import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.helper.IntentHelper
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.locale.LocaleString
-import com.glia.widgets.webbrowser.WebBrowserActivity.Companion.intent
 import kotlin.properties.Delegates
 
 /**
@@ -44,6 +41,7 @@ import kotlin.properties.Delegates
 </pre> *
  */
 class CallActivity : FadeTransitionActivity() {
+    private val intentHelper: IntentHelper by lazy { Dependencies.intentHelper }
     private var callConfiguration: CallConfiguration by Delegates.notNull()
     private var callView: CallView by Delegates.notNull()
 
@@ -63,7 +61,7 @@ class CallActivity : FadeTransitionActivity() {
         // Legacy company name support
         Dependencies.sdkConfigurationManager.setLegacyCompanyName(intent.getStringExtra(GliaWidgets.COMPANY_NAME))
 
-        callConfiguration = CallActivityIntentHelper.readConfiguration(this)
+        callConfiguration = CallActivityConfigurationHelper.readConfiguration(this)
         if (this.intent.hasExtra(GliaWidgets.USE_OVERLAY)) {
             // Integrator has passed a deprecated GliaWidgets.USE_OVERLAY parameter with Intent
             // Override bubble configuration with USE_OVERLAY value
@@ -81,9 +79,9 @@ class CallActivity : FadeTransitionActivity() {
         callView.setUiTheme(callConfiguration.engagementConfiguration?.runTimeTheme)
         onBackClickedListener?.also(callView::setOnBackClickedListener)
 
-        // In case the engagement ends, Activity is removed from the device's Recents menu
+        // In case the engagement ends, Activity is removed from the device's Recent menu
         // to avoid app users to accidentally start queueing for another call when they resume
-        // the app from the Recents menu and the app's backstack was empty.
+        // the app from the Recent menu and the app's backstack was empty.
         callView.setOnEndListener { this.finishAndRemoveTask() }
 
         callView.setOnMinimizeListener { this.finish() }
@@ -132,31 +130,12 @@ class CallActivity : FadeTransitionActivity() {
 
     private fun navigateToChat() {
         Logger.d(TAG, "navigateToChat")
-        val engagementConfiguration = callConfiguration.engagementConfiguration
-        val queueIds = engagementConfiguration?.queueIds?.let { ArrayList(it) }
-        val newIntent = Intent(applicationContext, ChatActivity::class.java)
-            .putExtra(GliaWidgets.QUEUE_IDS, queueIds)
-            .putExtra(GliaWidgets.CONTEXT_ASSET_ID, engagementConfiguration?.contextAssetId)
-            .putExtra(GliaWidgets.UI_THEME, engagementConfiguration?.runTimeTheme)
-            .putExtra(GliaWidgets.SCREEN_SHARING_MODE, engagementConfiguration?.screenSharingMode)
+        val newIntent = intentHelper.chatIntent(this, callConfiguration.engagementConfiguration ?: return)
         startActivity(newIntent)
     }
 
     private fun navigateToWebBrowser(title: LocaleString, url: String) {
-        val newIntent = intent(this, title, url)
+        val newIntent = intentHelper.webBrowserIntent(this, title, url)
         startActivity(newIntent)
-    }
-
-    internal companion object {
-
-        /**
-         * Creates and fills out Intent for starting CallActivity
-         * @param context - Context object
-         * @param callConfiguration - CallActivity configuration
-         * @return - Intent for Starting CallActivity
-         */
-        fun getIntent(context: Context, callConfiguration: CallConfiguration): Intent {
-            return CallActivityIntentHelper.createIntent(context, callConfiguration)
-        }
     }
 }

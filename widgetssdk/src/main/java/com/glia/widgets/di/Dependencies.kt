@@ -25,8 +25,8 @@ import com.glia.widgets.engagement.completion.EngagementCompletionActivityWatche
 import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource
 import com.glia.widgets.helper.ApplicationLifecycleManager
 import com.glia.widgets.helper.GliaActivityManagerImpl
-import com.glia.widgets.helper.IntentConfigurationHelper
-import com.glia.widgets.helper.IntentConfigurationHelperImpl
+import com.glia.widgets.helper.IntentHelper
+import com.glia.widgets.helper.IntentHelperImpl
 import com.glia.widgets.helper.ResourceProvider
 import com.glia.widgets.helper.rx.GliaWidgetsSchedulers
 import com.glia.widgets.helper.rx.Schedulers
@@ -43,19 +43,23 @@ internal object Dependencies {
     @JvmStatic
     val gliaThemeManager = UnifiedThemeManager()
     private val authenticationManagerProvider = AuthenticationManagerProvider()
+
     @JvmStatic
     lateinit var controllerFactory: ControllerFactory
         @VisibleForTesting set
     private lateinit var notificationManager: INotificationManager
+
     @JvmStatic
     lateinit var callVisualizerManager: CallVisualizerManager
         private set
+
     @JvmStatic
     lateinit var useCaseFactory: UseCaseFactory
         @VisibleForTesting set
     private lateinit var managerFactory: ManagerFactory
     var gliaCore: GliaCore = GliaCoreImpl()
         @VisibleForTesting set
+
     @JvmStatic
     lateinit var resourceProvider: ResourceProvider
         @VisibleForTesting set
@@ -63,10 +67,13 @@ internal object Dependencies {
         @VisibleForTesting set
     var schedulers: Schedulers = GliaWidgetsSchedulers()
         @VisibleForTesting set
+
     @JvmStatic
     var sdkConfigurationManager: GliaSdkConfigurationManager = GliaSdkConfigurationManager()
         @VisibleForTesting set
-    val intentConfigurationHelper: IntentConfigurationHelper = IntentConfigurationHelperImpl()
+
+    val intentHelper: IntentHelper by lazy { IntentHelperImpl(sdkConfigurationManager) }
+
     @JvmStatic
     lateinit var repositoryFactory: RepositoryFactory
         @VisibleForTesting set
@@ -119,14 +126,16 @@ internal object Dependencies {
             controllerFactory.callVisualizerController,
             GliaActivityManagerImpl(),
             localeProvider,
-            gliaThemeManager
+            gliaThemeManager,
+            intentHelper
         )
 
         application.registerActivityLifecycleCallbacks(callVisualizerActivityWatcher)
 
         val activityWatcherForChatHead = ActivityWatcherForChatHead(
-                controllerFactory.activityWatcherForChatHeadController
-            )
+            controllerFactory.activityWatcherForChatHeadController,
+            intentHelper
+        )
         application.registerActivityLifecycleCallbacks(activityWatcherForChatHead)
 
         val activityWatcherForLiveObservation = ActivityWatcherForLiveObservation(
@@ -137,8 +146,8 @@ internal object Dependencies {
         application.registerActivityLifecycleCallbacks(activityWatcherForLiveObservation)
 
         val activityWatcherForPermissionsRequest = ActivityWatcherForPermissionsRequest(
-                controllerFactory.permissionsController
-            )
+            controllerFactory.permissionsController
+        )
         application.registerActivityLifecycleCallbacks(activityWatcherForPermissionsRequest)
 
         callVisualizerManager = CallVisualizerManager(
@@ -154,7 +163,7 @@ internal object Dependencies {
 
         val operatorRequestActivityWatcher = OperatorRequestActivityWatcher(
             controllerFactory.operatorRequestController,
-            intentConfigurationHelper,
+            intentHelper,
             GliaActivityManagerImpl()
         )
         application.registerActivityLifecycleCallbacks(operatorRequestActivityWatcher)

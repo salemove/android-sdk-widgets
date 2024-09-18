@@ -25,12 +25,13 @@ import com.glia.widgets.engagement.completion.EngagementCompletionActivityWatche
 import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource
 import com.glia.widgets.helper.ApplicationLifecycleManager
 import com.glia.widgets.helper.GliaActivityManagerImpl
-import com.glia.widgets.helper.IntentHelper
 import com.glia.widgets.helper.IntentHelperImpl
 import com.glia.widgets.helper.ResourceProvider
 import com.glia.widgets.helper.rx.GliaWidgetsSchedulers
 import com.glia.widgets.helper.rx.Schedulers
 import com.glia.widgets.locale.LocaleProvider
+import com.glia.widgets.navigation.ActivityLauncher
+import com.glia.widgets.navigation.ActivityLauncherImpl
 import com.glia.widgets.operator.OperatorRequestActivityWatcher
 import com.glia.widgets.permissions.ActivityWatcherForPermissionsRequest
 import com.glia.widgets.view.head.ActivityWatcherForChatHead
@@ -72,7 +73,7 @@ internal object Dependencies {
     var sdkConfigurationManager: GliaSdkConfigurationManager = GliaSdkConfigurationManager()
         @VisibleForTesting set
 
-    val intentHelper: IntentHelper by lazy { IntentHelperImpl(sdkConfigurationManager) }
+    internal val activityLauncher: ActivityLauncher by lazy { ActivityLauncherImpl(IntentHelperImpl(sdkConfigurationManager)) }
 
     @JvmStatic
     lateinit var repositoryFactory: RepositoryFactory
@@ -127,14 +128,14 @@ internal object Dependencies {
             GliaActivityManagerImpl(),
             localeProvider,
             gliaThemeManager,
-            intentHelper
+            activityLauncher
         )
 
         application.registerActivityLifecycleCallbacks(callVisualizerActivityWatcher)
 
         val activityWatcherForChatHead = ActivityWatcherForChatHead(
             controllerFactory.activityWatcherForChatHeadController,
-            intentHelper
+            activityLauncher
         )
         application.registerActivityLifecycleCallbacks(activityWatcherForChatHead)
 
@@ -163,7 +164,7 @@ internal object Dependencies {
 
         val operatorRequestActivityWatcher = OperatorRequestActivityWatcher(
             controllerFactory.operatorRequestController,
-            intentHelper,
+            activityLauncher,
             GliaActivityManagerImpl()
         )
         application.registerActivityLifecycleCallbacks(operatorRequestActivityWatcher)

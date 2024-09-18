@@ -747,7 +747,7 @@ internal class ChatController(
             if (!isSecureEngagement && !isQueueingOrOngoingEngagement) {
                 viewInitPreQueueing()
             } else {
-                Logger.d(TAG, "Opened empty Secure Conversations chat")
+                Logger.d(TAG, "Opened empty Secure Messaging chat")
             }
         }
 

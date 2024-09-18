@@ -4,7 +4,6 @@ import android.COMMON_EXTENSIONS_CLASS_PATH
 import android.CONTEXT_EXTENSIONS_CLASS_PATH
 import android.LOGGER_PATH
 import android.app.Activity
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.targetActivityName
@@ -14,7 +13,7 @@ import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import com.glia.androidsdk.Engagement
+import com.glia.androidsdk.Engagement.MediaType
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.widgets.UiTheme
 import com.glia.widgets.call.CallActivity
@@ -22,15 +21,16 @@ import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.engagement.domain.MediaUpgradeOfferData
 import com.glia.widgets.helper.DialogHolderActivity
 import com.glia.widgets.helper.GliaActivityManager
-import com.glia.widgets.helper.IntentHelper
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.OneTimeEvent
 import com.glia.widgets.helper.showToast
 import com.glia.widgets.helper.withRuntimeTheme
+import com.glia.widgets.navigation.ActivityLauncher
 import com.glia.widgets.view.Dialogs
 import io.mockk.Runs
 import io.mockk.confirmVerified
 import io.mockk.every
+import io.mockk.invoke
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.mockkObject
@@ -51,7 +51,7 @@ class OperatorRequestActivityWatcherTest {
     private val controllerState: PublishProcessor<OneTimeEvent<OperatorRequestContract.State>> = PublishProcessor.create()
     private lateinit var controller: OperatorRequestContract.Controller
     private lateinit var gliaActivityManager: GliaActivityManager
-    private lateinit var intentHelper: IntentHelper
+    private lateinit var activityLauncher: ActivityLauncher
 
     private lateinit var watcher: OperatorRequestActivityWatcher
 
@@ -65,9 +65,9 @@ class OperatorRequestActivityWatcherTest {
         controller = mockk(relaxUnitFun = true)
         every { controller.state } returns controllerState
         gliaActivityManager = mockk(relaxUnitFun = true)
-        intentHelper = mockk(relaxUnitFun = true)
+        activityLauncher = mockk(relaxed = true)
 
-        watcher = OperatorRequestActivityWatcher(controller, intentHelper, gliaActivityManager)
+        watcher = OperatorRequestActivityWatcher(controller, activityLauncher, gliaActivityManager)
 
         verify { controller.state }
     }
@@ -76,7 +76,7 @@ class OperatorRequestActivityWatcherTest {
     fun tearDown() {
         RxAndroidPlugins.reset()
 
-        confirmVerified(controller, intentHelper)
+        confirmVerified(controller, activityLauncher)
         unmockkStatic(LOGGER_PATH, CONTEXT_EXTENSIONS_CLASS_PATH)
     }
 
@@ -86,7 +86,7 @@ class OperatorRequestActivityWatcherTest {
         val activityFinishing: Activity = mockk(relaxed = true)
         every { activityFinishing.isFinishing } returns true
 
-        val state: OperatorRequestContract.State = OperatorRequestContract.State.OpenCallActivity(Engagement.MediaType.VIDEO)
+        val state: OperatorRequestContract.State = OperatorRequestContract.State.OpenCallActivity(MediaType.VIDEO)
 
         val event: OneTimeEvent<OperatorRequestContract.State> = mockk()
         every { event.value } returns state
@@ -126,52 +126,42 @@ class OperatorRequestActivityWatcherTest {
 
     @Test
     fun `openCallActivity will start CallActivity when current activity is not a CallActivity`() {
-        val intent: Intent = mockk(relaxed = true)
-        every { intentHelper.callIntent(any(), any(), any()) } returns intent
-
         fireState<ChatActivity>(
-            controllerState, watcher, OperatorRequestContract.State.OpenCallActivity(Engagement.MediaType.VIDEO)
+            controllerState,
+            watcher,
+            OperatorRequestContract.State.OpenCallActivity(MediaType.VIDEO)
         ) { event, activity ->
             verify { event.consume(any()) }
             verify { gliaActivityManager.finishActivities() }
-            verify { intentHelper.callIntent(any(), any(), any()) }
-            verify { activity.startActivity(intent) }
+            verify { activityLauncher.launchCall(any(), any<MediaType>()) }
 
-            confirmVerified(intent, activity, event)
+            confirmVerified(activity, event)
         }
     }
 
     @Test
     fun `openCallActivity will start CallActivity when current activity is not a GliaActivity`() {
-        val intent: Intent = mockk(relaxed = true)
-        every { intentHelper.callIntent(any(), any(), any()) } returns intent
-
         fireState<Activity>(
-            controllerState, watcher, OperatorRequestContract.State.OpenCallActivity(Engagement.MediaType.VIDEO)
+            controllerState, watcher, OperatorRequestContract.State.OpenCallActivity(MediaType.VIDEO)
         ) { event, activity ->
             verify { event.consume(any()) }
             verify(exactly = 0) { gliaActivityManager.finishActivities() }
-            verify { intentHelper.callIntent(any(), any(), any()) }
-            verify { activity.startActivity(intent) }
+            verify { activityLauncher.launchCall(any(), any<MediaType>()) }
 
-            confirmVerified(intent, activity, event)
+            confirmVerified(activity, event)
         }
     }
 
     @Test
     fun `openCallActivity will do nothing when current activity is Call Activity`() {
-        val intent: Intent = mockk(relaxed = true)
-        every { intentHelper.callIntent(any(), any(), any()) } returns intent
-
         fireState<CallActivity>(
-            controllerState, watcher, OperatorRequestContract.State.OpenCallActivity(Engagement.MediaType.VIDEO)
+            controllerState, watcher, OperatorRequestContract.State.OpenCallActivity(MediaType.VIDEO)
         ) { event, activity ->
             verify { event.consume(any()) }
             verify(exactly = 0) { gliaActivityManager.finishActivities() }
-            verify(exactly = 0) { intentHelper.callIntent(any(), any(), any()) }
-            verify(exactly = 0) { activity.startActivity(intent) }
+            verify(exactly = 0) { activityLauncher.launchCall(any(), any<MediaType>()) }
 
-            confirmVerified(intent, activity, event)
+            confirmVerified(activity, event)
         }
     }
 
@@ -359,41 +349,31 @@ class OperatorRequestActivityWatcherTest {
 
     @Test
     fun `state OpenOverlayPermissionScreen will open overlay permissions screen when system can handle that intent`() {
-        val componentName: ComponentName = mockk()
-
-        val overlayIntent: Intent = mockk {
-            every { resolveActivity(any()) } returns componentName
-        }
-        every { intentHelper.overlayPermissionIntent(any()) } returns overlayIntent
+        val onSuccessSlot = slot<() -> Unit>()
         fireState<ChatActivity>(
             controllerState,
             watcher,
             OperatorRequestContract.State.OpenOverlayPermissionScreen
         ) { _, activity ->
-            verify { intentHelper.overlayPermissionIntent(eq(activity)) }
-            verify { overlayIntent.resolveActivity(any()) }
-            verify { activity.startActivity(eq(overlayIntent)) }
+            verify { activityLauncher.launchOverlayPermission(activity, capture(onSuccessSlot), any()) }
+            onSuccessSlot.invoke()
             verify { controller.overlayPermissionScreenOpened() }
-            confirmVerified(overlayIntent, componentName, intentHelper)
+            confirmVerified(activityLauncher)
         }
     }
 
     @Test
     fun `state OpenOverlayPermissionScreen will do nothing when system can't handle that intent`() {
-        val overlayIntent: Intent = mockk {
-            every { resolveActivity(any()) } returns null
-        }
-        every { intentHelper.overlayPermissionIntent(any()) } returns overlayIntent
-
+        val onFailureSlot = slot<() -> Unit>()
         fireState<ChatActivity>(
             controllerState,
             watcher,
             OperatorRequestContract.State.OpenOverlayPermissionScreen
         ) { _, activity ->
-            verify { intentHelper.overlayPermissionIntent(eq(activity)) }
-            verify { overlayIntent.resolveActivity(any()) }
+            verify { activityLauncher.launchOverlayPermission(activity, any(), capture(onFailureSlot)) }
+            onFailureSlot.invoke()
             verify { controller.failedToOpenOverlayPermissionScreen() }
-            confirmVerified(overlayIntent, intentHelper)
+            confirmVerified(activityLauncher)
         }
     }
 

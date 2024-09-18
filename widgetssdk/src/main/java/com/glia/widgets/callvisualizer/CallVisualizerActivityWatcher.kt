@@ -7,12 +7,12 @@ import com.glia.widgets.callvisualizer.controller.CallVisualizerContract
 import com.glia.widgets.core.dialog.model.ConfirmationDialogLinks
 import com.glia.widgets.helper.DialogHolderActivity
 import com.glia.widgets.helper.GliaActivityManager
-import com.glia.widgets.helper.IntentHelper
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.OneTimeEvent
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.locale.LocaleProvider
 import com.glia.widgets.locale.LocaleString
+import com.glia.widgets.navigation.ActivityLauncher
 import com.glia.widgets.view.Dialogs
 import com.glia.widgets.view.snackbar.SnackBarDelegate
 import com.glia.widgets.view.snackbar.SnackBarDelegateFactory
@@ -27,7 +27,7 @@ internal class CallVisualizerActivityWatcher(
     gliaActivityManager: GliaActivityManager,
     private val localeProvider: LocaleProvider,
     private val themeManager: UnifiedThemeManager,
-    private val intentHelper: IntentHelper
+    private val activityLauncher: ActivityLauncher
 ) : BaseSingleActivityWatcher(gliaActivityManager) {
 
     init {
@@ -91,7 +91,7 @@ internal class CallVisualizerActivityWatcher(
     }
 
     private fun openWebBrowser(activity: Activity, title: LocaleString, url: String) {
-        activity.startActivity(intentHelper.webBrowserIntent(activity, title, url))
+        activityLauncher.launchWebBrowser(activity, title, url)
     }
 
     private fun showSnackBar(activity: Activity) {

@@ -21,10 +21,10 @@ import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 
 /**
- * This activity is used for displaying the welcome screen for secure conversations.
+ * This activity is used for displaying the welcome screen for secure messaging.
  *
  * Main features:
- * - Returns an error if the visitor is not authenticated or the specified queue does not support secure conversations.
+ * - Returns an error if the visitor is not authenticated or the specified queue does not support secure messaging.
  * - Allows sending asynchronous messages.
  * - Offers the option to access chat history.
  *

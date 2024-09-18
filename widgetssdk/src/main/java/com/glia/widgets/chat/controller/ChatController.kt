@@ -52,8 +52,8 @@ import com.glia.widgets.core.notification.domain.CallNotificationUseCase
 import com.glia.widgets.core.permissions.domain.RequestNotificationPermissionIfPushNotificationsSetUpUseCase
 import com.glia.widgets.core.permissions.domain.WithCameraPermissionUseCase
 import com.glia.widgets.core.permissions.domain.WithReadWritePermissionsUseCase
-import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
 import com.glia.widgets.core.secureconversations.domain.GetAvailableQueueIdsForSecureMessagingUseCase
+import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.EngagementUpdateState
 import com.glia.widgets.engagement.ScreenSharingState
@@ -726,7 +726,7 @@ internal class ChatController(
             if (!isSecureEngagement && !isQueueingOrOngoingEngagement) {
                 viewInitPreQueueing()
             } else {
-                Logger.d(TAG, "Opened empty Secure Conversations chat")
+                Logger.d(TAG, "Opened empty Secure Messaging chat")
             }
         }
 

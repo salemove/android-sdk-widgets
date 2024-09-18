@@ -3,7 +3,7 @@ package com.glia.widgets.filepreview.ui
 import com.glia.widgets.base.BaseController
 import com.glia.widgets.base.BaseView
 
-internal interface FilePreviewContract {
+internal interface ImagePreviewContract {
     interface Controller : BaseController {
         fun onSharePressed()
         fun onDownloadPressed()

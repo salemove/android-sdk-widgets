@@ -13,11 +13,11 @@ import com.glia.androidsdk.Engagement
 import com.glia.widgets.base.BaseSingleActivityWatcher
 import com.glia.widgets.call.CallActivity
 import com.glia.widgets.helper.GliaActivityManager
-import com.glia.widgets.helper.IntentHelper
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.OneTimeEvent
 import com.glia.widgets.helper.isGlia
 import com.glia.widgets.helper.showToast
+import com.glia.widgets.navigation.ActivityLauncher
 import com.glia.widgets.view.Dialogs
 import io.reactivex.rxjava3.core.Flowable
 import java.lang.ref.WeakReference
@@ -27,7 +27,7 @@ private const val TAG = "RequestHandlerActivityWatcher"
 
 internal class OperatorRequestActivityWatcher(
     private val controller: OperatorRequestContract.Controller,
-    private val intentHelper: IntentHelper,
+    private val activityLauncher: ActivityLauncher,
     gliaActivityManager: GliaActivityManager
 ) : BaseSingleActivityWatcher(gliaActivityManager) {
 
@@ -82,14 +82,13 @@ internal class OperatorRequestActivityWatcher(
     }
 
     private fun openOverlayPermissionsScreen(activity: Activity) {
-        val overlayIntent = intentHelper.overlayPermissionIntent(activity)
-
-        if (overlayIntent.resolveActivity(activity.packageManager) != null) {
-            activity.startActivity(overlayIntent)
-            controller.overlayPermissionScreenOpened()
-        } else {
-            controller.failedToOpenOverlayPermissionScreen()
-        }
+        activityLauncher.launchOverlayPermission(
+            context = activity,
+            onSuccess = {
+                controller.overlayPermissionScreenOpened()
+            }, onFailure = {
+                controller.failedToOpenOverlayPermissionScreen()
+            })
     }
 
     private fun enforceComponentActivity(activity: Activity, callback: () -> Unit) {
@@ -137,7 +136,7 @@ internal class OperatorRequestActivityWatcher(
             activity.isGlia -> finishActivities()
         }
 
-        activity.startActivity(intentHelper.callIntent(activity, mediaType))
+        activityLauncher.launchCall(activity, mediaType)
     }
 
     private fun showUpgradeDialog(state: ControllerState.RequestMediaUpgrade, activity: Activity, consumeCallback: () -> Unit) {

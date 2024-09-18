@@ -77,6 +77,16 @@ internal val Activity.isGlia: Boolean
 
 internal val AlertDialog.parentActivity: Activity? get() = context.asActivity()
 
+internal fun Context.safeStartActivity(intent: Intent, onError: () -> Unit) {
+    if (intent.resolveActivity(packageManager) != null) {
+        startActivity(intent)
+    } else {
+        onError()
+    }
+}
+
+internal fun Intent.setSafeFlags(context: Context): Intent = context.asActivity()?.let { this } ?: addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+
 internal inline fun <reified T : Serializable> Intent.getSerializableExtraCompat(key: String): T? =
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         getSerializableExtra(key, T::class.java)

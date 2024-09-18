@@ -1,19 +1,18 @@
 package com.glia.widgets.chat
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.Parcelable
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.base.FadeTransitionActivity
-import com.glia.widgets.call.CallActivity
 import com.glia.widgets.call.CallConfiguration
 import com.glia.widgets.core.configuration.EngagementConfiguration
+import com.glia.widgets.di.Dependencies
 import com.glia.widgets.di.Dependencies.sdkConfigurationManager
+import com.glia.widgets.helper.IntentHelper
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.Utils
@@ -47,6 +46,7 @@ import kotlin.properties.Delegates
  * <pre></pre>
 </pre> */
 class ChatActivity : FadeTransitionActivity() {
+    private val intentHelper: IntentHelper by lazy { Dependencies.intentHelper }
     private var chatView: ChatView by Delegates.notNull()
     private var engagementConfiguration: EngagementConfiguration by Delegates.notNull()
 
@@ -125,7 +125,7 @@ class ChatActivity : FadeTransitionActivity() {
     //TODO: Check why theme attribute is not anymore used
     private fun startCallScreen(theme: UiTheme, mediaType: String) {
         startActivity(
-            CallActivity.getIntent(
+            intentHelper.callIntent(
                 applicationContext,
                 defaultCallConfiguration.copy(mediaType = Utils.toMediaType(mediaType), isUpgradeToCall = true)
             )
@@ -134,52 +134,7 @@ class ChatActivity : FadeTransitionActivity() {
     }
 
     private fun backToCallScreen() {
-        startActivity(CallActivity.getIntent(applicationContext, defaultCallConfiguration))
+        startActivity(intentHelper.callIntent(applicationContext, defaultCallConfiguration))
         finish()
-    }
-
-    /**
-     * Just commenting to avoid lint error, this should be removed in next tasks
-     */
-    companion object {
-        /**
-         * Creates and fills out Intent for starting ChatActivity
-         *
-         * @param context   - Android Context object
-         * @param contextId - Glia visitor context asset ID
-         * @param queueIds  - Queue IDs of the queues you would like to use for your engagements
-         * @return - Intent for Starting ChatActivity
-         */
-        fun getIntent(
-            context: Context,
-            contextId: String?,
-            queueIds: List<String>
-        ): Intent {
-            return Intent(context, ChatActivity::class.java)
-                .putExtra(GliaWidgets.CONTEXT_ASSET_ID, contextId)
-                .putStringArrayListExtra(GliaWidgets.QUEUE_IDS, ArrayList(queueIds))
-        }
-
-        /**
-         * Creates and fills out Intent for starting ChatActivity
-         *
-         * @param context   - Android Context object
-         * @param contextId - Glia visitor context asset ID
-         * @param queueIds  - Queue IDs of the queues you would like to use for your engagements
-         * @param chatType  - Type of chat screen
-         * @return - Intent for Starting ChatActivity
-         */
-        fun getIntent(
-            context: Context,
-            contextId: String?,
-            queueIds: List<String>,
-            chatType: ChatType?
-        ): Intent {
-            return Intent(context, ChatActivity::class.java)
-                .putExtra(GliaWidgets.CONTEXT_ASSET_ID, contextId)
-                .putExtra(GliaWidgets.QUEUE_IDS, ArrayList(queueIds))
-                .putExtra(GliaWidgets.COMPANY_NAME, "Legacy company")
-                .putExtra(GliaWidgets.CHAT_TYPE, chatType as Parcelable?)
-        }
     }
 }

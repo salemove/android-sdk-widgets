@@ -22,7 +22,7 @@ import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.engagement.domain.MediaUpgradeOfferData
 import com.glia.widgets.helper.DialogHolderActivity
 import com.glia.widgets.helper.GliaActivityManager
-import com.glia.widgets.helper.IntentConfigurationHelper
+import com.glia.widgets.helper.IntentHelper
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.OneTimeEvent
 import com.glia.widgets.helper.showToast
@@ -51,7 +51,7 @@ class OperatorRequestActivityWatcherTest {
     private val controllerState: PublishProcessor<OneTimeEvent<OperatorRequestContract.State>> = PublishProcessor.create()
     private lateinit var controller: OperatorRequestContract.Controller
     private lateinit var gliaActivityManager: GliaActivityManager
-    private lateinit var intentConfigurationHelper: IntentConfigurationHelper
+    private lateinit var intentHelper: IntentHelper
 
     private lateinit var watcher: OperatorRequestActivityWatcher
 
@@ -65,9 +65,9 @@ class OperatorRequestActivityWatcherTest {
         controller = mockk(relaxUnitFun = true)
         every { controller.state } returns controllerState
         gliaActivityManager = mockk(relaxUnitFun = true)
-        intentConfigurationHelper = mockk(relaxUnitFun = true)
+        intentHelper = mockk(relaxUnitFun = true)
 
-        watcher = OperatorRequestActivityWatcher(controller, intentConfigurationHelper, gliaActivityManager)
+        watcher = OperatorRequestActivityWatcher(controller, intentHelper, gliaActivityManager)
 
         verify { controller.state }
     }
@@ -76,7 +76,7 @@ class OperatorRequestActivityWatcherTest {
     fun tearDown() {
         RxAndroidPlugins.reset()
 
-        confirmVerified(controller, intentConfigurationHelper)
+        confirmVerified(controller, intentHelper)
         unmockkStatic(LOGGER_PATH, CONTEXT_EXTENSIONS_CLASS_PATH)
     }
 
@@ -127,14 +127,14 @@ class OperatorRequestActivityWatcherTest {
     @Test
     fun `openCallActivity will start CallActivity when current activity is not a CallActivity`() {
         val intent: Intent = mockk(relaxed = true)
-        every { intentConfigurationHelper.createForCall(any(), any(), any()) } returns intent
+        every { intentHelper.callIntent(any(), any(), any()) } returns intent
 
         fireState<ChatActivity>(
             controllerState, watcher, OperatorRequestContract.State.OpenCallActivity(Engagement.MediaType.VIDEO)
         ) { event, activity ->
             verify { event.consume(any()) }
             verify { gliaActivityManager.finishActivities() }
-            verify { intentConfigurationHelper.createForCall(any(), any(), any()) }
+            verify { intentHelper.callIntent(any(), any(), any()) }
             verify { activity.startActivity(intent) }
 
             confirmVerified(intent, activity, event)
@@ -144,14 +144,14 @@ class OperatorRequestActivityWatcherTest {
     @Test
     fun `openCallActivity will start CallActivity when current activity is not a GliaActivity`() {
         val intent: Intent = mockk(relaxed = true)
-        every { intentConfigurationHelper.createForCall(any(), any(), any()) } returns intent
+        every { intentHelper.callIntent(any(), any(), any()) } returns intent
 
         fireState<Activity>(
             controllerState, watcher, OperatorRequestContract.State.OpenCallActivity(Engagement.MediaType.VIDEO)
         ) { event, activity ->
             verify { event.consume(any()) }
             verify(exactly = 0) { gliaActivityManager.finishActivities() }
-            verify { intentConfigurationHelper.createForCall(any(), any(), any()) }
+            verify { intentHelper.callIntent(any(), any(), any()) }
             verify { activity.startActivity(intent) }
 
             confirmVerified(intent, activity, event)
@@ -161,14 +161,14 @@ class OperatorRequestActivityWatcherTest {
     @Test
     fun `openCallActivity will do nothing when current activity is Call Activity`() {
         val intent: Intent = mockk(relaxed = true)
-        every { intentConfigurationHelper.createForCall(any(), any(), any()) } returns intent
+        every { intentHelper.callIntent(any(), any(), any()) } returns intent
 
         fireState<CallActivity>(
             controllerState, watcher, OperatorRequestContract.State.OpenCallActivity(Engagement.MediaType.VIDEO)
         ) { event, activity ->
             verify { event.consume(any()) }
             verify(exactly = 0) { gliaActivityManager.finishActivities() }
-            verify(exactly = 0) { intentConfigurationHelper.createForCall(any(), any(), any()) }
+            verify(exactly = 0) { intentHelper.callIntent(any(), any(), any()) }
             verify(exactly = 0) { activity.startActivity(intent) }
 
             confirmVerified(intent, activity, event)
@@ -364,17 +364,17 @@ class OperatorRequestActivityWatcherTest {
         val overlayIntent: Intent = mockk {
             every { resolveActivity(any()) } returns componentName
         }
-        every { intentConfigurationHelper.createForOverlayPermissionScreen(any()) } returns overlayIntent
+        every { intentHelper.overlayPermissionIntent(any()) } returns overlayIntent
         fireState<ChatActivity>(
             controllerState,
             watcher,
             OperatorRequestContract.State.OpenOverlayPermissionScreen
         ) { _, activity ->
-            verify { intentConfigurationHelper.createForOverlayPermissionScreen(eq(activity)) }
+            verify { intentHelper.overlayPermissionIntent(eq(activity)) }
             verify { overlayIntent.resolveActivity(any()) }
             verify { activity.startActivity(eq(overlayIntent)) }
             verify { controller.overlayPermissionScreenOpened() }
-            confirmVerified(overlayIntent, componentName, intentConfigurationHelper)
+            confirmVerified(overlayIntent, componentName, intentHelper)
         }
     }
 
@@ -383,17 +383,17 @@ class OperatorRequestActivityWatcherTest {
         val overlayIntent: Intent = mockk {
             every { resolveActivity(any()) } returns null
         }
-        every { intentConfigurationHelper.createForOverlayPermissionScreen(any()) } returns overlayIntent
+        every { intentHelper.overlayPermissionIntent(any()) } returns overlayIntent
 
         fireState<ChatActivity>(
             controllerState,
             watcher,
             OperatorRequestContract.State.OpenOverlayPermissionScreen
         ) { _, activity ->
-            verify { intentConfigurationHelper.createForOverlayPermissionScreen(eq(activity)) }
+            verify { intentHelper.overlayPermissionIntent(eq(activity)) }
             verify { overlayIntent.resolveActivity(any()) }
             verify { controller.failedToOpenOverlayPermissionScreen() }
-            confirmVerified(overlayIntent, intentConfigurationHelper)
+            confirmVerified(overlayIntent, intentHelper)
         }
     }
 

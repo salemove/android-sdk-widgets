@@ -19,11 +19,11 @@ import androidx.core.content.FileProvider
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
-import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.widgets.R
 import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.databinding.FilePreviewActivityBinding
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.helper.ExtraKeys
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.SimpleWindowInsetsAndAnimationHandler
 import com.glia.widgets.helper.TAG
@@ -32,6 +32,8 @@ import com.glia.widgets.helper.getParcelable
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.showToast
 import java.io.File
+
+private const val WRITE_PERMISSION_REQUEST_CODE = 110011
 
 /**
  * Glia internal class.
@@ -81,8 +83,8 @@ internal class FilePreviewActivity : AppCompatActivity(), FilePreviewContract.Vi
         if (intent.hasExtra(LOCAL_IMAGE_URI)) {
             filePreviewController?.onLocalImageReceived(intent.getParcelable<Uri>(LOCAL_IMAGE_URI) ?: return)
         } else {
-            val bitmapId = intent.getStringExtra(IMAGE_ID_KEY).orEmpty()
-            val bitmapName = intent.getStringExtra(IMAGE_ID_NAME).orEmpty()
+            val bitmapId = intent.getStringExtra(ExtraKeys.FILE_PREVIEW_IMAGE_ID).orEmpty()
+            val bitmapName = intent.getStringExtra(ExtraKeys.FILE_PREVIEW_IMAGE_NAME).orEmpty()
             filePreviewController?.onImageDataReceived(bitmapId, bitmapName)
             filePreviewController?.onImageRequested()
         }
@@ -216,25 +218,5 @@ internal class FilePreviewActivity : AppCompatActivity(), FilePreviewContract.Vi
 
     override fun engagementEnded() {
         finishAfterTransition()
-    }
-
-    companion object {
-        private const val WRITE_PERMISSION_REQUEST_CODE = 110011
-        private const val IMAGE_ID_KEY = "image_id"
-        private const val IMAGE_ID_NAME = "image_name"
-        private const val LOCAL_IMAGE_URI = "local_image_uri"
-
-        fun intent(context: Context, attachment: AttachmentFile): Intent {
-            return Intent(context, FilePreviewActivity::class.java)
-                .putExtra(IMAGE_ID_KEY, attachment.id)
-                .putExtra(IMAGE_ID_NAME, attachment.name)
-                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-        }
-
-        fun intent(context: Context, attachment: LocalAttachment): Intent {
-            return Intent(context, FilePreviewActivity::class.java)
-                .putExtra(LOCAL_IMAGE_URI, attachment.uri)
-                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-        }
     }
 }

@@ -13,7 +13,7 @@ import com.glia.androidsdk.Engagement
 import com.glia.widgets.base.BaseSingleActivityWatcher
 import com.glia.widgets.call.CallActivity
 import com.glia.widgets.helper.GliaActivityManager
-import com.glia.widgets.helper.IntentConfigurationHelper
+import com.glia.widgets.helper.IntentHelper
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.OneTimeEvent
 import com.glia.widgets.helper.isGlia
@@ -27,7 +27,7 @@ private const val TAG = "RequestHandlerActivityWatcher"
 
 internal class OperatorRequestActivityWatcher(
     private val controller: OperatorRequestContract.Controller,
-    private val intentConfigurationHelper: IntentConfigurationHelper,
+    private val intentHelper: IntentHelper,
     gliaActivityManager: GliaActivityManager
 ) : BaseSingleActivityWatcher(gliaActivityManager) {
 
@@ -82,7 +82,7 @@ internal class OperatorRequestActivityWatcher(
     }
 
     private fun openOverlayPermissionsScreen(activity: Activity) {
-        val overlayIntent = intentConfigurationHelper.createForOverlayPermissionScreen(activity)
+        val overlayIntent = intentHelper.overlayPermissionIntent(activity)
 
         if (overlayIntent.resolveActivity(activity.packageManager) != null) {
             activity.startActivity(overlayIntent)
@@ -137,7 +137,7 @@ internal class OperatorRequestActivityWatcher(
             activity.isGlia -> finishActivities()
         }
 
-        activity.startActivity(intentConfigurationHelper.createForCall(activity, mediaType))
+        activity.startActivity(intentHelper.callIntent(activity, mediaType))
     }
 
     private fun showUpgradeDialog(state: ControllerState.RequestMediaUpgrade, activity: Activity, consumeCallback: () -> Unit) {

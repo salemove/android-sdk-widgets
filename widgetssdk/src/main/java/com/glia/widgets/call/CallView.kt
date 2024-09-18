@@ -34,6 +34,7 @@ import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.databinding.CallButtonsLayoutBinding
 import com.glia.widgets.databinding.CallViewBinding
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.helper.IntentHelper
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.SimpleWindowInsetsAndAnimationHandler
 import com.glia.widgets.helper.TAG
@@ -86,6 +87,7 @@ internal class CallView(
     defStyleAttr,
     defStyleRes
 ), CallContract.View, DialogDelegate by DialogDelegateImpl() {
+    private val intentHelper: IntentHelper by lazy { Dependencies.intentHelper }
 
     private val callTheme: CallTheme? by lazy {
         Dependencies.gliaThemeManager.theme?.callTheme
@@ -609,8 +611,7 @@ internal class CallView(
             positiveButtonClickListener = {
                 resetDialogStateAndDismiss()
                 callController?.overlayPermissionsDialogDismissed()
-                val overlayIntent = Dependencies.intentConfigurationHelper.createForOverlayPermissionScreen(context)
-                this.context.startActivity(overlayIntent)
+                this.context.startActivity(intentHelper.overlayPermissionIntent(context))
             },
             negativeButtonClickListener = {
                 resetDialogStateAndDismiss()

@@ -14,6 +14,7 @@ import com.glia.widgets.core.dialog.model.ConfirmationDialogLinks
 import com.glia.widgets.core.dialog.model.Link
 import com.glia.widgets.helper.DialogHolderActivity
 import com.glia.widgets.helper.GliaActivityManager
+import com.glia.widgets.helper.IntentHelper
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.OneTimeEvent
 import com.glia.widgets.helper.withRuntimeTheme
@@ -50,6 +51,7 @@ class CallVisualizerActivityWatcherTest {
 
     private lateinit var watcher: CallVisualizerActivityWatcher
     private lateinit var mockLocale: LocaleString
+    private lateinit var intentHelper: IntentHelper
 
     @Before
     fun setUp() {
@@ -66,8 +68,9 @@ class CallVisualizerActivityWatcherTest {
         localeProvider = mockk(relaxed = true)
         themeManager = mockk(relaxed = true)
         mockLocale = mockk(relaxed = true)
+        intentHelper = mockk(relaxed = true)
 
-        watcher = CallVisualizerActivityWatcher(controller, gliaActivityManager, localeProvider, themeManager)
+        watcher = CallVisualizerActivityWatcher(controller, gliaActivityManager, localeProvider, themeManager, intentHelper)
         verify { controller.state }
     }
 
@@ -322,9 +325,8 @@ class CallVisualizerActivityWatcherTest {
         val title = mockLocale
         val url = "url"
         val intent: Intent = mockk(relaxed = true)
-        mockkObject(WebBrowserActivity)
 
-        every { WebBrowserActivity.intent(any(), any(), any()) } returns intent
+        every { intentHelper.webBrowserIntent(any(), any(), any()) } returns intent
 
         val activity = emitActivity<DialogHolderActivity>()
         val event = createMockEvent(CallVisualizerContract.State.OpenWebBrowserScreen(title, url))
@@ -338,7 +340,6 @@ class CallVisualizerActivityWatcherTest {
         verify { activity.startActivity(eq(intent)) }
 
         confirmVerified(activity, event)
-        unmockkObject(WebBrowserActivity)
     }
 
     private fun createMockEvent(state: CallVisualizerContract.State, isConsumed: Boolean = false): OneTimeEvent<CallVisualizerContract.State> {

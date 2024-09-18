@@ -12,10 +12,10 @@ import com.glia.widgets.call.CallConfiguration
 import com.glia.widgets.core.configuration.EngagementConfiguration
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.di.Dependencies.sdkConfigurationManager
-import com.glia.widgets.helper.IntentHelper
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.Utils
+import com.glia.widgets.navigation.ActivityLauncher
 import kotlin.properties.Delegates
 
 /**
@@ -46,7 +46,8 @@ import kotlin.properties.Delegates
  * <pre></pre>
 </pre> */
 class ChatActivity : FadeTransitionActivity() {
-    private val intentHelper: IntentHelper by lazy { Dependencies.intentHelper }
+    private val activityLauncher: ActivityLauncher by lazy { Dependencies.activityLauncher }
+
     private var chatView: ChatView by Delegates.notNull()
     private var engagementConfiguration: EngagementConfiguration by Delegates.notNull()
 
@@ -124,17 +125,12 @@ class ChatActivity : FadeTransitionActivity() {
 
     //TODO: Check why theme attribute is not anymore used
     private fun startCallScreen(theme: UiTheme, mediaType: String) {
-        startActivity(
-            intentHelper.callIntent(
-                applicationContext,
-                defaultCallConfiguration.copy(mediaType = Utils.toMediaType(mediaType), isUpgradeToCall = true)
-            )
-        )
+        activityLauncher.launchCall(this, defaultCallConfiguration.copy(mediaType = Utils.toMediaType(mediaType), isUpgradeToCall = true))
         finish()
     }
 
     private fun backToCallScreen() {
-        startActivity(intentHelper.callIntent(applicationContext, defaultCallConfiguration))
+        activityLauncher.launchCall(this, defaultCallConfiguration)
         finish()
     }
 }

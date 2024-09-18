@@ -19,8 +19,8 @@ import com.glia.widgets.engagement.completion.EngagementCompletionContract;
 import com.glia.widgets.engagement.completion.EngagementCompletionController;
 import com.glia.widgets.entrywidget.EntryWidgetContract;
 import com.glia.widgets.entrywidget.EntryWidgetController;
-import com.glia.widgets.filepreview.ui.FilePreviewContract;
-import com.glia.widgets.filepreview.ui.FilePreviewController;
+import com.glia.widgets.filepreview.ui.ImagePreviewContract;
+import com.glia.widgets.filepreview.ui.ImagePreviewController;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
 import com.glia.widgets.messagecenter.MessageCenterContract;
@@ -58,7 +58,7 @@ public class ControllerFactory {
     private final MessagesNotSeenHandler messagesNotSeenHandler;
     private final UseCaseFactory useCaseFactory;
     private final GliaSdkConfigurationManager sdkConfigurationManager;
-    private final FilePreviewContract.Controller filePreviewController;
+    private final ImagePreviewContract.Controller filePreviewController;
     private final ManagerFactory managerFactory;
     private EngagementCompletionContract.Controller engagementCompletionController;
     private ChatContract.Controller retainedChatController;
@@ -81,7 +81,7 @@ public class ControllerFactory {
 
         this.useCaseFactory = useCaseFactory;
         this.dialogController = new DialogController();
-        this.filePreviewController = new FilePreviewController(
+        this.filePreviewController = new ImagePreviewController(
             useCaseFactory.createGetImageFileFromDownloadsUseCase(),
             useCaseFactory.createGetImageFileFromCacheUseCase(),
             useCaseFactory.createPutImageFileToDownloadsUseCase()
@@ -229,7 +229,7 @@ public class ControllerFactory {
         getActivityWatcherForChatHeadController().init();
     }
 
-    public FilePreviewContract.Controller getImagePreviewController() {
+    public ImagePreviewContract.Controller getImagePreviewController() {
         return filePreviewController;
     }
 

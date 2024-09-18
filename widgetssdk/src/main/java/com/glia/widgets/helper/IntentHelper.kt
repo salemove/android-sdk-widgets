@@ -2,6 +2,7 @@
 
 package com.glia.widgets.helper
 
+import android.app.Activity
 import android.content.ClipData
 import android.content.Context
 import android.content.Intent
@@ -23,8 +24,9 @@ import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.chat.ChatType
 import com.glia.widgets.core.configuration.EngagementConfiguration
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager
-import com.glia.widgets.filepreview.ui.FilePreviewActivity
+import com.glia.widgets.filepreview.ui.ImagePreviewActivity
 import com.glia.widgets.locale.LocaleString
+import com.glia.widgets.messagecenter.MessageCenterActivity
 import com.glia.widgets.survey.SurveyActivity
 import com.glia.widgets.webbrowser.WebBrowserActivity
 import java.io.File
@@ -33,8 +35,8 @@ internal object ExtraKeys {
     const val WEB_BROWSER_TITLE = "web_browser_title"
     const val WEB_BROWSER_URL = "web_browser_url"
 
-    const val FILE_PREVIEW_IMAGE_ID = "file_preview_image_id"
-    const val FILE_PREVIEW_IMAGE_NAME = "file_preview_image_name"
+    const val IMAGE_PREVIEW_IMAGE_ID = "image_preview_image_id"
+    const val IMAGE_PREVIEW_IMAGE_NAME = "image_preview_image_name"
 }
 
 internal interface IntentHelper {
@@ -42,13 +44,15 @@ internal interface IntentHelper {
 
     fun chatIntent(context: Context, engagementConfiguration: EngagementConfiguration): Intent
 
-    fun secureConversationsChatIntent(context: Context): Intent
+    fun secureMessagingChatIntent(activity: Activity): Intent
+
+    fun secureMessagingWelcomeScreenIntent(activity: Activity): Intent
 
     fun callIntent(context: Context, mediaType: MediaType, upgradeToCall: Boolean = true): Intent
 
     fun callIntent(context: Context, callConfiguration: CallConfiguration): Intent
 
-    fun filePreviewIntent(context: Context, attachment: AttachmentFile): Intent
+    fun imagePreviewIntent(context: Context, attachment: AttachmentFile): Intent
 
     fun shareImageIntent(context: Context, fileName: String): Intent
 
@@ -91,10 +95,12 @@ internal class IntentHelperImpl(private val configurationManager: GliaSdkConfigu
         .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
         .setSafeFlags(context)
 
-    override fun secureConversationsChatIntent(context: Context): Intent = Intent(context, ChatActivity::class.java)
+    override fun secureMessagingChatIntent(activity: Activity): Intent = Intent(activity, ChatActivity::class.java)
         .putExtra(GliaWidgets.CHAT_TYPE, ChatType.SECURE_MESSAGING as Parcelable)
         .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-        .setSafeFlags(context)
+
+    override fun secureMessagingWelcomeScreenIntent(activity: Activity): Intent = Intent(activity, MessageCenterActivity::class.java)
+        .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
 
     override fun callIntent(context: Context, mediaType: MediaType, upgradeToCall: Boolean): Intent = callIntent(
         context,
@@ -120,10 +126,10 @@ internal class IntentHelperImpl(private val configurationManager: GliaSdkConfigu
             .setSafeFlags(context)
     }
 
-    override fun filePreviewIntent(context: Context, attachment: AttachmentFile): Intent {
-        return Intent(context, FilePreviewActivity::class.java)
-            .putExtra(ExtraKeys.FILE_PREVIEW_IMAGE_ID, attachment.id)
-            .putExtra(ExtraKeys.FILE_PREVIEW_IMAGE_NAME, attachment.name)
+    override fun imagePreviewIntent(context: Context, attachment: AttachmentFile): Intent {
+        return Intent(context, ImagePreviewActivity::class.java)
+            .putExtra(ExtraKeys.IMAGE_PREVIEW_IMAGE_ID, attachment.id)
+            .putExtra(ExtraKeys.IMAGE_PREVIEW_IMAGE_NAME, attachment.name)
             .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
     }
 

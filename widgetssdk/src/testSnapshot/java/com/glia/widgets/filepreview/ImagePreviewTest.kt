@@ -5,13 +5,13 @@ import androidx.annotation.DrawableRes
 import com.android.ide.common.rendering.api.SessionParams
 import com.glia.widgets.R
 import com.glia.widgets.SnapshotTest
-import com.glia.widgets.databinding.FilePreviewActivityBinding
+import com.glia.widgets.databinding.ImagePreviewActivityBinding
 import com.glia.widgets.snapshotutils.SnapshotProviders
 import org.junit.Test
 
-internal class FilePreviewTest : SnapshotTest(
+internal class ImagePreviewTest : SnapshotTest(
     renderingMode = SessionParams.RenderingMode.NORMAL,
-    theme = "Application_Glia_FilePreview_Activity"
+    theme = "Application_Glia_ImagePreview_Activity"
 ), SnapshotProviders {
 
     @Test
@@ -26,14 +26,14 @@ internal class FilePreviewTest : SnapshotTest(
         showDownloadIcon: Boolean = true,
         showShareIcon: Boolean = false,
         @DrawableRes imageRes: Int? = R.drawable.test_banner
-    ): FilePreviewActivityBinding {
+    ): ImagePreviewActivityBinding {
         localeProviderMock()
 
-        val filePreviewActivityBinding = FilePreviewActivityBinding.inflate(layoutInflater)
+        val imagePreviewActivityBinding = ImagePreviewActivityBinding.inflate(layoutInflater)
 
-        filePreviewActivityBinding.toolbar.title = title
+        imagePreviewActivityBinding.toolbar.title = title
 
-        val menu = filePreviewActivityBinding.toolbar.menu
+        val menu = imagePreviewActivityBinding.toolbar.menu
         MenuInflater(context).inflate(R.menu.menu_file_preview, menu)
         menu.findItem(R.id.save_item).also {
             it.isVisible = showDownloadIcon
@@ -42,9 +42,9 @@ internal class FilePreviewTest : SnapshotTest(
             it.isVisible = showShareIcon
         }
 
-        imageRes?.also { filePreviewActivityBinding.filePreviewView.setImageResource(it) }
+        imageRes?.also { imagePreviewActivityBinding.previewView.setImageResource(it) }
 
-        return filePreviewActivityBinding
+        return imagePreviewActivityBinding
     }
 
 }

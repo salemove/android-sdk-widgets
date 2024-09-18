@@ -43,10 +43,10 @@
             android:theme="@style/Application.Glia.Chat.Activity"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".filepreview.ui.FilePreviewActivity"
+            android:name=".filepreview.ui.ImagePreviewActivity"
             android:launchMode="singleTop"
             android:parentActivityName=".chat.ChatActivity"
-            android:theme="@style/Application.Glia.FilePreview.Activity" />
+            android:theme="@style/Application.Glia.ImagePreview.Activity" />
         <activity
             android:name=".call.CallActivity"
             android:launchMode="singleTask"

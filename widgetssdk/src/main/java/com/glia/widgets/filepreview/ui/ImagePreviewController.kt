@@ -5,16 +5,16 @@ import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseC
 import com.glia.widgets.filepreview.domain.usecase.PutImageFileToDownloadsUseCase
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 
-internal class FilePreviewController @JvmOverloads constructor(
+internal class ImagePreviewController @JvmOverloads constructor(
     private val getImageFileFromDownloadsUseCase: GetImageFileFromDownloadsUseCase,
     private val getImageFileFromCacheUseCase: GetImageFileFromCacheUseCase,
     private val putImageFileToDownloadsUseCase: PutImageFileToDownloadsUseCase,
     private var state: State = State(),
     private val disposables: CompositeDisposable = CompositeDisposable()
-) : FilePreviewContract.Controller {
-    private var view: FilePreviewContract.View? = null
+) : ImagePreviewContract.Controller {
+    private var view: ImagePreviewContract.View? = null
 
-    override fun setView(view: FilePreviewContract.View) {
+    override fun setView(view: ImagePreviewContract.View) {
         this.view = view
         state.reset()
     }

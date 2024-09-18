@@ -25,12 +25,12 @@ import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
-class FilePreviewControllerTest {
-    private lateinit var view: FilePreviewContract.View
+class ImagePreviewControllerTest {
+    private lateinit var view: ImagePreviewContract.View
     private lateinit var getImageFileFromDownloadsUseCase: GetImageFileFromDownloadsUseCase
     private lateinit var getImageFileFromCacheUseCase: GetImageFileFromCacheUseCase
     private lateinit var putImageFileToDownloadsUseCase: PutImageFileToDownloadsUseCase
-    private lateinit var filePreviewController: FilePreviewController
+    private lateinit var imagePreviewController: ImagePreviewController
     private lateinit var state: State
 
     @Before
@@ -41,14 +41,14 @@ class FilePreviewControllerTest {
         putImageFileToDownloadsUseCase = mock()
         state = mock()
         mockState()
-        filePreviewController = FilePreviewController(
+        imagePreviewController = ImagePreviewController(
             getImageFileFromDownloadsUseCase,
             getImageFileFromCacheUseCase,
             putImageFileToDownloadsUseCase,
             state,
             mock()
         )
-        filePreviewController.setView(view)
+        imagePreviewController.setView(view)
     }
 
     @After
@@ -63,7 +63,7 @@ class FilePreviewControllerTest {
             BITMAP_ID,
             BITMAP_NAME
         )
-        filePreviewController.onImageDataReceived(BITMAP_ID, BITMAP_NAME)
+        imagePreviewController.onImageDataReceived(BITMAP_ID, BITMAP_NAME)
         verify(view).onStateUpdated(argument.capture())
         assertEquals(BITMAP_ID, argument.lastValue.imageName)
         assertEquals(BITMAP_NAME, argument.lastValue.imageId)
@@ -74,7 +74,7 @@ class FilePreviewControllerTest {
         whenever(state.loadingImageFromDownloads()) doReturn State().loadingImageFromDownloads()
         whenever(getImageFileFromDownloadsUseCase(any())) doReturn Maybe.just(BITMAP)
         val argument = argumentCaptor<State>()
-        filePreviewController.onImageRequested()
+        imagePreviewController.onImageRequested()
         verify(view, times(2)).onStateUpdated(argument.capture())
         val (imageLoadingState, isShowShareButton, isShowDownloadButton) = argument.allValues[0]
         assertEquals(State.ImageLoadingState.LOADING_FROM_DOWNLOADS, imageLoadingState)
@@ -94,7 +94,7 @@ class FilePreviewControllerTest {
         whenever(getImageFileFromDownloadsUseCase(any())) doReturn Maybe.error(EXCEPTION)
         whenever(getImageFileFromCacheUseCase(any())) doReturn Maybe.just(BITMAP)
 
-        filePreviewController.onImageRequested()
+        imagePreviewController.onImageRequested()
         verify(view, Mockito.times(3)).onStateUpdated(argument.capture())
         val (imageLoadingState, isShowShareButton, isShowDownloadButton) = argument.allValues[0]
         assertEquals(State.ImageLoadingState.LOADING_FROM_DOWNLOADS, imageLoadingState)
@@ -118,7 +118,7 @@ class FilePreviewControllerTest {
 
         whenever(getImageFileFromDownloadsUseCase(any())) doReturn Maybe.error(EXCEPTION)
         whenever(getImageFileFromCacheUseCase(any())) doReturn Maybe.error(EXCEPTION)
-        filePreviewController.onImageRequested()
+        imagePreviewController.onImageRequested()
         verify(view, times(3)).onStateUpdated(argument.capture())
         verify(view).showOnImageLoadingFailed()
         val (imageLoadingState, isShowShareButton, isShowDownloadButton) = argument.allValues[0]
@@ -139,8 +139,8 @@ class FilePreviewControllerTest {
             BITMAP_ID,
             BITMAP_NAME
         )
-        filePreviewController.onImageDataReceived(BITMAP_ID, BITMAP_NAME)
-        filePreviewController.onSharePressed()
+        imagePreviewController.onImageDataReceived(BITMAP_ID, BITMAP_NAME)
+        imagePreviewController.onSharePressed()
         verify(view).shareImageFile(BITMAP_ID)
     }
 
@@ -151,7 +151,7 @@ class FilePreviewControllerTest {
 
         whenever(putImageFileToDownloadsUseCase(any(), any())) doReturn Completable.complete()
 
-        filePreviewController.onDownloadPressed()
+        imagePreviewController.onDownloadPressed()
         verify(view).showOnImageSaveSuccess()
         verify(view).onStateUpdated(argument.capture())
         val (imageLoadingState, isShowShareButton, isShowDownloadButton) = argument.lastValue
@@ -163,7 +163,7 @@ class FilePreviewControllerTest {
     @Test
     fun onDownloadPressed_callsShowOnImageSaveFailed_whenDownloadFails() {
         whenever(putImageFileToDownloadsUseCase(any(), any())) doReturn Completable.error(EXCEPTION)
-        filePreviewController.onDownloadPressed()
+        imagePreviewController.onDownloadPressed()
         verify(view).showOnImageSaveFailed()
     }
 

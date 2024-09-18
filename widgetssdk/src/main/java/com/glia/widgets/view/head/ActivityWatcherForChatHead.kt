@@ -2,7 +2,6 @@ package com.glia.widgets.view.head
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Intent
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
@@ -11,15 +10,13 @@ import androidx.core.util.Pair
 import androidx.core.view.contains
 import com.glia.widgets.R
 import com.glia.widgets.base.BaseActivityStackWatcher
-import com.glia.widgets.call.CallActivity
 import com.glia.widgets.call.CallConfiguration
-import com.glia.widgets.callvisualizer.EndScreenSharingActivity
 import com.glia.widgets.callvisualizer.EndScreenSharingView
-import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.chat.ChatView
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.filepreview.ui.FilePreviewView
 import com.glia.widgets.helper.DialogHolderView
+import com.glia.widgets.helper.IntentHelper
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.WeakReferenceDelegate
@@ -29,7 +26,8 @@ import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadContract
 
 @SuppressLint("CheckResult")
 internal class ActivityWatcherForChatHead(
-    val controller: ActivityWatcherForChatHeadContract.Controller
+    val controller: ActivityWatcherForChatHeadContract.Controller,
+    private val intentHelper: IntentHelper
 ) : BaseActivityStackWatcher(), ActivityWatcherForChatHeadContract.Watcher {
 
     init {
@@ -179,9 +177,8 @@ internal class ActivityWatcherForChatHead(
 
     private fun navigateToChat(activity: Activity?) {
         activity?.let {
-            val intent = ChatActivity.getIntent(
+            val intent = intentHelper.chatIntent(
                 it,
-                null, // No need to set contextId because engagement is already ongoing
                 emptyList() // No need to set queueId because engagement is already ongoing
             )
             it.startActivity(intent)
@@ -189,14 +186,12 @@ internal class ActivityWatcherForChatHead(
     }
 
     private fun navigateToEndScreenSharing(activity: Activity?) {
-        val intent = Intent(activity, EndScreenSharingActivity::class.java)
-        // No need to set contextId because engagement is already ongoing
-        activity?.startActivity(intent)
+        activity?.startActivity(intentHelper.endScreenSharingIntent(activity))
     }
 
     private fun navigateToCall(activity: Activity?) {
         activity?.let {
-            val intent = CallActivity.getIntent(
+            val intent = intentHelper.callIntent(
                 it,
                 getDefaultCallConfiguration().copy(isUpgradeToCall = true)
             )

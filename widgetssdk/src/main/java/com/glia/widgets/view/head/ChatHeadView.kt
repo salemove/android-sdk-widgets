@@ -2,7 +2,6 @@ package com.glia.widgets.view.head
 
 import android.app.Service
 import android.content.Context
-import android.content.Intent
 import android.content.res.TypedArray
 import android.graphics.PorterDuff
 import android.util.AttributeSet
@@ -14,18 +13,15 @@ import androidx.core.view.AccessibilityDelegateCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.core.view.isVisible
-import com.glia.widgets.GliaWidgets
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
-import com.glia.widgets.call.CallActivity
 import com.glia.widgets.call.CallConfiguration
-import com.glia.widgets.callvisualizer.EndScreenSharingActivity
-import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase
 import com.glia.widgets.core.configuration.EngagementConfiguration
 import com.glia.widgets.databinding.ChatHeadViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
+import com.glia.widgets.helper.IntentHelper
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.helper.addColorFilter
 import com.glia.widgets.helper.getColorCompat
@@ -53,6 +49,7 @@ internal class ChatHeadView @JvmOverloads constructor(
     defStyleAttr,
     defStyleRes
 ), ChatHeadContract.View {
+    private val intentHelper: IntentHelper by lazy { Dependencies.intentHelper }
     private val binding by lazy { ChatHeadViewBinding.inflate(layoutInflater, this) }
     private var engagementConfiguration: EngagementConfiguration? = null
     private var configuration: ChatHeadConfiguration by Delegates.notNull()
@@ -94,7 +91,7 @@ internal class ChatHeadView @JvmOverloads constructor(
 
     override fun showUnreadMessageCount(count: Int) {
         post {
-            if (isCallVisualizerUseCase.invoke()) {
+            if (isCallVisualizerUseCase()) {
                 binding.chatBubbleBadge.isVisible = false
             } else {
                 binding.chatBubbleBadge.apply {
@@ -190,21 +187,19 @@ internal class ChatHeadView @JvmOverloads constructor(
 
     override fun navigateToChat() {
         engagementConfiguration?.let {
-            context.startActivity(getNavigationIntent(context, ChatActivity::class.java, it))
+            context.startActivity(intentHelper.chatIntent(context, it))
         }
     }
 
     override fun navigateToCall() {
         val activityConfig = CallConfiguration(engagementConfiguration)
 
-        val intent = CallActivity.getIntent(context, activityConfig)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        val intent = intentHelper.callIntent(context, activityConfig)
         context.startActivity(intent)
     }
 
     override fun navigateToEndScreenSharing() {
-        val intent = Intent(context, EndScreenSharingActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        val intent = intentHelper.endScreenSharingIntent(context)
         context.startActivity(intent)
     }
 
@@ -324,17 +319,5 @@ internal class ChatHeadView @JvmOverloads constructor(
     companion object {
         @JvmStatic
         fun getInstance(context: Context): ChatHeadView = ChatHeadView(context)
-
-        @JvmStatic
-        private fun getNavigationIntent(
-            context: Context,
-            cls: Class<*>,
-            engagementConfiguration: EngagementConfiguration
-        ): Intent = Intent(context, cls)
-            .putExtra(GliaWidgets.QUEUE_IDS, engagementConfiguration.queueIds?.let { ArrayList(it) })
-            .putExtra(GliaWidgets.CONTEXT_ASSET_ID, engagementConfiguration.contextAssetId)
-            .putExtra(GliaWidgets.UI_THEME, engagementConfiguration.runTimeTheme)
-            .putExtra(GliaWidgets.SCREEN_SHARING_MODE, engagementConfiguration.screenSharingMode)
-            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
 }

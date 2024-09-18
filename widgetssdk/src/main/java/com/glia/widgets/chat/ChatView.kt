@@ -44,7 +44,6 @@ import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.databinding.ChatViewBinding
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.helper.IntentHelper
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.SimpleTextWatcher
 import com.glia.widgets.helper.SimpleWindowInsetsAndAnimationHandler
@@ -62,10 +61,10 @@ import com.glia.widgets.helper.hideKeyboard
 import com.glia.widgets.helper.insetsController
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.requireActivity
-import com.glia.widgets.helper.safeStartActivity
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.setLocaleHint
 import com.glia.widgets.locale.LocaleString
+import com.glia.widgets.navigation.ActivityLauncher
 import com.glia.widgets.view.Dialogs
 import com.glia.widgets.view.SingleChoiceCardView.OnOptionClickedListener
 import com.glia.widgets.view.dialog.base.DialogDelegate
@@ -87,7 +86,7 @@ import kotlin.properties.Delegates
 internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : ConstraintLayout(
     MaterialThemeOverlay.wrap(context, attrs, defStyleAttr, defStyleRes), attrs, defStyleAttr, defStyleRes
 ), OnFileItemClickListener, OnImageItemClickListener, ChatContract.View, DialogDelegate by DialogDelegateImpl() {
-    private val intentHelper: IntentHelper by lazy { Dependencies.intentHelper }
+    private val activityLauncher: ActivityLauncher by lazy { Dependencies.activityLauncher }
 
     private var controller: ChatContract.Controller? = null
     private var dialogCallback: DialogContract.Controller.Callback? = null
@@ -407,7 +406,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             context.requireActivity(), view, context.getString(R.string.glia_file_preview_transition_name) // Not translatable
         )
 
-        context.startActivity(intentHelper.filePreviewIntent(context, attachmentFile), options.toBundle())
+        activityLauncher.launchImagePreview(context, attachmentFile, options.toBundle())
         insetsController?.hideKeyboard()
     }
 
@@ -429,7 +428,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     }
 
     override fun navigateToWebBrowserActivity(title: LocaleString, url: String) {
-        context.startActivity(intentHelper.webBrowserIntent(context, title, url))
+        activityLauncher.launchWebBrowser(context, title, url)
     }
 
     override fun showEngagementConfirmationDialog() {
@@ -458,21 +457,21 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     }
 
     override fun requestOpenEmailClient(uri: Uri) {
-        context.safeStartActivity(intentHelper.openEmailIntent(uri)) {
+        activityLauncher.launchEmailClient(context, uri) {
             Logger.e(TAG, "No email client, uri - $uri")
             showToast(localeProvider.getString(R.string.error_general))
         }
     }
 
     override fun requestOpenDialer(uri: Uri) {
-        context.safeStartActivity(intentHelper.dialerIntent(uri)) {
+        activityLauncher.launchDialer(context, uri) {
             Logger.e(TAG, "No dialer uri - $uri")
             showToast(localeProvider.getString(R.string.error_general))
         }
     }
 
     override fun requestOpenUri(uri: Uri) {
-        context.safeStartActivity(intentHelper.openUriIntent(uri)) {
+        activityLauncher.launchUri(context, uri) {
             Logger.e(TAG, "No app to open url - $uri")
             showToast(localeProvider.getString(R.string.error_general))
         }
@@ -749,7 +748,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         Dialogs.showOverlayPermissionsDialog(context = context, uiTheme = theme, positiveButtonClickListener = {
             controller?.overlayPermissionsDialogDismissed()
             resetDialogStateAndDismiss()
-            this.context.startActivity(intentHelper.overlayPermissionIntent(context))
+            activityLauncher.launchOverlayPermission(context)
         }, negativeButtonClickListener = {
             controller?.overlayPermissionsDialogDismissed()
             resetDialogStateAndDismiss()
@@ -773,7 +772,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     }
 
     override fun onFileOpenClick(file: AttachmentFile) {
-        context.safeStartActivity(intentHelper.openFileIntent(getContentUriCompat(file.fileName, context), file.contentType)) {
+        activityLauncher.launchFileReader(context, getContentUriCompat(file.fileName, context), file.contentType) {
             showToast(message = localeProvider.getString(R.string.android_file_view_error))
         }
     }

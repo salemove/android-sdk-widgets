@@ -76,7 +76,7 @@
 
     </style>
 
-    <style name="Application.Glia.FilePreview.Activity" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Application.Glia.ImagePreview.Activity" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:windowBackground">@color/glia_black_color</item>
         <item name="gliaIconAppBarBack">@drawable/ic_baseline_arrow_back</item>
         <item name="colorPrimary">@color/glia_black_color</item>

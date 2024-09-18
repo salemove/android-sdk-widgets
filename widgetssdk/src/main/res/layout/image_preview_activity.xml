@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical"
-    tools:context=".filepreview.ui.FilePreviewActivity">
+    tools:context=".filepreview.ui.ImagePreviewActivity">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
@@ -18,8 +18,8 @@
         app:titleCentered="true"
         app:titleTextColor="@color/glia_white_color" />
 
-    <com.glia.widgets.filepreview.ui.FilePreviewView
-        android:id="@+id/file_preview_view"
+    <com.glia.widgets.filepreview.ui.ImagePreviewView
+        android:id="@+id/preview_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:srcCompat="@android:drawable/ic_btn_speak_now" />

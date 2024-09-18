@@ -14,20 +14,20 @@ import com.glia.widgets.call.CallConfiguration
 import com.glia.widgets.callvisualizer.EndScreenSharingView
 import com.glia.widgets.chat.ChatView
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.filepreview.ui.FilePreviewView
+import com.glia.widgets.filepreview.ui.ImagePreviewView
 import com.glia.widgets.helper.DialogHolderView
-import com.glia.widgets.helper.IntentHelper
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.WeakReferenceDelegate
 import com.glia.widgets.helper.hasChildOfType
 import com.glia.widgets.messagecenter.MessageCenterView
+import com.glia.widgets.navigation.ActivityLauncher
 import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadContract
 
 @SuppressLint("CheckResult")
 internal class ActivityWatcherForChatHead(
     val controller: ActivityWatcherForChatHeadContract.Controller,
-    private val intentHelper: IntentHelper
+    private val activityLauncher: ActivityLauncher
 ) : BaseActivityStackWatcher(), ActivityWatcherForChatHeadContract.Watcher {
 
     init {
@@ -152,7 +152,7 @@ internal class ActivityWatcherForChatHead(
         var gliaView: View? = null
         activity?.let {
             gliaView = it.findViewById(R.id.call_view)
-                ?: it.findViewById<FilePreviewView>(R.id.file_preview_view)
+                ?: it.findViewById<ImagePreviewView>(R.id.preview_view)
                     ?: it.findViewById<EndScreenSharingView>(R.id.screen_sharing_screen_view)
         }
         return gliaView != null
@@ -161,7 +161,7 @@ internal class ActivityWatcherForChatHead(
     override fun fetchGliaOrRootView(): View? {
         return resumedActivity?.let {
             return it.findViewById(R.id.call_view)
-                ?: it.findViewById<FilePreviewView>(R.id.file_preview_view)
+                ?: it.findViewById<ImagePreviewView>(R.id.preview_view)
                 ?: it.findViewById<ChatView>(R.id.chat_view)
                 ?: it.findViewById<EndScreenSharingView>(R.id.screen_sharing_screen_view)
                 ?: it.findViewById<MessageCenterView>(R.id.message_center_view)
@@ -176,26 +176,14 @@ internal class ActivityWatcherForChatHead(
         .let(::CallConfiguration)
 
     private fun navigateToChat(activity: Activity?) {
-        activity?.let {
-            val intent = intentHelper.chatIntent(
-                it,
-                emptyList() // No need to set queueId because engagement is already ongoing
-            )
-            it.startActivity(intent)
-        }
+        activity?.also(activityLauncher::launchChat)
     }
 
     private fun navigateToEndScreenSharing(activity: Activity?) {
-        activity?.startActivity(intentHelper.endScreenSharingIntent(activity))
+        activity?.also(activityLauncher::launchEndScreenSharing)
     }
 
     private fun navigateToCall(activity: Activity?) {
-        activity?.let {
-            val intent = intentHelper.callIntent(
-                it,
-                getDefaultCallConfiguration().copy(isUpgradeToCall = true)
-            )
-            it.startActivity(intent)
-        }
+        activity?.also { activityLauncher.launchCall(it, getDefaultCallConfiguration().copy(isUpgradeToCall = true)) }
     }
 }

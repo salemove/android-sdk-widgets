@@ -9,7 +9,7 @@ import com.glia.widgets.engagement.domain.EngagementTypeUseCase
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
 import com.glia.widgets.engagement.domain.ScreenSharingUseCase
-import com.glia.widgets.filepreview.ui.FilePreviewView
+import com.glia.widgets.filepreview.ui.ImagePreviewView
 import com.glia.widgets.helper.DialogHolderView
 import com.glia.widgets.messagecenter.MessageCenterView
 
@@ -52,7 +52,7 @@ internal abstract class IsDisplayBubbleUseCase(
     private fun isGliaView(viewName: String?): Boolean {
         return viewName == ChatView::class.java.simpleName ||
             viewName == CallView::class.java.simpleName ||
-            viewName == FilePreviewView::class.java.simpleName ||
+            viewName == ImagePreviewView::class.java.simpleName ||
             viewName == EndScreenSharingView::class.java.simpleName ||
             viewName == MessageCenterView::class.java.simpleName ||
             viewName == DialogHolderView::class.java.simpleName

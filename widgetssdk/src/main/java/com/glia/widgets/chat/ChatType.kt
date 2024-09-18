@@ -22,7 +22,7 @@ enum class ChatType : Parcelable {
     LIVE_CHAT,
 
     /**
-     * Secure conversations.
+     * Secure Messaging.
      *
      * It is a secure alternative to SMS and email, which also allows for asynchronous interactions.
      *

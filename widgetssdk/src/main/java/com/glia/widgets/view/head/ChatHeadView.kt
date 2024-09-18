@@ -21,7 +21,6 @@ import com.glia.widgets.core.configuration.EngagementConfiguration
 import com.glia.widgets.databinding.ChatHeadViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
-import com.glia.widgets.helper.IntentHelper
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.helper.addColorFilter
 import com.glia.widgets.helper.getColorCompat
@@ -29,6 +28,7 @@ import com.glia.widgets.helper.getColorStateListCompat
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.load
 import com.glia.widgets.helper.setLocaleContentDescription
+import com.glia.widgets.navigation.ActivityLauncher
 import com.glia.widgets.view.configuration.ChatHeadConfiguration
 import com.glia.widgets.view.unifiedui.applyColorTheme
 import com.glia.widgets.view.unifiedui.applyImageColorTheme
@@ -49,7 +49,7 @@ internal class ChatHeadView @JvmOverloads constructor(
     defStyleAttr,
     defStyleRes
 ), ChatHeadContract.View {
-    private val intentHelper: IntentHelper by lazy { Dependencies.intentHelper }
+    private val activityLauncher: ActivityLauncher by lazy { Dependencies.activityLauncher }
     private val binding by lazy { ChatHeadViewBinding.inflate(layoutInflater, this) }
     private var engagementConfiguration: EngagementConfiguration? = null
     private var configuration: ChatHeadConfiguration by Delegates.notNull()
@@ -187,20 +187,16 @@ internal class ChatHeadView @JvmOverloads constructor(
 
     override fun navigateToChat() {
         engagementConfiguration?.let {
-            context.startActivity(intentHelper.chatIntent(context, it))
+            activityLauncher.launchChat(context, it)
         }
     }
 
     override fun navigateToCall() {
-        val activityConfig = CallConfiguration(engagementConfiguration)
-
-        val intent = intentHelper.callIntent(context, activityConfig)
-        context.startActivity(intent)
+        activityLauncher.launchCall(context, CallConfiguration(engagementConfiguration))
     }
 
     override fun navigateToEndScreenSharing() {
-        val intent = intentHelper.endScreenSharingIntent(context)
-        context.startActivity(intent)
+        activityLauncher.launchEndScreenSharing(context)
     }
 
     private fun createBuildTimeConfiguration(buildTimeTheme: UiTheme): ChatHeadConfiguration {

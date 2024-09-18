@@ -4,6 +4,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.os.Parcelable
 import android.text.InputType
 import android.util.TypedValue
 import android.view.Gravity
@@ -274,12 +275,12 @@ class MainFragment : Fragment() {
 
     private fun navigateToChat(chatType: ChatType) {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-        val intent = ChatActivity.getIntent(
-            requireContext(),
-            getContextAssetIdFromPrefs(sharedPreferences),
-            getQueueIdsFromPrefs(sharedPreferences),
-            chatType
-        )
+        val intent = Intent(requireContext(), ChatActivity::class.java).apply {
+            putExtra(GliaWidgets.CHAT_TYPE, chatType as Parcelable)
+            putExtra(GliaWidgets.CONTEXT_ASSET_ID, getContextAssetIdFromPrefs(sharedPreferences))
+            putExtra(GliaWidgets.QUEUE_IDS, ArrayList(getQueueIdsFromPrefs(sharedPreferences)))
+            setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        }
         startActivity(intent)
     }
 

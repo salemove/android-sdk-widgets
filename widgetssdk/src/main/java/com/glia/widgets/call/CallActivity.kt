@@ -7,10 +7,10 @@ import com.glia.widgets.base.FadeTransitionActivity
 import com.glia.widgets.call.CallView.OnNavigateToChatListener
 import com.glia.widgets.call.CallView.OnNavigateToWebBrowserListener
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.helper.IntentHelper
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.locale.LocaleString
+import com.glia.widgets.navigation.ActivityLauncher
 import kotlin.properties.Delegates
 
 /**
@@ -41,7 +41,7 @@ import kotlin.properties.Delegates
 </pre> *
  */
 class CallActivity : FadeTransitionActivity() {
-    private val intentHelper: IntentHelper by lazy { Dependencies.intentHelper }
+    private val activityLauncher: ActivityLauncher by lazy { Dependencies.activityLauncher }
     private var callConfiguration: CallConfiguration by Delegates.notNull()
     private var callView: CallView by Delegates.notNull()
 
@@ -130,12 +130,8 @@ class CallActivity : FadeTransitionActivity() {
 
     private fun navigateToChat() {
         Logger.d(TAG, "navigateToChat")
-        val newIntent = intentHelper.chatIntent(this, callConfiguration.engagementConfiguration ?: return)
-        startActivity(newIntent)
+        activityLauncher.launchChat(this, callConfiguration.engagementConfiguration ?: return)
     }
 
-    private fun navigateToWebBrowser(title: LocaleString, url: String) {
-        val newIntent = intentHelper.webBrowserIntent(this, title, url)
-        startActivity(newIntent)
-    }
+    private fun navigateToWebBrowser(title: LocaleString, url: String) = activityLauncher.launchWebBrowser(this, title, url)
 }

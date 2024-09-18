@@ -77,11 +77,12 @@ internal val Activity.isGlia: Boolean
 
 internal val AlertDialog.parentActivity: Activity? get() = context.asActivity()
 
-internal fun Context.safeStartActivity(intent: Intent, onError: () -> Unit) {
+internal fun Context.safeStartActivity(intent: Intent, onFailure: () -> Unit, onSuccess: () -> Unit = {}) {
     if (intent.resolveActivity(packageManager) != null) {
         startActivity(intent)
+        onSuccess()
     } else {
-        onError()
+        onFailure()
     }
 }
 

@@ -11,6 +11,8 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import com.glia.widgets.R
 import com.glia.widgets.databinding.EntryWidgetFragmentBinding
+import com.glia.widgets.di.Dependencies
+import com.glia.widgets.entrywidget.adapter.EntryWidgetAdapter
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -32,7 +34,14 @@ internal class EntryWidgetFragment : BottomSheetDialogFragment() {
     ): View {
         val binding = EntryWidgetFragmentBinding.inflate(inflater, container, false)
 
-        EntryWidgetView(requireContext(), EntryWidgetContract.ViewType.BOTTOM_SHEET).also {
+        val entryWidgetsTheme = Dependencies.gliaThemeManager.theme?.entryWidgetTheme
+        val entryWidgetAdapter = EntryWidgetAdapter(EntryWidgetContract.ViewType.BOTTOM_SHEET, entryWidgetsTheme)
+
+        EntryWidgetView(
+            requireContext(),
+            entryWidgetAdapter,
+            entryWidgetsTheme
+        ).also {
             binding.container.addView(it)
             it.onDismissListener = {
                 dismiss()

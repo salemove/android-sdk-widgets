@@ -1,4 +1,4 @@
-package com.glia.widgets.view.unifiedui.webbrowser
+package com.glia.widgets.view.unifiedui.theme.webbrowser
 
 import com.glia.widgets.view.unifiedui.Mergeable
 import com.glia.widgets.view.unifiedui.merge

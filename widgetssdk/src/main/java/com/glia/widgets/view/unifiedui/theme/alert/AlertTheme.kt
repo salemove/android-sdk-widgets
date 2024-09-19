@@ -15,6 +15,7 @@ internal data class AlertTheme(
     val linkButton: ButtonTheme? = null,
     val positiveButton: ButtonTheme? = null,
     val negativeButton: ButtonTheme? = null,
+    val negativeNeutralButton: ButtonTheme? = null,
     val isVerticalAxis: Boolean? = null
 ) : Mergeable<AlertTheme> {
     override fun merge(other: AlertTheme): AlertTheme = AlertTheme(
@@ -26,6 +27,7 @@ internal data class AlertTheme(
         linkButton = linkButton merge other.linkButton,
         positiveButton = positiveButton merge other.positiveButton,
         negativeButton = negativeButton merge other.negativeButton,
+        negativeNeutralButton = negativeNeutralButton merge other.negativeNeutralButton,
         isVerticalAxis = isVerticalAxis merge other.isVerticalAxis
     )
 }

@@ -7,10 +7,24 @@ import com.glia.widgets.databinding.EntryWidgetMediaTypeItemBinding
 import com.glia.widgets.entrywidget.EntryWidgetContract
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.setLocaleText
+import com.glia.widgets.view.unifiedui.applyImageColorTheme
+import com.glia.widgets.view.unifiedui.applyLayerTheme
+import com.glia.widgets.view.unifiedui.applyTextTheme
+import com.glia.widgets.view.unifiedui.theme.entrywidget.MediaTypeItemTheme
 
 internal class EntryWidgetMediaTypeItemViewHolder(
-    private val binding: EntryWidgetMediaTypeItemBinding
+    private val binding: EntryWidgetMediaTypeItemBinding,
+    itemTheme: MediaTypeItemTheme?
 ) : EntryWidgetAdapter.ViewHolder(binding.root) {
+
+    init {
+        itemTheme?.let {
+            binding.root.applyLayerTheme(it.background)
+            binding.title.applyTextTheme(it.title)
+            binding.description.applyTextTheme(it.message)
+            binding.icon.applyImageColorTheme(it.iconColor)
+        }
+    }
 
     override fun bind(itemType: EntryWidgetContract.ItemType, onClickListener: View.OnClickListener) {
         binding.root.setOnClickListener(onClickListener)

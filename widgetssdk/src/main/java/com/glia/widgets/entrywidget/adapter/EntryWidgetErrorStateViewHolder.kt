@@ -6,11 +6,24 @@ import com.glia.widgets.R
 import com.glia.widgets.databinding.EntryWidgetErrorItemBinding
 import com.glia.widgets.entrywidget.EntryWidgetContract
 import com.glia.widgets.helper.setLocaleText
+import com.glia.widgets.view.unifiedui.applyButtonTheme
+import com.glia.widgets.view.unifiedui.applyTextTheme
+import com.glia.widgets.view.unifiedui.theme.base.ButtonTheme
+import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 
 internal class EntryWidgetErrorStateViewHolder(
     private val binding: EntryWidgetErrorItemBinding,
-    private val viewType: EntryWidgetContract.ViewType
+    private val viewType: EntryWidgetContract.ViewType,
+    errorTitleTheme: TextTheme? = null,
+    errorMessageTheme: TextTheme? = null,
+    errorButtonTheme: ButtonTheme? = null
 ) : EntryWidgetAdapter.ViewHolder(binding.root) {
+
+    init {
+        errorTitleTheme?.let { binding.title.applyTextTheme(it) }
+        errorMessageTheme?.let { binding.description.applyTextTheme(it) }
+        errorButtonTheme?.let { binding.button.applyButtonTheme(it) }
+    }
 
     override fun bind(itemType: EntryWidgetContract.ItemType, onClickListener: View.OnClickListener) {
         when (itemType) {

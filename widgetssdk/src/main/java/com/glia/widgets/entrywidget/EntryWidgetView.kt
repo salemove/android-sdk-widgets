@@ -8,28 +8,46 @@ import com.glia.widgets.di.Dependencies
 import com.glia.widgets.entrywidget.adapter.EntryWidgetAdapter
 import com.glia.widgets.entrywidget.adapter.EntryWidgetItemDecoration
 import com.glia.widgets.helper.getDrawableCompat
+import com.glia.widgets.view.unifiedui.applyLayerTheme
+import com.glia.widgets.view.unifiedui.theme.base.ButtonTheme
+import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
+import com.glia.widgets.view.unifiedui.theme.base.TextTheme
+import com.glia.widgets.view.unifiedui.theme.entrywidget.EntryWidgetTheme
+import com.glia.widgets.view.unifiedui.theme.entrywidget.MediaTypeItemsTheme
 
 /**
  * EntryWidgetView provides a way to display the entry points for the user to start a chat, audio call, video call, or secure messaging.
  */
 internal class EntryWidgetView(
     context: Context,
-    viewType: EntryWidgetContract.ViewType
+    val viewAdapter: EntryWidgetAdapter,
+    backgroundTheme: LayerTheme? = null,
+    mediaTypeItemsTheme: MediaTypeItemsTheme? = null,
 ) : RecyclerView(context, null, 0), EntryWidgetContract.View {
+
+    constructor(
+        context: Context,
+        viewAdapter: EntryWidgetAdapter,
+        entryWidgetTheme: EntryWidgetTheme?
+    ) : this(
+        context,
+        viewAdapter,
+        entryWidgetTheme?.background,
+        entryWidgetTheme?.mediaTypeItems,
+    )
+
     var onDismissListener: (() -> Unit)? = null
 
     private lateinit var controller: EntryWidgetContract.Controller
-    private val adapter = EntryWidgetAdapter(viewType).also { setAdapter(it) }
 
     init {
-        layoutManager = LinearLayoutManager(context)
-        getDrawableCompat(R.drawable.bg_entry_widget_divider)?.let {
-            addItemDecoration(EntryWidgetItemDecoration(it))
-        }
-        adapter.onItemClickListener = {
+        setAdapter(viewAdapter)
+        viewAdapter.onItemClickListener = {
             controller.onItemClicked(it)
         }
 
+        disableScrolling()
+        applyTheme(backgroundTheme, mediaTypeItemsTheme)
         setController(Dependencies.controllerFactory.entryWidgetController)
     }
 
@@ -39,10 +57,29 @@ internal class EntryWidgetView(
     }
 
     override fun showItems(items: List<EntryWidgetContract.ItemType>) {
-        adapter.items = items
+        viewAdapter.items = items
     }
 
     override fun dismiss() {
         onDismissListener?.invoke()
+    }
+
+    private fun disableScrolling() {
+        // Entry Widget might be embedded in scrolling views, disabling the scroll for
+        // itself would prevent unintended scrolling behavior in such cases
+        isNestedScrollingEnabled = false
+        layoutManager = object : LinearLayoutManager(context) {
+            override fun canScrollVertically() = false
+        }
+    }
+
+    private fun applyTheme(backgroundTheme: LayerTheme? = null, mediaTypeItemsTheme: MediaTypeItemsTheme? = null) {
+        backgroundTheme?.let { applyLayerTheme(it) }
+        getDrawableCompat(R.drawable.bg_entry_widget_divider)?.let {
+            mediaTypeItemsTheme?.dividerColor?.let { dividerColor ->
+                it.setTint(dividerColor.primaryColor)
+            }
+            addItemDecoration(EntryWidgetItemDecoration(it))
+        }
     }
 }

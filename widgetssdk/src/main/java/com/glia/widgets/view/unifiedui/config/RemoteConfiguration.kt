@@ -5,6 +5,7 @@ import com.glia.widgets.view.unifiedui.config.bubble.BubbleRemoteConfig
 import com.glia.widgets.view.unifiedui.config.call.CallRemoteConfig
 import com.glia.widgets.view.unifiedui.config.callvisualizer.CallVisualizerConfig
 import com.glia.widgets.view.unifiedui.config.chat.ChatRemoteConfig
+import com.glia.widgets.view.unifiedui.config.entrywidget.EntryWidgetRemoteConfig
 import com.glia.widgets.view.unifiedui.config.secureconversations.SecureConversationsConfirmationScreenRemoteConfig
 import com.glia.widgets.view.unifiedui.config.secureconversations.SecureConversationsWelcomeScreenRemoteConfig
 import com.glia.widgets.view.unifiedui.config.snackbar.SnackBarRemoteConfig
@@ -47,7 +48,10 @@ internal data class RemoteConfiguration(
     val snackBarRemoteConfig: SnackBarRemoteConfig?,
 
     @SerializedName("webBrowserScreen")
-    val webBrowserRemoteConfig: WebBrowserRemoteConfig?
+    val webBrowserRemoteConfig: WebBrowserRemoteConfig?,
+
+    @SerializedName("entryWidget")
+    val entryWidgetRemoteConfig: EntryWidgetRemoteConfig?
 ) {
     fun toUnifiedTheme(): UnifiedTheme? {
         val defaultTheme = DefaultTheme(globalColorsConfig?.toColorPallet())
@@ -63,7 +67,8 @@ internal data class RemoteConfiguration(
             secureConversationsConfirmationScreenTheme = secureConversationsConfirmationScreenRemoteConfig
                 ?.toSecureConversationsConfirmationScreenTheme(),
             snackBarTheme = snackBarRemoteConfig?.toSnackBarTheme(),
-            webBrowserTheme = webBrowserRemoteConfig?.toWebBrowserTheme()
+            webBrowserTheme = webBrowserRemoteConfig?.toWebBrowserTheme(),
+            entryWidgetTheme = entryWidgetRemoteConfig?.toEntryWidgetTheme()
         )
 
         return defaultTheme merge unifiedTheme

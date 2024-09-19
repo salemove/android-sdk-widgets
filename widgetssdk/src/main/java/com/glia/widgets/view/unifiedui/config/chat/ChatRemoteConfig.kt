@@ -6,6 +6,7 @@ import com.glia.widgets.view.unifiedui.config.base.LayerRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.TextRemoteConfig
 import com.glia.widgets.view.unifiedui.config.bubble.BubbleRemoteConfig
 import com.glia.widgets.view.unifiedui.config.gva.GvaRemoteConfig
+import com.glia.widgets.view.unifiedui.config.secureconversations.SecureConversationsRemoteConfig
 import com.glia.widgets.view.unifiedui.theme.chat.ChatTheme
 import com.google.gson.annotations.SerializedName
 
@@ -56,7 +57,10 @@ internal data class ChatRemoteConfig(
     val newMessagesDividerTextRemoteConfig: TextRemoteConfig?,
 
     @SerializedName("gva")
-    val gvaRemoteConfig: GvaRemoteConfig?
+    val gvaRemoteConfig: GvaRemoteConfig?,
+
+    @SerializedName("secureConversations")
+    val secureConversationsRemoteConfig: SecureConversationsRemoteConfig?
 ) {
     fun toChatTheme(): ChatTheme = ChatTheme(
         background = background?.toLayerTheme(),
@@ -74,6 +78,7 @@ internal data class ChatRemoteConfig(
         typingIndicator = typingIndicator?.toColorTheme(),
         newMessagesDividerColorTheme = newMessagesDividerColorRemoteConfig?.toColorTheme(),
         newMessagesDividerTextTheme = newMessagesDividerTextRemoteConfig?.toTextTheme(),
-        gva = gvaRemoteConfig?.toGvaTheme()
+        gva = gvaRemoteConfig?.toGvaTheme(),
+        secureConversations = secureConversationsRemoteConfig?.toSecureConversationsTheme()
     )
 }

@@ -8,10 +8,26 @@ import com.glia.widgets.databinding.EntryWidgetMediaTypeItemBinding
 import com.glia.widgets.databinding.EntryWidgetPoweredByItemBinding
 import com.glia.widgets.entrywidget.EntryWidgetContract
 import com.glia.widgets.helper.layoutInflater
+import com.glia.widgets.view.unifiedui.theme.base.ButtonTheme
+import com.glia.widgets.view.unifiedui.theme.base.TextTheme
+import com.glia.widgets.view.unifiedui.theme.entrywidget.EntryWidgetTheme
+import com.glia.widgets.view.unifiedui.theme.entrywidget.MediaTypeItemsTheme
 
 internal class EntryWidgetAdapter(
-    private val viewType: EntryWidgetContract.ViewType
+    private val viewType: EntryWidgetContract.ViewType,
+    private val mediaTypeItemsTheme: MediaTypeItemsTheme? = null,
+    private val errorTitleTheme: TextTheme? = null,
+    private val errorMessageTheme: TextTheme? = null,
+    private val errorButtonTheme: ButtonTheme? = null
 ) : RecyclerView.Adapter<EntryWidgetAdapter.ViewHolder>() {
+
+    constructor(viewType: EntryWidgetContract.ViewType, entryWidgetTheme: EntryWidgetTheme?): this(
+        viewType,
+        entryWidgetTheme?.mediaTypeItems,
+        entryWidgetTheme?.errorTitle,
+        entryWidgetTheme?.errorMessage,
+        entryWidgetTheme?.errorButton
+    )
 
     enum class ViewType {
         CONTACT_ITEM,
@@ -31,13 +47,17 @@ internal class EntryWidgetAdapter(
         return when (viewType) {
             ViewType.ERROR_ITEM.ordinal -> EntryWidgetErrorStateViewHolder(
                 EntryWidgetErrorItemBinding.inflate(parent.layoutInflater, parent, false),
-                viewType = this.viewType
+                viewType = this.viewType,
+                errorTitleTheme = errorTitleTheme,
+                errorMessageTheme = errorMessageTheme,
+                errorButtonTheme = errorButtonTheme
             )
             ViewType.PROVIDED_BY_ITEM.ordinal -> EntryWidgetPoweredByViewHolder(
                 EntryWidgetPoweredByItemBinding.inflate(parent.layoutInflater, parent, false)
             )
             else -> EntryWidgetMediaTypeItemViewHolder(
-                EntryWidgetMediaTypeItemBinding.inflate(parent.layoutInflater, parent, false)
+                EntryWidgetMediaTypeItemBinding.inflate(parent.layoutInflater, parent, false),
+                itemTheme = mediaTypeItemsTheme?.mediaTypeItem
             )
         }
     }

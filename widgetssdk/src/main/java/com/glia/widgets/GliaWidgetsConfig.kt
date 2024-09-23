@@ -58,7 +58,7 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
         requestCode = builder.requestCode
         uiJsonRemoteConfig = builder.uiJsonRemoteConfig
         companyName = builder.companyName
-        screenSharingMode = builder.screenSharingMode ?: DEFAULT_SCREEN_SHARING_MODE
+        screenSharingMode = builder.screenSharingMode
         enableBubbleOutsideApp = builder.enableBubbleOutsideApp
         enableBubbleInsideApp = builder.enableBubbleInsideApp
         uiTheme = builder.uiTheme
@@ -274,9 +274,5 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
         fun build(): GliaWidgetsConfig {
             return GliaWidgetsConfig(this)
         }
-    }
-
-    internal companion object {
-        val DEFAULT_SCREEN_SHARING_MODE = ScreenSharing.Mode.APP_BOUNDED
     }
 }

@@ -21,9 +21,12 @@ import com.glia.widgets.core.visitor.GliaVisitorInfo;
 import com.glia.widgets.core.visitor.GliaWidgetException;
 import com.glia.widgets.core.visitor.VisitorInfoUpdate;
 import com.glia.widgets.di.Dependencies;
+import com.glia.widgets.entrywidget.EntryWidget;
 import com.glia.widgets.helper.Logger;
+import com.glia.widgets.launcher.EngagementLauncher;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.function.Consumer;
 
 import io.reactivex.rxjava3.exceptions.UndeliverableException;
@@ -92,8 +95,9 @@ public class GliaWidgets {
      * the application. However, it will be shown only if the user has accepted the permissions.
      * If false, then overlay permission is not requested and the navigation bubble is shown when the application is active.
      * Default value is true.
+     *
      * @deprecated Use {@link com.glia.widgets.GliaWidgetsConfig#isEnableBubbleOutsideApp() and
-     * @link GliaWidgetsConfig#isEnableBubbleInsideApp()}
+     * {@link GliaWidgetsConfig#isEnableBubbleInsideApp()}
      */
     @Deprecated
     public static final String USE_OVERLAY = "use_overlay";
@@ -153,6 +157,42 @@ public class GliaWidgets {
         setupLoggingMetadata(gliaWidgetsConfig);
         Logger.i(TAG, "Initialize Glia Widgets SDK");
         Dependencies.getGliaThemeManager().applyJsonConfig(gliaWidgetsConfig.uiJsonRemoteConfig);
+    }
+
+    /**
+     * Retrieves an instance of {@link EngagementLauncher}.
+     *
+     * @param queueIds A list of queue IDs to be used for the engagement launcher.
+     *                 When null, the default queues will be used.
+     * @return An instance of {@link EngagementLauncher}.
+     * @throws GliaException with the {@link GliaException.Cause#INVALID_INPUT} if the SDK is not initialized.
+     */
+    @NonNull
+    public synchronized static EngagementLauncher getEngagementLauncher(@Nullable List<String> queueIds) {
+        setupQueueIds(queueIds);
+
+        return Dependencies.getEngagementLauncher();
+    }
+
+    /**
+     * Retrieves an instance of {@link EntryWidget}.
+     *
+     * @param queueIds A list of queue IDs to be used for the entry widget.
+     *                 When null, the default queues will be used.
+     * @return An instance of {@link EntryWidget}.
+     * @throws GliaException with the {@link GliaException.Cause#INVALID_INPUT} if the SDK is not initialized.
+     */
+    @NonNull
+    public synchronized static EntryWidget getEntryWidget(@Nullable List<String> queueIds) {
+        setupQueueIds(queueIds);
+
+        return Dependencies.getEntryWidget();
+    }
+
+    private static void setupQueueIds(@Nullable List<String> queueIds) {
+        Dependencies.glia().ensureInitialized();
+
+        Dependencies.getConfigurationManager().setQueueIds(queueIds);
     }
 
     /**

@@ -177,8 +177,7 @@ public class SurveyController implements SurveyContract.Controller {
                     resetController();
                 }
                 return;
-            } else if (exception instanceof GliaException) {
-                GliaException gliaException = (GliaException) exception;
+            } else if (exception instanceof GliaException gliaException) {
                 if (gliaException.cause == GliaException.Cause.NETWORK_TIMEOUT) {
                     view.onNetworkTimeout();
                 }

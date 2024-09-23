@@ -3,11 +3,9 @@ package com.glia.widgets.core.callvisualizer
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
-import com.glia.androidsdk.GliaException
 import com.glia.widgets.callvisualizer.controller.CallVisualizerContract
 import com.glia.widgets.core.callvisualizer.domain.CallVisualizer
 import com.glia.widgets.core.callvisualizer.domain.VisitorCodeViewBuilderUseCase
-import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.unSafeSubscribe
 
 internal class CallVisualizerManager(

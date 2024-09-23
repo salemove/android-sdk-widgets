@@ -28,7 +28,7 @@ import com.glia.widgets.helper.getColorStateListCompat
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.load
 import com.glia.widgets.helper.setLocaleContentDescription
-import com.glia.widgets.navigation.ActivityLauncher
+import com.glia.widgets.launcher.ActivityLauncher
 import com.glia.widgets.view.configuration.ChatHeadConfiguration
 import com.glia.widgets.view.unifiedui.applyColorTheme
 import com.glia.widgets.view.unifiedui.applyImageColorTheme

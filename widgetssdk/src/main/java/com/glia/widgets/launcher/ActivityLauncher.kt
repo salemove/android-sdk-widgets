@@ -1,4 +1,4 @@
-package com.glia.widgets.navigation
+package com.glia.widgets.launcher
 
 import android.app.Activity
 import android.content.Context
@@ -29,6 +29,7 @@ internal interface ActivityLauncher {
     fun launchUri(context: Context, uri: Uri, onFailure: () -> Unit)
     fun launchFileReader(context: Context, contentUri: Uri, fileContentType: String, onFailure: () -> Unit)
     fun launchShareImage(activity: Activity, fileName: String)
+    fun launchEntryWidget(activity: Activity)
 }
 
 internal class ActivityLauncherImpl(private val intentHelper: IntentHelper) : ActivityLauncher {
@@ -71,5 +72,7 @@ internal class ActivityLauncherImpl(private val intentHelper: IntentHelper) : Ac
         context.safeStartActivity(intentHelper.openFileIntent(contentUri, fileContentType), onFailure)
 
     override fun launchShareImage(activity: Activity, fileName: String) = activity.startActivity(intentHelper.shareImageIntent(activity, fileName))
+
+    override fun launchEntryWidget(activity: Activity) = activity.startActivity(intentHelper.entryWidgetIntent(activity))
 
 }

@@ -9,8 +9,8 @@ import com.glia.widgets.call.CallView.OnNavigateToWebBrowserListener
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
+import com.glia.widgets.launcher.ActivityLauncher
 import com.glia.widgets.locale.LocaleString
-import com.glia.widgets.navigation.ActivityLauncher
 import kotlin.properties.Delegates
 
 /**

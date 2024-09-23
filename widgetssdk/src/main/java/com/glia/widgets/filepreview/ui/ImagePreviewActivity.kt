@@ -25,7 +25,7 @@ import com.glia.widgets.helper.SimpleWindowInsetsAndAnimationHandler
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.showToast
-import com.glia.widgets.navigation.ActivityLauncher
+import com.glia.widgets.launcher.ActivityLauncher
 
 private const val WRITE_PERMISSION_REQUEST_CODE = 110011
 

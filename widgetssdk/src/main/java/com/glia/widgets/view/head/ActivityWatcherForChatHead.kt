@@ -20,8 +20,8 @@ import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.WeakReferenceDelegate
 import com.glia.widgets.helper.hasChildOfType
+import com.glia.widgets.launcher.ActivityLauncher
 import com.glia.widgets.messagecenter.MessageCenterView
-import com.glia.widgets.navigation.ActivityLauncher
 import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadContract
 
 @SuppressLint("CheckResult")

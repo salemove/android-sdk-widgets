@@ -15,7 +15,7 @@ import com.glia.widgets.di.Dependencies.sdkConfigurationManager
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.Utils
-import com.glia.widgets.navigation.ActivityLauncher
+import com.glia.widgets.launcher.ActivityLauncher
 import kotlin.properties.Delegates
 
 /**

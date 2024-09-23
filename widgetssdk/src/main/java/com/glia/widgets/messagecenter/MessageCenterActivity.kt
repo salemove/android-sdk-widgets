@@ -41,8 +41,7 @@ import com.glia.widgets.helper.TAG
  * startActivity(intent);
  * ```
  */
-class MessageCenterActivity :
-    FadeTransitionActivity(),
+class MessageCenterActivity : FadeTransitionActivity(),
     MessageCenterView.OnFinishListener,
     MessageCenterView.OnNavigateToMessagingListener,
     MessageCenterView.OnAttachFileListener {

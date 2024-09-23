@@ -50,10 +50,10 @@ import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.setLocaleHint
 import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.helper.showToast
+import com.glia.widgets.launcher.ActivityLauncher
 import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.locale.StringKey
 import com.glia.widgets.locale.StringKeyPair
-import com.glia.widgets.navigation.ActivityLauncher
 import com.glia.widgets.view.Dialogs
 import com.glia.widgets.view.OperatorStatusView
 import com.glia.widgets.view.dialog.base.DialogDelegate

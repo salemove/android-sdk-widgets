@@ -63,8 +63,8 @@ import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.requireActivity
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.setLocaleHint
+import com.glia.widgets.launcher.ActivityLauncher
 import com.glia.widgets.locale.LocaleString
-import com.glia.widgets.navigation.ActivityLauncher
 import com.glia.widgets.view.Dialogs
 import com.glia.widgets.view.SingleChoiceCardView.OnOptionClickedListener
 import com.glia.widgets.view.dialog.base.DialogDelegate

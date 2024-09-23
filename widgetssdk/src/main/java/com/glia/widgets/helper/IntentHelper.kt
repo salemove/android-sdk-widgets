@@ -24,6 +24,7 @@ import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.chat.ChatType
 import com.glia.widgets.core.configuration.EngagementConfiguration
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager
+import com.glia.widgets.entrywidget.EntryWidgetActivity
 import com.glia.widgets.filepreview.ui.ImagePreviewActivity
 import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.messagecenter.MessageCenterActivity
@@ -71,6 +72,7 @@ internal interface IntentHelper {
     fun openUriIntent(uri: Uri): Intent
 
     fun openFileIntent(contentUri: Uri, fileContentType: String): Intent
+    fun entryWidgetIntent(activity: Activity): Intent
 }
 
 internal class IntentHelperImpl(private val configurationManager: GliaSdkConfigurationManager) : IntentHelper {
@@ -176,4 +178,7 @@ internal class IntentHelperImpl(private val configurationManager: GliaSdkConfigu
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
         setDataAndType(contentUri, fileContentType)
     }
+
+    override fun entryWidgetIntent(activity: Activity): Intent = Intent(activity, EntryWidgetActivity::class.java)
+        .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
 }

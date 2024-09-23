@@ -10,16 +10,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.glia.androidsdk.GliaException;
-import com.glia.androidsdk.RequestCallback;
 import com.glia.androidsdk.visitor.Authentication;
-import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest;
 import com.glia.widgets.chat.adapter.CustomCardAdapter;
 import com.glia.widgets.chat.adapter.WebViewCardAdapter;
 import com.glia.widgets.core.authentication.AuthenticationManager;
 import com.glia.widgets.core.callvisualizer.domain.CallVisualizer;
-import com.glia.widgets.core.visitor.GliaVisitorInfo;
-import com.glia.widgets.core.visitor.GliaWidgetException;
-import com.glia.widgets.core.visitor.VisitorInfoUpdate;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.entrywidget.EntryWidget;
 import com.glia.widgets.helper.Logger;
@@ -27,7 +22,6 @@ import com.glia.widgets.launcher.EngagementLauncher;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.function.Consumer;
 
 import io.reactivex.rxjava3.exceptions.UndeliverableException;
 import io.reactivex.rxjava3.plugins.RxJavaPlugins;
@@ -39,6 +33,7 @@ import io.reactivex.rxjava3.plugins.RxJavaPlugins;
 public class GliaWidgets {
 
     private final static String TAG = "GliaWidgets";
+
     @Nullable
     private static CustomCardAdapter customCardAdapter = new WebViewCardAdapter();
 
@@ -163,53 +158,6 @@ public class GliaWidgets {
     public static void endEngagement() {
         Logger.i(TAG, "End engagement by integrator");
         Dependencies.getUseCaseFactory().getEndEngagementUseCase().invoke(true);
-    }
-
-    /**
-     * Updates the visitor's information
-     * <p>
-     * Updates the visitor's information stored on the server. This information will also be displayed to the operator.
-     *
-     * @deprecated since 1.9.0 use @see {@link com.glia.androidsdk.Glia#updateVisitorInfo(VisitorInfoUpdateRequest, Consumer)}
-     */
-    @Deprecated
-    public static void updateVisitorInfo(VisitorInfoUpdate visitorInfoUpdate, Consumer<GliaWidgetException> exceptionConsumer) {
-        Logger.logDeprecatedMethodUse(TAG, "updateVisitorInfo(VisitorInfoUpdate, Consumer<GliaWidgetException>)");
-        Dependencies.glia().updateVisitorInfo(new VisitorInfoUpdateRequest.Builder()
-            .setName(visitorInfoUpdate.getName())
-            .setEmail(visitorInfoUpdate.getEmail())
-            .setPhone(visitorInfoUpdate.getPhone())
-            .setNote(visitorInfoUpdate.getNote())
-            .setCustomAttributes(visitorInfoUpdate.getCustomAttributes())
-            .setCustomAttrsUpdateMethod(visitorInfoUpdate.getCustomAttrsUpdateMethod())
-            .setNoteUpdateMethod(visitorInfoUpdate.getNoteUpdateMethod())
-            .build(), e -> {
-            if (e != null) {
-                exceptionConsumer.accept(new GliaWidgetException(e.debugMessage, e.cause));
-            } else {
-                exceptionConsumer.accept(null);
-            }
-        });
-    }
-
-    /**
-     * Fetches the visitor's information
-     * <p>
-     * If a visitor is authenticated, the response will include the attributes and tokens fetched from the authentication provider.
-     *
-     * @deprecated since 1.9.0 use @see {@link com.glia.androidsdk.Glia#getVisitorInfo(RequestCallback)}
-     */
-    @Deprecated
-    public static void getVisitorInfo(Consumer<GliaVisitorInfo> visitorCallback, Consumer<GliaWidgetException> exceptionConsumer) {
-        Logger.logDeprecatedMethodUse(TAG, "getVisitorInfo(Consumer<GliaVisitorInfo>, Consumer<GliaWidgetException>)");
-        Dependencies.glia().getVisitorInfo((visitorInfo, e) -> {
-            if (visitorInfo != null) {
-                visitorCallback.accept(new GliaVisitorInfo(visitorInfo));
-            }
-            if (e != null) {
-                exceptionConsumer.accept(new GliaWidgetException(e.debugMessage, e.cause));
-            }
-        });
     }
 
     /**

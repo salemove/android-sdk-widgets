@@ -17,7 +17,7 @@ internal class CallNotificationUseCase(
             video = getVideoDirection(visitorMedia, operatorMedia)
         } catch (error: IllegalStateException) {
             // One of the impossible scenario was detected during parsing of the states which is not supported by current GliaHub
-            Logger.e(TAG, "Unsupported request to show/update/hide media call notification", error)
+            Logger.i(TAG, "Unsupported request to show/update/hide media call notification \nDetails: ${error.message}")
             return
         }
 

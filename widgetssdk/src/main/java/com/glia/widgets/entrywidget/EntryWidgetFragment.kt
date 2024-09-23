@@ -38,9 +38,9 @@ internal class EntryWidgetFragment : BottomSheetDialogFragment() {
         val entryWidgetAdapter = EntryWidgetAdapter(EntryWidgetContract.ViewType.BOTTOM_SHEET, entryWidgetsTheme)
 
         EntryWidgetView(
-            requireContext(),
-            entryWidgetAdapter,
-            entryWidgetsTheme
+            context = requireContext(),
+            viewAdapter = entryWidgetAdapter,
+            entryWidgetTheme = entryWidgetsTheme
         ).also {
             binding.container.addView(it)
             it.onDismissListener = {

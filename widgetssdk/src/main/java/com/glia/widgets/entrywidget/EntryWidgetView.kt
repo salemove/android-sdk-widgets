@@ -9,9 +9,7 @@ import com.glia.widgets.entrywidget.adapter.EntryWidgetAdapter
 import com.glia.widgets.entrywidget.adapter.EntryWidgetItemDecoration
 import com.glia.widgets.helper.getDrawableCompat
 import com.glia.widgets.view.unifiedui.applyLayerTheme
-import com.glia.widgets.view.unifiedui.theme.base.ButtonTheme
 import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
-import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 import com.glia.widgets.view.unifiedui.theme.entrywidget.EntryWidgetTheme
 import com.glia.widgets.view.unifiedui.theme.entrywidget.MediaTypeItemsTheme
 
@@ -20,7 +18,7 @@ import com.glia.widgets.view.unifiedui.theme.entrywidget.MediaTypeItemsTheme
  */
 internal class EntryWidgetView(
     context: Context,
-    val viewAdapter: EntryWidgetAdapter,
+    private val viewAdapter: EntryWidgetAdapter,
     backgroundTheme: LayerTheme? = null,
     mediaTypeItemsTheme: MediaTypeItemsTheme? = null,
 ) : RecyclerView(context, null, 0), EntryWidgetContract.View {

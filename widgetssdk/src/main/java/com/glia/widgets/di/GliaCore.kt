@@ -62,4 +62,10 @@ internal interface GliaCore {
     fun getSiteInfo(callback: RequestCallback<SiteInfo?>)
     fun getOperator(operatorId: String, callback: RequestCallback<Operator?>)
     fun getAuthenticationManager(behavior: Authentication.Behavior): AuthenticationManager
+
+    fun ensureInitialized() {
+        if (!isInitialized) {
+            throw GliaException("Glia SDK is not initialized", GliaException.Cause.INVALID_INPUT)
+        }
+    }
 }

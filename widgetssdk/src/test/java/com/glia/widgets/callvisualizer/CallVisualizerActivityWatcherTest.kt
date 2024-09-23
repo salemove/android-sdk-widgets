@@ -16,9 +16,9 @@ import com.glia.widgets.helper.GliaActivityManager
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.OneTimeEvent
 import com.glia.widgets.helper.withRuntimeTheme
+import com.glia.widgets.launcher.ActivityLauncher
 import com.glia.widgets.locale.LocaleProvider
 import com.glia.widgets.locale.LocaleString
-import com.glia.widgets.navigation.ActivityLauncher
 import com.glia.widgets.view.Dialogs
 import com.glia.widgets.view.unifiedui.theme.UnifiedThemeManager
 import com.glia.widgets.webbrowser.WebBrowserActivity

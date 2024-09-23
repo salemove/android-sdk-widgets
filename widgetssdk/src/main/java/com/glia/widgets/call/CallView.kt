@@ -669,12 +669,6 @@ internal class CallView(
         fun onTitleUpdated(title: LocaleString?)
     }
 
-    @Deprecated("", ReplaceWith("shouldShowMediaEngagementView(isUpgradeToCall)"))
-    fun shouldShowMediaEngagementView() {
-        Logger.logDeprecatedMethodUse(TAG, "shouldShowMediaEngagementView()")
-        shouldShowMediaEngagementView(false)
-    }
-
     fun shouldShowMediaEngagementView(isUpgradeToCall: Boolean) =
         callController?.shouldShowMediaEngagementView(isUpgradeToCall) ?: false
 

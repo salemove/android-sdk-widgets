@@ -10,15 +10,15 @@ import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
 import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
 import com.glia.widgets.view.unifiedui.theme.base.TextInputTheme
 import com.glia.widgets.view.unifiedui.theme.base.TextTheme
-import com.glia.widgets.view.unifiedui.theme.secureconversations.SecureConversationsConfirmationScreenTheme
-import com.glia.widgets.view.unifiedui.theme.secureconversations.SecureConversationsWelcomeScreenTheme
+import com.glia.widgets.view.unifiedui.theme.securemessaging.SecureMessagingConfirmationScreenTheme
+import com.glia.widgets.view.unifiedui.theme.securemessaging.SecureMessagingWelcomeScreenTheme
 
-internal fun SecureConversationsWelcomeScreenTheme(pallet: ColorPallet):
-    SecureConversationsWelcomeScreenTheme {
+internal fun SecureMessagingWelcomeScreenTheme(pallet: ColorPallet):
+    SecureMessagingWelcomeScreenTheme {
     return pallet.let {
         val baseDarkColorText = TextTheme(textColor = pallet.baseDarkColorTheme)
 
-        SecureConversationsWelcomeScreenTheme(
+        SecureMessagingWelcomeScreenTheme(
             headerTheme = PrimaryColorHeaderTheme(it),
             welcomeTitleTheme = baseDarkColorText,
             titleImageTheme = it.primaryColorTheme,
@@ -77,10 +77,10 @@ private fun DefaultInputTheme(
     )
 }
 
-internal fun SecureConversationsConfirmationScreenTheme(pallet: ColorPallet):
-    SecureConversationsConfirmationScreenTheme {
+internal fun SecureMessagingConfirmationScreenTheme(pallet: ColorPallet):
+    SecureMessagingConfirmationScreenTheme {
     return pallet.let {
-        SecureConversationsConfirmationScreenTheme(
+        SecureMessagingConfirmationScreenTheme(
             headerTheme = PrimaryColorHeaderTheme(it),
             backgroundTheme = it.baseLightColorTheme,
             iconColorTheme = it.primaryColorTheme,

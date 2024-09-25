@@ -4405,7 +4405,7 @@
       }
     }
   },
-  "secureConversationsConfirmationScreen": {
+  "secureMessagingConfirmationScreen": {
     "header": {
       "backButton": {
         "background": {
@@ -4716,7 +4716,7 @@
       }
     }
   },
-  "secureConversationsWelcomeScreen": {
+  "secureMessagingWelcomeScreen": {
     "activityIndicatorColor": {
       "type": "fill",
       "value": [

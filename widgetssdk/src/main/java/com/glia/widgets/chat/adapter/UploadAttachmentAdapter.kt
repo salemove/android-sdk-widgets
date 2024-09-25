@@ -93,7 +93,7 @@ internal class ViewHolder(
     private val theme: FileUploadBarTheme? by lazy {
         Dependencies.gliaThemeManager.theme?.run {
             if (isMessageCenter) {
-                secureConversationsWelcomeScreenTheme?.attachmentListTheme
+                secureMessagingWelcomeScreenTheme?.attachmentListTheme
             } else {
                 chatTheme?.input?.fileUploadBar
             }

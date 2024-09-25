@@ -1,4 +1,4 @@
-package com.glia.widgets.view.unifiedui.theme.secureconversations
+package com.glia.widgets.view.unifiedui.theme.securemessaging
 
 import com.glia.widgets.view.unifiedui.Mergeable
 import com.glia.widgets.view.unifiedui.merge
@@ -10,7 +10,7 @@ import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 import com.glia.widgets.view.unifiedui.theme.chat.AttachmentsPopupTheme
 import com.glia.widgets.view.unifiedui.theme.chat.FileUploadBarTheme
 
-internal data class SecureConversationsWelcomeScreenTheme(
+internal data class SecureMessagingWelcomeScreenTheme(
     val headerTheme: HeaderTheme? = null,
     val welcomeTitleTheme: TextTheme? = null,
     val titleImageTheme: ColorTheme? = null,
@@ -33,9 +33,9 @@ internal data class SecureConversationsWelcomeScreenTheme(
     val attachmentListTheme: FileUploadBarTheme? = null,
     val pickMediaTheme: AttachmentsPopupTheme? = null,
     val backgroundTheme: ColorTheme? = null
-) : Mergeable<SecureConversationsWelcomeScreenTheme> {
-    override fun merge(other: SecureConversationsWelcomeScreenTheme): SecureConversationsWelcomeScreenTheme =
-        SecureConversationsWelcomeScreenTheme(
+) : Mergeable<SecureMessagingWelcomeScreenTheme> {
+    override fun merge(other: SecureMessagingWelcomeScreenTheme): SecureMessagingWelcomeScreenTheme =
+        SecureMessagingWelcomeScreenTheme(
             headerTheme = headerTheme merge other.headerTheme,
             welcomeTitleTheme = welcomeTitleTheme merge other.welcomeTitleTheme,
             titleImageTheme = titleImageTheme merge other.titleImageTheme,

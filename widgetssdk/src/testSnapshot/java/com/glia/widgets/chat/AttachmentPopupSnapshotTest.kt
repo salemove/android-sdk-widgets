@@ -39,9 +39,9 @@ class AttachmentPopupSnapshotTest : SnapshotTest(), SnapshotTheme, SnapshotProvi
     }
 
     @Test
-    fun secureConversationsWithUnifiedTheme() {
+    fun secureMessagingWithUnifiedTheme() {
         setupView(
-            unifiedTheme().secureConversationsWelcomeScreenTheme?.pickMediaTheme
+            unifiedTheme().secureMessagingWelcomeScreenTheme?.pickMediaTheme
         ) {
             snapshot(it)
         }

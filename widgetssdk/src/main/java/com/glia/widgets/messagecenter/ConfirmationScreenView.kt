@@ -22,7 +22,7 @@ import com.glia.widgets.view.unifiedui.applyButtonTheme
 import com.glia.widgets.view.unifiedui.applyColorTheme
 import com.glia.widgets.view.unifiedui.applyImageColorTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
-import com.glia.widgets.view.unifiedui.theme.secureconversations.SecureConversationsConfirmationScreenTheme
+import com.glia.widgets.view.unifiedui.theme.securemessaging.SecureMessagingConfirmationScreenTheme
 import com.google.android.material.transition.MaterialFadeThrough
 
 internal class ConfirmationScreenView(
@@ -37,8 +37,8 @@ internal class ConfirmationScreenView(
     defStyleRes
 ) {
 
-    private val unifiedTheme: SecureConversationsConfirmationScreenTheme? by lazy {
-        Dependencies.gliaThemeManager.theme?.secureConversationsConfirmationScreenTheme
+    private val unifiedTheme: SecureMessagingConfirmationScreenTheme? by lazy {
+        Dependencies.gliaThemeManager.theme?.secureMessagingConfirmationScreenTheme
     }
 
     private val binding: MessageCenterConfirmationViewBinding by lazy {

@@ -21,7 +21,6 @@ import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getColorStateListCompat
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.setLocaleContentDescription
-import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.helper.toFileExtensionOrEmpty
 import com.glia.widgets.locale.StringKey
 import com.glia.widgets.locale.StringKeyPair
@@ -94,7 +93,7 @@ internal class ViewHolder(
     private val theme: FileUploadBarTheme? by lazy {
         Dependencies.gliaThemeManager.theme?.run {
             if (isMessageCenter) {
-                secureConversationsWelcomeScreenTheme?.attachmentListTheme
+                secureMessagingWelcomeScreenTheme?.attachmentListTheme
             } else {
                 chatTheme?.input?.fileUploadBar
             }

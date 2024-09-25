@@ -8,7 +8,7 @@ import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
 import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 import com.glia.widgets.view.unifiedui.theme.bubble.BubbleTheme
 import com.glia.widgets.view.unifiedui.theme.gva.GvaTheme
-import com.glia.widgets.view.unifiedui.theme.secureconversations.SecureConversationsTheme
+import com.glia.widgets.view.unifiedui.theme.securemessaging.SecureMessagingTheme
 
 internal data class ChatTheme(
     val background: LayerTheme? = null,
@@ -27,7 +27,7 @@ internal data class ChatTheme(
     val newMessagesDividerColorTheme: ColorTheme? = null,
     val newMessagesDividerTextTheme: TextTheme? = null,
     val gva: GvaTheme? = null,
-    val secureConversations: SecureConversationsTheme? = null
+    val secureMessaging: SecureMessagingTheme? = null
 ) : Mergeable<ChatTheme> {
     override fun merge(other: ChatTheme): ChatTheme = ChatTheme(
         background = background merge other.background,
@@ -46,6 +46,6 @@ internal data class ChatTheme(
         newMessagesDividerColorTheme = newMessagesDividerColorTheme merge other.newMessagesDividerColorTheme,
         newMessagesDividerTextTheme = newMessagesDividerTextTheme merge other.newMessagesDividerTextTheme,
         gva = gva merge other.gva,
-        secureConversations = secureConversations merge other.secureConversations
+        secureMessaging = secureMessaging merge other.secureMessaging
     )
 }

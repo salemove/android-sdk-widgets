@@ -1,13 +1,13 @@
-package com.glia.widgets.view.unifiedui.config.secureconversations
+package com.glia.widgets.view.unifiedui.config.securemessaging
 
 import com.glia.widgets.view.unifiedui.config.base.ButtonRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.ColorLayerRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.HeaderRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.TextRemoteConfig
-import com.glia.widgets.view.unifiedui.theme.secureconversations.SecureConversationsConfirmationScreenTheme
+import com.glia.widgets.view.unifiedui.theme.securemessaging.SecureMessagingConfirmationScreenTheme
 import com.google.gson.annotations.SerializedName
 
-internal data class SecureConversationsConfirmationScreenRemoteConfig(
+internal data class SecureMessagingConfirmationScreenRemoteConfig(
     @SerializedName("header")
     val header: HeaderRemoteConfig?,
     @SerializedName("background")
@@ -21,8 +21,8 @@ internal data class SecureConversationsConfirmationScreenRemoteConfig(
     @SerializedName("checkMessagesButton")
     val checkMessagesButton: ButtonRemoteConfig?
 ) {
-    fun toSecureConversationsConfirmationScreenTheme(): SecureConversationsConfirmationScreenTheme =
-        SecureConversationsConfirmationScreenTheme(
+    fun toSecureMessagingConfirmationScreenTheme(): SecureMessagingConfirmationScreenTheme =
+        SecureMessagingConfirmationScreenTheme(
             headerTheme = header?.toHeaderTheme(),
             backgroundTheme = background?.toColorTheme(),
             iconColorTheme = iconColor?.toColorTheme(),

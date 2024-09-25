@@ -1,13 +1,13 @@
-package com.glia.widgets.view.unifiedui.config.secureconversations
+package com.glia.widgets.view.unifiedui.config.securemessaging
 
+import com.glia.widgets.view.unifiedui.config.base.ColorRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.LayerRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.TextRemoteConfig
-import com.glia.widgets.view.unifiedui.config.base.ColorRemoteConfig
 import com.glia.widgets.view.unifiedui.config.entrywidget.MediaTypeItemsRemoteConfig
-import com.glia.widgets.view.unifiedui.theme.secureconversations.SecureConversationsTheme
+import com.glia.widgets.view.unifiedui.theme.securemessaging.SecureMessagingTheme
 import com.google.gson.annotations.SerializedName
 
-internal data class SecureConversationsRemoteConfig(
+internal data class SecureMessagingRemoteConfig(
     @SerializedName("unavailableStatusBackground")
     val unavailableStatusBackground: LayerRemoteConfig?,
     @SerializedName("unavailableStatusText")
@@ -29,7 +29,7 @@ internal data class SecureConversationsRemoteConfig(
     @SerializedName("mediaTypeItems")
     val mediaTypeItems: MediaTypeItemsRemoteConfig?
 ) {
-    fun toSecureConversationsTheme(): SecureConversationsTheme = SecureConversationsTheme(
+    fun toSecureMessagingTheme(): SecureMessagingTheme = SecureMessagingTheme(
         unavailableStatusBackground = unavailableStatusBackground?.toLayerTheme(),
         unavailableStatusText = unavailableStatusText?.toTextTheme(),
         bottomBannerBackground = bottomBannerBackground?.toLayerTheme(),

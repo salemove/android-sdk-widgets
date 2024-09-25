@@ -6,8 +6,8 @@ import com.glia.widgets.view.unifiedui.config.call.CallRemoteConfig
 import com.glia.widgets.view.unifiedui.config.callvisualizer.CallVisualizerConfig
 import com.glia.widgets.view.unifiedui.config.chat.ChatRemoteConfig
 import com.glia.widgets.view.unifiedui.config.entrywidget.EntryWidgetRemoteConfig
-import com.glia.widgets.view.unifiedui.config.secureconversations.SecureConversationsConfirmationScreenRemoteConfig
-import com.glia.widgets.view.unifiedui.config.secureconversations.SecureConversationsWelcomeScreenRemoteConfig
+import com.glia.widgets.view.unifiedui.config.securemessaging.SecureMessagingConfirmationScreenRemoteConfig
+import com.glia.widgets.view.unifiedui.config.securemessaging.SecureMessagingWelcomeScreenRemoteConfig
 import com.glia.widgets.view.unifiedui.config.snackbar.SnackBarRemoteConfig
 import com.glia.widgets.view.unifiedui.config.survey.SurveyRemoteConfig
 import com.glia.widgets.view.unifiedui.config.webbrowser.WebBrowserRemoteConfig
@@ -38,11 +38,11 @@ internal data class RemoteConfiguration(
     @SerializedName("callVisualizer")
     val callVisualizerRemoteConfig: CallVisualizerConfig?,
 
-    @SerializedName("secureConversationsWelcomeScreen")
-    val secureConversationsWelcomeScreenRemoteConfig: SecureConversationsWelcomeScreenRemoteConfig?,
+    @SerializedName("secureMessagingWelcomeScreen")
+    val secureMessagingWelcomeScreenRemoteConfig: SecureMessagingWelcomeScreenRemoteConfig?,
 
-    @SerializedName("secureConversationsConfirmationScreen")
-    val secureConversationsConfirmationScreenRemoteConfig: SecureConversationsConfirmationScreenRemoteConfig?,
+    @SerializedName("secureMessagingConfirmationScreen")
+    val secureMessagingConfirmationScreenRemoteConfig: SecureMessagingConfirmationScreenRemoteConfig?,
 
     @SerializedName("snackBar")
     val snackBarRemoteConfig: SnackBarRemoteConfig?,
@@ -63,9 +63,9 @@ internal data class RemoteConfiguration(
             chatTheme = chatRemoteConfig?.toChatTheme(),
             surveyTheme = surveyRemoteConfig?.toSurveyTheme(),
             callVisualizerTheme = callVisualizerRemoteConfig?.toCallVisualizerTheme(),
-            secureConversationsWelcomeScreenTheme = secureConversationsWelcomeScreenRemoteConfig?.toSecureConversationsWelcomeScreenTheme(),
-            secureConversationsConfirmationScreenTheme = secureConversationsConfirmationScreenRemoteConfig
-                ?.toSecureConversationsConfirmationScreenTheme(),
+            secureMessagingWelcomeScreenTheme = secureMessagingWelcomeScreenRemoteConfig?.toSecureMessagingWelcomeScreenTheme(),
+            secureMessagingConfirmationScreenTheme = secureMessagingConfirmationScreenRemoteConfig
+                ?.toSecureMessagingConfirmationScreenTheme(),
             snackBarTheme = snackBarRemoteConfig?.toSnackBarTheme(),
             webBrowserTheme = webBrowserRemoteConfig?.toWebBrowserTheme(),
             entryWidgetTheme = entryWidgetRemoteConfig?.toEntryWidgetTheme()

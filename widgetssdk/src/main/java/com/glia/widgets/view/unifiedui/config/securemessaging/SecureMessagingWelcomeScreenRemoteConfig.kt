@@ -1,4 +1,4 @@
-package com.glia.widgets.view.unifiedui.config.secureconversations
+package com.glia.widgets.view.unifiedui.config.securemessaging
 
 import com.glia.widgets.view.unifiedui.config.base.ButtonRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.ColorLayerRemoteConfig
@@ -7,10 +7,10 @@ import com.glia.widgets.view.unifiedui.config.base.TextInputRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.TextRemoteConfig
 import com.glia.widgets.view.unifiedui.config.chat.AttachmentSourceListRemoteConfig
 import com.glia.widgets.view.unifiedui.config.chat.FileUploadBarRemoteConfig
-import com.glia.widgets.view.unifiedui.theme.secureconversations.SecureConversationsWelcomeScreenTheme
+import com.glia.widgets.view.unifiedui.theme.securemessaging.SecureMessagingWelcomeScreenTheme
 import com.google.gson.annotations.SerializedName
 
-internal data class SecureConversationsWelcomeScreenRemoteConfig(
+internal data class SecureMessagingWelcomeScreenRemoteConfig(
     @SerializedName("header")
     val headerRemoteConfig: HeaderRemoteConfig?,
     @SerializedName("welcomeTitle")
@@ -56,8 +56,8 @@ internal data class SecureConversationsWelcomeScreenRemoteConfig(
     @SerializedName("background")
     val backgroundRemoteConfig: ColorLayerRemoteConfig?
 ) {
-    fun toSecureConversationsWelcomeScreenTheme(): SecureConversationsWelcomeScreenTheme =
-        SecureConversationsWelcomeScreenTheme(
+    fun toSecureMessagingWelcomeScreenTheme(): SecureMessagingWelcomeScreenTheme =
+        SecureMessagingWelcomeScreenTheme(
             headerTheme = headerRemoteConfig?.toHeaderTheme(),
             welcomeTitleTheme = welcomeTitleRemoteConfig?.toTextTheme(),
             titleImageTheme = titleImageRemoteConfig?.toColorTheme(),

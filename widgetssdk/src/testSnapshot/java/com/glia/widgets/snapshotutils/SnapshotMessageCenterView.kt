@@ -13,7 +13,6 @@ import com.glia.widgets.messagecenter.MessageCenterState
 import com.glia.widgets.messagecenter.MessageCenterView
 import com.glia.widgets.messagecenter.MessageView
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.util.concurrent.Executor
@@ -84,10 +83,10 @@ internal interface SnapshotMessageCenterView : SnapshotTestLifecycle, SnapshotCo
     }
 
     fun unifiedThemeWithoutWelcomeScreen(): UnifiedTheme = unifiedTheme(R.raw.test_unified_config) { unifiedTheme ->
-        unifiedTheme.remove("secureConversationsWelcomeScreen")
+        unifiedTheme.remove("secureMessagingWelcomeScreen")
     }
 
     fun unifiedThemeWithoutConfirmationScreen(): UnifiedTheme = unifiedTheme(R.raw.test_unified_config) { unifiedTheme ->
-        unifiedTheme.remove("secureConversationsConfirmationScreen")
+        unifiedTheme.remove("secureMessagingConfirmationScreen")
     }
 }

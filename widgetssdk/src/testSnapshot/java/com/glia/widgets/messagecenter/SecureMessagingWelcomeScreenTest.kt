@@ -9,7 +9,7 @@ import com.glia.widgets.snapshotutils.SnapshotStrings
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import org.junit.Test
 
-internal class SecureConversationsWelcomeScreenTest : SnapshotTest(
+internal class SecureMessagingWelcomeScreenTest : SnapshotTest(
     renderingMode = SessionParams.RenderingMode.NORMAL
 ), SnapshotMessageCenterView, SnapshotStrings {
 

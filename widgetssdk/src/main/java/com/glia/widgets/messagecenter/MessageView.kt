@@ -37,7 +37,7 @@ import com.glia.widgets.helper.wrapWithMaterialThemeOverlay
 import com.glia.widgets.view.unifiedui.applyColorTheme
 import com.glia.widgets.view.unifiedui.applyImageColorTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
-import com.glia.widgets.view.unifiedui.theme.secureconversations.SecureConversationsWelcomeScreenTheme
+import com.glia.widgets.view.unifiedui.theme.securemessaging.SecureMessagingWelcomeScreenTheme
 import com.google.android.material.button.MaterialButton
 import java.util.concurrent.Executor
 import kotlin.properties.Delegates
@@ -70,8 +70,8 @@ internal class MessageView(
     private val sendMessageGroup: Group get() = binding.sendMessageGroup
     private val bottomSpace: Space get() = binding.bottomSpace
 
-    private val unifiedTheme: SecureConversationsWelcomeScreenTheme? by lazy {
-        Dependencies.gliaThemeManager.theme?.secureConversationsWelcomeScreenTheme
+    private val unifiedTheme: SecureMessagingWelcomeScreenTheme? by lazy {
+        Dependencies.gliaThemeManager.theme?.secureMessagingWelcomeScreenTheme
     }
 
     private var theme: UiTheme by Delegates.notNull()

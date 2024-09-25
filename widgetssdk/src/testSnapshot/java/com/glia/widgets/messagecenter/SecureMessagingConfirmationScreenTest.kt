@@ -7,7 +7,7 @@ import com.glia.widgets.snapshotutils.SnapshotStrings
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import org.junit.Test
 
-internal class SecureConversationsConfirmationScreenTest : SnapshotTest(
+internal class SecureMessagingConfirmationScreenTest : SnapshotTest(
     renderingMode = SessionParams.RenderingMode.NORMAL
 ), SnapshotMessageCenterView, SnapshotStrings {
 

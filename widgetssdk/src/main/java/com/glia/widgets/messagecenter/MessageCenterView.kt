@@ -108,7 +108,7 @@ internal class MessageCenterView(
         SimpleWindowInsetsAndAnimationHandler(this, appBar) { onKeyboardAnimation(it) }
 
         controller?.ensureMessageCenterAvailability()
-        setupAppBarUnifiedTheme(unifiedTheme?.secureConversationsWelcomeScreenTheme?.headerTheme)
+        setupAppBarUnifiedTheme(unifiedTheme?.secureMessagingWelcomeScreenTheme?.headerTheme)
         appBar?.hideBackButton()
         appBar?.setTitle(LocaleString(R.string.engagement_secure_messaging_title))
         initCallbacks()
@@ -212,7 +212,7 @@ internal class MessageCenterView(
             ColorTheme(getColorCompat(primaryColorId)),
             ColorTheme(getColorCompat(baseLightColorId)),
             null
-        ) merge unifiedTheme?.secureConversationsConfirmationScreenTheme?.headerTheme
+        ) merge unifiedTheme?.secureMessagingConfirmationScreenTheme?.headerTheme
 
         appBar?.resetTheme()
         setupAppBarUnifiedTheme(appBarTheme)

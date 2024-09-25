@@ -2689,7 +2689,7 @@
       }
     }
   },
-  "secureConversationsWelcomeScreen": {
+  "secureMessagingWelcomeScreen": {
     "header": {
       "backButton": {
         "background": {
@@ -3481,7 +3481,7 @@
       "value": ["#8717db", "#091394"]
     }
   },
-  "secureConversationsConfirmationScreen": {
+  "secureMessagingConfirmationScreen": {
     "header": {
       "backButton": {
         "background": {

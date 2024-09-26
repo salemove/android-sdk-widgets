@@ -6,4 +6,11 @@ internal sealed class Data<out T> {
 
     data class Value<out T>(val result: T) : Data<T>()
     object Empty : Data<Nothing>()
+
+    companion object
+}
+
+internal fun <T : Any> Data.Companion.from(value: T?): Data<T> = when (value) {
+    null -> Data.Empty
+    else -> Data.Value(value)
 }

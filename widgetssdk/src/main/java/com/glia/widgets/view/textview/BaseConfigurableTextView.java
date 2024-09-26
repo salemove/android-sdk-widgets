@@ -1,7 +1,6 @@
 package com.glia.widgets.view.textview;
 
 
-import static com.glia.widgets.helper.ContextExtensionsKt.pxToSp;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -13,6 +12,7 @@ import androidx.core.content.res.ResourcesCompat;
 
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
+import com.glia.widgets.helper.ContextExtensions;
 import com.glia.widgets.view.configuration.TextConfiguration;
 import com.google.android.material.textview.MaterialTextView;
 
@@ -48,7 +48,7 @@ public abstract class BaseConfigurableTextView extends MaterialTextView {
                 .textColor(getTextColors())
                 .textColorHighlight(getHighlightColor())
                 .hintColor(getHintTextColors())
-                .textSize(pxToSp(getContext(), getTextSize()))
+            .textSize(ContextExtensions.pxToSp(getContext(), getTextSize()))
                 .build();
     }
 

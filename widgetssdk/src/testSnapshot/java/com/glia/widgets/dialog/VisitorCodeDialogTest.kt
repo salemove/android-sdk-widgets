@@ -4,10 +4,10 @@ import com.glia.androidsdk.omnibrowse.VisitorCode
 import com.glia.widgets.R
 import com.glia.widgets.SnapshotTest
 import com.glia.widgets.UiTheme
-import com.glia.widgets.core.configuration.GliaSdkConfigurationManager
 import com.glia.widgets.di.ControllerFactory
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.snapshotutils.SnapshotProviders
+import com.glia.widgets.snapshotutils.SnapshotThemeConfiguration
 import com.glia.widgets.view.VisitorCodeView
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.google.gson.JsonObject
@@ -18,7 +18,7 @@ import java.util.concurrent.Executor
 
 class VisitorCodeDialogTest : SnapshotTest(
     renderingMode = fullWidthRenderMode
-), SnapshotProviders {
+), SnapshotProviders, SnapshotThemeConfiguration {
 
     // MARK: Show visitor code
 
@@ -220,24 +220,14 @@ class VisitorCodeDialogTest : SnapshotTest(
         unifiedTheme: UnifiedTheme? = null,
         executor: Executor? = Executor(Runnable::run)
     ): VisitorCodeView {
+        setGlobalThemes(uiTheme, unifiedTheme)
         localeProviderMock()
         resourceProviderMock()
 
-        unifiedTheme?.let { Dependencies.gliaThemeManager.theme = it }
-        val configurationManager = GliaSdkConfigurationManager().also {
-            it.uiTheme = uiTheme
-        }
         val controllerFactoryMock: ControllerFactory = mock<ControllerFactory>().also {
             whenever(it.visitorCodeController).thenReturn(mock())
         }
-        Dependencies.sdkConfigurationManager = configurationManager
         Dependencies.controllerFactory = controllerFactoryMock
-
-        setOnEndListener {
-            Dependencies.gliaThemeManager.theme = null
-            Dependencies.sdkConfigurationManager = GliaSdkConfigurationManager()
-//            Dependencies.controllerFactory = null
-        }
 
         return VisitorCodeView(context, executor).apply {
             notifySetupComplete()

@@ -30,10 +30,6 @@ import kotlinx.parcelize.Parcelize
         "The remote configurations approach is more versatile and better suited for future development."
 )
 data class UiTheme(
-    /**
-     * Text to be shown on the top of the app bar in the chat
-     */
-    val appBarTitle: String? = null,
 
     /**
      * Primary color for your brand. Used for example to set the color of the appbar
@@ -372,7 +368,6 @@ data class UiTheme(
 ) : Parcelable, Mergeable<UiTheme> {
 
     private constructor(builder: UiThemeBuilder) : this(
-        appBarTitle = builder.appBarTitle,
         brandPrimaryColor = builder.brandPrimaryColor,
         baseLightColor = builder.baseLightColor,
         baseDarkColor = builder.baseDarkColor,
@@ -439,7 +434,6 @@ data class UiTheme(
     )
 
     override fun merge(other: UiTheme): UiTheme = UiTheme(
-        appBarTitle = appBarTitle merge other.appBarTitle,
         brandPrimaryColor = brandPrimaryColor merge other.brandPrimaryColor,
         baseLightColor = baseLightColor merge other.baseLightColor,
         baseDarkColor = baseDarkColor merge other.baseDarkColor,
@@ -544,11 +538,6 @@ data class UiTheme(
             "The remote configurations approach is more versatile and better suited for future development."
     )
     class UiThemeBuilder {
-        /**
-         * Text to be shown on the top of the app bar in the chat
-         */
-        var appBarTitle: String? = null
-            private set
 
         /**
          * Primary color for your brand. Used for example to set the color of the appbar
@@ -932,10 +921,6 @@ data class UiTheme(
         var gvaQuickReplyTextColor: Int? = null
             private set
 
-        fun setAppBarTitle(appBarTitle: String?) {
-            this.appBarTitle = appBarTitle
-        }
-
         fun setFontRes(@FontRes fontRes: Int?) {
             this.fontRes = fontRes?.takeIf { it != 0 }
         }
@@ -1185,7 +1170,6 @@ data class UiTheme(
         }
 
         fun setTheme(theme: UiTheme) {
-            appBarTitle = theme.appBarTitle
             brandPrimaryColor = theme.brandPrimaryColor
             baseLightColor = theme.baseLightColor
             baseDarkColor = theme.baseDarkColor

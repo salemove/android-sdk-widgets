@@ -22,6 +22,7 @@ import com.glia.widgets.snapshotutils.SnapshotLottie
 import com.glia.widgets.snapshotutils.SnapshotProviders
 import com.glia.widgets.snapshotutils.SnapshotSchedulers
 import com.glia.widgets.snapshotutils.SnapshotTheme
+import com.glia.widgets.snapshotutils.SnapshotThemeConfiguration
 import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContract.FlipButtonState
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.google.gson.JsonObject
@@ -36,7 +37,7 @@ import java.util.concurrent.Executor
 // TODO: move to com.glia.widgets.snapshotutils after CallState refactored
 @Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 internal interface SnapshotCallView : SnapshotContent, SnapshotTheme, SnapshotActivityWindow,
-    SnapshotProviders, SnapshotSchedulers, SnapshotLottie {
+    SnapshotProviders, SnapshotSchedulers, SnapshotLottie, SnapshotThemeConfiguration {
 
     data class Mock(
         val activityMock: SnapshotActivityWindow.Mock,
@@ -58,10 +59,6 @@ internal interface SnapshotCallView : SnapshotContent, SnapshotTheme, SnapshotAc
         whenever(controllerFactoryMock.callController).thenReturn(callControllerMock)
         Dependencies.controllerFactory = controllerFactoryMock
 
-//        setOnEndListener {
-//            Dependencies.controllerFactory = null
-//        }
-
         return Mock(activityMock, schedulersMock, controllerFactoryMock, callControllerMock)
     }
 
@@ -73,16 +70,13 @@ internal interface SnapshotCallView : SnapshotContent, SnapshotTheme, SnapshotAc
 
     fun setupView(
         callState: CallState? = null,
-        companyName: String? = "SnapshotCall Tests",
         executor: Executor? = Executor(Runnable::run),
         unifiedTheme: UnifiedTheme? = null,
         uiTheme: UiTheme? = null,
         callViewCallback: ((CallContract.View, callState: CallState?) -> Unit)? = null
     ): ViewData {
+        setGlobalThemes(uiTheme, unifiedTheme)
         val mock = callViewMock()
-
-        unifiedTheme?.let { Dependencies.gliaThemeManager.theme = it }
-        Dependencies.sdkConfigurationManager.companyName = companyName
 
         val callViewCaptor: KArgumentCaptor<CallContract.View> = argumentCaptor()
 
@@ -91,19 +85,11 @@ internal interface SnapshotCallView : SnapshotContent, SnapshotTheme, SnapshotAc
         val callView = callActivityBinding.callView
         verify(mock.callControllerMock).setView(callViewCaptor.capture())
 
-        callView.setUiTheme(uiTheme)
-
         callView.executor = executor
 
         val callViewContract = callViewCaptor.lastValue
         callState?.let { callViewContract.emitState(it) }
         callViewCallback?.invoke(callViewContract, callState)
-
-        setOnEndListener {
-            Dependencies.gliaThemeManager.theme = null
-            Dependencies.sdkConfigurationManager.companyName = null
-        }
-
         return ViewData(root, callView, mock)
     }
 
@@ -160,6 +146,7 @@ internal interface SnapshotCallView : SnapshotContent, SnapshotTheme, SnapshotAc
     ) = mock<Audio>().also {
         whenever(it.status).thenReturn(status)
     }
+
     fun video(
         status: Media.Status = Media.Status.PLAYING,
         title: String,
@@ -175,7 +162,7 @@ internal interface SnapshotCallView : SnapshotContent, SnapshotTheme, SnapshotAc
         title: String,
         backgroundColor: Int = Color.BLACK,
         textColor: Int = Color.WHITE
-    ) = object:VideoView(context) {
+    ) = object : VideoView(context) {
         init {
             addView(
                 TextView(context).apply {
@@ -203,14 +190,12 @@ internal interface SnapshotCallView : SnapshotContent, SnapshotTheme, SnapshotAc
 
     fun CallState.initCall(
         companyName: String = "Snapshot tests",
-        queueIds: List<String> = listOf("queueId"),
-        visitorContextAssetId: String = "visitorContextAssetId",
         requestedMediaType: Engagement.MediaType = Engagement.MediaType.AUDIO,
         visitorMediaState: VisitorMediaState? = null,
         showFlipVisitorCameraButton: Boolean = false,
         isOnHold: Boolean = false
     ): CallState = this
-        .initCall(companyName, queueIds, visitorContextAssetId, requestedMediaType)
+        .initCall(requestedMediaType)
         .visitorMediaStateChanged(visitorMediaState)
         .setOnHold(isOnHold)
         .landscapeControlsVisibleChanged(false)

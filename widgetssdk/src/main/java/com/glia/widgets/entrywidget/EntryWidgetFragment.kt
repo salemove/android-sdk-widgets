@@ -13,6 +13,7 @@ import com.glia.widgets.R
 import com.glia.widgets.databinding.EntryWidgetFragmentBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.entrywidget.adapter.EntryWidgetAdapter
+import com.glia.widgets.view.unifiedui.applyLayerTheme
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -46,6 +47,10 @@ internal class EntryWidgetFragment : BottomSheetDialogFragment() {
             it.onDismissListener = {
                 dismiss()
             }
+        }
+
+        entryWidgetsTheme?.background?.let {
+            binding.root.applyLayerTheme(it)
         }
 
         return binding.root

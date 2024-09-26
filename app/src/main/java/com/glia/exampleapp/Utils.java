@@ -5,15 +5,12 @@ import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.core.content.ContextCompat;
 
-import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.screensharing.ScreenSharing;
 import com.glia.androidsdk.visitor.Authentication;
-import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.view.configuration.ButtonConfiguration;
 import com.glia.widgets.view.configuration.ChatHeadConfiguration;
@@ -21,8 +18,6 @@ import com.glia.widgets.view.configuration.TextConfiguration;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.security.InvalidParameterException;
 
 class Utils {
 
@@ -80,7 +75,6 @@ class Utils {
             return null;
         }
 
-        String title = Utils.getStringFromPrefs(R.string.pref_header_title, null, sharedPreferences, resources);
         Integer baseLightColor = getColorValueFromPrefs(R.string.pref_base_light_color, sharedPreferences, resources);
         Integer baseDarkColor = getColorValueFromPrefs(R.string.pref_base_dark_color, sharedPreferences, resources);
         Integer baseNormalColor = getColorValueFromPrefs(R.string.pref_base_normal_color, sharedPreferences, resources);
@@ -115,7 +109,6 @@ class Utils {
 
         UiTheme.UiThemeBuilder builder = new UiTheme.UiThemeBuilder();
 
-        builder.setAppBarTitle(title);
         builder.setBaseLightColor(baseLightColor);
         builder.setBaseDarkColor(baseDarkColor);
         builder.setBaseNormalColor(baseNormalColor);
@@ -319,17 +312,6 @@ class Utils {
             return Authentication.Behavior.ALLOWED_DURING_ENGAGEMENT;
         } else {
             return Authentication.Behavior.FORBIDDEN_DURING_ENGAGEMENT;
-        }
-    }
-
-    public static Engagement.MediaType toMediaType(@NonNull String mediaType) {
-        switch (mediaType) {
-            case GliaWidgets.MEDIA_TYPE_VIDEO:
-                return Engagement.MediaType.VIDEO;
-            case GliaWidgets.MEDIA_TYPE_AUDIO:
-                return Engagement.MediaType.AUDIO;
-            default:
-                throw new InvalidParameterException("Invalid Media Type");
         }
     }
 }

@@ -12,7 +12,6 @@ import com.glia.widgets.callvisualizer.controller.CallVisualizerController;
 import com.glia.widgets.callvisualizer.controller.VisitorCodeController;
 import com.glia.widgets.chat.ChatContract;
 import com.glia.widgets.chat.controller.ChatController;
-import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
 import com.glia.widgets.core.dialog.DialogContract;
 import com.glia.widgets.core.dialog.DialogController;
 import com.glia.widgets.engagement.completion.EngagementCompletionContract;
@@ -23,6 +22,7 @@ import com.glia.widgets.filepreview.ui.ImagePreviewContract;
 import com.glia.widgets.filepreview.ui.ImagePreviewController;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
+import com.glia.widgets.launcher.ConfigurationManager;
 import com.glia.widgets.messagecenter.MessageCenterContract;
 import com.glia.widgets.messagecenter.MessageCenterController;
 import com.glia.widgets.operator.OperatorRequestContract;
@@ -57,7 +57,7 @@ public class ControllerFactory {
     private final DialogContract.Controller dialogController;
     private final MessagesNotSeenHandler messagesNotSeenHandler;
     private final UseCaseFactory useCaseFactory;
-    private final GliaSdkConfigurationManager sdkConfigurationManager;
+    private final ConfigurationManager configurationManager;
     private final ImagePreviewContract.Controller filePreviewController;
     private final ManagerFactory managerFactory;
     private EngagementCompletionContract.Controller engagementCompletionController;
@@ -71,7 +71,7 @@ public class ControllerFactory {
     public ControllerFactory(
         RepositoryFactory repositoryFactory,
         UseCaseFactory useCaseFactory,
-        GliaSdkConfigurationManager sdkConfigurationManager,
+        ConfigurationManager configurationManager,
         ManagerFactory managerFactory
     ) {
         this.repositoryFactory = repositoryFactory;
@@ -86,7 +86,7 @@ public class ControllerFactory {
             useCaseFactory.createGetImageFileFromCacheUseCase(),
             useCaseFactory.createPutImageFileToDownloadsUseCase()
         );
-        this.sdkConfigurationManager = sdkConfigurationManager;
+        this.configurationManager = configurationManager;
         this.managerFactory = managerFactory;
     }
 
@@ -150,7 +150,6 @@ public class ControllerFactory {
         if (retainedCallController == null) {
             Logger.d(TAG, "new call controller");
             retainedCallController = new CallController(
-                sdkConfigurationManager,
                 sharedTimer,
                 new TimeCounter(),
                 new TimeCounter(),
@@ -292,7 +291,6 @@ public class ControllerFactory {
 
     public MessageCenterContract.Controller getMessageCenterController() {
         return new MessageCenterController(
-            serviceChatHeadController,
             useCaseFactory.createSetEngagementConfigUseCase(),
             useCaseFactory.createSendSecureMessageUseCase(),
             useCaseFactory.createSecureMessagingAvailableQueueIdsUseCase(),
@@ -381,7 +379,6 @@ public class ControllerFactory {
             useCaseFactory.getIsCurrentEngagementCallVisualizer(),
             useCaseFactory.createSetOverlayPermissionRequestDialogShownUseCase(),
             dialogController,
-            sdkConfigurationManager,
             useCaseFactory.getWithNotificationPermissionUseCase(),
             useCaseFactory.getPrepareToScreenSharingUseCase(),
             useCaseFactory.getReleaseScreenSharingResourcesUseCase()

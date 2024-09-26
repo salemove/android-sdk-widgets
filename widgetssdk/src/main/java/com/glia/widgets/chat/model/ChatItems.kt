@@ -165,25 +165,19 @@ internal sealed class OperatorStatusItem : ChatItem(ChatAdapter.OPERATOR_STATUS_
     override val id: String = "operator_status_item"
     override val timestamp: Long = -1
 
-    abstract val companyName: String?
-
-    data class InQueue(override val companyName: String?) : OperatorStatusItem()
+    object InQueue : OperatorStatusItem()
 
     data class Connected(
-        override val companyName: String?,
         val operatorName: String,
         val profileImgUrl: String?
     ) : OperatorStatusItem()
 
     data class Joined(
-        override val companyName: String?,
         val operatorName: String,
         val profileImgUrl: String?
     ) : OperatorStatusItem()
 
-    object Transferring : OperatorStatusItem() {
-        override val companyName: String? = null
-    }
+    object Transferring : OperatorStatusItem()
 }
 
 // Visitor

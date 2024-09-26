@@ -44,11 +44,11 @@ internal class EngagementLauncherImpl(private val activityLauncher: ActivityLaun
     }
 
     override fun startAudioCall(activity: Activity) {
-        activityLauncher.launchCall(activity, Engagement.MediaType.AUDIO)
+        activityLauncher.launchCall(activity, Engagement.MediaType.AUDIO, false)
     }
 
     override fun startVideoCall(activity: Activity) {
-        activityLauncher.launchCall(activity, Engagement.MediaType.VIDEO)
+        activityLauncher.launchCall(activity, Engagement.MediaType.VIDEO, false)
     }
 
     override fun startSecureMessaging(activity: Activity) {

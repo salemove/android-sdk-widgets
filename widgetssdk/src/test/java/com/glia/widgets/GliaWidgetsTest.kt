@@ -70,6 +70,7 @@ class GliaWidgetsTest {
         val callVisualizerController = mock<CallVisualizerController>()
         whenever(controllerFactory.callVisualizerController).thenReturn(callVisualizerController)
         whenever(repositoryFactory.engagementRepository) doReturn mock()
+        whenever(repositoryFactory.engagementConfigRepository) doReturn mock()
         GliaWidgets.init(widgetsConfig)
         val captor = argumentCaptor<GliaConfig>()
         verify(gliaCore).init(captor.capture())

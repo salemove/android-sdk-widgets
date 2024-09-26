@@ -1,12 +1,11 @@
 package com.glia.widgets.call
 
 import com.glia.androidsdk.Engagement
-import com.glia.androidsdk.screensharing.ScreenSharing
-import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.base.BaseController
 import com.glia.widgets.base.BaseView
 import com.glia.widgets.core.dialog.model.ConfirmationDialogLinks
 import com.glia.widgets.core.dialog.model.Link
+import com.glia.widgets.locale.LocaleString
 
 internal interface CallContract {
     interface Controller : BaseController {
@@ -21,14 +20,7 @@ internal interface CallContract {
         fun muteButtonClicked()
         fun videoButtonClicked()
         fun flipVideoButtonClicked()
-        fun startCall(
-            companyName: String,
-            queueIds: List<String>?,
-            visitorContextAssetId: String?,
-            mediaType: Engagement.MediaType?,
-            screenSharingMode: ScreenSharing.Mode,
-            upgradeToCall: Boolean
-        )
+        fun startCall(mediaType: Engagement.MediaType?, upgradeToCall: Boolean)
 
         fun onResume()
         fun onPause()

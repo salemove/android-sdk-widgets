@@ -6,8 +6,7 @@ import android.net.Uri
 import android.os.Bundle
 import com.glia.androidsdk.Engagement.MediaType
 import com.glia.androidsdk.chat.AttachmentFile
-import com.glia.widgets.call.CallConfiguration
-import com.glia.widgets.core.configuration.EngagementConfiguration
+import com.glia.androidsdk.engagement.Survey
 import com.glia.widgets.helper.IntentHelper
 import com.glia.widgets.helper.safeStartActivity
 import com.glia.widgets.locale.LocaleString
@@ -15,9 +14,8 @@ import com.glia.widgets.locale.LocaleString
 
 internal interface ActivityLauncher {
     fun launchChat(activity: Activity)
-    fun launchChat(context: Context, engagementConfiguration: EngagementConfiguration)
-    fun launchCall(context: Context, callConfiguration: CallConfiguration)
-    fun launchCall(activity: Activity, mediaType: MediaType)
+    fun launchChat(context: Context)
+    fun launchCall(context: Context, mediaType: MediaType?, upgradeToCall: Boolean)
     fun launchSecureMessagingChat(activity: Activity)
     fun launchSecureMessagingWelcomeScreen(activity: Activity)
     fun launchEndScreenSharing(context: Context)
@@ -30,19 +28,17 @@ internal interface ActivityLauncher {
     fun launchFileReader(context: Context, contentUri: Uri, fileContentType: String, onFailure: () -> Unit)
     fun launchShareImage(activity: Activity, fileName: String)
     fun launchEntryWidget(activity: Activity)
+    fun launchSurvey(activity: Activity, survey: Survey)
 }
 
 internal class ActivityLauncherImpl(private val intentHelper: IntentHelper) : ActivityLauncher {
 
-    override fun launchChat(activity: Activity) = activity.startActivity(intentHelper.chatIntent(activity, emptyList()))
+    override fun launchChat(activity: Activity) = activity.startActivity(intentHelper.chatIntent(activity))
 
-    override fun launchChat(context: Context, engagementConfiguration: EngagementConfiguration) =
-        context.startActivity(intentHelper.chatIntent(context, engagementConfiguration))
+    override fun launchChat(context: Context) = context.startActivity(intentHelper.chatIntent(context))
 
-    override fun launchCall(context: Context, callConfiguration: CallConfiguration) =
-        context.startActivity(intentHelper.callIntent(context, callConfiguration))
-
-    override fun launchCall(activity: Activity, mediaType: MediaType) = activity.startActivity(intentHelper.callIntent(activity, mediaType))
+    override fun launchCall(context: Context, mediaType: MediaType?, upgradeToCall: Boolean) =
+        context.startActivity(intentHelper.callIntent(context, mediaType, upgradeToCall))
 
     override fun launchSecureMessagingChat(activity: Activity) = activity.startActivity(intentHelper.secureMessagingChatIntent(activity))
 
@@ -75,4 +71,5 @@ internal class ActivityLauncherImpl(private val intentHelper: IntentHelper) : Ac
 
     override fun launchEntryWidget(activity: Activity) = activity.startActivity(intentHelper.entryWidgetIntent(activity))
 
+    override fun launchSurvey(activity: Activity, survey: Survey) = activity.startActivity(intentHelper.surveyIntent(activity, survey))
 }

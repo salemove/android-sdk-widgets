@@ -8,7 +8,6 @@ import com.glia.androidsdk.comms.MediaDirection
 import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.androidsdk.comms.Video
-import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.widgets.Constants
 import com.glia.widgets.call.CallStatus.EngagementOngoingAudioCallStarted
 import com.glia.widgets.call.CallStatus.EngagementOngoingVideoCallStarted
@@ -16,7 +15,6 @@ import com.glia.widgets.call.domain.HandleCallPermissionsUseCase
 import com.glia.widgets.chat.domain.DecideOnQueueingUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
 import com.glia.widgets.core.audio.domain.TurnSpeakerphoneUseCase
-import com.glia.widgets.core.configuration.GliaSdkConfigurationManager
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.dialog.domain.ConfirmationDialogLinksUseCase
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
@@ -64,10 +62,8 @@ import java.util.concurrent.TimeUnit
 private const val MAX_IDLE_TIME = 3200
 private const val INACTIVITY_TIMER_TICKER_VALUE = 400
 private const val INACTIVITY_TIMER_DELAY_VALUE = 0
-private const val TAG = "CallController"
 
 internal class CallController(
-    private val sdkConfigurationManager: GliaSdkConfigurationManager,
     private val callTimer: TimeCounter,
     private val inactivityTimeCounter: TimeCounter,
     private val connectingTimerCounter: TimeCounter,
@@ -184,45 +180,21 @@ internal class CallController(
         emitViewState(callState.engagementStarted())
     }
 
-    override fun startCall(
-        companyName: String,
-        queueIds: List<String>?,
-        visitorContextAssetId: String?,
-        mediaType: Engagement.MediaType?,
-        screenSharingMode: ScreenSharing.Mode,
-        upgradeToCall: Boolean
-    ) {
+    override fun startCall(mediaType: Engagement.MediaType?, upgradeToCall: Boolean) {
         if (upgradeToCall || mediaType == null) {
-            initCall(
-                companyName,
-                queueIds,
-                visitorContextAssetId,
-                mediaType,
-                screenSharingMode)
+            initCall(mediaType)
             return
         }
         handleCallPermissionsUseCase.invoke(mediaType) { isPermissionsGranted: Boolean ->
             if (isPermissionsGranted) {
-                initCall(
-                    companyName,
-                    queueIds,
-                    visitorContextAssetId,
-                    mediaType,
-                    screenSharingMode)
+                initCall(mediaType)
             } else {
                 view?.showMissingPermissionsDialog()
             }
         }
     }
 
-    private fun initCall(
-        companyName: String,
-        queueIds: List<String>?,
-        visitorContextAssetId: String?,
-        mediaType: Engagement.MediaType?,
-        screenSharingMode: ScreenSharing.Mode
-    ) {
-        sdkConfigurationManager.screenSharingMode = screenSharingMode
+    private fun initCall(mediaType: Engagement.MediaType?) {
         if (isShowOverlayPermissionRequestDialogUseCase()) {
             dialogController.showOverlayPermissionsDialog()
         } else {
@@ -232,7 +204,7 @@ internal class CallController(
         if (callState.integratorCallStarted || dialogController.isShowingUnexpectedErrorDialog) {
             return
         }
-        emitViewState(callState.initCall(companyName, queueIds, visitorContextAssetId, mediaType))
+        emitViewState(callState.initCall(mediaType))
         createNewTimerStatusCallback()
         initMessagesNotSeenCallback()
         tryToQueueForEngagement()
@@ -288,7 +260,7 @@ internal class CallController(
     }
 
     private fun enqueueForEngagement() {
-        enqueueForEngagementUseCase(callState.queueIds, callState.requestedMediaType, callState.visitorContextAssetId)
+        enqueueForEngagementUseCase(callState.requestedMediaType ?: return)
     }
 
     override fun onDestroy(retained: Boolean) {

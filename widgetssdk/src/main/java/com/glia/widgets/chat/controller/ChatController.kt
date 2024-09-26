@@ -211,8 +211,8 @@ internal class ChatController(
         screenSharingUseCase.end()
     }
 
-    override fun initChat(companyName: String?, queueIds: List<String>?, visitorContextAssetId: String?, chatType: ChatType) {
-        engagementConfigUseCase(chatType, queueIds ?: emptyList())
+    override fun initChat(chatType: ChatType) {
+        engagementConfigUseCase(chatType)
         updateOperatorDefaultImageUrlUseCase()
 
         ensureSecureMessagingAvailable()
@@ -225,7 +225,7 @@ internal class ChatController(
             return
         }
 
-        emitViewState { chatState.initChat(companyName, queueIds, visitorContextAssetId) }
+        emitViewState { chatState.initChat() }
         initChatManager()
     }
 
@@ -242,7 +242,6 @@ internal class ChatController(
             getAvailableQueueIdsForSecureMessagingUseCase().subscribe({
                 if (it.result != null) {
                     Logger.d(TAG, "Messaging is available")
-                    engagementConfigUseCase(ChatType.SECURE_MESSAGING, it.result)
                 } else {
                     Logger.d(TAG, "Messaging is unavailable")
                     dialogController.showMessageCenterUnavailableDialog()
@@ -293,9 +292,7 @@ internal class ChatController(
     }
 
     private fun enqueueForEngagement() {
-        requestNotificationPermissionIfPushNotificationsSetUpUseCase {
-            enqueueForEngagementUseCase(queueIds = chatState.queueIds, visitorContextAssetId = chatState.visitorContextAssetId)
-        }
+        requestNotificationPermissionIfPushNotificationsSetUpUseCase(enqueueForEngagementUseCase::invoke)
     }
 
     @Synchronized
@@ -585,7 +582,7 @@ internal class ChatController(
         if (isQueueingOrOngoingEngagement) return
 
         Logger.d(TAG, "viewInitPreQueueing")
-        chatManager.onChatAction(ChatManager.Action.QueuingStarted(chatState.companyName.orEmpty()))
+        chatManager.onChatAction(ChatManager.Action.QueuingStarted)
         confirmationDialogUseCase { shouldShow ->
             if (shouldShow) {
                 dialogController.showEngagementConfirmationDialog()
@@ -606,18 +603,14 @@ internal class ChatController(
 
     private fun operatorConnected(formattedOperatorName: String, profileImgUrl: String?) {
         chatManager.onChatAction(
-            ChatManager.Action.OperatorConnected(
-                chatState.companyName.orEmpty(), formattedOperatorName, profileImgUrl
-            )
+            ChatManager.Action.OperatorConnected(formattedOperatorName, profileImgUrl)
         )
         emitViewState { chatState.operatorConnected(formattedOperatorName, profileImgUrl).setLiveChatState() }
     }
 
     private fun operatorChanged(formattedOperatorName: String, profileImgUrl: String?) {
         chatManager.onChatAction(
-            ChatManager.Action.OperatorJoined(
-                chatState.companyName.orEmpty(), formattedOperatorName, profileImgUrl
-            )
+            ChatManager.Action.OperatorJoined(formattedOperatorName, profileImgUrl)
         )
         emitViewState { chatState.operatorConnected(formattedOperatorName, profileImgUrl) }
     }

@@ -12,6 +12,7 @@ import com.glia.widgets.helper.rx.Schedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import java.util.UUID
 
+//TODO this Class must be removed after we have layer for up to date queue list monitoring
 internal class GetAvailableQueueIdsForSecureMessagingUseCase(
     private val engagementConfigRepository: GliaEngagementConfigRepository,
     private val queueRepository: GliaQueueRepository,

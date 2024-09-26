@@ -146,17 +146,14 @@ class ChatManagerTest {
 
     @Test
     fun `mapInQueue adds OperatorStatusItem_InQueue to chatItems and updates operatorStatusItem`() {
-        val companyName = "company Name"
-        val newState = subjectUnderTest.mapInQueue(companyName, state)
+        val newState = subjectUnderTest.mapInQueue(state)
         val lastItem = newState.chatItems.last() as OperatorStatusItem.InQueue
-        assertEquals(companyName, lastItem.companyName)
-        assertEquals(companyName, newState.operatorStatusItem!!.companyName)
         assertEquals(lastItem, newState.operatorStatusItem)
     }
 
     @Test
     fun `mapTransferring removes old OperatorStatusItem when it exists and adds new one`() {
-        subjectUnderTest.mapTransferring(subjectUnderTest.mapInQueue("name", state)).apply {
+        subjectUnderTest.mapTransferring(subjectUnderTest.mapInQueue(state)).apply {
             assertTrue(chatItems.count() == 1)
             assertTrue(chatItems.contains(OperatorStatusItem.Transferring))
         }
@@ -164,7 +161,7 @@ class ChatManagerTest {
 
     @Test
     fun `mapOperatorConnected adds OperatorStatusItem_Connected when the old is null`() {
-        val action = ChatManager.Action.OperatorConnected("c_name", "o_name", "o_image")
+        val action = ChatManager.Action.OperatorConnected("o_name", "o_image")
         val stateSpy = spy(state)
         val subjectUnderTestSpy = spy(subjectUnderTest)
         subjectUnderTestSpy.mapOperatorConnected(action, stateSpy)
@@ -172,13 +169,12 @@ class ChatManagerTest {
         verify(stateSpy).resetOperator()
         val newItem = stateSpy.chatItems.last() as OperatorStatusItem.Connected
         assertEquals(newItem.operatorName, action.operatorFormattedName)
-        assertEquals(newItem.companyName, action.companyName)
         assertEquals(newItem.profileImgUrl, action.operatorImageUrl)
     }
 
     @Test
     fun `mapOperatorConnected replaces old OperatorStatusItem when the old is exists`() {
-        val action = ChatManager.Action.OperatorConnected("c_name", "o_name", "o_image")
+        val action = ChatManager.Action.OperatorConnected("o_name", "o_image")
         state.apply {
             operatorStatusItem = OperatorStatusItem.Transferring
             chatItems.add(mock())
@@ -190,7 +186,6 @@ class ChatManagerTest {
         verify(subjectUnderTestSpy).checkUnsentMessages(any())
         val newItem = newState.chatItems.last() as OperatorStatusItem.Connected
         assertEquals(newItem.operatorName, action.operatorFormattedName)
-        assertEquals(newItem.companyName, action.companyName)
         assertEquals(newItem.profileImgUrl, action.operatorImageUrl)
         assertFalse(newState.chatItems.contains(OperatorStatusItem.Transferring))
     }
@@ -198,7 +193,7 @@ class ChatManagerTest {
     @Test
     fun `addUnsentMessage adds Unsent message before OperatorStatusItem when chatItems contain OperatorStatusItem_InQueue`() {
         val message = Unsent(SendMessagePayload(content = "message"))
-        val inQueue = OperatorStatusItem.InQueue("company_name")
+        val inQueue = OperatorStatusItem.InQueue
         assertTrue(state.unsentItems.isEmpty())
         assertTrue(state.chatItems.isEmpty())
         val newState = subjectUnderTest.addUnsentMessage(message, state)
@@ -229,7 +224,7 @@ class ChatManagerTest {
 
     @Test
     fun `mapOperatorJoined adds OperatorStatusItem_Joined to chatItems when called`() {
-        val action: ChatManager.Action.OperatorJoined = ChatManager.Action.OperatorJoined("", "", "")
+        val action: ChatManager.Action.OperatorJoined = ChatManager.Action.OperatorJoined("", "")
         subjectUnderTest.mapTransferring(state).apply {
             assertTrue(chatItems.contains(OperatorStatusItem.Transferring))
         }
@@ -326,19 +321,14 @@ class ChatManagerTest {
 
     @Test
     fun `mapAction calls mapInQueue when Action_QueuingStarted passed`() {
-        val action: ChatManager.Action.QueuingStarted = mock {
-            on { companyName } doReturn ""
-        }
-
         val subjectUnderTestSpy = spy(subjectUnderTest)
-        subjectUnderTestSpy.mapAction(action, state)
-        verify(subjectUnderTestSpy).mapInQueue(any(), any())
+        subjectUnderTestSpy.mapAction(ChatManager.Action.QueuingStarted, state)
+        verify(subjectUnderTestSpy).mapInQueue(any())
     }
 
     @Test
     fun `mapAction calls mapOperatorConnected when Action_OperatorConnected passed`() {
         val action: ChatManager.Action.OperatorConnected = mock {
-            on { companyName } doReturn ""
             on { operatorFormattedName } doReturn ""
         }
 
@@ -359,7 +349,6 @@ class ChatManagerTest {
     @Test
     fun `mapAction calls mapOperatorJoined when Action_OperatorJoined passed`() {
         val action: ChatManager.Action.OperatorJoined = mock {
-            on { companyName } doReturn ""
             on { operatorFormattedName } doReturn ""
         }
 

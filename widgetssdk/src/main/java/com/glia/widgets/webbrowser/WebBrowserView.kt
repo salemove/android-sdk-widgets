@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.res.TypedArray
 import android.net.Uri
 import android.util.AttributeSet
-import android.view.Window
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -13,19 +12,16 @@ import androidx.core.content.withStyledAttributes
 import androidx.core.view.ViewCompat
 import com.glia.widgets.Constants
 import com.glia.widgets.R
-import com.glia.widgets.UiTheme
 import com.glia.widgets.databinding.WebBrowserViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.SimpleWindowInsetsAndAnimationHandler
 import com.glia.widgets.helper.Utils
-import com.glia.widgets.helper.asActivity
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.view.header.AppBarView
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.glia.widgets.view.unifiedui.theme.base.HeaderTheme
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
-import kotlin.properties.Delegates
 
 internal class WebBrowserView(
     context: Context,
@@ -39,7 +35,6 @@ internal class WebBrowserView(
     defStyleRes
 ) {
 
-    private var theme: UiTheme by Delegates.notNull()
     private val unifiedTheme: UnifiedTheme? by lazy { Dependencies.gliaThemeManager.theme }
 
     var onFinishListener: OnFinishListener? = null
@@ -49,8 +44,6 @@ internal class WebBrowserView(
 
     private val appBar: AppBarView? get() = binding?.appBarView
     private val webView: WebView? get() = binding?.webView
-
-    private val window: Window? by lazy { context.asActivity()?.window }
 
     init {
         isSaveEnabled = true
@@ -107,7 +100,7 @@ internal class WebBrowserView(
     }
 
     private fun setDefaultTheme(typedArray: TypedArray) {
-        theme = Utils.getThemeFromTypedArray(typedArray, this.context)
+        binding?.appBarView?.setTheme(Utils.getFullHybridTheme(typedArray, this.context))
     }
 
     private fun initCallbacks() {

@@ -7,9 +7,6 @@ internal data class ChatState(
     val messagesNotSeen: Int = 0,
     val formattedOperatorName: String? = null,
     val operatorProfileImgUrl: String? = null,
-    val companyName: String? = null,
-    val queueIds: List<String>? = null,
-    val visitorContextAssetId: String? = null,
     val isMediaUpgradeVide: Boolean? = null,
     val chatInputMode: ChatInputMode = ChatInputMode.ENABLED_NO_ENGAGEMENT,
     val lastTypedText: String = "",
@@ -35,11 +32,8 @@ internal data class ChatState(
 
     val isAttachmentButtonVisible: Boolean get() = isAttachmentButtonNeeded && isAttachmentAllowed
 
-    fun initChat(companyName: String?, queueIds: List<String>?, visitorContextAssetId: String?): ChatState = copy(
+    fun initChat(): ChatState = copy(
         integratorChatStarted = true,
-        companyName = companyName,
-        queueIds = queueIds,
-        visitorContextAssetId = visitorContextAssetId,
         isVisible = true,
         showSendButton = false,
         isAttachmentButtonEnabled = true,

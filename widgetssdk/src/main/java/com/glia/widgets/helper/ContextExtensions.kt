@@ -1,3 +1,4 @@
+@file:JvmName("ContextExtensions")
 package com.glia.widgets.helper
 
 import android.app.Activity
@@ -18,7 +19,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.withStyledAttributes
 import androidx.core.util.TypedValueCompat
 import com.glia.widgets.BuildConfig
-import com.glia.widgets.GliaWidgets
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
@@ -61,11 +61,8 @@ internal val Activity.rootView: View
 
 internal fun Activity.withRuntimeTheme(callback: (themedContext: Context, uiTheme: UiTheme) -> Unit) {
     val themedContext = wrapWithMaterialThemeOverlay()
-
-    intent.getParcelableExtraCompat<UiTheme>(GliaWidgets.UI_THEME)?.also {
-        callback(themedContext, it.withConfigurationTheme)
-    } ?: themedContext.withStyledAttributes(R.style.Application_Glia_Chat, R.styleable.GliaView) {
-        callback(themedContext, Utils.getThemeFromTypedArray(this, themedContext).withConfigurationTheme)
+    themedContext.withStyledAttributes(R.style.Application_Glia_Chat, R.styleable.GliaView) {
+        callback(themedContext, Utils.getFullHybridTheme(this, themedContext))
     }
 }
 
@@ -103,3 +100,8 @@ internal inline fun <reified T : Parcelable> Intent.getParcelableExtraCompat(key
         @Suppress("DEPRECATION")
         getParcelableExtra(key) as? T
     }
+
+internal inline fun <reified T : Enum<T>> Intent.putEnumExtra(key: String, value: T?): Intent = putExtra(key, value?.ordinal)
+
+internal inline fun <reified T : Enum<T>> Intent.getEnumExtra(key: String): T? = getIntExtra(key, -1).takeIf { it != -1 }
+    ?.let { T::class.java.enumConstants?.getOrNull(it) }

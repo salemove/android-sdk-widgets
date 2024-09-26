@@ -8,13 +8,11 @@ import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.androidsdk.engagement.EngagementFile
 import com.glia.androidsdk.site.SiteInfo
 import com.glia.widgets.Constants
-import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.ChatType
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.chat.domain.SiteInfoUseCase
 import com.glia.widgets.chat.domain.TakePictureUseCase
 import com.glia.widgets.chat.domain.UriToFileAttachmentUseCase
-import com.glia.widgets.core.configuration.EngagementConfiguration
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.engagement.domain.SetEngagementConfigUseCase
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase
@@ -22,21 +20,19 @@ import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.permissions.domain.RequestNotificationPermissionIfPushNotificationsSetUpUseCase
 import com.glia.widgets.core.secureconversations.domain.AddSecureFileAttachmentsObserverUseCase
 import com.glia.widgets.core.secureconversations.domain.AddSecureFileToAttachmentAndUploadUseCase
+import com.glia.widgets.core.secureconversations.domain.GetAvailableQueueIdsForSecureMessagingUseCase
 import com.glia.widgets.core.secureconversations.domain.GetSecureFileAttachmentsUseCase
 import com.glia.widgets.core.secureconversations.domain.OnNextMessageUseCase
 import com.glia.widgets.core.secureconversations.domain.RemoveSecureFileAttachmentUseCase
 import com.glia.widgets.core.secureconversations.domain.ResetMessageCenterUseCase
-import com.glia.widgets.core.secureconversations.domain.GetAvailableQueueIdsForSecureMessagingUseCase
 import com.glia.widgets.core.secureconversations.domain.SendMessageButtonStateUseCase
 import com.glia.widgets.core.secureconversations.domain.SendSecureMessageUseCase
 import com.glia.widgets.core.secureconversations.domain.ShowMessageLimitErrorUseCase
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
-import com.glia.widgets.view.head.ChatHeadContract
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 internal class MessageCenterController(
-    private var serviceChatHeadController: ChatHeadContract.Controller,
     private val engagementConfigUseCase: SetEngagementConfigUseCase,
     private val sendSecureMessageUseCase: SendSecureMessageUseCase,
     private val getAvailableQueueIdsForSecureMessagingUseCase: GetAvailableQueueIdsForSecureMessagingUseCase,
@@ -61,15 +57,8 @@ internal class MessageCenterController(
     @Volatile
     private var state = MessageCenterState()
 
-    override fun setConfiguration(uiTheme: UiTheme?, configuration: EngagementConfiguration?) {
-        setQueueIds(configuration?.queueIds)
-
-        serviceChatHeadController.setBuildTimeTheme(uiTheme)
-        serviceChatHeadController.setEngagementConfiguration(configuration)
-    }
-
-    private fun setQueueIds(queueIds: List<String>?) {
-        engagementConfigUseCase(ChatType.SECURE_MESSAGING, queueIds ?: emptyList())
+    init {
+        engagementConfigUseCase(ChatType.SECURE_MESSAGING)
     }
 
     override fun setView(view: MessageCenterContract.View) {
@@ -203,7 +192,6 @@ internal class MessageCenterController(
     override fun ensureMessageCenterAvailability() {
         getAvailableQueueIdsForSecureMessagingUseCase(
             RequestCallback { queueIds, exception ->
-                setQueueIds(queueIds)
 
                 val showSendMessageGroup = when {
                     exception != null -> {

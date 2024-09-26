@@ -34,8 +34,8 @@ import com.glia.widgets.core.notification.domain.CallNotificationUseCase
 import com.glia.widgets.core.permissions.domain.RequestNotificationPermissionIfPushNotificationsSetUpUseCase
 import com.glia.widgets.core.permissions.domain.WithCameraPermissionUseCase
 import com.glia.widgets.core.permissions.domain.WithReadWritePermissionsUseCase
-import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
 import com.glia.widgets.core.secureconversations.domain.GetAvailableQueueIdsForSecureMessagingUseCase
+import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
 import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCase
 import com.glia.widgets.engagement.domain.DeclineMediaUpgradeOfferUseCase
 import com.glia.widgets.engagement.domain.EndEngagementUseCase
@@ -238,35 +238,23 @@ class ChatControllerTest {
 
     @Test
     fun initChat_setsConfiguration_withInitialParams() {
-        val queueIds = listOf("QueueId1", "QueueId2")
         whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.never()
 
-        chatController.initChat(
-            "CompanyName",
-            queueIds,
-            "VisitorId",
-            ChatType.SECURE_MESSAGING
-        )
+        chatController.initChat(ChatType.SECURE_MESSAGING)
 
-        verify(engagementConfigUseCase).invoke(ChatType.SECURE_MESSAGING, queueIds)
+        verify(engagementConfigUseCase).invoke(ChatType.SECURE_MESSAGING)
     }
 
     @Test
     fun initChat_setsConfiguration_withAvailableQueues() {
         val queueIds = listOf("QueueId1", "QueueId2")
         whenever(isSecureEngagementUseCase.invoke()) doReturn true
-        whenever(getAvailableQueueIdsForSecureMessagingUseCase.invoke()) doReturn Single.just(Data.Value(queueIds))
+        whenever(getAvailableQueueIdsForSecureMessagingUseCase()) doReturn Single.just(Data.Value(queueIds))
         whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.never()
 
-        chatController.initChat(
-            "CompanyName",
-            emptyList(),
-            "VisitorId",
-            ChatType.SECURE_MESSAGING
-        )
+        chatController.initChat(ChatType.SECURE_MESSAGING)
 
-        verify(engagementConfigUseCase).invoke(ChatType.SECURE_MESSAGING, emptyList())
-        verify(engagementConfigUseCase).invoke(ChatType.SECURE_MESSAGING, queueIds)
+        verify(engagementConfigUseCase).invoke(ChatType.SECURE_MESSAGING)
     }
 
     @Test
@@ -275,12 +263,7 @@ class ChatControllerTest {
         whenever(getAvailableQueueIdsForSecureMessagingUseCase.invoke()) doReturn Single.just(Data.Value(null))
         whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.never()
 
-        chatController.initChat(
-            "CompanyName",
-            emptyList(),
-            "VisitorId",
-            ChatType.SECURE_MESSAGING
-        )
+        chatController.initChat(ChatType.SECURE_MESSAGING)
 
         verify(dialogController).showMessageCenterUnavailableDialog()
     }
@@ -291,12 +274,7 @@ class ChatControllerTest {
         whenever(getAvailableQueueIdsForSecureMessagingUseCase.invoke()) doReturn Single.error(Exception())
         whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.never()
 
-        chatController.initChat(
-            "CompanyName",
-            emptyList(),
-            "VisitorId",
-            ChatType.SECURE_MESSAGING
-        )
+        chatController.initChat(ChatType.SECURE_MESSAGING)
 
         verify(dialogController).showUnexpectedErrorDialog()
     }

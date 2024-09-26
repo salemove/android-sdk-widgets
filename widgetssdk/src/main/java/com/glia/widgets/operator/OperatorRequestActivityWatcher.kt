@@ -136,7 +136,7 @@ internal class OperatorRequestActivityWatcher(
             activity.isGlia -> finishActivities()
         }
 
-        activityLauncher.launchCall(activity, mediaType)
+        activityLauncher.launchCall(activity, mediaType, true)
     }
 
     private fun showUpgradeDialog(state: ControllerState.RequestMediaUpgrade, activity: Activity, consumeCallback: () -> Unit) {

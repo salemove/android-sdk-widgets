@@ -196,11 +196,11 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
         }
     }
 
-    override fun queueForEngagement(queueIds: List<String>, mediaType: MediaType, visitorContextAssetId: String?) {
+    override fun queueForEngagement(queueIds: List<String>, mediaType: MediaType) {
         if (isQueueingOrEngagement) return
 
         Logger.i(TAG, "Start queueing for media engagement")
-        core.queueForEngagement(queueIds.toTypedArray(), mediaType, visitorContextAssetId, null, MEDIA_PERMISSION_REQUEST_CODE) {
+        core.queueForEngagement(queueIds.toTypedArray(), mediaType, null, null, MEDIA_PERMISSION_REQUEST_CODE) {
             handleQueueingResponse(it, queueIds, mediaType)
         }
     }

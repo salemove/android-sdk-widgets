@@ -10,10 +10,8 @@ import androidx.core.util.Pair
 import androidx.core.view.contains
 import com.glia.widgets.R
 import com.glia.widgets.base.BaseActivityStackWatcher
-import com.glia.widgets.call.CallConfiguration
 import com.glia.widgets.callvisualizer.EndScreenSharingView
 import com.glia.widgets.chat.ChatView
-import com.glia.widgets.di.Dependencies
 import com.glia.widgets.filepreview.ui.ImagePreviewView
 import com.glia.widgets.helper.DialogHolderView
 import com.glia.widgets.helper.Logger
@@ -133,7 +131,7 @@ internal class ActivityWatcherForChatHead(
     }
 
     private fun saveBubblePosition() {
-        chatHeadLayout?.getPosition()?.let {
+        chatHeadLayout?.position?.let {
             if (it.first == null || it.second == null) return
             chatHeadViewPosition = Pair(it.first, it.second)
         }
@@ -171,10 +169,6 @@ internal class ActivityWatcherForChatHead(
         }
     }
 
-    private fun getDefaultCallConfiguration(): CallConfiguration = Dependencies.sdkConfigurationManager
-        .buildEngagementConfiguration()
-        .let(::CallConfiguration)
-
     private fun navigateToChat(activity: Activity?) {
         activity?.also(activityLauncher::launchChat)
     }
@@ -184,6 +178,6 @@ internal class ActivityWatcherForChatHead(
     }
 
     private fun navigateToCall(activity: Activity?) {
-        activity?.also { activityLauncher.launchCall(it, getDefaultCallConfiguration().copy(isUpgradeToCall = true)) }
+        activity?.also { activityLauncher.launchCall(it, null, false) }
     }
 }

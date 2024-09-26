@@ -85,7 +85,7 @@ internal class OperatorStatusViewHolder(
         chatStartingHeadingView.setLocaleText(R.string.general_company_name)
         when (item) {
             is OperatorStatusItem.Connected -> applyConnectedState(item.operatorName, item.profileImgUrl)
-            is OperatorStatusItem.InQueue -> applyInQueueState(item.companyName)
+            is OperatorStatusItem.InQueue -> applyInQueueState()
             is OperatorStatusItem.Joined -> applyConnectedState(item.operatorName, item.profileImgUrl)
             is OperatorStatusItem.Transferring -> applyTransferringState()
         }
@@ -93,13 +93,13 @@ internal class OperatorStatusViewHolder(
         statusPictureView.setShowRippleAnimation(isShowStatusViewRippleAnimation(item))
     }
 
-    private fun applyInQueueState(companyName: String?) {
+    private fun applyInQueueState() {
         statusPictureView.showPlaceholder()
         applyChatStartingViewsVisibility()
         applyChatStartedViewsVisibility(false)
         itemView.setLocaleContentDescription(
             R.string.android_chat_queue_message_accessibility_label,
-            StringKeyPair(StringKey.COMPANY_NAME, companyName ?: "")
+            StringKeyPair(StringKey.COMPANY_NAME, "")
         )
 
         engagementStatesTheme?.queue.also(::applyEngagementState)
@@ -122,24 +122,6 @@ internal class OperatorStatusViewHolder(
         )
 
         engagementStatesTheme?.connected.also(::applyEngagementState)
-    }
-
-    private fun applyJoinedState(operatorName: String, profileImgUrl: String?) {
-        profileImgUrl?.let { statusPictureView.showProfileImage(it) }
-            ?: statusPictureView.showPlaceholder()
-        chatStartedNameView.text = operatorName
-        chatStartedCaptionView.setLocaleText(
-            R.string.chat_operator_joined_system_message, StringKeyPair(StringKey.OPERATOR_NAME, operatorName)
-        )
-        itemView.setLocaleContentDescription(
-            R.string.chat_operator_joined_system_message,
-            StringKeyPair(StringKey.OPERATOR_NAME, operatorName)
-        )
-
-        applyChatStartingViewsVisibility(false)
-        applyChatStartedViewsVisibility()
-
-        engagementStatesTheme?.connecting.also(::applyEngagementState)
     }
 
     private fun applyTransferringState() {

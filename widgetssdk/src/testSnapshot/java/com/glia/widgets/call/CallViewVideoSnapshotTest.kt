@@ -12,8 +12,7 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(
 
     // MARK: Init call
 
-    private fun initCallState() = callState()
-        .initCall(requestedMediaType = Engagement.MediaType.VIDEO)
+    private fun initCallState() = callState().initCall(requestedMediaType = Engagement.MediaType.VIDEO)
 
     @Test
     fun initCall() {

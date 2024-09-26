@@ -16,19 +16,15 @@ import com.glia.widgets.survey.viewholder.SingleQuestionViewHolder
 import com.glia.widgets.survey.viewholder.SurveyViewHolder
 import com.glia.widgets.view.configuration.survey.SurveyStyle
 
-internal class SurveyAdapter(private val listener: SurveyAdapterListener) :
-    RecyclerView.Adapter<SurveyViewHolder>() {
+internal class SurveyAdapter(
+    private val listener: SurveyAdapterListener,
+    private val style: SurveyStyle
+) : RecyclerView.Adapter<SurveyViewHolder>() {
     interface SurveyAdapterListener {
         fun onAnswer(answer: Survey.Answer)
     }
 
-    private var style: SurveyStyle
     private val questionItems: MutableList<QuestionItem> = ArrayList()
-
-    init {
-        // initialize style with default empty SurveyStyle, to make sure that style usage is safe even if new style is not set.
-        style = SurveyStyle.Builder().build()
-    }
 
     fun submitList(items: List<QuestionItem>?) {
         questionItems.clear()
@@ -39,10 +35,6 @@ internal class SurveyAdapter(private val listener: SurveyAdapterListener) :
     }
 
     private fun getItem(position: Int): QuestionItem = questionItems[position]
-
-    fun setStyle(style: SurveyStyle) {
-        this.style = style
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SurveyViewHolder {
         val inflater = LayoutInflater.from(parent.context)

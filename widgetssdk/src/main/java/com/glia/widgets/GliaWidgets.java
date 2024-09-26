@@ -38,99 +38,6 @@ import io.reactivex.rxjava3.plugins.RxJavaPlugins;
  */
 public class GliaWidgets {
 
-    /**
-     * Use with {@link android.os.Bundle} to pass in a {@link UiTheme} as a navigation argument when
-     * navigating to {@link com.glia.widgets.chat.ChatActivity}
-     *
-     * @deprecated While UiTheme can still be used for UI customization,
-     * we strongly encourage adopting remote configurations {@link GliaWidgetsConfig.Builder#setUiJsonRemoteConfig(String)}.
-     * The remote configurations approach is more versatile and better suited for future development.
-     */
-    @Deprecated
-    public static final String UI_THEME = "ui_theme";
-    /**
-     * Use with {@link android.os.Bundle} to pass in the name of your company as a navigation
-     * argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
-     *
-     * @deprecated Use {@link com.glia.widgets.GliaWidgetsConfig.Builder#companyName}
-     * or customize the strings from GliaHub
-     */
-    @Deprecated
-    public static final String COMPANY_NAME = "company_name";
-
-    /**
-     * Use with {@link android.os.Bundle} to pass in the ID of the queue you wish to enroll in
-     * as a navigation argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
-     * or {@link com.glia.widgets.call.CallActivity}
-     *
-     * @deprecated Use {QUEUE_IDS} instead.
-     */
-    @Deprecated
-    public static final String QUEUE_ID = "queue_id";
-
-    /**
-     * Use with {@link android.os.Bundle} to pass in an {@link java.util.ArrayList} of {@link String} of the queues IDs
-     * you wish to enroll in as a navigation argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
-     * or {@link com.glia.widgets.call.CallActivity}
-     */
-    public static final String QUEUE_IDS = "queue_ids";
-    /**
-     * Use with {@link android.os.Bundle} to pass in a context url as a navigation
-     * argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
-     *
-     * @deprecated Use {@link com.glia.widgets.GliaWidgets#CONTEXT_ASSET_ID}
-     */
-    @Deprecated
-    public static final String CONTEXT_URL = "context_url";
-    /**
-     * Use with {@link android.os.Bundle} to pass in a context asset ID as a navigation
-     * argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
-     */
-    public static final String CONTEXT_ASSET_ID = "context_asset_id";
-    /**
-     * It's recommended to use {@link GliaWidgetsConfig.Builder#setUseOverlay(boolean)} ()} instead of this constant directly.
-     * Use with {@link android.os.Bundle}  to pass in a boolean which represents if you would like to use the chat head bubble
-     * as an overlay outside your application for navigating to {@link com.glia.widgets.chat.ChatActivity}.
-     * If set to true then the SDK will ask for overlay permissions and try to always show the navigation bubble outside
-     * the application. However, it will be shown only if the user has accepted the permissions.
-     * If false, then overlay permission is not requested and the navigation bubble is shown when the application is active.
-     * Default value is true.
-     *
-     * @deprecated Use {@link com.glia.widgets.GliaWidgetsConfig#isEnableBubbleOutsideApp() and
-     * {@link GliaWidgetsConfig#isEnableBubbleInsideApp()}
-     */
-    @Deprecated
-    public static final String USE_OVERLAY = "use_overlay";
-    /**
-     * Use with {@link android.os.Bundle} to pass an input parameter to the call activity to
-     * tell it which type of engagement you would like to start. Can be one of:
-     * {@link MEDIA_TYPE_AUDIO} or {@link MEDIA_TYPE_VIDEO}.
-     * If no parameter is passed then will default to {@link MEDIA_TYPE_AUDIO}
-     */
-    public static final String MEDIA_TYPE = "media_type";
-    /**
-     * Pass this parameter as an input parameter with {@link MEDIA_TYPE} as its key to
-     * {@link com.glia.widgets.call.CallActivity} to start an audio call media engagement.
-     */
-    public static final String MEDIA_TYPE_AUDIO = "media_type_audio";
-    /**
-     * Pass this parameter as an input parameter with {@link MEDIA_TYPE} as its key to
-     * {@link com.glia.widgets.call.CallActivity} to start a video call media engagement.
-     */
-    public static final String MEDIA_TYPE_VIDEO = "media_type_video";
-    /**
-     * Pass this parameter to call activity to tell it that upgrade to audio/video call is ongoing
-     * If no parameter is passed then will default to false
-     */
-    public static final String IS_UPGRADE_TO_CALL = "upgrade_to_call";
-    public static final String SURVEY = "survey";
-    /**
-     * Use with {@link android.os.Bundle} to pass in
-     * {@link com.glia.androidsdk.screensharing.ScreenSharing.Mode} as a navigation
-     * argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
-     */
-    public static final String SCREEN_SHARING_MODE = "screens_haring_mode";
-    public static final String CHAT_TYPE = "chat_type";
     private final static String TAG = "GliaWidgets";
     @Nullable
     private static CustomCardAdapter customCardAdapter = new WebViewCardAdapter();
@@ -207,7 +114,9 @@ public class GliaWidgets {
      * Your activity in turn must call this method to pass the results of the request to Glia SDK.</p>
      *
      * <p>This method is no-op for other non-Glia triggered results.</p>
+     * @deprecated This method is no longer required, as all the required permissions are now managed internally.
      */
+    @Deprecated(forRemoval = true)
     public static void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         Logger.d(TAG, "onRequestPermissionsResult");
         Dependencies.glia().onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -225,7 +134,9 @@ public class GliaWidgets {
      * Your activity in turn must call this method to pass the results of the request to Glia SDK.</p>
      *
      * <p>This method is no-op for other non-Glia triggered results.</p>
+     * @deprecated This method is no longer required, as required activity results are now managed internally.
      */
+    @Deprecated(forRemoval = true)
     public static void onActivityResult(int requestCode, int resultCode, Intent data) {
         Logger.d(TAG, "onActivityResult");
         Dependencies.getRepositoryFactory().getEngagementRepository().onActivityResult(requestCode, resultCode, data);

@@ -26,14 +26,14 @@ interface SnapshotActivityWindow: SnapshotTestLifecycle {
         val windowMock = mock<Window>()
         whenever(activityMock.window).thenReturn(windowMock)
         whenever(windowMock.statusBarColor).thenReturn(statusBarColor)
-        mockkStatic("com.glia.widgets.helper.ContextExtensionsKt")
+        mockkStatic("com.glia.widgets.helper.ContextExtensions")
         every { any<Context>().requireActivity() } returns activityMock
         every { any<Context>().asActivity() } returns activityMock
         mockkStatic("com.glia.widgets.helper.Insets")
         every { any<WindowInsetsControllerCompat>().hideKeyboard() } returns Unit
 
         setOnEndListener {
-            unmockkStatic("com.glia.widgets.helper.ContextExtensionsKt")
+            unmockkStatic("com.glia.widgets.helper.ContextExtensions")
             unmockkStatic("com.glia.widgets.helper.Insets")
         }
 

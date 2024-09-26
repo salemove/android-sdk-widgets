@@ -15,7 +15,6 @@ import com.glia.widgets.core.audio.domain.OnAudioStartedUseCase
 import com.glia.widgets.core.authentication.AuthenticationManager
 import com.glia.widgets.core.callvisualizer.CallVisualizerManager
 import com.glia.widgets.core.chathead.ChatHeadManager
-import com.glia.widgets.core.configuration.GliaSdkConfigurationManager
 import com.glia.widgets.core.dialog.PermissionDialogManager
 import com.glia.widgets.core.notification.device.INotificationManager
 import com.glia.widgets.core.notification.device.NotificationManager
@@ -75,13 +74,9 @@ internal object Dependencies {
         @VisibleForTesting set
 
     @JvmStatic
-    var sdkConfigurationManager: GliaSdkConfigurationManager = GliaSdkConfigurationManager()
-        @VisibleForTesting set
+    val configurationManager: ConfigurationManager by lazy { ConfigurationManagerImpl(repositoryFactory.engagementConfigRepository) }
 
-    @JvmStatic
-    val configurationManager: ConfigurationManager = ConfigurationManagerImpl()
-
-    val activityLauncher: ActivityLauncher by lazy { ActivityLauncherImpl(IntentHelperImpl(sdkConfigurationManager)) }
+    val activityLauncher: ActivityLauncher by lazy { ActivityLauncherImpl(IntentHelperImpl()) }
 
     @JvmStatic
     val engagementLauncher: EngagementLauncher by lazy { EngagementLauncherImpl(activityLauncher) }
@@ -113,7 +108,7 @@ internal object Dependencies {
             permissionManager,
             PermissionDialogManager(application),
             notificationManager,
-            sdkConfigurationManager,
+            configurationManager,
             ChatHeadManager(application),
             audioControlManager,
             authenticationManagerProvider,
@@ -129,7 +124,7 @@ internal object Dependencies {
         controllerFactory = ControllerFactory(
             repositoryFactory,
             useCaseFactory,
-            sdkConfigurationManager,
+            configurationManager,
             managerFactory
         )
         initApplicationLifecycleObserver(
@@ -172,7 +167,8 @@ internal object Dependencies {
 
         val engagementCompletionActivityWatcher = EngagementCompletionActivityWatcher(
             controllerFactory.endEngagementController,
-            GliaActivityManagerImpl()
+            GliaActivityManagerImpl(),
+            activityLauncher
         )
         application.registerActivityLifecycleCallbacks(engagementCompletionActivityWatcher)
 
@@ -190,7 +186,6 @@ internal object Dependencies {
         gliaCore.init(gliaConfig)
         controllerFactory.init()
         repositoryFactory.engagementRepository.initialize()
-        sdkConfigurationManager.fromConfiguration(gliaWidgetsConfig)
         configurationManager.applyConfiguration(gliaWidgetsConfig)
         localeProvider.setCompanyName(gliaWidgetsConfig.companyName)
     }

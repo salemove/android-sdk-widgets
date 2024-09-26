@@ -22,13 +22,11 @@ import androidx.transition.TransitionSet
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.comms.VideoView
-import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.widgets.Constants
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.UiTheme.UiThemeBuilder
 import com.glia.widgets.call.CallState.ViewState
-import com.glia.widgets.core.configuration.EngagementConfiguration
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.databinding.CallButtonsLayoutBinding
@@ -41,7 +39,6 @@ import com.glia.widgets.helper.Utils
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getColorStateListCompat
 import com.glia.widgets.helper.getFontCompat
-import com.glia.widgets.helper.getFullHybridTheme
 import com.glia.widgets.helper.hideKeyboard
 import com.glia.widgets.helper.insetsController
 import com.glia.widgets.helper.requireActivity
@@ -176,22 +173,8 @@ internal class CallView(
         }
     }
 
-    fun startCall(
-        companyName: String,
-        queueIds: List<String>?,
-        visitorContextAssetId: String?,
-        screenSharingMode: ScreenSharing.Mode,
-        isUpgradeToCall: Boolean,
-        mediaType: Engagement.MediaType?
-    ) {
-        callController?.startCall(
-            companyName,
-            queueIds,
-            visitorContextAssetId,
-            mediaType,
-            screenSharingMode,
-            isUpgradeToCall
-        )
+    fun startCall(isUpgradeToCall: Boolean, mediaType: Engagement.MediaType?) {
+        callController?.startCall(mediaType, isUpgradeToCall)
     }
 
     fun onDestroy() {
@@ -522,13 +505,7 @@ internal class CallView(
     }
 
     private fun setDefaultTheme(typedArray: TypedArray) {
-        theme = Utils.getThemeFromTypedArray(typedArray, this.context)
-            .getFullHybridTheme(Dependencies.sdkConfigurationManager.uiTheme)
-    }
-
-    fun setUiTheme(uiTheme: UiTheme?) {
-        theme = theme.getFullHybridTheme(uiTheme ?: return)
-        setupViewAppearance()
+        theme = Utils.getFullHybridTheme(typedArray, this.context)
     }
 
     fun setOnBackClickedListener(onBackClicked: OnBackClickedListener) {
@@ -670,11 +647,6 @@ internal class CallView(
 
     fun onUserInteraction() {
         callController?.onUserInteraction()
-    }
-
-    fun setEngagementConfiguration(engagementConfiguration: EngagementConfiguration?) {
-        serviceChatHeadController?.setBuildTimeTheme(theme)
-        serviceChatHeadController?.setEngagementConfiguration(engagementConfiguration)
     }
 
     override fun showToast(message: String) {

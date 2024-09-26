@@ -49,7 +49,7 @@ internal interface ChatContract {
         fun onLinkClicked(link: Link)
         fun getConfirmationDialogLinks(): ConfirmationDialogLinks
         fun onEngagementConfirmationDialogRequested()
-        fun initChat(companyName: String?, queueIds: List<String>?, visitorContextAssetId: String?, chatType: ChatType)
+        fun initChat(chatType: ChatType)
         fun show()
         fun onPause()
         fun onResume()
@@ -64,7 +64,6 @@ internal interface ChatContract {
         fun emitUploadAttachments(attachments: List<LocalAttachment>)
         fun emitState(chatState: ChatState)
         fun emitItems(items: List<ChatItem>)
-        fun navigateToCall(mediaType: String)
         fun backToCall()
         fun minimizeView()
         fun smoothScrollToBottom()

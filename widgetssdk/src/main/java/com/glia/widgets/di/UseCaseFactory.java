@@ -66,9 +66,8 @@ import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharing
 import com.glia.widgets.core.callvisualizer.domain.VisitorCodeViewBuilderUseCase;
 import com.glia.widgets.core.chathead.ChatHeadManager;
 import com.glia.widgets.core.chathead.domain.IsDisplayBubbleInsideAppUseCase;
-import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase;
 import com.glia.widgets.core.chathead.domain.IsDisplayBubbleOutsideAppUseCase;
-import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
+import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase;
 import com.glia.widgets.core.dialog.DialogContract;
 import com.glia.widgets.core.dialog.PermissionDialogManager;
 import com.glia.widgets.core.dialog.domain.ConfirmationDialogLinksUseCase;
@@ -105,6 +104,7 @@ import com.glia.widgets.core.permissions.domain.WithReadWritePermissionsUseCase;
 import com.glia.widgets.core.permissions.domain.WithReadWritePermissionsUseCaseImpl;
 import com.glia.widgets.core.secureconversations.domain.AddSecureFileAttachmentsObserverUseCase;
 import com.glia.widgets.core.secureconversations.domain.AddSecureFileToAttachmentAndUploadUseCase;
+import com.glia.widgets.core.secureconversations.domain.GetAvailableQueueIdsForSecureMessagingUseCase;
 import com.glia.widgets.core.secureconversations.domain.GetSecureFileAttachmentsUseCase;
 import com.glia.widgets.core.secureconversations.domain.GetUnreadMessagesCountWithTimeoutUseCase;
 import com.glia.widgets.core.secureconversations.domain.IsMessagingAvailableUseCase;
@@ -113,7 +113,6 @@ import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDela
 import com.glia.widgets.core.secureconversations.domain.OnNextMessageUseCase;
 import com.glia.widgets.core.secureconversations.domain.RemoveSecureFileAttachmentUseCase;
 import com.glia.widgets.core.secureconversations.domain.ResetMessageCenterUseCase;
-import com.glia.widgets.core.secureconversations.domain.GetAvailableQueueIdsForSecureMessagingUseCase;
 import com.glia.widgets.core.secureconversations.domain.SendMessageButtonStateUseCase;
 import com.glia.widgets.core.secureconversations.domain.SendSecureMessageUseCase;
 import com.glia.widgets.core.secureconversations.domain.ShowMessageLimitErrorUseCase;
@@ -150,14 +149,14 @@ import com.glia.widgets.engagement.domain.IsOperatorPresentUseCase;
 import com.glia.widgets.engagement.domain.IsOperatorPresentUseCaseImpl;
 import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase;
 import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCaseImpl;
+import com.glia.widgets.engagement.domain.OnIncomingEngagementRequestTimeoutUseCase;
+import com.glia.widgets.engagement.domain.OnIncomingEngagementRequestTimeoutUseCaseImpl;
 import com.glia.widgets.engagement.domain.OperatorMediaUpgradeOfferUseCase;
 import com.glia.widgets.engagement.domain.OperatorMediaUpgradeOfferUseCaseImpl;
 import com.glia.widgets.engagement.domain.OperatorMediaUseCase;
 import com.glia.widgets.engagement.domain.OperatorMediaUseCaseImpl;
 import com.glia.widgets.engagement.domain.OperatorTypingUseCase;
 import com.glia.widgets.engagement.domain.OperatorTypingUseCaseImpl;
-import com.glia.widgets.engagement.domain.OnIncomingEngagementRequestTimeoutUseCase;
-import com.glia.widgets.engagement.domain.OnIncomingEngagementRequestTimeoutUseCaseImpl;
 import com.glia.widgets.engagement.domain.PrepareToScreenSharingUseCase;
 import com.glia.widgets.engagement.domain.PrepareToScreenSharingUseCaseImpl;
 import com.glia.widgets.engagement.domain.ReleaseResourcesUseCase;
@@ -185,6 +184,7 @@ import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromNetworkUseCas
 import com.glia.widgets.filepreview.domain.usecase.IsFileReadyForPreviewUseCase;
 import com.glia.widgets.filepreview.domain.usecase.PutImageFileToDownloadsUseCase;
 import com.glia.widgets.helper.rx.Schedulers;
+import com.glia.widgets.launcher.ConfigurationManager;
 import com.glia.widgets.locale.LocaleProvider;
 import com.glia.widgets.push.notifications.IsPushNotificationsSetUpUseCase;
 import com.glia.widgets.push.notifications.IsPushNotificationsSetUpUseCaseImpl;
@@ -208,7 +208,7 @@ public class UseCaseFactory {
     private final RepositoryFactory repositoryFactory;
     private final PermissionManager permissionManager;
     private final PermissionDialogManager permissionDialogManager;
-    private final GliaSdkConfigurationManager gliaSdkConfigurationManager;
+    private final ConfigurationManager configurationManager;
     private final INotificationManager notificationManager;
     private final ChatHeadManager chatHeadManager;
     private final AudioControlManager audioControlManager;
@@ -223,7 +223,7 @@ public class UseCaseFactory {
                    PermissionManager permissionManager,
                    PermissionDialogManager permissionDialogManager,
                    INotificationManager notificationManager,
-                   GliaSdkConfigurationManager gliaSdkConfigurationManager,
+                   ConfigurationManager configurationManager,
                    ChatHeadManager chatHeadManager,
                    AudioControlManager audioControlManager,
                    Dependencies.AuthenticationManagerProvider authenticationManagerProvider,
@@ -235,7 +235,7 @@ public class UseCaseFactory {
         this.permissionManager = permissionManager;
         this.permissionDialogManager = permissionDialogManager;
         this.notificationManager = notificationManager;
-        this.gliaSdkConfigurationManager = gliaSdkConfigurationManager;
+        this.configurationManager = configurationManager;
         this.chatHeadManager = chatHeadManager;
         this.audioControlManager = audioControlManager;
         this.schedulers = schedulers;
@@ -278,7 +278,7 @@ public class UseCaseFactory {
                 getScreenSharingUseCase(),
                 chatHeadManager,
                 permissionManager,
-                gliaSdkConfigurationManager,
+                configurationManager,
                 getEngagementTypeUseCase()
             );
         }
@@ -293,7 +293,7 @@ public class UseCaseFactory {
                 getIsCurrentEngagementCallVisualizer(),
                 getScreenSharingUseCase(),
                 permissionManager,
-                gliaSdkConfigurationManager,
+                configurationManager,
                 getEngagementTypeUseCase()
             );
         }
@@ -435,7 +435,7 @@ public class UseCaseFactory {
 
     @NonNull
     public IsShowOverlayPermissionRequestDialogUseCase createIsShowOverlayPermissionRequestDialogUseCase() {
-        return new IsShowOverlayPermissionRequestDialogUseCaseImpl(permissionManager, permissionDialogManager, gliaSdkConfigurationManager);
+        return new IsShowOverlayPermissionRequestDialogUseCaseImpl(permissionManager, permissionDialogManager, configurationManager);
     }
 
     @NonNull
@@ -970,12 +970,12 @@ public class UseCaseFactory {
 
     @NonNull
     public EnqueueForEngagementUseCase getQueueForEngagementUseCase() {
-        return new EnqueueForEngagementUseCaseImpl(repositoryFactory.getEngagementRepository());
+        return new EnqueueForEngagementUseCaseImpl(repositoryFactory.getEngagementRepository(), configurationManager);
     }
 
     @NonNull
     public ScreenSharingUseCase getScreenSharingUseCase() {
-        return new ScreenSharingUseCaseImpl(repositoryFactory.getEngagementRepository(), getReleaseScreenSharingResourcesUseCase());
+        return new ScreenSharingUseCaseImpl(repositoryFactory.getEngagementRepository(), getReleaseScreenSharingResourcesUseCase(), configurationManager);
     }
 
     @NonNull

@@ -14,12 +14,10 @@ import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.androidsdk.engagement.Survey
 import com.glia.widgets.R
-import com.glia.widgets.UiTheme
 import com.glia.widgets.databinding.SurveyViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.SimpleWindowInsetsAndAnimationHandler
 import com.glia.widgets.helper.Utils
-import com.glia.widgets.helper.getFullHybridTheme
 import com.glia.widgets.helper.hideKeyboard
 import com.glia.widgets.helper.insetsController
 import com.glia.widgets.helper.layoutInflater
@@ -37,7 +35,6 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
-import kotlin.properties.Delegates
 
 internal class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) :
     FrameLayout(
@@ -51,8 +48,6 @@ internal class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: 
     private var onTitleUpdatedListener: OnTitleUpdatedListener? = null
     private var onFinishListener: OnFinishListener? = null
     private var controller: SurveyContract.Controller? = null
-
-    private var uiTheme: UiTheme by Delegates.notNull()
 
     private val surveyTheme: SurveyTheme? by lazy {
         Dependencies.gliaThemeManager.theme?.surveyTheme
@@ -80,16 +75,10 @@ internal class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: 
     ) : this(context, attrs, defStyleAttr, R.style.Application_Glia_Chat)
 
     init {
+        SimpleWindowInsetsAndAnimationHandler(this)
         readTypedArray(attrs, defStyleAttr, defStyleRes)
         setupViewAppearance()
         initCallbacks()
-        initAdapter()
-        SimpleWindowInsetsAndAnimationHandler(this)
-    }
-
-    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
-        super.onLayout(changed, left, top, right, bottom)
-        applyStyle(uiTheme.surveyStyle)
     }
 
     private fun setupViewAppearance() {
@@ -206,24 +195,15 @@ internal class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: 
 
     private fun setDefaultTheme(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
         @SuppressLint("CustomViewStyleable")
-        val typedArray = this.context.obtainStyledAttributes(
-            attrs,
-            R.styleable.GliaView,
-            defStyleAttr,
-            defStyleRes
-        )
-        uiTheme = Utils.getThemeFromTypedArray(typedArray, this.context)
+        val typedArray = context.obtainStyledAttributes(attrs, R.styleable.GliaView, defStyleAttr, defStyleRes)
+        val surveyStyle = Utils.getFullHybridTheme(typedArray, this.context).surveyStyle
+        initAdapter(surveyStyle)
+        applyStyle(surveyStyle)
         typedArray.recycle()
     }
 
-    fun setTheme(uiTheme: UiTheme?) {
-        if (uiTheme == null) return
-        this.uiTheme = this.uiTheme.getFullHybridTheme(uiTheme)
-        this.uiTheme.surveyStyle?.also { surveyAdapter?.setStyle(it) }
-    }
-
-    private fun initAdapter() {
-        surveyAdapter = SurveyAdapter(this)
+    private fun initAdapter(surveyStyle: SurveyStyle?) {
+        surveyAdapter = SurveyAdapter(this, surveyStyle ?: SurveyStyle.Builder().build())
         recyclerView.adapter = surveyAdapter
 
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {

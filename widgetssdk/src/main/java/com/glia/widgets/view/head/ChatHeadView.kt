@@ -15,9 +15,7 @@ import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.core.view.isVisible
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
-import com.glia.widgets.call.CallConfiguration
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase
-import com.glia.widgets.core.configuration.EngagementConfiguration
 import com.glia.widgets.databinding.ChatHeadViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
@@ -51,21 +49,17 @@ internal class ChatHeadView @JvmOverloads constructor(
 ), ChatHeadContract.View {
     private val activityLauncher: ActivityLauncher by lazy { Dependencies.activityLauncher }
     private val binding by lazy { ChatHeadViewBinding.inflate(layoutInflater, this) }
-    private var engagementConfiguration: EngagementConfiguration? = null
     private var configuration: ChatHeadConfiguration by Delegates.notNull()
 
     private val isService by lazy { context is Service }
 
     private val bubbleTheme: BubbleTheme?
-        get() = Dependencies.gliaThemeManager.theme?.run {
-            if (isService) bubbleTheme else chatTheme?.bubble
-        }
+        get() = Dependencies.gliaThemeManager.theme?.run { if (isService) bubbleTheme else chatTheme?.bubble }
 
     @Suppress("JoinDeclarationAndAssignment")
     private var serviceChatHeadController: ChatHeadContract.Controller
     private var isCallVisualizerScreenSharingUseCase: IsCallVisualizerScreenSharingUseCase
     private var isCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase
-    private var theme: UiTheme? = null
 
     init {
         serviceChatHeadController = Dependencies.controllerFactory.chatHeadController
@@ -76,17 +70,15 @@ internal class ChatHeadView @JvmOverloads constructor(
     }
 
     private fun readTypedArray() {
-        context.withStyledAttributes(
-            set = null,
-            attrs = R.styleable.GliaView,
-            defStyleAttr = 0
-        ) {
+        context.withStyledAttributes(set = null, attrs = R.styleable.GliaView, defStyleAttr = 0) {
             setDefaultTheme(this)
         }
     }
+
     private fun setDefaultTheme(typedArray: TypedArray) {
-        theme = Utils.getThemeFromTypedArray(typedArray, this.context)
-        serviceChatHeadController.setBuildTimeTheme(theme)
+        configuration = createConfiguration(Utils.getFullHybridTheme(typedArray, this.context))
+        post { updateView() }
+        updateView()
     }
 
     override fun showUnreadMessageCount(count: Int) {
@@ -159,16 +151,6 @@ internal class ChatHeadView @JvmOverloads constructor(
         post { binding.onHoldIcon.visibility = GONE }
     }
 
-    override fun updateConfiguration(
-        buildTimeTheme: UiTheme,
-        engagementConfiguration: EngagementConfiguration?
-    ) {
-        this.engagementConfiguration = engagementConfiguration
-        serviceChatHeadController.setBuildTimeTheme(buildTimeTheme)
-        createHybridConfiguration(buildTimeTheme, engagementConfiguration)
-        post { updateView() }
-    }
-
     private fun applyBubbleTheme() {
         bubbleTheme?.badge?.also(binding.chatBubbleBadge::applyBadgeTheme)
         bubbleTheme?.onHoldOverlay?.also {
@@ -186,54 +168,31 @@ internal class ChatHeadView @JvmOverloads constructor(
     }
 
     override fun navigateToChat() {
-        engagementConfiguration?.let {
-            activityLauncher.launchChat(context, it)
-        }
+        activityLauncher.launchChat(context)
     }
 
     override fun navigateToCall() {
-        activityLauncher.launchCall(context, CallConfiguration(engagementConfiguration))
+        activityLauncher.launchCall(context, null, false)
     }
 
     override fun navigateToEndScreenSharing() {
         activityLauncher.launchEndScreenSharing(context)
     }
 
-    private fun createBuildTimeConfiguration(buildTimeTheme: UiTheme): ChatHeadConfiguration {
-        return ChatHeadConfiguration.builder()
-            .operatorPlaceholderBackgroundColor(buildTimeTheme.brandPrimaryColor)
-            .operatorPlaceholderIcon(buildTimeTheme.iconPlaceholder)
-            .operatorPlaceholderIconTintList(buildTimeTheme.baseLightColor)
-            .badgeTextColor(buildTimeTheme.baseLightColor)
-            .badgeBackgroundTintList(buildTimeTheme.brandPrimaryColor)
-            .backgroundColorRes(buildTimeTheme.brandPrimaryColor)
-            .iconOnHold(buildTimeTheme.iconOnHold)
-            .iconOnHoldTintList(buildTimeTheme.baseLightColor)
-            .iconScreenSharingDialog(buildTimeTheme.iconScreenSharingDialog)
-            .build()
-    }
-
-    private fun createHybridConfiguration(
-        buildTimeTheme: UiTheme,
-        engagementConfiguration: EngagementConfiguration?
-    ) {
-        configuration = createBuildTimeConfiguration(buildTimeTheme)
-        val runTimeTheme = engagementConfiguration?.runTimeTheme ?: return
-
-        val builder = ChatHeadConfiguration.builder(configuration)
-
-        runTimeTheme.chatHeadConfiguration?.apply {
-            operatorPlaceholderBackgroundColor?.also(builder::operatorPlaceholderBackgroundColor)
-            operatorPlaceholderIcon?.also(builder::operatorPlaceholderIcon)
-            operatorPlaceholderIconTintList?.also(builder::operatorPlaceholderIconTintList)
-            badgeBackgroundTintList?.also(builder::badgeBackgroundTintList)
-            badgeTextColor?.also(builder::badgeTextColor)
-            backgroundColorRes?.also(builder::backgroundColorRes)
-            iconOnHold?.also(builder::iconOnHold)
-            iconOnHoldTintList?.also(builder::iconOnHoldTintList)
-            iconScreenSharingDialog?.also(builder::iconScreenSharingDialog)
+    private fun createConfiguration(buildTimeTheme: UiTheme): ChatHeadConfiguration {
+        return buildTimeTheme.chatHeadConfiguration.let {
+            ChatHeadConfiguration.builder()
+                .operatorPlaceholderBackgroundColor(it?.operatorPlaceholderBackgroundColor ?: buildTimeTheme.brandPrimaryColor)
+                .operatorPlaceholderIcon(it?.operatorPlaceholderIcon ?: buildTimeTheme.iconPlaceholder)
+                .operatorPlaceholderIconTintList(it?.operatorPlaceholderIconTintList ?: buildTimeTheme.baseLightColor)
+                .badgeTextColor(it?.badgeTextColor ?: buildTimeTheme.baseLightColor)
+                .badgeBackgroundTintList(it?.badgeBackgroundTintList ?: buildTimeTheme.brandPrimaryColor)
+                .backgroundColorRes(it?.backgroundColorRes ?: buildTimeTheme.brandPrimaryColor)
+                .iconOnHold(it?.iconOnHold ?: buildTimeTheme.iconOnHold)
+                .iconOnHoldTintList(it?.iconOnHoldTintList ?: buildTimeTheme.baseLightColor)
+                .iconScreenSharingDialog(it?.iconScreenSharingDialog ?: buildTimeTheme.iconScreenSharingDialog)
+                .build()
         }
-        configuration = builder.build()
     }
 
     private fun setAccessibilityLabels() {
@@ -300,6 +259,7 @@ internal class ChatHeadView @JvmOverloads constructor(
         updateQueueingAnimationView()
 
         applyBubbleTheme()
+        invalidate()
     }
 
     private fun isDisplayUnreadMessageBadge(unreadMessageCount: Int): Boolean =

@@ -2,13 +2,11 @@ package com.glia.widgets.messagecenter
 
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
-import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.ChatType
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.chat.domain.SiteInfoUseCase
 import com.glia.widgets.chat.domain.TakePictureUseCase
 import com.glia.widgets.chat.domain.UriToFileAttachmentUseCase
-import com.glia.widgets.core.configuration.EngagementConfiguration
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.engagement.domain.SetEngagementConfigUseCase
 import com.glia.widgets.core.fileupload.model.LocalAttachment
@@ -23,7 +21,6 @@ import com.glia.widgets.core.secureconversations.domain.ResetMessageCenterUseCas
 import com.glia.widgets.core.secureconversations.domain.SendMessageButtonStateUseCase
 import com.glia.widgets.core.secureconversations.domain.SendSecureMessageUseCase
 import com.glia.widgets.core.secureconversations.domain.ShowMessageLimitErrorUseCase
-import com.glia.widgets.view.head.controller.ServiceChatHeadController
 import io.reactivex.rxjava3.core.Observable
 import org.junit.Before
 import org.junit.Test
@@ -37,7 +34,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 internal class MessageCenterControllerTest {
-    private lateinit var serviceChatHeadController: ServiceChatHeadController
     private lateinit var messageCenterController: MessageCenterController
     private lateinit var engagementConfigUseCase: SetEngagementConfigUseCase
     private lateinit var sendSecureMessageUseCase: SendSecureMessageUseCase
@@ -60,7 +56,6 @@ internal class MessageCenterControllerTest {
 
     @Before
     fun setUp() {
-        serviceChatHeadController = mock()
         engagementConfigUseCase = mock()
         sendSecureMessageUseCase = mock()
         getAvailableQueueIdsForSecureMessagingUseCase = mock()
@@ -80,7 +75,6 @@ internal class MessageCenterControllerTest {
         uriToFileAttachmentUseCase = mock()
         requestNotificationPermissionIfPushNotificationsSetUpUseCase = mock()
         messageCenterController = MessageCenterController(
-            serviceChatHeadController = serviceChatHeadController,
             engagementConfigUseCase = engagementConfigUseCase,
             sendSecureMessageUseCase = sendSecureMessageUseCase,
             getAvailableQueueIdsForSecureMessagingUseCase = getAvailableQueueIdsForSecureMessagingUseCase,
@@ -99,22 +93,6 @@ internal class MessageCenterControllerTest {
             uriToFileAttachmentUseCase = uriToFileAttachmentUseCase,
             requestNotificationPermissionIfPushNotificationsSetUpUseCase = requestNotificationPermissionIfPushNotificationsSetUpUseCase
         )
-    }
-
-    @Test
-    fun setConfiguration_setBuildTimeTheme_onTrigger() {
-        val uiTheme = mock<UiTheme>()
-        messageCenterController.setConfiguration(uiTheme, mock())
-
-        verify(serviceChatHeadController, times(1)).setBuildTimeTheme(uiTheme)
-    }
-
-    @Test
-    fun setConfiguration_setEngagementConfiguration_onTrigger() {
-        val configuration = mock<EngagementConfiguration>()
-        messageCenterController.setConfiguration(mock(), configuration)
-
-        verify(serviceChatHeadController, times(1)).setEngagementConfiguration(configuration)
     }
 
     @Test
@@ -275,7 +253,7 @@ internal class MessageCenterControllerTest {
 
         argumentCaptor.firstValue.onResult(availableQueueIds, null)
 
-        verify(engagementConfigUseCase, times(1)).invoke(ChatType.SECURE_MESSAGING, availableQueueIds)
+        verify(engagementConfigUseCase, times(1)).invoke(ChatType.SECURE_MESSAGING)
     }
 
     @Test

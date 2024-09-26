@@ -34,9 +34,11 @@ internal abstract class OperatorChatItem(@ChatAdapter.Type viewType: Int) : Serv
 internal sealed class Attachment(val id: String) {
     val remoteAttachment: AttachmentFile? get() = (this as? Remote)?.attachmentFile
     val localAttachment: FileAttachment? get() = (this as? Local)?.fileAttachment
+
     data class Remote(val attachmentFile: AttachmentFile) : Attachment(attachmentFile.id)
     data class Local(val fileAttachment: FileAttachment) : Attachment(UUID.randomUUID().toString())
 }
+
 internal interface AttachmentItem {
     val attachment: Attachment
     val isFileExists: Boolean
@@ -173,25 +175,19 @@ internal sealed class OperatorStatusItem : ChatItem(ChatAdapter.OPERATOR_STATUS_
     override val id: String = "operator_status_item"
     override val timestamp: Long = -1
 
-    abstract val companyName: String?
-
-    data class InQueue(override val companyName: String?) : OperatorStatusItem()
+    object InQueue : OperatorStatusItem()
 
     data class Connected(
-        override val companyName: String?,
         val operatorName: String,
         val profileImgUrl: String?
     ) : OperatorStatusItem()
 
     data class Joined(
-        override val companyName: String?,
         val operatorName: String,
         val profileImgUrl: String?
     ) : OperatorStatusItem()
 
-    object Transferring : OperatorStatusItem() {
-        override val companyName: String? = null
-    }
+    object Transferring : OperatorStatusItem()
 }
 
 // Visitor

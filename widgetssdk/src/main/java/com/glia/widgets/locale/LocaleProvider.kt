@@ -17,7 +17,6 @@ import io.reactivex.rxjava3.core.Observer
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.PublishSubject
 import kotlinx.parcelize.Parcelize
-import java.lang.Exception
 
 /**
  * @hide
@@ -26,7 +25,7 @@ import java.lang.Exception
 data class LocaleString(
     @StringRes val stringKey: Int,
     val values: List<StringKeyPair> = emptyList()
-): Parcelable {
+) : Parcelable {
 
     constructor(@StringRes stringKey: Int, vararg values: StringKeyPair) : this(stringKey, values.toList())
 
@@ -86,10 +85,10 @@ internal open class LocaleProvider @JvmOverloads constructor(
     }
 
     fun getString(stringKey: Int, values: List<StringKeyPair>): String {
-        if (stringKey == R.string.general_company_name) {
-            return getCompanyName()
+        return if (stringKey == R.string.general_company_name) {
+            getCompanyName()
         } else {
-            return getStringInternal(stringKey, values)
+            getStringInternal(stringKey, values)
         }
     }
 
@@ -103,10 +102,10 @@ internal open class LocaleProvider @JvmOverloads constructor(
         return try {
             getLocaleManager().getRemoteString(key)?.let {
                 values.fold(it, ::replaceInsertedValues).run(::cleanupRemainingReferences)
-            } ?: resourceProvider.getString(stringKey, *values.map { pair -> pair.value }.toTypedArray())
+            } ?: resourceProvider.getString(stringKey, *values.map { pair -> valueOrCompanyName(pair) }.toTypedArray())
         } catch (e: GliaException) {
             Logger.d(TAG, "Remote locale string failed to load : ${e.message}")
-            resourceProvider.getString(stringKey, *values.map { pair -> pair.value }.toTypedArray())
+            resourceProvider.getString(stringKey, *values.map { pair -> valueOrCompanyName(pair) }.toTypedArray())
         }
     }
 
@@ -118,18 +117,21 @@ internal open class LocaleProvider @JvmOverloads constructor(
         hardcodedCompanyName = companyName
     }
 
-    // Priority for remote company name but not found or no locales it will fall back to hardcoded one or "" if no hardcoded one
-    fun getCompanyName(): String {
-        var companyName = getStringInternal(R.string.general_company_name)
-        if (companyName.isBlank()) {
-            companyName = hardcodedCompanyName ?: ""
+    fun valueOrCompanyName(stringKeyPair: StringKeyPair): String {
+        return if (stringKeyPair.key == StringKey.COMPANY_NAME) {
+            getCompanyName()
+        } else {
+            stringKeyPair.value
         }
-        return companyName
     }
+
+    // Priority for remote company name but not found or no locales it will fall back to hardcoded one or "" if no hardcoded one
+    private fun getCompanyName(): String = getStringInternal(R.string.general_company_name)
+        .takeIf { it.isNotBlank() } ?: hardcodedCompanyName.orEmpty()
 
     private fun replaceInsertedValues(string: String, pair: StringKeyPair): String {
         return if (string.contains(pair.key.value, false)) {
-            string.replace("{${pair.key.value}}", pair.value)
+            string.replace("{${pair.key.value}}", valueOrCompanyName(pair))
         } else {
             string
         }

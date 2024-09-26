@@ -7,7 +7,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResult
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.comms.MediaUpgradeOffer
-import com.glia.widgets.core.configuration.GliaSdkConfigurationManager
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
 import com.glia.widgets.core.dialog.domain.SetOverlayPermissionRequestDialogShownUseCase
@@ -48,7 +47,6 @@ internal class OperatorRequestController(
     private val isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase,
     private val setOverlayPermissionRequestDialogShownUseCase: SetOverlayPermissionRequestDialogShownUseCase,
     private val dialogController: DialogContract.Controller,
-    private val gliaSdkConfigurationManager: GliaSdkConfigurationManager,
     private val withNotificationPermissionUseCase: WithNotificationPermissionUseCase,
     private val prepareToScreenSharingUseCase: PrepareToScreenSharingUseCase,
     private val releaseScreenSharingResourcesUseCase: ReleaseScreenSharingResourcesUseCase
@@ -160,7 +158,7 @@ internal class OperatorRequestController(
 
         withNotificationPermissionUseCase {
             _state.onNext(State.AcquireMediaProjectionToken)
-            screenSharingUseCase.acceptRequestWithAskedPermission(activity, gliaSdkConfigurationManager.screenSharingMode)
+            screenSharingUseCase.acceptRequestWithAskedPermission(activity)
         }
     }
 

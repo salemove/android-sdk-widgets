@@ -6,7 +6,7 @@ import com.glia.widgets.base.FadeTransitionActivity
 /**
  * EntryWidgetActivity provides a way to display the EntryWidget bottom sheet.
  */
-class EntryWidgetActivity : FadeTransitionActivity(), EntryWidgetFragment.OnDismissListener {
+internal class EntryWidgetActivity : FadeTransitionActivity(), EntryWidgetFragment.OnDismissListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

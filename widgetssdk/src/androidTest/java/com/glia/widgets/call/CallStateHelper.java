@@ -113,7 +113,6 @@ public class CallStateHelper {
             landscapeLayoutControlsVisible = callState.landscapeLayoutControlsVisible;
             isMuted = callState.isMuted;
             hasVideo = callState.hasVideo;
-            companyName = callState.companyName;
             requestedMediaType = callState.requestedMediaType;
             isSpeakerOn = callState.isSpeakerOn;
             return this;
@@ -159,7 +158,6 @@ public class CallStateHelper {
                 .setLandscapeLayoutControlsVisible(landscapeLayoutControlsVisible)
                 .setIsMuted(isMuted)
                 .setHasVideo(hasVideo)
-                .setCompanyName(companyName)
                 .setRequestedMediaType(requestedMediaType)
                 .setIsSpeakerOn(isSpeakerOn)
                 .createCallState();

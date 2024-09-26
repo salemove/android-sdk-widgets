@@ -1,6 +1,6 @@
 package com.glia.widgets.view.unifiedui.config.entrywidget
 
-import com.glia.widgets.view.unifiedui.config.base.ColorRemoteConfig
+import com.glia.widgets.view.unifiedui.config.base.ColorLayerRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.LayerRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.TextRemoteConfig
 import com.glia.widgets.view.unifiedui.theme.entrywidget.MediaTypeItemTheme
@@ -10,7 +10,7 @@ internal data class MediaTypeItemRemoteConfig(
     @SerializedName("background")
     val background: LayerRemoteConfig?,
     @SerializedName("iconColor")
-    val iconColor: ColorRemoteConfig?,
+    val iconColor: ColorLayerRemoteConfig?,
     @SerializedName("title")
     val title: TextRemoteConfig?,
     @SerializedName("message")

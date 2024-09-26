@@ -36,19 +36,25 @@
       "background": {
         "border": {
           "type": "fill",
-          "value": ["#FFFFFF"]
+          "value": [
+            "#FFFFFF"
+          ]
         },
         "borderWidth": 0,
         "color": {
           "type": "fill",
-          "value": ["#FFFFFF"]
+          "value": [
+            "#FFFFFF"
+          ]
         },
         "cornerRadius": 8
       },
       "shadow": {
         "color": {
           "type": "fill",
-          "value": ["#FF0000"]
+          "value": [
+            "#FF0000"
+          ]
         },
         "offset": 0,
         "opacity": 1,
@@ -58,7 +64,9 @@
         "alignment": "center",
         "background": {
           "type": "fill",
-          "value": ["#FF0000"]
+          "value": [
+            "#FF0000"
+          ]
         },
         "font": {
           "size": 16,
@@ -66,12 +74,16 @@
         },
         "foreground": {
           "type": "fill",
-          "value": ["#04728c"]
+          "value": [
+            "#04728c"
+          ]
         }
       },
       "tintColor": {
         "type": "fill",
-        "value": ["#ffd100"]
+        "value": [
+          "#ffd100"
+        ]
       }
     },
     "negativeButton": {
@@ -95,7 +107,7 @@
         "color": {
           "type": "fill",
           "value": [
-            "FF0000"
+            "#FF0000"
           ]
         },
         "offset": 0,
@@ -107,7 +119,7 @@
         "background": {
           "type": "fill",
           "value": [
-            "FF0000"
+            "#FF0000"
           ]
         },
         "font": {
@@ -126,6 +138,37 @@
         "value": [
           "#ffd100"
         ]
+      }
+    },
+    "negativeNeutralButton": {
+      "background": {
+        "border": {
+          "type": "fill",
+          "value": [
+            "#99e5ea"
+          ]
+        },
+        "borderWidth": 1,
+        "color": {
+          "type": "fill",
+          "value": [
+            "#FFFFFF"
+          ]
+        },
+        "cornerRadius": 8
+      },
+      "text": {
+        "alignment": "center",
+        "font": {
+          "size": 16,
+          "style": "regular"
+        },
+        "foreground": {
+          "type": "fill",
+          "value": [
+            "#d32f2f"
+          ]
+        }
       }
     },
     "positiveButton": {
@@ -149,7 +192,7 @@
         "color": {
           "type": "fill",
           "value": [
-            "FF0000"
+            "#FF0000"
           ]
         },
         "offset": 0,
@@ -161,7 +204,7 @@
         "background": {
           "type": "fill",
           "value": [
-            "FF0000"
+            "#FF0000"
           ]
         },
         "font": {
@@ -276,7 +319,7 @@
       "border": {
         "type": "fill",
         "value": [
-          "FF0000"
+          "#FF0000"
         ]
       },
       "borderWidth": 2,
@@ -1134,10 +1177,9 @@
           },
           "borderWidth": 2,
           "color": {
-            "type": "gradient",
+            "type": "fill",
             "value": [
-              "#fdd42b",
-              "#ff0000"
+              "#000000"
             ]
           },
           "cornerRadius": 8
@@ -1188,10 +1230,9 @@
         },
         "borderWidth": 2,
         "color": {
-          "type": "gradient",
+          "type": "fill",
           "value": [
-            "#fdd42b",
-            "#ff0000"
+            "#f9d12b"
           ]
         },
         "cornerRadius": 8
@@ -1394,6 +1435,20 @@
         "type": "fill",
         "value": [
           "#FFFFFF"
+        ]
+      }
+    },
+    "snackBar": {
+      "background": {
+        "type": "fill",
+        "value": [
+          "#FFFFFF"
+        ]
+      },
+      "text": {
+        "type": "fill",
+        "value": [
+          "#3B3B40"
         ]
       }
     },
@@ -1964,10 +2019,9 @@
         },
         "borderWidth": 2,
         "color": {
-          "type": "gradient",
+          "type": "fill",
           "value": [
-            "#fdd42b",
-            "#ff0000"
+            "#fdd42b"
           ]
         },
         "cornerRadius": 8
@@ -2649,7 +2703,7 @@
             "background": {
               "type": "fill",
               "value": [
-                "FF0000"
+                "#FF0000"
               ]
             },
             "font": {
@@ -2703,7 +2757,7 @@
             "background": {
               "type": "fill",
               "value": [
-                "FF0000"
+                "#FF0000"
               ]
             },
             "font": {
@@ -2757,7 +2811,7 @@
             "background": {
               "type": "fill",
               "value": [
-                "FF0000"
+                "#FF0000"
               ]
             },
             "font": {
@@ -2784,7 +2838,7 @@
         "background": {
           "type": "fill",
           "value": [
-            "8E8E93"
+            "#8E8E93"
           ]
         },
         "font": {
@@ -2998,7 +3052,9 @@
         "alignment": "center",
         "background": {
           "type": "fill",
-          "value": ["#FFFFFF"]
+          "value": [
+            "#FFFFFF"
+          ]
         },
         "font": {
           "size": 16,
@@ -3006,7 +3062,9 @@
         },
         "foreground": {
           "type": "fill",
-          "value": ["#FF0000"]
+          "value": [
+            "#FF0000"
+          ]
         }
       },
       "text": {
@@ -3301,6 +3359,125 @@
             ]
           },
           "cornerRadius": 24
+        }
+      }
+    },
+    "secureMessaging": {
+      "unavailableStatusBackground": {
+        "color": {
+          "type": "fill",
+          "value": [
+            "#d32f2f"
+          ]
+        }
+      },
+      "unavailableStatusText": {
+        "alignment": "center",
+        "foreground": {
+          "type": "fill",
+          "value": [
+            "#FFFFFF"
+          ]
+        }
+      },
+      "bottomBannerBackground": {
+        "color": {
+          "type": "fill",
+          "value": [
+            "#99e5ea"
+          ]
+        }
+      },
+      "bottomBannerText": {
+        "alignment": "center",
+        "font": {
+          "size": 16,
+          "style": "regular"
+        },
+        "foreground": {
+          "type": "fill",
+          "value": [
+            "#8E8E93"
+          ]
+        }
+      },
+      "bottomBannerDividerColor": {
+        "type": "fill",
+        "value": [
+          "#8E8E93"
+        ]
+      },
+      "topBannerBackground": {
+        "color": {
+          "type": "fill",
+          "value": [
+            "#FFFFFF"
+          ]
+        }
+      },
+      "topBannerText": {
+        "alignment": "center",
+        "font": {
+          "size": 16,
+          "style": "regular"
+        },
+        "foreground": {
+          "type": "fill",
+          "value": [
+            "#04728c"
+          ]
+        }
+      },
+      "topBannerDividerColor": {
+        "type": "fill",
+        "value": [
+          "#8E8E93"
+        ]
+      },
+      "topBannerDropDownIconColor": {
+        "type": "fill",
+        "value": [
+          "#04728c"
+        ]
+      },
+      "mediaTypeItems": {
+        "mediaTypeItem": {
+          "background": {
+            "color": {
+              "type": "fill",
+              "value": [
+                "#ffffff"
+              ]
+            }
+          },
+          "iconColor": {
+            "type": "fill",
+            "value": [
+              "#ffd100"
+            ]
+          },
+          "title": {
+            "foreground": {
+              "type": "fill",
+              "value": [
+                "#04728c"
+              ]
+            }
+          },
+          "message": {
+            "foreground": {
+              "type": "fill",
+              "value": [
+                "#444444"
+              ]
+            }
+          }
+        },
+        "dividerColor": {
+          "type": "fill",
+          "value": [
+            "#04728c"
+          ]
         }
       }
     }
@@ -3993,10 +4170,9 @@
           },
           "borderWidth": 2,
           "color": {
-            "type": "gradient",
+            "type": "fill",
             "value": [
-              "#fdd42b",
-              "#ff0000"
+              "#fdd42b"
             ]
           },
           "cornerRadius": 8
@@ -4223,7 +4399,7 @@
           "color": {
             "type": "fill",
             "value": [
-              "FF0000"
+              "#FF0000"
             ]
           },
           "offset": 0,
@@ -4235,7 +4411,7 @@
           "background": {
             "type": "fill",
             "value": [
-              "FF0000"
+              "#FF0000"
             ]
           },
           "font": {
@@ -4295,7 +4471,7 @@
           "color": {
             "type": "fill",
             "value": [
-              "FF0000"
+              "#FF0000"
             ]
           },
           "offset": 0,
@@ -4307,7 +4483,7 @@
           "background": {
             "type": "fill",
             "value": [
-              "FF0000"
+              "#FF0000"
             ]
           },
           "font": {
@@ -4417,10 +4593,9 @@
           },
           "borderWidth": 2,
           "color": {
-            "type": "gradient",
+            "type": "fill",
             "value": [
-              "#fdd42b",
-              "#ff0000"
+              "#000000"
             ]
           },
           "cornerRadius": 8
@@ -4471,10 +4646,9 @@
         },
         "borderWidth": 2,
         "color": {
-          "type": "gradient",
+          "type": "fill",
           "value": [
-            "#fdd42b",
-            "#ff0000"
+            "#f9d12b"
           ]
         },
         "cornerRadius": 8
@@ -4796,10 +4970,9 @@
           },
           "borderWidth": 2,
           "color": {
-            "type": "gradient",
+            "type": "fill",
             "value": [
-              "#fdd42b",
-              "#ff0000"
+              "#000000"
             ]
           },
           "cornerRadius": 8
@@ -4850,10 +5023,9 @@
         },
         "borderWidth": 2,
         "color": {
-          "type": "gradient",
+          "type": "fill",
           "value": [
-            "#fdd42b",
-            "#ff0000"
+            "#f9d12b"
           ]
         },
         "cornerRadius": 8
@@ -5209,6 +5381,20 @@
       }
     }
   },
+  "snackBar": {
+    "background": {
+      "type": "fill",
+      "value": [
+        "#3B3B40"
+      ]
+    },
+    "text": {
+      "type": "fill",
+      "value": [
+        "#FFFFFF"
+      ]
+    }
+  },
   "webBrowserScreen": {
     "header": {
       "background": {
@@ -5220,10 +5406,9 @@
         },
         "borderWidth": 2,
         "color": {
-          "type": "gradient",
+          "type": "fill",
           "value": [
-            "#fdd42b",
-            "#ff0000"
+            "#fdd42b"
           ]
         },
         "cornerRadius": 8
@@ -5298,6 +5483,89 @@
           "type": "fill",
           "value": [
             "#000000"
+          ]
+        }
+      }
+    }
+  },
+  "entryWidget": {
+    "background": {
+      "color": {
+        "type": "fill",
+        "value": [
+          "#ffffff"
+        ]
+      }
+    },
+    "mediaTypeItems": {
+      "mediaTypeItem": {
+        "background": {
+          "color": {
+            "type": "fill",
+            "value": [
+              "#ffffff"
+            ]
+          }
+        },
+        "iconColor": {
+          "type": "fill",
+          "value": [
+            "#ffd100"
+          ]
+        },
+        "title": {
+          "foreground": {
+            "type": "fill",
+            "value": [
+              "#04728c"
+            ]
+          }
+        },
+        "message": {
+          "foreground": {
+            "type": "fill",
+            "value": [
+              "#444444"
+            ]
+          }
+        }
+      },
+      "dividerColor": {
+        "type": "fill",
+        "value": [
+          "#04728c"
+        ]
+      }
+    },
+    "errorTitle": {
+      "alignment": "center",
+      "foreground": {
+        "type": "fill",
+        "value": [
+          "#d32f2f"
+        ]
+      }
+    },
+    "errorMessage": {
+      "alignment": "center",
+      "foreground": {
+        "type": "fill",
+        "value": [
+          "#8E8E93"
+        ]
+      }
+    },
+    "errorButton": {
+      "text": {
+        "alignment": "center",
+        "font": {
+          "size": 16,
+          "style": "regular"
+        },
+        "foreground": {
+          "type": "fill",
+          "value": [
+            "#04728c"
           ]
         }
       }

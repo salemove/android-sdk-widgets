@@ -74,8 +74,6 @@ internal class MessageView(
         Dependencies.gliaThemeManager.theme?.secureMessagingWelcomeScreenTheme
     }
 
-    private var theme: UiTheme by Delegates.notNull()
-
     private val attachmentPopup by lazy {
         AttachmentPopup(context, unifiedTheme?.pickMediaTheme)
     }
@@ -116,12 +114,12 @@ internal class MessageView(
     }
 
     private fun setDefaultTheme(typedArray: TypedArray) {
-        theme = Utils.getThemeFromTypedArray(typedArray, this.context)
-        setupAttachmentIconTheme()
-        setupMessageErrorTextTheme()
+        val theme = Utils.getFullHybridTheme(typedArray, this.context)
+        setupAttachmentIconTheme(theme)
+        setupMessageErrorTextTheme(theme)
     }
 
-    private fun setupMessageErrorTextTheme() {
+    private fun setupMessageErrorTextTheme(theme: UiTheme) {
         val systemNegativeColorId = theme.systemNegativeColor ?: return
 
         TextViewCompat.setCompoundDrawableTintList(
@@ -185,7 +183,7 @@ internal class MessageView(
         attachmentRecyclerView.adapter = uploadAttachmentAdapter
     }
 
-    private fun setupAttachmentIconTheme() {
+    private fun setupAttachmentIconTheme(theme: UiTheme) {
         val normalColor = unifiedTheme?.filePickerButtonTheme?.primaryColor
             ?: theme.baseNormalColor?.let { getColorCompat(it) }
         val disabledColor = unifiedTheme?.filePickerButtonDisabledTheme?.primaryColor

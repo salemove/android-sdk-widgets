@@ -203,7 +203,7 @@ internal class ChatManager(
     @VisibleForTesting
     fun mapAction(action: Action, state: State): State {
         return when (action) {
-            is Action.QueuingStarted -> mapInQueue(action.companyName, state)
+            Action.QueuingStarted -> mapInQueue(state)
             is Action.OperatorConnected -> mapOperatorConnected(action, state)
             Action.Transferring -> mapTransferring(state)
             is Action.OperatorJoined -> mapOperatorJoined(action, state)
@@ -371,7 +371,7 @@ internal class ChatManager(
     fun mapOperatorJoined(action: Action.OperatorJoined, state: State): State = state.apply {
         chatItems -= OperatorStatusItem.Transferring
         chatItems += action.run {
-            OperatorStatusItem.Joined(companyName, operatorFormattedName, operatorImageUrl)
+            OperatorStatusItem.Joined(operatorFormattedName, operatorImageUrl)
         }
     }
 
@@ -390,7 +390,7 @@ internal class ChatManager(
 
     @VisibleForTesting
     fun mapOperatorConnected(action: Action.OperatorConnected, state: State): State {
-        val operatorStatusItem = action.run { OperatorStatusItem.Connected(companyName, operatorFormattedName, operatorImageUrl) }
+        val operatorStatusItem = action.run { OperatorStatusItem.Connected(operatorFormattedName, operatorImageUrl) }
         val oldOperatorStatusItem: OperatorStatusItem? = state.operatorStatusItem
         state.operatorStatusItem = operatorStatusItem
 
@@ -420,8 +420,8 @@ internal class ChatManager(
     }
 
     @VisibleForTesting
-    fun mapInQueue(companyName: String, state: State): State = state.apply {
-        OperatorStatusItem.InQueue(companyName).also {
+    fun mapInQueue(state: State): State = state.apply {
+        OperatorStatusItem.InQueue.also {
             operatorStatusItem = it
             chatItems += it
         }
@@ -476,10 +476,10 @@ internal class ChatManager(
     }
 
     internal sealed interface Action {
-        data class QueuingStarted(val companyName: String) : Action
-        data class OperatorConnected(val companyName: String, val operatorFormattedName: String, val operatorImageUrl: String?) : Action
+        object QueuingStarted : Action
+        data class OperatorConnected(val operatorFormattedName: String, val operatorImageUrl: String?) : Action
         object Transferring : Action
-        data class OperatorJoined(val companyName: String, val operatorFormattedName: String, val operatorImageUrl: String?) : Action
+        data class OperatorJoined(val operatorFormattedName: String, val operatorImageUrl: String?) : Action
         data class ResponseCardClicked(val responseCard: OperatorMessageItem.ResponseCard) : Action
         data class OnMediaUpgradeStarted(val isVideo: Boolean) : Action
         data class OnMediaUpgradeTimerUpdated(val formattedValue: String) : Action

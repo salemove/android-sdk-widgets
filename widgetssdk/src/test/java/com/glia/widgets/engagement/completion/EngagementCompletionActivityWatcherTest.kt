@@ -7,12 +7,14 @@ import android.content.Context
 import android.os.Parcelable
 import android.view.View
 import androidx.appcompat.app.AlertDialog
+import com.glia.androidsdk.engagement.Survey
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.helper.GliaActivityManager
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.OneTimeEvent
 import com.glia.widgets.helper.withRuntimeTheme
+import com.glia.widgets.launcher.ActivityLauncher
 import com.glia.widgets.view.Dialogs
 import io.mockk.Runs
 import io.mockk.confirmVerified
@@ -40,6 +42,7 @@ class EngagementCompletionActivityWatcherTest {
     private lateinit var controller: EngagementCompletionContract.Controller
 
     private lateinit var watcher: EngagementCompletionActivityWatcher
+    private lateinit var activityLauncher: ActivityLauncher
 
     @Before
     fun setUp() {
@@ -59,7 +62,9 @@ class EngagementCompletionActivityWatcherTest {
             every { state } returns stateProcessor
         }
 
-        watcher = EngagementCompletionActivityWatcher(controller, gliaActivityManager)
+        activityLauncher = mockk(relaxUnitFun = true)
+
+        watcher = EngagementCompletionActivityWatcher(controller, gliaActivityManager, activityLauncher)
 
         verify { controller.state }
     }
@@ -275,7 +280,8 @@ class EngagementCompletionActivityWatcherTest {
 
     @Test
     fun `handleState will start Survey when event is SurveyLoaded`() {
-        val event = createMockEvent(EngagementCompletionState.SurveyLoaded(mockk(moreInterfaces = arrayOf(Parcelable::class))))
+        val survey = mockk<Survey>(moreInterfaces = arrayOf(Parcelable::class))
+        val event = createMockEvent(EngagementCompletionState.SurveyLoaded(survey))
 
         val activity = mockkActivity<ChatActivity>()
 
@@ -292,9 +298,7 @@ class EngagementCompletionActivityWatcherTest {
 
         verify { event.consume(any()) }
 
-        verify { activity.overridePendingTransition(any(), any()) }
-        verify { activity.startActivity(any()) }
-        verify { activity.packageName }
+        verify { activityLauncher.launchSurvey(eq(activity), eq(survey)) }
 
         verify(exactly = 0) { dialog.dismiss() }
         verify(exactly = 0) { gliaActivityManager.finishActivities() }

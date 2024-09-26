@@ -3,7 +3,6 @@ package com.glia.widgets.core.chathead.domain
 import com.glia.widgets.call.CallView
 import com.glia.widgets.callvisualizer.EndScreenSharingView
 import com.glia.widgets.chat.ChatView
-import com.glia.widgets.core.configuration.GliaSdkConfigurationManager
 import com.glia.widgets.core.permissions.PermissionManager
 import com.glia.widgets.engagement.domain.EngagementTypeUseCase
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
@@ -11,6 +10,7 @@ import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
 import com.glia.widgets.engagement.domain.ScreenSharingUseCase
 import com.glia.widgets.filepreview.ui.ImagePreviewView
 import com.glia.widgets.helper.DialogHolderView
+import com.glia.widgets.launcher.ConfigurationManager
 import com.glia.widgets.messagecenter.MessageCenterView
 
 internal abstract class IsDisplayBubbleUseCase(
@@ -18,7 +18,7 @@ internal abstract class IsDisplayBubbleUseCase(
     private val isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase,
     private val screenSharingUseCase: ScreenSharingUseCase,
     val permissionManager: PermissionManager,
-    internal val configurationManager: GliaSdkConfigurationManager,
+    internal val configurationManager: ConfigurationManager,
     private val engagementTypeUseCase: EngagementTypeUseCase
 ) {
     open operator fun invoke(viewName: String?): Boolean {

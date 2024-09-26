@@ -22,7 +22,6 @@ import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.androidsdk.queuing.Queue
 import com.glia.widgets.UiTheme
-import com.glia.widgets.di.Dependencies
 import com.glia.widgets.view.unifiedui.merge
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
@@ -57,9 +56,6 @@ internal val Operator.imageUrl: String? get() = picture?.url?.getOrNull()
 internal fun UiTheme?.isAlertDialogButtonUseVerticalAlignment(): Boolean = this?.gliaAlertDialogButtonUseVerticalAlignment ?: false
 
 internal fun UiTheme?.getFullHybridTheme(newTheme: UiTheme?): UiTheme = merge(newTheme) ?: UiTheme.UiThemeBuilder().build()
-
-internal val UiTheme?.withConfigurationTheme: UiTheme
-    get() = getFullHybridTheme(Dependencies.sdkConfigurationManager.uiTheme)
 
 /**
  * Returns styled text from the provided HTML string. Replaces \n to <br> regardless of the operating system where the string was created.

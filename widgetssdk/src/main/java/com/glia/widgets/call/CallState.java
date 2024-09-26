@@ -10,7 +10,6 @@ import com.glia.androidsdk.comms.Video;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContract.FlipButtonState;
 
-import java.util.List;
 import java.util.Objects;
 
 class CallState {
@@ -23,7 +22,6 @@ class CallState {
     public final boolean landscapeLayoutControlsVisible;
     public final boolean isMuted;
     public final boolean hasVideo;
-    public final String companyName;
     @Nullable
     public final Engagement.MediaType requestedMediaType;
     public final boolean isSpeakerOn;
@@ -31,8 +29,6 @@ class CallState {
     //    Need this to not update all views when only time is changed.
     public final boolean isOnlyTimeChanged;
     public final boolean isCallVisualizer;
-    public final List<String> queueIds;
-    public final String visitorContextAssetId;
 
     public final boolean isSharingScreen;
     public final FlipButtonState flipButtonState;
@@ -45,14 +41,11 @@ class CallState {
         this.landscapeLayoutControlsVisible = builder.landscapeLayoutControlsVisible;
         this.isMuted = builder.isMuted;
         this.hasVideo = builder.hasVideo;
-        this.companyName = builder.companyName;
         this.requestedMediaType = builder.requestedMediaType;
         this.isSpeakerOn = builder.isSpeakerOn;
         this.isOnHold = builder.isOnHold;
         this.isOnlyTimeChanged = builder.isOnlyTimeChanged;
         this.isCallVisualizer = builder.isCallVisualizer;
-        this.queueIds = builder.queueIds;
-        this.visitorContextAssetId = builder.visitorContextAssetId;
         this.isSharingScreen = builder.isSharingScreen;
         this.flipButtonState = builder.flipButtonState;
     }
@@ -83,7 +76,6 @@ class CallState {
             isMuted == callState.isMuted &&
             hasVideo == callState.hasVideo &&
             Objects.equals(callStatus, callState.callStatus) &&
-            Objects.equals(companyName, callState.companyName) &&
             Objects.equals(requestedMediaType, callState.requestedMediaType) &&
             isSpeakerOn == callState.isSpeakerOn &&
             isOnHold == callState.isOnHold &&
@@ -97,7 +89,7 @@ class CallState {
     public int hashCode() {
         return Objects.hash(integratorCallStarted, isVisible, messagesNotSeen,
             callStatus, landscapeLayoutControlsVisible, isMuted, hasVideo,
-            companyName, requestedMediaType, isSpeakerOn, isOnHold, isOnlyTimeChanged,
+            requestedMediaType, isSpeakerOn, isOnHold, isOnlyTimeChanged,
             isCallVisualizer, isSharingScreen, flipButtonState);
     }
 
@@ -163,7 +155,6 @@ class CallState {
             ", landscapeLayoutControlsVisible=" + landscapeLayoutControlsVisible +
             ", isMuted=" + isMuted +
             ", hasVideo=" + hasVideo +
-            ", companyName: " + companyName +
             ", requestedMediaType: " + requestedMediaType +
             ", isSpeakerOn: " + isSpeakerOn +
             ", isOnHold: " + isOnHold +
@@ -481,15 +472,12 @@ class CallState {
             visitorMediaState.getAudio().getStatus() != Media.Status.PLAYING;
     }
 
-    public CallState initCall(String companyName, List<String> queueIds, String visitorContextAssetId, @Nullable Engagement.MediaType requestedMediaType) {
+    public CallState initCall(@Nullable Engagement.MediaType requestedMediaType) {
         return new Builder()
             .copyFrom(this)
             .setIntegratorCallStarted(true)
             .setVisible(true)
             .setIsOnHold(false)
-            .setCompanyName(companyName)
-            .setQueueIds(queueIds)
-            .setVisitorContextAssetId(visitorContextAssetId)
             .setRequestedMediaType(requestedMediaType)
             .createCallState();
     }
@@ -506,15 +494,12 @@ class CallState {
         private boolean landscapeLayoutControlsVisible;
         private boolean isMuted;
         private boolean hasVideo;
-        private String companyName;
         private Engagement.MediaType requestedMediaType;
         private boolean isSpeakerOn;
         private boolean isOnHold;
         //Maybe helpful when converting to Kotlin, as an android studio makes fields nullable.
         private boolean isOnlyTimeChanged = false;
         private boolean isCallVisualizer;
-        private List<String> queueIds;
-        private String visitorContextAssetId;
         private boolean isSharingScreen;
         private FlipButtonState flipButtonState = FlipButtonState.HIDE;
 
@@ -553,11 +538,6 @@ class CallState {
             return this;
         }
 
-        public Builder setCompanyName(String companyName) {
-            this.companyName = companyName;
-            return this;
-        }
-
         public Builder setRequestedMediaType(Engagement.MediaType requestedMediaType) {
             this.requestedMediaType = requestedMediaType;
             return this;
@@ -583,16 +563,6 @@ class CallState {
             return this;
         }
 
-        public Builder setQueueIds(List<String> queueIds) {
-            this.queueIds = queueIds;
-            return this;
-        }
-
-        public Builder setVisitorContextAssetId(String visitorContextAssetId) {
-            this.visitorContextAssetId = visitorContextAssetId;
-            return this;
-        }
-
         public Builder setIsSharingScreen(Boolean isSharingScreen) {
             this.isSharingScreen = isSharingScreen;
             return this;
@@ -611,15 +581,12 @@ class CallState {
             landscapeLayoutControlsVisible = callState.landscapeLayoutControlsVisible;
             isMuted = callState.isMuted;
             hasVideo = callState.hasVideo;
-            companyName = callState.companyName;
             requestedMediaType = callState.requestedMediaType;
             isSpeakerOn = callState.isSpeakerOn;
             isOnHold = callState.isOnHold;
             //as we are updating this field only when only time is changed, so needs to make it false every time.
             isOnlyTimeChanged = false;
             isCallVisualizer = callState.isCallVisualizer;
-            queueIds = callState.queueIds;
-            visitorContextAssetId = callState.visitorContextAssetId;
             isSharingScreen = callState.isSharingScreen;
             flipButtonState = callState.flipButtonState;
             return this;

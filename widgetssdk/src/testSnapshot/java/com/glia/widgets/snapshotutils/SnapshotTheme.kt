@@ -90,7 +90,6 @@ internal interface SnapshotTheme : SnapshotContent {
         gliaAlertDialogButtonUseVerticalAlignment: Boolean? = true
     ): UiTheme {
         return UiTheme(
-            appBarTitle = "Snapshot Test",
             brandPrimaryColor = brandPrimaryColor,
             baseLightColor = baseLightColor,
             baseDarkColor = baseDarkColor,

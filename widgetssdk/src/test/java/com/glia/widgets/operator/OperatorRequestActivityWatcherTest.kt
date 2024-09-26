@@ -133,7 +133,7 @@ class OperatorRequestActivityWatcherTest {
         ) { event, activity ->
             verify { event.consume(any()) }
             verify { gliaActivityManager.finishActivities() }
-            verify { activityLauncher.launchCall(any(), any<MediaType>()) }
+            verify { activityLauncher.launchCall(any(), any<MediaType>(), eq(true)) }
 
             confirmVerified(activity, event)
         }
@@ -146,7 +146,7 @@ class OperatorRequestActivityWatcherTest {
         ) { event, activity ->
             verify { event.consume(any()) }
             verify(exactly = 0) { gliaActivityManager.finishActivities() }
-            verify { activityLauncher.launchCall(any(), any<MediaType>()) }
+            verify { activityLauncher.launchCall(any(), any<MediaType>(), eq(true)) }
 
             confirmVerified(activity, event)
         }
@@ -159,7 +159,7 @@ class OperatorRequestActivityWatcherTest {
         ) { event, activity ->
             verify { event.consume(any()) }
             verify(exactly = 0) { gliaActivityManager.finishActivities() }
-            verify(exactly = 0) { activityLauncher.launchCall(any(), any<MediaType>()) }
+            verify(exactly = 0) { activityLauncher.launchCall(any(), any<MediaType>(), eq(true)) }
 
             confirmVerified(activity, event)
         }

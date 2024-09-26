@@ -48,15 +48,7 @@
             android:id="@+id/visitor_info"
             app:destination="@id/visitor_info_fragment" />
 
-        <action
-            android:id="@+id/chat"
-            app:destination="@id/chat_fragment" />
-
     </fragment>
-
-    <fragment
-        android:id="@+id/chat_fragment"
-        android:name="com.glia.exampleapp.ChatFragment" />
 
     <fragment
         android:id="@+id/visitor_info_fragment"

@@ -23,7 +23,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.AdapterDataObserver
 import com.glia.androidsdk.chat.AttachmentFile
-import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.widgets.Constants
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.R
@@ -39,7 +38,6 @@ import com.glia.widgets.chat.model.ChatInputMode
 import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.ChatState
 import com.glia.widgets.chat.model.CustomCardChatItem
-import com.glia.widgets.core.configuration.EngagementConfiguration
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.fileupload.model.FileAttachment
@@ -57,7 +55,6 @@ import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getColorStateListCompat
 import com.glia.widgets.helper.getContentUriCompat
 import com.glia.widgets.helper.getFontCompat
-import com.glia.widgets.helper.getFullHybridTheme
 import com.glia.widgets.helper.hideKeyboard
 import com.glia.widgets.helper.insetsController
 import com.glia.widgets.helper.layoutInflater
@@ -105,7 +102,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     private var onTitleUpdatedListener: OnTitleUpdatedListener? = null
     private var onEndListener: OnEndListener? = null
     private var onMinimizeListener: OnMinimizeListener? = null
-    private var onNavigateToCallListener: OnNavigateToCallListener? = null
     private var onBackToCallListener: OnBackToCallListener? = null
     private val onMessageClickListener = ChatAdapter.OnMessageClickListener { messageId: String ->
         controller?.onMessageClicked(messageId)
@@ -192,36 +188,10 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = R.attr.gliaChatStyle
     ) : this(context, attrs, defStyleAttr, R.style.Application_Glia_Chat)
 
-    /**
-     * @param uiTheme sets this view's appearance using the parameters provided in the
-     * [com.glia.widgets.UiTheme]
-     */
-    fun setUiTheme(uiTheme: UiTheme?) {
-        if (uiTheme == null) return
-        theme = theme.getFullHybridTheme(uiTheme)
-        setupViewAppearance()
-    }
 
-    /**
-     * Used to start the chat functionality.
-     *
-     * @param companyName Text shown in the chat while waiting in a queue.
-     * @param queueIds    The queue ids to which you would like to queue to and speak to operators from.
-     * @param visitorContextAssetId  Provide some context asset ID as to from where are you initiating the chat from.
-     * @see [com.glia.widgets.GliaWidgets].USE_OVERLAY to see its full usage description.
-     * Important! This parameter is ignored if the view is not used in the sdk's [ChatActivity]
-     */
-    @JvmOverloads
-    fun startChat(
-        companyName: String?,
-        queueIds: List<String>?,
-        visitorContextAssetId: String?,
-        screenSharingMode: ScreenSharing.Mode? = null,
-        chatType: ChatType = ChatType.LIVE_CHAT
-    ) {
-        Dependencies.sdkConfigurationManager.screenSharingMode = screenSharingMode
+    fun startChat(chatType: ChatType = ChatType.LIVE_CHAT) {
         dialogCallback?.also { dialogController?.addCallback(it) }
-        controller?.initChat(companyName, queueIds, visitorContextAssetId, chatType)
+        controller?.initChat(chatType)
     }
 
     /**
@@ -266,19 +236,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         this.onMinimizeListener = onMinimizeListener
     }
 
-    /**
-     * Add a listener here for when the user has accepted an audio or video call and should navigate
-     * to a call.
-     * Important! Should be used together with [.navigateToCallSuccess] to notify the view
-     * of a completed navigation.
-     *
-     * @param onNavigateToCallListener The callback which is fired when the user accepts a media
-     * upgrade offer.
-     */
-    fun setOnNavigateToCallListener(onNavigateToCallListener: OnNavigateToCallListener?) {
-        this.onNavigateToCallListener = onNavigateToCallListener
-    }
-
     fun setOnBackToCallListener(onBackToCallListener: OnBackToCallListener?) {
         this.onBackToCallListener = onBackToCallListener
     }
@@ -305,7 +262,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         resetDialogStateAndDismiss()
 
         onEndListener = null
-        onNavigateToCallListener = null
         destroyController()
         adapter.unregisterAdapterDataObserver(dataObserver)
         binding.chatRecyclerView.adapter = null
@@ -362,10 +318,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     override fun emitItems(items: List<ChatItem>) {
         val updatedItems = items.asSequence().map { chatItem: ChatItem -> updateIsFileDownloaded(chatItem) }.toList()
         post { adapter.submitList(updatedItems) }
-    }
-
-    override fun navigateToCall(mediaType: String) {
-        onNavigateToCallListener?.call(theme, mediaType)
     }
 
     override fun backToCall() {
@@ -580,8 +532,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     }
 
     private fun setDefaultTheme(typedArray: TypedArray) {
-        theme = Utils.getThemeFromTypedArray(typedArray, this.context)
-        theme = theme.getFullHybridTheme(Dependencies.sdkConfigurationManager.uiTheme)
+        theme = Utils.getFullHybridTheme(typedArray, this.context)
     }
 
     private fun initConfigurations() {
@@ -803,11 +754,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         controller?.onImageItemClick(item, view)
     }
 
-    fun setConfiguration(configuration: EngagementConfiguration?) {
-        serviceChatHeadController?.setBuildTimeTheme(theme)
-        serviceChatHeadController?.setEngagementConfiguration(configuration)
-    }
-
     override fun showToast(message: String, duration: Int) {
         Toast.makeText(context, message, duration).show()
     }
@@ -885,17 +831,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
 
     fun interface OnMinimizeListener {
         fun onMinimize()
-    }
-
-    fun interface OnNavigateToCallListener {
-        /**
-         * Callback which is fired when the user has accepted a media upgrade offer and should be
-         * navigated to a view where they can visually see data about their media upgrade.
-         *
-         * @param theme Used to pass the finalized [UiTheme]
-         * to the activity which is being navigated to.
-         */
-        fun call(theme: UiTheme, mediaType: String)
     }
 
     fun interface OnBackToCallListener {

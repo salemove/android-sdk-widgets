@@ -18,10 +18,11 @@ internal class TimeCounter {
 
     fun stop() {
         Logger.d(TAG, "stop")
-        timerTask?.cancel()
-        timerTask = null
         timer?.cancel()
         timer = null
+
+        timerTask?.cancel()
+        timerTask = null
     }
 
     fun clear() {

@@ -4,7 +4,6 @@ import android.net.Uri
 import android.widget.Toast
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.androidsdk.chat.SingleChoiceOption
-import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.base.BaseController
 import com.glia.widgets.base.BaseView
 import com.glia.widgets.chat.model.ChatItem
@@ -15,6 +14,7 @@ import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.core.dialog.model.ConfirmationDialogLinks
 import com.glia.widgets.core.dialog.model.Link
 import com.glia.widgets.core.fileupload.model.FileAttachment
+import com.glia.widgets.locale.LocaleString
 
 internal interface ChatContract {
     interface Controller : BaseController {
@@ -49,7 +49,7 @@ internal interface ChatContract {
         fun onLinkClicked(link: Link)
         fun getConfirmationDialogLinks(): ConfirmationDialogLinks
         fun onEngagementConfirmationDialogRequested()
-        fun initChat(companyName: String?, queueIds: List<String>?, visitorContextAssetId: String?, chatType: ChatType)
+        fun initChat(chatType: ChatType)
         fun show()
         fun onPause()
         fun onResume()
@@ -63,7 +63,6 @@ internal interface ChatContract {
         fun emitUploadAttachments(attachments: List<FileAttachment>)
         fun emitState(chatState: ChatState)
         fun emitItems(items: List<ChatItem>)
-        fun navigateToCall(mediaType: String)
         fun backToCall()
         fun minimizeView()
         fun smoothScrollToBottom()

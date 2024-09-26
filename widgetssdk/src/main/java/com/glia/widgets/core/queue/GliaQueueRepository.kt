@@ -14,7 +14,7 @@ internal class GliaQueueRepository(private val gliaCore: GliaCore) {
                 when {
                     exception != null -> emitter.onError(exception)
                     queues != null -> emitter.onSuccess(queues)
-                    else -> emitter.onError(RuntimeException("Fetching file failed"))
+                    else -> emitter.onError(RuntimeException("Fetching queues failed"))
                 }
             }
         }

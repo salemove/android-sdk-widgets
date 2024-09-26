@@ -1,6 +1,6 @@
 package com.glia.widgets.view.unifiedui.config.securemessaging
 
-import com.glia.widgets.view.unifiedui.config.base.ColorRemoteConfig
+import com.glia.widgets.view.unifiedui.config.base.ColorLayerRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.LayerRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.TextRemoteConfig
 import com.glia.widgets.view.unifiedui.config.entrywidget.MediaTypeItemsRemoteConfig
@@ -17,15 +17,15 @@ internal data class SecureMessagingRemoteConfig(
     @SerializedName("bottomBannerText")
     val bottomBannerText: TextRemoteConfig?,
     @SerializedName("bottomBannerDividerColor")
-    val bottomBannerDividerColor: ColorRemoteConfig?,
+    val bottomBannerDividerColor: ColorLayerRemoteConfig?,
     @SerializedName("topBannerBackground")
     val topBannerBackground: LayerRemoteConfig?,
     @SerializedName("topBannerText")
     val topBannerText: TextRemoteConfig?,
     @SerializedName("topBannerDividerColor")
-    val topBannerDividerColor: ColorRemoteConfig?,
+    val topBannerDividerColor: ColorLayerRemoteConfig?,
     @SerializedName("topBannerDropDownIconColor")
-    val topBannerDropDownIconColor: ColorRemoteConfig?,
+    val topBannerDropDownIconColor: ColorLayerRemoteConfig?,
     @SerializedName("mediaTypeItems")
     val mediaTypeItems: MediaTypeItemsRemoteConfig?
 ) {

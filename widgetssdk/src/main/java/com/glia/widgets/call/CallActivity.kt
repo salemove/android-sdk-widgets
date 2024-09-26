@@ -1,14 +1,16 @@
 package com.glia.widgets.call
 
 import android.os.Bundle
-import com.glia.widgets.GliaWidgets
+import com.glia.androidsdk.Engagement.MediaType
 import com.glia.widgets.R
 import com.glia.widgets.base.FadeTransitionActivity
 import com.glia.widgets.call.CallView.OnNavigateToChatListener
 import com.glia.widgets.call.CallView.OnNavigateToWebBrowserListener
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.helper.ExtraKeys
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
+import com.glia.widgets.helper.getEnumExtra
 import com.glia.widgets.launcher.ActivityLauncher
 import com.glia.widgets.locale.LocaleString
 import kotlin.properties.Delegates
@@ -25,24 +27,9 @@ import kotlin.properties.Delegates
  *
  *
  * Before this activity is launched, make sure that Glia Widgets SDK is set up correctly.
- *
- *
- * Data that can be passed together with the Activity intent:
- * - [GliaWidgets.QUEUE_IDS]: IDs list of the queues you would like to use for your engagements.
- * For a full list of optional parameters, see the constants defined in [GliaWidgets].
- *
- *
- * Code example:
- * <pre>
- * Intent intent = new Intent(requireContext(), CallActivity.class);
- * intent.putExtra(GliaWidgets.QUEUE_IDS, new ArrayList<>(List.of("AUDIO_QUEUE_ID")));
- * intent.putExtra(GliaWidgets.MEDIA_TYPE, Engagement.MediaType.VIDEO);
- * startActivity(intent);
-</pre> *
  */
-class CallActivity : FadeTransitionActivity() {
+internal class CallActivity : FadeTransitionActivity() {
     private val activityLauncher: ActivityLauncher by lazy { Dependencies.activityLauncher }
-    private var callConfiguration: CallConfiguration by Delegates.notNull()
     private var callView: CallView by Delegates.notNull()
 
     private var onBackClickedListener: CallView.OnBackClickedListener? = CallView.OnBackClickedListener { this.finish() }
@@ -58,25 +45,14 @@ class CallActivity : FadeTransitionActivity() {
         setContentView(R.layout.call_activity)
         callView = findViewById(R.id.call_view)
 
-        // Legacy company name support
-        Dependencies.sdkConfigurationManager.setLegacyCompanyName(intent.getStringExtra(GliaWidgets.COMPANY_NAME))
+        val isUpgradeToCall = intent.getBooleanExtra(ExtraKeys.IS_UPGRADE_TO_CALL, false)
 
-        callConfiguration = CallActivityConfigurationHelper.readConfiguration(this)
-        if (this.intent.hasExtra(GliaWidgets.USE_OVERLAY)) {
-            // Integrator has passed a deprecated GliaWidgets.USE_OVERLAY parameter with Intent
-            // Override bubble configuration with USE_OVERLAY value
-            val useOverlay = this.intent.getBooleanExtra(GliaWidgets.USE_OVERLAY, true)
-            Dependencies.sdkConfigurationManager.setLegacyUseOverlay(useOverlay)
-        }
-
-        if (!callView.shouldShowMediaEngagementView(callConfiguration.isUpgradeToCall)) {
+        if (!callView.shouldShowMediaEngagementView(isUpgradeToCall)) {
             finishAndRemoveTask()
             return
         }
 
         callView.setOnTitleUpdatedListener(this::setTitle)
-        callView.setEngagementConfiguration(callConfiguration.engagementConfiguration)
-        callView.setUiTheme(callConfiguration.engagementConfiguration?.runTimeTheme)
         onBackClickedListener?.also(callView::setOnBackClickedListener)
 
         // In case the engagement ends, Activity is removed from the device's Recent menu
@@ -89,7 +65,8 @@ class CallActivity : FadeTransitionActivity() {
         callView.setOnNavigateToWebBrowserListener(onNavigateToWebBrowserListener)
 
         if (savedInstanceState == null) {
-            startCall()
+
+            startCall(intent.getEnumExtra<MediaType>(ExtraKeys.MEDIA_TYPE), isUpgradeToCall)
         }
     }
 
@@ -116,21 +93,13 @@ class CallActivity : FadeTransitionActivity() {
         callView.onUserInteraction()
     }
 
-    private fun startCall() {
-        val engagementConfiguration = callConfiguration.engagementConfiguration!!
-        callView.startCall(
-            engagementConfiguration.companyName!!,
-            engagementConfiguration.queueIds,
-            engagementConfiguration.contextAssetId,
-            engagementConfiguration.screenSharingMode!!,
-            callConfiguration.isUpgradeToCall,
-            callConfiguration.mediaType
-        )
+    private fun startCall(mediaType: MediaType?, isUpgradeToCall: Boolean) {
+        callView.startCall(isUpgradeToCall, mediaType)
     }
 
     private fun navigateToChat() {
         Logger.d(TAG, "navigateToChat")
-        activityLauncher.launchChat(this, callConfiguration.engagementConfiguration ?: return)
+        activityLauncher.launchChat(this)
     }
 
     private fun navigateToWebBrowser(title: LocaleString, url: String) = activityLauncher.launchWebBrowser(this, title, url)

@@ -28,7 +28,6 @@ import com.glia.widgets.helper.applyTextTheme
 import com.glia.widgets.helper.combineStringWith
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getFontCompat
-import com.glia.widgets.helper.getFullHybridTheme
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.separateStringWithSymbol
 import com.glia.widgets.helper.setLocaleContentDescription
@@ -56,7 +55,6 @@ internal class VisitorCodeView internal constructor(
     private val uiThreadExecutor: Executor? = null
 ) : FrameLayout(context.wrapWithMaterialThemeOverlay(), null, 0), VisitorCodeContract.View {
     private lateinit var controller: VisitorCodeContract.Controller
-    private var theme: UiTheme? = null
 
     private var timer: CountDownTimer? = null
 
@@ -139,10 +137,7 @@ internal class VisitorCodeView internal constructor(
     }
 
     private fun setDefaultTheme(typedArray: TypedArray) {
-        val typedArrayTheme = Utils.getThemeFromTypedArray(typedArray, this.context)
-        val runtimeGlobalTheme = Dependencies.sdkConfigurationManager.uiTheme
-        theme = typedArrayTheme.getFullHybridTheme(runtimeGlobalTheme)
-        applyRuntimeThemeConfig(theme)
+        applyRuntimeThemeConfig(Utils.getFullHybridTheme(typedArray, this.context))
     }
 
     override fun startLoading() {

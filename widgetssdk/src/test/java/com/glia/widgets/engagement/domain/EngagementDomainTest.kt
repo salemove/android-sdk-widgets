@@ -24,6 +24,7 @@ import com.glia.widgets.engagement.EngagementRepository
 import com.glia.widgets.engagement.ScreenSharingState
 import com.glia.widgets.helper.Data
 import com.glia.widgets.helper.formattedName
+import com.glia.widgets.launcher.ConfigurationManager
 import com.glia.widgets.permissions.Permissions
 import com.glia.widgets.permissions.PermissionsGrantedCallback
 import io.mockk.Runs
@@ -309,29 +310,17 @@ class EngagementDomainTest {
     }
 
     @Test
-    fun `EnqueueForEngagementUseCase invoke enqueues for chat engagement when media type is absent`() {
-        val repository: EngagementRepository = mockk(relaxUnitFun = true)
-        val queueIds = listOf("queueId1", "queueId2")
-        val mediaType: Engagement.MediaType? = null
-        val visitorContextAssetId = null
-
-        val useCase: EnqueueForEngagementUseCase = EnqueueForEngagementUseCaseImpl(engagementRepository = repository)
-        useCase(queueIds, mediaType, visitorContextAssetId)
-
-        verify { repository.queueForEngagement(queueIds, Engagement.MediaType.TEXT, visitorContextAssetId) }
-    }
-
-    @Test
     fun `EnqueueForEngagementUseCase invoke enqueues with selected type engagement when media type is present`() {
         val repository: EngagementRepository = mockk(relaxUnitFun = true)
         val queueIds = listOf("queueId1", "queueId2")
         val mediaType: Engagement.MediaType = mockk(relaxUnitFun = true)
-        val visitorContextAssetId = null
 
-        val useCase: EnqueueForEngagementUseCase = EnqueueForEngagementUseCaseImpl(engagementRepository = repository)
-        useCase(queueIds, mediaType, visitorContextAssetId)
+        val configurationManager = mockk<ConfigurationManager>()
+        every { configurationManager.queueIds } returns queueIds
+        val useCase: EnqueueForEngagementUseCase = EnqueueForEngagementUseCaseImpl(engagementRepository = repository, configurationManager)
+        useCase(mediaType)
 
-        verify { repository.queueForEngagement(queueIds, mediaType, visitorContextAssetId) }
+        verify { repository.queueForEngagement(queueIds, mediaType) }
     }
 
     @Test
@@ -523,12 +512,17 @@ class EngagementDomainTest {
 
     @Test
     fun `ScreenSharingUseCase test`() {
+        val mode = ScreenSharing.Mode.UNBOUNDED
         val engagementRepository: EngagementRepository = mockk(relaxUnitFun = true)
         val releaseScreenSharingResourcesUseCase: ReleaseScreenSharingResourcesUseCase = mockk(relaxUnitFun = true)
 
+        val configurationManager = mockk<ConfigurationManager> {
+            every { screenSharingMode } returns mode
+        }
         val useCase: ScreenSharingUseCase = ScreenSharingUseCaseImpl(
             engagementRepository = engagementRepository,
-            releaseScreenSharingResourcesUseCase = releaseScreenSharingResourcesUseCase
+            releaseScreenSharingResourcesUseCase = releaseScreenSharingResourcesUseCase,
+            configurationManager
         )
 
         every { engagementRepository.isSharingScreen } returns true
@@ -548,8 +542,7 @@ class EngagementDomainTest {
         verify { engagementRepository.declineScreenSharingRequest() }
 
         val activity: Activity = mockk(relaxUnitFun = true)
-        val mode: ScreenSharing.Mode = mockk(relaxUnitFun = true)
-        useCase.acceptRequestWithAskedPermission(activity, mode)
+        useCase.acceptRequestWithAskedPermission(activity)
         verify { engagementRepository.acceptScreenSharingWithAskedPermission(activity, mode) }
 
         val resultCode = 1

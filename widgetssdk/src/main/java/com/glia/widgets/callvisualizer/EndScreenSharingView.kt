@@ -9,15 +9,12 @@ import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.databinding.EndScreenSharingViewBinding
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.SimpleWindowInsetsAndAnimationHandler
-import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.helper.applyButtonTheme
 import com.glia.widgets.helper.applyTextTheme
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getFontCompat
-import com.glia.widgets.helper.getFullHybridTheme
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.locale.LocaleString
@@ -70,12 +67,7 @@ internal class EndScreenSharingView(
 
     private fun applyDefaultTheme(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
         context.withStyledAttributes(attrs, R.styleable.GliaView, defStyleAttr, defStyleRes) {
-            var theme = Utils.getThemeFromTypedArray(this, context)
-            theme.iconEndScreenShare?.let {
-                binding.endSharingButton.icon = ResourcesCompat.getDrawable(context.resources, it, null)
-            }
-            theme = theme.getFullHybridTheme(Dependencies.sdkConfigurationManager.uiTheme)
-            applyRuntimeTheme(theme)
+            applyRuntimeTheme(Utils.getFullHybridTheme(this, context))
         }
     }
 
@@ -109,10 +101,9 @@ internal class EndScreenSharingView(
         binding.root.applyLayerTheme(theme.background)
     }
 
-    private fun applyRuntimeTheme(theme: UiTheme?) {
-        if (theme == null) {
-            Logger.d(TAG, "UiTheme is null!")
-            return
+    private fun applyRuntimeTheme(theme: UiTheme) {
+        theme.iconEndScreenShare?.let {
+            binding.endSharingButton.icon = ResourcesCompat.getDrawable(context.resources, it, null)
         }
 
         val systemNegativeColor = theme.systemNegativeColor?.let(::getColorCompat)

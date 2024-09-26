@@ -20,7 +20,6 @@ class OperatorStatusViewHolderSnapshotTest : SnapshotTest(
     // MARK: Connected
 
     private fun connectedItem() = OperatorStatusItem.Connected(
-        "Snapshot Company",
         "Screen Shot",
         "https://test.url"
     )
@@ -88,9 +87,7 @@ class OperatorStatusViewHolderSnapshotTest : SnapshotTest(
 
     // MARK: In Queue
 
-    private fun inQueueItem() = OperatorStatusItem.InQueue(
-        "Snapshot Company"
-    )
+    private fun inQueueItem() = OperatorStatusItem.InQueue
 
     @Test
     fun inQueue() {
@@ -144,7 +141,6 @@ class OperatorStatusViewHolderSnapshotTest : SnapshotTest(
     // MARK: In Queue
 
     private fun joinedItem() = OperatorStatusItem.Joined(
-        "Snapshot Company",
         "Screen Shot",
         null
     )

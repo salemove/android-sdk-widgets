@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION")
-
 package com.glia.widgets.helper
 
 import android.app.Activity
@@ -15,15 +13,10 @@ import androidx.core.net.toUri
 import com.glia.androidsdk.Engagement.MediaType
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.androidsdk.engagement.Survey
-import com.glia.widgets.GliaWidgets
-import com.glia.widgets.UiTheme
 import com.glia.widgets.call.CallActivity
-import com.glia.widgets.call.CallConfiguration
 import com.glia.widgets.callvisualizer.EndScreenSharingActivity
 import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.chat.ChatType
-import com.glia.widgets.core.configuration.EngagementConfiguration
-import com.glia.widgets.core.configuration.GliaSdkConfigurationManager
 import com.glia.widgets.entrywidget.EntryWidgetActivity
 import com.glia.widgets.filepreview.ui.ImagePreviewActivity
 import com.glia.widgets.locale.LocaleString
@@ -38,26 +31,27 @@ internal object ExtraKeys {
 
     const val IMAGE_PREVIEW_IMAGE_ID = "image_preview_image_id"
     const val IMAGE_PREVIEW_IMAGE_NAME = "image_preview_image_name"
+
+    const val CHAT_TYPE = "chat_screen_chat_type"
+    const val MEDIA_TYPE = "media_type"
+    const val SURVEY = "survey"
+    const val IS_UPGRADE_TO_CALL = "call_screen_is_upgrade_to_call"
 }
 
 internal interface IntentHelper {
-    fun chatIntent(context: Context, queueIds: List<String>, chatType: ChatType? = null, contextId: String? = null): Intent
-
-    fun chatIntent(context: Context, engagementConfiguration: EngagementConfiguration): Intent
+    fun chatIntent(context: Context): Intent
 
     fun secureMessagingChatIntent(activity: Activity): Intent
 
     fun secureMessagingWelcomeScreenIntent(activity: Activity): Intent
 
-    fun callIntent(context: Context, mediaType: MediaType, upgradeToCall: Boolean = true): Intent
-
-    fun callIntent(context: Context, callConfiguration: CallConfiguration): Intent
+    fun callIntent(context: Context, mediaType: MediaType?, upgradeToCall: Boolean): Intent
 
     fun imagePreviewIntent(context: Context, attachment: AttachmentFile): Intent
 
     fun shareImageIntent(context: Context, fileName: String): Intent
 
-    fun surveyIntent(context: Context, survey: Survey, uiTheme: UiTheme): Intent
+    fun surveyIntent(context: Context, survey: Survey): Intent
 
     fun endScreenSharingIntent(context: Context): Intent
 
@@ -75,58 +69,26 @@ internal interface IntentHelper {
     fun entryWidgetIntent(activity: Activity): Intent
 }
 
-internal class IntentHelperImpl(private val configurationManager: GliaSdkConfigurationManager) : IntentHelper {
-    private val defaultEngagementConfiguration: EngagementConfiguration
-        get() = configurationManager.buildEngagementConfiguration()
+internal class IntentHelperImpl : IntentHelper {
 
-
-    override fun chatIntent(context: Context, queueIds: List<String>, chatType: ChatType?, contextId: String?): Intent =
+    override fun chatIntent(context: Context): Intent =
         Intent(context, ChatActivity::class.java).apply {
-            (chatType as? Parcelable)?.also { putExtra(GliaWidgets.CHAT_TYPE, it) }
-            contextId?.also { putExtra(GliaWidgets.CONTEXT_ASSET_ID, it) }
-            putExtra(GliaWidgets.QUEUE_IDS, ArrayList(queueIds))
             setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
             setSafeFlags(context)
         }
 
-    override fun chatIntent(context: Context, engagementConfiguration: EngagementConfiguration): Intent = Intent(context, ChatActivity::class.java)
-        .putExtra(GliaWidgets.QUEUE_IDS, engagementConfiguration.queueIds?.let { ArrayList(it) })
-        .putExtra(GliaWidgets.CONTEXT_ASSET_ID, engagementConfiguration.contextAssetId)
-        .putExtra(GliaWidgets.UI_THEME, engagementConfiguration.runTimeTheme)
-        .putExtra(GliaWidgets.SCREEN_SHARING_MODE, engagementConfiguration.screenSharingMode)
-        .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-        .setSafeFlags(context)
-
     override fun secureMessagingChatIntent(activity: Activity): Intent = Intent(activity, ChatActivity::class.java)
-        .putExtra(GliaWidgets.CHAT_TYPE, ChatType.SECURE_MESSAGING as Parcelable)
+        .putEnumExtra(ExtraKeys.CHAT_TYPE, ChatType.SECURE_MESSAGING)
         .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
 
     override fun secureMessagingWelcomeScreenIntent(activity: Activity): Intent = Intent(activity, MessageCenterActivity::class.java)
         .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
 
-    override fun callIntent(context: Context, mediaType: MediaType, upgradeToCall: Boolean): Intent = callIntent(
-        context,
-        CallConfiguration(
-            engagementConfiguration = defaultEngagementConfiguration,
-            mediaType = mediaType,
-            isUpgradeToCall = upgradeToCall
-        )
-    )
-
-    override fun callIntent(context: Context, callConfiguration: CallConfiguration): Intent {
-        val engagementConfiguration =
-            callConfiguration.engagementConfiguration ?: throw NullPointerException("WidgetsSdk Configuration can't be null")
-
-        return Intent(context, CallActivity::class.java)
-            .putExtra(GliaWidgets.QUEUE_IDS, engagementConfiguration.queueIds?.let(::ArrayList))
-            .putExtra(GliaWidgets.CONTEXT_ASSET_ID, engagementConfiguration.contextAssetId)
-            .putExtra(GliaWidgets.UI_THEME, engagementConfiguration.runTimeTheme)
-            .putExtra(GliaWidgets.SCREEN_SHARING_MODE, engagementConfiguration.screenSharingMode)
-            .putExtra(GliaWidgets.MEDIA_TYPE, callConfiguration.mediaType)
-            .putExtra(GliaWidgets.IS_UPGRADE_TO_CALL, callConfiguration.isUpgradeToCall)
-            .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-            .setSafeFlags(context)
-    }
+    override fun callIntent(context: Context, mediaType: MediaType?, upgradeToCall: Boolean): Intent = Intent(context, CallActivity::class.java)
+        .putEnumExtra(ExtraKeys.MEDIA_TYPE, mediaType)
+        .putExtra(ExtraKeys.IS_UPGRADE_TO_CALL, upgradeToCall)
+        .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        .setSafeFlags(context)
 
     override fun imagePreviewIntent(context: Context, attachment: AttachmentFile): Intent {
         return Intent(context, ImagePreviewActivity::class.java)
@@ -147,9 +109,8 @@ internal class IntentHelperImpl(private val configurationManager: GliaSdkConfigu
             .setType("image/jpeg")
     }
 
-    override fun surveyIntent(context: Context, survey: Survey, uiTheme: UiTheme): Intent = Intent(context, SurveyActivity::class.java)
-        .putExtra(GliaWidgets.UI_THEME, uiTheme)
-        .putExtra(GliaWidgets.SURVEY, survey as Parcelable)
+    override fun surveyIntent(context: Context, survey: Survey): Intent = Intent(context, SurveyActivity::class.java)
+        .putExtra(ExtraKeys.SURVEY, survey as Parcelable)
         .setSafeFlags(context)
 
     override fun endScreenSharingIntent(context: Context): Intent = Intent(context, EndScreenSharingActivity::class.java)

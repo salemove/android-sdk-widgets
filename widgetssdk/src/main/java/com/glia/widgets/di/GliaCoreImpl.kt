@@ -128,4 +128,12 @@ internal class GliaCoreImpl : GliaCore {
     override fun getAuthenticationManager(behavior: Authentication.Behavior): AuthenticationManager {
         return AuthenticationManager(Glia.getAuthentication(behavior))
     }
+
+    override fun subscribeToQueueStateUpdates(queueIds: Array<String>, onError: Consumer<GliaException>, callback: Consumer<Queue>) {
+        Glia.subscribeToQueueStateUpdates(queueIds, onError, callback)
+    }
+
+    override fun unsubscribeFromQueueUpdates(onError: Consumer<GliaException>?, callback: Consumer<Queue>) {
+        Glia.unsubscribeFromQueueUpdates(onError, callback)
+    }
 }

@@ -102,6 +102,12 @@ import com.glia.widgets.core.permissions.domain.WithNotificationPermissionUseCas
 import com.glia.widgets.core.permissions.domain.WithNotificationPermissionUseCaseImpl;
 import com.glia.widgets.core.permissions.domain.WithReadWritePermissionsUseCase;
 import com.glia.widgets.core.permissions.domain.WithReadWritePermissionsUseCaseImpl;
+import com.glia.widgets.core.queue.domain.FetchQueuesUseCase;
+import com.glia.widgets.core.queue.domain.FetchQueuesUseCaseImpl;
+import com.glia.widgets.core.queue.domain.SubscribeToQueueUpdatesUseCase;
+import com.glia.widgets.core.queue.domain.SubscribeToQueueUpdatesUseCaseImpl;
+import com.glia.widgets.core.queue.domain.UnsubscribeFromQueueUpdatesUseCase;
+import com.glia.widgets.core.queue.domain.UnsubscribeFromQueueUpdatesUseCaseImpl;
 import com.glia.widgets.core.secureconversations.domain.AddSecureFileAttachmentsObserverUseCase;
 import com.glia.widgets.core.secureconversations.domain.AddSecureFileToAttachmentAndUploadUseCase;
 import com.glia.widgets.core.secureconversations.domain.GetAvailableQueueIdsForSecureMessagingUseCase;
@@ -1100,4 +1106,15 @@ public class UseCaseFactory {
         );
     }
 
+    public FetchQueuesUseCase getFetchQueuesUseCase() {
+        return new FetchQueuesUseCaseImpl(gliaCore);
+    }
+
+    public SubscribeToQueueUpdatesUseCase getSubscribeToQueueUpdatesUseCase() {
+        return new SubscribeToQueueUpdatesUseCaseImpl(gliaCore);
+    }
+
+    public UnsubscribeFromQueueUpdatesUseCase getUnsubscribeFromQueueUpdatesUseCase() {
+        return new UnsubscribeFromQueueUpdatesUseCaseImpl(gliaCore);
+    }
 }

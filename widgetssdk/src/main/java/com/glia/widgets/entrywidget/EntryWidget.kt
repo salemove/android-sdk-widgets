@@ -31,7 +31,11 @@ interface EntryWidget {
     fun hide()
 }
 
-internal class EntryWidgetImpl(private val activityLauncher: ActivityLauncher, private val themeManager: UnifiedThemeManager) : EntryWidget {
+internal class EntryWidgetImpl(
+    private val activityLauncher: ActivityLauncher,
+    private val themeManager: UnifiedThemeManager
+) : EntryWidget {
+
     override fun show(activity: Activity) = activityLauncher.launchEntryWidget(activity)
 
     override fun createEntryWidgetView(context: Context): View {

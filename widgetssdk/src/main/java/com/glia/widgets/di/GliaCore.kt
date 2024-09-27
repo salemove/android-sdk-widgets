@@ -68,4 +68,7 @@ internal interface GliaCore {
             throw GliaException("Glia SDK is not initialized", GliaException.Cause.INVALID_INPUT)
         }
     }
+
+    fun subscribeToQueueStateUpdates(queueIds: Array<String>, onError: Consumer<GliaException> , callback: Consumer<Queue>)
+    fun unsubscribeFromQueueUpdates(onError: Consumer<GliaException>?, callback: Consumer<Queue>)
 }

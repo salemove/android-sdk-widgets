@@ -2,6 +2,8 @@ package com.glia.widgets.entrywidget.adapter
 
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.databinding.EntryWidgetErrorItemBinding
 import com.glia.widgets.databinding.EntryWidgetMediaTypeItemBinding
@@ -19,7 +21,7 @@ internal class EntryWidgetAdapter(
     private val errorTitleTheme: TextTheme? = null,
     private val errorMessageTheme: TextTheme? = null,
     private val errorButtonTheme: ButtonTheme? = null
-) : RecyclerView.Adapter<EntryWidgetAdapter.ViewHolder>() {
+) : ListAdapter<EntryWidgetContract.ItemType, EntryWidgetAdapter.ViewHolder>(DIFF_CALLBACK) {
 
     constructor(viewType: EntryWidgetContract.ViewType, entryWidgetTheme: EntryWidgetTheme?): this(
         viewType,
@@ -29,17 +31,31 @@ internal class EntryWidgetAdapter(
         entryWidgetTheme?.errorButton
     )
 
+    companion object {
+        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<EntryWidgetContract.ItemType>() {
+            override fun areItemsTheSame(
+                oldItem: EntryWidgetContract.ItemType,
+                newItem: EntryWidgetContract.ItemType
+            ): Boolean {
+                // Whether items are the same
+                return oldItem.ordinal == newItem.ordinal
+            }
+
+            override fun areContentsTheSame(
+                oldItem: EntryWidgetContract.ItemType,
+                newItem: EntryWidgetContract.ItemType
+            ): Boolean {
+                // Whether content is the same
+                return oldItem.ordinal == newItem.ordinal
+            }
+        }
+    }
+
     enum class ViewType {
         CONTACT_ITEM,
         ERROR_ITEM,
         PROVIDED_BY_ITEM
     }
-
-    var items: List<EntryWidgetContract.ItemType>? = null
-        set(value) {
-            field = value
-            notifyDataSetChanged()
-        }
 
     var onItemClickListener: ((EntryWidgetContract.ItemType) -> Unit)? = null
 
@@ -63,7 +79,7 @@ internal class EntryWidgetAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        items?.get(position)?.let { item ->
+        getItem(position)?.let { item ->
             holder.bind(item) {
                 onItemClickListener?.invoke(item)
             }
@@ -71,16 +87,12 @@ internal class EntryWidgetAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return when (items?.get(position)) {
+        return when (getItem(position)) {
             EntryWidgetContract.ItemType.EMPTY_STATE,
             EntryWidgetContract.ItemType.ERROR_STATE -> ViewType.ERROR_ITEM.ordinal
             EntryWidgetContract.ItemType.PROVIDED_BY -> ViewType.PROVIDED_BY_ITEM.ordinal
             else -> ViewType.CONTACT_ITEM.ordinal
         }
-    }
-
-    override fun getItemCount(): Int {
-        return items?.size ?: 0
     }
 
     abstract class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

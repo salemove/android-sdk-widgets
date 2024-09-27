@@ -48,6 +48,7 @@ internal class EntryWidgetView(
         disableScrolling()
         applyTheme(backgroundTheme, mediaTypeItemsTheme)
         setController(Dependencies.controllerFactory.entryWidgetController)
+        itemAnimator = null
     }
 
     override fun setController(controller: EntryWidgetContract.Controller) {
@@ -56,7 +57,7 @@ internal class EntryWidgetView(
     }
 
     override fun showItems(items: List<EntryWidgetContract.ItemType>) {
-        viewAdapter.items = items
+        viewAdapter.submitList(items)
     }
 
     override fun dismiss() {

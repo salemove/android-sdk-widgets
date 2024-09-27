@@ -14,6 +14,7 @@ import com.glia.widgets.chat.ChatContract;
 import com.glia.widgets.chat.controller.ChatController;
 import com.glia.widgets.core.dialog.DialogContract;
 import com.glia.widgets.core.dialog.DialogController;
+import com.glia.widgets.core.queue.QueueMonitor;
 import com.glia.widgets.engagement.completion.EngagementCompletionContract;
 import com.glia.widgets.engagement.completion.EngagementCompletionController;
 import com.glia.widgets.entrywidget.EntryWidgetContract;
@@ -386,6 +387,11 @@ public class ControllerFactory {
     }
 
     public EntryWidgetContract.Controller getEntryWidgetController() {
-        return new EntryWidgetController();
+        return new EntryWidgetController(new QueueMonitor(
+            configurationManager,
+            useCaseFactory.getFetchQueuesUseCase(),
+            useCaseFactory.getSubscribeToQueueUpdatesUseCase(),
+            useCaseFactory.getUnsubscribeFromQueueUpdatesUseCase()
+        ));
     }
 }

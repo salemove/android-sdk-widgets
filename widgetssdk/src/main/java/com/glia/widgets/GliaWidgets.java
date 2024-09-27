@@ -91,7 +91,11 @@ public class GliaWidgets {
      */
     @NonNull
     public synchronized static EntryWidget getEntryWidget(@Nullable List<String> queueIds) {
-        setupQueueIds(queueIds);
+        if (Dependencies.glia().isInitialized()) {
+            setupQueueIds(queueIds);
+        } else {
+            Logger.w(TAG, "Attempt to get EntryWidget before SDK initialization");
+        }
 
         return Dependencies.getEntryWidget();
     }

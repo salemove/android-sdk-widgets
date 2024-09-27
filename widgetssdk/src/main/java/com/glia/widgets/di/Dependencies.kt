@@ -82,7 +82,8 @@ internal object Dependencies {
     val engagementLauncher: EngagementLauncher by lazy { EngagementLauncherImpl(activityLauncher) }
 
     @JvmStatic
-    val entryWidget: EntryWidget by lazy { EntryWidgetImpl(activityLauncher, gliaThemeManager) }
+    val entryWidget: EntryWidget
+        get() = EntryWidgetImpl(activityLauncher, gliaThemeManager)
 
     @JvmStatic
     lateinit var repositoryFactory: RepositoryFactory

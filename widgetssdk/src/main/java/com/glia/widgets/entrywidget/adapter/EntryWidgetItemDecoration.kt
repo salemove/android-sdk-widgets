@@ -20,6 +20,9 @@ internal class EntryWidgetItemDecoration(
         for (i in 0 until childCount) {
             val child = parent.getChildAt(i)
             val position = parent.getChildAdapterPosition(child)
+            if (position == RecyclerView.NO_POSITION) {
+                continue
+            }
 
             val viewType = parent.adapter?.getItemViewType(position)
 
@@ -42,8 +45,10 @@ internal class EntryWidgetItemDecoration(
         state: RecyclerView.State
     ) {
         val position = parent.getChildAdapterPosition(view)
+        if (position == RecyclerView.NO_POSITION) {
+            return
+        }
         val viewType = parent.adapter?.getItemViewType(position)
-
         if (isContactItem(viewType)) {
             outRect.bottom = divider.intrinsicHeight
         } else {

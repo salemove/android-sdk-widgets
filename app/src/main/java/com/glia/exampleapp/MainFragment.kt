@@ -39,6 +39,7 @@ import kotlin.concurrent.thread
 import kotlin.properties.Delegates
 
 class MainFragment : Fragment() {
+
     private var containerView: ConstraintLayout? = null
     private var authentication: Authentication? = null
 
@@ -50,7 +51,6 @@ class MainFragment : Fragment() {
 
     private val authToken: String
         get() {
-            val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
             val authTokenFromPrefs = getAuthTokenFromPrefs(sharedPreferences)
             return authTokenFromPrefs.ifEmpty { getString(R.string.glia_jwt) }
         }
@@ -312,13 +312,11 @@ class MainFragment : Fragment() {
 
     private fun saveAuthToken(jwt: String) {
         if (jwt != getString(R.string.glia_jwt)) {
-            val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
             putAuthTokenToPrefs(sharedPreferences, jwt)
         }
     }
 
     private fun clearAuthToken() {
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
         putAuthTokenToPrefs(sharedPreferences, null)
     }
 
@@ -505,6 +503,8 @@ class MainFragment : Fragment() {
     private fun prepareAuthentication() {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
         authentication = GliaWidgets.getAuthentication(getAuthenticationBehaviorFromPrefs(sharedPreferences, resources))
+        authentication =
+            GliaWidgets.getAuthentication(getAuthenticationBehaviorFromPrefs(sharedPreferences, resources))
     }
 
     private fun authenticate(
@@ -552,7 +552,6 @@ class MainFragment : Fragment() {
     }
 
     private fun showVisitorCode() {
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
         val visitorContext = getContextAssetIdFromPrefs(sharedPreferences)
         val cv = GliaWidgets.getCallVisualizer()
         if (!visitorContext.isNullOrBlank()) {

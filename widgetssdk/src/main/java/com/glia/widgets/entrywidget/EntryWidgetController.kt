@@ -1,25 +1,66 @@
 package com.glia.widgets.entrywidget
 
-internal class EntryWidgetController : EntryWidgetContract.Controller {
+import android.annotation.SuppressLint
+import com.glia.androidsdk.Engagement
+import com.glia.androidsdk.queuing.Queue
+import com.glia.androidsdk.queuing.QueueState
+import com.glia.widgets.core.queue.QueueMonitor
+import com.glia.widgets.core.queue.QueueMonitorState
+import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.TAG
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+
+internal class EntryWidgetController(private val queueMonitor: QueueMonitor) : EntryWidgetContract.Controller {
     private lateinit var view: EntryWidgetContract.View
 
+    @SuppressLint("CheckResult")
     override fun setView(view: EntryWidgetContract.View) {
         this.view = view
-
-        // TODO: Remove this hardcoded list of items
-        val items = listOf(
-            EntryWidgetContract.ItemType.VIDEO_CALL,
-            EntryWidgetContract.ItemType.AUDIO_CALL,
-            EntryWidgetContract.ItemType.CHAT,
-            EntryWidgetContract.ItemType.SECURE_MESSAGE,
-            EntryWidgetContract.ItemType.PROVIDED_BY
-        )
-        view.showItems(items)
+        queueMonitor.observableIntegratorQueues
+            .map(::mapState)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(view::showItems)
     }
+
+    private fun mapState(state: QueueMonitorState): List<EntryWidgetContract.ItemType> = when (state) {
+        QueueMonitorState.Loading -> mapLoadingState()
+        QueueMonitorState.Empty -> listOf(EntryWidgetContract.ItemType.EMPTY_STATE)
+        QueueMonitorState.Error -> listOf(EntryWidgetContract.ItemType.ERROR_STATE)
+        is QueueMonitorState.Queues -> mapMediaTypes(state.queues)
+    }
+
+    private fun mapLoadingState() = listOf(
+        EntryWidgetContract.ItemType.LOADING_STATE,
+        EntryWidgetContract.ItemType.LOADING_STATE,
+        EntryWidgetContract.ItemType.LOADING_STATE,
+        EntryWidgetContract.ItemType.LOADING_STATE,
+        EntryWidgetContract.ItemType.PROVIDED_BY
+    )
+
+    private fun mapMediaTypes(queues: List<Queue>): List<EntryWidgetContract.ItemType> =
+        queues.map { it.state }
+            .filter { it.status == QueueState.Status.OPEN }
+            .flatMap { it.medias.toList() }
+            .distinct()
+            .let { allMedias ->
+                return buildList {
+                    if (allMedias.contains(Engagement.MediaType.TEXT)) add(EntryWidgetContract.ItemType.CHAT)
+                    if (allMedias.contains(Engagement.MediaType.AUDIO)) add(EntryWidgetContract.ItemType.AUDIO_CALL)
+                    if (allMedias.contains(Engagement.MediaType.VIDEO)) add(EntryWidgetContract.ItemType.VIDEO_CALL)
+                    if (allMedias.contains(Engagement.MediaType.MESSAGING)) add(EntryWidgetContract.ItemType.SECURE_MESSAGE)
+
+                    if (allMedias.isEmpty()) {
+                        add(EntryWidgetContract.ItemType.EMPTY_STATE)
+                    } else {
+                        add(EntryWidgetContract.ItemType.PROVIDED_BY)
+                    }
+                }
+            }
 
     override fun onItemClicked(itemType: EntryWidgetContract.ItemType) {
         // TODO: Handle item click
 
+        Logger.d(TAG, "Item clicked: $itemType")
         // Dismiss the widget
         view.dismiss()
     }

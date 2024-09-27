@@ -12,9 +12,9 @@ internal interface EntryWidgetContract {
     }
 
     enum class ItemType {
-        VIDEO_CALL,
-        AUDIO_CALL,
         CHAT,
+        AUDIO_CALL,
+        VIDEO_CALL,
         SECURE_MESSAGE,
         LOADING_STATE,
         EMPTY_STATE,

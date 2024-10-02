@@ -153,7 +153,7 @@
             android:src="?attr/gliaIconSendMessage"
             app:tint="?attr/gliaBrandPrimaryColor"
             tools:src="@drawable/ic_baseline_send"
-            tools:tint="@color/glia_brand_primary_color" />
+            tools:tint="?attr/gliaBrandPrimaryColor" />
     </LinearLayout>
 
 </merge>

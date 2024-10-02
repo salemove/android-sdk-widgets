@@ -5,7 +5,7 @@
         android:width="@dimen/glia_large_x_large"
         android:height="@dimen/glia_large_x_large">
         <shape android:shape="oval">
-            <solid android:color="@color/glia_base_light_color" />
+            <solid android:color="?attr/gliaBaseLightColor" />
         </shape>
     </item>
 
@@ -16,7 +16,7 @@
         <shape android:shape="oval">
             <stroke
                 android:width="@dimen/glia_px"
-                android:color="@color/glia_base_shade_color" />
+                android:color="?attr/gliaBaseShadeColor" />
         </shape>
     </item>
 
@@ -27,7 +27,7 @@
         android:end="5.25dp"
         android:bottom="5.25dp">
         <shape android:shape="oval">
-            <solid android:color="@color/glia_brand_primary_color" />
+            <solid android:color="?attr/gliaBrandPrimaryColor" />
         </shape>
     </item>
 </layer-list>

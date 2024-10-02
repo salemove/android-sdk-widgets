@@ -12,7 +12,7 @@
         android:layout_marginEnd="@dimen/glia_small"
         android:layout_marginBottom="@dimen/glia_medium"
         style="@style/Application.Glia.Caption"
-        android:textColor="@color/glia_base_shade_color"
+        android:textColor="?attr/gliaBaseShadeColor"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"

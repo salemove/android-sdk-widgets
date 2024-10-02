@@ -154,7 +154,7 @@
         android:background="@null"
         android:visibility="gone"
         tools:visibility="visible"
-        tools:tint="@color/glia_base_normal_color"
+        tools:tint="?attr/gliaBaseNormalColor"
         app:layout_constraintTop_toBottomOf="@+id/body_container"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>

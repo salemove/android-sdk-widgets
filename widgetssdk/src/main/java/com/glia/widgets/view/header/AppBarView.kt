@@ -1,7 +1,6 @@
 package com.glia.widgets.view.header
 
 import android.content.Context
-import android.content.res.ColorStateList
 import android.util.AttributeSet
 import android.view.MenuItem
 import android.widget.TextView
@@ -22,7 +21,6 @@ import com.glia.widgets.helper.applyIconColorTheme
 import com.glia.widgets.helper.applyImageColorTheme
 import com.glia.widgets.helper.applyTextTheme
 import com.glia.widgets.helper.getColorCompat
-import com.glia.widgets.helper.getColorStateListCompat
 import com.glia.widgets.helper.getFontCompat
 import com.glia.widgets.helper.getTypedArrayResId
 import com.glia.widgets.helper.layoutInflater
@@ -93,7 +91,8 @@ internal class AppBarView @JvmOverloads constructor(
                 R.styleable.AppBarView_android_backgroundTint,
                 R.attr.gliaBrandPrimaryColor
             )
-            this@AppBarView.backgroundTintList = getColorStateListCompat(backgroundTintList)
+
+            setBackgroundColor(getColorCompat(backgroundTintList))
 
             Utils.getTypedArrayStringValue(this, R.styleable.AppBarView_titleText)?.also {
                 binding.title.text = it
@@ -130,7 +129,7 @@ internal class AppBarView @JvmOverloads constructor(
         val textFont = uiTheme.fontRes?.let(::getFontCompat)
 
         chatHeaderHomeButtonColor?.also { binding.toolbar.setNavigationIconTint(it) }
-        brandPrimaryColor?.also { backgroundTintList = ColorStateList.valueOf(it) }
+        brandPrimaryColor?.also { setBackgroundColor(it) }
 
         leaveQueueIcon.applyIconColorTheme(exitQueueButtonColor)
         endScreenShareButton.applyImageColorTheme(endScreenShareButtonColor)

@@ -12,6 +12,7 @@
         android:layout_height="@dimen/glia_large_x_large"
         android:layout_marginStart="@dimen/glia_large"
         android:layout_marginEnd="@dimen/glia_large"
+        app:tint="?attr/gliaBrandPrimaryColor"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/title"
         app:layout_constraintStart_toStartOf="parent"

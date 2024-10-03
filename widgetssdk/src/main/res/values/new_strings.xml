@@ -219,10 +219,10 @@
     <string name="entry_widget_live_chat_button_description">For the texter in all of us</string>
     <string name="entry_widget_live_chat_button_accessibility">Chat with us</string>
     <string name="entry_widget_audio_button_label">Audio</string>
-    <string name="entry_widget_audio_button_description">Speak through your phone</string>
+    <string name="entry_widget_audio_button_description">Speak through your device</string>
     <string name="entry_widget_audio_button_accessibility">Call with us</string>
     <string name="entry_widget_video_button_label">Video</string>
-    <string name="entry_widget_video_button_description">You’ll see us, but we won’t see you</string>
+    <string name="entry_widget_video_button_description">Face-to-face, just like in person</string>
     <string name="entry_widget_video_button_accessibility">Video call with us</string>
     <string name="entry_widget_secure_messaging_button_label">Secure Messaging</string>
     <string name="entry_widget_secure_messaging_button_description">Start a conversation, we’ll get back to you</string>

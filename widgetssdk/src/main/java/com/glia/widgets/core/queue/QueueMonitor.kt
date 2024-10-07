@@ -1,14 +1,11 @@
 package com.glia.widgets.core.queue
 
-import android.annotation.SuppressLint
-import com.glia.androidsdk.RequestCallback
 import com.glia.androidsdk.queuing.Queue
-import com.glia.widgets.core.queue.domain.FetchQueuesUseCase
 import com.glia.widgets.core.queue.domain.SubscribeToQueueUpdatesUseCase
 import com.glia.widgets.core.queue.domain.UnsubscribeFromQueueUpdatesUseCase
 import com.glia.widgets.helper.Data
+import com.glia.widgets.helper.unSafeSubscribe
 import com.glia.widgets.launcher.ConfigurationManager
-import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.processors.BehaviorProcessor
 import java.util.function.Consumer
@@ -21,15 +18,11 @@ internal sealed interface QueueMonitorState {
 }
 
 internal class QueueMonitor(
-    configurationManager: ConfigurationManager,
-    private val fetchQueuesUseCase: FetchQueuesUseCase,
+    private val configurationManager: ConfigurationManager,
+    private val gliaQueueRepository: GliaQueueRepository,
     private val subscribeToQueueUpdatesUseCase: SubscribeToQueueUpdatesUseCase,
     private val unsubscribeFromQueueUpdatesUseCase: UnsubscribeFromQueueUpdatesUseCase
 ) {
-
-    // Queues received from an integrator or default queues
-    private val _integratorQueues: Flowable<List<Queue>> = configurationManager.queueIdsObservable
-        .flatMap(::findIntegratorQueues)
 
     private val _observableIntegratorQueues: BehaviorProcessor<QueueMonitorState> = BehaviorProcessor.createDefault(QueueMonitorState.Loading)
     val observableIntegratorQueues = _observableIntegratorQueues.hide()
@@ -42,27 +35,24 @@ internal class QueueMonitor(
         subscribeToQueueUpdates()
     }
 
-    private fun findIntegratorQueues(queueIds: Data<List<String>>): Flowable<List<Queue>> =
-        fetchSiteQueues()
-            .map { mapCurrentQueues(it, queueIds) }
-
-    private fun fetchSiteQueues(): Flowable<List<Queue>> = Flowable.create({
-        fetchQueuesUseCase(RequestCallback { queues, exception ->
-            if (exception == null) {
-                it.onNext(queues?.toList().orEmpty())
-            } else {
-                it.onError(exception)
-            }
-        })
-    }, BackpressureStrategy.LATEST)
-
-    @SuppressLint("CheckResult")
     private fun subscribeToQueueUpdates() {
-        _integratorQueues.subscribe({
-            updateQueuesList(it)
-        }, {
-            _observableIntegratorQueues.onNext(QueueMonitorState.Error)
-        })
+        Flowable.combineLatest(configurationManager.queueIdsObservable, gliaQueueRepository.fetchQueues()) { queueIds, queuesState ->
+            queueIds to queuesState
+        }.unSafeSubscribe { (queueIds, queuesState) ->
+            when (queuesState) {
+                is FetchQueuesState.Queues -> {
+                    updateQueuesList(mapCurrentQueues(queuesState.queues, queueIds))
+                }
+
+                FetchQueuesState.Loading -> {
+                    _observableIntegratorQueues.onNext(QueueMonitorState.Loading)
+                }
+
+                FetchQueuesState.Error -> {
+                    _observableIntegratorQueues.onNext(QueueMonitorState.Error)
+                }
+            }
+        }
     }
 
     private fun updateQueuesList(queues: List<Queue>) {

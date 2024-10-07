@@ -389,7 +389,7 @@ public class ControllerFactory {
     public EntryWidgetContract.Controller getEntryWidgetController() {
         return new EntryWidgetController(new QueueMonitor(
             configurationManager,
-            useCaseFactory.getFetchQueuesUseCase(),
+            repositoryFactory.getGliaQueueRepository(),
             useCaseFactory.getSubscribeToQueueUpdatesUseCase(),
             useCaseFactory.getUnsubscribeFromQueueUpdatesUseCase()
         ));

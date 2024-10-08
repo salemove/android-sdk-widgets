@@ -34,7 +34,7 @@ import com.glia.widgets.core.notification.domain.CallNotificationUseCase
 import com.glia.widgets.core.permissions.domain.RequestNotificationPermissionIfPushNotificationsSetUpUseCase
 import com.glia.widgets.core.permissions.domain.WithCameraPermissionUseCase
 import com.glia.widgets.core.permissions.domain.WithReadWritePermissionsUseCase
-import com.glia.widgets.core.secureconversations.domain.GetAvailableQueueIdsForSecureMessagingUseCase
+import com.glia.widgets.core.secureconversations.domain.IsMessagingAvailableUseCase
 import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
 import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCase
 import com.glia.widgets.engagement.domain.DeclineMediaUpgradeOfferUseCase
@@ -49,14 +49,12 @@ import com.glia.widgets.engagement.domain.ReleaseResourcesUseCase
 import com.glia.widgets.engagement.domain.ScreenSharingUseCase
 import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase
 import com.glia.widgets.filepreview.domain.usecase.IsFileReadyForPreviewUseCase
-import com.glia.widgets.helper.Data
 import com.glia.widgets.helper.TimeCounter
 import com.glia.widgets.view.MessagesNotSeenHandler
 import com.glia.widgets.view.MinimizeHandler
 import com.glia.widgets.webbrowser.domain.GetUrlFromLinkUseCase
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.core.Single
 import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -64,6 +62,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
@@ -91,7 +90,6 @@ class ChatControllerTest {
     private lateinit var updateFromCallScreenUseCase: UpdateFromCallScreenUseCase
     private lateinit var isSecureEngagementUseCase: IsSecureEngagementUseCase
     private lateinit var engagementConfigUseCase: SetEngagementConfigUseCase
-    private lateinit var getAvailableQueueIdsForSecureMessagingUseCase: GetAvailableQueueIdsForSecureMessagingUseCase
     private lateinit var isFileReadyForPreviewUseCase: IsFileReadyForPreviewUseCase
     private lateinit var determineGvaButtonTypeUseCase: DetermineGvaButtonTypeUseCase
     private lateinit var updateOperatorDefaultImageUrlUseCase: UpdateOperatorDefaultImageUrlUseCase
@@ -121,6 +119,7 @@ class ChatControllerTest {
     private lateinit var chatManager: ChatManager
 
     private lateinit var chatView: ChatContract.View
+    private lateinit var isMessagingAvailableUseCase: IsMessagingAvailableUseCase
 
     @Before
     fun setUp() {
@@ -145,7 +144,6 @@ class ChatControllerTest {
         updateFromCallScreenUseCase = mock()
         isSecureEngagementUseCase = mock()
         engagementConfigUseCase = mock()
-        getAvailableQueueIdsForSecureMessagingUseCase = mock()
         isFileReadyForPreviewUseCase = mock()
         determineGvaButtonTypeUseCase = mock()
         isAuthenticatedUseCase = mock()
@@ -184,6 +182,7 @@ class ChatControllerTest {
         requestNotificationPermissionIfPushNotificationsSetUpUseCase = mock()
         releaseResourcesUseCase = mock()
         getUrlFromLinkUseCase = mock()
+        isMessagingAvailableUseCase = mock()
 
         chatController = ChatController(
             callTimer = callTimer,
@@ -207,7 +206,6 @@ class ChatControllerTest {
             updateFromCallScreenUseCase = updateFromCallScreenUseCase,
             isSecureEngagementUseCase = isSecureEngagementUseCase,
             engagementConfigUseCase = engagementConfigUseCase,
-            getAvailableQueueIdsForSecureMessagingUseCase = getAvailableQueueIdsForSecureMessagingUseCase,
             isFileReadyForPreviewUseCase = isFileReadyForPreviewUseCase,
             determineGvaButtonTypeUseCase = determineGvaButtonTypeUseCase,
             isAuthenticatedUseCase = isAuthenticatedUseCase,
@@ -231,7 +229,8 @@ class ChatControllerTest {
             withReadWritePermissionsUseCase = withReadWritePermissionsUseCase,
             requestNotificationPermissionIfPushNotificationsSetUpUseCase = requestNotificationPermissionIfPushNotificationsSetUpUseCase,
             releaseResourcesUseCase = releaseResourcesUseCase,
-            getUrlFromLinkUseCase = getUrlFromLinkUseCase
+            getUrlFromLinkUseCase = getUrlFromLinkUseCase,
+            isMessagingAvailableUseCase = isMessagingAvailableUseCase
         )
         chatController.setView(chatView)
     }
@@ -247,35 +246,38 @@ class ChatControllerTest {
 
     @Test
     fun initChat_setsConfiguration_withAvailableQueues() {
-        val queueIds = listOf("QueueId1", "QueueId2")
-        whenever(isSecureEngagementUseCase.invoke()) doReturn true
-        whenever(getAvailableQueueIdsForSecureMessagingUseCase()) doReturn Single.just(Data.Value(queueIds))
+        whenever(isSecureEngagementUseCase()) doReturn true
         whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.never()
+        whenever(isMessagingAvailableUseCase()) doReturn Flowable.just(Result.success(true))
 
         chatController.initChat(ChatType.SECURE_MESSAGING)
 
+        verify(dialogController, never()).showMessageCenterUnavailableDialog()
+        verify(dialogController, never()).showUnexpectedErrorDialog()
         verify(engagementConfigUseCase).invoke(ChatType.SECURE_MESSAGING)
     }
 
     @Test
     fun initChat_showsMessageCenterUnavailableDialog_whenNoAvailableQueues() {
-        whenever(isSecureEngagementUseCase.invoke()) doReturn true
-        whenever(getAvailableQueueIdsForSecureMessagingUseCase.invoke()) doReturn Single.just(Data.Value(null))
+        whenever(isSecureEngagementUseCase()) doReturn true
         whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.never()
+        whenever(isMessagingAvailableUseCase()) doReturn Flowable.just(Result.success(false))
 
         chatController.initChat(ChatType.SECURE_MESSAGING)
 
         verify(dialogController).showMessageCenterUnavailableDialog()
+        verify(dialogController, never()).showUnexpectedErrorDialog()
     }
 
     @Test
     fun initChat_showsUnexpectedErrorDialog_onException() {
-        whenever(isSecureEngagementUseCase.invoke()) doReturn true
-        whenever(getAvailableQueueIdsForSecureMessagingUseCase.invoke()) doReturn Single.error(Exception())
+        whenever(isSecureEngagementUseCase()) doReturn true
         whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.never()
+        whenever(isMessagingAvailableUseCase()) doReturn Flowable.just(Result.failure(RuntimeException()))
 
         chatController.initChat(ChatType.SECURE_MESSAGING)
 
+        verify(dialogController, never()).showMessageCenterUnavailableDialog()
         verify(dialogController).showUnexpectedErrorDialog()
     }
 

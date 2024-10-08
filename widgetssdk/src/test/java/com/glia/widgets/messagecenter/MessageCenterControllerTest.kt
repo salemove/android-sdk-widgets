@@ -1,8 +1,6 @@
 package com.glia.widgets.messagecenter
 
 import com.glia.androidsdk.GliaException
-import com.glia.androidsdk.RequestCallback
-import com.glia.widgets.chat.ChatType
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.chat.domain.SiteInfoUseCase
 import com.glia.widgets.chat.domain.TakePictureUseCase
@@ -13,14 +11,15 @@ import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.core.permissions.domain.RequestNotificationPermissionIfPushNotificationsSetUpUseCase
 import com.glia.widgets.core.secureconversations.domain.AddSecureFileAttachmentsObserverUseCase
 import com.glia.widgets.core.secureconversations.domain.AddSecureFileToAttachmentAndUploadUseCase
-import com.glia.widgets.core.secureconversations.domain.GetAvailableQueueIdsForSecureMessagingUseCase
 import com.glia.widgets.core.secureconversations.domain.GetSecureFileAttachmentsUseCase
+import com.glia.widgets.core.secureconversations.domain.IsMessagingAvailableUseCase
 import com.glia.widgets.core.secureconversations.domain.OnNextMessageUseCase
 import com.glia.widgets.core.secureconversations.domain.RemoveSecureFileAttachmentUseCase
 import com.glia.widgets.core.secureconversations.domain.ResetMessageCenterUseCase
 import com.glia.widgets.core.secureconversations.domain.SendMessageButtonStateUseCase
 import com.glia.widgets.core.secureconversations.domain.SendSecureMessageUseCase
 import com.glia.widgets.core.secureconversations.domain.ShowMessageLimitErrorUseCase
+import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Observable
 import org.junit.Before
 import org.junit.Test
@@ -31,13 +30,13 @@ import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.whenever
 
 internal class MessageCenterControllerTest {
     private lateinit var messageCenterController: MessageCenterController
     private lateinit var engagementConfigUseCase: SetEngagementConfigUseCase
     private lateinit var sendSecureMessageUseCase: SendSecureMessageUseCase
-    private lateinit var getAvailableQueueIdsForSecureMessagingUseCase: GetAvailableQueueIdsForSecureMessagingUseCase
     private lateinit var addFileAttachmentsObserverUseCase: AddSecureFileAttachmentsObserverUseCase
     private lateinit var addFileToAttachmentAndUploadUseCase: AddSecureFileToAttachmentAndUploadUseCase
     private lateinit var getFileAttachmentsUseCase: GetSecureFileAttachmentsUseCase
@@ -53,12 +52,12 @@ internal class MessageCenterControllerTest {
     private lateinit var takePictureUseCase: TakePictureUseCase
     private lateinit var uriToFileAttachmentUseCase: UriToFileAttachmentUseCase
     private lateinit var requestNotificationPermissionIfPushNotificationsSetUpUseCase: RequestNotificationPermissionIfPushNotificationsSetUpUseCase
+    private lateinit var isMessagingAvailableUseCase: IsMessagingAvailableUseCase
 
     @Before
     fun setUp() {
         engagementConfigUseCase = mock()
         sendSecureMessageUseCase = mock()
-        getAvailableQueueIdsForSecureMessagingUseCase = mock()
         addFileAttachmentsObserverUseCase = mock()
         addFileToAttachmentAndUploadUseCase = mock()
         getFileAttachmentsUseCase = mock()
@@ -74,10 +73,10 @@ internal class MessageCenterControllerTest {
         takePictureUseCase = mock()
         uriToFileAttachmentUseCase = mock()
         requestNotificationPermissionIfPushNotificationsSetUpUseCase = mock()
+        isMessagingAvailableUseCase = mock()
         messageCenterController = MessageCenterController(
             engagementConfigUseCase = engagementConfigUseCase,
             sendSecureMessageUseCase = sendSecureMessageUseCase,
-            getAvailableQueueIdsForSecureMessagingUseCase = getAvailableQueueIdsForSecureMessagingUseCase,
             addFileAttachmentsObserverUseCase = addFileAttachmentsObserverUseCase,
             addFileToAttachmentAndUploadUseCase = addFileToAttachmentAndUploadUseCase,
             getFileAttachmentsUseCase = getFileAttachmentsUseCase,
@@ -91,7 +90,8 @@ internal class MessageCenterControllerTest {
             dialogController = dialogController,
             takePictureUseCase = takePictureUseCase,
             uriToFileAttachmentUseCase = uriToFileAttachmentUseCase,
-            requestNotificationPermissionIfPushNotificationsSetUpUseCase = requestNotificationPermissionIfPushNotificationsSetUpUseCase
+            requestNotificationPermissionIfPushNotificationsSetUpUseCase = requestNotificationPermissionIfPushNotificationsSetUpUseCase,
+            isMessagingAvailableUseCase = isMessagingAvailableUseCase
         )
     }
 
@@ -237,57 +237,52 @@ internal class MessageCenterControllerTest {
     }
 
     @Test
-    fun onDestroy_ExecutesIsMessageCenterAvailableUseCase_onTrigger() {
-        messageCenterController.onDestroy()
-
-        verify(getAvailableQueueIdsForSecureMessagingUseCase, times(1)).dispose()
-    }
-
-    @Test
-    fun ensureMessageCenterAvailability_setsAvailableQueueIds_onTrigger() {
-        val availableQueueIds = listOf("id1", "id2")
-
-        messageCenterController.ensureMessageCenterAvailability()
-        val argumentCaptor = argumentCaptor<RequestCallback<List<String>>>()
-        verify(getAvailableQueueIdsForSecureMessagingUseCase, times(1)).invoke(argumentCaptor.capture())
-
-        argumentCaptor.firstValue.onResult(availableQueueIds, null)
-
-        verify(engagementConfigUseCase, times(1)).invoke(ChatType.SECURE_MESSAGING)
-    }
-
-    @Test
     fun ensureMessageCenterAvailability_showsUnexpectedErrorDialog_onException() {
+        messageCenterController.setView(viewContract)
+        whenever(isMessagingAvailableUseCase.invoke()) doReturn Flowable.just(
+            Result.failure(
+                GliaException(
+                    "Error",
+                    GliaException.Cause.INTERNAL_ERROR
+                )
+            )
+        )
         messageCenterController.ensureMessageCenterAvailability()
-        val argumentCaptor = argumentCaptor<RequestCallback<List<String>>>()
-        verify(getAvailableQueueIdsForSecureMessagingUseCase, times(1)).invoke(argumentCaptor.capture())
 
-        argumentCaptor.firstValue.onResult(null, GliaException("Error", GliaException.Cause.INTERNAL_ERROR))
+        val messageCenterStateArgumentCaptor = argumentCaptor<MessageCenterState>()
+        verify(viewContract, times(1)).onStateUpdated(messageCenterStateArgumentCaptor.capture())
 
+        messageCenterStateArgumentCaptor.firstValue.apply {
+            assert(!showSendMessageGroup)
+        }
+
+        verify(dialogController, never()).showMessageCenterUnavailableDialog()
         verify(dialogController, times(1)).showUnexpectedErrorDialog()
     }
 
     @Test
-    fun ensureMessageCenterAvailability_showsMessageCenterUnavailableDialog_whenNoAvailableQueues() {
+    fun ensureMessageCenterAvailability_showsMessageCenterUnavailableDialog_whenMessagingIsUnavailable() {
+        messageCenterController.setView(viewContract)
+        whenever(isMessagingAvailableUseCase.invoke()) doReturn Flowable.just(Result.success(false))
         messageCenterController.ensureMessageCenterAvailability()
-        val argumentCaptor = argumentCaptor<RequestCallback<List<String>>>()
-        verify(getAvailableQueueIdsForSecureMessagingUseCase, times(1)).invoke(argumentCaptor.capture())
 
-        argumentCaptor.firstValue.onResult(null, null)
+        val messageCenterStateArgumentCaptor = argumentCaptor<MessageCenterState>()
+        verify(viewContract, times(1)).onStateUpdated(messageCenterStateArgumentCaptor.capture())
+
+        messageCenterStateArgumentCaptor.firstValue.apply {
+            assert(!showSendMessageGroup)
+        }
 
         verify(dialogController, times(1)).showMessageCenterUnavailableDialog()
+        verify(dialogController, never()).showUnexpectedErrorDialog()
     }
 
     @Test
-    fun ensureMessageCenterAvailability_showSendMessageGroup_whenQueuesAvailable() {
+    fun ensureMessageCenterAvailability_showSendMessageGroup_whenMessageCenterAvailable() {
         messageCenterController.setView(viewContract)
-        val availableQueueIds = listOf("id1", "id2")
+        whenever(isMessagingAvailableUseCase.invoke()) doReturn Flowable.just(Result.success(true))
 
         messageCenterController.ensureMessageCenterAvailability()
-        val requestCallbackArgumentCaptor = argumentCaptor<RequestCallback<List<String>>>()
-        verify(getAvailableQueueIdsForSecureMessagingUseCase, times(1)).invoke(requestCallbackArgumentCaptor.capture())
-
-        requestCallbackArgumentCaptor.firstValue.onResult(availableQueueIds, null)
 
         val messageCenterStateArgumentCaptor = argumentCaptor<MessageCenterState>()
         verify(viewContract, times(1)).onStateUpdated(messageCenterStateArgumentCaptor.capture())
@@ -295,5 +290,8 @@ internal class MessageCenterControllerTest {
         messageCenterStateArgumentCaptor.firstValue.apply {
             assert(showSendMessageGroup)
         }
+
+        verify(dialogController, never()).showMessageCenterUnavailableDialog()
+        verify(dialogController, never()).showUnexpectedErrorDialog()
     }
 }

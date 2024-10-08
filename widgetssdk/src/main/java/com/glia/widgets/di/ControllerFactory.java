@@ -14,7 +14,6 @@ import com.glia.widgets.chat.ChatContract;
 import com.glia.widgets.chat.controller.ChatController;
 import com.glia.widgets.core.dialog.DialogContract;
 import com.glia.widgets.core.dialog.DialogController;
-import com.glia.widgets.core.queue.QueueMonitor;
 import com.glia.widgets.engagement.completion.EngagementCompletionContract;
 import com.glia.widgets.engagement.completion.EngagementCompletionController;
 import com.glia.widgets.entrywidget.EntryWidgetContract;
@@ -23,7 +22,6 @@ import com.glia.widgets.filepreview.ui.ImagePreviewContract;
 import com.glia.widgets.filepreview.ui.ImagePreviewController;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
-import com.glia.widgets.launcher.ConfigurationManager;
 import com.glia.widgets.messagecenter.MessageCenterContract;
 import com.glia.widgets.messagecenter.MessageCenterController;
 import com.glia.widgets.operator.OperatorRequestContract;
@@ -58,7 +56,6 @@ public class ControllerFactory {
     private final DialogContract.Controller dialogController;
     private final MessagesNotSeenHandler messagesNotSeenHandler;
     private final UseCaseFactory useCaseFactory;
-    private final ConfigurationManager configurationManager;
     private final ImagePreviewContract.Controller filePreviewController;
     private final ManagerFactory managerFactory;
     private EngagementCompletionContract.Controller engagementCompletionController;
@@ -72,7 +69,6 @@ public class ControllerFactory {
     public ControllerFactory(
         RepositoryFactory repositoryFactory,
         UseCaseFactory useCaseFactory,
-        ConfigurationManager configurationManager,
         ManagerFactory managerFactory
     ) {
         this.repositoryFactory = repositoryFactory;
@@ -87,7 +83,6 @@ public class ControllerFactory {
             useCaseFactory.createGetImageFileFromCacheUseCase(),
             useCaseFactory.createPutImageFileToDownloadsUseCase()
         );
-        this.configurationManager = configurationManager;
         this.managerFactory = managerFactory;
     }
 
@@ -118,7 +113,6 @@ public class ControllerFactory {
                 useCaseFactory.createUpdateFromCallScreenUseCase(),
                 useCaseFactory.createIsSecureEngagementUseCase(),
                 useCaseFactory.createSetEngagementConfigUseCase(),
-                useCaseFactory.createSecureMessagingAvailableQueueIdsUseCase(),
                 useCaseFactory.getIsCurrentEngagementCallVisualizer(),
                 useCaseFactory.createIsFileReadyForPreviewUseCase(),
                 useCaseFactory.createDetermineGvaButtonTypeUseCase(),
@@ -140,7 +134,8 @@ public class ControllerFactory {
                 useCaseFactory.getWithReadWritePermissionsUseCase(),
                 useCaseFactory.getRequestNotificationPermissionIfPushNotificationsSetUpUseCase(),
                 useCaseFactory.getReleaseResourcesUseCase(getDialogController()),
-                useCaseFactory.createGetUrlFromLinkUseCase()
+                useCaseFactory.createGetUrlFromLinkUseCase(),
+                useCaseFactory.createIsMessagingAvailableUseCase()
             );
         }
 
@@ -294,7 +289,6 @@ public class ControllerFactory {
         return new MessageCenterController(
             useCaseFactory.createSetEngagementConfigUseCase(),
             useCaseFactory.createSendSecureMessageUseCase(),
-            useCaseFactory.createSecureMessagingAvailableQueueIdsUseCase(),
             useCaseFactory.createAddSecureFileAttachmentsObserverUseCase(),
             useCaseFactory.createAddSecureFileToAttachmentAndUploadUseCase(),
             useCaseFactory.createGetSecureFileAttachmentsUseCase(),
@@ -308,7 +302,8 @@ public class ControllerFactory {
             createDialogController(),
             useCaseFactory.getTakePictureUseCase(),
             useCaseFactory.getUriToFileAttachmentUseCase(),
-            useCaseFactory.getRequestNotificationPermissionIfPushNotificationsSetUpUseCase()
+            useCaseFactory.getRequestNotificationPermissionIfPushNotificationsSetUpUseCase(),
+            useCaseFactory.createIsMessagingAvailableUseCase()
         );
     }
 
@@ -387,11 +382,6 @@ public class ControllerFactory {
     }
 
     public EntryWidgetContract.Controller getEntryWidgetController() {
-        return new EntryWidgetController(new QueueMonitor(
-            configurationManager,
-            repositoryFactory.getGliaQueueRepository(),
-            useCaseFactory.getSubscribeToQueueUpdatesUseCase(),
-            useCaseFactory.getUnsubscribeFromQueueUpdatesUseCase()
-        ));
+        return new EntryWidgetController(repositoryFactory.getQueueRepository());
     }
 }

@@ -54,7 +54,7 @@ import com.glia.widgets.core.notification.domain.CallNotificationUseCase
 import com.glia.widgets.core.permissions.domain.RequestNotificationPermissionIfPushNotificationsSetUpUseCase
 import com.glia.widgets.core.permissions.domain.WithCameraPermissionUseCase
 import com.glia.widgets.core.permissions.domain.WithReadWritePermissionsUseCase
-import com.glia.widgets.core.secureconversations.domain.GetAvailableQueueIdsForSecureMessagingUseCase
+import com.glia.widgets.core.secureconversations.domain.IsMessagingAvailableUseCase
 import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.EngagementUpdateState
@@ -112,7 +112,6 @@ internal class ChatController(
     private val updateFromCallScreenUseCase: UpdateFromCallScreenUseCase,
     private val isSecureEngagementUseCase: IsSecureEngagementUseCase,
     private val engagementConfigUseCase: SetEngagementConfigUseCase,
-    private val getAvailableQueueIdsForSecureMessagingUseCase: GetAvailableQueueIdsForSecureMessagingUseCase,
     private val isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase,
     private val isFileReadyForPreviewUseCase: IsFileReadyForPreviewUseCase,
     private val determineGvaButtonTypeUseCase: DetermineGvaButtonTypeUseCase,
@@ -134,7 +133,8 @@ internal class ChatController(
     private val withReadWritePermissionsUseCase: WithReadWritePermissionsUseCase,
     private val requestNotificationPermissionIfPushNotificationsSetUpUseCase: RequestNotificationPermissionIfPushNotificationsSetUpUseCase,
     private val releaseResourcesUseCase: ReleaseResourcesUseCase,
-    private val getUrlFromLinkUseCase: GetUrlFromLinkUseCase
+    private val getUrlFromLinkUseCase: GetUrlFromLinkUseCase,
+    private val isMessagingAvailableUseCase: IsMessagingAvailableUseCase
 ) : ChatContract.Controller {
     private var backClickedListener: ChatView.OnBackClickedListener? = null
     private var view: ChatContract.View? = null
@@ -251,19 +251,23 @@ internal class ChatController(
     private fun ensureSecureMessagingAvailable() {
         if (!isSecureEngagement) return
 
-        disposable.add(
-            getAvailableQueueIdsForSecureMessagingUseCase().subscribe({
-                if (it.result != null) {
-                    Logger.d(TAG, "Messaging is available")
-                } else {
-                    Logger.d(TAG, "Messaging is unavailable")
-                    dialogController.showMessageCenterUnavailableDialog()
-                }
-            }, {
-                Logger.e(TAG, "Checking for Messaging availability failed", it)
-                dialogController.showUnexpectedErrorDialog()
-            })
-        )
+        disposable.add(isMessagingAvailableUseCase().subscribe(::handleMessagingAvailableResult))
+    }
+
+    private fun handleMessagingAvailableResult(result: Result<Boolean>) {
+        result.onFailure { error ->
+            Logger.e(TAG, "Checking for Messaging availability failed", error)
+            dialogController.showUnexpectedErrorDialog()
+        }
+
+        result.onSuccess { isMessagingAvailable ->
+            if (!isMessagingAvailable) {
+                Logger.d(TAG, "Messaging is unavailable")
+                dialogController.showMessageCenterUnavailableDialog()
+            } else {
+                Logger.d(TAG, "Messaging is available")
+            }
+        }
     }
 
     private fun prepareChatComponents() {

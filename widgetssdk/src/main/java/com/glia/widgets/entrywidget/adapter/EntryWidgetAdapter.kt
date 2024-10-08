@@ -16,7 +16,7 @@ import com.glia.widgets.view.unifiedui.theme.entrywidget.EntryWidgetTheme
 import com.glia.widgets.view.unifiedui.theme.entrywidget.MediaTypeItemsTheme
 
 internal class EntryWidgetAdapter(
-    private val viewType: EntryWidgetContract.ViewType,
+    val viewType: EntryWidgetContract.ViewType,
     private val mediaTypeItemsTheme: MediaTypeItemsTheme? = null,
     private val errorTitleTheme: TextTheme? = null,
     private val errorMessageTheme: TextTheme? = null,

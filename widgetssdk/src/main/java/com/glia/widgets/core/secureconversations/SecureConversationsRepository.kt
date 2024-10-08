@@ -8,11 +8,12 @@ import com.glia.widgets.chat.data.GliaChatRepository
 import com.glia.widgets.chat.domain.GliaSendMessageUseCase
 import com.glia.widgets.chat.model.SendMessagePayload
 import com.glia.widgets.chat.model.Unsent
+import com.glia.widgets.core.queue.QueueRepository
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.reactivex.rxjava3.subjects.Subject
 
-internal class SecureConversationsRepository(private val secureConversations: SecureConversations) {
+internal class SecureConversationsRepository(private val secureConversations: SecureConversations, private val queueRepository: QueueRepository) {
     private val _messageSendingObservable: Subject<Boolean> = BehaviorSubject.createDefault(false)
 
     val messageSendingObservable: Observable<Boolean> = _messageSendingObservable
@@ -21,15 +22,13 @@ internal class SecureConversationsRepository(private val secureConversations: Se
         secureConversations.fetchChatTranscript(listener::loaded)
     }
 
-    fun send(payload: SendMessagePayload, queueIds: List<String>, callback: RequestCallback<VisitorMessage?>) {
+    fun send(payload: SendMessagePayload, callback: RequestCallback<VisitorMessage?>) {
         _messageSendingObservable.onNext(true)
-        secureConversations.send(payload.payload, queueIds.toTypedArray(), handleResult(callback))
+        secureConversations.send(payload.payload, queueRepository.integratorQueueIds.toTypedArray(), handleResult(callback))
     }
 
-    fun send(payload: SendMessagePayload, queueIds: List<String>, listener: GliaSendMessageUseCase.Listener) {
-        send(payload, queueIds) { visitorMessage, ex ->
-            onMessageReceived(visitorMessage, ex, listener, payload)
-        }
+    fun send(payload: SendMessagePayload, listener: GliaSendMessageUseCase.Listener) {
+        send(payload) { visitorMessage, ex -> onMessageReceived(visitorMessage, ex, listener, payload) }
     }
 
     fun markMessagesRead(callback: RequestCallback<Void>) {

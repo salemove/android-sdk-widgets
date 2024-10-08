@@ -102,13 +102,8 @@ import com.glia.widgets.core.permissions.domain.WithNotificationPermissionUseCas
 import com.glia.widgets.core.permissions.domain.WithNotificationPermissionUseCaseImpl;
 import com.glia.widgets.core.permissions.domain.WithReadWritePermissionsUseCase;
 import com.glia.widgets.core.permissions.domain.WithReadWritePermissionsUseCaseImpl;
-import com.glia.widgets.core.queue.domain.SubscribeToQueueUpdatesUseCase;
-import com.glia.widgets.core.queue.domain.SubscribeToQueueUpdatesUseCaseImpl;
-import com.glia.widgets.core.queue.domain.UnsubscribeFromQueueUpdatesUseCase;
-import com.glia.widgets.core.queue.domain.UnsubscribeFromQueueUpdatesUseCaseImpl;
 import com.glia.widgets.core.secureconversations.domain.AddSecureFileAttachmentsObserverUseCase;
 import com.glia.widgets.core.secureconversations.domain.AddSecureFileToAttachmentAndUploadUseCase;
-import com.glia.widgets.core.secureconversations.domain.GetAvailableQueueIdsForSecureMessagingUseCase;
 import com.glia.widgets.core.secureconversations.domain.GetSecureFileAttachmentsUseCase;
 import com.glia.widgets.core.secureconversations.domain.GetUnreadMessagesCountWithTimeoutUseCase;
 import com.glia.widgets.core.secureconversations.domain.IsMessagingAvailableUseCase;
@@ -380,7 +375,6 @@ public class UseCaseFactory {
             repositoryFactory.getGliaMessageRepository(),
             repositoryFactory.getGliaFileAttachmentRepository(),
             getIsOperatorPresentUseCase(),
-            repositoryFactory.getEngagementConfigRepository(),
             repositoryFactory.getSecureConversationsRepository(),
             createIsSecureEngagementUseCase()
         );
@@ -555,22 +549,11 @@ public class UseCaseFactory {
     @NonNull
     public SendSecureMessageUseCase createSendSecureMessageUseCase() {
         return new SendSecureMessageUseCase(
-            repositoryFactory.getEngagementConfigRepository(),
             repositoryFactory.getSendMessageRepository(),
             repositoryFactory.getSecureConversationsRepository(),
             repositoryFactory.getSecureFileAttachmentRepository(),
             repositoryFactory.getGliaMessageRepository(),
             getIsQueueingOrEngagementUseCase()
-        );
-    }
-
-    @NonNull
-    public GetAvailableQueueIdsForSecureMessagingUseCase createSecureMessagingAvailableQueueIdsUseCase() {
-        return new GetAvailableQueueIdsForSecureMessagingUseCase(
-            repositoryFactory.getEngagementConfigRepository(),
-            repositoryFactory.getGliaQueueRepository(),
-            createIsMessagingAvailableUseCase(),
-            schedulers
         );
     }
 
@@ -617,7 +600,7 @@ public class UseCaseFactory {
 
     @NonNull
     public IsMessagingAvailableUseCase createIsMessagingAvailableUseCase() {
-        return new IsMessagingAvailableUseCase();
+        return new IsMessagingAvailableUseCase(repositoryFactory.getQueueRepository());
     }
 
     @NonNull
@@ -840,7 +823,6 @@ public class UseCaseFactory {
         return new SendUnsentMessagesUseCase(
             repositoryFactory.getGliaMessageRepository(),
             repositoryFactory.getSecureConversationsRepository(),
-            repositoryFactory.getEngagementConfigRepository(),
             createIsSecureEngagementUseCase()
         );
     }
@@ -1102,13 +1084,5 @@ public class UseCaseFactory {
             repositoryFactory.getEngagementRepository(),
             getFlipVisitorCameraUseCase()
         );
-    }
-
-    public SubscribeToQueueUpdatesUseCase getSubscribeToQueueUpdatesUseCase() {
-        return new SubscribeToQueueUpdatesUseCaseImpl(gliaCore);
-    }
-
-    public UnsubscribeFromQueueUpdatesUseCase getUnsubscribeFromQueueUpdatesUseCase() {
-        return new UnsubscribeFromQueueUpdatesUseCaseImpl(gliaCore);
     }
 }

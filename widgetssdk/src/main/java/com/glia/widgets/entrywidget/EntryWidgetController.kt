@@ -4,29 +4,30 @@ import android.annotation.SuppressLint
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.queuing.Queue
 import com.glia.androidsdk.queuing.QueueState
-import com.glia.widgets.core.queue.QueueMonitor
-import com.glia.widgets.core.queue.QueueMonitorState
+import com.glia.widgets.core.queue.QueueRepository
+import com.glia.widgets.core.queue.QueuesState
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 
-internal class EntryWidgetController(private val queueMonitor: QueueMonitor) : EntryWidgetContract.Controller {
+internal class EntryWidgetController(private val queueRepository: QueueRepository) :
+    EntryWidgetContract.Controller {
     private lateinit var view: EntryWidgetContract.View
 
     @SuppressLint("CheckResult")
     override fun setView(view: EntryWidgetContract.View) {
         this.view = view
-        queueMonitor.observableIntegratorQueues
+        queueRepository.observableIntegratorQueues
             .map(::mapState)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(view::showItems)
     }
 
-    private fun mapState(state: QueueMonitorState): List<EntryWidgetContract.ItemType> = when (state) {
-        QueueMonitorState.Loading -> mapLoadingState()
-        QueueMonitorState.Empty -> listOf(EntryWidgetContract.ItemType.EMPTY_STATE)
-        QueueMonitorState.Error -> listOf(EntryWidgetContract.ItemType.ERROR_STATE)
-        is QueueMonitorState.Queues -> mapMediaTypes(state.queues)
+    private fun mapState(state: QueuesState): List<EntryWidgetContract.ItemType> = when (state) {
+        QueuesState.Loading -> mapLoadingState()
+        QueuesState.Empty -> listOf(EntryWidgetContract.ItemType.EMPTY_STATE)
+        is QueuesState.Error -> listOf(EntryWidgetContract.ItemType.ERROR_STATE)
+        is QueuesState.Queues -> mapMediaTypes(state.queues)
     }
 
     private fun mapLoadingState() = listOf(

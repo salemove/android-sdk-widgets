@@ -13,7 +13,6 @@ import com.glia.widgets.core.secureconversations.SendMessageRepository
 import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
 
 internal class SendSecureMessageUseCase(
-    private val engagementConfigRepository: GliaEngagementConfigRepository,
     private val sendMessageRepository: SendMessageRepository,
     private val secureConversationsRepository: SecureConversationsRepository,
     private val fileAttachmentRepository: SecureFileAttachmentRepository,
@@ -29,17 +28,16 @@ internal class SendSecureMessageUseCase(
     ) {
         val message = sendMessageRepository.value
         val fileAttachments = fileAttachmentRepository.getReadyToSendFileAttachments()
-        sendMessage(message, engagementConfigRepository.queueIds, fileAttachments, callback)
+        sendMessage(message, fileAttachments, callback)
     }
 
     private fun sendMessage(
         message: String,
-        queueIds: List<String>,
         localAttachments: List<LocalAttachment>,
         callback: RequestCallback<VisitorMessage?>
     ) {
         if (localAttachments.isNotEmpty()) {
-            sendMessageWithAttachments(message, queueIds, localAttachments) { result, ex ->
+            sendMessageWithAttachments(message, localAttachments) { result, ex ->
                 if (ex == null) {
                     sendMessageRepository.reset()
                     fileAttachmentRepository.detachFiles(localAttachments)
@@ -47,13 +45,12 @@ internal class SendSecureMessageUseCase(
                 callback.onResult(result, ex)
             }
         } else {
-            sendMessage(message, queueIds, callback)
+            sendMessage(message, callback)
         }
     }
 
     private fun sendMessage(
         message: String,
-        queueIds: List<String>,
         callback: RequestCallback<VisitorMessage?>
     ) {
         val payload = SendMessagePayload(content = message)
@@ -61,13 +58,12 @@ internal class SendSecureMessageUseCase(
         if (hasOngoingEngagement) {
             chatRepository.sendMessage(payload, callback)
         } else {
-            secureConversationsRepository.send(payload, queueIds, callback)
+            secureConversationsRepository.send(payload, callback)
         }
     }
 
     private fun sendMessageWithAttachments(
         message: String,
-        queueIds: List<String>,
         localAttachments: List<LocalAttachment>,
         callback: RequestCallback<VisitorMessage?>
     ) {
@@ -81,7 +77,7 @@ internal class SendSecureMessageUseCase(
         if (hasOngoingEngagement) {
             chatRepository.sendMessage(payload, callback)
         } else {
-            secureConversationsRepository.send(payload, queueIds, callback)
+            secureConversationsRepository.send(payload, callback)
         }
     }
 }

@@ -13,7 +13,6 @@ import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCas
 internal class SendUnsentMessagesUseCase(
     private val chatRepository: GliaChatRepository,
     private val secureConversationsRepository: SecureConversationsRepository,
-    private val engagementConfigRepository: GliaEngagementConfigRepository,
     private val isSecureEngagementUseCase: IsSecureEngagementUseCase
 ) {
     operator fun invoke(
@@ -33,7 +32,7 @@ internal class SendUnsentMessagesUseCase(
 
     private fun sendMessage(payload: SendMessagePayload, callback: RequestCallback<VisitorMessage?>) {
         if (isSecureEngagementUseCase()) {
-            secureConversationsRepository.send(payload, engagementConfigRepository.queueIds, callback)
+            secureConversationsRepository.send(payload, callback)
         } else {
             chatRepository.sendMessage(payload, callback)
         }

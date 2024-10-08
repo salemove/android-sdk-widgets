@@ -1,6 +1,8 @@
 package android
 
 import android.content.Intent
+import io.reactivex.rxjava3.functions.Predicate
+import io.reactivex.rxjava3.subscribers.TestSubscriber
 import java.nio.charset.StandardCharsets
 
 internal const val COMMON_EXTENSIONS_CLASS_PATH = "com.glia.widgets.helper.CommonExtensionsKt"
@@ -12,3 +14,11 @@ fun <T> Class<T>.readRawResource(resName: String): String = classLoader?.getReso
 } ?: ""
 
 val Intent.targetActivityName: String? get() = component?.shortClassName
+
+fun <T : Any> TestSubscriber<T>.assertCurrentValue(expected: T): TestSubscriber<T> = run {
+    assertValueAt(values().lastIndex, expected)
+}
+
+fun <T : Any> TestSubscriber<T>.assertCurrentValue(predicate: Predicate<T>): TestSubscriber<T> = run {
+    assertValueAt(values().lastIndex, predicate)
+}

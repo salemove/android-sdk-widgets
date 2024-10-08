@@ -3,7 +3,6 @@ package com.glia.widgets.messagecenter
 import android.net.Uri
 import androidx.annotation.VisibleForTesting
 import com.glia.androidsdk.GliaException
-import com.glia.androidsdk.RequestCallback
 import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.androidsdk.engagement.EngagementFile
 import com.glia.androidsdk.site.SiteInfo
@@ -20,8 +19,8 @@ import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.permissions.domain.RequestNotificationPermissionIfPushNotificationsSetUpUseCase
 import com.glia.widgets.core.secureconversations.domain.AddSecureFileAttachmentsObserverUseCase
 import com.glia.widgets.core.secureconversations.domain.AddSecureFileToAttachmentAndUploadUseCase
-import com.glia.widgets.core.secureconversations.domain.GetAvailableQueueIdsForSecureMessagingUseCase
 import com.glia.widgets.core.secureconversations.domain.GetSecureFileAttachmentsUseCase
+import com.glia.widgets.core.secureconversations.domain.IsMessagingAvailableUseCase
 import com.glia.widgets.core.secureconversations.domain.OnNextMessageUseCase
 import com.glia.widgets.core.secureconversations.domain.RemoveSecureFileAttachmentUseCase
 import com.glia.widgets.core.secureconversations.domain.ResetMessageCenterUseCase
@@ -33,9 +32,8 @@ import com.glia.widgets.helper.TAG
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 internal class MessageCenterController(
-    private val engagementConfigUseCase: SetEngagementConfigUseCase,
+    engagementConfigUseCase: SetEngagementConfigUseCase,
     private val sendSecureMessageUseCase: SendSecureMessageUseCase,
-    private val getAvailableQueueIdsForSecureMessagingUseCase: GetAvailableQueueIdsForSecureMessagingUseCase,
     private val addFileAttachmentsObserverUseCase: AddSecureFileAttachmentsObserverUseCase,
     private val addFileToAttachmentAndUploadUseCase: AddSecureFileToAttachmentAndUploadUseCase,
     private val getFileAttachmentsUseCase: GetSecureFileAttachmentsUseCase,
@@ -49,7 +47,8 @@ internal class MessageCenterController(
     private val dialogController: DialogContract.Controller,
     private val takePictureUseCase: TakePictureUseCase,
     private val uriToFileAttachmentUseCase: UriToFileAttachmentUseCase,
-    private val requestNotificationPermissionIfPushNotificationsSetUpUseCase: RequestNotificationPermissionIfPushNotificationsSetUpUseCase
+    private val requestNotificationPermissionIfPushNotificationsSetUpUseCase: RequestNotificationPermissionIfPushNotificationsSetUpUseCase,
+    private val isMessagingAvailableUseCase: IsMessagingAvailableUseCase
 ) : MessageCenterContract.Controller {
     private var view: MessageCenterContract.View? = null
     private val disposables = CompositeDisposable()
@@ -190,25 +189,21 @@ internal class MessageCenterController(
     }
 
     override fun ensureMessageCenterAvailability() {
-        getAvailableQueueIdsForSecureMessagingUseCase(
-            RequestCallback { queueIds, exception ->
+        disposables.add(isMessagingAvailableUseCase().subscribe(::handleMessagingAvailableResult))
+    }
 
-                val showSendMessageGroup = when {
-                    exception != null -> {
-                        dialogController.showUnexpectedErrorDialog()
-                        false
-                    }
+    private fun handleMessagingAvailableResult(result: Result<Boolean>) {
+        result.onFailure {
+            dialogController.showUnexpectedErrorDialog()
+            setState(state.copy(showSendMessageGroup = false))
+        }
 
-                    queueIds == null -> {
-                        dialogController.showMessageCenterUnavailableDialog()
-                        false
-                    }
-
-                    else -> true
-                }
-                setState(state.copy(showSendMessageGroup = showSendMessageGroup))
+        result.onSuccess {
+            setState(state.copy(showSendMessageGroup = it))
+            if (!it) {
+                dialogController.showMessageCenterUnavailableDialog()
             }
-        )
+        }
     }
 
     fun onAttachmentReceived(file: FileAttachment) {
@@ -245,7 +240,6 @@ internal class MessageCenterController(
     }
 
     override fun onDestroy() {
-        getAvailableQueueIdsForSecureMessagingUseCase.dispose()
         disposables.dispose()
     }
 

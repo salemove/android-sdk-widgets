@@ -1,108 +1,101 @@
 package com.glia.widgets.core.secureconversations.domain
 
-import com.glia.androidsdk.Engagement
+import android.COMMON_EXTENSIONS_CLASS_PATH
 import com.glia.androidsdk.queuing.Queue
 import com.glia.androidsdk.queuing.QueueState
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import com.glia.widgets.core.queue.QueueRepository
+import com.glia.widgets.core.queue.QueuesState
+import com.glia.widgets.helper.supportMessaging
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
+import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.subscribers.TestSubscriber
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import kotlin.properties.Delegates
 
 class IsMessagingAvailableUseCaseTest {
-    private val messagingQueueId = "messagingQueueId"
-    private val mediaTypesWithMessaging =
-        arrayOf(Engagement.MediaType.TEXT, Engagement.MediaType.MESSAGING)
-    private val mediaTypesWithoutMessaging =
-        arrayOf(Engagement.MediaType.TEXT, Engagement.MediaType.AUDIO)
 
-    // Queues
-    private val audioQueue = Queue(
-        "audioQueueId",
-        "Audio Queue",
-        QueueState.Status.OPEN,
-        mediaTypesWithoutMessaging,
-        false
-    )
-    private val videoQueue = Queue(
-        "videoQueueId",
-        "Video Queue",
-        QueueState.Status.OPEN,
-        mediaTypesWithoutMessaging,
-        false
-    )
-
-    private var isMessagingAvailableUseCase: IsMessagingAvailableUseCase by Delegates.notNull()
+    private lateinit var queueRepository: QueueRepository
+    private lateinit var isMessagingAvailableUseCase: IsMessagingAvailableUseCase
 
     @Before
     fun setUp() {
-        isMessagingAvailableUseCase = IsMessagingAvailableUseCase()
+        queueRepository = mockk()
+        isMessagingAvailableUseCase = IsMessagingAvailableUseCase(queueRepository)
+        mockkStatic(COMMON_EXTENSIONS_CLASS_PATH)
+    }
+
+    @After
+    fun tearDown() {
+        unmockkStatic(COMMON_EXTENSIONS_CLASS_PATH)
     }
 
     @Test
-    fun containsMessagingQueue_ReturnsTrue_WhenQueueWithMediaTypeMessagingExists() {
-        val messagingQueue = createMessagingQueueWithStatus()
-        val queues = listOf(audioQueue, messagingQueue, videoQueue)
-        val isMessageCenterAvailable: Boolean = isMessagingAvailableUseCase(queues)
-        assertTrue(isMessageCenterAvailable)
+    fun `invoke returns true when queue with messaging exists`() {
+        val messagingQueue = createQueueWithStatus(QueueState.Status.OPEN, true)
+        val queuesState = QueuesState.Queues(listOf(messagingQueue))
+        every { queueRepository.observableIntegratorQueues } returns Flowable.just(queuesState)
+
+        val testSubscriber = TestSubscriber<Result<Boolean>>()
+        isMessagingAvailableUseCase().subscribe(testSubscriber)
+
+        testSubscriber.assertValue(Result.success(true))
     }
 
     @Test
-    fun containsMessagingQueue_ReturnsFalse_WhenQueueWithMediaTypeMessagingDoesNotExist() {
-        val queues = listOf(audioQueue, videoQueue)
-        val isMessageCenterAvailable: Boolean = isMessagingAvailableUseCase(queues)
-        assertFalse(isMessageCenterAvailable)
+    fun `invoke returns false when no queue with messaging exists`() {
+        val nonMessagingQueue = createQueueWithStatus(QueueState.Status.OPEN, false)
+        val queuesState = QueuesState.Queues(listOf(nonMessagingQueue))
+        every { queueRepository.observableIntegratorQueues } returns Flowable.just(queuesState)
+
+        val testSubscriber = TestSubscriber<Result<Boolean>>()
+        isMessagingAvailableUseCase().subscribe(testSubscriber)
+
+        testSubscriber.assertValue(Result.success(false))
     }
 
     @Test
-    fun containsMessagingQueue_ReturnsTrue_WhenExistingQueueUnStaffed() {
-        val queueWithMessagingIdFromUseCaseUnstaffed =
-            createMessagingQueueWithStatus(QueueState.Status.UNSTAFFED)
-        val queues = listOf(audioQueue, queueWithMessagingIdFromUseCaseUnstaffed, videoQueue)
-        val isMessageCenterAvailable: Boolean = isMessagingAvailableUseCase(queues)
-        assertTrue(isMessageCenterAvailable)
+    fun `invoke returns false when queue state is closed`() {
+        val closedQueue = createQueueWithStatus(QueueState.Status.CLOSED, true)
+        val queuesState = QueuesState.Queues(listOf(closedQueue))
+        every { queueRepository.observableIntegratorQueues } returns Flowable.just(queuesState)
+
+        val testSubscriber = TestSubscriber<Result<Boolean>>()
+        isMessagingAvailableUseCase().subscribe(testSubscriber)
+
+        testSubscriber.assertValue(Result.success(false))
     }
 
     @Test
-    fun containsMessagingQueue_ReturnsTrue_WhenExistingQueueFull() {
-        val queueWithMessagingIdFromUseCaseFull =
-            createMessagingQueueWithStatus(QueueState.Status.FULL)
-        val queues = listOf(audioQueue, queueWithMessagingIdFromUseCaseFull, videoQueue)
-        val isMessageCenterAvailable: Boolean = isMessagingAvailableUseCase(queues)
-        assertTrue(isMessageCenterAvailable)
+    fun `invoke returns false when queue state is unknown`() {
+        val unknownQueue = createQueueWithStatus(QueueState.Status.UNKNOWN, true)
+        val queuesState = QueuesState.Queues(listOf(unknownQueue))
+        every { queueRepository.observableIntegratorQueues } returns Flowable.just(queuesState)
+
+        val testSubscriber = TestSubscriber<Result<Boolean>>()
+        isMessagingAvailableUseCase().subscribe(testSubscriber)
+
+        testSubscriber.assertValue(Result.success(false))
     }
 
     @Test
-    fun containsMessagingQueue_ReturnsFalse_WhenExistingQueueClosed() {
-        val queueWithMessagingIdFromUseCaseClosed =
-            createMessagingQueueWithStatus(QueueState.Status.CLOSED)
-        val queues = listOf(audioQueue, queueWithMessagingIdFromUseCaseClosed, videoQueue)
-        val isMessageCenterAvailable: Boolean = isMessagingAvailableUseCase(queues)
-        assertFalse(isMessageCenterAvailable)
+    fun `invoke returns error when queue state is error`() {
+        val errorState = QueuesState.Error(Throwable("Error"))
+        every { queueRepository.observableIntegratorQueues } returns Flowable.just(errorState)
+
+        val testSubscriber = TestSubscriber<Result<Boolean>>()
+        isMessagingAvailableUseCase().subscribe(testSubscriber)
+
+        testSubscriber.assertValue { it.isFailure }
     }
 
-    @Test
-    fun containsMessagingQueue_ReturnsFalse_WhenExistingQueueStateUnknown() {
-        val queueWithMessagingIdFromUseCaseUnknown =
-            createMessagingQueueWithStatus(QueueState.Status.UNKNOWN)
-        val queues = listOf(audioQueue, queueWithMessagingIdFromUseCaseUnknown, videoQueue)
-        val isMessageCenterAvailable: Boolean = isMessagingAvailableUseCase(queues)
-        assertFalse(isMessageCenterAvailable)
+    private fun createQueueWithStatus(status: QueueState.Status, supportsMessaging: Boolean): Queue {
+        val queue = mockk<Queue>()
+        every { queue.state.status } returns status
+        every { any<Queue>().supportMessaging() } returns supportsMessaging
+        return queue
     }
-
-    @Test
-    fun containsMessagingQueue_ReturnsFalse_WhenQueuesEmpty() {
-        val queues = listOf<Queue>()
-        val isMessageCenterAvailable: Boolean = isMessagingAvailableUseCase(queues)
-        assertFalse(isMessageCenterAvailable)
-    }
-
-    private fun createMessagingQueueWithStatus(status: QueueState.Status = QueueState.Status.OPEN) =
-        Queue(
-            messagingQueueId,
-            "Messaging Queue",
-            status,
-            mediaTypesWithMessaging,
-            false
-        )
 }

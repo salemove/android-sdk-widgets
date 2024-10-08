@@ -4,7 +4,6 @@ import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.GliaWidgetsConfig
 import com.glia.widgets.UiTheme
-import com.glia.widgets.core.engagement.GliaEngagementConfigRepository
 import com.glia.widgets.helper.Data
 import com.glia.widgets.helper.from
 import io.reactivex.rxjava3.core.Flowable
@@ -33,7 +32,7 @@ internal interface ConfigurationManager {
     fun setQueueIds(queueIds: List<String>?)
 }
 
-internal class ConfigurationManagerImpl(private val engagementConfigRepository: GliaEngagementConfigRepository) : ConfigurationManager {
+internal class ConfigurationManagerImpl : ConfigurationManager {
     private var _screenSharingMode: ScreenSharing.Mode = ScreenSharing.Mode.APP_BOUNDED
     override val screenSharingMode: ScreenSharing.Mode
         get() = _screenSharingMode
@@ -64,7 +63,6 @@ internal class ConfigurationManagerImpl(private val engagementConfigRepository: 
     }
 
     override fun setQueueIds(queueIds: List<String>?) {
-        engagementConfigRepository.queueIds = queueIds ?: emptyList()
         _queueIdsObservable.onNext(Data.from(queueIds))
     }
 }

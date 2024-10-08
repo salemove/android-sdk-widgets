@@ -4,7 +4,6 @@ import com.glia.androidsdk.RequestCallback
 import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.widgets.chat.data.GliaChatRepository
 import com.glia.widgets.chat.model.SendMessagePayload
-import com.glia.widgets.core.engagement.GliaEngagementConfigRepository
 import com.glia.widgets.core.fileupload.SecureFileAttachmentRepository
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
@@ -12,7 +11,6 @@ import com.glia.widgets.core.secureconversations.SendMessageRepository
 import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
 
 internal class SendSecureMessageUseCase(
-    private val engagementConfigRepository: GliaEngagementConfigRepository,
     private val sendMessageRepository: SendMessageRepository,
     private val secureConversationsRepository: SecureConversationsRepository,
     private val fileAttachmentRepository: SecureFileAttachmentRepository,
@@ -28,17 +26,16 @@ internal class SendSecureMessageUseCase(
     ) {
         val message = sendMessageRepository.value
         val fileAttachments = fileAttachmentRepository.getReadyToSendFileAttachments()
-        sendMessage(message, engagementConfigRepository.queueIds, fileAttachments, callback)
+        sendMessage(message, fileAttachments, callback)
     }
 
     private fun sendMessage(
         message: String,
-        queueIds: List<String>,
         fileAttachments: List<FileAttachment>,
         callback: RequestCallback<VisitorMessage?>
     ) {
         if (fileAttachments.isNotEmpty()) {
-            sendMessageWithAttachments(message, queueIds, fileAttachments) { result, ex ->
+            sendMessageWithAttachments(message, fileAttachments) { result, ex ->
                 if (ex == null) {
                     sendMessageRepository.reset()
                     fileAttachmentRepository.detachFiles(fileAttachments)
@@ -46,13 +43,12 @@ internal class SendSecureMessageUseCase(
                 callback.onResult(result, ex)
             }
         } else {
-            sendMessage(message, queueIds, callback)
+            sendMessage(message, callback)
         }
     }
 
     private fun sendMessage(
         message: String,
-        queueIds: List<String>,
         callback: RequestCallback<VisitorMessage?>
     ) {
         val payload = SendMessagePayload(content = message)
@@ -60,13 +56,12 @@ internal class SendSecureMessageUseCase(
         if (hasOngoingEngagement) {
             chatRepository.sendMessage(payload, callback)
         } else {
-            secureConversationsRepository.send(payload, queueIds, callback)
+            secureConversationsRepository.send(payload, callback)
         }
     }
 
     private fun sendMessageWithAttachments(
         message: String,
-        queueIds: List<String>,
         fileAttachments: List<FileAttachment>,
         callback: RequestCallback<VisitorMessage?>
     ) {
@@ -78,7 +73,7 @@ internal class SendSecureMessageUseCase(
         if (hasOngoingEngagement) {
             chatRepository.sendMessage(payload, callback)
         } else {
-            secureConversationsRepository.send(payload, queueIds, callback)
+            secureConversationsRepository.send(payload, callback)
         }
     }
 }

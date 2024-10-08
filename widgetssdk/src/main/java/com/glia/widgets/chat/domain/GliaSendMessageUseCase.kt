@@ -6,7 +6,6 @@ import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.widgets.chat.data.GliaChatRepository
 import com.glia.widgets.chat.model.SendMessagePayload
 import com.glia.widgets.chat.model.Unsent
-import com.glia.widgets.core.engagement.GliaEngagementConfigRepository
 import com.glia.widgets.core.fileupload.FileAttachmentRepository
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
@@ -17,7 +16,6 @@ internal class GliaSendMessageUseCase(
     private val chatRepository: GliaChatRepository,
     private val fileAttachmentRepository: FileAttachmentRepository,
     private val isOperatorPresentUseCase: IsOperatorPresentUseCase,
-    private val engagementConfigRepository: GliaEngagementConfigRepository,
     private val secureConversationsRepository: SecureConversationsRepository,
     private val isSecureEngagementUseCase: IsSecureEngagementUseCase
 ) {
@@ -41,7 +39,7 @@ internal class GliaSendMessageUseCase(
 
     private fun sendMessage(payload: SendMessagePayload, listener: Listener) {
         if (isSecureEngagement) {
-            secureConversationsRepository.send(payload, engagementConfigRepository.queueIds, listener)
+            secureConversationsRepository.send(payload, listener)
         } else {
             chatRepository.sendMessage(payload, listener)
         }
@@ -68,7 +66,7 @@ internal class GliaSendMessageUseCase(
     fun execute(singleChoiceAttachment: SingleChoiceAttachment, listener: Listener) {
         val payload = SendMessagePayload(attachment = singleChoiceAttachment)
         when {
-            isSecureEngagement -> secureConversationsRepository.send(payload, engagementConfigRepository.queueIds, listener)
+            isSecureEngagement -> secureConversationsRepository.send(payload, listener)
 
             isOperatorOnline -> chatRepository.sendMessage(payload, listener)
 

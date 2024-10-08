@@ -74,7 +74,7 @@ internal object Dependencies {
         @VisibleForTesting set
 
     @JvmStatic
-    val configurationManager: ConfigurationManager by lazy { ConfigurationManagerImpl(repositoryFactory.engagementConfigRepository) }
+    val configurationManager: ConfigurationManager by lazy { ConfigurationManagerImpl() }
 
     val activityLauncher: ActivityLauncher by lazy { ActivityLauncherImpl(IntentHelperImpl()) }
 
@@ -95,7 +95,7 @@ internal object Dependencies {
         localeProvider = LocaleProvider(resourceProvider)
         notificationManager = NotificationManager(application)
         val downloadsFolderDataSource = DownloadsFolderDataSource(application)
-        repositoryFactory = RepositoryFactory(gliaCore, downloadsFolderDataSource)
+        repositoryFactory = RepositoryFactory(gliaCore, downloadsFolderDataSource, configurationManager)
 
         val permissionManager = PermissionManager(
             application,
@@ -125,8 +125,7 @@ internal object Dependencies {
         controllerFactory = ControllerFactory(
             repositoryFactory,
             useCaseFactory,
-            configurationManager,
-            managerFactory
+            managerFactory,
         )
         initApplicationLifecycleObserver(
             ApplicationLifecycleManager(),

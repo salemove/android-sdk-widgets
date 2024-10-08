@@ -45,7 +45,12 @@ internal class EntryWidgetView(
             controller.onItemClicked(it)
         }
 
-        disableScrolling()
+        val isBottomSheet = viewAdapter.viewType == EntryWidgetContract.ViewType.BOTTOM_SHEET
+        // Entry Widget might be embedded in scrolling views, disabling the scroll for
+        // itself would prevent unintended scrolling behavior in such cases.
+        // Scrolling is only applicable for bottom sheet view.
+        enableScrolling(isBottomSheet)
+
         applyTheme(backgroundTheme, mediaTypeItemsTheme)
         setController(Dependencies.controllerFactory.entryWidgetController)
         itemAnimator = null
@@ -64,12 +69,14 @@ internal class EntryWidgetView(
         onDismissListener?.invoke()
     }
 
-    private fun disableScrolling() {
-        // Entry Widget might be embedded in scrolling views, disabling the scroll for
-        // itself would prevent unintended scrolling behavior in such cases
-        isNestedScrollingEnabled = false
+    private fun enableScrolling(enable: Boolean) {
+        if (!enable) {
+            // setNestedScrollingEnabled() broke scrolling in some cases (bottom sheet).
+            // By default, it is enabled. So we can only disable it if needed.
+            isNestedScrollingEnabled = false
+        }
         layoutManager = object : LinearLayoutManager(context) {
-            override fun canScrollVertically() = false
+            override fun canScrollVertically() = enable
         }
     }
 

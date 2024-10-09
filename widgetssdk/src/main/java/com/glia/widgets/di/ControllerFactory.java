@@ -392,6 +392,6 @@ public class ControllerFactory {
             repositoryFactory.getGliaQueueRepository(),
             useCaseFactory.getSubscribeToQueueUpdatesUseCase(),
             useCaseFactory.getUnsubscribeFromQueueUpdatesUseCase()
-        ));
+        ), useCaseFactory.createIsAuthenticatedUseCase());
     }
 }

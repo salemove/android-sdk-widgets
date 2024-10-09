@@ -382,6 +382,9 @@ public class ControllerFactory {
     }
 
     public EntryWidgetContract.Controller getEntryWidgetController() {
-        return new EntryWidgetController(repositoryFactory.getQueueRepository());
+        return new EntryWidgetController(
+            repositoryFactory.getQueueRepository(),
+            useCaseFactory.createIsAuthenticatedUseCase()
+        );
     }
 }

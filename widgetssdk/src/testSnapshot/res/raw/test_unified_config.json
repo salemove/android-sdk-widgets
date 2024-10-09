@@ -3958,5 +3958,128 @@
         }
       }
     }
+  },
+  "entryWidget": {
+    "background": {
+      "color": {
+        "type": "fill",
+        "value": ["#7de9ff"]
+      },
+      "border": {
+        "type": "fill",
+        "value": ["#6657ff"]
+      },
+      "borderWidth": 6,
+      "cornerRadius": 9
+    },
+    "mediaTypeItems": {
+      "mediaTypeItem": {
+        "background": {
+          "color": {
+            "type": "gradient",
+            "value": ["#71ffdb", "#99ff41"]
+          },
+          "border": {
+            "type": "fill",
+            "value": ["#00a325"]
+          },
+          "borderWidth": 3,
+          "cornerRadius": 18
+        },
+        "iconColor": {
+          "type": "fill",
+          "value": ["#ff3200"]
+        },
+        "title": {
+          "alignment": "center",
+          "background": {
+            "type": "fill",
+            "value": ["#ffcc00"]
+          },
+          "font": {
+            "size": 21,
+            "style": "bold"
+          },
+          "foreground": {
+            "type": "fill",
+            "value": ["#e4a3ff"]
+          }
+        },
+        "message": {
+          "alignment": "left",
+          "background": {
+            "type": "fill",
+            "value": ["#ff687c"]
+          },
+          "font": {
+            "size": 14,
+            "style": "italic"
+          },
+          "foreground": {
+            "type": "fill",
+            "value": ["#687022"]
+          }
+        }
+      },
+      "dividerColor": {
+        "type": "gradient",
+        "value": ["#0738ff", "#ff00ef"]
+      }
+    },
+    "errorTitle": {
+      "alignment": "center",
+      "background": {
+        "type": "fill",
+        "value": ["#abcdef"]
+      },
+      "font": {
+        "size": 12,
+        "style": "bold"
+      },
+      "foreground": {
+        "type": "fill",
+        "value": ["#877563"]
+      }
+    },
+    "errorMessage": {
+      "alignment": "left",
+      "background": {
+        "type": "gradient",
+        "value": ["#007686", "#1e6941"]
+      },
+      "font": {
+        "size": 24,
+        "style": "italic"
+      },
+      "foreground": {
+        "type": "fill",
+        "value": ["#ff1028"]
+      }
+    },
+    "errorButton": {
+      "background": {
+        "type": "fill",
+        "value": ["#778899"]
+      },
+      "text": {
+        "alignment": "center",
+        "background": {
+          "type": "fill",
+          "value": ["#6f67de"]
+        },
+        "font": {
+          "size": 16,
+          "style": "regular"
+        },
+        "foreground": {
+          "type": "fill",
+          "value": ["#ddeeff"]
+        }
+      },
+      "tintColor": {
+        "type": "fill",
+        "value": ["#ff9f2c"]
+      }
+    }
   }
 }

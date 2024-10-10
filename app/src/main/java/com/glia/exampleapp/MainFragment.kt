@@ -284,10 +284,10 @@ class MainFragment : Fragment() {
         }
     }
 
-    private fun getQueueIdsFromPrefs(sharedPreferences: SharedPreferences): List<String> {
+    private fun getQueueIdsFromPrefs(sharedPreferences: SharedPreferences): List<String>? {
         val defaultQueues = sharedPreferences.getBoolean(resources.getString(R.string.pref_default_queues), false)
         if (defaultQueues) {
-            return emptyList()
+            return null
         }
         return listOf(getQueueIdFromPrefs(sharedPreferences))
     }

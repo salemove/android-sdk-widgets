@@ -63,6 +63,6 @@ internal class ConfigurationManagerImpl : ConfigurationManager {
     }
 
     override fun setQueueIds(queueIds: List<String>?) {
-        _queueIdsObservable.onNext(Data.from(queueIds))
+        _queueIdsObservable.onNext(Data.from(queueIds?.takeIf { it.isNotEmpty() }))
     }
 }

@@ -65,12 +65,12 @@ public class GliaWidgets {
      * Retrieves an instance of {@link EngagementLauncher}.
      *
      * @param queueIds A list of queue IDs to be used for the engagement launcher.
-     *                 When null, the default queues will be used.
+     *                 When empty, the default queues will be used.
      * @return An instance of {@link EngagementLauncher}.
      * @throws GliaException with the {@link GliaException.Cause#INVALID_INPUT} if the SDK is not initialized.
      */
     @NonNull
-    public synchronized static EngagementLauncher getEngagementLauncher(@Nullable List<String> queueIds) {
+    public synchronized static EngagementLauncher getEngagementLauncher(@NonNull List<String> queueIds) {
         setupQueueIds(queueIds);
 
         return Dependencies.getEngagementLauncher();
@@ -80,12 +80,12 @@ public class GliaWidgets {
      * Retrieves an instance of {@link EntryWidget}.
      *
      * @param queueIds A list of queue IDs to be used for the entry widget.
-     *                 When null, the default queues will be used.
+     *                 When empty, the default queues will be used.
      * @return An instance of {@link EntryWidget}.
      * @throws GliaException with the {@link GliaException.Cause#INVALID_INPUT} if the SDK is not initialized.
      */
     @NonNull
-    public synchronized static EntryWidget getEntryWidget(@Nullable List<String> queueIds) {
+    public synchronized static EntryWidget getEntryWidget(@NonNull List<String> queueIds) {
         if (!Dependencies.glia().isInitialized()) {
             Logger.e(TAG, "Attempt to get EntryWidget before SDK initialization");
         }
@@ -94,7 +94,7 @@ public class GliaWidgets {
         return Dependencies.getEntryWidget();
     }
 
-    private static void setupQueueIds(@Nullable List<String> queueIds) {
+    private static void setupQueueIds(@NonNull List<String> queueIds) {
         Dependencies.glia().ensureInitialized();
 
         Dependencies.getConfigurationManager().setQueueIds(queueIds);

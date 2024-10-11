@@ -196,7 +196,7 @@ internal class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: 
     private fun setDefaultTheme(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
         @SuppressLint("CustomViewStyleable")
         val typedArray = context.obtainStyledAttributes(attrs, R.styleable.GliaView, defStyleAttr, defStyleRes)
-        val surveyStyle = Utils.getFullHybridTheme(typedArray, this.context).surveyStyle
+        val surveyStyle = Utils.getThemeFromTypedArray(typedArray, this.context).surveyStyle
         initAdapter(surveyStyle)
         applyStyle(surveyStyle)
         typedArray.recycle()

@@ -3,7 +3,6 @@ package com.glia.widgets.launcher
 import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.GliaWidgetsConfig
-import com.glia.widgets.UiTheme
 import com.glia.widgets.helper.Data
 import com.glia.widgets.helper.from
 import io.reactivex.rxjava3.core.Flowable
@@ -11,7 +10,6 @@ import io.reactivex.rxjava3.processors.BehaviorProcessor
 
 internal interface ConfigurationManager {
     val screenSharingMode: ScreenSharing.Mode
-    val uiTheme: UiTheme?
 
     val enableBubbleOutsideApp: Boolean
     val enableBubbleInsideApp: Boolean
@@ -37,10 +35,6 @@ internal class ConfigurationManagerImpl : ConfigurationManager {
     override val screenSharingMode: ScreenSharing.Mode
         get() = _screenSharingMode
 
-    private var _uiTheme: UiTheme? = null
-    override val uiTheme: UiTheme?
-        get() = _uiTheme
-
     private var _enableBubbleOutsideApp: Boolean = true
     override val enableBubbleOutsideApp: Boolean
         get() = _enableBubbleOutsideApp
@@ -59,7 +53,6 @@ internal class ConfigurationManagerImpl : ConfigurationManager {
         config.screenSharingMode?.also { _screenSharingMode = it }
         config.enableBubbleInsideApp?.also { _enableBubbleInsideApp = it }
         config.enableBubbleOutsideApp?.also { _enableBubbleOutsideApp = it }
-        _uiTheme = config.uiTheme
     }
 
     override fun setQueueIds(queueIds: List<String>?) {

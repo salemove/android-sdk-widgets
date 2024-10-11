@@ -67,7 +67,7 @@ internal class EndScreenSharingView(
 
     private fun applyDefaultTheme(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
         context.withStyledAttributes(attrs, R.styleable.GliaView, defStyleAttr, defStyleRes) {
-            applyRuntimeTheme(Utils.getFullHybridTheme(this, context))
+            applyRuntimeTheme(Utils.getThemeFromTypedArray(this, context))
         }
     }
 

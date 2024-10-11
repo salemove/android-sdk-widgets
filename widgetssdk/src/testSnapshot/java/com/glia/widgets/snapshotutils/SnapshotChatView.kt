@@ -4,7 +4,6 @@ import android.view.View
 import android.widget.EditText
 import androidx.annotation.DrawableRes
 import com.glia.widgets.R
-import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.ChatContract
 import com.glia.widgets.chat.ChatView
 import com.glia.widgets.chat.controller.ChatController
@@ -63,10 +62,9 @@ internal interface SnapshotChatView : SnapshotContent, SnapshotTheme, SnapshotAc
         @DrawableRes imageResources: List<Int>? = null,
         message: String? = null,
         executor: Executor? = Executor(Runnable::run),
-        unifiedTheme: UnifiedTheme? = null,
-        uiTheme: UiTheme? = null
+        unifiedTheme: UnifiedTheme? = null
     ): ViewData {
-        setGlobalThemes(uiTheme, unifiedTheme)
+        setUnifiedTheme(unifiedTheme)
 
         val mock = chatViewMock()
 

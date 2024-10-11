@@ -12,7 +12,6 @@ import com.glia.androidsdk.comms.Video
 import com.glia.androidsdk.comms.VideoView
 import com.glia.androidsdk.comms.VisitorMediaState
 import com.glia.widgets.R
-import com.glia.widgets.UiTheme
 import com.glia.widgets.databinding.CallActivityBinding
 import com.glia.widgets.di.ControllerFactory
 import com.glia.widgets.di.Dependencies
@@ -72,10 +71,9 @@ internal interface SnapshotCallView : SnapshotContent, SnapshotTheme, SnapshotAc
         callState: CallState? = null,
         executor: Executor? = Executor(Runnable::run),
         unifiedTheme: UnifiedTheme? = null,
-        uiTheme: UiTheme? = null,
         callViewCallback: ((CallContract.View, callState: CallState?) -> Unit)? = null
     ): ViewData {
-        setGlobalThemes(uiTheme, unifiedTheme)
+        setUnifiedTheme(unifiedTheme)
         val mock = callViewMock()
 
         val callViewCaptor: KArgumentCaptor<CallContract.View> = argumentCaptor()

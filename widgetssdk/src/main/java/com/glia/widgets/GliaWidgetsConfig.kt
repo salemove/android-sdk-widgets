@@ -44,9 +44,6 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
     val enableBubbleInsideApp: Boolean?
 
     @JvmField
-    val uiTheme: UiTheme?
-
-    @JvmField
     val manualLocaleOverride: String?
 
     init {
@@ -61,7 +58,6 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
         screenSharingMode = builder.screenSharingMode
         enableBubbleOutsideApp = builder.enableBubbleOutsideApp
         enableBubbleInsideApp = builder.enableBubbleInsideApp
-        uiTheme = builder.uiTheme
         manualLocaleOverride = builder.manualLocaleOverride
     }
 
@@ -133,8 +129,6 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
         var enableBubbleOutsideApp: Boolean? = null
             private set
         var enableBubbleInsideApp: Boolean? = null
-            private set
-        var uiTheme: UiTheme? = null
             private set
         var manualLocaleOverride: String? = null
             private set
@@ -241,19 +235,6 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
         fun enableBubbleInsideApp(enableBubbleInsideApp: Boolean): Builder {
             Logger.i(TAG, "Bubble: enable inside app $enableBubbleInsideApp")
             this.enableBubbleInsideApp = enableBubbleInsideApp
-            return this
-        }
-
-        /**
-         * @param uiTheme - uiTheme resource for UI configuration
-         * @return Builder instance
-         */
-        @Deprecated(
-            "While UiTheme can still be used for UI customization, we strongly encourage adopting remote configurations(GliaWidgetsConfig.Builder.setUiJsonRemoteConfig). " +
-                "The remote configurations approach is more versatile and better suited for future development."
-        )
-        fun setUiTheme(uiTheme: UiTheme?): Builder {
-            this.uiTheme = uiTheme
             return this
         }
 

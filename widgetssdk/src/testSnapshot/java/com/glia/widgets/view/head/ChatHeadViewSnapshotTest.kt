@@ -2,7 +2,6 @@ package com.glia.widgets.view.head
 
 import com.glia.widgets.R
 import com.glia.widgets.SnapshotTest
-import com.glia.widgets.UiTheme
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase
 import com.glia.widgets.di.ControllerFactory
 import com.glia.widgets.di.Dependencies
@@ -13,7 +12,6 @@ import com.glia.widgets.snapshotutils.SnapshotLottie
 import com.glia.widgets.snapshotutils.SnapshotPicasso
 import com.glia.widgets.snapshotutils.SnapshotProviders
 import com.glia.widgets.snapshotutils.SnapshotThemeConfiguration
-import com.glia.widgets.view.configuration.ChatHeadConfiguration
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -301,7 +299,6 @@ class ChatHeadViewSnapshotTest : SnapshotTest(
 
     private fun setupView(
         unifiedTheme: UnifiedTheme? = null,
-        uiTheme: UiTheme = UiTheme(),
         executor: Executor? = Executor(Runnable::run),
         isCallVisualizerScreenSharingUseCase: Boolean = false
     ): ChatHeadView {
@@ -323,23 +320,11 @@ class ChatHeadViewSnapshotTest : SnapshotTest(
         whenever(useCaseFactoryMock.isCurrentEngagementCallVisualizer).thenReturn(isCurrentEngagementCallVisualizerUseCaseMock)
         Dependencies.useCaseFactory = useCaseFactoryMock
 
-        setGlobalThemes(uiTheme.copy(chatHeadConfiguration = chatHeadConfiguration()), unifiedTheme)
+        setUnifiedTheme(unifiedTheme)
 
         return ChatHeadView(context).also {
             it.executor = executor
         }
     }
-
-    private fun chatHeadConfiguration() = ChatHeadConfiguration.Builder()
-        .operatorPlaceholderBackgroundColor(R.color.glia_brand_primary_color)
-        .operatorPlaceholderIcon(R.drawable.ic_person)
-        .operatorPlaceholderIconTintList(R.color.call_fab_icon_color_states)
-        .badgeBackgroundTintList(R.color.call_fab_bg_color_states)
-        .badgeTextColor(R.color.glia_base_light_color)
-        .backgroundColorRes(R.color.glia_system_negative_color)
-        .iconOnHold(R.drawable.ic_pause_circle)
-        .iconOnHoldTintList(R.color.call_fab_icon_color_states)
-        .iconScreenSharingDialog(R.drawable.ic_screensharing)
-        .build()
 
 }

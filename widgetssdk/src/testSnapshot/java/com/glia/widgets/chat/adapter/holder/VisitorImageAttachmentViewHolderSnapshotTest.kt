@@ -29,16 +29,6 @@ class VisitorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotCha
     }
 
     @Test
-    fun withoutLabelsWithUiTheme() {
-        snapshot(
-            setupView(
-                visitorAttachmentItemImage(),
-                uiTheme = uiTheme()
-            ).viewHolder.itemView
-        )
-    }
-
-    @Test
     fun withoutLabelsWithGlobalColors() {
         snapshot(
             setupView(
@@ -75,16 +65,6 @@ class VisitorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotCha
         snapshot(
             setupView(
                 visitorAttachmentItemImage(showDelivered = true)
-            ).viewHolder.itemView
-        )
-    }
-
-    @Test
-    fun deliveredLabelWithUiTheme() {
-        snapshot(
-            setupView(
-                visitorAttachmentItemImage(showDelivered = true),
-                uiTheme = uiTheme()
             ).viewHolder.itemView
         )
     }
@@ -131,16 +111,6 @@ class VisitorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotCha
     }
 
     @Test
-    fun errorLabelWithUiTheme() {
-        snapshot(
-            setupView(
-                visitorAttachmentItemImage(showError = true),
-                uiTheme = uiTheme()
-            ).viewHolder.itemView
-        )
-    }
-
-    @Test
     fun errorLabelWithGlobalColors() {
         snapshot(
             setupView(
@@ -176,8 +146,7 @@ class VisitorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotCha
 
     private fun setupView(
         item: VisitorAttachmentItem.Image,
-        unifiedTheme: UnifiedTheme? = null,
-        uiTheme: UiTheme = UiTheme()
+        unifiedTheme: UnifiedTheme? = null
     ): ViewData {
         val imageFileMock = getImageFileMock(R.drawable.test_banner)
         val schedulersMock = schedulersMock()
@@ -186,7 +155,7 @@ class VisitorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotCha
 
         val viewHolder = VisitorImageAttachmentViewHolder(
             binding, imageFileMock.getImageFileFromCacheUseCaseMock, imageFileMock.getImageFileFromDownloadsUseCaseMock,
-            imageFileMock.getImageFileFromNetworkUseCaseMock, schedulersMock.schedulers, uiTheme, unifiedTheme, localeProviderMock()
+            imageFileMock.getImageFileFromNetworkUseCaseMock, schedulersMock.schedulers, UiTheme(), unifiedTheme, localeProviderMock()
         )
 
         viewHolder.bind(item, { _, _ -> }) {}

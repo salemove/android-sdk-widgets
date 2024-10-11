@@ -105,7 +105,7 @@ internal class WebBrowserView(
     }
 
     private fun setDefaultTheme(typedArray: TypedArray) {
-        binding?.appBarView?.setTheme(Utils.getFullHybridTheme(typedArray, this.context))
+        binding?.appBarView?.setTheme(Utils.getThemeFromTypedArray(typedArray, this.context))
     }
 
     private fun initCallbacks() {

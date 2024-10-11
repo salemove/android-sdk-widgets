@@ -505,7 +505,7 @@ internal class CallView(
     }
 
     private fun setDefaultTheme(typedArray: TypedArray) {
-        theme = Utils.getFullHybridTheme(typedArray, this.context)
+        theme = Utils.getThemeFromTypedArray(typedArray, this.context)
     }
 
     fun setOnBackClickedListener(onBackClicked: OnBackClickedListener) {

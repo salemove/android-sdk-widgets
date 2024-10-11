@@ -25,17 +25,6 @@ internal class VisitorFileAttachmentChatItemsSnapshotTest : SnapshotTest(), Snap
     }
 
     @Test
-    fun withoutLabelsWithUiTheme() {
-        snapshot(
-            setupView(
-                chatState = chatState(),
-                chatItems = listOf(visitorAttachmentItemFile()),
-                uiTheme = uiTheme()
-            ).root
-        )
-    }
-
-    @Test
     fun withoutLabelsWithGlobalColors() {
         snapshot(
             setupView(

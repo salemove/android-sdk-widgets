@@ -29,7 +29,7 @@ import kotlinx.parcelize.Parcelize
     "While this class can still be used for UI customization, we strongly encourage adopting remote configurations(GliaWidgetsConfig.Builder.setUiJsonRemoteConfig). " +
         "The remote configurations approach is more versatile and better suited for future development."
 )
-data class UiTheme(
+internal data class UiTheme(
 
     /**
      * Primary color for your brand. Used for example to set the color of the appbar

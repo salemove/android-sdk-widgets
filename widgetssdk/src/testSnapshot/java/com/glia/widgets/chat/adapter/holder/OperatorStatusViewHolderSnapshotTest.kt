@@ -34,16 +34,6 @@ class OperatorStatusViewHolderSnapshotTest : SnapshotTest(
     }
 
     @Test
-    fun connectedWithUiTheme() {
-        snapshot(
-            setupView(
-                connectedItem(),
-                uiTheme = uiTheme()
-            ).viewHolder.itemView
-        )
-    }
-
-    @Test
     fun connectedWithGlobalColors() {
         snapshot(
             setupView(
@@ -99,16 +89,6 @@ class OperatorStatusViewHolderSnapshotTest : SnapshotTest(
     }
 
     @Test
-    fun inQueueWithUiTheme() {
-        snapshot(
-            setupView(
-                inQueueItem(),
-                uiTheme = uiTheme()
-            ).viewHolder.itemView
-        )
-    }
-
-    @Test
     fun inQueueWithGlobalColors() {
         snapshot(
             setupView(
@@ -155,16 +135,6 @@ class OperatorStatusViewHolderSnapshotTest : SnapshotTest(
     }
 
     @Test
-    fun joinedWithUiTheme() {
-        snapshot(
-            setupView(
-                joinedItem(),
-                uiTheme = uiTheme()
-            ).viewHolder.itemView
-        )
-    }
-
-    @Test
     fun joinedWithGlobalColors() {
         snapshot(
             setupView(
@@ -206,16 +176,6 @@ class OperatorStatusViewHolderSnapshotTest : SnapshotTest(
     }
 
     @Test
-    fun transferringWithUiTheme() {
-        snapshot(
-            setupView(
-                OperatorStatusItem.Transferring,
-                uiTheme = uiTheme()
-            ).viewHolder.itemView
-        )
-    }
-
-    @Test
     fun transferringWithGlobalColors() {
         snapshot(
             setupView(
@@ -252,8 +212,7 @@ class OperatorStatusViewHolderSnapshotTest : SnapshotTest(
     private fun setupView(
         item: OperatorStatusItem,
         imageLoadError: Boolean = false,
-        unifiedTheme: UnifiedTheme? = null,
-        uiTheme: UiTheme = UiTheme()
+        unifiedTheme: UnifiedTheme? = null
     ): ViewData {
         lottieMock()
         localeProviderMock()
@@ -262,7 +221,7 @@ class OperatorStatusViewHolderSnapshotTest : SnapshotTest(
         unifiedTheme?.let { Dependencies.gliaThemeManager.theme = it }
 
         val binding = ChatOperatorStatusLayoutBinding.inflate(layoutInflater)
-        val viewHolder = OperatorStatusViewHolder(binding, uiTheme)
+        val viewHolder = OperatorStatusViewHolder(binding, UiTheme())
 
         viewHolder.bind(item)
 

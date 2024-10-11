@@ -137,7 +137,7 @@ internal class VisitorCodeView internal constructor(
     }
 
     private fun setDefaultTheme(typedArray: TypedArray) {
-        applyRuntimeThemeConfig(Utils.getFullHybridTheme(typedArray, this.context))
+        applyRuntimeThemeConfig(Utils.getThemeFromTypedArray(typedArray, this.context))
     }
 
     override fun startLoading() {

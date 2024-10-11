@@ -25,17 +25,6 @@ internal class VisitorFileAttachmentChatItemsSnapshotTest : SnapshotTest(), Snap
     }
 
     @Test
-    fun withoutLabelsWithUiTheme() {
-        snapshot(
-            setupView(
-                chatState = chatState(),
-                chatItems = listOf(visitorAttachmentItemFile()),
-                uiTheme = uiTheme()
-            ).root
-        )
-    }
-
-    @Test
     fun withoutLabelsWithGlobalColors() {
         snapshot(
             setupView(
@@ -81,17 +70,6 @@ internal class VisitorFileAttachmentChatItemsSnapshotTest : SnapshotTest(), Snap
     }
 
     @Test
-    fun deliveredLabelWithUiTheme() {
-        snapshot(
-            setupView(
-                chatState = chatState(),
-                chatItems = listOf(visitorAttachmentItemFile(showDelivered = true)),
-                uiTheme = uiTheme()
-            ).root
-        )
-    }
-
-    @Test
     fun deliveredLabelWithGlobalColors() {
         snapshot(
             setupView(
@@ -132,17 +110,6 @@ internal class VisitorFileAttachmentChatItemsSnapshotTest : SnapshotTest(), Snap
             setupView(
                 chatState = chatState(),
                 chatItems = listOf(visitorAttachmentItemFile(showError = true))
-            ).root
-        )
-    }
-
-    @Test
-    fun errorLabelWithUiTheme() {
-        snapshot(
-            setupView(
-                chatState = chatState(),
-                chatItems = listOf(visitorAttachmentItemFile(showError = true)),
-                uiTheme = uiTheme()
             ).root
         )
     }

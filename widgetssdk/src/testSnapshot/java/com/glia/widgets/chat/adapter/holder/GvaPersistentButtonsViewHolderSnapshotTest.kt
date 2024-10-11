@@ -31,16 +31,6 @@ class GvaPersistentButtonsViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, 
     }
 
     @Test
-    fun withoutChatHeadWithUiTheme() {
-        snapshot(
-            setupView(
-                gvaPersistentButtons(),
-                uiTheme = uiTheme()
-            ).viewHolder.itemView
-        )
-    }
-
-    @Test
     fun withoutChatHeadWithGlobalColors() {
         snapshot(
             setupView(
@@ -79,18 +69,6 @@ class GvaPersistentButtonsViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, 
                 gvaPersistentButtons(
                     showChatHead = true
                 )
-            ).viewHolder.itemView
-        )
-    }
-
-    @Test
-    fun withChatHeadWithUiTheme() {
-        snapshot(
-            setupView(
-                gvaPersistentButtons(
-                    showChatHead = true
-                ),
-                uiTheme = uiTheme()
             ).viewHolder.itemView
         )
     }
@@ -141,8 +119,7 @@ class GvaPersistentButtonsViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, 
 
     private fun setupView(
         card: GvaPersistentButtons,
-        unifiedTheme: UnifiedTheme? = null,
-        uiTheme: UiTheme = UiTheme()
+        unifiedTheme: UnifiedTheme? = null
     ): ViewData {
         localeProviderMock()
 
@@ -156,7 +133,7 @@ class GvaPersistentButtonsViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, 
             chatOperatorMessageLayoutBinding,
             gvaPersistentButtonsContentBinding,
             {},
-            uiTheme,
+            UiTheme(),
             unifiedTheme
         )
 

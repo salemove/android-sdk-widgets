@@ -26,14 +26,8 @@ internal class AlertDialogTest : SnapshotTest(), SnapshotDialog {
     }
 
     @Test
-    fun withUiTheme() {
-        val view = inflateView(context = context, uiTheme = uiTheme(), dialogType = DialogType.AlertDialog(payloadWithoutButton))
-        snapshot(view)
-    }
-
-    @Test
     fun withUnifiedTheme() {
-        val view = inflateView(context = context, uiTheme = uiTheme(), unifiedTheme(), dialogType = DialogType.AlertDialog(payloadWithoutButton))
+        val view = inflateView(context = context, unifiedTheme(), dialogType = DialogType.AlertDialog(payloadWithoutButton))
         snapshot(view)
     }
 
@@ -41,7 +35,6 @@ internal class AlertDialogTest : SnapshotTest(), SnapshotDialog {
     fun withGlobalColors() {
         val view = inflateView(
             context = context,
-            uiTheme = uiTheme(),
             unifiedThemeWithGlobalColors(),
             dialogType = DialogType.AlertDialog(payloadWithoutButton)
         )
@@ -55,15 +48,9 @@ internal class AlertDialogTest : SnapshotTest(), SnapshotDialog {
     }
 
     @Test
-    fun withUiThemeAndButton() {
-        val view = inflateView(context = context, uiTheme = uiTheme(), dialogType = DialogType.AlertDialog(payloadWithButton))
-        snapshot(view)
-    }
-
-    @Test
     fun withUnifiedThemeAndButton() {
         val view =
-            inflateView(context = context, uiTheme = uiTheme(), unifiedTheme = unifiedTheme(), dialogType = DialogType.AlertDialog(payloadWithButton))
+            inflateView(context = context, unifiedTheme = unifiedTheme(), dialogType = DialogType.AlertDialog(payloadWithButton))
         snapshot(view)
     }
 
@@ -71,7 +58,6 @@ internal class AlertDialogTest : SnapshotTest(), SnapshotDialog {
     fun withGlobalColorsAndButton() {
         val view = inflateView(
             context = context,
-            uiTheme = uiTheme(),
             unifiedTheme = unifiedThemeWithGlobalColors(),
             dialogType = DialogType.AlertDialog(payloadWithButton)
         )

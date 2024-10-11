@@ -24,20 +24,14 @@ internal class OperatorEndedEngagementTest : SnapshotTest(), SnapshotDialog {
     }
 
     @Test
-    fun withUiTheme() {
-        val view = inflateView(context = context, uiTheme = uiTheme(), dialogType = dialogType)
-        snapshot(view)
-    }
-
-    @Test
     fun withUnifiedTheme() {
-        val view = inflateView(context = context, uiTheme = uiTheme(), unifiedTheme(), dialogType = dialogType)
+        val view = inflateView(context = context, unifiedTheme(), dialogType = dialogType)
         snapshot(view)
     }
 
     @Test
     fun withGlobalColors() {
-        val view = inflateView(context = context, uiTheme = uiTheme(), unifiedThemeWithGlobalColors(), dialogType = dialogType)
+        val view = inflateView(context = context, unifiedThemeWithGlobalColors(), dialogType = dialogType)
         snapshot(view)
     }
 }

@@ -43,18 +43,6 @@ class GvaGalleryViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, SnapshotPr
     }
 
     @Test
-    fun itemsWithoutChatHeadWithUiTheme() {
-        snapshot(
-            setupView(
-                GvaGalleryCards(
-                    galleryCards = galleryCardList()
-                ),
-                uiTheme = uiTheme()
-            ).viewHolder.itemView
-        )
-    }
-
-    @Test
     fun itemsWithoutChatHeadWithGlobalColors() {
         snapshot(
             setupView(
@@ -105,19 +93,6 @@ class GvaGalleryViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, SnapshotPr
     }
 
     @Test
-    fun itemsWithChatHeadWithUiTheme() {
-        snapshot(
-            setupView(
-                GvaGalleryCards(
-                    galleryCards = galleryCardList(),
-                    showChatHead = true
-                ),
-                uiTheme = uiTheme()
-            ).viewHolder.itemView
-        )
-    }
-
-    @Test
     fun itemsWithChatHeadWithGlobalColors() {
         snapshot(
             setupView(
@@ -160,18 +135,14 @@ class GvaGalleryViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, SnapshotPr
 
     private data class ViewData(val binding: ChatGvaGalleryLayoutBinding, val viewHolder: GvaGalleryViewHolder)
 
-    private fun setupView(
-        galleryCards: GvaGalleryCards,
-        unifiedTheme: UnifiedTheme? = null,
-        uiTheme: UiTheme = UiTheme()
-    ): ViewData {
+    private fun setupView(galleryCards: GvaGalleryCards, unifiedTheme: UnifiedTheme? = null): ViewData {
         localeProviderMock()
 
-        val heightManager = ChatItemHeightManager(uiTheme, layoutInflater, resources, unifiedTheme)
+        val heightManager = ChatItemHeightManager(UiTheme(), layoutInflater, resources, unifiedTheme)
         heightManager.measureHeight(listOf(galleryCards))
 
         val binding = ChatGvaGalleryLayoutBinding.inflate(layoutInflater)
-        val viewHolder = GvaGalleryViewHolder(binding, {}, uiTheme, unifiedTheme)
+        val viewHolder = GvaGalleryViewHolder(binding, {}, UiTheme(), unifiedTheme)
 
         viewHolder.bind(galleryCards, heightManager.getMeasuredHeight(galleryCards))
 

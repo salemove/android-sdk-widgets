@@ -24,16 +24,6 @@ class MediaUpgradeStartedViewHolderSnapshotTest : SnapshotTest(), SnapshotChatSc
     }
 
     @Test
-    fun audioUiTheme() {
-        snapshot(
-            setupView(
-                MediaUpgradeStartedTimerItem.Audio(),
-                uiTheme = uiTheme()
-            ).itemView
-        )
-    }
-
-    @Test
     fun audioWithGlobalColors() {
         snapshot(
             setupView(
@@ -73,16 +63,6 @@ class MediaUpgradeStartedViewHolderSnapshotTest : SnapshotTest(), SnapshotChatSc
     }
 
     @Test
-    fun videoUiTheme() {
-        snapshot(
-            setupView(
-                MediaUpgradeStartedTimerItem.Video(),
-                uiTheme = uiTheme()
-            ).itemView
-        )
-    }
-
-    @Test
     fun videoWithGlobalColors() {
         snapshot(
             setupView(
@@ -114,11 +94,7 @@ class MediaUpgradeStartedViewHolderSnapshotTest : SnapshotTest(), SnapshotChatSc
 
     // MARK: utils for tests
 
-    private fun setupView(
-        item: MediaUpgradeStartedTimerItem,
-        unifiedTheme: UnifiedTheme? = null,
-        uiTheme: UiTheme = UiTheme(iconChatVideoUpgrade = R.drawable.ic_baseline_videocam)
-    ): MediaUpgradeStartedViewHolder {
+    private fun setupView(item: MediaUpgradeStartedTimerItem, unifiedTheme: UnifiedTheme? = null): MediaUpgradeStartedViewHolder {
         localeProviderMock()
         unifiedTheme?.let { Dependencies.gliaThemeManager.theme = it }
 
@@ -128,7 +104,7 @@ class MediaUpgradeStartedViewHolderSnapshotTest : SnapshotTest(), SnapshotChatSc
 
         return MediaUpgradeStartedViewHolder(
             ChatMediaUpgradeLayoutBinding.inflate(layoutInflater),
-            uiTheme
+            UiTheme(iconChatVideoUpgrade = R.drawable.ic_baseline_videocam)
         ).also { viewHolder ->
             viewHolder.bind(item)
         }

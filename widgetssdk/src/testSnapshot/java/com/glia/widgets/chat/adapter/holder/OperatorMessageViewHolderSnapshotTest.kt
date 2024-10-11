@@ -29,16 +29,6 @@ class OperatorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen
     }
 
     @Test
-    fun plainTextWithUiTheme() {
-        snapshot(
-            setupView(
-                operatorMessagePlainText(content = mediumLengthTexts()[0]),
-                uiTheme = uiTheme()
-            ).itemView
-        )
-    }
-
-    @Test
     fun plainTextWithGlobalColors() {
         snapshot(
             setupView(
@@ -79,16 +69,6 @@ class OperatorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen
     fun plainTextWithHeader() {
         snapshot(
             setupView(plainTextWithHeaderItem()).itemView
-        )
-    }
-
-    @Test
-    fun plainTextWithHeaderWithUiTheme() {
-        snapshot(
-            setupView(
-                plainTextWithHeaderItem(),
-                uiTheme = uiTheme()
-            ).itemView
         )
     }
 
@@ -139,16 +119,6 @@ class OperatorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen
     }
 
     @Test
-    fun responseCardWithUiTheme() {
-        snapshot(
-            setupView(
-                responseCardItem(),
-                uiTheme = uiTheme()
-            ).itemView
-        )
-    }
-
-    @Test
     fun responseCardWithGlobalColors() {
         snapshot(
             setupView(
@@ -180,11 +150,7 @@ class OperatorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen
 
     // MARK: utils for tests
 
-    private fun setupView(
-        item: OperatorMessageItem,
-        unifiedTheme: UnifiedTheme? = null,
-        uiTheme: UiTheme = UiTheme()
-    ): OperatorMessageViewHolder {
+    private fun setupView(item: OperatorMessageItem, unifiedTheme: UnifiedTheme? = null): OperatorMessageViewHolder {
         localeProviderMock()
         picassoMock(listOf(R.drawable.test_banner, R.drawable.test_launcher2))
         unifiedTheme?.let { Dependencies.gliaThemeManager.theme = it }
@@ -195,7 +161,7 @@ class OperatorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen
 
         return OperatorMessageViewHolder(
             ChatOperatorMessageLayoutBinding.inflate(layoutInflater),
-            uiTheme
+            UiTheme()
         ).also { viewHolder ->
             viewHolder.bind(item) { _, _ -> }
         }

@@ -30,7 +30,6 @@ import com.glia.androidsdk.visitor.Authentication
 import com.glia.exampleapp.ExampleAppConfigManager.createDefaultConfig
 import com.glia.exampleapp.Utils.getAuthenticationBehaviorFromPrefs
 import com.glia.widgets.GliaWidgets
-import com.glia.widgets.UiTheme
 import com.glia.widgets.core.notification.NotificationActionReceiver
 import com.glia.widgets.entrywidget.EntryWidget
 import com.glia.widgets.launcher.EngagementLauncher
@@ -483,7 +482,6 @@ class MainFragment : Fragment() {
             createDefaultConfig(
                 context = requireActivity().applicationContext,
 //                uiJsonRemoteConfig = UnifiedUiConfigurationLoader.fetchLocalConfigSample(requireContext()),
-//                runtimeConfig = createSampleRuntimeConfig(),
 //                region = "us"
             )
         )
@@ -493,12 +491,6 @@ class MainFragment : Fragment() {
 
         view?.post { initMenu() }
     }
-
-    private fun createSampleRuntimeConfig(): UiTheme = UiTheme(
-        gvaQuickReplyTextColor = android.R.color.holo_green_dark,
-        gvaQuickReplyStrokeColor = android.R.color.holo_green_dark,
-        brandPrimaryColor = android.R.color.holo_green_dark
-    )
 
     private fun prepareAuthentication() {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())

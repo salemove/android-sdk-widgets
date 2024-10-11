@@ -37,14 +37,11 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         // IllegalStateException: Fragment 'MyFragment' declared target fragment 'AnotherMyFragment'
         // that does not belong to this FragmentManager!
         String baseSettingsKey = getString(R.string.pref_glia_basic_settings);
-        String runtimeSettingsKey = getString(R.string.pref_glia_runtime_theme_settings);
         String remoteSettingsKey = getString(R.string.pref_glia_remote_theme_settings);
         String currentKey = preference.getKey();
         NavController navController = NavHostFragment.findNavController(this);
         if (currentKey.equals(baseSettingsKey)) {
             navController.navigate(R.id.base_settings);
-        } else if (currentKey.equals(runtimeSettingsKey)) {
-            navController.navigate(R.id.runtime_settings);
         } else if (currentKey.equals(remoteSettingsKey)) {
             navController.navigate(R.id.remote_settings);
         } else {

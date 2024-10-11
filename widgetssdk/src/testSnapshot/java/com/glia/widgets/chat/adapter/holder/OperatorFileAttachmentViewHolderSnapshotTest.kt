@@ -33,16 +33,6 @@ class OperatorFileAttachmentViewHolderSnapshotTest : SnapshotTest(
     }
 
     @Test
-    fun withoutHeaderWithUiTheme() {
-        snapshot(
-            setupView(
-                operatorAttachmentItemFile(),
-                uiTheme = uiTheme()
-            ).itemView
-        )
-    }
-
-    @Test
     fun withoutHeaderWithGlobalColors() {
         snapshot(
             setupView(
@@ -79,16 +69,6 @@ class OperatorFileAttachmentViewHolderSnapshotTest : SnapshotTest(
         snapshot(
             setupView(
                 operatorAttachmentItemFile(showChatHead = true)
-            ).itemView
-        )
-    }
-
-    @Test
-    fun withHeaderWithUiTheme() {
-        snapshot(
-            setupView(
-                operatorAttachmentItemFile(showChatHead = true),
-                uiTheme = uiTheme()
             ).itemView
         )
     }
@@ -140,16 +120,6 @@ class OperatorFileAttachmentViewHolderSnapshotTest : SnapshotTest(
     }
 
     @Test
-    fun operatorImageHeaderWithUiTheme() {
-        snapshot(
-            setupView(
-                operatorImageHeaderItem(),
-                uiTheme = uiTheme()
-            ).itemView
-        )
-    }
-
-    @Test
     fun operatorImageHeaderWithGlobalColors() {
         snapshot(
             setupView(
@@ -181,11 +151,7 @@ class OperatorFileAttachmentViewHolderSnapshotTest : SnapshotTest(
 
     // MARK: utils for tests
 
-    private fun setupView(
-        item: OperatorAttachmentItem.File,
-        unifiedTheme: UnifiedTheme? = null,
-        uiTheme: UiTheme = UiTheme()
-    ): OperatorFileAttachmentViewHolder {
+    private fun setupView(item: OperatorAttachmentItem.File, unifiedTheme: UnifiedTheme? = null): OperatorFileAttachmentViewHolder {
         localeProviderMock()
         picassoMock(listOf(R.drawable.test_launcher2))
         unifiedTheme?.let { Dependencies.gliaThemeManager.theme = it }
@@ -196,7 +162,7 @@ class OperatorFileAttachmentViewHolderSnapshotTest : SnapshotTest(
 
         return OperatorFileAttachmentViewHolder(
             ChatAttachmentOperatorFileLayoutBinding.inflate(layoutInflater),
-            uiTheme,
+            UiTheme(),
             object : ChatAdapter.OnFileItemClickListener {
                 override fun onFileOpenClick(file: AttachmentFile) {}
                 override fun onFileDownloadClick(file: AttachmentFile) {}

@@ -45,19 +45,9 @@ class ConfirmationDialogTest : SnapshotTest(
     }
 
     @Test
-    fun withUiTheme() {
-        val view = inflateView(context = context,
-            uiTheme = uiTheme(),
-            dialogType = dialogType()
-        )
-        snapshot(view)
-    }
-
-    @Test
     fun withUnifiedTheme() {
         val view = inflateView(
             context = context,
-            uiTheme = uiTheme(whiteLabel = false),
             unifiedTheme = unifiedTheme(),
             dialogType = dialogType()
         )
@@ -68,7 +58,6 @@ class ConfirmationDialogTest : SnapshotTest(
     fun withUnifiedThemeWithoutDialogLinkButton() {
         val view = inflateView(
             context = context,
-            uiTheme = uiTheme(whiteLabel = false),
             unifiedTheme = unifiedThemeWithoutDialogLinkButton(),
             dialogType = dialogType()
         )
@@ -79,7 +68,6 @@ class ConfirmationDialogTest : SnapshotTest(
     fun withGlobalColors() {
         val view = inflateView(
             context = context,
-            uiTheme = uiTheme(),
             unifiedTheme = unifiedThemeWithGlobalColors(),
             dialogType = dialogType()
         )

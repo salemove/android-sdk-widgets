@@ -3,7 +3,6 @@ package com.glia.widgets.dialog
 import com.glia.androidsdk.omnibrowse.VisitorCode
 import com.glia.widgets.R
 import com.glia.widgets.SnapshotTest
-import com.glia.widgets.UiTheme
 import com.glia.widgets.di.ControllerFactory
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.snapshotutils.SnapshotProviders
@@ -26,19 +25,6 @@ class VisitorCodeDialogTest : SnapshotTest(
     fun visitorCode() {
         snapshot(
             setupView().apply {
-                startLoading()
-                showVisitorCode(code())
-            },
-            offsetMillis = 200
-        )
-    }
-
-    @Test
-    fun visitorCodeWithUiTheme() {
-        snapshot(
-            setupView(
-                uiTheme = uiTheme()
-            ).apply {
                 startLoading()
                 showVisitorCode(code())
             },
@@ -91,20 +77,6 @@ class VisitorCodeDialogTest : SnapshotTest(
     fun error() {
         snapshot(
             setupView().apply {
-                setClosable(true)
-                startLoading()
-                showError(Throwable())
-            },
-            offsetMillis = 200
-        )
-    }
-
-    @Test
-    fun errorWithUiTheme() {
-        snapshot(
-            setupView(
-                uiTheme = uiTheme()
-            ).apply {
                 setClosable(true)
                 startLoading()
                 showError(Throwable())
@@ -168,18 +140,6 @@ class VisitorCodeDialogTest : SnapshotTest(
     }
 
     @Test
-    fun loadingWithUiTheme() {
-        snapshot(
-            setupView(
-                uiTheme = uiTheme()
-            ).apply {
-                setClosable(true)
-                startLoading()
-            }
-        )
-    }
-
-    @Test
     fun loadingWithGlobalColors() {
         snapshot(
             setupView(
@@ -216,11 +176,10 @@ class VisitorCodeDialogTest : SnapshotTest(
     }
 
     private fun setupView(
-        uiTheme: UiTheme = UiTheme(),
         unifiedTheme: UnifiedTheme? = null,
         executor: Executor? = Executor(Runnable::run)
     ): VisitorCodeView {
-        setGlobalThemes(uiTheme, unifiedTheme)
+        setUnifiedTheme(unifiedTheme)
         localeProviderMock()
         resourceProviderMock()
 

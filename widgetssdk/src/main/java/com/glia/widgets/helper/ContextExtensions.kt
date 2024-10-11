@@ -62,7 +62,7 @@ internal val Activity.rootView: View
 internal fun Activity.withRuntimeTheme(callback: (themedContext: Context, uiTheme: UiTheme) -> Unit) {
     val themedContext = wrapWithMaterialThemeOverlay()
     themedContext.withStyledAttributes(R.style.Application_Glia_Chat, R.styleable.GliaView) {
-        callback(themedContext, Utils.getFullHybridTheme(this, themedContext))
+        callback(themedContext, Utils.getThemeFromTypedArray(this, themedContext))
     }
 }
 

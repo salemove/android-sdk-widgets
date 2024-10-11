@@ -22,16 +22,6 @@ internal class CallViewAudioSnapshotTest : SnapshotTest(
     }
 
     @Test
-    fun initCallWithUiTheme() {
-        snapshot(
-            setupView(
-                callState = initCallState(),
-                uiTheme = uiTheme()
-            ).root
-        )
-    }
-
-    @Test
     fun initCallWithGlobalColors() {
         snapshot(
             setupView(
@@ -72,16 +62,6 @@ internal class CallViewAudioSnapshotTest : SnapshotTest(
         snapshot(
             setupView(
                 callState = operatorConnectedState()
-            ).root
-        )
-    }
-
-    @Test
-    fun operatorConnectedWithUiTheme() {
-        snapshot(
-            setupView(
-                callState = operatorConnectedState(),
-                uiTheme = uiTheme()
             ).root
         )
     }
@@ -135,16 +115,6 @@ internal class CallViewAudioSnapshotTest : SnapshotTest(
     }
 
     @Test
-    fun audioCallStartedWithUiTheme() {
-        snapshot(
-            setupView(
-                callState = audioCallStartedState(),
-                uiTheme = uiTheme()
-            ).root
-        )
-    }
-
-    @Test
     fun audioCallStartedWithGlobalColors() {
         snapshot(
             setupView(
@@ -184,16 +154,6 @@ internal class CallViewAudioSnapshotTest : SnapshotTest(
         snapshot(
             setupView(
                 callState = onHoldState()
-            ).root
-        )
-    }
-
-    @Test
-    fun onHoldWithUiTheme() {
-        snapshot(
-            setupView(
-                callState = onHoldState(),
-                uiTheme = uiTheme()
             ).root
         )
     }

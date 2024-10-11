@@ -24,15 +24,6 @@ class NewMessagesDividerViewHolderSnapshotTest : SnapshotTest(
     }
 
     @Test
-    fun withUiTheme() {
-        snapshot(
-            setupView(
-                uiTheme = uiTheme()
-            ).itemView
-        )
-    }
-
-    @Test
     fun withGlobalColors() {
         snapshot(
             setupView(
@@ -61,10 +52,7 @@ class NewMessagesDividerViewHolderSnapshotTest : SnapshotTest(
 
     // MARK: utils for tests
 
-    private fun setupView(
-        unifiedTheme: UnifiedTheme? = null,
-        uiTheme: UiTheme = UiTheme()
-    ): NewMessagesDividerViewHolder {
+    private fun setupView(unifiedTheme: UnifiedTheme? = null): NewMessagesDividerViewHolder {
         localeProviderMock()
         unifiedTheme?.let { Dependencies.gliaThemeManager.theme = it }
 
@@ -74,7 +62,7 @@ class NewMessagesDividerViewHolderSnapshotTest : SnapshotTest(
 
         return NewMessagesDividerViewHolder(
             ChatNewMessagesDividerLayoutBinding.inflate(layoutInflater),
-            uiTheme
+            UiTheme()
         )
     }
 }

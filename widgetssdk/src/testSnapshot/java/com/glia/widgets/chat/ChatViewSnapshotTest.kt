@@ -2,7 +2,6 @@ package com.glia.widgets.chat
 
 import com.glia.widgets.R
 import com.glia.widgets.SnapshotTest
-import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.model.ChatState
 import com.glia.widgets.chat.model.OperatorStatusItem
 import com.glia.widgets.core.fileupload.model.FileAttachment
@@ -25,10 +24,7 @@ internal class ChatViewSnapshotTest : SnapshotTest(), SnapshotChatView, Snapshot
 
     // MARK: Attachment list
 
-    private fun attachmentListView(
-        unifiedTheme: UnifiedTheme? = null,
-        uiTheme: UiTheme? = null
-    ) = setupView(
+    private fun attachmentListView(unifiedTheme: UnifiedTheme? = null) = setupView(
         chatState = ChatState()
             .changeVisibility(true)
             .engagementStarted()
@@ -60,23 +56,13 @@ internal class ChatViewSnapshotTest : SnapshotTest(), SnapshotChatView, Snapshot
             R.drawable.test_launcher
         ),
         message = mediumLengthTexts()[0],
-        unifiedTheme = unifiedTheme,
-        uiTheme = uiTheme
+        unifiedTheme = unifiedTheme
     )
 
     @Test
     fun attachmentList() {
         snapshot(
             attachmentListView().root
-        )
-    }
-
-    @Test
-    fun attachmentListWithUiTheme() {
-        snapshot(
-            attachmentListView(
-                uiTheme = uiTheme()
-            ).root
         )
     }
 
@@ -109,10 +95,7 @@ internal class ChatViewSnapshotTest : SnapshotTest(), SnapshotChatView, Snapshot
 
     // MARK: Failed attachment list
 
-    private fun failedAttachmentListView(
-        unifiedTheme: UnifiedTheme? = null,
-        uiTheme: UiTheme? = null
-    ) = setupView(
+    private fun failedAttachmentListView(unifiedTheme: UnifiedTheme? = null) = setupView(
         chatState = ChatState()
             .changeVisibility(true)
             .engagementStarted()
@@ -135,23 +118,13 @@ internal class ChatViewSnapshotTest : SnapshotTest(), SnapshotChatView, Snapshot
             R.drawable.test_launcher
         ),
         message = mediumLengthTexts()[1],
-        unifiedTheme = unifiedTheme,
-        uiTheme = uiTheme
+        unifiedTheme = unifiedTheme
     )
 
     @Test
     fun failedAttachmentList() {
         snapshot(
             failedAttachmentListView().root
-        )
-    }
-
-    @Test
-    fun failedAttachmentListWithUiTheme() {
-        snapshot(
-            failedAttachmentListView(
-                uiTheme = uiTheme()
-            ).root
         )
     }
 
@@ -184,31 +157,18 @@ internal class ChatViewSnapshotTest : SnapshotTest(), SnapshotChatView, Snapshot
 
     // MARK: Secure messaging
 
-    private fun secureMessagingView(
-        unifiedTheme: UnifiedTheme? = null,
-        uiTheme: UiTheme? = null
-    ) = setupView(
+    private fun secureMessagingView(unifiedTheme: UnifiedTheme? = null) = setupView(
         chatState = ChatState()
             .changeVisibility(true)
             .setSecureMessagingState(),
         message = mediumLengthTexts()[2],
-        unifiedTheme = unifiedTheme,
-        uiTheme = uiTheme
+        unifiedTheme = unifiedTheme
     )
 
     @Test
     fun secureMessaging() {
         snapshot(
             secureMessagingView().root
-        )
-    }
-
-    @Test
-    fun secureMessagingWithUiTheme() {
-        snapshot(
-            secureMessagingView(
-                uiTheme = uiTheme()
-            ).root
         )
     }
 
@@ -241,31 +201,18 @@ internal class ChatViewSnapshotTest : SnapshotTest(), SnapshotChatView, Snapshot
 
     // MARK: Transferring
 
-    private fun transferringView(
-        unifiedTheme: UnifiedTheme? = null,
-        uiTheme: UiTheme? = null
-    ) = setupView(
+    private fun transferringView(unifiedTheme: UnifiedTheme? = null) = setupView(
         chatState = ChatState()
             .changeVisibility(true)
             .transferring(),
         chatItems = listOf(OperatorStatusItem.Transferring),
-        unifiedTheme = unifiedTheme,
-        uiTheme = uiTheme
+        unifiedTheme = unifiedTheme
     )
 
     @Test
     fun transferring() {
         snapshot(
             transferringView().root
-        )
-    }
-
-    @Test
-    fun transferringWithUiTheme() {
-        snapshot(
-            transferringView(
-                uiTheme = uiTheme()
-            ).root
         )
     }
 

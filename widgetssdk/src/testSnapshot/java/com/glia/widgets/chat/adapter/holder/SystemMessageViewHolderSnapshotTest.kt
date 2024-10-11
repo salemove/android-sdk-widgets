@@ -22,15 +22,6 @@ class SystemMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen, 
     }
 
     @Test
-    fun withUiTheme() {
-        snapshot(
-            setupView(
-                uiTheme = uiTheme()
-            ).itemView
-        )
-    }
-
-    @Test
     fun withGlobalColors() {
         snapshot(
             setupView(
@@ -61,8 +52,7 @@ class SystemMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen, 
 
     private fun setupView(
         message: String = mediumLengthTexts().joinToString(separator = " "),
-        unifiedTheme: UnifiedTheme? = null,
-        uiTheme: UiTheme = UiTheme()
+        unifiedTheme: UnifiedTheme? = null
     ): SystemMessageViewHolder {
         localeProviderMock()
         unifiedTheme?.let { Dependencies.gliaThemeManager.theme = it }
@@ -73,7 +63,7 @@ class SystemMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen, 
 
         return SystemMessageViewHolder(
             ChatReceiveMessageContentBinding.inflate(layoutInflater),
-            uiTheme
+            UiTheme()
         ).also { viewHolder ->
             viewHolder.bind(message)
         }

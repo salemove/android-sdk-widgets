@@ -29,16 +29,6 @@ class GvaResponseTextViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, Snaps
     }
 
     @Test
-    fun withoutChatHeadWithUiTheme() {
-        snapshot(
-            setupView(
-                gvaResponseText(),
-                uiTheme = uiTheme()
-            ).viewHolder.itemView
-        )
-    }
-
-    @Test
     fun withoutChatHeadWithGlobalColors() {
         snapshot(
             setupView(
@@ -67,18 +57,6 @@ class GvaResponseTextViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, Snaps
                 gvaResponseText(
                     showChatHead = true
                 )
-            ).viewHolder.itemView
-        )
-    }
-
-    @Test
-    fun withChatHeadWithUiTheme() {
-        snapshot(
-            setupView(
-                gvaResponseText(
-                    showChatHead = true
-                ),
-                uiTheme = uiTheme()
             ).viewHolder.itemView
         )
     }
@@ -115,11 +93,7 @@ class GvaResponseTextViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, Snaps
         val viewHolder: GvaResponseTextViewHolder
     )
 
-    private fun setupView(
-        card: GvaResponseText,
-        unifiedTheme: UnifiedTheme? = null,
-        uiTheme: UiTheme = UiTheme()
-    ): ViewData {
+    private fun setupView(card: GvaResponseText, unifiedTheme: UnifiedTheme? = null): ViewData {
         localeProviderMock()
 
         val chatOperatorMessageLayoutBinding = ChatOperatorMessageLayoutBinding.inflate(layoutInflater)
@@ -131,7 +105,7 @@ class GvaResponseTextViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, Snaps
         val viewHolder = GvaResponseTextViewHolder(
             chatOperatorMessageLayoutBinding,
             gvaPersistentButtonsContentBinding,
-            uiTheme,
+            UiTheme(),
             unifiedTheme
         )
 

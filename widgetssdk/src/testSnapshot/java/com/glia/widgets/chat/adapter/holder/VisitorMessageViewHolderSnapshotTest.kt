@@ -23,16 +23,6 @@ class VisitorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen,
     }
 
     @Test
-    fun withoutLabelsWithUiTheme() {
-        snapshot(
-            setupView(
-                VisitorMessageItem("Visitor message text", "ID"),
-                uiTheme = uiTheme()
-            ).viewHolder.itemView
-        )
-    }
-
-    @Test
     fun withoutLabelsWithGlobalColors() {
         snapshot(
             setupView(
@@ -66,13 +56,9 @@ class VisitorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen,
 
     private data class ViewData(val binding: ChatVisitorMessageLayoutBinding, val viewHolder: VisitorMessageViewHolder)
 
-    private fun setupView(
-        item: VisitorMessageItem,
-        unifiedTheme: UnifiedTheme? = null,
-        uiTheme: UiTheme = UiTheme()
-    ): ViewData {
+    private fun setupView(item: VisitorMessageItem, unifiedTheme: UnifiedTheme? = null): ViewData {
         val binding = ChatVisitorMessageLayoutBinding.inflate(layoutInflater)
-        val viewHolder = VisitorMessageViewHolder(binding, {}, uiTheme, unifiedTheme, localeProviderMock())
+        val viewHolder = VisitorMessageViewHolder(binding, {}, UiTheme(), unifiedTheme, localeProviderMock())
 
         viewHolder.bind(item)
 

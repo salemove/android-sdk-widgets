@@ -11,7 +11,7 @@
     <!-- Must be included for dialog styling -->
     <style name="Application.Glia.Activity.Style" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- example usage of compile time styling -->
-        <!-- <item name="gliaChatStyle">@style/Theme.GliaAndroidSdkWidgetsExample.Chat</item> -->
+        <item name="gliaChatStyle">@style/Theme.GliaAndroidSdkWidgetsExample.Chat</item>
     </style>
 
     <style name="Theme.GliaAndroidSdkWidgetsExample.Chat" parent="Application.Glia.Chat">

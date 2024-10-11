@@ -124,7 +124,7 @@ internal class MessageCenterView(
     }
 
     private fun setDefaultTheme(typedArray: TypedArray) {
-        theme = Utils.getFullHybridTheme(typedArray, this.context)
+        theme = Utils.getThemeFromTypedArray(typedArray, this.context)
     }
 
     private fun initCallbacks() {

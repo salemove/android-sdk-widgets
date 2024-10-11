@@ -10,14 +10,10 @@ import androidx.core.content.res.ResourcesCompat
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.UiTheme.UiThemeBuilder
-import com.glia.widgets.di.Dependencies
 
 internal object Utils {
 
-    fun getFullHybridTheme(typedArray: TypedArray, context: Context): UiTheme = getThemeFromTypedArray(typedArray, context)
-        .getFullHybridTheme(Dependencies.configurationManager.uiTheme)
-
-    private fun getThemeFromTypedArray(typedArray: TypedArray, context: Context): UiTheme {
+    fun getThemeFromTypedArray(typedArray: TypedArray, context: Context): UiTheme {
         val defaultThemeBuilder = UiThemeBuilder().apply {
             setBrandPrimaryColor(
                 getTypedArrayIntegerValue(

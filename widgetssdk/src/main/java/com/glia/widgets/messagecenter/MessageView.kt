@@ -114,7 +114,7 @@ internal class MessageView(
     }
 
     private fun setDefaultTheme(typedArray: TypedArray) {
-        val theme = Utils.getFullHybridTheme(typedArray, this.context)
+        val theme = Utils.getThemeFromTypedArray(typedArray, this.context)
         setupAttachmentIconTheme(theme)
         setupMessageErrorTextTheme(theme)
     }

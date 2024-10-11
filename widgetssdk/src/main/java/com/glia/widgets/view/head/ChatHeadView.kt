@@ -76,7 +76,7 @@ internal class ChatHeadView @JvmOverloads constructor(
     }
 
     private fun setDefaultTheme(typedArray: TypedArray) {
-        configuration = createConfiguration(Utils.getFullHybridTheme(typedArray, this.context))
+        configuration = createConfiguration(Utils.getThemeFromTypedArray(typedArray, this.context))
         post { updateView() }
         updateView()
     }

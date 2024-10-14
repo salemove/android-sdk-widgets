@@ -5,7 +5,6 @@ import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
 import com.glia.androidsdk.queuing.Queue
 import com.glia.widgets.di.GliaCore
-import com.glia.widgets.helper.Data
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.launcher.ConfigurationManager
 import io.mockk.CapturingSlot
@@ -16,8 +15,8 @@ import io.mockk.verify
 import io.reactivex.rxjava3.functions.Predicate
 import io.reactivex.rxjava3.processors.PublishProcessor
 import io.reactivex.rxjava3.subscribers.TestSubscriber
-import junit.framework.Assert.assertEquals
-import junit.framework.Assert.assertTrue
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import java.util.function.Consumer
@@ -33,7 +32,7 @@ class QueueRepositoryTest {
 
     private lateinit var testSubscriber: TestSubscriber<QueuesState>
 
-    private val configurationQueuesProcessor: PublishProcessor<Data<List<String>>> = PublishProcessor.create()
+    private val configurationQueuesProcessor: PublishProcessor<List<String>> = PublishProcessor.create()
 
     @Before
     fun setUp() {
@@ -45,18 +44,18 @@ class QueueRepositoryTest {
         getQueuesCallbackSlot = slot()
         subscribeToQueueUpdatesCallbackSlot = slot()
 
-        queueRepository = QueueRepository(gliaCore, configurationManager)
+        queueRepository = QueueRepositoryImpl(gliaCore, configurationManager)
         verify { configurationManager.queueIdsObservable }
 
-        testSubscriber = queueRepository.observableIntegratorQueues.test()
+        testSubscriber = queueRepository.queuesState.test()
 
         //Verify fetchQueues is called on subscription
         testSubscriber.assertValue(QueuesState.Loading)
-        assertTrue(queueRepository.integratorQueueIds.isEmpty())
+        assertTrue(queueRepository.relevantQueueIds.isEmpty())
         verify { gliaCore.getQueues(capture(getQueuesCallbackSlot)) }
     }
 
-    private fun pushCustomQueues(queues: Data<List<String>> = Data.Empty) {
+    private fun pushCustomQueues(queues: List<String> = emptyList()) {
         configurationQueuesProcessor.onNext(queues)
     }
 
@@ -76,7 +75,7 @@ class QueueRepositoryTest {
         pushCustomQueues()
 
         testSubscriber.assertCurrentValue(QueuesState.Error(exception))
-        assertTrue(queueRepository.integratorQueueIds.isEmpty())
+        assertTrue(queueRepository.relevantQueueIds.isEmpty())
     }
 
     @Test
@@ -86,57 +85,74 @@ class QueueRepositoryTest {
         pushCustomQueues()
 
         testSubscriber.assertCurrentValue(Predicate { it is QueuesState.Error })
-        assertTrue(queueRepository.integratorQueueIds.isEmpty())
+        assertTrue(queueRepository.relevantQueueIds.isEmpty())
     }
 
     @Test
-    fun `updateQueues will set Empty state when no matched queue`() {
-        getQueuesCallbackSlot.captured.onResult(arrayOf(createQueue("3", true)), null)
+    fun `onQueuesReceived will emit Empty state when site has no Queues`() {
+        getQueuesCallbackSlot.captured.onResult(emptyArray(), null)
 
-        pushCustomQueues(Data.Value(listOf("1", "2")))
+        pushCustomQueues(listOf("1", "2"))
 
         testSubscriber.assertCurrentValue(Predicate { it is QueuesState.Empty })
-        assertTrue(queueRepository.integratorQueueIds.isEmpty())
+        assertTrue(queueRepository.relevantQueueIds.isEmpty())
     }
 
     @Test
-    fun `updateQueues will set Empty state when there is no default queue`() {
-        getQueuesCallbackSlot.captured.onResult(arrayOf(createQueue("3", false)), null)
-
-        pushCustomQueues()
-
-        testSubscriber.assertCurrentValue(Predicate { it is QueuesState.Empty })
-        assertTrue(queueRepository.integratorQueueIds.isEmpty())
-    }
-
-    @Test
-    fun `updateQueues will use default queues when no queues are provided`() {
+    fun `onQueuesReceived will fall back to Default Queues when integrator queues are empty`() {
         val defaultQueueId = "defaultQueueId"
         val defaultQueue = createQueue(defaultQueueId, true)
         getQueuesCallbackSlot.captured.onResult(arrayOf(createQueue("3", false), defaultQueue), null)
 
         pushCustomQueues()
 
-        verify { gliaCore.subscribeToQueueStateUpdates(eq(arrayOf(defaultQueueId)), any(), any()) }
-
         testSubscriber.assertCurrentValue(QueuesState.Queues(listOf(defaultQueue)))
-        assertEquals(1, queueRepository.integratorQueueIds.count())
+        assertEquals(1, queueRepository.relevantQueueIds.count())
     }
 
     @Test
-    fun `updateQueues will use matched queues when queues are provided`() {
-        val customQueueId = "matchedQueueId"
-        val defaultQueue = createQueue("defaultQueue", true)
-        val customQueue = createQueue(customQueueId, false)
+    fun `onQueuesReceived will emit Empty state when integrator queues are empty and no default queues`() {
+        getQueuesCallbackSlot.captured.onResult(arrayOf(createQueue("3", false)), null)
 
-        getQueuesCallbackSlot.captured.onResult(arrayOf(customQueue, defaultQueue), null)
+        pushCustomQueues()
 
-        pushCustomQueues(Data.Value(listOf(customQueueId)))
+        testSubscriber.assertCurrentValue(Predicate { it is QueuesState.Empty })
+        assertTrue(queueRepository.relevantQueueIds.isEmpty())
+    }
 
-        verify { gliaCore.subscribeToQueueStateUpdates(eq(arrayOf(customQueueId)), any(), any()) }
+    @Test
+    fun `onQueuesReceived will fall back to Default Queues when no matched queues`() {
+        val defaultQueueId = "defaultQueueId"
+        val defaultQueue = createQueue(defaultQueueId, true)
+        getQueuesCallbackSlot.captured.onResult(arrayOf(createQueue("3", false), defaultQueue), null)
 
-        testSubscriber.assertCurrentValue(QueuesState.Queues(listOf(customQueue)))
-        assertEquals(1, queueRepository.integratorQueueIds.count())
+        pushCustomQueues(listOf("1"))
+
+        testSubscriber.assertCurrentValue(QueuesState.Queues(listOf(defaultQueue)))
+        assertEquals(1, queueRepository.relevantQueueIds.count())
+    }
+
+    @Test
+    fun `onQueuesReceived will emit Empty state when no matched and default queues`() {
+        getQueuesCallbackSlot.captured.onResult(arrayOf(createQueue("3", false)), null)
+
+        pushCustomQueues(listOf("1"))
+
+        testSubscriber.assertCurrentValue(Predicate { it is QueuesState.Empty })
+        assertTrue(queueRepository.relevantQueueIds.isEmpty())
+    }
+
+    @Test
+    fun `onQueuesReceived will emit matched Queues`() {
+        val defaultQueueId = "defaultQueueId"
+        val defaultQueue = createQueue(defaultQueueId, true)
+        val matchedQueue = createQueue("3", false)
+        getQueuesCallbackSlot.captured.onResult(arrayOf(matchedQueue, defaultQueue), null)
+
+        pushCustomQueues(listOf(matchedQueue.id))
+
+        testSubscriber.assertCurrentValue(QueuesState.Queues(listOf(matchedQueue)))
+        assertEquals(1, queueRepository.relevantQueueIds.count())
     }
 
     @Test
@@ -147,19 +163,19 @@ class QueueRepositoryTest {
 
         getQueuesCallbackSlot.captured.onResult(arrayOf(customQueue, defaultQueue), null)
 
-        pushCustomQueues(Data.Value(listOf(customQueueId)))
+        pushCustomQueues(listOf(customQueueId))
 
         verify { gliaCore.subscribeToQueueStateUpdates(eq(arrayOf(customQueueId)), any(), capture(subscribeToQueueUpdatesCallbackSlot)) }
 
         testSubscriber.assertCurrentValue(QueuesState.Queues(listOf(customQueue)))
-        assertEquals(1, queueRepository.integratorQueueIds.count())
+        assertEquals(1, queueRepository.relevantQueueIds.count())
 
         val updatedQueue = createQueue(customQueueId, false, "updatedName")
         subscribeToQueueUpdatesCallbackSlot.captured.accept(updatedQueue)
 
         testSubscriber.assertCurrentValue(QueuesState.Queues(listOf(updatedQueue)))
         testSubscriber.assertCurrentValue(Predicate { (it as QueuesState.Queues).queues.first().name == "updatedName" })
-        assertEquals(1, queueRepository.integratorQueueIds.count())
+        assertEquals(1, queueRepository.relevantQueueIds.count())
     }
 
 

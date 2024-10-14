@@ -4019,6 +4019,10 @@
             "type": "fill",
             "value": ["#687022"]
           }
+        },
+        "loadingTintColor": {
+          "type": "gradient",
+          "value": ["#FF8E45", "#FF7CB9"]
         }
       },
       "dividerColor": {

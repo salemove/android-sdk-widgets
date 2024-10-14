@@ -39,7 +39,8 @@ internal fun DefaultMediaItemTypeTheme(pallet: ColorPallet?): MediaTypeItemTheme
                 textColor = baseDarkColorTheme
             ),
             message = TextTheme(
-                textColor = baseShadeColorTheme
-            )
+                textColor = baseNormalColorTheme
+            ),
+            loadingTintColor = baseShadeColorTheme
         )
     }

@@ -10,6 +10,7 @@ import com.glia.widgets.core.engagement.GliaOperatorRepositoryImpl;
 import com.glia.widgets.core.fileupload.FileAttachmentRepository;
 import com.glia.widgets.core.fileupload.SecureFileAttachmentRepository;
 import com.glia.widgets.core.queue.QueueRepository;
+import com.glia.widgets.core.queue.QueueRepositoryImpl;
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository;
 import com.glia.widgets.core.secureconversations.SendMessageRepository;
 import com.glia.widgets.core.survey.GliaSurveyRepository;
@@ -58,7 +59,7 @@ public class RepositoryFactory {
 
     public QueueRepository getQueueRepository() {
         if (queueRepository == null) {
-            queueRepository = new QueueRepository(gliaCore, configurationManager);
+            queueRepository = new QueueRepositoryImpl(gliaCore, configurationManager);
         }
         return queueRepository;
     }

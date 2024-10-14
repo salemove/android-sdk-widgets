@@ -13,7 +13,6 @@ internal interface ConfigurationManager {
     val enableBubbleInsideApp: Boolean
 
     val queueIdsObservable: Flowable<List<String>>
-    val queueIds: List<String>?
 
     /**
      * Applies [GliaWidgetsConfig] from the [GliaWidgets.init] configuration step
@@ -43,9 +42,6 @@ internal class ConfigurationManagerImpl : ConfigurationManager {
 
     private var _queueIdsObservable: BehaviorProcessor<List<String>> = BehaviorProcessor.create()
     override val queueIdsObservable: Flowable<List<String>> = _queueIdsObservable.onBackpressureLatest()
-
-    override val queueIds: List<String>?
-        get() = _queueIdsObservable.value
 
     override fun applyConfiguration(config: GliaWidgetsConfig) {
         config.screenSharingMode?.also { _screenSharingMode = it }

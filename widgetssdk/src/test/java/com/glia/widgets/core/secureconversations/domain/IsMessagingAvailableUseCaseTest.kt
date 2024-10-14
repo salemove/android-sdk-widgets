@@ -37,7 +37,7 @@ class IsMessagingAvailableUseCaseTest {
     fun `invoke returns true when queue with messaging exists`() {
         val messagingQueue = createQueueWithStatus(QueueState.Status.OPEN, true)
         val queuesState = QueuesState.Queues(listOf(messagingQueue))
-        every { queueRepository.observableIntegratorQueues } returns Flowable.just(queuesState)
+        every { queueRepository.queuesState } returns Flowable.just(queuesState)
 
         val testSubscriber = TestSubscriber<Result<Boolean>>()
         isMessagingAvailableUseCase().subscribe(testSubscriber)
@@ -49,7 +49,7 @@ class IsMessagingAvailableUseCaseTest {
     fun `invoke returns false when no queue with messaging exists`() {
         val nonMessagingQueue = createQueueWithStatus(QueueState.Status.OPEN, false)
         val queuesState = QueuesState.Queues(listOf(nonMessagingQueue))
-        every { queueRepository.observableIntegratorQueues } returns Flowable.just(queuesState)
+        every { queueRepository.queuesState } returns Flowable.just(queuesState)
 
         val testSubscriber = TestSubscriber<Result<Boolean>>()
         isMessagingAvailableUseCase().subscribe(testSubscriber)
@@ -61,7 +61,7 @@ class IsMessagingAvailableUseCaseTest {
     fun `invoke returns false when queue state is closed`() {
         val closedQueue = createQueueWithStatus(QueueState.Status.CLOSED, true)
         val queuesState = QueuesState.Queues(listOf(closedQueue))
-        every { queueRepository.observableIntegratorQueues } returns Flowable.just(queuesState)
+        every { queueRepository.queuesState } returns Flowable.just(queuesState)
 
         val testSubscriber = TestSubscriber<Result<Boolean>>()
         isMessagingAvailableUseCase().subscribe(testSubscriber)
@@ -73,7 +73,7 @@ class IsMessagingAvailableUseCaseTest {
     fun `invoke returns false when queue state is unknown`() {
         val unknownQueue = createQueueWithStatus(QueueState.Status.UNKNOWN, true)
         val queuesState = QueuesState.Queues(listOf(unknownQueue))
-        every { queueRepository.observableIntegratorQueues } returns Flowable.just(queuesState)
+        every { queueRepository.queuesState } returns Flowable.just(queuesState)
 
         val testSubscriber = TestSubscriber<Result<Boolean>>()
         isMessagingAvailableUseCase().subscribe(testSubscriber)
@@ -84,7 +84,7 @@ class IsMessagingAvailableUseCaseTest {
     @Test
     fun `invoke returns error when queue state is error`() {
         val errorState = QueuesState.Error(Throwable("Error"))
-        every { queueRepository.observableIntegratorQueues } returns Flowable.just(errorState)
+        every { queueRepository.queuesState } returns Flowable.just(errorState)
 
         val testSubscriber = TestSubscriber<Result<Boolean>>()
         isMessagingAvailableUseCase().subscribe(testSubscriber)

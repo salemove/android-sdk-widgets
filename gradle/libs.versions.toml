@@ -1,8 +1,8 @@
 [versions]
 javaVersion = "17"
 
-kotlinVersion = "1.8.22" # Kotlin, Kotlin Reflect and Dokka versions should have the same minor version to support the same kotlin version
-dokkaVersion = "1.9.20" # Kotlin, Kotlin Reflect and Dokka versions should have the same minor version to support the same kotlin version
+kotlinVersion = "1.9.25" # Kotlin and Dokka versions should have the same minor version to support the same kotlin version
+dokkaVersion = "1.9.20" # Kotlin and Dokka versions should have the same minor version to support the same kotlin version
 agpVersion = "8.6.0"
 nexusPublishVersion = "2.0.0"
 ktlintVersion = "11.5.0"

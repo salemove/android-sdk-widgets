@@ -9,7 +9,7 @@ import io.reactivex.rxjava3.core.Flowable
 
 internal class IsMessagingAvailableUseCase(private val queueRepository: QueueRepository) {
 
-    operator fun invoke(): Flowable<Result<Boolean>> = queueRepository.observableIntegratorQueues
+    operator fun invoke(): Flowable<Result<Boolean>> = queueRepository.queuesState
         .filter { it !is QueuesState.Loading }
         .map { mapResult(it) }
         .distinctUntilChanged()

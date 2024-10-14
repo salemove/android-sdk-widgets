@@ -3,8 +3,6 @@ package com.glia.widgets.launcher
 import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.GliaWidgetsConfig
-import com.glia.widgets.helper.Data
-import com.glia.widgets.helper.from
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.processors.BehaviorProcessor
 
@@ -14,7 +12,7 @@ internal interface ConfigurationManager {
     val enableBubbleOutsideApp: Boolean
     val enableBubbleInsideApp: Boolean
 
-    val queueIdsObservable: Flowable<Data<List<String>>>
+    val queueIdsObservable: Flowable<List<String>>
     val queueIds: List<String>?
 
     /**
@@ -25,9 +23,9 @@ internal interface ConfigurationManager {
     /**
      * Retrives queue IDs
      * [queueIds] A list of queue IDs to be used for the engagement launcher.
-     * When null, the default queues will be used.
+     * When empty or invalid, the default queues will be used.
      */
-    fun setQueueIds(queueIds: List<String>?)
+    fun setQueueIds(queueIds: List<String>)
 }
 
 internal class ConfigurationManagerImpl : ConfigurationManager {
@@ -43,11 +41,11 @@ internal class ConfigurationManagerImpl : ConfigurationManager {
     override val enableBubbleInsideApp: Boolean
         get() = _enableBubbleInsideApp
 
-    private var _queueIdsObservable: BehaviorProcessor<Data<List<String>>> = BehaviorProcessor.create()
-    override val queueIdsObservable: Flowable<Data<List<String>>> = _queueIdsObservable.onBackpressureLatest()
+    private var _queueIdsObservable: BehaviorProcessor<List<String>> = BehaviorProcessor.create()
+    override val queueIdsObservable: Flowable<List<String>> = _queueIdsObservable.onBackpressureLatest()
 
     override val queueIds: List<String>?
-        get() = _queueIdsObservable.value?.valueOrNull
+        get() = _queueIdsObservable.value
 
     override fun applyConfiguration(config: GliaWidgetsConfig) {
         config.screenSharingMode?.also { _screenSharingMode = it }
@@ -55,7 +53,7 @@ internal class ConfigurationManagerImpl : ConfigurationManager {
         config.enableBubbleOutsideApp?.also { _enableBubbleOutsideApp = it }
     }
 
-    override fun setQueueIds(queueIds: List<String>?) {
-        _queueIdsObservable.onNext(Data.from(queueIds?.takeIf { it.isNotEmpty() }))
+    override fun setQueueIds(queueIds: List<String>) {
+        _queueIdsObservable.onNext(queueIds)
     }
 }

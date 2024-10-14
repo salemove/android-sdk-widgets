@@ -65,7 +65,7 @@ public class GliaWidgets {
      * Retrieves an instance of {@link EngagementLauncher}.
      *
      * @param queueIds A list of queue IDs to be used for the engagement launcher.
-     *                 When empty, the default queues will be used.
+     *                 When empty or invalid, the default queues will be used.
      * @return An instance of {@link EngagementLauncher}.
      * @throws GliaException with the {@link GliaException.Cause#INVALID_INPUT} if the SDK is not initialized.
      */
@@ -80,7 +80,7 @@ public class GliaWidgets {
      * Retrieves an instance of {@link EntryWidget}.
      *
      * @param queueIds A list of queue IDs to be used for the entry widget.
-     *                 When empty, the default queues will be used.
+     *                 When empty or invalid, the default queues will be used.
      * @return An instance of {@link EntryWidget}.
      * @throws GliaException with the {@link GliaException.Cause#INVALID_INPUT} if the SDK is not initialized.
      */

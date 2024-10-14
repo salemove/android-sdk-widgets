@@ -14,12 +14,15 @@ internal data class MediaTypeItemRemoteConfig(
     @SerializedName("title")
     val title: TextRemoteConfig?,
     @SerializedName("message")
-    val message: TextRemoteConfig?
+    val message: TextRemoteConfig?,
+    @SerializedName("loadingTintColor")
+    val loadingTintColor: ColorLayerRemoteConfig?
 ) {
     fun toMediaTypeItemTheme(): MediaTypeItemTheme = MediaTypeItemTheme(
         background = background?.toLayerTheme(),
         iconColor = iconColor?.toColorTheme(),
         title = title?.toTextTheme(),
-        message = message?.toTextTheme()
+        message = message?.toTextTheme(),
+        loadingTintColor = loadingTintColor?.toColorTheme()
     )
 }

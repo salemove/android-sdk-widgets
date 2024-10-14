@@ -5,6 +5,7 @@ import androidx.core.view.isVisible
 import com.glia.widgets.R
 import com.glia.widgets.databinding.EntryWidgetMediaTypeItemBinding
 import com.glia.widgets.entrywidget.EntryWidgetContract
+import com.glia.widgets.helper.applyShadow
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.view.unifiedui.applyImageColorTheme
@@ -23,6 +24,11 @@ internal class EntryWidgetMediaTypeItemViewHolder(
             binding.title.applyTextTheme(it.title)
             binding.description.applyTextTheme(it.message)
             binding.icon.applyImageColorTheme(it.iconColor)
+            it.loadingTintColor?.primaryColorStateList?.let { tintList ->
+                binding.iconLoading.backgroundTintList = tintList
+                binding.titleLoading.backgroundTintList = tintList
+                binding.descriptionLoading.backgroundTintList = tintList
+            }
         }
     }
 

@@ -23,7 +23,7 @@ internal class SecureConversationsRepository(private val secureConversations: Se
 
     fun send(payload: SendMessagePayload, callback: RequestCallback<VisitorMessage?>) {
         _messageSendingObservable.onNext(true)
-        secureConversations.send(payload, queueRepository.integratorQueueIds.toTypedArray(), handleResult(callback))
+        secureConversations.send(payload, queueRepository.relevantQueueIds.toTypedArray(), handleResult(callback))
     }
 
     fun send(payload: SendMessagePayload, listener: GliaSendMessageUseCase.Listener) {

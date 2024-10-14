@@ -2,7 +2,6 @@ package com.glia.widgets.core.queue
 
 import com.glia.androidsdk.queuing.Queue
 import com.glia.widgets.di.GliaCore
-import com.glia.widgets.helper.Data
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.unSafeSubscribe
@@ -18,18 +17,23 @@ internal sealed interface QueuesState {
     data class Error(val error: Throwable) : QueuesState
 }
 
-internal class QueueRepository(private val gliaCore: GliaCore, private val configurationManager: ConfigurationManager) {
+internal interface QueueRepository {
+    val queuesState: Flowable<QueuesState>
+    val relevantQueueIds: List<String>
+}
+
+internal class QueueRepositoryImpl(private val gliaCore: GliaCore, private val configurationManager: ConfigurationManager) : QueueRepository {
 
     private val queueUpdateCallback: Consumer<Queue> = Consumer { updateQueues(it) }
     private val siteQueues: BehaviorProcessor<Result<List<Queue>>> = BehaviorProcessor.create()
 
-    private val _observableIntegratorQueues: BehaviorProcessor<QueuesState> = BehaviorProcessor.createDefault(QueuesState.Loading)
-    val observableIntegratorQueues = _observableIntegratorQueues.hide()
+    private val _queuesState: BehaviorProcessor<QueuesState> = BehaviorProcessor.createDefault(QueuesState.Loading)
+    override val queuesState = _queuesState.hide()
         .doOnSubscribe { fetchQueues() }
         .distinctUntilChanged()
 
-    val integratorQueueIds: List<String>
-        get() = _observableIntegratorQueues.value
+    override val relevantQueueIds: List<String>
+        get() = _queuesState.value
             ?.let { it as? QueuesState.Queues }
             ?.run { queues.map { it.id } }
             .orEmpty()
@@ -41,7 +45,7 @@ internal class QueueRepository(private val gliaCore: GliaCore, private val confi
 
     private fun fetchQueues() {
         if (siteQueues.value?.isSuccess != true) {
-            _observableIntegratorQueues.onNext(QueuesState.Loading)
+            _queuesState.onNext(QueuesState.Loading)
             gliaCore.getQueues { queues, exception ->
                 when {
                     queues != null -> siteQueues.onNext(Result.success(queues.toList()))
@@ -55,7 +59,7 @@ internal class QueueRepository(private val gliaCore: GliaCore, private val confi
     }
 
     private fun subscribeToQueueUpdates() {
-        _observableIntegratorQueues
+        _queuesState
             .filter { it is QueuesState.Queues }
             .map { it as QueuesState.Queues }
             .map { it.queues }
@@ -69,23 +73,53 @@ internal class QueueRepository(private val gliaCore: GliaCore, private val confi
             queueIds to queuesState
         }.unSafeSubscribe { (integratorQueueIds, siteQueueResult) ->
             siteQueueResult.fold(
-                onSuccess = { updateQueues(mapCurrentQueues(it, integratorQueueIds)) },
-                onFailure = { _observableIntegratorQueues.onNext(QueuesState.Error(it)) }
+                onSuccess = {
+                    Logger.i(TAG, "Setting up queues. site has ${it.count()} queues")
+                    onQueuesReceived(integratorQueueIds, it)
+                },
+                onFailure = {
+                    Logger.e(TAG, "Setting up queues. Failed to get site queues", it)
+                    _queuesState.onNext(QueuesState.Error(it))
+                }
             )
         }
     }
 
-    private fun updateQueues(queues: List<Queue>) {
-        if (queues.isEmpty()) {
-            _observableIntegratorQueues.onNext(QueuesState.Empty)
-            return
-        }
+    private fun onQueuesReceived(queueIds: List<String>, siteQueues: List<Queue>) {
+        when {
+            siteQueues.isEmpty() -> {
+                Logger.i(TAG, "Setting up queues. Site has no queues")
+                _queuesState.onNext(QueuesState.Empty)
+            }
 
-        _observableIntegratorQueues.onNext(QueuesState.Queues(queues))
+            queueIds.isEmpty() -> {
+                Logger.i(TAG, "Setting up queues. Integrator queues are empty")
+                setDefaultQueues(siteQueues)
+            }
+
+            else -> {
+                Logger.i(TAG, "Setting up queues. Matching queues")
+                matchQueues(queueIds, siteQueues)
+            }
+        }
+    }
+
+    private fun setDefaultQueues(siteQueues: List<Queue>) {
+        Logger.i(TAG, "Setting up queues. Falling back to default queues")
+
+        val defaultQueues = siteQueues.filter { it.isDefault == true }
+
+        if (defaultQueues.isEmpty()) {
+            Logger.w(TAG, "Setting up queues. No default queues")
+            _queuesState.onNext(QueuesState.Empty)
+        } else {
+            Logger.i(TAG, "Setting up queues. Using default ${defaultQueues.count()} queues")
+            _queuesState.onNext(QueuesState.Queues(defaultQueues))
+        }
     }
 
     private fun updateQueues(queue: Queue) {
-        val currentQueues = _observableIntegratorQueues.value
+        val currentQueues = _queuesState.value
             ?.let { it as? QueuesState.Queues }
             ?.queues
             ?.toMutableList() ?: return
@@ -94,11 +128,21 @@ internal class QueueRepository(private val gliaCore: GliaCore, private val confi
 
         currentQueues[index] = queue
 
-        _observableIntegratorQueues.onNext(QueuesState.Queues(currentQueues.toList()))
+        _queuesState.onNext(QueuesState.Queues(currentQueues.toList()))
     }
 
-    private fun mapCurrentQueues(siteQueues: List<Queue>, queueIds: Data<List<String>>): List<Queue> = when (queueIds) {
-        is Data.Value -> siteQueues.filter { queueIds.result.contains(it.id) }
-        else -> siteQueues.filter { it.isDefault == true }
+    private fun matchQueues(queueIds: List<String>, siteQueues: List<Queue>) {
+        val matchedQueues = siteQueues.filter { queueIds.contains(it.id) }
+
+        if (matchedQueues.isEmpty()) {
+            setDefaultQueues(siteQueues)
+        } else {
+            Logger.i(
+                TAG,
+                "Setting up queues. ${matchedQueues.count()} out of ${queueIds.count()} queues provided by an integrator match with site queues."
+            )
+            _queuesState.onNext(QueuesState.Queues(matchedQueues))
+        }
     }
+
 }

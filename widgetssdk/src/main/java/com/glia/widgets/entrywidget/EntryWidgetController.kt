@@ -20,7 +20,7 @@ internal class EntryWidgetController(
     @SuppressLint("CheckResult")
     override fun setView(view: EntryWidgetContract.View) {
         this.view = view
-        queueRepository.observableIntegratorQueues
+        queueRepository.queuesState
             .map(::mapState)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(view::showItems)

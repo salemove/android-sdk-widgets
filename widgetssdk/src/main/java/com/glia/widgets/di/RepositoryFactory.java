@@ -149,7 +149,7 @@ public class RepositoryFactory {
 
     public EngagementRepository getEngagementRepository() {
         if (engagementRepository == null) {
-            engagementRepository = new EngagementRepositoryImpl(gliaCore, getOperatorRepository());
+            engagementRepository = new EngagementRepositoryImpl(gliaCore, getOperatorRepository(), getQueueRepository());
         }
         return engagementRepository;
     }

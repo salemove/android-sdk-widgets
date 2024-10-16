@@ -9,6 +9,7 @@ import com.glia.widgets.chat.domain.GliaSendMessageUseCase
 import com.glia.widgets.chat.model.SendMessagePayload
 import com.glia.widgets.chat.model.Unsent
 import com.glia.widgets.core.queue.QueueRepository
+import com.glia.widgets.helper.unSafeSubscribe
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.reactivex.rxjava3.subjects.Subject
@@ -24,7 +25,14 @@ internal class SecureConversationsRepository(private val secureConversations: Se
 
     fun send(payload: SendMessagePayload, callback: RequestCallback<VisitorMessage?>) {
         _messageSendingObservable.onNext(true)
-        secureConversations.send(payload.payload, queueRepository.relevantQueueIds.toTypedArray(), handleResult(callback))
+        queueRepository.relevantQueueIds.unSafeSubscribe { queueIds ->
+            if (queueIds.isNotEmpty()) {
+                secureConversations.send(payload.payload, queueIds.toTypedArray(), handleResult(callback))
+            } else {
+                handleResult(callback).onResult(null, GliaException("relevant queues are empty", GliaException.Cause.INVALID_INPUT))
+            }
+
+        }
     }
 
     fun send(payload: SendMessagePayload, listener: GliaSendMessageUseCase.Listener) {

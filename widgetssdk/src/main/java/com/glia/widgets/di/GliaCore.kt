@@ -41,11 +41,11 @@ internal interface GliaCore {
     fun <T> off(event: OmnicoreEvent<T>, listener: Consumer<T>)
     fun <T> off(event: OmnicoreEvent<T>)
     fun fetchFile(attachmentFile: AttachmentFile, callback: RequestCallback<InputStream?>)
-    fun getChatHistory(callback: RequestCallback<Array<ChatMessage>?>)
-    fun getQueues(requestCallback: RequestCallback<Array<Queue>?>)
+    fun getChatHistory(callback: RequestCallback<List<ChatMessage>?>)
+    fun getQueues(requestCallback: RequestCallback<List<Queue>?>)
 
     fun queueForEngagement(
-        queueIds: Array<String>,
+        queueIds: List<String>,
         mediaType: Engagement.MediaType,
         visitorContextAssetId: String?,
         engagementOptions: EngagementOptions?,
@@ -69,6 +69,6 @@ internal interface GliaCore {
         }
     }
 
-    fun subscribeToQueueStateUpdates(queueIds: Array<String>, onError: Consumer<GliaException> , callback: Consumer<Queue>)
+    fun subscribeToQueueStateUpdates(queueIds: List<String>, onError: Consumer<GliaException>, callback: Consumer<Queue>)
     fun unsubscribeFromQueueUpdates(onError: Consumer<GliaException>?, callback: Consumer<Queue>)
 }

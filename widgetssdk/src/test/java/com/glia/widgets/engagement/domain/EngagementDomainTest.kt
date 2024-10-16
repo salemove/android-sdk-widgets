@@ -18,7 +18,6 @@ import com.glia.widgets.core.engagement.GliaEngagementConfigRepository
 import com.glia.widgets.core.fileupload.FileAttachmentRepository
 import com.glia.widgets.core.notification.domain.CallNotificationUseCase
 import com.glia.widgets.core.permissions.PermissionManager
-import com.glia.widgets.core.queue.QueueRepository
 import com.glia.widgets.core.screensharing.MEDIA_PROJECTION_SERVICE_ACTION_START
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.EngagementRepository
@@ -316,12 +315,10 @@ class EngagementDomainTest {
         val queueIds = listOf("queueId1", "queueId2")
         val mediaType: Engagement.MediaType = mockk(relaxUnitFun = true)
 
-        val queueRepository = mockk<QueueRepository>()
-        every { queueRepository.relevantQueueIds } returns queueIds
-        val useCase: EnqueueForEngagementUseCase = EnqueueForEngagementUseCaseImpl(engagementRepository = repository, queueRepository)
+        val useCase: EnqueueForEngagementUseCase = EnqueueForEngagementUseCaseImpl(engagementRepository = repository)
         useCase(mediaType)
 
-        verify { repository.queueForEngagement(queueIds, mediaType) }
+        verify { repository.queueForEngagement(mediaType) }
     }
 
     @Test

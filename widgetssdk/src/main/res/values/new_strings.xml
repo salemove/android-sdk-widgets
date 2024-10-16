@@ -65,7 +65,7 @@
 
     <!-- Chat -->
     <string name="engagement_chat_title">@string/glia_chat_title</string>
-    <string name="message_center_header">@string/glia_messaging_title</string>
+    <string name="message_center_header">@string/glia_message_center_title</string>
     <string name="chat_input_placeholder">@string/glia_chat_enter_message</string>
     <string name="chat_message_start_engagement_placeholder">@string/glia_chat_not_started_hint</string>
     <string name="android_file_not_ready_for_preview">@string/glia_view_file_not_ready_for_preview</string>

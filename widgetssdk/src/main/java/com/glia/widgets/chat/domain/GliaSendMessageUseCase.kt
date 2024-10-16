@@ -24,7 +24,8 @@ internal class GliaSendMessageUseCase(
     interface Listener {
         fun messageSent(message: VisitorMessage?)
         fun onMessageValidated()
-        fun errorOperatorNotOnline(message: Unsent)
+        fun onMessagePrepared(message: Unsent)
+        fun errorOperatorOffline()
         fun error(ex: GliaException, message: Unsent)
 
         fun errorMessageInvalid() {
@@ -54,10 +55,11 @@ internal class GliaSendMessageUseCase(
             listener.onMessageValidated()
             val attachments = if (hasFileAttachments(fileAttachments)) fileAttachments else null
             val payload = SendMessagePayload(content = message, fileAttachments = attachments)
+            listener.onMessagePrepared(Unsent(payload = payload))
             if (isOperatorOnline || isSecureEngagement) {
                 sendMessage(payload, listener)
             } else {
-                listener.errorOperatorNotOnline(Unsent(payload = payload))
+                listener.errorOperatorOffline()
             }
             fileAttachmentRepository.detachFiles(fileAttachments)
         } else {
@@ -67,12 +69,13 @@ internal class GliaSendMessageUseCase(
 
     fun execute(singleChoiceAttachment: SingleChoiceAttachment, listener: Listener) {
         val payload = SendMessagePayload(attachment = singleChoiceAttachment)
+        listener.onMessagePrepared(Unsent(payload = payload))
         when {
             isSecureEngagement -> secureConversationsRepository.send(payload, engagementConfigRepository.queueIds, listener)
 
             isOperatorOnline -> chatRepository.sendMessage(payload, listener)
 
-            else -> listener.errorOperatorNotOnline(Unsent(payload = payload))
+            else -> listener.errorOperatorOffline()
         }
     }
 

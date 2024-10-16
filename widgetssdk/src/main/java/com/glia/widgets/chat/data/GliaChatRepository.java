@@ -11,6 +11,7 @@ import com.glia.androidsdk.chat.VisitorMessage;
 import com.glia.widgets.chat.domain.GliaSendMessageUseCase.Listener;
 import com.glia.widgets.di.GliaCore;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -27,7 +28,7 @@ public class GliaChatRepository {
      * @hide
      */
     public interface HistoryLoadedListener {
-        void loaded(ChatMessage[] messages, Throwable error);
+        void loaded(List<ChatMessage> messages, Throwable error);
     }
 
     public void loadHistory(HistoryLoadedListener historyLoadedListener) {

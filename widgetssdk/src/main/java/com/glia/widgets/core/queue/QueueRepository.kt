@@ -1,5 +1,6 @@
 package com.glia.widgets.core.queue
 
+import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.queuing.Queue
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.Logger
@@ -7,82 +8,87 @@ import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.unSafeSubscribe
 import com.glia.widgets.launcher.ConfigurationManager
 import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.processors.BehaviorProcessor
 import java.util.function.Consumer
 
 internal sealed interface QueuesState {
-    object Loading : QueuesState
-    object Empty : QueuesState
+    fun queuesOrEmpty(): List<Queue> = when (this) {
+        is Queues -> queues
+        else -> emptyList()
+    }
+
+    data object Loading : QueuesState
+    data object Empty : QueuesState
     data class Queues(val queues: List<Queue>) : QueuesState
     data class Error(val error: Throwable) : QueuesState
 }
 
 internal interface QueueRepository {
     val queuesState: Flowable<QueuesState>
-    val relevantQueueIds: List<String>
+    val relevantQueueIds: Single<List<String>>
+    fun initialize()
 }
 
 internal class QueueRepositoryImpl(private val gliaCore: GliaCore, private val configurationManager: ConfigurationManager) : QueueRepository {
 
     private val queueUpdateCallback: Consumer<Queue> = Consumer { updateQueues(it) }
-    private val siteQueues: BehaviorProcessor<Result<List<Queue>>> = BehaviorProcessor.create()
+    private val siteQueues: BehaviorProcessor<List<Queue>> = BehaviorProcessor.create()
 
-    private val _queuesState: BehaviorProcessor<QueuesState> = BehaviorProcessor.createDefault(QueuesState.Loading)
+    private val _queuesState: BehaviorProcessor<QueuesState> = BehaviorProcessor.create()
     override val queuesState = _queuesState.hide()
         .doOnSubscribe { fetchQueues() }
         .distinctUntilChanged()
 
-    override val relevantQueueIds: List<String>
-        get() = _queuesState.value
-            ?.let { it as? QueuesState.Queues }
-            ?.run { queues.map { it.id } }
-            .orEmpty()
+    private val _relevantQueueIds: Flowable<List<String>>
+        get() = queuesState
+            .filter { it !is QueuesState.Loading }
+            .map { it.queuesOrEmpty() }
+            .map { queues -> queues.map { it.id } }
 
-    init {
-        subscribeToQueues()
-        subscribeToQueueUpdates()
+    override val relevantQueueIds: Single<List<String>>
+        get() = _relevantQueueIds.firstOrError()
+
+    override fun initialize() {
+        fetchQueues()
     }
 
     private fun fetchQueues() {
-        if (siteQueues.value?.isSuccess != true) {
+        if (gliaCore.isInitialized && siteQueues.value == null) {
             _queuesState.onNext(QueuesState.Loading)
+
             gliaCore.getQueues { queues, exception ->
-                when {
-                    queues != null -> siteQueues.onNext(Result.success(queues.toList()))
-                    else -> {
-                        siteQueues.onNext(Result.failure(exception ?: RuntimeException("Fetching queues failed")))
-                        Logger.e(TAG, "Fetching queues failed", exception)
-                    }
-                }
+                queues?.let { siteQueuesReceived(it) } ?: reportGetSiteQueuesError(exception)
             }
         }
     }
 
+    private fun siteQueuesReceived(queues: List<Queue>) {
+        siteQueues.onNext(queues)
+        subscribeToQueues()
+        subscribeToQueueUpdates()
+    }
+
+    private fun reportGetSiteQueuesError(exception: GliaException?) {
+        val ex = exception ?: RuntimeException("Fetching queues failed: queues were null")
+        Logger.e(TAG, "Setting up queues. Failed to get site queues", ex)
+        _queuesState.onNext(QueuesState.Error(ex))
+    }
+
     private fun subscribeToQueueUpdates() {
-        _queuesState
-            .filter { it is QueuesState.Queues }
-            .map { it as QueuesState.Queues }
-            .map { it.queues }
-            .map { queues -> queues.map { it.id } }
-            .map { it.toTypedArray() }
+        _relevantQueueIds
+            .filter { it.isNotEmpty() }
+            .distinctUntilChanged()
             .unSafeSubscribe { gliaCore.subscribeToQueueStateUpdates(it, {}, queueUpdateCallback) }
     }
 
     private fun subscribeToQueues() {
-        Flowable.combineLatest(configurationManager.queueIdsObservable, siteQueues) { queueIds, queuesState ->
-            queueIds to queuesState
-        }.unSafeSubscribe { (integratorQueueIds, siteQueueResult) ->
-            siteQueueResult.fold(
-                onSuccess = {
-                    Logger.i(TAG, "Setting up queues. site has ${it.count()} queues")
-                    onQueuesReceived(integratorQueueIds, it)
-                },
-                onFailure = {
-                    Logger.e(TAG, "Setting up queues. Failed to get site queues", it)
-                    _queuesState.onNext(QueuesState.Error(it))
-                }
-            )
-        }
+        Flowable.combineLatest(configurationManager.queueIdsObservable, siteQueues, ::Pair)
+            .distinctUntilChanged()
+            .unSafeSubscribe { (integratorQueueIds, siteQueues) ->
+                Logger.i(TAG, "Setting up queues. site has ${siteQueues.count()} queues")
+                onQueuesReceived(integratorQueueIds, siteQueues)
+            }
     }
 
     private fun onQueuesReceived(queueIds: List<String>, siteQueues: List<Queue>) {

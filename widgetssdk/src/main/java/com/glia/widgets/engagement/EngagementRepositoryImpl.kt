@@ -30,6 +30,7 @@ import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.androidsdk.screensharing.ScreenSharingRequest
 import com.glia.androidsdk.screensharing.VisitorScreenSharingState
 import com.glia.widgets.core.engagement.GliaOperatorRepository
+import com.glia.widgets.core.queue.QueueRepository
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.Data
 import com.glia.widgets.helper.Logger
@@ -38,6 +39,7 @@ import com.glia.widgets.helper.isQueueUnavailable
 import com.glia.widgets.helper.unSafeSubscribe
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.processors.BehaviorProcessor
 import io.reactivex.rxjava3.processors.PublishProcessor
 import java.util.function.Consumer
@@ -50,7 +52,11 @@ internal const val MEDIA_PERMISSION_REQUEST_CODE = 0x3E9
 @VisibleForTesting
 internal const val SKIP_ASKING_SCREEN_SHARING_PERMISSION_RESULT_CODE = 0x1995
 
-internal class EngagementRepositoryImpl(private val core: GliaCore, private val operatorRepository: GliaOperatorRepository) : EngagementRepository {
+internal class EngagementRepositoryImpl(
+    private val core: GliaCore,
+    private val operatorRepository: GliaOperatorRepository,
+    private val queueRepository: QueueRepository
+) : EngagementRepository {
     private val engagementRequestCallback = Consumer<IncomingEngagementRequest>(::handleIncomingEngagementRequest)
     private val engagementOutcomeCallback = Consumer<Outcome>(::handleEngagementOutcome)
 
@@ -123,12 +129,13 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
     private val _screenSharingState: BehaviorProcessor<ScreenSharingState> = BehaviorProcessor.create()
     override val screenSharingState: Flowable<ScreenSharingState> = _screenSharingState.onBackpressureLatest()
 
-
     private val readyToShareScreenProcessor: PublishProcessor<Unit> = PublishProcessor.create()
     private val mediaProjectionActivityResultProcessor: PublishProcessor<Pair<Int, Intent?>> = PublishProcessor.create()
 
     private var currentScreenSharingRequest: ScreenSharingRequest? = null
     private var currentScreenSharingScreen: LocalScreen? = null
+
+    private val queueIngDisposable = CompositeDisposable()
 
     override val hasOngoingEngagement: Boolean
         get() = currentEngagement != null
@@ -196,17 +203,29 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
         }
     }
 
-    override fun queueForEngagement(queueIds: List<String>, mediaType: MediaType) {
+    override fun queueForEngagement(mediaType: MediaType) {
         if (isQueueingOrEngagement) return
 
+        _engagementState.onNext(State.PreQueuing(mediaType))
+
         Logger.i(TAG, "Start queueing for media engagement")
-        core.queueForEngagement(queueIds.toTypedArray(), mediaType, null, null, MEDIA_PERMISSION_REQUEST_CODE) {
-            handleQueueingResponse(it, queueIds, mediaType)
-        }
+
+        queueIngDisposable.add(
+            queueRepository.relevantQueueIds.subscribe { ids ->
+                if (ids.isNotEmpty()) {
+                    core.queueForEngagement(ids, mediaType, null, null, MEDIA_PERMISSION_REQUEST_CODE) {
+                        handleQueueingResponse(it)
+                    }
+                } else {
+                    handleQueueingResponse(GliaException("relevant queues are empty", GliaException.Cause.INVALID_INPUT))
+                }
+            }
+        )
     }
 
     override fun cancelQueuing() {
         (_engagementState.value as? State.PreQueuing)?.apply {
+            queueIngDisposable.clear()
             _engagementState.onNext(State.QueueingCanceled)
             return
         }
@@ -320,7 +339,7 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
         }
 
         if (currentState is State.PreQueuing) {
-            _engagementState.onNext(State.Queuing(currentState.queueIds, ticket.id, currentState.mediaType))
+            _engagementState.onNext(State.Queuing(ticket.id, currentState.mediaType))
             trackQueueTicketUpdates(ticket)
         }
     }
@@ -334,10 +353,9 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
         }
     }
 
-    private fun handleQueueingResponse(exception: GliaException?, queueIds: List<String>, mediaType: MediaType) {
+    private fun handleQueueingResponse(exception: GliaException?) {
         when {
-            exception == null || exception.cause == GliaException.Cause.ALREADY_QUEUED ->
-                _engagementState.onNext(State.PreQueuing(queueIds, mediaType))
+            exception == null || exception.cause == GliaException.Cause.ALREADY_QUEUED -> return
 
             exception.isQueueUnavailable -> {
                 _engagementState.onNext(State.QueueUnstaffed)

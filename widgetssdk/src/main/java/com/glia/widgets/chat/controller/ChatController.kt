@@ -52,8 +52,8 @@ import com.glia.widgets.core.notification.domain.CallNotificationUseCase
 import com.glia.widgets.core.permissions.domain.RequestNotificationPermissionIfPushNotificationsSetUpUseCase
 import com.glia.widgets.core.permissions.domain.WithCameraPermissionUseCase
 import com.glia.widgets.core.permissions.domain.WithReadWritePermissionsUseCase
-import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
 import com.glia.widgets.core.secureconversations.domain.GetAvailableQueueIdsForSecureMessagingUseCase
+import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.EngagementUpdateState
 import com.glia.widgets.engagement.ScreenSharingState
@@ -153,8 +153,12 @@ internal class ChatController(
             emitViewState { chatState.setLastTypedText("").setShowSendButton(isShowSendButtonUseCase("")) }
         }
 
-        override fun errorOperatorNotOnline(message: Unsent) {
-            onSendMessageOperatorOffline(message)
+        override fun onMessagePrepared(message: Unsent) {
+            appendUnsentMessage(message)
+        }
+
+        override fun errorOperatorOffline() {
+            onSendMessageOperatorOffline()
         }
 
         override fun error(ex: GliaException, message: Unsent) {
@@ -374,8 +378,7 @@ internal class ChatController(
         scrollChatToBottom()
     }
 
-    private fun onSendMessageOperatorOffline(message: Unsent) {
-        appendUnsentMessage(message)
+    private fun onSendMessageOperatorOffline() {
         if (!chatState.engagementRequested) {
             viewInitPreQueueing()
         }

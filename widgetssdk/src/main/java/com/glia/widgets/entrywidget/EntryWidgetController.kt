@@ -1,29 +1,43 @@
 package com.glia.widgets.entrywidget
 
-import android.annotation.SuppressLint
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.queuing.Queue
 import com.glia.androidsdk.queuing.QueueState
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.core.queue.QueueRepository
 import com.glia.widgets.core.queue.QueuesState
+import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
+import com.glia.widgets.helper.unSafeSubscribe
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 
 internal class EntryWidgetController(
     private val queueRepository: QueueRepository,
-    private val isAuthenticatedUseCase: IsAuthenticatedUseCase
+    private val isAuthenticatedUseCase: IsAuthenticatedUseCase,
+    private val core: GliaCore
 ) : EntryWidgetContract.Controller {
     private lateinit var view: EntryWidgetContract.View
 
-    @SuppressLint("CheckResult")
     override fun setView(view: EntryWidgetContract.View) {
         this.view = view
+
+        if (core.isInitialized) {
+            subscribeToQueueState()
+        } else {
+            initErrorState()
+        }
+    }
+
+    private fun initErrorState() {
+        view.showItems(listOf(EntryWidgetContract.ItemType.ERROR_STATE))
+    }
+
+    private fun subscribeToQueueState() {
         queueRepository.queuesState
             .map(::mapState)
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(view::showItems)
+            .unSafeSubscribe(view::showItems)
     }
 
     private fun mapState(state: QueuesState): List<EntryWidgetContract.ItemType> = when (state) {

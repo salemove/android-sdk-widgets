@@ -142,7 +142,7 @@ internal class ActivityWatcherForChatHeadTest {
     fun `bubble will be updated when PreQueuing`() {
         mockShouldShowChatHead()
 
-        engagementStateFlowable.onNext(State.PreQueuing(listOf(""), Engagement.MediaType.TEXT))
+        engagementStateFlowable.onNext(State.PreQueuing(Engagement.MediaType.TEXT))
         verifyBubbleIsShowed(times = 2)
     }
 
@@ -150,7 +150,7 @@ internal class ActivityWatcherForChatHeadTest {
     fun `bubble will be updated when Queueing is started`() {
         mockShouldShowChatHead()
 
-        engagementStateFlowable.onNext(State.Queuing(listOf(""), "", Engagement.MediaType.TEXT))
+        engagementStateFlowable.onNext(State.Queuing("", Engagement.MediaType.TEXT))
         verifyBubbleIsShowed(times = 2)
     }
 

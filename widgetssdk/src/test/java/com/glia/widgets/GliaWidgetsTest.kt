@@ -6,10 +6,12 @@ import com.glia.androidsdk.GliaConfig
 import com.glia.androidsdk.SiteApiKey
 import com.glia.androidsdk.omnibrowse.Omnibrowse
 import com.glia.widgets.callvisualizer.controller.CallVisualizerController
+import com.glia.widgets.core.queue.QueueRepository
 import com.glia.widgets.di.ControllerFactory
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.di.RepositoryFactory
+import com.glia.widgets.engagement.EngagementRepository
 import org.junit.Assert
 import org.junit.Before
 import org.junit.ClassRule
@@ -69,11 +71,16 @@ class GliaWidgetsTest {
         whenever(gliaCore.callVisualizer).thenReturn(callVisualizer)
         val callVisualizerController = mock<CallVisualizerController>()
         whenever(controllerFactory.callVisualizerController).thenReturn(callVisualizerController)
-        whenever(repositoryFactory.engagementRepository) doReturn mock()
+        val engagementRepository = mock<EngagementRepository>()
+        whenever(repositoryFactory.engagementRepository) doReturn engagementRepository
         whenever(repositoryFactory.engagementConfigRepository) doReturn mock()
+        val queueRepository = mock<QueueRepository>()
+        whenever(repositoryFactory.queueRepository) doReturn queueRepository
         GliaWidgets.init(widgetsConfig)
         val captor = argumentCaptor<GliaConfig>()
         verify(gliaCore).init(captor.capture())
+        verify(engagementRepository).initialize()
+        verify(queueRepository).initialize()
         val gliaConfig = captor.lastValue
         Assert.assertEquals(siteApiKey, gliaConfig.siteApiKey)
         Assert.assertEquals(siteId, gliaConfig.siteId)

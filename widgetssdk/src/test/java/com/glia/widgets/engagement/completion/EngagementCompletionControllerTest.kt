@@ -103,8 +103,8 @@ class EngagementCompletionControllerTest {
         val testState = controller.state.test()
 
         engagementStateProcessor.onNext(State.NoEngagement)
-        engagementStateProcessor.onNext(State.PreQueuing(listOf("queueId"), Engagement.MediaType.TEXT))
-        engagementStateProcessor.onNext(State.Queuing(listOf("queueId"), "queueTicketId", Engagement.MediaType.TEXT))
+        engagementStateProcessor.onNext(State.PreQueuing(Engagement.MediaType.TEXT))
+        engagementStateProcessor.onNext(State.Queuing("queueTicketId", Engagement.MediaType.TEXT))
         engagementStateProcessor.onNext(State.QueueingCanceled)
         engagementStateProcessor.onNext(State.StartedOmniCore)
         engagementStateProcessor.onNext(State.StartedCallVisualizer)

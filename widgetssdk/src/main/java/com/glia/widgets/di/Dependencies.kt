@@ -126,6 +126,7 @@ internal object Dependencies {
             repositoryFactory,
             useCaseFactory,
             managerFactory,
+            gliaCore
         )
         initApplicationLifecycleObserver(
             ApplicationLifecycleManager(),

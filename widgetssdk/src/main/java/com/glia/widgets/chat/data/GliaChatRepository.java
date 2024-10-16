@@ -10,6 +10,7 @@ import com.glia.widgets.chat.model.SendMessagePayload;
 import com.glia.widgets.chat.model.Unsent;
 import com.glia.widgets.di.GliaCore;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -26,7 +27,7 @@ public class GliaChatRepository {
      * @hide
      */
     public interface HistoryLoadedListener {
-        void loaded(ChatMessage[] messages, Throwable error);
+        void loaded(List<ChatMessage> messages, Throwable error);
     }
 
     public void loadHistory(HistoryLoadedListener historyLoadedListener) {

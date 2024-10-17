@@ -44,7 +44,7 @@ internal class QueueRepositoryImpl(private val gliaCore: GliaCore, private val c
         get() = queuesState
             .filter { it !is QueuesState.Loading }
             .map { it.queuesOrEmpty() }
-            .map { getIds(it) }
+            .map { queues -> queues.map { it.id } }
 
     override val relevantQueueIds: Single<List<String>>
         get() = _relevantQueueIds.firstOrError()
@@ -54,11 +54,11 @@ internal class QueueRepositoryImpl(private val gliaCore: GliaCore, private val c
     }
 
     private fun fetchQueues() {
-        if (siteQueues.value?.isSuccess != true && gliaCore.isInitialized) {
+        if (gliaCore.isInitialized && siteQueues.value?.isSuccess != true) {
             _queuesState.onNext(QueuesState.Loading)
 
             gliaCore.getQueues { queues, exception ->
-                queues?.run { siteQueuesReceived(toList()) } ?: getSiteQueuesError(exception)
+                queues?.run { siteQueuesReceived(toList()) } ?: reportGetSiteQueuesError(exception)
             }
         }
     }
@@ -69,12 +69,10 @@ internal class QueueRepositoryImpl(private val gliaCore: GliaCore, private val c
         subscribeToQueueUpdates()
     }
 
-    private fun getSiteQueuesError(exception: GliaException?) {
+    private fun reportGetSiteQueuesError(exception: GliaException?) {
         siteQueues.onNext(Result.failure(exception ?: RuntimeException("Fetching queues failed")))
         Logger.e(TAG, "Fetching queues failed", exception)
     }
-
-    private fun getIds(queues: List<Queue>): List<String> = queues.map { it.id }
 
     private fun subscribeToQueueUpdates() {
         _relevantQueueIds

@@ -956,7 +956,7 @@ public class UseCaseFactory {
 
     @NonNull
     public EnqueueForEngagementUseCase getQueueForEngagementUseCase() {
-        return new EnqueueForEngagementUseCaseImpl(repositoryFactory.getEngagementRepository(), repositoryFactory.getQueueRepository());
+        return new EnqueueForEngagementUseCaseImpl(repositoryFactory.getEngagementRepository());
     }
 
     @NonNull

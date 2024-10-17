@@ -14,9 +14,6 @@ import io.mockk.slot
 import io.mockk.verify
 import io.reactivex.rxjava3.functions.Predicate
 import io.reactivex.rxjava3.processors.PublishProcessor
-import io.reactivex.rxjava3.subscribers.TestSubscriber
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import java.util.function.Consumer
@@ -27,12 +24,11 @@ class QueueRepositoryTest {
     private lateinit var configurationManager: ConfigurationManager
     private lateinit var queueRepository: QueueRepository
 
-    private lateinit var getQueuesCallbackSlot: CapturingSlot<RequestCallback<Array<Queue>?>>
+    private lateinit var getQueuesCallbackSlot: MutableList<RequestCallback<List<Queue>?>>
     private lateinit var subscribeToQueueUpdatesCallbackSlot: CapturingSlot<Consumer<Queue>>
 
-    private lateinit var testSubscriber: TestSubscriber<QueuesState>
-
-    private val configurationQueuesProcessor: PublishProcessor<List<String>> = PublishProcessor.create()
+    private val configurationQueuesProcessor: PublishProcessor<List<String>> =
+        PublishProcessor.create()
 
     @Before
     fun setUp() {
@@ -41,18 +37,14 @@ class QueueRepositoryTest {
         configurationManager = mockk {
             every { queueIdsObservable } returns configurationQueuesProcessor.hide()
         }
-        getQueuesCallbackSlot = slot()
+        getQueuesCallbackSlot = mutableListOf()
         subscribeToQueueUpdatesCallbackSlot = slot()
 
         queueRepository = QueueRepositoryImpl(gliaCore, configurationManager)
-        verify { configurationManager.queueIdsObservable }
 
-        testSubscriber = queueRepository.queuesState.test()
-
-        //Verify fetchQueues is called on subscription
-        testSubscriber.assertValue(QueuesState.Loading)
-        assertTrue(queueRepository.relevantQueueIds.isEmpty())
-        verify { gliaCore.getQueues(capture(getQueuesCallbackSlot)) }
+        verify(exactly = 0) { configurationManager.queueIdsObservable }
+        verify(exactly = 0) { gliaCore.getQueues(any()) }
+        verify(exactly = 0) { gliaCore.isInitialized }
     }
 
     private fun pushCustomQueues(queues: List<String> = emptyList()) {
@@ -67,115 +59,235 @@ class QueueRepositoryTest {
         return queue
     }
 
+    private fun initialize() {
+        every { gliaCore.isInitialized } returns true
+
+        queueRepository.initialize()
+
+        verify { gliaCore.isInitialized }
+        verify { gliaCore.getQueues(capture(getQueuesCallbackSlot)) }
+
+        verify(exactly = 0) { configurationManager.queueIdsObservable }
+    }
+
+    private fun pushSiteQueues(vararg queues: Queue) {
+        getQueuesCallbackSlot.last().onResult(listOf(*queues), null)
+    }
+
+    @Test
+    fun `getQueues is not called when core not initialized`() {
+        every { gliaCore.isInitialized } returns false
+
+        queueRepository.initialize()
+
+        verify(exactly = 0) { configurationManager.queueIdsObservable }
+        verify(exactly = 0) { gliaCore.getQueues(any()) }
+        verify { gliaCore.isInitialized }
+    }
+
+    @Test
+    fun `getQueues will be called on subscription when core initialized`() {
+        every { gliaCore.isInitialized } returns true
+
+        queueRepository.relevantQueueIds.test().assertNotComplete()
+        verify { gliaCore.isInitialized }
+        verify { gliaCore.getQueues(any()) }
+
+        verify(exactly = 0) { configurationManager.queueIdsObservable }
+    }
+
+    @Test
+    fun `getQueues will be called on initialization when core initialized`() {
+        initialize()
+    }
+
     @Test
     fun `fetchQueues will set Error state when fetching failed`() {
+        initialize()
+
         val exception = GliaException("Fetching queues failed", GliaException.Cause.NETWORK_TIMEOUT)
-        getQueuesCallbackSlot.captured.onResult(null, exception)
 
-        pushCustomQueues()
+        val subscriber = queueRepository.queuesState.test()
 
-        testSubscriber.assertCurrentValue(QueuesState.Error(exception))
-        assertTrue(queueRepository.relevantQueueIds.isEmpty())
+        verify { gliaCore.getQueues(capture(getQueuesCallbackSlot)) }
+        verify(exactly = 0) { configurationManager.queueIdsObservable }
+        subscriber.assertCurrentValue(QueuesState.Loading)
+
+        getQueuesCallbackSlot.last().onResult(null, exception)
+        subscriber.assertCurrentValue(QueuesState.Error(exception))
     }
 
     @Test
     fun `fetchQueues will set Error state when queues are null`() {
-        getQueuesCallbackSlot.captured.onResult(null, null)
+        initialize()
 
-        pushCustomQueues()
+        val subscriber = queueRepository.queuesState.test()
 
-        testSubscriber.assertCurrentValue(Predicate { it is QueuesState.Error })
-        assertTrue(queueRepository.relevantQueueIds.isEmpty())
+        verify { gliaCore.getQueues(capture(getQueuesCallbackSlot)) }
+        verify(exactly = 0) { configurationManager.queueIdsObservable }
+        subscriber.assertCurrentValue(QueuesState.Loading)
+
+        getQueuesCallbackSlot.last().onResult(null, null)
+        subscriber.assertCurrentValue(Predicate { it is QueuesState.Error })
+    }
+
+    @Test
+    fun `fetchQueues will subscribe to queues when response is not error`() {
+        initialize()
+
+        pushSiteQueues(createQueue("1", false))
+        verify { configurationManager.queueIdsObservable }
     }
 
     @Test
     fun `onQueuesReceived will emit Empty state when site has no Queues`() {
-        getQueuesCallbackSlot.captured.onResult(emptyArray(), null)
+        initialize()
 
+        pushSiteQueues()
         pushCustomQueues(listOf("1", "2"))
-
-        testSubscriber.assertCurrentValue(Predicate { it is QueuesState.Empty })
-        assertTrue(queueRepository.relevantQueueIds.isEmpty())
+        verify { configurationManager.queueIdsObservable }
+        verify(exactly = 0) { gliaCore.subscribeToQueueStateUpdates(any(), any(), any()) }
+        queueRepository.queuesState.test().assertCurrentValue(Predicate { it is QueuesState.Empty })
+        queueRepository.relevantQueueIds.test().assertValue { it.isEmpty() }
     }
 
     @Test
     fun `onQueuesReceived will fall back to Default Queues when integrator queues are empty`() {
-        val defaultQueueId = "defaultQueueId"
+        val defaultQueueId = "defaultQueue"
         val defaultQueue = createQueue(defaultQueueId, true)
-        getQueuesCallbackSlot.captured.onResult(arrayOf(createQueue("3", false), defaultQueue), null)
+        val nonDefaultQueue = createQueue("nonDefaultQueue", false)
+        initialize()
 
+        pushSiteQueues(defaultQueue, nonDefaultQueue)
         pushCustomQueues()
 
-        testSubscriber.assertCurrentValue(QueuesState.Queues(listOf(defaultQueue)))
-        assertEquals(1, queueRepository.relevantQueueIds.count())
+        verify { configurationManager.queueIdsObservable }
+
+        queueRepository.queuesState.test()
+            .assertCurrentValue(QueuesState.Queues(listOf(defaultQueue)))
+
+        queueRepository.relevantQueueIds.test().assertValue(listOf(defaultQueue.id))
+        verify { gliaCore.subscribeToQueueStateUpdates(eq(listOf(defaultQueueId)), any(), any()) }
     }
 
     @Test
     fun `onQueuesReceived will emit Empty state when integrator queues are empty and no default queues`() {
-        getQueuesCallbackSlot.captured.onResult(arrayOf(createQueue("3", false)), null)
+        val nonDefaultQueue = createQueue("nonDefaultQueue", false)
+        initialize()
 
+        pushSiteQueues(nonDefaultQueue)
         pushCustomQueues()
 
-        testSubscriber.assertCurrentValue(Predicate { it is QueuesState.Empty })
-        assertTrue(queueRepository.relevantQueueIds.isEmpty())
+        verify { configurationManager.queueIdsObservable }
+
+        queueRepository.queuesState.test().assertCurrentValue(QueuesState.Empty)
+        queueRepository.relevantQueueIds.test().assertValue { it.isEmpty() }
+        verify(exactly = 0) { gliaCore.subscribeToQueueStateUpdates(any(), any(), any()) }
     }
 
     @Test
     fun `onQueuesReceived will fall back to Default Queues when no matched queues`() {
-        val defaultQueueId = "defaultQueueId"
+        val defaultQueueId = "defaultQueue"
         val defaultQueue = createQueue(defaultQueueId, true)
-        getQueuesCallbackSlot.captured.onResult(arrayOf(createQueue("3", false), defaultQueue), null)
+        val nonDefaultQueue = createQueue("nonDefaultQueue", false)
+        initialize()
 
+        pushSiteQueues(defaultQueue, nonDefaultQueue)
         pushCustomQueues(listOf("1"))
 
-        testSubscriber.assertCurrentValue(QueuesState.Queues(listOf(defaultQueue)))
-        assertEquals(1, queueRepository.relevantQueueIds.count())
+        verify { configurationManager.queueIdsObservable }
+
+        queueRepository.queuesState.test()
+            .assertCurrentValue(QueuesState.Queues(listOf(defaultQueue)))
+        queueRepository.relevantQueueIds.test().assertValue(listOf(defaultQueue.id))
+        verify { gliaCore.subscribeToQueueStateUpdates(eq(listOf(defaultQueueId)), any(), any()) }
     }
 
     @Test
     fun `onQueuesReceived will emit Empty state when no matched and default queues`() {
-        getQueuesCallbackSlot.captured.onResult(arrayOf(createQueue("3", false)), null)
+        val nonDefaultQueue = createQueue("nonDefaultQueue", false)
+        initialize()
 
+        pushSiteQueues(nonDefaultQueue)
         pushCustomQueues(listOf("1"))
 
-        testSubscriber.assertCurrentValue(Predicate { it is QueuesState.Empty })
-        assertTrue(queueRepository.relevantQueueIds.isEmpty())
+        verify { configurationManager.queueIdsObservable }
+
+        queueRepository.queuesState.test().assertCurrentValue(QueuesState.Empty)
+        queueRepository.relevantQueueIds.test().assertValue { it.isEmpty() }
+        verify(exactly = 0) { gliaCore.subscribeToQueueStateUpdates(any(), any(), any()) }
     }
 
     @Test
     fun `onQueuesReceived will emit matched Queues`() {
-        val defaultQueueId = "defaultQueueId"
+        val defaultQueueId = "defaultQueue"
         val defaultQueue = createQueue(defaultQueueId, true)
-        val matchedQueue = createQueue("3", false)
-        getQueuesCallbackSlot.captured.onResult(arrayOf(matchedQueue, defaultQueue), null)
+        val nonDefaultQueueId = "nonDefaultQueue"
+        val nonDefaultQueue = createQueue(nonDefaultQueueId, false)
+        initialize()
 
-        pushCustomQueues(listOf(matchedQueue.id))
+        pushSiteQueues(defaultQueue, nonDefaultQueue)
+        pushCustomQueues(listOf(defaultQueue.id, nonDefaultQueue.id))
 
-        testSubscriber.assertCurrentValue(QueuesState.Queues(listOf(matchedQueue)))
-        assertEquals(1, queueRepository.relevantQueueIds.count())
+        verify { configurationManager.queueIdsObservable }
+
+        queueRepository.queuesState.test()
+            .assertCurrentValue(QueuesState.Queues(listOf(defaultQueue, nonDefaultQueue)))
+        queueRepository.relevantQueueIds.test()
+            .assertValue(listOf(defaultQueue.id, nonDefaultQueue.id))
+        verify {
+            gliaCore.subscribeToQueueStateUpdates(
+                eq(
+                    listOf(
+                        defaultQueueId,
+                        nonDefaultQueueId
+                    )
+                ), any(), any()
+            )
+        }
     }
 
     @Test
     fun `updateQueues updates proper queue when it receives`() {
-        val customQueueId = "matchedQueueId"
-        val defaultQueue = createQueue("defaultQueue", true)
-        val customQueue = createQueue(customQueueId, false)
+        val defaultQueueId = "defaultQueue"
+        val defaultQueue = createQueue(defaultQueueId, true)
+        val nonDefaultQueueId = "nonDefaultQueue"
+        val nonDefaultQueue = createQueue(nonDefaultQueueId, false)
+        initialize()
 
-        getQueuesCallbackSlot.captured.onResult(arrayOf(customQueue, defaultQueue), null)
+        pushSiteQueues(defaultQueue, nonDefaultQueue)
+        pushCustomQueues(listOf(defaultQueue.id, nonDefaultQueue.id))
 
-        pushCustomQueues(listOf(customQueueId))
+        verify { configurationManager.queueIdsObservable }
 
-        verify { gliaCore.subscribeToQueueStateUpdates(eq(arrayOf(customQueueId)), any(), capture(subscribeToQueueUpdatesCallbackSlot)) }
+        queueRepository.queuesState.test()
+            .assertCurrentValue(QueuesState.Queues(listOf(defaultQueue, nonDefaultQueue)))
+        queueRepository.relevantQueueIds.test()
+            .assertValue(listOf(defaultQueue.id, nonDefaultQueue.id))
 
-        testSubscriber.assertCurrentValue(QueuesState.Queues(listOf(customQueue)))
-        assertEquals(1, queueRepository.relevantQueueIds.count())
+        verify {
+            gliaCore.subscribeToQueueStateUpdates(
+                eq(listOf(defaultQueueId, nonDefaultQueueId)),
+                any(),
+                capture(subscribeToQueueUpdatesCallbackSlot)
+            )
+        }
 
-        val updatedQueue = createQueue(customQueueId, false, "updatedName")
-        subscribeToQueueUpdatesCallbackSlot.captured.accept(updatedQueue)
+        val updatedQueueName = "updatedDefaultQueueName"
+        val updatedDefaultQueue = createQueue(defaultQueue.id, true, updatedQueueName)
 
-        testSubscriber.assertCurrentValue(QueuesState.Queues(listOf(updatedQueue)))
-        testSubscriber.assertCurrentValue(Predicate { (it as QueuesState.Queues).queues.first().name == "updatedName" })
-        assertEquals(1, queueRepository.relevantQueueIds.count())
+        subscribeToQueueUpdatesCallbackSlot.captured.accept(updatedDefaultQueue)
+
+        verify(atMost = 1) {
+            gliaCore.subscribeToQueueStateUpdates(
+                eq(listOf(defaultQueueId, nonDefaultQueueId)), any(), any()
+            )
+        }
+
+        queueRepository.queuesState.test()
+            .assertCurrentValue(QueuesState.Queues(listOf(updatedDefaultQueue, nonDefaultQueue)))
+        queueRepository.relevantQueueIds.test()
+            .assertValue(listOf(defaultQueue.id, nonDefaultQueue.id))
     }
 
 

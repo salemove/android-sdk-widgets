@@ -58,6 +58,7 @@ public class ControllerFactory {
     private final UseCaseFactory useCaseFactory;
     private final ImagePreviewContract.Controller filePreviewController;
     private final ManagerFactory managerFactory;
+    private final GliaCore core;
     private EngagementCompletionContract.Controller engagementCompletionController;
     private ChatContract.Controller retainedChatController;
     private CallContract.Controller retainedCallController;
@@ -69,7 +70,8 @@ public class ControllerFactory {
     public ControllerFactory(
         RepositoryFactory repositoryFactory,
         UseCaseFactory useCaseFactory,
-        ManagerFactory managerFactory
+        ManagerFactory managerFactory,
+        GliaCore core
     ) {
         this.repositoryFactory = repositoryFactory;
         messagesNotSeenHandler = new MessagesNotSeenHandler(
@@ -77,6 +79,7 @@ public class ControllerFactory {
         );
 
         this.useCaseFactory = useCaseFactory;
+        this.core = core;
         this.dialogController = new DialogController();
         this.filePreviewController = new ImagePreviewController(
             useCaseFactory.createGetImageFileFromDownloadsUseCase(),
@@ -384,7 +387,8 @@ public class ControllerFactory {
     public EntryWidgetContract.Controller getEntryWidgetController() {
         return new EntryWidgetController(
             repositoryFactory.getQueueRepository(),
-            useCaseFactory.createIsAuthenticatedUseCase()
+            useCaseFactory.createIsAuthenticatedUseCase(),
+            core
         );
     }
 }

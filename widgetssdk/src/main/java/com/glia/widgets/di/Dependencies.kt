@@ -126,6 +126,7 @@ internal object Dependencies {
             repositoryFactory,
             useCaseFactory,
             managerFactory,
+            gliaCore
         )
         initApplicationLifecycleObserver(
             ApplicationLifecycleManager(),
@@ -186,6 +187,7 @@ internal object Dependencies {
         gliaCore.init(gliaConfig)
         controllerFactory.init()
         repositoryFactory.engagementRepository.initialize()
+        repositoryFactory.queueRepository.initialize()
         configurationManager.applyConfiguration(gliaWidgetsConfig)
         localeProvider.setCompanyName(gliaWidgetsConfig.companyName)
     }

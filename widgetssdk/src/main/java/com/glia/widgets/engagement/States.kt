@@ -6,16 +6,16 @@ import com.glia.androidsdk.engagement.EngagementState
 import com.glia.androidsdk.engagement.Survey
 
 internal sealed interface State {
-    object NoEngagement : State
-    data class PreQueuing(val queueIds: List<String>, val mediaType: MediaType) : State
-    data class Queuing(val queueIds: List<String>, val queueTicketId: String, val mediaType: MediaType) : State
-    object QueueUnstaffed : State
-    object UnexpectedErrorHappened : State
-    object QueueingCanceled : State
-    object StartedOmniCore : State
-    object StartedCallVisualizer : State
-    object FinishedOmniCore : State
-    object FinishedCallVisualizer : State
+    data object NoEngagement : State
+    data class PreQueuing(val mediaType: MediaType) : State
+    data class Queuing(val queueTicketId: String, val mediaType: MediaType) : State
+    data object QueueUnstaffed : State
+    data object UnexpectedErrorHappened : State
+    data object QueueingCanceled : State
+    data object StartedOmniCore : State
+    data object StartedCallVisualizer : State
+    data object FinishedOmniCore : State
+    data object FinishedCallVisualizer : State
     data class Update(val state: EngagementState, val updateState: EngagementUpdateState) : State
 
     val queueingMediaType: MediaType?
@@ -27,23 +27,23 @@ internal sealed interface State {
 }
 
 internal sealed interface EngagementUpdateState {
-    object Transferring : EngagementUpdateState
+    data object Transferring : EngagementUpdateState
     data class Ongoing(val operator: Operator) : EngagementUpdateState
     data class OperatorConnected(val operator: Operator) : EngagementUpdateState
     data class OperatorChanged(val operator: Operator) : EngagementUpdateState
 }
 
 internal sealed interface SurveyState {
-    object Empty : SurveyState
-    object EmptyFromOperatorRequest : SurveyState
+    data object Empty : SurveyState
+    data object EmptyFromOperatorRequest : SurveyState
     data class Value(val survey: Survey) : SurveyState
 }
 
 internal sealed interface ScreenSharingState {
-    object Requested : ScreenSharingState
-    object Started : ScreenSharingState
-    object RequestAccepted : ScreenSharingState
-    object RequestDeclined : ScreenSharingState
+    data object Requested : ScreenSharingState
+    data object Started : ScreenSharingState
+    data object RequestAccepted : ScreenSharingState
+    data object RequestDeclined : ScreenSharingState
     data class FailedToAcceptRequest(val message: String) : ScreenSharingState
-    object Ended : ScreenSharingState
+    data object Ended : ScreenSharingState
 }

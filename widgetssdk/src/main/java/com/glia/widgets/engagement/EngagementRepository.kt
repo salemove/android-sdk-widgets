@@ -45,7 +45,7 @@ internal interface EngagementRepository {
     fun reset()
     fun resetQueueing()
     fun endEngagement(silently: Boolean)
-    fun queueForEngagement(queueIds: List<String>, mediaType: MediaType)
+    fun queueForEngagement(mediaType: MediaType)
     fun cancelQueuing()
     fun acceptCurrentEngagementRequest(visitorContextAssetId: String)
     fun declineCurrentEngagementRequest()

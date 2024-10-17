@@ -32,7 +32,7 @@ internal class GliaLoadHistoryUseCase(
     ) { messages, count -> ChatHistoryResponse(messages, count) }
 
     private fun loadHistoryAndMapOperator(): Single<MutableList<ChatMessageInternal>> = loadHistory()
-        .flatMapPublisher { Flowable.fromArray(*it) }
+        .flatMapPublisher { Flowable.fromIterable(it) }
         .concatMapSingle { mapOperatorUseCase(chatMessage = it) }
         .toSortedList(Comparator.comparingLong { it.chatMessage.timestamp })
 

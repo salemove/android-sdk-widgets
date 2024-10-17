@@ -24,7 +24,7 @@ class QueueRepositoryTest {
     private lateinit var configurationManager: ConfigurationManager
     private lateinit var queueRepository: QueueRepository
 
-    private lateinit var getQueuesCallbackSlot: MutableList<RequestCallback<Array<Queue>?>>
+    private lateinit var getQueuesCallbackSlot: MutableList<RequestCallback<List<Queue>?>>
     private lateinit var subscribeToQueueUpdatesCallbackSlot: CapturingSlot<Consumer<Queue>>
 
     private val configurationQueuesProcessor: PublishProcessor<List<String>> =
@@ -71,7 +71,7 @@ class QueueRepositoryTest {
     }
 
     private fun pushSiteQueues(vararg queues: Queue) {
-        getQueuesCallbackSlot.last().onResult(arrayOf(*queues), null)
+        getQueuesCallbackSlot.last().onResult(listOf(*queues), null)
     }
 
     @Test
@@ -153,7 +153,8 @@ class QueueRepositoryTest {
 
     @Test
     fun `onQueuesReceived will fall back to Default Queues when integrator queues are empty`() {
-        val defaultQueue = createQueue("defaultQueue", true)
+        val defaultQueueId = "defaultQueue"
+        val defaultQueue = createQueue(defaultQueueId, true)
         val nonDefaultQueue = createQueue("nonDefaultQueue", false)
         initialize()
 
@@ -164,8 +165,9 @@ class QueueRepositoryTest {
 
         queueRepository.queuesState.test()
             .assertCurrentValue(QueuesState.Queues(listOf(defaultQueue)))
+
         queueRepository.relevantQueueIds.test().assertValue(listOf(defaultQueue.id))
-        verify { gliaCore.subscribeToQueueStateUpdates(any(), any(), any()) }
+        verify { gliaCore.subscribeToQueueStateUpdates(eq(listOf(defaultQueueId)), any(), any()) }
     }
 
     @Test
@@ -185,7 +187,8 @@ class QueueRepositoryTest {
 
     @Test
     fun `onQueuesReceived will fall back to Default Queues when no matched queues`() {
-        val defaultQueue = createQueue("defaultQueue", true)
+        val defaultQueueId = "defaultQueue"
+        val defaultQueue = createQueue(defaultQueueId, true)
         val nonDefaultQueue = createQueue("nonDefaultQueue", false)
         initialize()
 
@@ -197,7 +200,7 @@ class QueueRepositoryTest {
         queueRepository.queuesState.test()
             .assertCurrentValue(QueuesState.Queues(listOf(defaultQueue)))
         queueRepository.relevantQueueIds.test().assertValue(listOf(defaultQueue.id))
-        verify { gliaCore.subscribeToQueueStateUpdates(any(), any(), any()) }
+        verify { gliaCore.subscribeToQueueStateUpdates(eq(listOf(defaultQueueId)), any(), any()) }
     }
 
     @Test
@@ -217,8 +220,10 @@ class QueueRepositoryTest {
 
     @Test
     fun `onQueuesReceived will emit matched Queues`() {
-        val defaultQueue = createQueue("defaultQueue", true)
-        val nonDefaultQueue = createQueue("nonDefaultQueue", false)
+        val defaultQueueId = "defaultQueue"
+        val defaultQueue = createQueue(defaultQueueId, true)
+        val nonDefaultQueueId = "nonDefaultQueue"
+        val nonDefaultQueue = createQueue(nonDefaultQueueId, false)
         initialize()
 
         pushSiteQueues(defaultQueue, nonDefaultQueue)
@@ -230,13 +235,24 @@ class QueueRepositoryTest {
             .assertCurrentValue(QueuesState.Queues(listOf(defaultQueue, nonDefaultQueue)))
         queueRepository.relevantQueueIds.test()
             .assertValue(listOf(defaultQueue.id, nonDefaultQueue.id))
-        verify { gliaCore.subscribeToQueueStateUpdates(any(), any(), any()) }
+        verify {
+            gliaCore.subscribeToQueueStateUpdates(
+                eq(
+                    listOf(
+                        defaultQueueId,
+                        nonDefaultQueueId
+                    )
+                ), any(), any()
+            )
+        }
     }
 
     @Test
     fun `updateQueues updates proper queue when it receives`() {
-        val defaultQueue = createQueue("defaultQueue", true)
-        val nonDefaultQueue = createQueue("nonDefaultQueue", false)
+        val defaultQueueId = "defaultQueue"
+        val defaultQueue = createQueue(defaultQueueId, true)
+        val nonDefaultQueueId = "nonDefaultQueue"
+        val nonDefaultQueue = createQueue(nonDefaultQueueId, false)
         initialize()
 
         pushSiteQueues(defaultQueue, nonDefaultQueue)
@@ -251,7 +267,7 @@ class QueueRepositoryTest {
 
         verify {
             gliaCore.subscribeToQueueStateUpdates(
-                any(),
+                eq(listOf(defaultQueueId, nonDefaultQueueId)),
                 any(),
                 capture(subscribeToQueueUpdatesCallbackSlot)
             )
@@ -262,7 +278,11 @@ class QueueRepositoryTest {
 
         subscribeToQueueUpdatesCallbackSlot.captured.accept(updatedDefaultQueue)
 
-        verify(atMost = 1) { gliaCore.subscribeToQueueStateUpdates(any(), any(), any()) }
+        verify(atMost = 1) {
+            gliaCore.subscribeToQueueStateUpdates(
+                eq(listOf(defaultQueueId, nonDefaultQueueId)), any(), any()
+            )
+        }
 
         queueRepository.queuesState.test()
             .assertCurrentValue(QueuesState.Queues(listOf(updatedDefaultQueue, nonDefaultQueue)))

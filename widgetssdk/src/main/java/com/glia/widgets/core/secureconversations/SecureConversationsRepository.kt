@@ -20,7 +20,9 @@ internal class SecureConversationsRepository(private val secureConversations: Se
     val messageSendingObservable: Observable<Boolean> = _messageSendingObservable
 
     fun fetchChatTranscript(listener: GliaChatRepository.HistoryLoadedListener) {
-        secureConversations.fetchChatTranscript(listener::loaded)
+        secureConversations.fetchChatTranscript { messages, exception ->
+            listener.loaded(messages?.toList(), exception)
+        }
     }
 
     fun send(payload: SendMessagePayload, callback: RequestCallback<VisitorMessage?>) {

@@ -58,7 +58,7 @@ internal class QueueRepositoryImpl(private val gliaCore: GliaCore, private val c
             _queuesState.onNext(QueuesState.Loading)
 
             gliaCore.getQueues { queues, exception ->
-                queues?.run { siteQueuesReceived(toList()) } ?: reportGetSiteQueuesError(exception)
+                queues?.let { siteQueuesReceived(it) } ?: reportGetSiteQueuesError(exception)
             }
         }
     }
@@ -79,7 +79,6 @@ internal class QueueRepositoryImpl(private val gliaCore: GliaCore, private val c
         _relevantQueueIds
             .filter { it.isNotEmpty() }
             .distinctUntilChanged()
-            .map { it.toTypedArray() }
             .unSafeSubscribe { gliaCore.subscribeToQueueStateUpdates(it, {}, queueUpdateCallback) }
     }
 

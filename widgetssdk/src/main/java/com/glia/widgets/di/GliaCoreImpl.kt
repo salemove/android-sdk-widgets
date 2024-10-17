@@ -78,23 +78,23 @@ internal class GliaCoreImpl : GliaCore {
         Glia.fetchFile(attachmentFile, callback)
     }
 
-    override fun getChatHistory(callback: RequestCallback<Array<ChatMessage>?>) {
-        Glia.getChatHistory(callback)
+    override fun getChatHistory(callback: RequestCallback<List<ChatMessage>?>) {
+        Glia.getChatHistory { messages, exception -> callback.onResult(messages?.toList(), exception) }
     }
 
-    override fun getQueues(requestCallback: RequestCallback<Array<Queue>?>) {
-        Glia.getQueues(requestCallback)
+    override fun getQueues(requestCallback: RequestCallback<List<Queue>?>) {
+        Glia.getQueues { queues, exception -> requestCallback.onResult(queues?.toList(), exception) }
     }
 
     override fun queueForEngagement(
-        queueIds: Array<String>,
+        queueIds: List<String>,
         mediaType: Engagement.MediaType,
         visitorContextAssetId: String?,
         engagementOptions: EngagementOptions?,
         mediaPermissionRequestCode: Int,
         callback: Consumer<GliaException?>
     ) {
-        Glia.queueForEngagement(queueIds, mediaType, visitorContextAssetId, engagementOptions, mediaPermissionRequestCode, callback)
+        Glia.queueForEngagement(queueIds.toTypedArray(), mediaType, visitorContextAssetId, engagementOptions, mediaPermissionRequestCode, callback)
     }
 
     override fun cancelQueueTicket(queueTicketId: String, callback: Consumer<GliaException?>) {
@@ -129,8 +129,8 @@ internal class GliaCoreImpl : GliaCore {
         return AuthenticationManager(Glia.getAuthentication(behavior))
     }
 
-    override fun subscribeToQueueStateUpdates(queueIds: Array<String>, onError: Consumer<GliaException>, callback: Consumer<Queue>) {
-        Glia.subscribeToQueueStateUpdates(queueIds, onError, callback)
+    override fun subscribeToQueueStateUpdates(queueIds: List<String>, onError: Consumer<GliaException>, callback: Consumer<Queue>) {
+        Glia.subscribeToQueueStateUpdates(queueIds.toTypedArray(), onError, callback)
     }
 
     override fun unsubscribeFromQueueUpdates(onError: Consumer<GliaException>?, callback: Consumer<Queue>) {

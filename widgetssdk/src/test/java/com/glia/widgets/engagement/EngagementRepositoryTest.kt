@@ -799,7 +799,7 @@ class EngagementRepositoryTest {
 
         repository.queueForEngagement(MediaType.TEXT)
 
-        verify(exactly = 1) { core.queueForEngagement(arrayOf(queueId), MediaType.TEXT, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
+        verify(exactly = 1) { core.queueForEngagement(listOf(queueId), MediaType.TEXT, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
         queueForEngagementCallbackSlot.captured.accept(null)
 
         assertTrue(repository.isQueueing)
@@ -810,7 +810,7 @@ class EngagementRepositoryTest {
         repository.queueForEngagement(MediaType.TEXT)
 
         verify { queueRepository.relevantQueueIds }
-        verify(exactly = 0) { core.queueForEngagement(arrayOf(queueId), MediaType.TEXT, "url", any(), any(), capture(queueForEngagementCallbackSlot)) }
+        verify(exactly = 0) { core.queueForEngagement(listOf(queueId), MediaType.TEXT, "url", any(), any(), capture(queueForEngagementCallbackSlot)) }
     }
     @Test
     fun `queueForEngagement with produces Error when relevant queues are empty`() {
@@ -843,7 +843,7 @@ class EngagementRepositoryTest {
 
         repository.engagementState.test().assertNotComplete().assertValue(State.PreQueuing(mediaType))
         verify { queueRepository.relevantQueueIds }
-        verify(exactly = 1) { core.queueForEngagement(arrayOf(queueId), mediaType, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
+        verify(exactly = 1) { core.queueForEngagement(listOf(queueId), mediaType, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
         queueForEngagementCallbackSlot.captured.accept(GliaException("message", GliaException.Cause.ALREADY_QUEUED))
 
         assertTrue(repository.isQueueing)
@@ -853,7 +853,7 @@ class EngagementRepositoryTest {
 
         repository.queueForEngagement(MediaType.VIDEO)
 
-        verify(exactly = 0) { core.queueForEngagement(arrayOf(queueId), MediaType.VIDEO, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
+        verify(exactly = 0) { core.queueForEngagement(listOf(queueId), MediaType.VIDEO, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
     }
 
     @Test
@@ -866,7 +866,7 @@ class EngagementRepositoryTest {
         repository.queueForEngagement(mediaType)
 
         verify { queueRepository.relevantQueueIds }
-        verify { core.queueForEngagement(arrayOf(queueId), mediaType, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
+        verify { core.queueForEngagement(listOf(queueId), mediaType, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
         queueForEngagementCallbackSlot.captured.accept(GliaException("message", GliaException.Cause.QUEUE_CLOSED))
 
         testSubscriber.assertNotComplete().assertValuesOnly(
@@ -887,7 +887,7 @@ class EngagementRepositoryTest {
         repository.queueForEngagement(mediaType)
 
         verify { queueRepository.relevantQueueIds }
-        verify { core.queueForEngagement(arrayOf(queueId), mediaType, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
+        verify { core.queueForEngagement(listOf(queueId), mediaType, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
         queueForEngagementCallbackSlot.captured.accept(GliaException("message", GliaException.Cause.NETWORK_TIMEOUT))
 
         testSubscriber.assertNotComplete().assertValuesOnly(
@@ -912,7 +912,7 @@ class EngagementRepositoryTest {
         repository.queueForEngagement(mediaType)
 
         verify { queueRepository.relevantQueueIds }
-        verify(exactly = 1) { core.queueForEngagement(arrayOf(queueId), mediaType, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
+        verify(exactly = 1) { core.queueForEngagement(listOf(queueId), mediaType, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
         queueForEngagementCallbackSlot.captured.accept(null)
 
         assertTrue(repository.isQueueing)
@@ -953,7 +953,7 @@ class EngagementRepositoryTest {
         repository.queueForEngagement(mediaType)
 
         verify { queueRepository.relevantQueueIds }
-        verify(exactly = 1) { core.queueForEngagement(arrayOf(queueId), mediaType, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
+        verify(exactly = 1) { core.queueForEngagement(listOf(queueId), mediaType, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
         queueForEngagementCallbackSlot.captured.accept(null)
 
         assertTrue(repository.isQueueing)
@@ -993,7 +993,7 @@ class EngagementRepositoryTest {
         repository.queueForEngagement(mediaType)
 
         verify { queueRepository.relevantQueueIds }
-        verify(exactly = 1) { core.queueForEngagement(arrayOf(queueId), mediaType, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
+        verify(exactly = 1) { core.queueForEngagement(listOf(queueId), mediaType, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
         queueForEngagementCallbackSlot.captured.accept(null)
 
         assertTrue(repository.isQueueing)

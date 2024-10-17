@@ -213,7 +213,7 @@ internal class EngagementRepositoryImpl(
         queueIngDisposable.add(
             queueRepository.relevantQueueIds.subscribe { ids ->
                 if (ids.isNotEmpty()) {
-                    core.queueForEngagement(ids.toTypedArray(), mediaType, null, null, MEDIA_PERMISSION_REQUEST_CODE) {
+                    core.queueForEngagement(ids, mediaType, null, null, MEDIA_PERMISSION_REQUEST_CODE) {
                         handleQueueingResponse(it)
                     }
                 } else {

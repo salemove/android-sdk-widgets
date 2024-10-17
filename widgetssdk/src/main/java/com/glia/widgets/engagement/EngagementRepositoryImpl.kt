@@ -214,10 +214,10 @@ internal class EngagementRepositoryImpl(
             queueRepository.relevantQueueIds.subscribe { ids ->
                 if (ids.isNotEmpty()) {
                     core.queueForEngagement(ids.toTypedArray(), mediaType, null, null, MEDIA_PERMISSION_REQUEST_CODE) {
-                        handleQueueingResponse(it, mediaType)
+                        handleQueueingResponse(it)
                     }
                 } else {
-                    handleQueueingResponse(GliaException("relevant queues are empty", GliaException.Cause.INVALID_INPUT), mediaType)
+                    handleQueueingResponse(GliaException("relevant queues are empty", GliaException.Cause.INVALID_INPUT))
                 }
             }
         )
@@ -353,7 +353,7 @@ internal class EngagementRepositoryImpl(
         }
     }
 
-    private fun handleQueueingResponse(exception: GliaException?, mediaType: MediaType) {
+    private fun handleQueueingResponse(exception: GliaException?) {
         when {
             exception == null || exception.cause == GliaException.Cause.ALREADY_QUEUED -> return
 

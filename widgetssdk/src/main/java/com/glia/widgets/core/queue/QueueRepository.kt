@@ -33,9 +33,9 @@ internal interface QueueRepository {
 internal class QueueRepositoryImpl(private val gliaCore: GliaCore, private val configurationManager: ConfigurationManager) : QueueRepository {
 
     private val queueUpdateCallback: Consumer<Queue> = Consumer { updateQueues(it) }
-    private val siteQueues: BehaviorProcessor<Result<List<Queue>>> = BehaviorProcessor.create()
+    private val siteQueues: BehaviorProcessor<List<Queue>> = BehaviorProcessor.create()
 
-    private val _queuesState: BehaviorProcessor<QueuesState> = BehaviorProcessor.createDefault(QueuesState.Loading)
+    private val _queuesState: BehaviorProcessor<QueuesState> = BehaviorProcessor.create()
     override val queuesState = _queuesState.hide()
         .doOnSubscribe { fetchQueues() }
         .distinctUntilChanged()
@@ -54,7 +54,7 @@ internal class QueueRepositoryImpl(private val gliaCore: GliaCore, private val c
     }
 
     private fun fetchQueues() {
-        if (gliaCore.isInitialized && siteQueues.value?.isSuccess != true) {
+        if (gliaCore.isInitialized && siteQueues.value == null) {
             _queuesState.onNext(QueuesState.Loading)
 
             gliaCore.getQueues { queues, exception ->
@@ -64,14 +64,15 @@ internal class QueueRepositoryImpl(private val gliaCore: GliaCore, private val c
     }
 
     private fun siteQueuesReceived(queues: List<Queue>) {
-        siteQueues.onNext(Result.success(queues))
+        siteQueues.onNext(queues)
         subscribeToQueues()
         subscribeToQueueUpdates()
     }
 
     private fun reportGetSiteQueuesError(exception: GliaException?) {
-        siteQueues.onNext(Result.failure(exception ?: RuntimeException("Fetching queues failed")))
-        Logger.e(TAG, "Fetching queues failed", exception)
+        val ex = exception ?: RuntimeException("Fetching queues failed: queues were null")
+        Logger.e(TAG, "Setting up queues. Failed to get site queues", ex)
+        _queuesState.onNext(QueuesState.Error(ex))
     }
 
     private fun subscribeToQueueUpdates() {
@@ -85,17 +86,9 @@ internal class QueueRepositoryImpl(private val gliaCore: GliaCore, private val c
     private fun subscribeToQueues() {
         Flowable.combineLatest(configurationManager.queueIdsObservable, siteQueues, ::Pair)
             .distinctUntilChanged()
-            .unSafeSubscribe { (integratorQueueIds, siteQueueResult) ->
-                siteQueueResult.fold(
-                    onSuccess = {
-                        Logger.i(TAG, "Setting up queues. site has ${it.count()} queues")
-                        onQueuesReceived(integratorQueueIds, it)
-                    },
-                    onFailure = {
-                        Logger.e(TAG, "Setting up queues. Failed to get site queues", it)
-                        _queuesState.onNext(QueuesState.Error(it))
-                    }
-                )
+            .unSafeSubscribe { (integratorQueueIds, siteQueues) ->
+                Logger.i(TAG, "Setting up queues. site has ${siteQueues.count()} queues")
+                onQueuesReceived(integratorQueueIds, siteQueues)
             }
     }
 

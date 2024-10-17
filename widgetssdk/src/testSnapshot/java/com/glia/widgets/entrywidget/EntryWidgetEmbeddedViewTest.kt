@@ -1,5 +1,6 @@
 package com.glia.widgets.entrywidget
 
+import android.view.View
 import com.glia.widgets.R
 import com.glia.widgets.SnapshotTest
 import com.glia.widgets.di.ControllerFactory
@@ -11,11 +12,9 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-internal open class EntryWidgetViewEmbeddedViewTypeTest : SnapshotTest(
+internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
     renderingMode = fullWidthRenderMode
 ), SnapshotProviders {
-
-    open val viewType: EntryWidgetContract.ViewType = EntryWidgetContract.ViewType.EMBEDDED_VIEW
 
     override fun setUp() {
         super.setUp()
@@ -210,10 +209,11 @@ internal open class EntryWidgetViewEmbeddedViewTypeTest : SnapshotTest(
 
     // MARK: utils for tests
 
-    private fun setupView(
+    open fun setupView(
         items: List<EntryWidgetContract.ItemType> = listOf(EntryWidgetContract.ItemType.PROVIDED_BY),
+        viewType: EntryWidgetContract.ViewType = EntryWidgetContract.ViewType.EMBEDDED_VIEW,
         unifiedTheme: UnifiedTheme? = null
-    ) : EntryWidgetView {
+    ) : View {
         localeProviderMock()
 
         val entryWidgetTheme = unifiedTheme?.entryWidgetTheme

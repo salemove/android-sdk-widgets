@@ -18,6 +18,7 @@ import com.glia.widgets.engagement.completion.EngagementCompletionContract;
 import com.glia.widgets.engagement.completion.EngagementCompletionController;
 import com.glia.widgets.entrywidget.EntryWidgetContract;
 import com.glia.widgets.entrywidget.EntryWidgetController;
+import com.glia.widgets.entrywidget.EntryWidgetHideController;
 import com.glia.widgets.filepreview.ui.ImagePreviewContract;
 import com.glia.widgets.filepreview.ui.ImagePreviewController;
 import com.glia.widgets.helper.Logger;
@@ -66,6 +67,7 @@ public class ControllerFactory {
     private CallVisualizerContract.Controller callVisualizerController;
     private ActivityWatcherForChatHeadController activityWatcherForChatHeadController;
     private ActivityWatcherForLiveObservationController activityWatcherForLiveObservationController;
+    private EntryWidgetHideController entryWidgetHideController;
 
     public ControllerFactory(
         RepositoryFactory repositoryFactory,
@@ -390,5 +392,12 @@ public class ControllerFactory {
             useCaseFactory.createIsAuthenticatedUseCase(),
             core
         );
+    }
+
+    public EntryWidgetHideController getEntryWidgetHideController() {
+        if (entryWidgetHideController == null) {
+            entryWidgetHideController = new EntryWidgetHideController();
+        }
+        return entryWidgetHideController;
     }
 }

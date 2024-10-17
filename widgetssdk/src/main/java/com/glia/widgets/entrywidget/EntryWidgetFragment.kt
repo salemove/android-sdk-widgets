@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import com.glia.widgets.R
@@ -42,7 +43,8 @@ internal class EntryWidgetFragment : BottomSheetDialogFragment() {
         return binding.root
     }
 
-    internal fun setupView(
+    @VisibleForTesting
+    fun setupView(
         context: Context,
         binding: EntryWidgetFragmentBinding,
         entryWidgetsTheme: EntryWidgetTheme?

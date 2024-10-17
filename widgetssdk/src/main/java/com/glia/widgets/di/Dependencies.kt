@@ -20,6 +20,7 @@ import com.glia.widgets.core.notification.device.INotificationManager
 import com.glia.widgets.core.notification.device.NotificationManager
 import com.glia.widgets.core.permissions.PermissionManager
 import com.glia.widgets.engagement.completion.EngagementCompletionActivityWatcher
+import com.glia.widgets.entrywidget.ActivityWatcherForEntryWidget
 import com.glia.widgets.entrywidget.EntryWidget
 import com.glia.widgets.entrywidget.EntryWidgetImpl
 import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource
@@ -83,7 +84,11 @@ internal object Dependencies {
 
     @JvmStatic
     val entryWidget: EntryWidget
-        get() = EntryWidgetImpl(activityLauncher, gliaThemeManager)
+        get() = EntryWidgetImpl(
+            activityLauncher,
+            gliaThemeManager,
+            controllerFactory.entryWidgetHideController
+        )
 
     @JvmStatic
     lateinit var repositoryFactory: RepositoryFactory
@@ -179,6 +184,9 @@ internal object Dependencies {
             GliaActivityManagerImpl()
         )
         application.registerActivityLifecycleCallbacks(operatorRequestActivityWatcher)
+
+        val activityWatcherForEntryWidget = ActivityWatcherForEntryWidget(controllerFactory.entryWidgetHideController)
+        application.registerActivityLifecycleCallbacks(activityWatcherForEntryWidget)
     }
 
     @JvmStatic

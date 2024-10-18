@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 
 import androidx.annotation.NonNull;
@@ -66,7 +67,9 @@ public class WebViewViewHolder extends CustomCardViewHolder {
         super(LayoutInflater.from(parent.getContext()).inflate(R.layout.web_view_layout, parent, false));
 
         webView = itemView.findViewById(R.id.web_view);
-        webView.getSettings().setJavaScriptEnabled(true);
+        WebSettings webViewSettings = webView.getSettings();
+        webViewSettings.setJavaScriptEnabled(true);
+        webViewSettings.setAllowFileAccess(false);
         webView.addJavascriptInterface(new JavaScriptInterface(), "Glia");
     }
 

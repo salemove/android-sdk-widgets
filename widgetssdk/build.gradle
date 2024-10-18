@@ -1,7 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'org.jetbrains.kotlin.android'
 apply plugin: 'kotlin-parcelize'
-apply plugin: 'app.cash.paparazzi'
 
 //Detailed information about advantages of Java toolchain https://developer.android.com/build/jdks#toolchain
 java {
@@ -32,6 +31,7 @@ android {
     }
     snapshot {
       // Build type used for snapshot testing.
+      apply plugin: 'app.cash.paparazzi'
     }
   }
 
@@ -80,6 +80,11 @@ tasks.register('publishToLocalMaven') {
   dependsOn ':widgetssdk:publishSnapshotPublicationToMavenLocal'
 }
 
+tasks.withType(Test).configureEach {
+  // Increase the maximum heap size to 2 GB
+  maxHeapSize = "2g"
+}
+
 dependencies {
   implementation libs.java.appcompat
   implementation libs.java.material
@@ -97,6 +102,7 @@ dependencies {
   implementation libs.media.lottie
   implementation libs.data.gson
   implementation libs.java.core.ktx
+  implementation libs.media.exif.interface
 
   testImplementation libs.test.junit
   testImplementation libs.test.mockito.kotlin

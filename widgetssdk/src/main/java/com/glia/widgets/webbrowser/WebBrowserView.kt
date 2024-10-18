@@ -3,8 +3,8 @@ package com.glia.widgets.webbrowser
 import android.content.Context
 import android.content.res.TypedArray
 import android.net.Uri
+import android.os.Build
 import android.util.AttributeSet
-import android.view.Window
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -18,7 +18,6 @@ import com.glia.widgets.databinding.WebBrowserViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.SimpleWindowInsetsAndAnimationHandler
 import com.glia.widgets.helper.Utils
-import com.glia.widgets.helper.asActivity
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.view.header.AppBarView
@@ -49,8 +48,6 @@ internal class WebBrowserView(
 
     private val appBar: AppBarView? get() = binding?.appBarView
     private val webView: WebView? get() = binding?.webView
-
-    private val window: Window? by lazy { context.asActivity()?.window }
 
     init {
         isSaveEnabled = true
@@ -94,6 +91,10 @@ internal class WebBrowserView(
         setupAppBarUnifiedTheme(unifiedTheme?.webBrowserTheme?.header)
         appBar?.hideBackButton()
         initCallbacks()
+
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
+            webView?.settings?.allowFileAccess = false
+        }
     }
 
     private fun setupAppBarUnifiedTheme(headerTheme: HeaderTheme?) {

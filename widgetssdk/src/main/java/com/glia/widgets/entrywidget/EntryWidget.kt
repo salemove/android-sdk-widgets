@@ -45,6 +45,6 @@ internal class EntryWidgetImpl(
     }
 
     override fun hide() {
-        entryWidgetHideController.onHide.onNext("Hide Entry Widget")
+        entryWidgetHideController.onHide.onNext(Unit)
     }
 }

@@ -16,7 +16,7 @@ class ActivityWatcherForEntryWidgetTest {
         mockkObject(watcher)
         every { watcher.resumedActivity } returns activity
 
-        controller.onHide.onNext("Hide Entry Widget")
+        controller.onHide.onNext(Unit)
 
         verify { activity.finish() }
     }

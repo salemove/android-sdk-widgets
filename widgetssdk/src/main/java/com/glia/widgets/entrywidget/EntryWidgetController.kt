@@ -6,6 +6,7 @@ import com.glia.androidsdk.queuing.QueueState
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.core.queue.QueueRepository
 import com.glia.widgets.core.queue.QueuesState
+import com.glia.widgets.di.Dependencies
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
@@ -18,6 +19,7 @@ internal class EntryWidgetController(
     private val core: GliaCore
 ) : EntryWidgetContract.Controller {
     private lateinit var view: EntryWidgetContract.View
+    private val engagementLauncher = Dependencies.engagementLauncher
 
     override fun setView(view: EntryWidgetContract.View) {
         this.view = view
@@ -76,9 +78,16 @@ internal class EntryWidgetController(
             }
 
     override fun onItemClicked(itemType: EntryWidgetContract.ItemType) {
-        // TODO: Handle item click
-
         Logger.d(TAG, "Item clicked: $itemType")
+
+        when (itemType) {
+            EntryWidgetContract.ItemType.CHAT -> engagementLauncher.startChat(view.getActivity())
+            EntryWidgetContract.ItemType.AUDIO_CALL -> engagementLauncher.startAudioCall(view.getActivity())
+            EntryWidgetContract.ItemType.VIDEO_CALL -> engagementLauncher.startVideoCall(view.getActivity())
+            EntryWidgetContract.ItemType.SECURE_MESSAGE -> engagementLauncher.startSecureMessaging(view.getActivity())
+            else -> {}
+        }
+
         // Dismiss the widget
         view.dismiss()
     }

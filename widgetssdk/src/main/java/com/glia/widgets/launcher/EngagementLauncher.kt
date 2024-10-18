@@ -4,6 +4,9 @@ import android.content.Context
 import com.glia.androidsdk.Engagement
 import com.glia.widgets.chat.Intention
 import com.glia.widgets.core.secureconversations.domain.HasOngoingSecureConversationUseCase
+import com.glia.widgets.di.ControllerFactory
+import com.glia.widgets.engagement.domain.EndEngagementUseCase
+import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 
 /**
  * An interface for launching different types of engagements, such as chat,
@@ -46,10 +49,18 @@ interface EngagementLauncher {
 internal class EngagementLauncherImpl(
     private val activityLauncher: ActivityLauncher,
     private val hasOngoingSecureConversationUseCase: HasOngoingSecureConversationUseCase,
-    private val configurationManager: ConfigurationManager
+    private val isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase,
+    private val endEngagementUseCase: EndEngagementUseCase,
+    private val configurationManager: ConfigurationManager,
+    private val controllerFactory: ControllerFactory
 ) : EngagementLauncher {
 
     override fun startChat(context: Context, visitorContextAssetId: String?) {
+        if (isQueueingOrLiveEngagementUseCase.isQueueing) {
+            endEngagementUseCase()
+            controllerFactory.destroyChatController()
+        }
+
         visitorContextAssetId?.let { configurationManager.setVisitorContextAssetId(it) }
         hasOngoingSecureConversationUseCase {
             if (it) {
@@ -61,6 +72,11 @@ internal class EngagementLauncherImpl(
     }
 
     override fun startAudioCall(context: Context, visitorContextAssetId: String?) {
+        if (isQueueingOrLiveEngagementUseCase.isQueueing) {
+            endEngagementUseCase()
+            controllerFactory.destroyCallController()
+        }
+
         visitorContextAssetId?.let { configurationManager.setVisitorContextAssetId(it) }
         hasOngoingSecureConversationUseCase {
             if (it) {
@@ -72,6 +88,11 @@ internal class EngagementLauncherImpl(
     }
 
     override fun startVideoCall(context: Context, visitorContextAssetId: String?) {
+        if (isQueueingOrLiveEngagementUseCase.isQueueing) {
+            endEngagementUseCase()
+            controllerFactory.destroyCallController()
+        }
+
         visitorContextAssetId?.let { configurationManager.setVisitorContextAssetId(it) }
         hasOngoingSecureConversationUseCase {
             if (it) {

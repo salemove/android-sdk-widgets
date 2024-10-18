@@ -1,5 +1,6 @@
 package com.glia.widgets.entrywidget
 
+import android.app.Activity
 import android.content.Context
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -8,6 +9,7 @@ import com.glia.widgets.di.Dependencies
 import com.glia.widgets.entrywidget.adapter.EntryWidgetAdapter
 import com.glia.widgets.entrywidget.adapter.EntryWidgetItemDecoration
 import com.glia.widgets.helper.getDrawableCompat
+import com.glia.widgets.helper.requireActivity
 import com.glia.widgets.helper.wrapWithMaterialThemeOverlay
 import com.glia.widgets.view.unifiedui.applyLayerTheme
 import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
@@ -67,6 +69,10 @@ internal class EntryWidgetView(
 
     override fun dismiss() {
         onDismissListener?.invoke()
+    }
+
+    override fun getActivity(): Activity {
+        return context.requireActivity()
     }
 
     private fun enableScrolling(enable: Boolean) {

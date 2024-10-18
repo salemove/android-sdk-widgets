@@ -13,8 +13,8 @@ import com.glia.widgets.snapshotutils.OnTestEnded
 import com.glia.widgets.snapshotutils.SnapshotContent
 import com.glia.widgets.snapshotutils.SnapshotProviders
 import com.glia.widgets.snapshotutils.SnapshotStrings
-import com.glia.widgets.snapshotutils.SnapshotTheme
 import com.glia.widgets.snapshotutils.SnapshotTestLifecycle
+import com.glia.widgets.snapshotutils.SnapshotTheme
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule

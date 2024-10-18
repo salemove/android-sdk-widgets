@@ -80,6 +80,11 @@ tasks.register('publishToLocalMaven') {
   dependsOn ':widgetssdk:publishSnapshotPublicationToMavenLocal'
 }
 
+tasks.withType(Test).configureEach {
+  // Increase the maximum heap size to 2 GB
+  maxHeapSize = "2g"
+}
+
 dependencies {
   implementation libs.java.appcompat
   implementation libs.java.material
@@ -97,6 +102,7 @@ dependencies {
   implementation libs.media.lottie
   implementation libs.data.gson
   implementation libs.java.core.ktx
+  implementation libs.media.exif.interface
 
   testImplementation libs.test.junit
   testImplementation libs.test.mockito.kotlin

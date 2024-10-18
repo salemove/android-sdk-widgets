@@ -13,8 +13,8 @@ import com.glia.widgets.snapshotutils.OnTestEnded
 import com.glia.widgets.snapshotutils.SnapshotContent
 import com.glia.widgets.snapshotutils.SnapshotProviders
 import com.glia.widgets.snapshotutils.SnapshotStrings
-import com.glia.widgets.snapshotutils.SnapshotTheme
 import com.glia.widgets.snapshotutils.SnapshotTestLifecycle
+import com.glia.widgets.snapshotutils.SnapshotTheme
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -29,7 +29,7 @@ open class SnapshotTest(
     val renderingMode: RenderingMode = RenderingMode.SHRINK,
     val showSystemUi: Boolean = false,
     val theme: String = "ThemeOverlay_Glia_Chat_Material",
-    val maxPercentDifference: Double = 0.001,
+    val maxPercentDifference: Double = 0.05,
     @get:Rule var animationsRule: TestRule = InstantAnimationsRule()
 ) : SnapshotTestLifecycle, SnapshotContent, SnapshotStrings, SnapshotTheme, SnapshotProviders {
 

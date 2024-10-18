@@ -18,9 +18,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.util.concurrent.Executor
 
-class ChatHeadViewSnapshotTest : SnapshotTest(
-    maxPercentDifference = 0.01
-), SnapshotChatView, SnapshotProviders, SnapshotLottie, SnapshotPicasso, SnapshotThemeConfiguration {
+class ChatHeadViewSnapshotTest : SnapshotTest(), SnapshotChatView, SnapshotProviders, SnapshotLottie, SnapshotPicasso, SnapshotThemeConfiguration {
 
     // MARK: Default state
 

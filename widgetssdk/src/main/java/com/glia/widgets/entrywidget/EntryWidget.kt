@@ -21,9 +21,9 @@ interface EntryWidget {
     /**
      * Creates the entry widget view that might be easily embedded in a custom UI.
      *
-     * @return The entry widget view.
+     * @return New instance of an entry widget view.
      */
-    fun createEntryWidgetView(context: Context): View
+    fun getView(context: Context): View
 
     /**
      * Hides the entry widget.
@@ -38,7 +38,7 @@ internal class EntryWidgetImpl(
 
     override fun show(activity: Activity) = activityLauncher.launchEntryWidget(activity)
 
-    override fun createEntryWidgetView(context: Context): View {
+    override fun getView(context: Context): View {
         val adapter = EntryWidgetAdapter(EntryWidgetContract.ViewType.EMBEDDED_VIEW, themeManager.theme?.entryWidgetTheme)
         return EntryWidgetView(context, adapter)
     }

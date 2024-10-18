@@ -82,12 +82,12 @@ internal val GliaException.isQueueUnavailable: Boolean
     get() = cause == GliaException.Cause.QUEUE_CLOSED || cause == GliaException.Cause.QUEUE_FULL
 
 @SuppressLint("CheckResult")
-internal fun <T: Any> Flowable<out T>.unSafeSubscribe(onNextCallback: (T) -> Unit) {
+internal fun <T : Any> Flowable<out T>.unSafeSubscribe(onNextCallback: (T) -> Unit) {
     subscribe({ onNextCallback(it) }) { Logger.e("Observable<T>.unSafeSubscribe", "Unexpected local exception happened", it) }
 }
 
 @SuppressLint("CheckResult")
-internal fun <T: Any> Single<out T>.unSafeSubscribe(onNextCallback: (T) -> Unit) {
+internal fun <T : Any> Single<out T>.unSafeSubscribe(onNextCallback: (T) -> Unit) {
     subscribe({ onNextCallback(it) }) { Logger.e("Single<T>.unSafeSubscribe", "Unexpected local exception happened", it) }
 }
 
@@ -96,6 +96,6 @@ internal fun Completable.unSafeSubscribe(onComplete: Action) {
     subscribe(onComplete) { Logger.e("Single<T>.unSafeSubscribe", "Unexpected local exception happened", it) }
 }
 
-internal fun <T: Any> FlowableProcessor<T>.asStateFlowable(): Flowable<T> = onBackpressureBuffer().observeOn(AndroidSchedulers.mainThread())
-internal fun <T: Any> FlowableProcessor<T>.asOneTimeStateFlowable(): Flowable<OneTimeEvent<T>> =
+internal fun <T : Any> FlowableProcessor<T>.asStateFlowable(): Flowable<T> = onBackpressureBuffer().observeOn(AndroidSchedulers.mainThread())
+internal fun <T : Any> FlowableProcessor<T>.asOneTimeStateFlowable(): Flowable<OneTimeEvent<T>> =
     onBackpressureBuffer().map(::OneTimeEvent).observeOn(AndroidSchedulers.mainThread())

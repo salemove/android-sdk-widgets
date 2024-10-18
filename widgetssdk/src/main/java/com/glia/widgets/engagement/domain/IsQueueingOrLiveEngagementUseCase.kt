@@ -6,6 +6,7 @@ internal interface IsQueueingOrLiveEngagementUseCase {
     val hasOngoingLiveEngagement: Boolean
     val isQueueingForMedia: Boolean
     val isQueueingForLiveChat: Boolean
+    val isQueueing: Boolean
     operator fun invoke(): Boolean
 }
 
@@ -13,5 +14,6 @@ internal class IsQueueingOrLiveEngagementUseCaseImpl(private val engagementRepos
     override val hasOngoingLiveEngagement: Boolean get() = engagementRepository.hasOngoingLiveEngagement
     override val isQueueingForMedia: Boolean get() = engagementRepository.isQueueingForMedia
     override val isQueueingForLiveChat: Boolean get() = engagementRepository.isQueueing && !isQueueingForMedia
+    override val isQueueing: Boolean get() = engagementRepository.isQueueing
     override fun invoke(): Boolean = engagementRepository.isQueueingOrLiveEngagement
 }

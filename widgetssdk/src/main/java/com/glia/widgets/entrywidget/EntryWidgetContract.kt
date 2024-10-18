@@ -1,5 +1,6 @@
 package com.glia.widgets.entrywidget
 
+import android.app.Activity
 import com.glia.widgets.base.BaseController
 import com.glia.widgets.base.BaseView
 
@@ -30,5 +31,6 @@ internal interface EntryWidgetContract {
     interface View : BaseView<Controller> {
         fun showItems(items: List<ItemType>)
         fun dismiss()
+        fun getActivity(): Activity
     }
 }

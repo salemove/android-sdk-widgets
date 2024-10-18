@@ -83,7 +83,11 @@ internal object Dependencies {
 
     @JvmStatic
     val entryWidget: EntryWidget
-        get() = EntryWidgetImpl(activityLauncher, gliaThemeManager)
+        get() = EntryWidgetImpl(
+            activityLauncher,
+            gliaThemeManager,
+            controllerFactory.entryWidgetHideController
+        )
 
     @JvmStatic
     lateinit var repositoryFactory: RepositoryFactory

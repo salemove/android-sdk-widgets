@@ -25,7 +25,7 @@ internal interface EntryWidgetContract {
 
     interface Controller : BaseController {
         fun setView(view: View)
-        fun onItemClicked(itemType: ItemType)
+        fun onItemClicked(itemType: ItemType, activity: Activity)
     }
 
     interface View : BaseView<Controller> {

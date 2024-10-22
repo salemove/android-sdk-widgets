@@ -27,7 +27,7 @@
     <color name="glia_chat_background_color">#FFFFFF</color>
     <color name="glia_dark_transparent_bg">#99000000</color>
 
-    <color name="glia_disable_button_bg">#F3F3F3</color>
-    <color name="glia_disable_button_border">#33616A75</color>
-    <color name="glia_disable_button_text">#80616A75</color>
+    <color name="glia_disable_button_bg">@color/glia_system_agent_bubble_color</color>
+    <color name="glia_disable_button_border">@color/glia_base_shade_color</color>
+    <color name="glia_disable_button_text">@color/glia_base_shade_color</color>
 </resources>

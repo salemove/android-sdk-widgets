@@ -82,7 +82,7 @@
 
     <!-- Message Center Welcome Screen -->
     <dimen name="glia_welcome_screen_input_min_height">168dp</dimen>
-    <dimen name="glia_welcome_screen_input_title_margin">56dp</dimen>
+    <dimen name="glia_welcome_screen_input_title_margin">64dp</dimen>
 
     <!-- Message Center Confirmation Screen -->
     <dimen name="glia_confirmation_screen_confirmation_icon_size">144dp</dimen>

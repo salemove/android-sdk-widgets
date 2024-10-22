@@ -28,6 +28,7 @@ internal interface QueueRepository {
     val queuesState: Flowable<QueuesState>
     val relevantQueueIds: Single<List<String>>
     fun initialize()
+    fun fetchQueues()
 }
 
 internal class QueueRepositoryImpl(private val gliaCore: GliaCore, private val configurationManager: ConfigurationManager) : QueueRepository {
@@ -53,7 +54,7 @@ internal class QueueRepositoryImpl(private val gliaCore: GliaCore, private val c
         fetchQueues()
     }
 
-    private fun fetchQueues() {
+    override fun fetchQueues() {
         if (gliaCore.isInitialized && siteQueues.value == null) {
             _queuesState.onNext(QueuesState.Loading)
 

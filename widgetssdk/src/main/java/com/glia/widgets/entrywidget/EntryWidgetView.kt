@@ -44,7 +44,7 @@ internal class EntryWidgetView(
     init {
         setAdapter(viewAdapter)
         viewAdapter.onItemClickListener = {
-            controller.onItemClicked(it)
+            controller.onItemClicked(it, context.requireActivity())
         }
 
         val isBottomSheet = viewAdapter.viewType == EntryWidgetContract.ViewType.BOTTOM_SHEET

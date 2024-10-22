@@ -1,5 +1,7 @@
 package com.glia.widgets.entrywidget
 
+import android.app.Activity
+import androidx.annotation.VisibleForTesting
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.queuing.Queue
 import com.glia.androidsdk.queuing.QueueState
@@ -42,7 +44,8 @@ internal class EntryWidgetController(
             .unSafeSubscribe(view::showItems)
     }
 
-    private fun mapState(state: QueuesState): List<EntryWidgetContract.ItemType> = when (state) {
+    @VisibleForTesting
+    fun mapState(state: QueuesState): List<EntryWidgetContract.ItemType> = when (state) {
         QueuesState.Loading -> mapLoadingState()
         QueuesState.Empty -> listOf(EntryWidgetContract.ItemType.EMPTY_STATE)
         is QueuesState.Error -> listOf(EntryWidgetContract.ItemType.ERROR_STATE)
@@ -77,19 +80,26 @@ internal class EntryWidgetController(
                 }
             }
 
-    override fun onItemClicked(itemType: EntryWidgetContract.ItemType) {
+    override fun onItemClicked(itemType: EntryWidgetContract.ItemType, activity: Activity) {
         Logger.d(TAG, "Item clicked: $itemType")
 
         when (itemType) {
-            EntryWidgetContract.ItemType.CHAT -> engagementLauncher.startChat(view.getActivity())
-            EntryWidgetContract.ItemType.AUDIO_CALL -> engagementLauncher.startAudioCall(view.getActivity())
-            EntryWidgetContract.ItemType.VIDEO_CALL -> engagementLauncher.startVideoCall(view.getActivity())
-            EntryWidgetContract.ItemType.SECURE_MESSAGE -> engagementLauncher.startSecureMessaging(view.getActivity())
+            EntryWidgetContract.ItemType.CHAT -> engagementLauncher.startChat(activity)
+            EntryWidgetContract.ItemType.AUDIO_CALL -> engagementLauncher.startAudioCall(activity)
+            EntryWidgetContract.ItemType.VIDEO_CALL -> engagementLauncher.startVideoCall(activity)
+            EntryWidgetContract.ItemType.SECURE_MESSAGE -> engagementLauncher.startSecureMessaging(activity)
+            EntryWidgetContract.ItemType.ERROR_STATE -> onRetryButtonClicked()
             else -> {}
         }
 
-        // Dismiss the widget
-        view.dismiss()
+        if (itemType != EntryWidgetContract.ItemType.ERROR_STATE) {
+            // Dismiss the widget only if the clicked item is not a retry button
+            view.dismiss()
+        }
+    }
+
+    private fun onRetryButtonClicked() {
+        queueRepository.fetchQueues()
     }
 
     override fun onDestroy() {

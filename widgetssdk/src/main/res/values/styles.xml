@@ -139,7 +139,11 @@
     <style name="Application.Glia.Header3" parent="TextAppearance.MaterialComponents.Headline3">
         <item name="android:textSize">18sp</item>
         <item name="android:textColor">?attr/gliaBaseDarkColor</item>
-        <!--        font weight available from api 28 :(-->
+
+        <!-- font weight available from api 28 :( -->
+        <!-- below is a workaround to make font look similar to android:textFontWeight=500 -->
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
     <!-- {@deprecated For internal use only} -->

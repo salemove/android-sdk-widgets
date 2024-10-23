@@ -217,25 +217,21 @@
     <!--    Entry Widget -->
     <string name="entry_widget_live_chat_button_label">Live Chat</string>
     <string name="entry_widget_live_chat_button_description">For the texter in all of us</string>
-    <string name="entry_widget_live_chat_button_accessibility">Chat with us</string>
+    <string name="entry_widget_live_chat_button_accessibility_hint">Starts a chat</string>
     <string name="entry_widget_audio_button_label">Audio</string>
     <string name="entry_widget_audio_button_description">Speak through your device</string>
-    <string name="entry_widget_audio_button_accessibility">Call with us</string>
+    <string name="entry_widget_audio_button_accessibility_hint">Starts a call</string>
     <string name="entry_widget_video_button_label">Video</string>
     <string name="entry_widget_video_button_description">Face-to-face, just like in person</string>
-    <string name="entry_widget_video_button_accessibility">Video call with us</string>
+    <string name="entry_widget_video_button_accessibility_hint">Starts a video call</string>
     <string name="entry_widget_secure_messaging_button_label">Secure Messaging</string>
     <string name="entry_widget_secure_messaging_button_description">Start a conversation, we’ll get back to you</string>
-    <string name="entry_widget_secure_messaging_button_accessibility">Secure Messaging with us</string>
-    <string name="entry_widget.empty_state.title">Support team is currently offline</string>
-    <string name="entry_widget.empty_state.title.accessibility">No active operators available</string>
-    <string name="entry_widget.empty_state.description">We are here to assist you during our business hours.</string>
-    <string name="entry_widget.empty_state.description.accessibility">No active operators available</string>
-    <string name="entry_widget.error_state.title">Oops! Contacts Couldn\'t Be Loaded</string>
-    <string name="entry_widget.error_state.title.accessibility">Contacts Couldn\'t Be Loaded</string>
-    <string name="entry_widget.error_state.description">We couldn\'t load the contacts at this time. This may be due to a temporary syncing issue or network problem.</string>
-    <string name="entry_widget.error_state.description.accessibility">Contacts Couldn\'t Be Loaded</string>
-    <string name="entry_widget.error_state.try_again.button.label">Try again</string>
-    <string name="entry_widget.error_state.try_again.button.accessibility">Try to connect again</string>
+    <string name="entry_widget_secure_messaging_button_accessibility_hint">Starts messaging with us</string>
+    <string name="entry_widget_empty_state_title">Support team is currently offline</string>
+    <string name="entry_widget_empty_state_description">We are here to assist you during our business hours.</string>
+    <string name="entry_widget_error_state_title">Oops! Contacts Couldn\'t Be Loaded</string>
+    <string name="entry_widget_error_state_description">We couldn\'t load the contacts at this time. This may be due to a temporary syncing issue or network problem.</string>
+    <string name="entry_widget_error_state_try_again_button_label">Try again</string>
+    <string name="entry_widget_loading_accessibility_label">Loading indicator. Waiting for available options.</string>
 
 </resources>

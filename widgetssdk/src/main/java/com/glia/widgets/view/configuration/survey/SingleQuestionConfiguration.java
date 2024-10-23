@@ -100,7 +100,7 @@ public class SingleQuestionConfiguration implements Parcelable {
             return new TextConfiguration.Builder()
                     .textColor(optionTextColor)
                     .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
-                    .build();
+                    .build(resourceProvider);
         }
 
         private TextConfiguration prepareDefaultTitleConfiguration(ResourceProvider resourceProvider) {
@@ -109,7 +109,7 @@ public class SingleQuestionConfiguration implements Parcelable {
                     .textColor(titleColor)
                     .bold(true)
                     .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
-                    .build();
+                    .build(resourceProvider);
         }
     }
 

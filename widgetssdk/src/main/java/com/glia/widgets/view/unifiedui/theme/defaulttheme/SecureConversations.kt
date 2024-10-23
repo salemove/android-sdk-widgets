@@ -11,6 +11,7 @@ import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
 import com.glia.widgets.view.unifiedui.theme.base.TextInputTheme
 import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 import com.glia.widgets.view.unifiedui.theme.securemessaging.SecureMessagingConfirmationScreenTheme
+import com.glia.widgets.view.unifiedui.theme.securemessaging.SecureMessagingTheme
 import com.glia.widgets.view.unifiedui.theme.securemessaging.SecureMessagingWelcomeScreenTheme
 
 internal fun SecureMessagingWelcomeScreenTheme(pallet: ColorPallet):
@@ -90,3 +91,21 @@ internal fun SecureMessagingConfirmationScreenTheme(pallet: ColorPallet):
         )
     }
 }
+
+internal fun SecureMessagingTheme(pallet: ColorPallet): SecureMessagingTheme {
+    return pallet.let {
+        SecureMessagingTheme(
+            unavailableStatusBackground = LayerTheme(fill = it.systemNegativeColorTheme),
+            unavailableStatusText = BaseLightColorTextTheme(it),
+            bottomBannerBackground = LayerTheme(fill = it.baseNeutralColorTheme),
+            bottomBannerText = BaseNormalColorTextTheme(it),
+            bottomBannerDividerColor = it.baseShadeColorTheme,
+            topBannerBackground = LayerTheme(fill = it.baseNeutralColorTheme),
+            topBannerText = BaseDarkColorTextTheme(it),
+            topBannerDividerColor = it.baseShadeColorTheme,
+            topBannerDropDownIconColor = it.baseNormalColorTheme,
+            mediaTypeItems = DefaultMediaTypeItemsTheme(it)
+        )
+    }
+}
+

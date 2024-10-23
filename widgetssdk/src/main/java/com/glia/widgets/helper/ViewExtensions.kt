@@ -35,6 +35,7 @@ import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.model.KeyPath
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.locale.LocaleProvider
 import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.locale.StringKeyPair
 import com.glia.widgets.view.textview.SingleLineHintEditText
@@ -218,7 +219,7 @@ internal fun View.removeAccessibilityClickAction() {
 }
 
 private fun View.registerLocaleListener(@StringRes stringKey: Int, vararg values: StringKeyPair, listener: (String) -> Unit) {
-    val localeManager = Dependencies.localeProvider
+    val localeManager = if (isInEditMode) LocaleProvider(ResourceProvider(context)) else Dependencies.localeProvider
     val disposable = localeManager.getLocaleObservable()
         .startWithItem("stub")
         .map { localeManager.getString(stringKey, values.toList()) }

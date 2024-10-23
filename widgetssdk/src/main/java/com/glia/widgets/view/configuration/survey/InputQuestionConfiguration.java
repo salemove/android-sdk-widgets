@@ -99,7 +99,7 @@ public class InputQuestionConfiguration implements Parcelable {
                     .textColor(color)
                     .bold(true)
                     .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_title_text_size))
-                    .build();
+                    .build(resourceProvider);
         }
     }
 

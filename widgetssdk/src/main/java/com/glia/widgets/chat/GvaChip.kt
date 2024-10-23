@@ -77,6 +77,15 @@ internal class GvaChipGroup @JvmOverloads constructor(
         isSelectionRequired = false
         isSingleLine = false
         isSingleSelection = false
+
+        if (isInEditMode) {
+            // Add dummy content to show on Studio layout previews
+            setButtons(listOf(
+                GvaButton(text = "GVA Option 1"),
+                GvaButton(text = "GVA Option 2"),
+                GvaButton(text = "GVA Option 3")
+            ))
+        }
     }
 
     internal fun updateTheme(theme: UiTheme?) {

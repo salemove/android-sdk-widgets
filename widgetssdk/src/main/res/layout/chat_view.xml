@@ -9,7 +9,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/chat_recycler_view"
         app:layout_constraintTop_toTopOf="parent"
         tools:visibility="visible" />
 
@@ -30,7 +29,8 @@
         android:paddingVertical="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/chat_recycler_view" />
+        app:layout_constraintTop_toBottomOf="@id/chat_recycler_view"
+        app:layout_constraintBottom_toTopOf="@+id/operator_typing_animation_view"/>
 
 
     <RelativeLayout
@@ -40,10 +40,10 @@
         android:clipChildren="false"
         android:clipToPadding="false"
         android:padding="@dimen/glia_large"
-        app:layout_constraintBottom_toTopOf="@id/divider_view"
+        app:layout_constraintBottom_toTopOf="@id/chat_bottom_divider_barrier"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        tools:visibility="gone">
+        tools:visibility="visible">
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/new_messages_indicator_card"
@@ -81,22 +81,52 @@
         android:layout_height="36dp"
         android:layout_marginStart="@dimen/glia_medium"
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/divider_view"
+        app:layout_constraintBottom_toTopOf="@+id/chat_bottom_divider_barrier"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/gva_quick_replies_layout"
         app:lottie_autoPlay="true"
         app:lottie_loop="true"
         app:lottie_rawRes="@raw/chat_typing_indicator"
         tools:visibility="visible" />
 
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/chat_bottom_divider_barrier"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:barrierDirection="top"
+        app:constraint_referenced_ids="sc_bottom_banner_divider, chat_divider"/>
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/secure_conversations_bottom_banner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="sc_bottom_banner_divider, sc_bottom_banner_label" />
+
     <View
-        android:id="@+id/divider_view"
+        android:id="@+id/sc_bottom_banner_divider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="?attr/gliaBaseShadeColor"
-        app:layout_constraintBottom_toTopOf="@+id/add_attachment_queue"
-        app:layout_constraintTop_toBottomOf="@+id/operator_typing_animation_view"
-        tools:background="@android:color/holo_red_dark" />
+        app:layout_constraintBottom_toTopOf="@+id/sc_bottom_banner_label"/>
+
+    <TextView
+        android:id="@+id/sc_bottom_banner_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/chat_divider"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:background="?attr/gliaSystemAgentBubbleColor"
+        android:textAppearance="?attr/textAppearanceCaption"
+        tools:text="@string/secure_messaging_chat_banner_bottom" />
+
+    <View
+        android:id="@+id/chat_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?attr/gliaBaseShadeColor"
+        app:layout_constraintBottom_toTopOf="@+id/add_attachment_queue" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/add_attachment_queue"
@@ -105,7 +135,6 @@
         android:scrollbars="vertical"
         app:layout_constraintBottom_toTopOf="@+id/chat_message_layout"
         app:layout_constraintHeight_max="216dp"
-        app:layout_constraintTop_toBottomOf="@+id/divider_view"
         tools:itemCount="6"
         tools:listitem="@layout/chat_attachment_uploaded_item" />
 
@@ -114,8 +143,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/add_attachment_queue">
+        app:layout_constraintBottom_toBottomOf="parent">
 
     <com.glia.widgets.view.textview.SingleLineHintEditText
         android:id="@+id/chat_edit_text"

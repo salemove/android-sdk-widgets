@@ -61,6 +61,7 @@ import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.requireActivity
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.setLocaleHint
+import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.launcher.ActivityLauncher
 import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.view.Dialogs
@@ -76,6 +77,7 @@ import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.glia.widgets.view.unifiedui.theme.base.HeaderTheme
 import com.glia.widgets.view.unifiedui.theme.chat.InputTheme
 import com.glia.widgets.view.unifiedui.theme.chat.UnreadIndicatorTheme
+import com.glia.widgets.view.unifiedui.theme.securemessaging.SecureMessagingTheme
 import com.google.android.material.shape.MarkerEdgeTreatment
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import java.util.concurrent.Executor
@@ -157,7 +159,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     private var binding by Delegates.notNull<ChatViewBinding>()
     private val attachmentPopup by lazy {
         AttachmentPopup(
-            context, Dependencies.gliaThemeManager.theme?.chatTheme?.attachmentsPopup
+            binding.chatMessageLayout, Dependencies.gliaThemeManager.theme?.chatTheme?.attachmentsPopup
         )
     }
 
@@ -501,9 +503,12 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             showToolbar(LocaleString(R.string.message_center_header))
             binding.appBarView.hideBackButton()
             binding.appBarView.showXButton()
+            binding.secureConversationsBottomBanner.visibility = View.VISIBLE
+            binding.scBottomBannerLabel.setLocaleText(R.string.secure_messaging_chat_banner_bottom)
         } else {
             showToolbar(LocaleString(R.string.engagement_chat_title))
             binding.appBarView.showBackButton()
+            binding.secureConversationsBottomBanner.visibility = View.GONE
         }
     }
 
@@ -600,7 +605,9 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         theme.baseLightColor?.let(::getColorCompat)?.also(binding.newMessagesBadgeView::setTextColor)
 
         // colors
-        theme.baseShadeColor?.let(::getColorCompat)?.also(binding.dividerView::setBackgroundColor)
+        theme.baseShadeColor?.let(::getColorCompat)
+            ?.also(binding.chatDivider::setBackgroundColor)
+            ?.also(binding.scBottomBannerDivider::setBackgroundColor)
 
         theme.brandPrimaryColor?.let(::getColorStateListCompat)?.also {
             binding.newMessagesBadgeView.backgroundTintList = it
@@ -608,7 +615,10 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         binding.sendButton.imageTintList = theme.sendMessageButtonTintColor?.let(::getColorStateListCompat)
 
         theme.baseDarkColor?.let(::getColorCompat)?.also(binding.chatEditText::setTextColor)
-        theme.baseNormalColor?.let(::getColorCompat)?.also(binding.chatEditText::setHintTextColor)
+        theme.baseNormalColor?.let(::getColorCompat)
+            ?.also(binding.chatEditText::setHintTextColor)
+            ?.also(binding.scBottomBannerLabel::setTextColor)
+        theme.systemAgentBubbleColor?.let(::getColorCompat)?.also(binding.scBottomBannerLabel::setBackgroundColor)
 
         theme.gliaChatBackgroundColor?.let(::getColorCompat)?.also(::setBackgroundColor)
 
@@ -652,7 +662,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
 
     private fun setupAddAttachmentButton() {
         binding.addAttachmentButton.setOnClickListener {
-            attachmentPopup.show(binding.addAttachmentButton, {
+            attachmentPopup.show(binding.chatMessageLayout, {
                 getContentLauncher?.launch(arrayOf(Constants.MIME_TYPE_IMAGES))
             }, {
                 controller?.onTakePhotoClicked()
@@ -761,6 +771,8 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         chatTheme.typingIndicator?.primaryColor?.also(binding.operatorTypingAnimationView::addColorFilter)
 
         chatTheme.unreadIndicator?.also(::applyUnreadMessagesTheme)
+
+        chatTheme.secureMessaging?.also(::applySecureMessagingTheme)
     }
 
     private fun applyHeaderTheme(headerTheme: HeaderTheme) {
@@ -770,8 +782,8 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     private fun applyInputTheme(inputTheme: InputTheme) {
         binding.sendButton.applyButtonTheme(inputTheme.sendButton)
         binding.addAttachmentButton.applyButtonTheme(inputTheme.mediaButton)
-        binding.dividerView.applyColorTheme(inputTheme.divider)
-        binding.messageInputBackground.applyLayerTheme(inputTheme.background)
+        binding.chatDivider.applyColorTheme(inputTheme.divider)
+        binding.chatMessageLayout.applyLayerTheme(inputTheme.background)
         binding.chatEditText.applyTextTheme(textTheme = inputTheme.text, withAlignment = false)
         inputTheme.placeholder?.textColor?.primaryColor?.also(binding.chatEditText::setHintTextColor)
     }
@@ -780,6 +792,12 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         unreadIndicatorTheme.bubble?.badge?.also(binding.newMessagesBadgeView::applyBadgeTheme)
         unreadIndicatorTheme.bubble?.userImage?.also(binding.newMessagesIndicatorImage::applyUserImageTheme)
         unreadIndicatorTheme.background?.primaryColor?.also(binding.newMessagesIndicatorCard::setCardBackgroundColor)
+    }
+
+    private fun applySecureMessagingTheme(secureMessagingTheme: SecureMessagingTheme) {
+        binding.scBottomBannerLabel.applyTextTheme(secureMessagingTheme.bottomBannerText)
+        binding.scBottomBannerLabel.applyLayerTheme(secureMessagingTheme.bottomBannerBackground)
+        binding.scBottomBannerDivider.applyColorTheme(secureMessagingTheme.bottomBannerDividerColor)
     }
 
     private fun showChatUnavailableView() = showDialog {
@@ -792,10 +810,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         binding.apply {
             chatRecyclerView.updatePadding(bottom = dialogHeight)
             chatRecyclerView.scrollBy(0, dialogHeight)
-            messageInputBackground.isGone = true
-            chatEditText.isGone = true
-            addAttachmentButton.isGone = true
-            sendButton.isGone = true
+            chatMessageLayout.isGone = true
             operatorTypingAnimationView.isGone = true
         }
     }

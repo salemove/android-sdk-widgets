@@ -8,7 +8,6 @@ import android.os.Parcelable;
 import androidx.annotation.Nullable;
 
 import com.glia.widgets.R;
-import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.ResourceProvider;
 
@@ -143,13 +142,12 @@ public class ButtonConfiguration implements Parcelable {
             return this;
         }
 
-        public ButtonConfiguration build() {
+        public ButtonConfiguration build(ResourceProvider resourceProvider) {
             Logger.logDeprecatedClassUse(ButtonConfiguration.class.getSimpleName() + "." + TAG);
             if (textConfiguration == null) {
-                ResourceProvider resourceProvider = Dependencies.getResourceProvider();
                 textConfiguration = new TextConfiguration.Builder()
                         .textColor(resourceProvider.getColorStateList(R.color.glia_base_light_color))
-                        .build();
+                        .build(resourceProvider);
             }
             return new ButtonConfiguration(this);
         }

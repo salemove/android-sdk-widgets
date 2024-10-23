@@ -7,6 +7,7 @@ import com.glia.widgets.databinding.EntryWidgetMediaTypeItemBinding
 import com.glia.widgets.entrywidget.EntryWidgetContract
 import com.glia.widgets.helper.applyShadow
 import com.glia.widgets.helper.setLocaleContentDescription
+import com.glia.widgets.helper.setLocaleHint
 import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.view.unifiedui.applyImageColorTheme
 import com.glia.widgets.view.unifiedui.applyLayerTheme
@@ -34,36 +35,39 @@ internal class EntryWidgetMediaTypeItemViewHolder(
 
     override fun bind(itemType: EntryWidgetContract.ItemType, onClickListener: View.OnClickListener) {
         binding.root.setOnClickListener(onClickListener)
+        binding.root.contentDescription = null
         when (itemType) {
             EntryWidgetContract.ItemType.VIDEO_CALL -> {
                 binding.icon.setImageResource(R.drawable.ic_video)
                 binding.title.setLocaleText(R.string.entry_widget_video_button_label)
                 binding.description.setLocaleText(R.string.entry_widget_video_button_description)
-                binding.root.setLocaleContentDescription(R.string.entry_widget_video_button_accessibility)
+                binding.description.setLocaleHint(R.string.entry_widget_video_button_accessibility_hint)
             }
             EntryWidgetContract.ItemType.AUDIO_CALL -> {
                 binding.icon.setImageResource(R.drawable.ic_audio)
                 binding.title.setLocaleText(R.string.entry_widget_audio_button_label)
                 binding.description.setLocaleText(R.string.entry_widget_audio_button_description)
-                binding.root.setLocaleContentDescription(R.string.entry_widget_audio_button_accessibility)
+                binding.description.setLocaleHint(R.string.entry_widget_audio_button_accessibility_hint)
             }
             EntryWidgetContract.ItemType.CHAT -> {
                 binding.icon.setImageResource(R.drawable.ic_chat)
                 binding.title.setLocaleText(R.string.entry_widget_live_chat_button_label)
                 binding.description.setLocaleText(R.string.entry_widget_live_chat_button_description)
-                binding.root.setLocaleContentDescription(R.string.entry_widget_live_chat_button_accessibility)
+                binding.description.setLocaleHint(R.string.entry_widget_live_chat_button_accessibility_hint)
             }
             EntryWidgetContract.ItemType.SECURE_MESSAGE -> {
                 binding.icon.setImageResource(R.drawable.ic_secure_message)
                 binding.title.setLocaleText(R.string.entry_widget_secure_messaging_button_label)
                 binding.description.setLocaleText(R.string.entry_widget_secure_messaging_button_description)
-                binding.root.setLocaleContentDescription(R.string.entry_widget_secure_messaging_button_accessibility)
+                binding.description.setLocaleHint(R.string.entry_widget_secure_messaging_button_accessibility_hint)
             }
             else -> {
                 binding.icon.setImageResource(0)
                 binding.title.text = null
                 binding.description.text = null
-                binding.root.contentDescription = null
+                binding.description.hint = null
+                binding.root.setLocaleContentDescription(R.string.entry_widget_loading_accessibility_label)
+                binding.root.setOnClickListener(null)
             }
         }
 

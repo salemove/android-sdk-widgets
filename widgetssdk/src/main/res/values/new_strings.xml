@@ -167,6 +167,7 @@
     <string name="general_sending">@string/message_center_progress_bar_content_description</string>
     <string name="general_send">@string/message_center_send_message_btn</string>
     <string name="message_center_welcome_file_picker_accessibility_label">File picker</string>
+    <string name="secure_messaging_chat_banner_bottom">@string/message_center_bottom_banner</string>
 
     <!-- General -->
     <string name="general_refresh">@string/glia_visitor_code_refresh_button</string>

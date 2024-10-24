@@ -1435,6 +1435,35 @@
           "value": ["84d9f7", "#4a6bac"]
         }
       }
+    },
+    "secureMessaging": {
+      "bottomBannerBackground": {
+        "color": {
+          "type": "gradient",
+          "value": ["#ff55e0", "#e7a518"]
+        },
+        "border": {
+          "type": "fill",
+          "value": ["#a2522f"]
+        },
+        "borderWidth": 4,
+        "cornerRadius": 30
+      },
+      "bottomBannerText": {
+        "alignment": "center",
+        "font": {
+          "size": 16,
+          "style": "italic"
+        },
+        "foreground": {
+          "type": "fill",
+          "value": ["#288726"]
+        }
+      },
+      "bottomBannerDividerColor": {
+        "type": "fill",
+        "value": ["b9000d"]
+      }
     }
   },
   "snackBar": {

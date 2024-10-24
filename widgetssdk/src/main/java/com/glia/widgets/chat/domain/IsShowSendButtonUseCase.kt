@@ -21,7 +21,7 @@ internal class IsShowSendButtonUseCase(
     }
 
     private fun hadReadyToSendUnsentAttachments(): Boolean {
-        return fileAttachmentRepository.readyToSendFileAttachments.isNotEmpty()
+        return fileAttachmentRepository.readyToSendLocalAttachments.isNotEmpty()
     }
 
     private fun hasEngagementOngoingAndReadyToSendUnsentAttachments(): Boolean {

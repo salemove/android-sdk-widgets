@@ -4,7 +4,6 @@ import android.net.Uri
 import android.widget.Toast
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.androidsdk.chat.SingleChoiceOption
-import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.base.BaseController
 import com.glia.widgets.base.BaseView
 import com.glia.widgets.chat.model.ChatItem
@@ -14,7 +13,8 @@ import com.glia.widgets.chat.model.GvaButton
 import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.core.dialog.model.ConfirmationDialogLinks
 import com.glia.widgets.core.dialog.model.Link
-import com.glia.widgets.core.fileupload.model.FileAttachment
+import com.glia.widgets.core.fileupload.model.LocalAttachment
+import com.glia.widgets.locale.LocaleString
 
 internal interface ChatContract {
     interface Controller : BaseController {
@@ -27,7 +27,7 @@ internal interface ChatContract {
         fun onGvaButtonClicked(button: GvaButton)
         fun isCallVisualizerOngoing(): Boolean
         fun onFileDownloadClicked(attachmentFile: AttachmentFile)
-        fun onRemoveAttachment(attachment: FileAttachment)
+        fun onRemoveAttachment(attachment: LocalAttachment)
         fun newMessagesIndicatorClicked()
         fun onRecyclerviewPositionChanged(isBottom: Boolean)
         fun sendCustomCardResponse(customCard: CustomCardChatItem, text: String, value: String)
@@ -60,7 +60,7 @@ internal interface ChatContract {
     }
 
     interface View : BaseView<Controller> {
-        fun emitUploadAttachments(attachments: List<FileAttachment>)
+        fun emitUploadAttachments(attachments: List<LocalAttachment>)
         fun emitState(chatState: ChatState)
         fun emitItems(items: List<ChatItem>)
         fun navigateToCall(mediaType: String)

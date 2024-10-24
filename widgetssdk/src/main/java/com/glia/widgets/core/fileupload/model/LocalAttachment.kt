@@ -3,7 +3,7 @@ package com.glia.widgets.core.fileupload.model
 import android.net.Uri
 import com.glia.androidsdk.engagement.EngagementFile
 
-internal data class FileAttachment(
+internal data class LocalAttachment(
     val uri: Uri,
     val mimeType: String?,
     val displayName: String,
@@ -12,7 +12,7 @@ internal data class FileAttachment(
     val engagementFile: EngagementFile? = null,
 ) {
 
-    constructor(attachment: FileAttachment, status: Status): this(
+    constructor(attachment: LocalAttachment, status: Status) : this(
         uri = attachment.uri,
         engagementFile = attachment.engagementFile,
         displayName = attachment.displayName,
@@ -21,7 +21,7 @@ internal data class FileAttachment(
         mimeType = attachment.mimeType,
     )
 
-    constructor(attachment: FileAttachment, engagementFile: EngagementFile?): this(
+    constructor(attachment: LocalAttachment, engagementFile: EngagementFile?) : this(
         uri = attachment.uri,
         attachmentStatus = attachment.attachmentStatus,
         displayName = attachment.displayName,
@@ -30,12 +30,12 @@ internal data class FileAttachment(
         mimeType = attachment.mimeType
     )
 
-    fun setEngagementFile(engagementFile: EngagementFile?): FileAttachment {
-        return FileAttachment(this, engagementFile)
+    fun setEngagementFile(engagementFile: EngagementFile?): LocalAttachment {
+        return LocalAttachment(this, engagementFile)
     }
 
-    fun setAttachmentStatus(status: Status): FileAttachment {
-        return FileAttachment(this, status)
+    fun setAttachmentStatus(status: Status): LocalAttachment {
+        return LocalAttachment(this, status)
     }
 
     val isReadyToSend: Boolean

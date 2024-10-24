@@ -6,11 +6,11 @@ import com.glia.widgets.core.fileupload.domain.SupportedFileCountCheckUseCase
 import com.glia.widgets.core.fileupload.exception.RemoveBeforeReUploadingException
 import com.glia.widgets.core.fileupload.exception.SupportedFileCountExceededException
 import com.glia.widgets.core.fileupload.exception.SupportedFileSizeExceededException
-import com.glia.widgets.core.fileupload.model.FileAttachment
+import com.glia.widgets.core.fileupload.model.LocalAttachment
 
 internal class AddSecureFileToAttachmentAndUploadUseCase(private val fileAttachmentRepository: SecureFileAttachmentRepository) {
 
-    fun execute(file: FileAttachment, listener: AddFileToAttachmentAndUploadUseCase.Listener) {
+    fun execute(file: LocalAttachment, listener: AddFileToAttachmentAndUploadUseCase.Listener) {
         if (fileAttachmentRepository.isFileAttached(file.uri)) {
             listener.onError(RemoveBeforeReUploadingException())
         } else {
@@ -19,7 +19,7 @@ internal class AddSecureFileToAttachmentAndUploadUseCase(private val fileAttachm
     }
 
     private fun onFileNotAttached(
-        file: FileAttachment,
+        file: LocalAttachment,
         listener: AddFileToAttachmentAndUploadUseCase.Listener
     ) {
         fileAttachmentRepository.attachFile(file)
@@ -35,7 +35,7 @@ internal class AddSecureFileToAttachmentAndUploadUseCase(private val fileAttachm
         }
     }
 
-    private fun isSupportedFileSizeExceeded(file: FileAttachment): Boolean {
+    private fun isSupportedFileSizeExceeded(file: LocalAttachment): Boolean {
         return file.size >= AddFileToAttachmentAndUploadUseCase.SUPPORTED_FILE_SIZE
     }
     private fun isSupportedFileCountExceeded(): Boolean {

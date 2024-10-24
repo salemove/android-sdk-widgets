@@ -4,15 +4,15 @@ import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
-import com.glia.widgets.core.fileupload.model.FileAttachment
+import com.glia.widgets.core.fileupload.model.LocalAttachment
 
 internal interface UriToFileAttachmentUseCase {
-    operator fun invoke(uri: Uri): FileAttachment?
+    operator fun invoke(uri: Uri): LocalAttachment?
 }
 
 internal class UriToFileAttachmentUseCaseImpl(context: Context) : UriToFileAttachmentUseCase {
     private val contentResolver: ContentResolver by lazy { context.contentResolver }
-    override fun invoke(uri: Uri): FileAttachment? = contentResolver.query(uri, null, null, null, null)?.use {
+    override fun invoke(uri: Uri): LocalAttachment? = contentResolver.query(uri, null, null, null, null)?.use {
         if (it.count == 0) return@use null
 
         val nameIndex = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
@@ -21,6 +21,6 @@ internal class UriToFileAttachmentUseCaseImpl(context: Context) : UriToFileAttac
         val displayName = it.getString(nameIndex)
         val mimeType = contentResolver.getType(uri)
         val size = it.getLong(sizeIndex)
-        FileAttachment(uri, mimeType, displayName, size)
+        LocalAttachment(uri, mimeType, displayName, size)
     }
 }

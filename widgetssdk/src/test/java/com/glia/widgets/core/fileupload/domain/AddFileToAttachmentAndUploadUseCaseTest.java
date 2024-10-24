@@ -18,7 +18,7 @@ import com.glia.widgets.core.fileupload.FileAttachmentRepository;
 import com.glia.widgets.core.fileupload.exception.RemoveBeforeReUploadingException;
 import com.glia.widgets.core.fileupload.exception.SupportedFileCountExceededException;
 import com.glia.widgets.core.fileupload.exception.SupportedFileSizeExceededException;
-import com.glia.widgets.core.fileupload.model.FileAttachment;
+import com.glia.widgets.core.fileupload.model.LocalAttachment;
 import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase;
 
 import org.junit.Before;
@@ -46,79 +46,79 @@ public class AddFileToAttachmentAndUploadUseCaseTest {
 
     @Test
     public void execute_callsOnErrorWithRemoveBeforeReUploadingException_whenFileAttachmentIsAttached() {
-        FileAttachment fileAttachment = mock(FileAttachment.class);
+        LocalAttachment localAttachment = mock(LocalAttachment.class);
         Uri uri = mock(Uri.class);
-        when(fileAttachment.getUri()).thenReturn(uri);
+        when(localAttachment.getUri()).thenReturn(uri);
         AddFileToAttachmentAndUploadUseCase.Listener listener =
                 mock(AddFileToAttachmentAndUploadUseCase.Listener.class);
         when(fileAttachmentRepository.isFileAttached(any())).thenReturn(true);
 
-        subjectUnderTest.execute(fileAttachment, listener);
+        subjectUnderTest.execute(localAttachment, listener);
 
         verify(listener).onError(isA(RemoveBeforeReUploadingException.class));
     }
 
     @Test
     public void execute_callsOnErrorWithEngagementMissingException_whenEngagementIsMissing() {
-        FileAttachment fileAttachment = mock(FileAttachment.class);
+        LocalAttachment localAttachment = mock(LocalAttachment.class);
         Uri uri = mock(Uri.class);
-        when(fileAttachment.getUri()).thenReturn(uri);
+        when(localAttachment.getUri()).thenReturn(uri);
         AddFileToAttachmentAndUploadUseCase.Listener listener =
                 mock(AddFileToAttachmentAndUploadUseCase.Listener.class);
         when(fileAttachmentRepository.isFileAttached(any())).thenReturn(false);
         when(isQueueingOrEngagementUseCase.getHasOngoingEngagement()).thenReturn(false);
 
-        subjectUnderTest.execute(fileAttachment, listener);
+        subjectUnderTest.execute(localAttachment, listener);
 
         verify(listener).onError(isA(EngagementMissingException.class));
     }
 
     @Test
     public void execute_callsOnErrorWithSupportedFileCountExceededException_whenTooManyAttachedFiles() {
-        FileAttachment fileAttachment = mock(FileAttachment.class);
+        LocalAttachment localAttachment = mock(LocalAttachment.class);
         Uri uri = mock(Uri.class);
-        when(fileAttachment.getUri()).thenReturn(uri);
+        when(localAttachment.getUri()).thenReturn(uri);
         AddFileToAttachmentAndUploadUseCase.Listener listener =
                 mock(AddFileToAttachmentAndUploadUseCase.Listener.class);
         when(fileAttachmentRepository.isFileAttached(any())).thenReturn(false);
         when(fileAttachmentRepository.getAttachedFilesCount()).thenReturn(SUPPORTED_FILE_COUNT + 1);
         when(isQueueingOrEngagementUseCase.getHasOngoingEngagement()).thenReturn(true);
 
-        subjectUnderTest.execute(fileAttachment, listener);
+        subjectUnderTest.execute(localAttachment, listener);
 
         verify(listener).onError(isA(SupportedFileCountExceededException.class));
     }
 
     @Test
     public void execute_callsOnErrorWithSupportedFileSizeExceededException_whenFileAttachmentTooLarge() {
-        FileAttachment fileAttachment = mock(FileAttachment.class);
+        LocalAttachment localAttachment = mock(LocalAttachment.class);
         Uri uri = mock(Uri.class);
-        when(fileAttachment.getUri()).thenReturn(uri);
+        when(localAttachment.getUri()).thenReturn(uri);
         AddFileToAttachmentAndUploadUseCase.Listener listener =
                 mock(AddFileToAttachmentAndUploadUseCase.Listener.class);
         when(fileAttachmentRepository.isFileAttached(any())).thenReturn(false);
         when(fileAttachmentRepository.getAttachedFilesCount()).thenReturn(1L);
         when(isQueueingOrEngagementUseCase.getHasOngoingEngagement()).thenReturn(true);
-        when(fileAttachment.getSize()).thenReturn(SUPPORTED_FILE_SIZE);
+        when(localAttachment.getSize()).thenReturn(SUPPORTED_FILE_SIZE);
 
-        subjectUnderTest.execute(fileAttachment, listener);
+        subjectUnderTest.execute(localAttachment, listener);
 
         verify(listener).onError(isA(SupportedFileSizeExceededException.class));
     }
 
     @Test
     public void execute_callsOnStarted_whenValidArgument() {
-        FileAttachment fileAttachment = mock(FileAttachment.class);
+        LocalAttachment localAttachment = mock(LocalAttachment.class);
         Uri uri = mock(Uri.class);
-        when(fileAttachment.getUri()).thenReturn(uri);
+        when(localAttachment.getUri()).thenReturn(uri);
         AddFileToAttachmentAndUploadUseCase.Listener listener =
                 mock(AddFileToAttachmentAndUploadUseCase.Listener.class);
         when(fileAttachmentRepository.isFileAttached(any())).thenReturn(false);
         when(fileAttachmentRepository.getAttachedFilesCount()).thenReturn(1L);
         when(isQueueingOrEngagementUseCase.getHasOngoingEngagement()).thenReturn(true);
-        when(fileAttachment.getSize()).thenReturn(SUPPORTED_FILE_SIZE - 1);
+        when(localAttachment.getSize()).thenReturn(SUPPORTED_FILE_SIZE - 1);
 
-        subjectUnderTest.execute(fileAttachment, listener);
+        subjectUnderTest.execute(localAttachment, listener);
 
         verify(listener).onStarted();
     }
@@ -136,44 +136,44 @@ public class AddFileToAttachmentAndUploadUseCaseTest {
 
     @Test(expected = NullPointerException.class)
     public void execute_throwsNullPointerException_whenListenerIsNull() {
-        FileAttachment fileAttachment = mock(FileAttachment.class);
+        LocalAttachment localAttachment = mock(LocalAttachment.class);
         when(fileAttachmentRepository.isFileAttached(any())).thenReturn(false);
         when(fileAttachmentRepository.getAttachedFilesCount()).thenReturn(1L);
         when(isQueueingOrEngagementUseCase.getHasOngoingEngagement()).thenReturn(true);
 
-        subjectUnderTest.execute(fileAttachment, null);
+        subjectUnderTest.execute(localAttachment, null);
     }
 
     @Test
     public void execute_checkIsSecureEngagement_whenHasNoOngoingEngagement() {
-        FileAttachment fileAttachment = mock(FileAttachment.class);
+        LocalAttachment localAttachment = mock(LocalAttachment.class);
         Uri uri = mock(Uri.class);
-        when(fileAttachment.getUri()).thenReturn(uri);
+        when(localAttachment.getUri()).thenReturn(uri);
         AddFileToAttachmentAndUploadUseCase.Listener listener =
                 mock(AddFileToAttachmentAndUploadUseCase.Listener.class);
         when(fileAttachmentRepository.isFileAttached(any())).thenReturn(false);
         when(isQueueingOrEngagementUseCase.getHasOngoingEngagement()).thenReturn(false);
 
-        subjectUnderTest.execute(fileAttachment, listener);
+        subjectUnderTest.execute(localAttachment, listener);
 
         verify(gliaEngagementConfigRepository).getChatType();
     }
 
     @Test
     public void execute_uploadFile_whenIsSecureEngagement() {
-        FileAttachment fileAttachment = mock(FileAttachment.class);
+        LocalAttachment localAttachment = mock(LocalAttachment.class);
         Uri uri = mock(Uri.class);
-        when(fileAttachment.getUri()).thenReturn(uri);
+        when(localAttachment.getUri()).thenReturn(uri);
         AddFileToAttachmentAndUploadUseCase.Listener listener =
                 mock(AddFileToAttachmentAndUploadUseCase.Listener.class);
         when(fileAttachmentRepository.isFileAttached(any())).thenReturn(false);
         when(isQueueingOrEngagementUseCase.getHasOngoingEngagement()).thenReturn(false);
         when(gliaEngagementConfigRepository.getChatType()).thenReturn(ChatType.SECURE_MESSAGING);
         when(fileAttachmentRepository.getAttachedFilesCount()).thenReturn(1L);
-        when(fileAttachment.getSize()).thenReturn(SUPPORTED_FILE_SIZE - 1);
+        when(localAttachment.getSize()).thenReturn(SUPPORTED_FILE_SIZE - 1);
 
-        subjectUnderTest.execute(fileAttachment, listener);
+        subjectUnderTest.execute(localAttachment, listener);
 
-        verify(fileAttachmentRepository, times(1)).uploadFile(fileAttachment, listener);
+        verify(fileAttachmentRepository, times(1)).uploadFile(localAttachment, listener);
     }
 }

@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.widgets.R
 import com.glia.widgets.chat.model.Attachment
-import com.glia.widgets.core.fileupload.model.FileAttachment
+import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromNetworkUseCase
@@ -66,9 +66,9 @@ internal open class ImageAttachmentViewHolder(
         setAccessibilityActions()
     }
 
-    private fun bind(fileAttachment: FileAttachment) {
+    private fun bind(localAttachment: LocalAttachment) {
         Picasso.get()
-            .load(fileAttachment.uri)
+            .load(localAttachment.uri)
             .into(imageView)
     }
 

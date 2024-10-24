@@ -11,7 +11,6 @@ import androidx.transition.TransitionManager
 import com.glia.widgets.R
 import com.glia.widgets.databinding.ProgressButtonBinding
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.helper.ResourceProvider
 import com.glia.widgets.helper.applyShadow
 import com.glia.widgets.helper.getAttr
 import com.glia.widgets.helper.getColorCompat
@@ -19,7 +18,6 @@ import com.glia.widgets.helper.getDimenRes
 import com.glia.widgets.helper.getDrawableCompat
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.setLocaleContentDescription
-import com.glia.widgets.locale.LocaleProvider
 import com.glia.widgets.view.unifiedui.applyIndicatorColorTheme
 import com.glia.widgets.view.unifiedui.applyLayerTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
@@ -57,7 +55,7 @@ internal class ProgressButton @JvmOverloads constructor(context: Context, attrs:
     private val progressBar get() = binding.progressBar
 
     // End Widgets + Binding
-    private val localeProvider =  Dependencies.localeProvider
+    private val localeProvider = Dependencies.localeProvider
 
     @get:ColorInt
     private val gliaBrandPrimaryColor: Int by lazy { // btn bg

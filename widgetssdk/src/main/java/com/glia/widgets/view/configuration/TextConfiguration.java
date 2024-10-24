@@ -6,7 +6,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.glia.widgets.R;
-import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.ResourceProvider;
 
@@ -152,9 +151,8 @@ public class TextConfiguration implements Parcelable {
             return this;
         }
 
-        public TextConfiguration build() {
+        public TextConfiguration build(ResourceProvider resourceProvider) {
             Logger.logDeprecatedClassUse(TextConfiguration.class.getSimpleName() + "." + TAG);
-            ResourceProvider resourceProvider = Dependencies.getResourceProvider();
             // Default configuration
             if (this.textSize == 0) {
                 this.textSize = resourceProvider.getDimension(R.dimen.glia_survey_default_text_size);

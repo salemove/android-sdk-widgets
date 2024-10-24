@@ -213,11 +213,11 @@ public class SurveyStyle implements Parcelable {
                                                                       int backgroundColorId) {
             ColorStateList buttonTexColor = resourceProvider.getColorStateList(R.color.glia_base_light_color);
             TextConfiguration textConfiguration =
-                    new TextConfiguration.Builder().textColor(buttonTexColor).build();
+                    new TextConfiguration.Builder().textColor(buttonTexColor).build(resourceProvider);
             return new ButtonConfiguration.Builder()
                     .backgroundColor(resourceProvider.getColorStateList(backgroundColorId))
                     .textConfiguration(textConfiguration)
-                    .build();
+                    .build(resourceProvider);
         }
 
         private TextConfiguration prepareDefaultTitleConfiguration(ResourceProvider resourceProvider) {
@@ -225,7 +225,7 @@ public class SurveyStyle implements Parcelable {
             return new TextConfiguration.Builder()
                     .textColor(color)
                     .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_survey_title_text_size))
-                    .build();
+                    .build(resourceProvider);
         }
 
         private LayerConfiguration prepareDefaultBackgroundConfiguration(ResourceProvider resourceProvider) {

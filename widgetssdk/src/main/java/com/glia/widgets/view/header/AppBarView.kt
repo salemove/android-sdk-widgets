@@ -15,6 +15,7 @@ import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.databinding.AppBarBinding
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.helper.ResourceProvider
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.helper.applyButtonTheme
 import com.glia.widgets.helper.applyIconColorTheme
@@ -29,6 +30,7 @@ import com.glia.widgets.helper.setLocaleNavigationContentDescription
 import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.helper.setText
 import com.glia.widgets.helper.setTintCompat
+import com.glia.widgets.locale.LocaleProvider
 import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.view.unifiedui.applyButtonTheme
 import com.glia.widgets.view.unifiedui.applyColorTheme
@@ -49,7 +51,13 @@ internal class AppBarView @JvmOverloads constructor(
 
     @DrawableRes
     private var iconAppBarBackRes: Int? = null
-    private val localeProvider = Dependencies.localeProvider
+    private val localeProvider by lazy {
+        if (isInEditMode) {
+            LocaleProvider(ResourceProvider(context))
+        } else {
+            Dependencies.localeProvider
+        }
+    }
 
     init {
         setDefaults(attrs)

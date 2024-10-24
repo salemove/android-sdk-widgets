@@ -5,7 +5,9 @@ import android.util.AttributeSet;
 
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
+import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
+import com.glia.widgets.helper.ResourceProvider;
 import com.glia.widgets.view.configuration.ButtonConfiguration;
 import com.glia.widgets.view.configuration.TextConfiguration;
 import com.google.android.material.button.MaterialButton;
@@ -17,6 +19,7 @@ public abstract class BaseConfigurableButton extends MaterialButton {
     private final String TAG = BaseConfigurableButton.class.getSimpleName();
 
     private ButtonConfiguration buttonConfiguration;
+    private final ResourceProvider resourceProvider;
 
     public abstract ButtonConfiguration getButtonConfigurationFromTheme(UiTheme theme);
 
@@ -30,6 +33,12 @@ public abstract class BaseConfigurableButton extends MaterialButton {
 
     public BaseConfigurableButton(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        if (isInEditMode()) {
+            resourceProvider = new ResourceProvider(getContext());
+        } else {
+            resourceProvider = Dependencies.getResourceProvider();
+        }
+
         createBuildTimeConfiguration();
         updateView();
     }
@@ -71,7 +80,7 @@ public abstract class BaseConfigurableButton extends MaterialButton {
                 .textColorHighlight(getHighlightColor())
                 .hintColor(getHintTextColors())
                 .textSize(getTextSize())
-                .build();
+                .build(resourceProvider);
 
         buttonConfiguration = ButtonConfiguration
                 .builder()
@@ -79,7 +88,7 @@ public abstract class BaseConfigurableButton extends MaterialButton {
                 .backgroundColor(getBackgroundTintList())
                 .strokeColor(getStrokeColor())
                 .strokeWidth(getStrokeWidth())
-                .build();
+                .build(resourceProvider);
     }
 
     @Deprecated
@@ -97,7 +106,7 @@ public abstract class BaseConfigurableButton extends MaterialButton {
             builder.strokeColor(runTimeConfiguration.getStrokeColor());
         if (runTimeConfiguration.getStrokeWidth() != null)
             builder.strokeWidth(runTimeConfiguration.getStrokeWidth());
-        buttonConfiguration = builder.build();
+        buttonConfiguration = builder.build(resourceProvider);
         updateView();
     }
 }

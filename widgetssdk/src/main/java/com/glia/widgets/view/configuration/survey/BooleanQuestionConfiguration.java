@@ -83,15 +83,15 @@ public class BooleanQuestionConfiguration implements Parcelable {
             TextConfiguration normalText = new TextConfiguration.Builder()
                     .textColor(normalTextColor)
                     .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
-                    .build();
+                    .build(resourceProvider);
             TextConfiguration selectedText = new TextConfiguration.Builder()
                     .textColor(selectedTextColor)
                     .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
-                    .build();
+                    .build(resourceProvider);
             TextConfiguration highlightedText = new TextConfiguration.Builder()
                     .textColor(normalTextColor)
                     .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
-                    .build();
+                    .build(resourceProvider);
 
             LayerConfiguration normalLayer = new LayerConfiguration.Builder()
                     .backgroundColor(resourceProvider.getString(R.color.glia_base_light_color))
@@ -124,7 +124,7 @@ public class BooleanQuestionConfiguration implements Parcelable {
                     .textColor(normalTextColor)
                     .bold(true)
                     .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_title_text_size))
-                    .build();
+                    .build(resourceProvider);
         }
     }
 

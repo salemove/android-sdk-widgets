@@ -7,7 +7,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.glia.widgets.core.fileupload.FileAttachmentRepository;
-import com.glia.widgets.core.fileupload.model.FileAttachment;
+import com.glia.widgets.core.fileupload.model.LocalAttachment;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -27,9 +27,11 @@ public class SupportedFileCountCheckUseCaseTest {
         subjectUnderTest = new SupportedFileCountCheckUseCase(repository);
     }
 
+    private static final LocalAttachment FILE_ATTACHMENT = mock(LocalAttachment.class);
+
     @Test
     public void execute_returnsTrue_whenSingleFileAttachment() {
-        when(repository.getFileAttachments())
+        when(repository.getLocalAttachments())
                 .thenReturn(Collections.singletonList(FILE_ATTACHMENT));
 
         assertTrue(subjectUnderTest.invoke());
@@ -37,7 +39,7 @@ public class SupportedFileCountCheckUseCaseTest {
 
     @Test
     public void execute_returnsTrue_whenNoFileAttachment() {
-        when(repository.getFileAttachments())
+        when(repository.getLocalAttachments())
                 .thenReturn(Collections.emptyList());
 
         assertTrue(subjectUnderTest.invoke());
@@ -45,25 +47,23 @@ public class SupportedFileCountCheckUseCaseTest {
 
     @Test
     public void execute_returnsTrue_whenSupportedFileAttachmentsCount() {
-        List<FileAttachment> fileAttachmentList = new ArrayList<>();
+        List<LocalAttachment> localAttachmentList = new ArrayList<>();
         for (int i = 0; i < SUPPORTED_FILE_COUNT; i++) {
-            fileAttachmentList.add(FILE_ATTACHMENT);
+            localAttachmentList.add(FILE_ATTACHMENT);
         }
-        when(repository.getFileAttachments()).thenReturn(fileAttachmentList);
+        when(repository.getLocalAttachments()).thenReturn(localAttachmentList);
 
         assertTrue(subjectUnderTest.invoke());
     }
 
     @Test
     public void execute_returnsFalse_whenMoreThanSupportedFileAttachments() {
-        List<FileAttachment> fileAttachmentList = new ArrayList<>();
+        List<LocalAttachment> localAttachmentList = new ArrayList<>();
         for (int i = 0; i < SUPPORTED_FILE_COUNT + 1; i++) {
-            fileAttachmentList.add(FILE_ATTACHMENT);
+            localAttachmentList.add(FILE_ATTACHMENT);
         }
-        when(repository.getFileAttachments()).thenReturn(fileAttachmentList);
+        when(repository.getLocalAttachments()).thenReturn(localAttachmentList);
 
         assertFalse(subjectUnderTest.invoke());
     }
-
-    private static final FileAttachment FILE_ATTACHMENT = mock(FileAttachment.class);
 }

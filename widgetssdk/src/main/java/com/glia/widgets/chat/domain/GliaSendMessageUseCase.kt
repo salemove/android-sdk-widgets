@@ -8,7 +8,7 @@ import com.glia.widgets.chat.model.SendMessagePayload
 import com.glia.widgets.chat.model.Unsent
 import com.glia.widgets.core.engagement.GliaEngagementConfigRepository
 import com.glia.widgets.core.fileupload.FileAttachmentRepository
-import com.glia.widgets.core.fileupload.model.FileAttachment
+import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
 import com.glia.widgets.engagement.domain.IsOperatorPresentUseCase
@@ -36,8 +36,8 @@ internal class GliaSendMessageUseCase(
     private val isSecureEngagement: Boolean
         get() = isSecureEngagementUseCase()
 
-    private fun hasFileAttachments(fileAttachments: List<FileAttachment>): Boolean {
-        return fileAttachments.isNotEmpty()
+    private fun hasFileAttachments(localAttachments: List<LocalAttachment>): Boolean {
+        return localAttachments.isNotEmpty()
     }
 
     private fun sendMessage(payload: SendMessagePayload, listener: Listener) {
@@ -49,19 +49,19 @@ internal class GliaSendMessageUseCase(
     }
 
     fun execute(message: String, listener: Listener) {
-        val fileAttachments: List<FileAttachment> =
-            fileAttachmentRepository.readyToSendFileAttachments
-        if (canSendMessage(message, fileAttachments.size)) {
+        val localAttachments: List<LocalAttachment> =
+            fileAttachmentRepository.readyToSendLocalAttachments
+        if (canSendMessage(message, localAttachments.size)) {
             listener.onMessageValidated()
-            val attachments = if (hasFileAttachments(fileAttachments)) fileAttachments else null
-            val payload = SendMessagePayload(content = message, fileAttachments = attachments)
+            val attachments = if (hasFileAttachments(localAttachments)) localAttachments else null
+            val payload = SendMessagePayload(content = message, localAttachments = attachments)
             listener.onMessagePrepared(Unsent(payload = payload))
             if (isOperatorOnline || isSecureEngagement) {
                 sendMessage(payload, listener)
             } else {
                 listener.errorOperatorOffline()
             }
-            fileAttachmentRepository.detachFiles(fileAttachments)
+            fileAttachmentRepository.detachFiles(localAttachments)
         } else {
             listener.errorMessageInvalid()
         }

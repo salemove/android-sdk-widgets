@@ -7,7 +7,7 @@ import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.androidsdk.chat.ChatMessage
 import com.glia.androidsdk.chat.SingleChoiceOption
 import com.glia.widgets.chat.adapter.ChatAdapter
-import com.glia.widgets.core.fileupload.model.FileAttachment
+import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.helper.isDownloaded
 import java.util.UUID
 
@@ -33,9 +33,9 @@ internal abstract class OperatorChatItem(@ChatAdapter.Type viewType: Int) : Serv
 
 internal sealed class Attachment(val id: String) {
     val remoteAttachment: AttachmentFile? get() = (this as? Remote)?.attachmentFile
-    val localAttachment: FileAttachment? get() = (this as? Local)?.fileAttachment
+    val localAttachment: LocalAttachment? get() = (this as? Local)?.fileAttachment
     data class Remote(val attachmentFile: AttachmentFile) : Attachment(attachmentFile.id)
-    data class Local(val fileAttachment: FileAttachment) : Attachment(UUID.randomUUID().toString())
+    data class Local(val fileAttachment: LocalAttachment) : Attachment(UUID.randomUUID().toString())
 }
 internal interface AttachmentItem {
     val attachment: Attachment
@@ -256,8 +256,8 @@ internal data class Unsent(
     val messageId: String = payload.messageId
     val content: String = payload.content
 
-    private val fileAttachments: List<FileAttachment>? = payload.fileAttachments
-    private val hasFileAttachments: Boolean = !fileAttachments.isNullOrEmpty()
+    private val localAttachments: List<LocalAttachment>? = payload.localAttachments
+    private val hasFileAttachments: Boolean = !localAttachments.isNullOrEmpty()
 
     val chatMessage: VisitorMessageItem? = if (content.isNotEmpty()) VisitorMessageItem(
         id = messageId,
@@ -265,8 +265,8 @@ internal data class Unsent(
         showError = error != null && !hasFileAttachments
     ) else null
 
-    val attachmentItems: List<VisitorAttachmentItem>? = fileAttachments?.map {
-        val showError = error != null && fileAttachments.indexOf(it) == fileAttachments.lastIndex
+    val attachmentItems: List<VisitorAttachmentItem>? = localAttachments?.map {
+        val showError = error != null && localAttachments.indexOf(it) == localAttachments.lastIndex
         val attachment = Attachment.Local(it)
         if (it.isImage) {
             VisitorAttachmentItem.Image(

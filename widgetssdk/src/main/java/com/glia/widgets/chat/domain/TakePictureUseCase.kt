@@ -4,7 +4,7 @@ import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import android.os.Environment
-import com.glia.widgets.core.fileupload.model.FileAttachment
+import com.glia.widgets.core.fileupload.model.LocalAttachment
 import java.io.File
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -17,7 +17,7 @@ private const val PATTERN = "yyyyMMdd_HHmmss_"
 internal interface TakePictureUseCase {
     fun prepare(onFileCreated: (Uri) -> Unit)
 
-    fun onImageCaptured(captured: Boolean, onFileReady: (FileAttachment) -> Unit)
+    fun onImageCaptured(captured: Boolean, onFileReady: (LocalAttachment) -> Unit)
     fun deleteCurrent()
 }
 
@@ -37,7 +37,7 @@ internal class TakePictureUseCaseImpl(
         uri = fileProviderUseCase.getUriForFile(createTempPhotoFile()).also(onFileCreated)
     }
 
-    override fun onImageCaptured(captured: Boolean, onFileReady: (FileAttachment) -> Unit) {
+    override fun onImageCaptured(captured: Boolean, onFileReady: (LocalAttachment) -> Unit) {
         if (!captured) {
             deleteCurrent()
             return

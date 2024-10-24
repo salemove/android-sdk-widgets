@@ -1,12 +1,12 @@
 package com.glia.widgets.core.fileupload;
 
-import static com.glia.widgets.core.fileupload.model.FileAttachment.Status.ERROR_ENGAGEMENT_MISSING;
-import static com.glia.widgets.core.fileupload.model.FileAttachment.Status.ERROR_FILE_TOO_LARGE;
-import static com.glia.widgets.core.fileupload.model.FileAttachment.Status.ERROR_INTERNAL;
-import static com.glia.widgets.core.fileupload.model.FileAttachment.Status.ERROR_SECURITY_SCAN_FAILED;
-import static com.glia.widgets.core.fileupload.model.FileAttachment.Status.ERROR_SUPPORTED_FILE_ATTACHMENT_COUNT_EXCEEDED;
-import static com.glia.widgets.core.fileupload.model.FileAttachment.Status.READY_TO_SEND;
-import static com.glia.widgets.core.fileupload.model.FileAttachment.Status.SECURITY_SCAN;
+import static com.glia.widgets.core.fileupload.model.LocalAttachment.Status.ERROR_ENGAGEMENT_MISSING;
+import static com.glia.widgets.core.fileupload.model.LocalAttachment.Status.ERROR_FILE_TOO_LARGE;
+import static com.glia.widgets.core.fileupload.model.LocalAttachment.Status.ERROR_INTERNAL;
+import static com.glia.widgets.core.fileupload.model.LocalAttachment.Status.ERROR_SECURITY_SCAN_FAILED;
+import static com.glia.widgets.core.fileupload.model.LocalAttachment.Status.ERROR_SUPPORTED_FILE_ATTACHMENT_COUNT_EXCEEDED;
+import static com.glia.widgets.core.fileupload.model.LocalAttachment.Status.READY_TO_SEND;
+import static com.glia.widgets.core.fileupload.model.LocalAttachment.Status.SECURITY_SCAN;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -32,7 +32,7 @@ import com.glia.widgets.chat.ChatType;
 import com.glia.widgets.core.engagement.GliaEngagementConfigRepository;
 import com.glia.widgets.core.engagement.exception.EngagementMissingException;
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase;
-import com.glia.widgets.core.fileupload.model.FileAttachment;
+import com.glia.widgets.core.fileupload.model.LocalAttachment;
 import com.glia.widgets.di.GliaCore;
 
 import org.junit.Before;
@@ -44,7 +44,7 @@ import java.util.Observer;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-public class FileAttachmentRepositoryTest {
+public class LocalAttachmentRepositoryTest {
 
     private FileAttachmentRepository subjectUnderTest;
     GliaCore gliaCore;
@@ -95,36 +95,15 @@ public class FileAttachmentRepositoryTest {
         assertFalse(result);
     }
 
+    private static final LocalAttachment FILE_ATTACHMENT_1 = mock(LocalAttachment.class);
+    private static final LocalAttachment FILE_ATTACHMENT_2 = mock(LocalAttachment.class);
+
     @Test
     public void attachFile_attachesFileAttachment_whenValidArgument() {
         subjectUnderTest.detachAllFiles();
         subjectUnderTest.attachFile(FILE_ATTACHMENT_1);
-        List<FileAttachment> result = subjectUnderTest.getFileAttachments();
+        List<LocalAttachment> result = subjectUnderTest.getLocalAttachments();
         assertTrue(result.contains(FILE_ATTACHMENT_1));
-    }
-
-    @Test
-    public void attachFile_attachesMultipleFiles_whenCalledMultipleTimes() {
-        subjectUnderTest.detachAllFiles();
-        subjectUnderTest.attachFile(FILE_ATTACHMENT_1);
-        subjectUnderTest.attachFile(FILE_ATTACHMENT_2);
-        List<FileAttachment> result = subjectUnderTest.getFileAttachments();
-        assertTrue(
-                result.containsAll(
-                        Arrays.asList(FILE_ATTACHMENT_1, FILE_ATTACHMENT_2)
-                )
-        );
-    }
-
-    @Test
-    public void attachFile_attachesSameFileMultipleTimes_whenCalledMultipleTimes() {
-        subjectUnderTest.detachAllFiles();
-        subjectUnderTest.attachFile(FILE_ATTACHMENT_1);
-        subjectUnderTest.attachFile(FILE_ATTACHMENT_1);
-        List<FileAttachment> result = subjectUnderTest.getFileAttachments();
-        assertTrue(
-                result.indexOf(FILE_ATTACHMENT_1) != result.lastIndexOf(FILE_ATTACHMENT_1)
-        );
     }
 
     @Test
@@ -321,6 +300,30 @@ public class FileAttachmentRepositoryTest {
     }
 
     @Test
+    public void attachFile_attachesMultipleFiles_whenCalledMultipleTimes() {
+        subjectUnderTest.detachAllFiles();
+        subjectUnderTest.attachFile(FILE_ATTACHMENT_1);
+        subjectUnderTest.attachFile(FILE_ATTACHMENT_2);
+        List<LocalAttachment> result = subjectUnderTest.getLocalAttachments();
+        assertTrue(
+                result.containsAll(
+                        Arrays.asList(FILE_ATTACHMENT_1, FILE_ATTACHMENT_2)
+                )
+        );
+    }
+
+    @Test
+    public void attachFile_attachesSameFileMultipleTimes_whenCalledMultipleTimes() {
+        subjectUnderTest.detachAllFiles();
+        subjectUnderTest.attachFile(FILE_ATTACHMENT_1);
+        subjectUnderTest.attachFile(FILE_ATTACHMENT_1);
+        List<LocalAttachment> result = subjectUnderTest.getLocalAttachments();
+        assertTrue(
+                result.indexOf(FILE_ATTACHMENT_1) != result.lastIndexOf(FILE_ATTACHMENT_1)
+        );
+    }
+
+    @Test
     public void detachFile_detachesFile_whenFileAttachmentAttached() {
         subjectUnderTest.detachAllFiles();
         subjectUnderTest.attachFile(FILE_ATTACHMENT_1);
@@ -328,7 +331,7 @@ public class FileAttachmentRepositoryTest {
 
         subjectUnderTest.detachFile(FILE_ATTACHMENT_1);
 
-        List<FileAttachment> result = subjectUnderTest.getFileAttachments();
+        List<LocalAttachment> result = subjectUnderTest.getLocalAttachments();
 
         assertFalse(result.contains(FILE_ATTACHMENT_1));
         assertTrue(result.contains(FILE_ATTACHMENT_2));
@@ -342,7 +345,7 @@ public class FileAttachmentRepositoryTest {
 
         subjectUnderTest.detachFile(FILE_ATTACHMENT_1);
 
-        assertTrue(subjectUnderTest.getFileAttachments().isEmpty());
+        assertTrue(subjectUnderTest.getLocalAttachments().isEmpty());
     }
 
     @Test
@@ -351,7 +354,7 @@ public class FileAttachmentRepositoryTest {
 
         subjectUnderTest.detachFile(FILE_ATTACHMENT_1);
 
-        assertFalse(subjectUnderTest.getFileAttachments().contains(FILE_ATTACHMENT_1));
+        assertFalse(subjectUnderTest.getLocalAttachments().contains(FILE_ATTACHMENT_1));
     }
 
     @Test
@@ -363,29 +366,7 @@ public class FileAttachmentRepositoryTest {
 
         subjectUnderTest.detachAllFiles();
 
-        assertTrue(subjectUnderTest.getFileAttachments().isEmpty());
-    }
-
-    @Test
-    public void detachAllFiles_doesNothing_whenNoFilesAttached() {
-        subjectUnderTest.detachAllFiles();
-        subjectUnderTest.detachAllFiles();
-
-        assertTrue(subjectUnderTest.getFileAttachments().isEmpty());
-    }
-
-    @Test
-    public void getReadyToSendFileAttachments_returnsReadyToSendFileAttachments_whenNoFilesAttached() {
-        subjectUnderTest.detachAllFiles();
-        when(FILE_ATTACHMENT_1.isReadyToSend()).thenReturn(true);
-        when(FILE_ATTACHMENT_2.isReadyToSend()).thenReturn(false);
-        subjectUnderTest.attachFile(FILE_ATTACHMENT_1);
-        subjectUnderTest.attachFile(FILE_ATTACHMENT_2);
-
-        List<FileAttachment> result = subjectUnderTest.getReadyToSendFileAttachments();
-
-        assertTrue(result.contains(FILE_ATTACHMENT_1));
-        assertFalse(result.contains(FILE_ATTACHMENT_2));
+        assertTrue(subjectUnderTest.getLocalAttachments().isEmpty());
     }
 
     @Test
@@ -461,8 +442,27 @@ public class FileAttachmentRepositoryTest {
         subjectUnderTest.clearObservers();
     }
 
-    private static final FileAttachment FILE_ATTACHMENT_1 = mock(FileAttachment.class);
-    private static final FileAttachment FILE_ATTACHMENT_2 = mock(FileAttachment.class);
+    @Test
+    public void detachAllFiles_doesNothing_whenNoFilesAttached() {
+        subjectUnderTest.detachAllFiles();
+        subjectUnderTest.detachAllFiles();
+
+        assertTrue(subjectUnderTest.getLocalAttachments().isEmpty());
+    }
+
+    @Test
+    public void getReadyToSendFileAttachments_returnsReadyToSendFileAttachments_whenNoFilesAttached() {
+        subjectUnderTest.detachAllFiles();
+        when(FILE_ATTACHMENT_1.isReadyToSend()).thenReturn(true);
+        when(FILE_ATTACHMENT_2.isReadyToSend()).thenReturn(false);
+        subjectUnderTest.attachFile(FILE_ATTACHMENT_1);
+        subjectUnderTest.attachFile(FILE_ATTACHMENT_2);
+
+        List<LocalAttachment> result = subjectUnderTest.getReadyToSendLocalAttachments();
+
+        assertTrue(result.contains(FILE_ATTACHMENT_1));
+        assertFalse(result.contains(FILE_ATTACHMENT_2));
+    }
     private static final Uri URI_1 = mock(Uri.class);
     private static final Uri URI_2 = mock(Uri.class);
     private static final Engagement ENGAGEMENT = mock(Engagement.class);

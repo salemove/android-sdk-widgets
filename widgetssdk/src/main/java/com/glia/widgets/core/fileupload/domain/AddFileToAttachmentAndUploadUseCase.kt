@@ -8,7 +8,7 @@ import com.glia.widgets.core.fileupload.FileAttachmentRepository
 import com.glia.widgets.core.fileupload.exception.RemoveBeforeReUploadingException
 import com.glia.widgets.core.fileupload.exception.SupportedFileCountExceededException
 import com.glia.widgets.core.fileupload.exception.SupportedFileSizeExceededException
-import com.glia.widgets.core.fileupload.model.FileAttachment
+import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
 
 internal class AddFileToAttachmentAndUploadUseCase(
@@ -25,7 +25,7 @@ internal class AddFileToAttachmentAndUploadUseCase(
     private val isNotSecureEngagement: Boolean
         get() = engagementConfigRepository.chatType != ChatType.SECURE_MESSAGING
 
-    fun execute(file: FileAttachment, listener: Listener) {
+    fun execute(file: LocalAttachment, listener: Listener) {
         if (fileAttachmentRepository.isFileAttached(file.uri)) {
             listener.onError(RemoveBeforeReUploadingException())
         } else {
@@ -33,7 +33,7 @@ internal class AddFileToAttachmentAndUploadUseCase(
         }
     }
 
-    private fun onFileNotAttached(file: FileAttachment, listener: Listener) {
+    private fun onFileNotAttached(file: LocalAttachment, listener: Listener) {
         fileAttachmentRepository.attachFile(file)
         if (hasNoOngoingEngagement && isNotSecureEngagement) {
             fileAttachmentRepository.setFileAttachmentEngagementMissing(file.uri)
@@ -43,7 +43,7 @@ internal class AddFileToAttachmentAndUploadUseCase(
         }
     }
 
-    private fun onHasOngoingOrSecureEngagement(file: FileAttachment, listener: Listener) {
+    private fun onHasOngoingOrSecureEngagement(file: LocalAttachment, listener: Listener) {
         if (isSupportedFileCountExceeded) {
             fileAttachmentRepository.setSupportedFileAttachmentCountExceeded(file.uri)
             listener.onError(SupportedFileCountExceededException())
@@ -56,7 +56,7 @@ internal class AddFileToAttachmentAndUploadUseCase(
         }
     }
 
-    private fun isSupportedFileSizeExceeded(file: FileAttachment): Boolean {
+    private fun isSupportedFileSizeExceeded(file: LocalAttachment): Boolean {
         return file.size >= SUPPORTED_FILE_SIZE
     }
 

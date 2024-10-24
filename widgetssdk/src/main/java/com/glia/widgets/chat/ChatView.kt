@@ -45,7 +45,7 @@ import com.glia.widgets.chat.model.CustomCardChatItem
 import com.glia.widgets.core.configuration.EngagementConfiguration
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.dialog.model.DialogState
-import com.glia.widgets.core.fileupload.model.FileAttachment
+import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.databinding.ChatViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.filepreview.ui.FilePreviewActivity
@@ -334,7 +334,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         controller.setView(this)
     }
 
-    override fun emitUploadAttachments(attachments: List<FileAttachment>) {
+    override fun emitUploadAttachments(attachments: List<LocalAttachment>) {
         post { uploadAttachmentAdapter.submitList(attachments) }
     }
 

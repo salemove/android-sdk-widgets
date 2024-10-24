@@ -22,7 +22,7 @@ import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.AttachmentPopup
 import com.glia.widgets.chat.adapter.UploadAttachmentAdapter
-import com.glia.widgets.core.fileupload.model.FileAttachment
+import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.databinding.MessageCenterMessageViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Utils
@@ -86,7 +86,7 @@ internal class MessageView(
     private var attachmentButtonClickListener: OnClickListener? = null
     private var sendMessageButtonClickListener: OnClickListener? = null
     private var onMessageTextChangedListener: ((String) -> Unit)? = null
-    private var onRemoveAttachmentListener: ((FileAttachment) -> Unit)? = null
+    private var onRemoveAttachmentListener: ((LocalAttachment) -> Unit)? = null
 
     private var uploadAttachmentAdapter by Delegates.notNull<UploadAttachmentAdapter>()
 
@@ -269,7 +269,7 @@ internal class MessageView(
         onMessageTextChangedListener = listener
     }
 
-    fun setOnRemoveAttachmentListener(listener: (FileAttachment) -> Unit) {
+    fun setOnRemoveAttachmentListener(listener: (LocalAttachment) -> Unit) {
         onRemoveAttachmentListener = listener
     }
 
@@ -280,7 +280,7 @@ internal class MessageView(
         updateSendMessageGroup(state)
     }
 
-    fun emitUploadAttachments(attachments: List<FileAttachment>) {
+    fun emitUploadAttachments(attachments: List<LocalAttachment>) {
         post {
             uploadAttachmentAdapter.submitList(attachments)
             if (attachments.isEmpty()) {

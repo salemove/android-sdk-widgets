@@ -13,15 +13,14 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
-import com.glia.widgets.core.fileupload.model.FileAttachment
-import com.glia.widgets.core.fileupload.model.FileAttachment.Status
+import com.glia.widgets.core.fileupload.model.LocalAttachment
+import com.glia.widgets.core.fileupload.model.LocalAttachment.Status
 import com.glia.widgets.databinding.ChatAttachmentUploadedItemBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getColorStateListCompat
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.setLocaleContentDescription
-import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.helper.toFileExtensionOrEmpty
 import com.glia.widgets.locale.StringKey
 import com.glia.widgets.locale.StringKeyPair
@@ -38,13 +37,13 @@ import com.squareup.picasso.Picasso
 import com.google.android.material.R as Material_R
 
 /**
- * [DiffUtil.ItemCallback] for [FileAttachment] type
+ * [DiffUtil.ItemCallback] for [LocalAttachment] type
  */
-internal class UploadAttachmentItemCallback : DiffUtil.ItemCallback<FileAttachment>() {
-    override fun areItemsTheSame(oldItem: FileAttachment, newItem: FileAttachment): Boolean =
+internal class UploadAttachmentItemCallback : DiffUtil.ItemCallback<LocalAttachment>() {
+    override fun areItemsTheSame(oldItem: LocalAttachment, newItem: LocalAttachment): Boolean =
         oldItem.uri == newItem.uri
 
-    override fun areContentsTheSame(oldItem: FileAttachment, newItem: FileAttachment): Boolean =
+    override fun areContentsTheSame(oldItem: LocalAttachment, newItem: LocalAttachment): Boolean =
         oldItem.isReadyToSend == newItem.isReadyToSend && oldItem.attachmentStatus == newItem.attachmentStatus
 }
 
@@ -52,7 +51,7 @@ internal class UploadAttachmentItemCallback : DiffUtil.ItemCallback<FileAttachme
  * Upload File Attachment Adapter
  */
 internal class UploadAttachmentAdapter(private val isMessageCenter: Boolean = false) :
-    ListAdapter<FileAttachment, ViewHolder>(UploadAttachmentItemCallback()) {
+    ListAdapter<LocalAttachment, ViewHolder>(UploadAttachmentItemCallback()) {
     private var callback: ItemCallback? = null
     fun setItemCallback(callback: ItemCallback?) {
         this.callback = callback
@@ -68,7 +67,7 @@ internal class UploadAttachmentAdapter(private val isMessageCenter: Boolean = fa
         holder.onBind(getItem(position), callback)
 
     fun interface ItemCallback {
-        fun onRemoveItemClicked(attachment: FileAttachment)
+        fun onRemoveItemClicked(attachment: LocalAttachment)
     }
 }
 
@@ -112,7 +111,7 @@ internal class ViewHolder(
         extensionTypeText.applyTextTheme(filePreviewTheme?.text, withAlignment = false)
     }
 
-    fun onBind(attachment: FileAttachment?, callback: UploadAttachmentAdapter.ItemCallback?) {
+    fun onBind(attachment: LocalAttachment?, callback: UploadAttachmentAdapter.ItemCallback?) {
         val displayName = attachment?.displayName ?: return
 
         val size = Formatter.formatFileSize(context, attachment.size)
@@ -129,7 +128,7 @@ internal class ViewHolder(
     }
 
     private fun updateExtensionType(
-        attachment: FileAttachment,
+        attachment: LocalAttachment,
         displayName: String
     ) {
         if (attachment.attachmentStatus.isError) {
@@ -178,7 +177,7 @@ internal class ViewHolder(
     private fun updateContentDescription(
         displayName: String,
         size: String?,
-        attachment: FileAttachment
+        attachment: LocalAttachment
     ) {
         removeItemButton.setLocaleContentDescription(
             R.string.chat_file_remove_upload_accessibility_label,

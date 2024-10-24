@@ -6,7 +6,7 @@ import com.glia.widgets.chat.data.GliaChatRepository
 import com.glia.widgets.chat.model.SendMessagePayload
 import com.glia.widgets.core.engagement.GliaEngagementConfigRepository
 import com.glia.widgets.core.fileupload.SecureFileAttachmentRepository
-import com.glia.widgets.core.fileupload.model.FileAttachment
+import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.core.secureconversations.SendMessageRepository
 import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
@@ -34,14 +34,14 @@ internal class SendSecureMessageUseCase(
     private fun sendMessage(
         message: String,
         queueIds: List<String>,
-        fileAttachments: List<FileAttachment>,
+        localAttachments: List<LocalAttachment>,
         callback: RequestCallback<VisitorMessage?>
     ) {
-        if (fileAttachments.isNotEmpty()) {
-            sendMessageWithAttachments(message, queueIds, fileAttachments) { result, ex ->
+        if (localAttachments.isNotEmpty()) {
+            sendMessageWithAttachments(message, queueIds, localAttachments) { result, ex ->
                 if (ex == null) {
                     sendMessageRepository.reset()
-                    fileAttachmentRepository.detachFiles(fileAttachments)
+                    fileAttachmentRepository.detachFiles(localAttachments)
                 }
                 callback.onResult(result, ex)
             }
@@ -67,12 +67,12 @@ internal class SendSecureMessageUseCase(
     private fun sendMessageWithAttachments(
         message: String,
         queueIds: List<String>,
-        fileAttachments: List<FileAttachment>,
+        localAttachments: List<LocalAttachment>,
         callback: RequestCallback<VisitorMessage?>
     ) {
         val payload = SendMessagePayload(
             content = message,
-            fileAttachments = fileAttachments.ifEmpty { null }
+            localAttachments = localAttachments.ifEmpty { null }
         )
 
         if (hasOngoingEngagement) {

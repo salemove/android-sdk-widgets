@@ -6,7 +6,7 @@ import com.glia.androidsdk.RequestCallback
 import com.glia.androidsdk.engagement.EngagementFile
 import com.glia.androidsdk.secureconversations.SecureConversations
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase
-import com.glia.widgets.core.fileupload.model.FileAttachment
+import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.di.GliaCore
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
@@ -17,17 +17,17 @@ internal class SecureFileAttachmentRepository(private val gliaCore: GliaCore) {
         gliaCore.secureConversations
     }
 
-    private val _observable = BehaviorSubject.createDefault(emptyList<FileAttachment>())
+    private val _observable = BehaviorSubject.createDefault(emptyList<LocalAttachment>())
 
-    val observable: Observable<List<FileAttachment>> = _observable
+    val observable: Observable<List<LocalAttachment>> = _observable
 
-    fun getFileAttachments(): List<FileAttachment> {
+    fun getFileAttachments(): List<LocalAttachment> {
         return _observable.value ?: emptyList()
     }
 
-    fun getReadyToSendFileAttachments(): List<FileAttachment> {
+    fun getReadyToSendFileAttachments(): List<LocalAttachment> {
         return getFileAttachments()
-            .filter { obj: FileAttachment -> obj.isReadyToSend }
+            .filter { obj: LocalAttachment -> obj.isReadyToSend }
     }
 
     fun getAttachedFilesCount(): Int {
@@ -39,11 +39,11 @@ internal class SecureFileAttachmentRepository(private val gliaCore: GliaCore) {
             .any { it.uri == uri }
     }
 
-    fun attachFile(file: FileAttachment) {
+    fun attachFile(file: LocalAttachment) {
         _observable.onNext(getFileAttachments() + file)
     }
 
-    fun uploadFile(file: FileAttachment, listener: AddFileToAttachmentAndUploadUseCase.Listener) {
+    fun uploadFile(file: LocalAttachment, listener: AddFileToAttachmentAndUploadUseCase.Listener) {
         val engagement = gliaCore.currentEngagement.getOrNull()
         if (engagement != null) {
             engagement.uploadFile(file.uri, handleFileUpload(file, listener))
@@ -53,7 +53,7 @@ internal class SecureFileAttachmentRepository(private val gliaCore: GliaCore) {
     }
 
     private fun handleFileUpload(
-        file: FileAttachment,
+        file: LocalAttachment,
         listener: AddFileToAttachmentAndUploadUseCase.Listener
     ) = RequestCallback<EngagementFile> { engagementFile: EngagementFile?, e: GliaException? ->
         if (engagementFile != null) {
@@ -68,17 +68,17 @@ internal class SecureFileAttachmentRepository(private val gliaCore: GliaCore) {
         }
     }
 
-    fun detachFile(attachment: FileAttachment) {
+    fun detachFile(attachment: LocalAttachment) {
         _observable.onNext(
             getFileAttachments()
                 .filter { it.uri !== attachment.uri }
         )
     }
 
-    fun detachFiles(attachments: List<FileAttachment?>) {
+    fun detachFiles(attachments: List<LocalAttachment?>) {
         _observable.onNext(
             getFileAttachments()
-                .filter { attachment: FileAttachment? ->
+                .filter { attachment: LocalAttachment? ->
                     !attachments.contains(
                         attachment
                     )
@@ -95,7 +95,7 @@ internal class SecureFileAttachmentRepository(private val gliaCore: GliaCore) {
         engagementFile: EngagementFile,
         listener: AddFileToAttachmentAndUploadUseCase.Listener
     ) {
-        setFileAttachmentStatus(uri, FileAttachment.Status.SECURITY_SCAN)
+        setFileAttachmentStatus(uri, LocalAttachment.Status.SECURITY_SCAN)
         listener.onSecurityCheckStarted()
         engagementFile.on(
             EngagementFile.Events.SCAN_RESULT
@@ -115,7 +115,7 @@ internal class SecureFileAttachmentRepository(private val gliaCore: GliaCore) {
         if (scanResult == EngagementFile.ScanResult.CLEAN && engagementFile != null) {
             onUploadFileSuccess(uri, engagementFile, listener)
         } else {
-            setFileAttachmentStatus(uri, FileAttachment.Status.ERROR_SECURITY_SCAN_FAILED)
+            setFileAttachmentStatus(uri, LocalAttachment.Status.ERROR_SECURITY_SCAN_FAILED)
             listener.onFinished()
         }
     }
@@ -132,11 +132,11 @@ internal class SecureFileAttachmentRepository(private val gliaCore: GliaCore) {
     private fun onEngagementFileReceived(uri: Uri, engagementFile: EngagementFile) {
         _observable.onNext(
             getFileAttachments()
-                .map { attachment: FileAttachment ->
+                .map { attachment: LocalAttachment ->
                     if (attachment.uri == uri) {
                         attachment
                             .setEngagementFile(engagementFile)
-                            .setAttachmentStatus(FileAttachment.Status.READY_TO_SEND)
+                            .setAttachmentStatus(LocalAttachment.Status.READY_TO_SEND)
                     } else {
                         attachment
                     }
@@ -145,36 +145,36 @@ internal class SecureFileAttachmentRepository(private val gliaCore: GliaCore) {
     }
 
     fun setFileAttachmentTooLarge(uri: Uri) {
-        setFileAttachmentStatus(uri, FileAttachment.Status.ERROR_FILE_TOO_LARGE)
+        setFileAttachmentStatus(uri, LocalAttachment.Status.ERROR_FILE_TOO_LARGE)
     }
 
     fun setSupportedFileAttachmentCountExceeded(uri: Uri) {
-        setFileAttachmentStatus(uri, FileAttachment.Status.ERROR_SUPPORTED_FILE_ATTACHMENT_COUNT_EXCEEDED)
+        setFileAttachmentStatus(uri, LocalAttachment.Status.ERROR_SUPPORTED_FILE_ATTACHMENT_COUNT_EXCEEDED)
     }
 
-    private fun setFileAttachmentStatus(uri: Uri, status: FileAttachment.Status) {
+    private fun setFileAttachmentStatus(uri: Uri, status: LocalAttachment.Status) {
         _observable.onNext(
             getFileAttachments()
-                .map { fileAttachment: FileAttachment ->
-                    if (fileAttachment.uri === uri) {
-                        fileAttachment.setAttachmentStatus(status)
+                .map { localAttachment: LocalAttachment ->
+                    if (localAttachment.uri === uri) {
+                        localAttachment.setAttachmentStatus(status)
                     } else {
-                        fileAttachment
+                        localAttachment
                     }
                 }
         )
     }
 
-    private fun getAttachmentStatus(exception: GliaException): FileAttachment.Status {
+    private fun getAttachmentStatus(exception: GliaException): LocalAttachment.Status {
         return when (exception.cause) {
-            GliaException.Cause.FILE_UPLOAD_FORBIDDEN -> FileAttachment.Status.ERROR_FILE_UPLOAD_FORBIDDEN
-            GliaException.Cause.INVALID_INPUT -> FileAttachment.Status.ERROR_INVALID_INPUT
-            GliaException.Cause.NETWORK_TIMEOUT -> FileAttachment.Status.ERROR_NETWORK_TIMEOUT
-            GliaException.Cause.INTERNAL_ERROR -> FileAttachment.Status.ERROR_INTERNAL
-            GliaException.Cause.PERMISSIONS_DENIED -> FileAttachment.Status.ERROR_PERMISSIONS_DENIED
-            GliaException.Cause.FILE_FORMAT_UNSUPPORTED -> FileAttachment.Status.ERROR_FORMAT_UNSUPPORTED
-            GliaException.Cause.FILE_TOO_LARGE -> FileAttachment.Status.ERROR_FILE_TOO_LARGE
-            else -> FileAttachment.Status.ERROR_UNKNOWN
+            GliaException.Cause.FILE_UPLOAD_FORBIDDEN -> LocalAttachment.Status.ERROR_FILE_UPLOAD_FORBIDDEN
+            GliaException.Cause.INVALID_INPUT -> LocalAttachment.Status.ERROR_INVALID_INPUT
+            GliaException.Cause.NETWORK_TIMEOUT -> LocalAttachment.Status.ERROR_NETWORK_TIMEOUT
+            GliaException.Cause.INTERNAL_ERROR -> LocalAttachment.Status.ERROR_INTERNAL
+            GliaException.Cause.PERMISSIONS_DENIED -> LocalAttachment.Status.ERROR_PERMISSIONS_DENIED
+            GliaException.Cause.FILE_FORMAT_UNSUPPORTED -> LocalAttachment.Status.ERROR_FORMAT_UNSUPPORTED
+            GliaException.Cause.FILE_TOO_LARGE -> LocalAttachment.Status.ERROR_FILE_TOO_LARGE
+            else -> LocalAttachment.Status.ERROR_UNKNOWN
         }
     }
 }

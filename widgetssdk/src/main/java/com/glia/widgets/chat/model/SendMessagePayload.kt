@@ -2,19 +2,19 @@ package com.glia.widgets.chat.model
 
 import com.glia.androidsdk.chat.FilesAttachment
 import com.glia.androidsdk.chat.SingleChoiceAttachment
-import com.glia.widgets.core.fileupload.model.FileAttachment
+import com.glia.widgets.core.fileupload.model.LocalAttachment
 
 internal class SendMessagePayload private constructor(
     val content: String,
-    val fileAttachments: List<FileAttachment>?,
+    val localAttachments: List<LocalAttachment>?,
     val payload: com.glia.androidsdk.chat.SendMessagePayload
 ) {
-    constructor(content: String, fileAttachments: List<FileAttachment>?) : this(
+    constructor(content: String, localAttachments: List<LocalAttachment>?) : this(
         content,
-        fileAttachments,
+        localAttachments,
         com.glia.androidsdk.chat.SendMessagePayload(
             content,
-            fileAttachments
+            localAttachments
                 ?.map { it.engagementFile }
                 ?.toTypedArray()
                 ?.let { FilesAttachment.from(it) }

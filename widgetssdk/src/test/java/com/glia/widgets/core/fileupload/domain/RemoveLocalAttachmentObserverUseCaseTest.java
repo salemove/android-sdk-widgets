@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import java.util.Observer;
 
-public class RemoveFileAttachmentObserverUseCaseTest {
+public class RemoveLocalAttachmentObserverUseCaseTest {
 
     private FileAttachmentRepository repository;
     private RemoveFileAttachmentObserverUseCase subjectUnderTest;

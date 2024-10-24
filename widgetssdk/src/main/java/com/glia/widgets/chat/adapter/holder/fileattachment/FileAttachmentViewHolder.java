@@ -13,7 +13,7 @@ import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.widgets.R;
 import com.glia.widgets.chat.adapter.ChatAdapter;
 import com.glia.widgets.chat.model.Attachment;
-import com.glia.widgets.core.fileupload.model.FileAttachment;
+import com.glia.widgets.core.fileupload.model.LocalAttachment;
 import com.glia.widgets.helper.FileHelper;
 import com.glia.widgets.locale.LocaleProvider;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
@@ -105,9 +105,9 @@ public class FileAttachmentViewHolder extends RecyclerView.ViewHolder {
         if (attachmentFile != null) {
             return attachmentFile.getName();
         }
-        FileAttachment fileAttachment = attachment.getLocalAttachment();
-        if (fileAttachment != null) {
-            return fileAttachment.getDisplayName();
+        LocalAttachment localAttachment = attachment.getLocalAttachment();
+        if (localAttachment != null) {
+            return localAttachment.getDisplayName();
         }
         return "";
     }
@@ -117,9 +117,9 @@ public class FileAttachmentViewHolder extends RecyclerView.ViewHolder {
         if (attachmentFile != null) {
             return attachmentFile.getSize();
         }
-        FileAttachment fileAttachment = attachment.getLocalAttachment();
-        if (fileAttachment != null) {
-            return fileAttachment.getSize();
+        LocalAttachment localAttachment = attachment.getLocalAttachment();
+        if (localAttachment != null) {
+            return localAttachment.getSize();
         }
         return 0;
     }

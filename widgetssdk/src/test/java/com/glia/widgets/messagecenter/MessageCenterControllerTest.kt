@@ -11,15 +11,15 @@ import com.glia.widgets.chat.domain.UriToFileAttachmentUseCase
 import com.glia.widgets.core.configuration.EngagementConfiguration
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.engagement.domain.SetEngagementConfigUseCase
-import com.glia.widgets.core.fileupload.model.FileAttachment
+import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.core.permissions.domain.RequestNotificationPermissionIfPushNotificationsSetUpUseCase
 import com.glia.widgets.core.secureconversations.domain.AddSecureFileAttachmentsObserverUseCase
 import com.glia.widgets.core.secureconversations.domain.AddSecureFileToAttachmentAndUploadUseCase
+import com.glia.widgets.core.secureconversations.domain.GetAvailableQueueIdsForSecureMessagingUseCase
 import com.glia.widgets.core.secureconversations.domain.GetSecureFileAttachmentsUseCase
 import com.glia.widgets.core.secureconversations.domain.OnNextMessageUseCase
 import com.glia.widgets.core.secureconversations.domain.RemoveSecureFileAttachmentUseCase
 import com.glia.widgets.core.secureconversations.domain.ResetMessageCenterUseCase
-import com.glia.widgets.core.secureconversations.domain.GetAvailableQueueIdsForSecureMessagingUseCase
 import com.glia.widgets.core.secureconversations.domain.SendMessageButtonStateUseCase
 import com.glia.widgets.core.secureconversations.domain.SendSecureMessageUseCase
 import com.glia.widgets.core.secureconversations.domain.ShowMessageLimitErrorUseCase
@@ -225,16 +225,16 @@ internal class MessageCenterControllerTest {
 
     @Test
     fun onAttachmentReceived_ExecutesAddSecureFileToAttachmentAndUploadUseCase_onTrigger() {
-        val fileAttachment = mock<FileAttachment>()
-        messageCenterController.onAttachmentReceived(fileAttachment)
-        verify(addFileToAttachmentAndUploadUseCase, times(1)).execute(eq(fileAttachment), any())
+        val localAttachment = mock<LocalAttachment>()
+        messageCenterController.onAttachmentReceived(localAttachment)
+        verify(addFileToAttachmentAndUploadUseCase, times(1)).execute(eq(localAttachment), any())
     }
 
     @Test
     fun onRemoveAttachment() {
-        val fileAttachment = mock<FileAttachment>()
-        messageCenterController.onRemoveAttachment(fileAttachment)
-        verify(removeFileAttachmentUseCase, times(1)).execute(eq(fileAttachment))
+        val localAttachment = mock<LocalAttachment>()
+        messageCenterController.onRemoveAttachment(localAttachment)
+        verify(removeFileAttachmentUseCase, times(1)).execute(eq(localAttachment))
     }
 
     @Test

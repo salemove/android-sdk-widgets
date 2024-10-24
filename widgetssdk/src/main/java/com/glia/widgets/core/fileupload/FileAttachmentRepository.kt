@@ -9,7 +9,7 @@ import com.glia.widgets.chat.ChatType
 import com.glia.widgets.core.engagement.GliaEngagementConfigRepository
 import com.glia.widgets.core.engagement.exception.EngagementMissingException
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase
-import com.glia.widgets.core.fileupload.model.FileAttachment
+import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.di.GliaCore
 import java.util.Observable
 import java.util.Observer
@@ -25,28 +25,28 @@ internal class FileAttachmentRepository(
 
     private val observable = ObservableFileAttachmentList()
 
-    val fileAttachments: List<FileAttachment>
-        get() = observable.fileAttachments
+    val localAttachments: List<LocalAttachment>
+        get() = observable.localAttachments
 
-    val readyToSendFileAttachments: List<FileAttachment>
-        get() = observable.fileAttachments
-            .filter { obj: FileAttachment -> obj.isReadyToSend }
+    val readyToSendLocalAttachments: List<LocalAttachment>
+        get() = observable.localAttachments
+            .filter { obj: LocalAttachment -> obj.isReadyToSend }
 
     val attachedFilesCount: Long
-        get() = observable.fileAttachments.size.toLong()
+        get() = observable.localAttachments.size.toLong()
 
     fun isFileAttached(uri: Uri): Boolean {
-        return observable.fileAttachments
+        return observable.localAttachments
             .any { it.uri == uri }
     }
 
-    fun attachFile(file: FileAttachment) {
+    fun attachFile(file: LocalAttachment) {
         observable.notifyUpdate(
-            observable.fileAttachments + file
+            observable.localAttachments + file
         )
     }
 
-    fun uploadFile(file: FileAttachment, listener: AddFileToAttachmentAndUploadUseCase.Listener) {
+    fun uploadFile(file: LocalAttachment, listener: AddFileToAttachmentAndUploadUseCase.Listener) {
         val engagement = gliaCore.currentEngagement.getOrNull()
         if (engagement != null) {
             engagement.uploadFile(file.uri, handleFileUpload(file, listener))
@@ -59,7 +59,7 @@ internal class FileAttachmentRepository(
     }
 
     private fun handleFileUpload(
-        file: FileAttachment,
+        file: LocalAttachment,
         listener: AddFileToAttachmentAndUploadUseCase.Listener
     ) = RequestCallback<EngagementFile> { engagementFile: EngagementFile?, e: GliaException? ->
         if (engagementFile != null) {
@@ -75,31 +75,31 @@ internal class FileAttachmentRepository(
     }
 
     fun setFileAttachmentTooLarge(uri: Uri) {
-        setFileAttachmentStatus(uri, FileAttachment.Status.ERROR_FILE_TOO_LARGE)
+        setFileAttachmentStatus(uri, LocalAttachment.Status.ERROR_FILE_TOO_LARGE)
     }
 
     fun setSupportedFileAttachmentCountExceeded(uri: Uri) {
         setFileAttachmentStatus(
             uri,
-            FileAttachment.Status.ERROR_SUPPORTED_FILE_ATTACHMENT_COUNT_EXCEEDED
+            LocalAttachment.Status.ERROR_SUPPORTED_FILE_ATTACHMENT_COUNT_EXCEEDED
         )
     }
 
     fun setFileAttachmentEngagementMissing(uri: Uri) {
-        setFileAttachmentStatus(uri, FileAttachment.Status.ERROR_ENGAGEMENT_MISSING)
+        setFileAttachmentStatus(uri, LocalAttachment.Status.ERROR_ENGAGEMENT_MISSING)
     }
 
-    fun detachFile(attachment: FileAttachment?) {
+    fun detachFile(attachment: LocalAttachment?) {
         observable.notifyUpdate(
-            observable.fileAttachments
+            observable.localAttachments
                 .filter { it.uri !== attachment?.uri }
         )
     }
 
-    fun detachFiles(attachments: List<FileAttachment?>) {
+    fun detachFiles(attachments: List<LocalAttachment?>) {
         observable.notifyUpdate(
-            observable.fileAttachments
-                .filter { attachment: FileAttachment? ->
+            observable.localAttachments
+                .filter { attachment: LocalAttachment? ->
                     !attachments.contains(attachment)
                 }
         )
@@ -126,7 +126,7 @@ internal class FileAttachmentRepository(
         engagementFile: EngagementFile,
         listener: AddFileToAttachmentAndUploadUseCase.Listener
     ) {
-        setFileAttachmentStatus(uri, FileAttachment.Status.SECURITY_SCAN)
+        setFileAttachmentStatus(uri, LocalAttachment.Status.SECURITY_SCAN)
         listener.onSecurityCheckStarted()
         engagementFile.on(EngagementFile.Events.SCAN_RESULT) { scanResult: EngagementFile.ScanResult ->
             engagementFile.off(EngagementFile.Events.SCAN_RESULT)
@@ -144,7 +144,7 @@ internal class FileAttachmentRepository(
         if (scanResult == EngagementFile.ScanResult.CLEAN && engagementFile != null) {
             onUploadFileSuccess(uri, engagementFile, listener)
         } else {
-            setFileAttachmentStatus(uri, FileAttachment.Status.ERROR_SECURITY_SCAN_FAILED)
+            setFileAttachmentStatus(uri, LocalAttachment.Status.ERROR_SECURITY_SCAN_FAILED)
             listener.onFinished()
         }
     }
@@ -158,14 +158,14 @@ internal class FileAttachmentRepository(
         listener.onFinished()
     }
 
-    private fun setFileAttachmentStatus(uri: Uri, status: FileAttachment.Status) {
+    private fun setFileAttachmentStatus(uri: Uri, status: LocalAttachment.Status) {
         observable.notifyUpdate(
-            observable.fileAttachments
-                .map { fileAttachment: FileAttachment ->
-                    if (fileAttachment.uri === uri) {
-                        fileAttachment.setAttachmentStatus(status)
+            observable.localAttachments
+                .map { localAttachment: LocalAttachment ->
+                    if (localAttachment.uri === uri) {
+                        localAttachment.setAttachmentStatus(status)
                     } else {
-                        fileAttachment
+                        localAttachment
                     }
                 }
         )
@@ -173,12 +173,12 @@ internal class FileAttachmentRepository(
 
     private fun onEngagementFileReceived(uri: Uri, engagementFile: EngagementFile) {
         observable.notifyUpdate(
-            observable.fileAttachments
-                .map { attachment: FileAttachment ->
+            observable.localAttachments
+                .map { attachment: LocalAttachment ->
                     if (attachment.uri == uri) {
                         attachment
                             .setEngagementFile(engagementFile)
-                            .setAttachmentStatus(FileAttachment.Status.READY_TO_SEND)
+                            .setAttachmentStatus(LocalAttachment.Status.READY_TO_SEND)
                     } else {
                         attachment
                     }
@@ -186,24 +186,24 @@ internal class FileAttachmentRepository(
         )
     }
 
-    private fun getAttachmentStatus(exception: GliaException): FileAttachment.Status {
+    private fun getAttachmentStatus(exception: GliaException): LocalAttachment.Status {
         return when (exception.cause) {
-            GliaException.Cause.FILE_UPLOAD_FORBIDDEN -> FileAttachment.Status.ERROR_FILE_UPLOAD_FORBIDDEN
-            GliaException.Cause.INVALID_INPUT -> FileAttachment.Status.ERROR_INVALID_INPUT
-            GliaException.Cause.NETWORK_TIMEOUT -> FileAttachment.Status.ERROR_NETWORK_TIMEOUT
-            GliaException.Cause.INTERNAL_ERROR -> FileAttachment.Status.ERROR_INTERNAL
-            GliaException.Cause.PERMISSIONS_DENIED -> FileAttachment.Status.ERROR_PERMISSIONS_DENIED
-            GliaException.Cause.FILE_FORMAT_UNSUPPORTED -> FileAttachment.Status.ERROR_FORMAT_UNSUPPORTED
-            GliaException.Cause.FILE_TOO_LARGE -> FileAttachment.Status.ERROR_FILE_TOO_LARGE
-            else -> FileAttachment.Status.ERROR_UNKNOWN
+            GliaException.Cause.FILE_UPLOAD_FORBIDDEN -> LocalAttachment.Status.ERROR_FILE_UPLOAD_FORBIDDEN
+            GliaException.Cause.INVALID_INPUT -> LocalAttachment.Status.ERROR_INVALID_INPUT
+            GliaException.Cause.NETWORK_TIMEOUT -> LocalAttachment.Status.ERROR_NETWORK_TIMEOUT
+            GliaException.Cause.INTERNAL_ERROR -> LocalAttachment.Status.ERROR_INTERNAL
+            GliaException.Cause.PERMISSIONS_DENIED -> LocalAttachment.Status.ERROR_PERMISSIONS_DENIED
+            GliaException.Cause.FILE_FORMAT_UNSUPPORTED -> LocalAttachment.Status.ERROR_FORMAT_UNSUPPORTED
+            GliaException.Cause.FILE_TOO_LARGE -> LocalAttachment.Status.ERROR_FILE_TOO_LARGE
+            else -> LocalAttachment.Status.ERROR_UNKNOWN
         }
     }
 
     class ObservableFileAttachmentList : Observable() {
-        var fileAttachments: List<FileAttachment> = ArrayList()
+        var localAttachments: List<LocalAttachment> = ArrayList()
 
-        fun notifyUpdate(newObject: List<FileAttachment>) {
-            fileAttachments = newObject
+        fun notifyUpdate(newObject: List<LocalAttachment>) {
+            localAttachments = newObject
             setChanged()
             notifyObservers()
         }

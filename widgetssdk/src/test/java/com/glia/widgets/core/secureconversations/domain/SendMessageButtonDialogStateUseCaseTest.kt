@@ -1,7 +1,7 @@
 package com.glia.widgets.core.secureconversations.domain
 
 import com.glia.widgets.core.fileupload.SecureFileAttachmentRepository
-import com.glia.widgets.core.fileupload.model.FileAttachment
+import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.core.secureconversations.SendMessageRepository
 import com.glia.widgets.helper.rx.Schedulers
@@ -58,10 +58,10 @@ class SendMessageButtonDialogStateUseCaseTest {
     @Test
     fun `invoke returns disable if the message is blank and files are empty`() {
         val message = ""
-        val fileAttachments = emptyList<FileAttachment>()
+        val localAttachments = emptyList<LocalAttachment>()
         val isSending = false
         val isLimitError = false
-        setInitialValues(message, fileAttachments, isSending, isLimitError)
+        setInitialValues(message, localAttachments, isSending, isLimitError)
 
         val testObservable = useCase().test()
         testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
@@ -73,14 +73,14 @@ class SendMessageButtonDialogStateUseCaseTest {
     @Test
     fun `invoke returns disable if the message is blank and file is not ready to send`() {
         val message = ""
-        val fileAttachments = listOf(
-            mock<FileAttachment>().also {
+        val localAttachments = listOf(
+            mock<LocalAttachment>().also {
                 whenever(it.isReadyToSend) doReturn false
             }
         )
         val isSending = false
         val isLimitError = false
-        setInitialValues(message, fileAttachments, isSending, isLimitError)
+        setInitialValues(message, localAttachments, isSending, isLimitError)
 
         val testObservable = useCase().test()
         testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
@@ -92,14 +92,14 @@ class SendMessageButtonDialogStateUseCaseTest {
     @Test
     fun `invoke returns disable if the message is not blank and file is not ready to send`() {
         val message = "test"
-        val fileAttachments = listOf(
-            mock<FileAttachment>().also {
+        val localAttachments = listOf(
+            mock<LocalAttachment>().also {
                 whenever(it.isReadyToSend) doReturn false
             }
         )
         val isSending = false
         val isLimitError = false
-        setInitialValues(message, fileAttachments, isSending, isLimitError)
+        setInitialValues(message, localAttachments, isSending, isLimitError)
 
         val testObservable = useCase().test()
         testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
@@ -111,20 +111,20 @@ class SendMessageButtonDialogStateUseCaseTest {
     @Test
     fun `invoke returns disable if some file is not ready to send`() {
         val message = "test"
-        val fileAttachments = listOf(
-            mock<FileAttachment>().also {
+        val localAttachments = listOf(
+            mock<LocalAttachment>().also {
                 whenever(it.isReadyToSend) doReturn true
             },
-            mock<FileAttachment>().also {
+            mock<LocalAttachment>().also {
                 whenever(it.isReadyToSend) doReturn false
             },
-            mock<FileAttachment>().also {
+            mock<LocalAttachment>().also {
                 whenever(it.isReadyToSend) doReturn true
             }
         )
         val isSending = false
         val isLimitError = false
-        setInitialValues(message, fileAttachments, isSending, isLimitError)
+        setInitialValues(message, localAttachments, isSending, isLimitError)
 
         val testObservable = useCase().test()
         testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
@@ -136,14 +136,14 @@ class SendMessageButtonDialogStateUseCaseTest {
     @Test
     fun `invoke returns disable if the limit error`() {
         val message = "test"
-        val fileAttachments = listOf(
-            mock<FileAttachment>().also {
+        val localAttachments = listOf(
+            mock<LocalAttachment>().also {
                 whenever(it.isReadyToSend) doReturn true
             }
         )
         val isSending = false
         val isLimitError = true
-        setInitialValues(message, fileAttachments, isSending, isLimitError)
+        setInitialValues(message, localAttachments, isSending, isLimitError)
 
         val testObservable = useCase().test()
         testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
@@ -155,14 +155,14 @@ class SendMessageButtonDialogStateUseCaseTest {
     @Test
     fun `invoke returns normal if the message is blank and file is ready to send`() {
         val message = ""
-        val fileAttachments = listOf(
-            mock<FileAttachment>().also {
+        val localAttachments = listOf(
+            mock<LocalAttachment>().also {
                 whenever(it.isReadyToSend) doReturn true
             }
         )
         val isSending = false
         val isLimitError = false
-        setInitialValues(message, fileAttachments, isSending, isLimitError)
+        setInitialValues(message, localAttachments, isSending, isLimitError)
 
         val testObservable = useCase().test()
         testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
@@ -174,20 +174,20 @@ class SendMessageButtonDialogStateUseCaseTest {
     @Test
     fun `invoke returns normal if the message is blank and all files are ready to send`() {
         val message = ""
-        val fileAttachments = listOf(
-            mock<FileAttachment>().also {
+        val localAttachments = listOf(
+            mock<LocalAttachment>().also {
                 whenever(it.isReadyToSend) doReturn true
             },
-            mock<FileAttachment>().also {
+            mock<LocalAttachment>().also {
                 whenever(it.isReadyToSend) doReturn true
             },
-            mock<FileAttachment>().also {
+            mock<LocalAttachment>().also {
                 whenever(it.isReadyToSend) doReturn true
             }
         )
         val isSending = false
         val isLimitError = false
-        setInitialValues(message, fileAttachments, isSending, isLimitError)
+        setInitialValues(message, localAttachments, isSending, isLimitError)
 
         val testObservable = useCase().test()
         testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
@@ -199,14 +199,14 @@ class SendMessageButtonDialogStateUseCaseTest {
     @Test
     fun `invoke returns progress if it is sending`() {
         val message = "test"
-        val fileAttachments = listOf(
-            mock<FileAttachment>().also {
+        val localAttachments = listOf(
+            mock<LocalAttachment>().also {
                 whenever(it.isReadyToSend) doReturn true
             }
         )
         val isSending = true
         val isLimitError = false
-        setInitialValues(message, fileAttachments, isSending, isLimitError)
+        setInitialValues(message, localAttachments, isSending, isLimitError)
 
         val testObservable = useCase().test()
         testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
@@ -217,14 +217,14 @@ class SendMessageButtonDialogStateUseCaseTest {
 
     private fun setInitialValues(
         message: String,
-        fileAttachments: List<FileAttachment>,
+        localAttachments: List<LocalAttachment>,
         isSending: Boolean,
         isLimitError: Boolean
     ) {
         whenever(sendMessageRepository.observable) doReturn BehaviorSubject
             .createDefault(message)
         whenever(fileAttachmentRepository.observable) doReturn BehaviorSubject
-            .createDefault(fileAttachments)
+            .createDefault(localAttachments)
         whenever(secureConversationsRepository.messageSendingObservable) doReturn BehaviorSubject
             .createDefault(isSending)
         whenever(showMessageLimitErrorUseCase.invoke()) doReturn BehaviorSubject

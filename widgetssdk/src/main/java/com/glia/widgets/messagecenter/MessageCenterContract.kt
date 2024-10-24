@@ -6,7 +6,7 @@ import com.glia.widgets.base.BaseController
 import com.glia.widgets.base.BaseView
 import com.glia.widgets.core.configuration.EngagementConfiguration
 import com.glia.widgets.core.dialog.DialogContract
-import com.glia.widgets.core.fileupload.model.FileAttachment
+import com.glia.widgets.core.fileupload.model.LocalAttachment
 
 internal interface MessageCenterContract {
     interface Controller : BaseController {
@@ -23,7 +23,7 @@ internal interface MessageCenterContract {
         fun onBrowseClicked()
         fun onTakePhotoClicked()
         fun ensureMessageCenterAvailability()
-        fun onRemoveAttachment(file: FileAttachment)
+        fun onRemoveAttachment(file: LocalAttachment)
         fun addCallback(dialogCallback: DialogContract.Controller.Callback)
         fun removeCallback(dialogCallback: DialogContract.Controller.Callback)
         fun dismissDialogs()
@@ -35,7 +35,7 @@ internal interface MessageCenterContract {
     interface View : BaseView<Controller> {
         fun setupViewAppearance()
         fun onStateUpdated(state: MessageCenterState)
-        fun emitUploadAttachments(attachments: List<FileAttachment>)
+        fun emitUploadAttachments(attachments: List<LocalAttachment>)
         fun selectAttachmentFile(type: String)
         fun takePhoto(uri: Uri)
         fun finish()

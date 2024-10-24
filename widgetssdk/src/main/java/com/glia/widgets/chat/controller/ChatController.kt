@@ -47,7 +47,7 @@ import com.glia.widgets.core.fileupload.domain.GetFileAttachmentsUseCase
 import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentObserverUseCase
 import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentUseCase
 import com.glia.widgets.core.fileupload.domain.SupportedFileCountCheckUseCase
-import com.glia.widgets.core.fileupload.model.FileAttachment
+import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.core.notification.domain.CallNotificationUseCase
 import com.glia.widgets.core.permissions.domain.RequestNotificationPermissionIfPushNotificationsSetUpUseCase
 import com.glia.widgets.core.permissions.domain.WithCameraPermissionUseCase
@@ -779,11 +779,11 @@ internal class ChatController(
         viewInitQueueing()
     }
 
-    override fun onRemoveAttachment(attachment: FileAttachment) {
+    override fun onRemoveAttachment(attachment: LocalAttachment) {
         removeFileAttachmentUseCase(attachment)
     }
 
-    private fun onAttachmentReceived(file: FileAttachment) {
+    private fun onAttachmentReceived(file: LocalAttachment) {
         addFileToAttachmentAndUploadUseCase.execute(file, object : AddFileToAttachmentAndUploadUseCase.Listener {
             override fun onFinished() {
                 Logger.d(TAG, "fileUploadFinished")

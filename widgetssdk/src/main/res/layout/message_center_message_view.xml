@@ -13,6 +13,20 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/leftGuideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="16dp"/>
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/rightGuideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_end="16dp"/>
+
         <Space
             android:id="@+id/top_space"
             android:layout_width="wrap_content"
@@ -28,7 +42,6 @@
             android:id="@+id/icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
             android:layout_marginBottom="10dp"
             android:src="@drawable/ic_secure_message"
             app:tint="?attr/gliaBrandPrimaryColor"
@@ -36,15 +49,13 @@
             app:layout_constraintBottom_toTopOf="@id/title"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="@id/leftGuideline"
             app:layout_constraintTop_toBottomOf="@+id/top_space" />
 
         <TextView
             android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
             tools:text="@string/message_center_title"
             android:textColor="?attr/gliaBaseDarkColor"
@@ -52,25 +63,23 @@
             android:textAppearance="?attr/textAppearanceHeadline3"
             app:layout_constrainedWidth="true"
             app:layout_constraintBottom_toTopOf="@id/description"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/rightGuideline"
+            app:layout_constraintStart_toStartOf="@id/leftGuideline"
             app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/icon" />
 
         <TextView
             android:id="@+id/description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
             tools:text="@string/message_center_description"
             android:textColor="?attr/gliaBaseDarkColor"
             android:textSize="16sp"
             app:layout_constrainedWidth="true"
             app:layout_constraintBottom_toTopOf="@id/btn_check_messages"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/rightGuideline"
+            app:layout_constraintStart_toStartOf="@id/leftGuideline"
             app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/title"/>
 
         <com.google.android.material.button.MaterialButton
@@ -95,13 +104,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="invisible"
+            tools:visibility="visible"
             app:constraint_referenced_ids="message_title, message_edit_text, attachments_recycler_view, btn_send_message" />
 
         <TextView
             android:id="@+id/message_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="14dp"
             android:layout_marginTop="@dimen/glia_welcome_screen_input_title_margin"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
@@ -112,7 +121,7 @@
             app:layout_constraintEnd_toStartOf="@id/add_attachment_button"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
             app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="@id/leftGuideline"
             app:layout_constraintTop_toBottomOf="@+id/btn_check_messages" />
 
         <ImageButton
@@ -134,8 +143,6 @@
             android:id="@+id/message_edit_text"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
             android:gravity="start"
             android:inputType="textCapSentences|textMultiLine"
             android:textColor="?attr/gliaBaseDarkColor"
@@ -144,9 +151,9 @@
             android:textColorHint="?attr/gliaBaseNormalColor"
             android:textCursorDrawable="@null"
             app:layout_constraintBottom_toTopOf="@id/error_text_view"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/leftGuideline"
+            app:layout_constraintEnd_toEndOf="@id/rightGuideline"
             app:layout_constraintHeight_min="@dimen/glia_welcome_screen_input_min_height"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/message_title"
             app:layout_constraintVertical_weight="7" />
 
@@ -154,8 +161,6 @@
             android:id="@+id/error_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
             android:layout_marginTop="4dp"
             tools:text="@string/message_center_message_limit_error_message"
             android:drawablePadding="@dimen/glia_small"
@@ -163,8 +168,8 @@
             app:drawableStartCompat="@drawable/ic_attention"
             android:textColor="?attr/gliaSystemNegativeColor"
             app:layout_constraintTop_toBottomOf="@id/message_edit_text"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/leftGuideline"
+            app:layout_constraintEnd_toEndOf="@id/rightGuideline"
             app:layout_constraintBottom_toTopOf="@id/attachments_recycler_view"
             app:layout_constraintHorizontal_bias="0.0"/>
 
@@ -173,12 +178,10 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
             android:overScrollMode="never"
             app:layout_constraintBottom_toTopOf="@id/btn_send_message"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="@id/leftGuideline"
+            app:layout_constraintEnd_toEndOf="@id/rightGuideline"
             app:layout_constraintTop_toBottomOf="@id/error_text_view"
             tools:itemCount="1"
             tools:listitem="@layout/chat_attachment_uploaded_item" />
@@ -188,12 +191,10 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
             app:layout_constraintBottom_toTopOf="@id/bottom_space"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="@id/leftGuideline"
+            app:layout_constraintEnd_toEndOf="@id/rightGuideline"
             app:layout_constraintTop_toBottomOf="@+id/attachments_recycler_view" />
 
         <Space

@@ -39,6 +39,13 @@ internal class EntryWidgetErrorStateViewHolder(
                 binding.button.setOnClickListener(onClickListener)
                 binding.button.isVisible = true
             }
+            EntryWidgetContract.ItemType.SDK_NOT_INITIALIZED_STATE -> {
+                binding.title.setLocaleText(R.string.entry_widget_error_state_title)
+                binding.description.setLocaleText(R.string.entry_widget_error_state_description)
+                binding.button.setLocaleText(R.string.entry_widget_error_state_try_again_button_label)
+                binding.button.setOnClickListener(onClickListener)
+                binding.button.isVisible = false
+            }
             else -> {
                 // Do nothing
             }

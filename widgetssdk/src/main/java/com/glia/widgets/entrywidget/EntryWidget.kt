@@ -40,7 +40,10 @@ internal class EntryWidgetImpl(
     override fun show(activity: Activity) = activityLauncher.launchEntryWidget(activity)
 
     override fun getView(context: Context): View {
-        val adapter = EntryWidgetAdapter(EntryWidgetContract.ViewType.EMBEDDED_VIEW, themeManager.theme?.entryWidgetTheme)
+        val adapter = EntryWidgetAdapter(
+            EntryWidgetContract.ViewType.EMBEDDED_VIEW,
+            themeManager.theme?.entryWidgetTheme
+        )
         return EntryWidgetView(context, adapter)
     }
 

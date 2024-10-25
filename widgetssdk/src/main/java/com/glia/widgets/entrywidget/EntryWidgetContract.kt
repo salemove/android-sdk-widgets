@@ -19,6 +19,7 @@ internal interface EntryWidgetContract {
         SECURE_MESSAGE,
         LOADING_STATE,
         EMPTY_STATE,
+        SDK_NOT_INITIALIZED_STATE,
         ERROR_STATE,
         PROVIDED_BY
     }

@@ -57,7 +57,7 @@ class EntryWidgetControllerTest {
 
         controller.setView(view)
 
-        verify(view, atLeast(1)).showItems(listOf(EntryWidgetContract.ItemType.ERROR_STATE))
+        verify(view, atLeast(1)).showItems(listOf(EntryWidgetContract.ItemType.SDK_NOT_INITIALIZED_STATE))
     }
 
     @Test
@@ -73,6 +73,41 @@ class EntryWidgetControllerTest {
             result == listOf(
                 EntryWidgetContract.ItemType.CHAT,
                 EntryWidgetContract.ItemType.PROVIDED_BY
+            )
+        )
+    }
+
+    @Test
+    fun `mapState returns SECURE_MESSAGE and PROVIDED_BY if SECURE_MESSAGE media type is available and visitor is authenticates`() {
+        val queue = mock(Queue::class.java)
+        val queueState = mock(QueueState::class.java)
+        `when`(queue.state).thenReturn(queueState)
+        `when`(queueState.status).thenReturn(QueueState.Status.OPEN)
+        `when`(isAuthenticatedUseCase.invoke()).thenReturn(true)
+        `when`(queueState.medias).thenReturn(arrayOf(Engagement.MediaType.MESSAGING))
+
+        val result = controller.mapState(QueuesState.Queues(listOf(queue)))
+        assert(
+            result == listOf(
+                EntryWidgetContract.ItemType.SECURE_MESSAGE,
+                EntryWidgetContract.ItemType.PROVIDED_BY
+            )
+        )
+    }
+
+    @Test
+    fun `mapState returns EMPTY_STATE if SECURE_MESSAGE media type is available but visitor is not authenticates`() {
+        val queue = mock(Queue::class.java)
+        val queueState = mock(QueueState::class.java)
+        `when`(queue.state).thenReturn(queueState)
+        `when`(queueState.status).thenReturn(QueueState.Status.OPEN)
+        `when`(isAuthenticatedUseCase.invoke()).thenReturn(false)
+        `when`(queueState.medias).thenReturn(arrayOf(Engagement.MediaType.MESSAGING))
+
+        val result = controller.mapState(QueuesState.Queues(listOf(queue)))
+        assert(
+            result == listOf(
+                EntryWidgetContract.ItemType.EMPTY_STATE
             )
         )
     }

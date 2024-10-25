@@ -23,7 +23,10 @@ internal class EntryWidgetAdapter(
     private val errorButtonTheme: ButtonTheme? = null
 ) : ListAdapter<EntryWidgetContract.ItemType, EntryWidgetAdapter.ViewHolder>(DIFF_CALLBACK) {
 
-    constructor(viewType: EntryWidgetContract.ViewType, entryWidgetTheme: EntryWidgetTheme?): this(
+    constructor(
+        viewType: EntryWidgetContract.ViewType,
+        entryWidgetTheme: EntryWidgetTheme?
+    ) : this(
         viewType,
         entryWidgetTheme?.mediaTypeItems,
         entryWidgetTheme?.errorTitle,
@@ -89,6 +92,7 @@ internal class EntryWidgetAdapter(
     override fun getItemViewType(position: Int): Int {
         return when (getItem(position)) {
             EntryWidgetContract.ItemType.EMPTY_STATE,
+            EntryWidgetContract.ItemType.SDK_NOT_INITIALIZED_STATE,
             EntryWidgetContract.ItemType.ERROR_STATE -> ViewType.ERROR_ITEM.ordinal
             EntryWidgetContract.ItemType.PROVIDED_BY -> ViewType.PROVIDED_BY_ITEM.ordinal
             else -> ViewType.CONTACT_ITEM.ordinal

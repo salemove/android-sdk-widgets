@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@drawable/bg_bottom_sheet">
+    android:background="@drawable/bg_bottom_sheet"
+    android:backgroundTint="?attr/gliaBaseLightColor">
 
     <ImageView
         android:id="@+id/drag_handle"
@@ -16,7 +17,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/container"/>
+        app:layout_constraintBottom_toTopOf="@id/container" />
 
     <FrameLayout
         android:id="@+id/container"

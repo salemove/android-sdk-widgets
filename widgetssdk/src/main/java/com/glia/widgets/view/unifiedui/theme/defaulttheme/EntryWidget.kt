@@ -27,7 +27,7 @@ internal fun DefaultMediaTypeItemsTheme(pallet: ColorPallet?): MediaTypeItemsThe
     pallet?.run {
         MediaTypeItemsTheme(
             mediaTypeItem = DefaultMediaItemTypeTheme(this),
-            dividerColor = baseNormalColorTheme
+            dividerColor = baseShadeColorTheme
         )
     }
 

@@ -14,6 +14,7 @@ import com.glia.widgets.R
 import com.glia.widgets.databinding.EntryWidgetFragmentBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.entrywidget.adapter.EntryWidgetAdapter
+import com.glia.widgets.helper.wrapWithMaterialThemeOverlay
 import com.glia.widgets.view.unifiedui.applyLayerTheme
 import com.glia.widgets.view.unifiedui.theme.entrywidget.EntryWidgetTheme
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -35,7 +36,8 @@ internal class EntryWidgetFragment : BottomSheetDialogFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val binding = EntryWidgetFragmentBinding.inflate(inflater, container, false)
+        val layoutInflater = LayoutInflater.from(requireContext().wrapWithMaterialThemeOverlay())
+        val binding = EntryWidgetFragmentBinding.inflate(layoutInflater, container, false)
         val entryWidgetsTheme = Dependencies.gliaThemeManager.theme?.entryWidgetTheme
 
         setupView(requireContext(), binding, entryWidgetsTheme)

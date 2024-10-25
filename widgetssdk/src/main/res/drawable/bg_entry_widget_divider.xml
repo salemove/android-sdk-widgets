@@ -7,7 +7,7 @@
         <shape
             android:shape="rectangle">
             <size android:height="@dimen/glia_px" />
-            <solid android:color="@color/glia_stroke_gray" />
+            <solid android:color="?attr/gliaBaseShadeColor" />
         </shape>
 
     </item>

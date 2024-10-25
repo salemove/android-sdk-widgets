@@ -49,7 +49,10 @@ internal class EntryWidgetFragment : BottomSheetDialogFragment() {
         binding: EntryWidgetFragmentBinding,
         entryWidgetsTheme: EntryWidgetTheme?
     ) {
-        val entryWidgetAdapter = EntryWidgetAdapter(EntryWidgetContract.ViewType.BOTTOM_SHEET, entryWidgetsTheme)
+        val entryWidgetAdapter = EntryWidgetAdapter(
+            EntryWidgetContract.ViewType.BOTTOM_SHEET,
+            entryWidgetsTheme
+        )
 
         EntryWidgetView(
             context = context,

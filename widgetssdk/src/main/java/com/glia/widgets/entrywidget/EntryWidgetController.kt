@@ -29,12 +29,12 @@ internal class EntryWidgetController(
         if (core.isInitialized) {
             subscribeToQueueState()
         } else {
-            initErrorState()
+            showSdkNotInitializedState()
         }
     }
 
-    private fun initErrorState() {
-        view.showItems(listOf(EntryWidgetContract.ItemType.ERROR_STATE))
+    private fun showSdkNotInitializedState() {
+        view.showItems(listOf(EntryWidgetContract.ItemType.SDK_NOT_INITIALIZED_STATE))
     }
 
     private fun subscribeToQueueState() {
@@ -72,13 +72,16 @@ internal class EntryWidgetController(
                     if (allMedias.contains(Engagement.MediaType.VIDEO)) add(EntryWidgetContract.ItemType.VIDEO_CALL)
                     if (allMedias.contains(Engagement.MediaType.MESSAGING) && isAuthenticatedUseCase()) add(EntryWidgetContract.ItemType.SECURE_MESSAGE)
 
-                    if (allMedias.isEmpty()) {
+                    if (allMedias.isEmpty() || allMedias.hasOnlyMessagingAndIsNotAuthenticated()) {
                         add(EntryWidgetContract.ItemType.EMPTY_STATE)
                     } else {
                         add(EntryWidgetContract.ItemType.PROVIDED_BY)
                     }
                 }
             }
+
+    private fun List<Engagement.MediaType>.hasOnlyMessagingAndIsNotAuthenticated(): Boolean =
+        this.size == 1 && this.contains(Engagement.MediaType.MESSAGING) && !isAuthenticatedUseCase()
 
     override fun onItemClicked(itemType: EntryWidgetContract.ItemType, activity: Activity) {
         Logger.d(TAG, "Item clicked: $itemType")

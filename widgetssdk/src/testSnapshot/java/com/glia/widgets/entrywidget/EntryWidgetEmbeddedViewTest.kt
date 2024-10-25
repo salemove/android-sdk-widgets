@@ -163,6 +163,51 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
         )
     }
 
+
+    // MARK: SDK not initialized state tests
+
+    private val sdkNotInitializedItems = listOf(
+        EntryWidgetContract.ItemType.SDK_NOT_INITIALIZED_STATE,
+        EntryWidgetContract.ItemType.PROVIDED_BY
+    )
+
+    @Test
+    fun sdkNotInitializedItemsDefaultTheme() {
+        snapshot(
+            setupView(items = sdkNotInitializedItems)
+        )
+    }
+
+    @Test
+    fun sdkNotInitializedItemsWithUnifiedTheme() {
+        snapshot(
+            setupView(
+                items = sdkNotInitializedItems,
+                unifiedTheme = unifiedTheme()
+            )
+        )
+    }
+
+    @Test
+    fun sdkNotInitializedItemsWithUnifiedThemeWithGlobalColors() {
+        snapshot(
+            setupView(
+                items = sdkNotInitializedItems,
+                unifiedTheme = unifiedThemeWithGlobalColors()
+            )
+        )
+    }
+
+    @Test
+    fun sdkNotInitializedItemsWithUnifiedThemeWithoutEntryWidget() {
+        snapshot(
+            setupView(
+                items = sdkNotInitializedItems,
+                unifiedTheme = unifiedThemeWithoutEntryWidget()
+            )
+        )
+    }
+
     // MARK: Error state tests
 
     private val errorItems = listOf(

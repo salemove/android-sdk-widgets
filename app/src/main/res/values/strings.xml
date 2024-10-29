@@ -81,7 +81,9 @@
     <string name="main_launch_activity">Launch Chat in Activity</string>
     <string name="main_launch_fragment">Launch Chat in Fragment</string>
     <string name="main_start_in_integrator_app">Start Chat in integrator app</string>
-    <string name="main_start_entry_widget">Entry Widget</string>
+    <string name="main_start_entry_widget">Show Entry Widget</string>
+    <string name="main_start_entry_widget_bottom_sheet">Bottom Sheet</string>
+    <string name="main_start_entry_widget_embedded_view">Embedded View</string>
     <string name="main_start_chat_flow">Start new chat flow</string>
     <string name="main_start_message_center_flow">Start new messaging flow</string>
     <string name="main_start_audio_call">Start new audio call</string>

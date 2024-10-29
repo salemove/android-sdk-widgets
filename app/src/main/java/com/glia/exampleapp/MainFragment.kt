@@ -12,6 +12,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -83,7 +84,13 @@ class MainFragment : Fragment() {
         view.findViewById<View>(R.id.settings_button)
             .setOnClickListener { navController.navigate(R.id.settings) }
         view.findViewById<View>(R.id.entry_widget_button)
-            .setOnClickListener { entryWidget.show(requireActivity()) }
+            .setOnClickListener {
+                if ((view.findViewById<View>(R.id.entry_widget_switch) as SwitchCompat).isChecked) {
+                    showEntryWidgetInADedicatedView()
+                } else {
+                    entryWidget.show(requireActivity())
+                }
+            }
         view.findViewById<View>(R.id.chat_activity_button)
             .setOnClickListener { engagementLauncher.startChat(requireActivity()) }
         view.findViewById<View>(R.id.audio_call_button)
@@ -543,6 +550,15 @@ class MainFragment : Fragment() {
         setupAuthButtonsVisibility()
     }
 
+    // For testing the embedded Entry Widget
+    private fun showEntryWidgetInADedicatedView() {
+        val entryWidgetView = entryWidget.getView(requireContext())
+        val container = containerView!!.findViewById<FrameLayout>(R.id.entry_widget_container)
+        container.removeAllViews()
+        container.addView(entryWidgetView)
+        container.visibility = View.VISIBLE
+    }
+
     private fun showVisitorCode() {
         val visitorContext = getContextAssetIdFromPrefs(sharedPreferences)
         val cv = GliaWidgets.getCallVisualizer()
@@ -555,14 +571,14 @@ class MainFragment : Fragment() {
     // For testing the integrated Visitor Code solution
     private fun showVisitorCodeInADedicatedView() {
         val visitorCodeView = GliaWidgets.getCallVisualizer().createVisitorCodeView(requireContext())
-        val cv = containerView!!.findViewById<CardView>(R.id.container)
+        val cv = containerView!!.findViewById<CardView>(R.id.visitor_code_container)
         cv.removeAllViews()
         cv.addView(visitorCodeView)
         cv.visibility = View.VISIBLE
     }
 
     private fun removeVisitorCodeFromDedicatedView() {
-        val cv = containerView!!.findViewById<CardView>(R.id.container)
+        val cv = containerView!!.findViewById<CardView>(R.id.visitor_code_container)
         cv.removeAllViews()
         cv.visibility = View.GONE
     }

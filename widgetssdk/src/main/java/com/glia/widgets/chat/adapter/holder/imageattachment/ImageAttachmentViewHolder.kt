@@ -10,7 +10,6 @@ import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.Accessibilit
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.widgets.R
-import com.glia.widgets.chat.model.Attachment
 import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase
@@ -25,27 +24,16 @@ import io.reactivex.rxjava3.disposables.Disposable
 
 internal open class ImageAttachmentViewHolder(
     itemView: View,
+    private val imageView: ShapeableImageView,
     private val getImageFileFromCacheUseCase: GetImageFileFromCacheUseCase,
     private val getImageFileFromDownloadsUseCase: GetImageFileFromDownloadsUseCase,
     private val getImageFileFromNetworkUseCase: GetImageFileFromNetworkUseCase,
     private val schedulers: Schedulers
 ) : RecyclerView.ViewHolder(itemView) {
-    private val imageView: ShapeableImageView
     private var disposable: Disposable? = null
 
-    init {
-        imageView = itemView.findViewById(R.id.incoming_image_attachment)
-    }
-
-    fun bind(attachment: Attachment) {
-        val attachmentFile = attachment.remoteAttachment
-        attachmentFile?.let { bind(it) }
-        val fileAttachment = attachment.localAttachment
-        fileAttachment?.let { bind(it) }
-    }
-
-    private fun bind(attachmentFile: AttachmentFile) {
-        imageView.setImageResource(android.R.color.transparent) // clear the previous view state
+    fun bind(attachmentFile: AttachmentFile) {
+        imageView.setImageResource(android.R.color.darker_gray) // clear the previous view state
         val imageName = attachmentFile.fileName
         disposable = getImageFileFromCacheUseCase.invoke(imageName)
             .doOnError { error: Throwable -> d(TAG, "failed loading from cache: " + imageName + " reason: " + error.message) }
@@ -66,7 +54,7 @@ internal open class ImageAttachmentViewHolder(
         setAccessibilityActions()
     }
 
-    private fun bind(localAttachment: LocalAttachment) {
+    fun bind(localAttachment: LocalAttachment) {
         Picasso.get()
             .load(localAttachment.uri)
             .into(imageView)

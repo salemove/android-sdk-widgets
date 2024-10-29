@@ -2,16 +2,14 @@ package com.glia.widgets.chat.adapter.holder.fileattachment
 
 import android.text.format.Formatter
 import android.view.View
-import androidx.core.view.AccessibilityDelegateCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
-import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
-import com.glia.widgets.chat.adapter.ChatAdapter.OnFileItemClickListener
+import com.glia.widgets.chat.adapter.ChatAdapter
 import com.glia.widgets.chat.model.OperatorAttachmentItem
 import com.glia.widgets.databinding.ChatAttachmentOperatorFileLayoutBinding
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.helper.addClickActionAccessibilityLabel
+import com.glia.widgets.helper.removeAccessibilityClickAction
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.locale.LocaleProvider
 import com.glia.widgets.locale.StringKey
@@ -21,8 +19,9 @@ import com.glia.widgets.view.unifiedui.theme.chat.MessageBalloonTheme
 internal class OperatorFileAttachmentViewHolder @JvmOverloads constructor(
     private val binding: ChatAttachmentOperatorFileLayoutBinding,
     uiTheme: UiTheme,
+    private val onFileItemClickListener: ChatAdapter.OnFileItemClickListener,
     private val localeProvider: LocaleProvider = Dependencies.localeProvider
-) : FileAttachmentViewHolder(binding.root, localeProvider) {
+) : FileAttachmentViewHolder(binding.root) {
     private val operatorTheme: MessageBalloonTheme? by lazy {
         Dependencies.gliaThemeManager.theme?.chatTheme?.operatorMessage
     }
@@ -31,8 +30,8 @@ internal class OperatorFileAttachmentViewHolder @JvmOverloads constructor(
         setupOperatorStatusView(uiTheme)
     }
 
-    fun bind(item: OperatorAttachmentItem.File, listener: OnFileItemClickListener?) {
-        super.setData(item.isFileExists, item.isDownloading, item.attachment, listener)
+    fun bind(item: OperatorAttachmentItem.File) {
+        super.setData(item.isFileExists, item.isDownloading, item.attachment)
         updateOperatorStatusView(item)
     }
 
@@ -49,27 +48,33 @@ internal class OperatorFileAttachmentViewHolder @JvmOverloads constructor(
         } else {
             binding.chatHeadView.showPlaceholder()
         }
-        val name = getAttachmentName(item.attachment)
-        val size = getAttachmentSize(item.attachment)
+        val name = item.attachment.name
+        val size = item.attachment.size
         val byteSize = Formatter.formatFileSize(itemView.context, size)
-        itemView.setLocaleContentDescription(
+
+        val attachmentView = binding.attachmentFileView.root
+
+        when {
+            item.isDownloading -> {
+                attachmentView.setOnClickListener(null)
+                attachmentView.removeAccessibilityClickAction()
+            }
+
+            item.isFileExists -> {
+                attachmentView.setOnClickListener { onFileItemClickListener.onFileOpenClick(item.attachment) }
+                attachmentView.addClickActionAccessibilityLabel(localeProvider.getString(R.string.general_open))
+            }
+
+            else -> {
+                attachmentView.setOnClickListener { onFileItemClickListener.onFileDownloadClick(item.attachment) }
+                attachmentView.addClickActionAccessibilityLabel(localeProvider.getString(R.string.general_download))
+            }
+        }
+
+        attachmentView.setLocaleContentDescription(
             R.string.android_chat_operator_file_accessibility,
             StringKeyPair(StringKey.NAME, name),
             StringKeyPair(StringKey.SIZE, byteSize)
         )
-        ViewCompat.setAccessibilityDelegate(itemView, object : AccessibilityDelegateCompat() {
-            override fun onInitializeAccessibilityNodeInfo(
-                host: View,
-                info: AccessibilityNodeInfoCompat
-            ) {
-                super.onInitializeAccessibilityNodeInfo(host, info)
-                val actionLabel =
-                    localeProvider.getString(if (item.isFileExists) R.string.general_open else R.string.general_download)
-                val actionClick = AccessibilityActionCompat(
-                    AccessibilityNodeInfoCompat.ACTION_CLICK, actionLabel
-                )
-                info.addAction(actionClick)
-            }
-        })
     }
 }

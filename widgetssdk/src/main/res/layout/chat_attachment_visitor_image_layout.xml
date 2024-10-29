@@ -22,6 +22,7 @@
         app:layout_constraintGuide_end="@dimen/glia_chat_visitor_margin_end" />
 
     <include
+        android:id="@+id/image_layout"
         layout="@layout/chat_attachment_image_item"
         android:layout_width="@dimen/glia_chat_attachment_image_width"
         android:layout_height="@dimen/glia_chat_attachment_image_height"
@@ -46,7 +47,7 @@
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
         app:layout_constraintHorizontal_bias="1"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
-        app:layout_constraintTop_toBottomOf="@id/incoming_image_attachment" />
+        app:layout_constraintTop_toBottomOf="@id/image_layout" />
 
     <TextView
         android:id="@+id/delivered_view"
@@ -61,5 +62,5 @@
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
         app:layout_constraintHorizontal_bias="1"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
-        app:layout_constraintTop_toBottomOf="@id/incoming_image_attachment" />
+        app:layout_constraintTop_toBottomOf="@id/image_layout" />
 </androidx.constraintlayout.widget.ConstraintLayout>

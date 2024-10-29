@@ -23,7 +23,7 @@ internal interface ChatContract {
         fun setView(view: View)
         fun getView(): View?
         fun onDestroy(retain: Boolean)
-        fun onMessageClicked(messageId: String)
+        fun onTapToRetryClicked(messageId: String)
         fun onGvaButtonClicked(button: GvaButton)
         fun isCallVisualizerOngoing(): Boolean
         fun onFileDownloadClicked(attachmentFile: AttachmentFile)
@@ -57,6 +57,7 @@ internal interface ChatContract {
         fun onTakePhotoClicked()
         fun onImageCaptured(result: Boolean)
         fun onContentChosen(uri: Uri)
+        fun onLocalImageItemClick(attachment: LocalAttachment, view: android.view.View)
     }
 
     interface View : BaseView<Controller> {
@@ -82,5 +83,6 @@ internal interface ChatContract {
         fun showToast(message: String, duration: Int = Toast.LENGTH_SHORT)
         fun dispatchImageCapture(uri: Uri)
         fun onFileDownload(attachmentFile: AttachmentFile)
+        fun navigateToPreview(attachmentFile: LocalAttachment, view: android.view.View)
     }
 }

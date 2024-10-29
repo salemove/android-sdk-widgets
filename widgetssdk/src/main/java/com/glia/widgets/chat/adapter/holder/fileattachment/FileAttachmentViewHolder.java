@@ -11,11 +11,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.widgets.R;
-import com.glia.widgets.chat.adapter.ChatAdapter;
-import com.glia.widgets.chat.model.Attachment;
 import com.glia.widgets.core.fileupload.model.LocalAttachment;
 import com.glia.widgets.helper.FileHelper;
-import com.glia.widgets.locale.LocaleProvider;
+import com.glia.widgets.helper.ViewExtensionsKt;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 
 /**
@@ -27,112 +25,47 @@ public class FileAttachmentViewHolder extends RecyclerView.ViewHolder {
     private final LinearProgressIndicator progressIndicator;
     private final TextView titleText;
     private final TextView statusIndicator;
-    private final LocaleProvider localeProvider;
 
-    public FileAttachmentViewHolder(@NonNull View itemView, @NonNull LocaleProvider localeProvider) {
+    public FileAttachmentViewHolder(@NonNull View itemView) {
         super(itemView);
-        this.localeProvider = localeProvider;
         extensionContainerView = itemView.findViewById(R.id.type_indicator_view);
         extensionTypeText = itemView.findViewById(R.id.type_indicator_text);
         progressIndicator = itemView.findViewById(R.id.progress_indicator);
         titleText = itemView.findViewById(R.id.item_title);
         statusIndicator = itemView.findViewById(R.id.status_indicator);
-        statusIndicator.setContentDescription(localeProvider.getRemoteString(R.string.general_download));
+        ViewExtensionsKt.setLocaleContentDescription(statusIndicator, R.string.general_download);
 
         setupExtensionContainer(itemView);
     }
 
-    protected void setData(
-        boolean isFileExists,
-        boolean isDownloading,
-        Attachment attachment,
-        ChatAdapter.OnFileItemClickListener listener
-    ) {
-        setData(false, isFileExists, isDownloading, attachment, listener);
-    }
-
-    protected void setData(
-            boolean isLocalFile,
-            boolean isFileExists,
-            boolean isDownloading,
-            Attachment attachment,
-            ChatAdapter.OnFileItemClickListener listener
-    ) {
-        updateClickListener(isFileExists, isDownloading, attachment, listener);
-        updateTitle(attachment);
-        updateStatusIndicator(isLocalFile, isFileExists, isDownloading);
+    protected void setData(boolean isFileExists, boolean isDownloading, AttachmentFile attachment) {
+        updateTitle(attachment.getName(), attachment.getSize());
+        updateStatusIndicator(isFileExists, isDownloading);
         updateProgressIndicator(isDownloading);
     }
 
+    protected void setData(LocalAttachment attachment) {
+        updateTitle(attachment.getDisplayName(), attachment.getSize());
+        updateStatusIndicator(true, false);
+        updateProgressIndicator(false);
+    }
+
     private void setupExtensionContainer(@NonNull View itemView) {
-        extensionContainerView.setCardBackgroundColor(
-                ContextCompat.getColor(
-                        itemView.getContext(),
-                        R.color.glia_brand_primary_color
-                )
-        );
+        extensionContainerView.setCardBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.glia_brand_primary_color));
     }
 
-    private void updateClickListener(
-            boolean isFileExists,
-            boolean isDownloading,
-            Attachment attachment,
-            ChatAdapter.OnFileItemClickListener listener
-    ) {
-        AttachmentFile attachmentFile = attachment.getRemoteAttachment();
-        if (isDownloading || attachmentFile == null) {
-            itemView.setOnClickListener(null);
-        } else {
-            itemView.setOnClickListener(v -> {
-                if (isFileExists) {
-                    listener.onFileOpenClick(attachmentFile);
-                } else {
-                    listener.onFileDownloadClick(attachmentFile);
-                }
-            });
-        }
-    }
-
-    private void updateTitle(Attachment attachment) {
-        String name = getAttachmentName(attachment);
-        long byteSize = getAttachmentSize(attachment);
+    private void updateTitle(String name, long byteSize) {
         titleText.setText(String.format("%s • %s", name, Formatter.formatFileSize(itemView.getContext(), byteSize)));
         extensionTypeText.setText(FileHelper.toFileExtensionOrEmpty(name).toUpperCase());
     }
 
-    public String getAttachmentName(Attachment attachment) {
-        AttachmentFile attachmentFile = attachment.getRemoteAttachment();
-        if (attachmentFile != null) {
-            return attachmentFile.getName();
-        }
-        LocalAttachment localAttachment = attachment.getLocalAttachment();
-        if (localAttachment != null) {
-            return localAttachment.getDisplayName();
-        }
-        return "";
-    }
-
-    public long getAttachmentSize(Attachment attachment) {
-        AttachmentFile attachmentFile = attachment.getRemoteAttachment();
-        if (attachmentFile != null) {
-            return attachmentFile.getSize();
-        }
-        LocalAttachment localAttachment = attachment.getLocalAttachment();
-        if (localAttachment != null) {
-            return localAttachment.getSize();
-        }
-        return 0;
-    }
-
-    private void updateStatusIndicator(boolean isLocalFile, boolean isFileExists, boolean isDownloading) {
-        statusIndicator.setVisibility(isLocalFile ? View.GONE : View.VISIBLE);
-
+    private void updateStatusIndicator(boolean isFileExists, boolean isDownloading) {
         if (isDownloading) {
-            statusIndicator.setText(localeProvider.getRemoteString(R.string.chat_download_downloading));
+            ViewExtensionsKt.setLocaleText(statusIndicator, R.string.chat_download_downloading);
         } else if (isFileExists) {
-            statusIndicator.setText(localeProvider.getRemoteString(R.string.general_open));
+            ViewExtensionsKt.setLocaleText(statusIndicator, R.string.general_open);
         } else {
-            statusIndicator.setText(localeProvider.getRemoteString(R.string.general_download));
+            ViewExtensionsKt.setLocaleText(statusIndicator, R.string.general_download);
         }
     }
 

@@ -1,9 +1,10 @@
 package com.glia.widgets.core.secureconversations.domain
 
 import com.glia.androidsdk.RequestCallback
+import com.glia.androidsdk.chat.FilesAttachment
+import com.glia.androidsdk.chat.SendMessagePayload
 import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.widgets.chat.data.GliaChatRepository
-import com.glia.widgets.chat.model.SendMessagePayload
 import com.glia.widgets.core.engagement.GliaEngagementConfigRepository
 import com.glia.widgets.core.fileupload.SecureFileAttachmentRepository
 import com.glia.widgets.core.fileupload.model.LocalAttachment
@@ -70,10 +71,12 @@ internal class SendSecureMessageUseCase(
         localAttachments: List<LocalAttachment>,
         callback: RequestCallback<VisitorMessage?>
     ) {
-        val payload = SendMessagePayload(
-            content = message,
-            localAttachments = localAttachments.ifEmpty { null }
-        )
+        val attachment = localAttachments
+            .mapNotNull { it.engagementFile }
+            .takeIf { it.isNotEmpty() }
+            ?.run { FilesAttachment.from(toTypedArray()) }
+
+        val payload = SendMessagePayload(content = message, attachment)
 
         if (hasOngoingEngagement) {
             chatRepository.sendMessage(payload, callback)

@@ -1,22 +1,19 @@
 package com.glia.widgets.chat.adapter.holder.fileattachment
 
 import android.text.format.Formatter
-import android.view.View
-import androidx.core.view.AccessibilityDelegateCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
-import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat
 import androidx.core.view.isVisible
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.adapter.ChatAdapter.OnFileItemClickListener
-import com.glia.widgets.chat.adapter.ChatAdapter.OnMessageClickListener
+import com.glia.widgets.chat.adapter.ChatAdapter.OnTapToRetryClickListener
 import com.glia.widgets.chat.model.VisitorAttachmentItem
+import com.glia.widgets.chat.model.VisitorItemStatus
 import com.glia.widgets.databinding.ChatAttachmentVisitorFileLayoutBinding
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.helper.addClickActionAccessibilityLabel
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getFontCompat
-import com.glia.widgets.helper.setContentDescription
+import com.glia.widgets.helper.removeAccessibilityClickAction
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.locale.LocaleProvider
@@ -29,40 +26,59 @@ import com.glia.widgets.view.unifiedui.theme.chat.MessageBalloonTheme
 internal class VisitorFileAttachmentViewHolder(
     private val binding: ChatAttachmentVisitorFileLayoutBinding,
     uiTheme: UiTheme,
+    private val onFileItemClickListener: OnFileItemClickListener,
+    private val onTapToRetryClickListener: OnTapToRetryClickListener,
     unifiedTheme: UnifiedTheme? = Dependencies.gliaThemeManager.theme,
     private val localeProvider: LocaleProvider = Dependencies.localeProvider
-) : FileAttachmentViewHolder(binding.root, localeProvider) {
-    private val visitorTheme: MessageBalloonTheme? by lazy {
-        unifiedTheme?.chatTheme?.visitorMessage
-    }
-
-    private lateinit var item: VisitorAttachmentItem.File
+) : FileAttachmentViewHolder(binding.root) {
+    private val visitorTheme: MessageBalloonTheme? by lazy { unifiedTheme?.chatTheme?.visitorMessage }
+    private var messageId: String? = null
+    private var name: String? = null
+    private var size: Long? = null
 
     init {
         setupDeliveredView(uiTheme)
         setupErrorView(uiTheme)
     }
 
-    fun bind(
-        item: VisitorAttachmentItem.File,
-        onFileItemClickListener: OnFileItemClickListener,
-        onMessageClickListener: OnMessageClickListener
-    ) {
-        this.item = item
-        val isLocalFile = item.attachment.localAttachment != null
-        super.setData(
-            isLocalFile,
-            item.isFileExists,
-            item.isDownloading,
-            item.attachment,
-            onFileItemClickListener
-        )
-        if (isLocalFile) {
-            itemView.setOnClickListener { _ -> onMessageClickListener.onMessageClick(item.id) }
+    fun bind(item: VisitorAttachmentItem.LocalFile) {
+        messageId = item.messageId
+        name = item.attachment.displayName
+        size = item.attachment.size
+
+        super.setData(item.attachment)
+        setUpState(status = item.status, fileExists = true, name = item.attachment.displayName, size = item.attachment.size)
+
+        binding.attachmentFileView.root.setOnClickListener {
+            onFileItemClickListener.onLocalFileOpenClick(item.attachment)
         }
-        setShowDelivered(item.showDelivered)
-        setShowError(item.showError)
-        setAccessibilityLabels(item.showDelivered)
+    }
+
+    fun bind(item: VisitorAttachmentItem.RemoteFile) {
+        name = item.attachment.name
+        size = item.attachment.size
+
+        super.setData(item.isFileExists, item.isDownloading, item.attachment)
+        setUpState(status = item.status, fileExists = item.isFileExists, name = item.attachment.name, size = item.attachment.size)
+
+        val attachmentView = binding.attachmentFileView.root
+
+        when {
+            item.isDownloading -> attachmentView.setOnClickListener(null)
+            item.isFileExists -> attachmentView.setOnClickListener { onFileItemClickListener.onFileOpenClick(item.attachment) }
+            else -> attachmentView.setOnClickListener { onFileItemClickListener.onFileDownloadClick(item.attachment) }
+        }
+    }
+
+    private fun setUpState(status: VisitorItemStatus, fileExists: Boolean, name: String, size: Long) {
+        binding.deliveredView.isVisible = status == VisitorItemStatus.DELIVERED
+        binding.errorView.isVisible = status == VisitorItemStatus.ERROR_INDICATOR
+        setAccessibilityLabels(status, fileExists, name, size)
+        if (status.isError) {
+            itemView.setOnClickListener { onTapToRetryClickListener.onTapToRetryClicked(messageId ?: return@setOnClickListener) }
+        } else {
+            itemView.setOnClickListener(null)
+        }
     }
 
     private fun setupDeliveredView(uiTheme: UiTheme) {
@@ -89,53 +105,33 @@ internal class VisitorFileAttachmentViewHolder(
         binding.errorView.setLocaleText(R.string.chat_message_failed_to_deliver_retry)
     }
 
-    private fun setShowDelivered(showDelivered: Boolean) {
-        binding.deliveredView.isVisible = showDelivered
-    }
-
-    private fun setShowError(showError: Boolean) {
-        binding.errorView.isVisible = showError
-    }
-
-    private fun setAccessibilityLabels(showDelivered: Boolean) {
-        val name = getAttachmentName(item.attachment)
-        val size = getAttachmentSize(item.attachment)
+    private fun setAccessibilityLabels(status: VisitorItemStatus, fileExists: Boolean, name: String, size: Long) {
         val byteSize = Formatter.formatFileSize(itemView.context, size)
-        val stringKey = if (item.showError) {
-            R.string.android_chat_visitor_file_not_delivered_accessibility
-        } else if (showDelivered) {
-            R.string.android_chat_visitor_file_delivered_accessibility
-        } else {
-            R.string.android_chat_visitor_file_accessibility
+        val stringKey = when (status) {
+            VisitorItemStatus.ERROR_INDICATOR, VisitorItemStatus.ERROR -> R.string.android_chat_visitor_file_not_delivered_accessibility
+            VisitorItemStatus.DELIVERED -> R.string.android_chat_visitor_file_delivered_accessibility
+            else -> R.string.android_chat_visitor_file_accessibility
         }
-        itemView.setLocaleContentDescription(
-            stringKey,
-            StringKeyPair(StringKey.NAME, name),
-            StringKeyPair(StringKey.SIZE, byteSize)
-        )
-        ViewCompat.setAccessibilityDelegate(itemView, object : AccessibilityDelegateCompat() {
-            override fun onInitializeAccessibilityNodeInfo(
-                host: View,
-                info: AccessibilityNodeInfoCompat
-            ) {
-                super.onInitializeAccessibilityNodeInfo(host, info)
-                val actionLabel = if (item.showError) {
-                    localeProvider.getString(R.string.general_retry)
-                } else if (item.isFileExists) {
-                    localeProvider.getString(R.string.general_open)
-                } else {
-                    localeProvider.getString(R.string.general_download)
-                }
-                val actionClick = AccessibilityActionCompat(
-                    AccessibilityNodeInfoCompat.ACTION_CLICK, actionLabel
-                )
-                info.addAction(actionClick)
+
+        binding.attachmentFileView.root.apply {
+            setLocaleContentDescription(stringKey, StringKeyPair(StringKey.NAME, name), StringKeyPair(StringKey.SIZE, byteSize))
+            val actionLabel = if (fileExists) {
+                localeProvider.getString(R.string.general_open)
+            } else {
+                localeProvider.getString(R.string.general_download)
             }
-        })
+
+            addClickActionAccessibilityLabel(actionLabel)
+        }
+
+        if (status.isError) {
+            itemView.addClickActionAccessibilityLabel(localeProvider.getString(R.string.general_retry))
+        } else {
+            itemView.removeAccessibilityClickAction()
+        }
     }
 
-    fun updateDelivered(delivered: Boolean) {
-        setShowDelivered(delivered)
-        setAccessibilityLabels(delivered)
+    fun updateStatus(status: VisitorItemStatus) {
+        setUpState(status, true, name.orEmpty(), size ?: 0)
     }
 }

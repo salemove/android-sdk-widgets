@@ -6,7 +6,6 @@ import androidx.annotation.IntDef
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.androidsdk.chat.AttachmentFile
-import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.adapter.holder.CustomCardViewHolder
 import com.glia.widgets.chat.adapter.holder.GvaGalleryViewHolder
@@ -37,6 +36,7 @@ import com.glia.widgets.chat.model.OperatorStatusItem
 import com.glia.widgets.chat.model.SystemChatItem
 import com.glia.widgets.chat.model.VisitorAttachmentItem
 import com.glia.widgets.chat.model.VisitorMessageItem
+import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.databinding.ChatAttachmentOperatorFileLayoutBinding
 import com.glia.widgets.databinding.ChatAttachmentOperatorImageLayoutBinding
 import com.glia.widgets.databinding.ChatAttachmentVisitorFileLayoutBinding
@@ -59,7 +59,7 @@ import com.glia.widgets.view.SingleChoiceCardView.OnOptionClickedListener
 
 internal class ChatAdapter(
     private val uiTheme: UiTheme,
-    private val onMessageClickListener: OnMessageClickListener,
+    private val onTapToRetryClickListener: OnTapToRetryClickListener,
     private val onOptionClickedListener: OnOptionClickedListener,
     private val onFileItemClickListener: OnFileItemClickListener,
     private val onImageItemClickListener: OnImageItemClickListener,
@@ -74,25 +74,19 @@ internal class ChatAdapter(
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val differ = AsyncListDiffer(this, ChatAdapterDiffCallback())
 
-    override fun onCreateViewHolder(
-        parent: ViewGroup,
-        @Type viewType: Int
-    ): RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, @Type viewType: Int): RecyclerView.ViewHolder {
         val inflater = parent.layoutInflater
         return when (viewType) {
-            OPERATOR_STATUS_VIEW_TYPE -> {
-                OperatorStatusViewHolder(
-                    ChatOperatorStatusLayoutBinding.inflate(inflater, parent, false),
-                    uiTheme
-                )
-            }
+            OPERATOR_STATUS_VIEW_TYPE ->
+                OperatorStatusViewHolder(ChatOperatorStatusLayoutBinding.inflate(inflater, parent, false), uiTheme)
 
-            VISITOR_FILE_VIEW_TYPE -> {
+            VISITOR_FILE_VIEW_TYPE ->
                 VisitorFileAttachmentViewHolder(
                     ChatAttachmentVisitorFileLayoutBinding.inflate(inflater, parent, false),
-                    uiTheme
+                    uiTheme,
+                    onFileItemClickListener,
+                    onTapToRetryClickListener
                 )
-            }
 
             VISITOR_IMAGE_VIEW_TYPE -> {
                 VisitorImageAttachmentViewHolder(
@@ -101,14 +95,16 @@ internal class ChatAdapter(
                     getImageFileFromDownloadsUseCase,
                     getImageFileFromNetworkUseCase,
                     schedulers,
-                    uiTheme
+                    uiTheme,
+                    onTapToRetryClickListener,
+                    onImageItemClickListener
                 )
             }
 
             VISITOR_MESSAGE_TYPE -> {
                 VisitorMessageViewHolder(
                     ChatVisitorMessageLayoutBinding.inflate(inflater, parent, false),
-                    onMessageClickListener,
+                    onTapToRetryClickListener,
                     uiTheme
                 )
             }
@@ -120,50 +116,28 @@ internal class ChatAdapter(
                     getImageFileFromDownloadsUseCase,
                     getImageFileFromNetworkUseCase,
                     schedulers,
-                    uiTheme
+                    uiTheme,
+                    onImageItemClickListener
                 )
             }
 
-            OPERATOR_FILE_VIEW_TYPE -> {
+            OPERATOR_FILE_VIEW_TYPE ->
                 OperatorFileAttachmentViewHolder(
                     ChatAttachmentOperatorFileLayoutBinding.inflate(inflater, parent, false),
-                    uiTheme
+                    uiTheme,
+                    onFileItemClickListener
                 )
-            }
 
-            OPERATOR_MESSAGE_VIEW_TYPE -> {
-                OperatorMessageViewHolder(
-                    ChatOperatorMessageLayoutBinding.inflate(inflater, parent, false),
-                    uiTheme
-                )
-            }
+            OPERATOR_MESSAGE_VIEW_TYPE ->
+                OperatorMessageViewHolder(ChatOperatorMessageLayoutBinding.inflate(inflater, parent, false), uiTheme)
 
-            MEDIA_UPGRADE_ITEM_TYPE -> {
-                MediaUpgradeStartedViewHolder(
-                    ChatMediaUpgradeLayoutBinding.inflate(inflater, parent, false),
-                    uiTheme
-                )
-            }
+            MEDIA_UPGRADE_ITEM_TYPE ->
+                MediaUpgradeStartedViewHolder(ChatMediaUpgradeLayoutBinding.inflate(inflater, parent, false), uiTheme)
 
-            NEW_MESSAGES_DIVIDER_TYPE -> {
-                NewMessagesDividerViewHolder(
-                    ChatNewMessagesDividerLayoutBinding.inflate(
-                        inflater,
-                        parent,
-                        false
-                    ),
-                    uiTheme
-                )
-            }
+            NEW_MESSAGES_DIVIDER_TYPE ->
+                NewMessagesDividerViewHolder(ChatNewMessagesDividerLayoutBinding.inflate(inflater, parent, false), uiTheme)
 
-            SYSTEM_MESSAGE_TYPE -> SystemMessageViewHolder(
-                ChatReceiveMessageContentBinding.inflate(
-                    inflater,
-                    parent,
-                    false
-                ),
-                uiTheme
-            )
+            SYSTEM_MESSAGE_TYPE -> SystemMessageViewHolder(ChatReceiveMessageContentBinding.inflate(inflater, parent, false), uiTheme)
 
             GVA_RESPONSE_TEXT_TYPE, GVA_QUICK_REPLIES_TYPE -> {
                 val operatorMessageBinding = ChatOperatorMessageLayoutBinding.inflate(inflater, parent, false)
@@ -192,31 +166,15 @@ internal class ChatAdapter(
                 )
             }
 
-            GVA_GALLERY_CARDS_TYPE -> {
-                GvaGalleryViewHolder(
-                    ChatGvaGalleryLayoutBinding.inflate(
-                        inflater,
-                        parent,
-                        false
-                    ),
-                    onGvaButtonsClickListener,
-                    uiTheme
-                )
-            }
+            GVA_GALLERY_CARDS_TYPE ->
+                GvaGalleryViewHolder(ChatGvaGalleryLayoutBinding.inflate(inflater, parent, false), onGvaButtonsClickListener, uiTheme)
 
             else -> {
                 var customCardViewHolder: CustomCardViewHolder? = null
                 if (customCardAdapter != null) {
-                    customCardViewHolder =
-                        customCardAdapter.getCustomCardViewHolder(
-                            parent,
-                            inflater,
-                            uiTheme,
-                            viewType
-                        )
+                    customCardViewHolder = customCardAdapter.getCustomCardViewHolder(parent, inflater, uiTheme, viewType)
                 }
-                customCardViewHolder
-                    ?: throw IllegalArgumentException("Unknown view type: $viewType")
+                customCardViewHolder ?: throw IllegalArgumentException("Unknown view type: $viewType")
             }
         }
     }
@@ -236,42 +194,42 @@ internal class ChatAdapter(
     }
 
     private fun updateVisitorMessageViewHolder(payloads: MutableList<Any>, holder: VisitorMessageViewHolder): Boolean =
-        when (val payload = payloads.lastOrNull { it is ChatAdapterPayload } ) {
-            is ChatAdapterPayload.ShowDelivered -> {
-                holder.updateDelivered(payload.showDelivered)
+        when (val payload = payloads.lastOrNull { it is ChatAdapterPayload }) {
+            is ChatAdapterPayload.MessageUpdated -> {
+                holder.updateStatus(payload.status, payload.message)
                 true
             }
-            is ChatAdapterPayload.ShowError -> {
-                holder.updateError(payload.showError)
-                true
-            }
+
             else -> false
         }
 
     private fun updateVisitorFileAttachmentViewHolder(payloads: MutableList<Any>, holder: VisitorFileAttachmentViewHolder): Boolean =
-        when (val payload = payloads.lastOrNull { it is ChatAdapterPayload } ) {
-            is ChatAdapterPayload.ShowDelivered -> {
-                holder.updateDelivered(payload.showDelivered)
+        when (val payload = payloads.lastOrNull { it is ChatAdapterPayload }) {
+            is ChatAdapterPayload.StatusChanged -> {
+                holder.updateStatus(payload.status)
                 true
             }
+
             else -> false
         }
 
     private fun updateVisitorImageAttachmentViewHolder(payloads: MutableList<Any>, holder: VisitorImageAttachmentViewHolder): Boolean =
-        when (val payload = payloads.lastOrNull { it is ChatAdapterPayload } ) {
-            is ChatAdapterPayload.ShowDelivered -> {
-                holder.updateDelivered(payload.showDelivered)
+        when (val payload = payloads.lastOrNull { it is ChatAdapterPayload }) {
+            is ChatAdapterPayload.StatusChanged -> {
+                holder.updateStatus(payload.status, onTapToRetryClickListener)
                 true
             }
+
             else -> false
         }
 
     private fun updateMediaUpgradeStartedViewHolder(payloads: MutableList<Any>, viewHolder: MediaUpgradeStartedViewHolder): Boolean =
-        when (val payload = payloads.lastOrNull { it is ChatAdapterPayload } ) {
+        when (val payload = payloads.lastOrNull { it is ChatAdapterPayload }) {
             is ChatAdapterPayload.Time -> {
                 viewHolder.updateTime(payload.time)
                 true
             }
+
             else -> false
         }
 
@@ -281,12 +239,13 @@ internal class ChatAdapter(
             is VisitorMessageItem -> (holder as VisitorMessageViewHolder).bind(chatItem)
             is OperatorMessageItem -> (holder as OperatorMessageViewHolder).bind(chatItem, onOptionClickedListener)
             is MediaUpgradeStartedTimerItem -> (holder as MediaUpgradeStartedViewHolder).bind(chatItem)
-            is OperatorAttachmentItem.Image -> (holder as OperatorImageAttachmentViewHolder).bind(chatItem, onImageItemClickListener)
-            is OperatorAttachmentItem.File -> (holder as OperatorFileAttachmentViewHolder).bind(chatItem, onFileItemClickListener)
-            is VisitorAttachmentItem.File ->
-                (holder as VisitorFileAttachmentViewHolder).bind(chatItem, onFileItemClickListener, onMessageClickListener)
-            is VisitorAttachmentItem.Image ->
-                (holder as VisitorImageAttachmentViewHolder).bind(chatItem, onImageItemClickListener, onMessageClickListener)
+            is OperatorAttachmentItem.Image -> (holder as OperatorImageAttachmentViewHolder).bind(chatItem)
+            is OperatorAttachmentItem.File -> (holder as OperatorFileAttachmentViewHolder).bind(chatItem)
+            is VisitorAttachmentItem.RemoteFile -> (holder as VisitorFileAttachmentViewHolder).bind(chatItem)
+            is VisitorAttachmentItem.LocalFile -> (holder as VisitorFileAttachmentViewHolder).bind(chatItem)
+            is VisitorAttachmentItem.RemoteImage -> (holder as VisitorImageAttachmentViewHolder).bind(chatItem)
+            is VisitorAttachmentItem.LocalImage -> (holder as VisitorImageAttachmentViewHolder).bind(chatItem)
+
             is SystemChatItem -> (holder as SystemMessageViewHolder).bind(chatItem.message)
             is GvaResponseText -> (holder as GvaResponseTextViewHolder).bind(chatItem)
             is GvaQuickReplies -> (holder as GvaResponseTextViewHolder).bind(chatItem.asResponseText())
@@ -324,10 +283,12 @@ internal class ChatAdapter(
     interface OnFileItemClickListener {
         fun onFileOpenClick(file: AttachmentFile)
         fun onFileDownloadClick(file: AttachmentFile)
+        fun onLocalFileOpenClick(attachment: LocalAttachment)
     }
 
-    fun interface OnImageItemClickListener {
+    interface OnImageItemClickListener {
         fun onImageItemClick(item: AttachmentFile, view: View)
+        fun onLocalImageItemClick(attachment: LocalAttachment, view: View)
     }
 
     fun interface OnCustomCardResponse {
@@ -337,8 +298,9 @@ internal class ChatAdapter(
     fun interface OnGvaButtonsClickListener {
         fun onGvaButtonClicked(gvaButton: GvaButton)
     }
-    fun interface OnMessageClickListener {
-        fun onMessageClick(messageId: String)
+
+    fun interface OnTapToRetryClickListener {
+        fun onTapToRetryClicked(messageId: String)
     }
 
     companion object {

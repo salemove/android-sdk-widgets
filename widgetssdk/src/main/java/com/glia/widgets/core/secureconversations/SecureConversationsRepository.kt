@@ -2,12 +2,11 @@ package com.glia.widgets.core.secureconversations
 
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
+import com.glia.androidsdk.chat.SendMessagePayload
 import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.androidsdk.secureconversations.SecureConversations
 import com.glia.widgets.chat.data.GliaChatRepository
 import com.glia.widgets.chat.domain.GliaSendMessageUseCase
-import com.glia.widgets.chat.model.SendMessagePayload
-import com.glia.widgets.chat.model.Unsent
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.reactivex.rxjava3.subjects.Subject
@@ -23,7 +22,7 @@ internal class SecureConversationsRepository(private val secureConversations: Se
 
     fun send(payload: SendMessagePayload, queueIds: List<String>, callback: RequestCallback<VisitorMessage?>) {
         _messageSendingObservable.onNext(true)
-        secureConversations.send(payload.payload, queueIds.toTypedArray(), handleResult(callback))
+        secureConversations.send(payload, queueIds.toTypedArray(), handleResult(callback))
     }
 
     fun send(payload: SendMessagePayload, queueIds: List<String>, listener: GliaSendMessageUseCase.Listener) {
@@ -50,7 +49,7 @@ internal class SecureConversationsRepository(private val secureConversations: Se
         payload: SendMessagePayload
     ) {
         if (ex != null) {
-            listener.error(ex, Unsent(payload = payload, error = ex))
+            listener.error(ex, payload.messageId)
         } else {
             listener.messageSent(visitorMessage)
         }

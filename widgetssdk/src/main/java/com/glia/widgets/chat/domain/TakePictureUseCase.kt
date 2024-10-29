@@ -19,6 +19,7 @@ internal interface TakePictureUseCase {
 
     fun onImageCaptured(captured: Boolean, onFileReady: (LocalAttachment) -> Unit)
     fun deleteCurrent()
+    fun clearUriReference()
 }
 
 internal class TakePictureUseCaseImpl(
@@ -52,6 +53,10 @@ internal class TakePictureUseCaseImpl(
             contentResolver.delete(it, null, null)
             uri = null
         }
+    }
+
+    override fun clearUriReference() {
+        uri = null
     }
 
     private fun createTempPhotoFile(): File = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES).let {

@@ -28,12 +28,13 @@
         android:layout_marginEnd="@dimen/glia_small"
         app:imageContentPadding="@dimen/glia_chat_profile_picture_small_content_padding"
         app:imageSize="@dimen/glia_chat_profile_picture_small_size"
-        app:layout_constraintBottom_toBottomOf="@id/incoming_image_attachment"
+        app:layout_constraintBottom_toBottomOf="@id/image_layout"
         app:layout_constraintEnd_toStartOf="@id/start_guideline"
         app:layout_constraintStart_toStartOf="parent"
         tools:ignore="ContentDescription" />
 
     <include
+        android:id="@+id/image_layout"
         layout="@layout/chat_attachment_image_item"
         android:layout_width="@dimen/glia_chat_attachment_image_width"
         android:layout_height="@dimen/glia_chat_attachment_image_height"

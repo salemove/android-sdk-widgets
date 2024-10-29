@@ -3,11 +3,11 @@ package com.glia.widgets.chat.domain
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.androidsdk.chat.VisitorMessage
-import com.glia.widgets.chat.model.Attachment
 import com.glia.widgets.chat.model.OperatorAttachmentItem
 import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.chat.model.VisitorAttachmentItem
 import com.glia.widgets.chat.model.VisitorChatItem
+import com.glia.widgets.chat.model.VisitorItemStatus
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 import com.glia.widgets.helper.isImage
 import kotlin.jvm.optionals.getOrNull
@@ -16,7 +16,7 @@ internal class MapOperatorAttachmentUseCase {
     operator fun invoke(attachment: AttachmentFile, chatMessageInternal: ChatMessageInternal, showChatHead: Boolean) = chatMessageInternal.run {
         if (attachment.isImage) {
             OperatorAttachmentItem.Image(
-                attachment = Attachment.Remote(attachment),
+                attachment = attachment,
                 id = chatMessage.id,
                 timestamp = chatMessage.timestamp,
                 showChatHead = showChatHead,
@@ -25,7 +25,7 @@ internal class MapOperatorAttachmentUseCase {
             )
         } else {
             OperatorAttachmentItem.File(
-                attachment = Attachment.Remote(attachment),
+                attachment = attachment,
                 id = chatMessage.id,
                 timestamp = chatMessage.timestamp,
                 showChatHead = showChatHead,
@@ -38,10 +38,25 @@ internal class MapOperatorAttachmentUseCase {
 
 internal class MapVisitorAttachmentUseCase {
     operator fun invoke(attachmentFile: AttachmentFile, message: VisitorMessage, showDelivered: Boolean = false): VisitorChatItem = message.run {
+        val status = if (showDelivered) VisitorItemStatus.DELIVERED else VisitorItemStatus.HISTORY
         if (attachmentFile.isImage) {
-            VisitorAttachmentItem.Image(id, timestamp, Attachment.Remote(attachmentFile), showDelivered = showDelivered)
+            VisitorAttachmentItem.RemoteImage(
+                id = attachmentFile.id,
+                attachment = attachmentFile,
+                isFileExists = false,
+                isDownloading = false,
+                status = status,
+                timestamp = timestamp
+            )
         } else {
-            VisitorAttachmentItem.File(id, timestamp, Attachment.Remote(attachmentFile), showDelivered = showDelivered)
+            VisitorAttachmentItem.RemoteFile(
+                id = attachmentFile.id,
+                attachment = attachmentFile,
+                isFileExists = false,
+                isDownloading = false,
+                status = status,
+                timestamp = timestamp
+            )
         }
     }
 }

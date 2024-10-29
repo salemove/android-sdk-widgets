@@ -2,6 +2,8 @@ package com.glia.widgets.core.fileupload.model
 
 import android.net.Uri
 import com.glia.androidsdk.engagement.EngagementFile
+import com.glia.widgets.chat.model.VisitorAttachmentItem
+import java.util.UUID
 
 internal data class LocalAttachment(
     val uri: Uri,
@@ -11,6 +13,13 @@ internal data class LocalAttachment(
     val attachmentStatus: Status = Status.UPLOADING,
     val engagementFile: EngagementFile? = null,
 ) {
+
+    val isReadyToSend: Boolean
+        get() = attachmentStatus == Status.READY_TO_SEND
+    val isImage: Boolean
+        get() = mimeType?.startsWith("image") ?: false
+    val id: String
+        get() = engagementFile?.id ?: UUID.randomUUID().toString()
 
     constructor(attachment: LocalAttachment, status: Status) : this(
         uri = attachment.uri,
@@ -38,10 +47,11 @@ internal data class LocalAttachment(
         return LocalAttachment(this, status)
     }
 
-    val isReadyToSend: Boolean
-        get() = attachmentStatus == Status.READY_TO_SEND
-    val isImage: Boolean
-        get() = mimeType?.startsWith("image") ?: false
+    fun toVisitorAttachmentItem(messageId: String): VisitorAttachmentItem = if (isImage) {
+        VisitorAttachmentItem.LocalImage(id, messageId, this)
+    } else {
+        VisitorAttachmentItem.LocalFile(id, messageId, this)
+    }
 
     enum class Status(val isError: Boolean) {
         UPLOADING(false),

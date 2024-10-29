@@ -25,6 +25,10 @@ import androidx.annotation.StyleableRes
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.AccessibilityDelegateCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat
 import androidx.core.view.children
 import androidx.core.widget.TextViewCompat
 import com.airbnb.lottie.LottieAnimationView
@@ -187,6 +191,25 @@ internal fun Toolbar.setLocaleNavigationContentDescription(@StringRes stringKey:
     registerLocaleListener(stringKey, *values) { upToDateTranslation ->
         navigationContentDescription = upToDateTranslation
     }
+}
+
+internal fun View.addClickActionAccessibilityLabel(label: String) {
+    ViewCompat.setAccessibilityDelegate(this, object : AccessibilityDelegateCompat() {
+        override fun onInitializeAccessibilityNodeInfo(host: View, info: AccessibilityNodeInfoCompat) {
+            super.onInitializeAccessibilityNodeInfo(host, info)
+            info.addAction(AccessibilityActionCompat(AccessibilityNodeInfoCompat.ACTION_CLICK, label))
+        }
+    })
+}
+
+internal fun View.removeAccessibilityClickAction() {
+    ViewCompat.setAccessibilityDelegate(this, object : AccessibilityDelegateCompat() {
+        override fun onInitializeAccessibilityNodeInfo(host: View, info: AccessibilityNodeInfoCompat) {
+            super.onInitializeAccessibilityNodeInfo(host, info)
+            info.removeAction(AccessibilityActionCompat.ACTION_CLICK)
+            info.isClickable = false
+        }
+    })
 }
 
 private fun View.registerLocaleListener(@StringRes stringKey: Int, vararg values: StringKeyPair, listener: (String) -> Unit) {

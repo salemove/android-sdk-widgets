@@ -9,9 +9,11 @@ import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.widgets.chat.ChatManager
 import com.glia.widgets.chat.domain.gva.IsGvaUseCase
 import com.glia.widgets.chat.model.ChatItem
+import com.glia.widgets.chat.model.LocalAttachmentItem
 import com.glia.widgets.chat.model.OperatorChatItem
 import com.glia.widgets.chat.model.ServerChatItem
 import com.glia.widgets.chat.model.VisitorChatItem
+import com.glia.widgets.chat.model.VisitorItemStatus
 import com.glia.widgets.chat.model.VisitorMessageItem
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 import com.glia.widgets.helper.Logger
@@ -124,59 +126,91 @@ internal class AppendNewResponseCardOrTextItemUseCase(
     }
 }
 
-internal class AppendNewVisitorMessageUseCase(
-    private val mapVisitorAttachmentUseCase: MapVisitorAttachmentUseCase
-) {
+internal class AppendNewVisitorMessageUseCase(private val mapVisitorAttachmentUseCase: MapVisitorAttachmentUseCase) {
+    private var lastDeliveredItem: VisitorChatItem? = null
 
-    @VisibleForTesting
-    var lastDeliveredItem: VisitorChatItem? = null
-
-    @VisibleForTesting
-    fun addUnsentItem(state: ChatManager.State, message: VisitorMessage): Boolean {
-        if (state.unsentItems.isEmpty()) return false
-
-        val unsentMessage = state.unsentItems.firstOrNull { it.messageId == message.id } ?: return false
-        state.unsentItems.remove(unsentMessage)
-
-        val index = unsentMessage.chatMessage?.let { state.chatItems.indexOf(it) }
-        if (index != null && index >= 0) {
-            if (lastDeliveredItem != null) {
-                val lastDeliveredIndex = state.chatItems.indexOf(lastDeliveredItem!!)
-                state.chatItems[lastDeliveredIndex] = lastDeliveredItem!!.withDeliveredStatus(false)
-            }
-
-            state.chatItems[index] = message.run {
-                lastDeliveredItem = VisitorMessageItem(content, id, timestamp, true)
-                lastDeliveredItem!!
-            }
-
-            return true
-        }
-
-        return false
-    }
     operator fun invoke(state: ChatManager.State, chatMessageInternal: ChatMessageInternal) {
         val message = chatMessageInternal.chatMessage as VisitorMessage
-        if (!addUnsentItem(state, message)) {
-            message.apply {
-                val files = (attachment as? FilesAttachment)?.files
-                val hasFiles = !files.isNullOrEmpty()
 
-                if (content.isNotBlank()) {
-                    state.chatItems += VisitorMessageItem(content, id, timestamp, !hasFiles)
-                }
+        if (state.messagePreviews.remove(message.id) != null) {
+            state.preEngagementChatItemIds.remove(message.id)
+            markMessageDelivered(state, message)
+            return
+        }
 
-                files?.forEachIndexed { index, attachmentFile ->
-                    state.chatItems += mapVisitorAttachmentUseCase(attachmentFile, message, index == files.lastIndex)
-                }
+        addNewMessage(state, message)
+    }
 
-                if (lastDeliveredItem != null) {
-                    val index = state.chatItems.indexOf(lastDeliveredItem!!)
-                    state.chatItems[index] = lastDeliveredItem!!.withDeliveredStatus(false)
-                }
-
-                lastDeliveredItem = state.chatItems.last() as? VisitorChatItem
-            }
+    private fun markLastDeliveredItemAsDelivered(state: ChatManager.State) {
+        lastDeliveredItem?.also {
+            val index = state.chatItems.indexOf(it)
+            state.chatItems[index] = it.withStatus(VisitorItemStatus.HISTORY)
+            lastDeliveredItem = null
         }
     }
+
+    private fun addNewMessage(state: ChatManager.State, message: VisitorMessage) {
+        markLastDeliveredItemAsDelivered(state)
+
+        message.apply {
+            val files = (attachment as? FilesAttachment)?.files
+
+            if (content.isNotBlank()) {
+                val messageStatus = if (files != null) VisitorItemStatus.HISTORY else VisitorItemStatus.DELIVERED
+                state.chatItems += VisitorMessageItem(content, id, messageStatus, timestamp).also {
+                    lastDeliveredItem = it
+                }
+            }
+
+            files?.forEachIndexed { index, attachmentFile ->
+                val showDelivered = index == files.lastIndex
+                state.chatItems += mapVisitorAttachmentUseCase(attachmentFile, message, showDelivered).also {
+                    if (showDelivered) {
+                        lastDeliveredItem = it
+                    }
+                }
+            }
+
+        }
+    }
+
+    private fun markMessageDelivered(state: ChatManager.State, message: VisitorMessage) {
+        markLastDeliveredItemAsDelivered(state)
+
+        val chatItems = state.chatItems
+
+        val files = (message.attachment as? FilesAttachment)?.files?.takeIf { it.isNotEmpty() }
+
+        val messageIndex = chatItems.indexOfLast { it.id == message.id }
+
+        if (messageIndex != -1) {
+            val messageStatus = if (files != null) {
+                VisitorItemStatus.HISTORY
+            } else {
+                VisitorItemStatus.DELIVERED
+            }
+            chatItems[messageIndex] = VisitorMessageItem(message.content, message.id, messageStatus, message.timestamp).also {
+                lastDeliveredItem = it
+            }
+        }
+
+        if (files == null) return
+
+        val lastDeliveredIndex = chatItems.indexOfLast { (it as? LocalAttachmentItem)?.messageId == message.id }
+
+        files.forEach { attachment ->
+            val index = chatItems.indexOfLast { it.id == attachment.id }
+            val visitorChatItem = chatItems[index] as VisitorChatItem
+
+            chatItems[index] = if (index == lastDeliveredIndex) {
+                visitorChatItem.withStatus(VisitorItemStatus.DELIVERED).also {
+                    lastDeliveredItem = it
+                }
+            } else {
+                visitorChatItem.withStatus(VisitorItemStatus.HISTORY)
+            }
+        }
+
+    }
+
 }

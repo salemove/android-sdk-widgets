@@ -5,6 +5,7 @@ import android.view.View
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.Operator
 import com.glia.androidsdk.chat.AttachmentFile
+import com.glia.androidsdk.chat.SendMessagePayload
 import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.androidsdk.chat.SingleChoiceOption
 import com.glia.androidsdk.chat.VisitorMessage
@@ -33,7 +34,8 @@ import com.glia.widgets.chat.model.CustomCardChatItem
 import com.glia.widgets.chat.model.Gva
 import com.glia.widgets.chat.model.GvaButton
 import com.glia.widgets.chat.model.OperatorMessageItem
-import com.glia.widgets.chat.model.Unsent
+import com.glia.widgets.chat.model.VisitorAttachmentItem
+import com.glia.widgets.chat.model.VisitorChatItem
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.dialog.domain.ConfirmationDialogLinksUseCase
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
@@ -144,8 +146,7 @@ internal class ChatController(
     private val sendMessageCallback: GliaSendMessageUseCase.Listener = object : GliaSendMessageUseCase.Listener {
         override fun messageSent(message: VisitorMessage?) {
             Logger.d(TAG, "messageSent: $message, id: ${message?.id}")
-            message?.takeIf { it.isValid() }?.also { chatManager.onChatAction(ChatManager.Action.MessageSent(it)) }
-            scrollChatToBottom()
+            onMessageSent(message)
         }
 
         override fun onMessageValidated() {
@@ -153,19 +154,27 @@ internal class ChatController(
             emitViewState { chatState.setLastTypedText("").setShowSendButton(isShowSendButtonUseCase("")) }
         }
 
-        override fun onMessagePrepared(message: Unsent) {
-            appendUnsentMessage(message)
-        }
-
-        override fun errorOperatorOffline() {
+        override fun errorOperatorOffline(messageId: String) {
+            chatManager.onChatAction(ChatManager.Action.OnSendMessageOperatorOffline(messageId))
             onSendMessageOperatorOffline()
         }
 
-        override fun error(ex: GliaException, message: Unsent) {
-            onMessageSendError(ex, message)
+        override fun onMessagePrepared(visitorChatItem: VisitorChatItem, payload: SendMessagePayload) {
+            addMessagePreview(visitorChatItem, payload)
+            scrollChatToBottom()
+        }
+
+        override fun onAttachmentsPrepared(items: List<VisitorAttachmentItem>, payload: SendMessagePayload?) {
+            addAttachmentPreview(items, payload)
+            scrollChatToBottom()
+        }
+
+        override fun error(ex: GliaException, messageId: String) {
+            Logger.e(TAG, "Message send exception", ex)
+
+            showMessageError(messageId)
         }
     }
-
 
     @Volatile
     private var isChatViewPaused = false
@@ -342,10 +351,14 @@ internal class ChatController(
 
     override fun onImageItemClick(item: AttachmentFile, view: View) {
         if (isFileReadyForPreviewUseCase(item)) {
-            this.view?.navigateToPreview(item, view)
+            this.view?.navigateToImagePreview(item, view)
         } else {
             this.view?.fileIsNotReadyForPreview()
         }
+    }
+
+    override fun onLocalImageItemClick(attachment: LocalAttachment, view: View) {
+        this.view?.navigateToImagePreview(attachment, view)
     }
 
     override fun onMessageTextChanged(message: String) {
@@ -371,11 +384,8 @@ internal class ChatController(
         sendMessagePreview("")
     }
 
-    private fun onMessageSendError(ex: GliaException, message: Unsent) {
-        Logger.e(TAG, "Message send exception", ex)
-
-        chatManager.onChatAction(ChatManager.Action.MessageSendError(message))
-        scrollChatToBottom()
+    private fun showMessageError(messageId: String) {
+        chatManager.onChatAction(ChatManager.Action.OnSendMessageError(messageId))
     }
 
     private fun onSendMessageOperatorOffline() {
@@ -384,9 +394,17 @@ internal class ChatController(
         }
     }
 
-    private fun appendUnsentMessage(message: Unsent) {
-        Logger.d(TAG, "appendUnsentMessage: $message")
-        chatManager.onChatAction(ChatManager.Action.UnsentMessageReceived(message))
+    private fun onMessageSent(message: VisitorMessage?) {
+        message?.takeIf { it.isValid() }?.also { chatManager.onChatAction(ChatManager.Action.OnMessageSent(it)) }
+    }
+
+    private fun addMessagePreview(visitorChatItem: VisitorChatItem, payload: SendMessagePayload) {
+        chatManager.onChatAction(ChatManager.Action.MessagePreviewAdded(visitorChatItem, payload))
+        scrollChatToBottom()
+    }
+
+    private fun addAttachmentPreview(items: List<VisitorAttachmentItem>, payload: SendMessagePayload?) {
+        chatManager.onChatAction(ChatManager.Action.AttachmentPreviewAdded(items, payload))
         scrollChatToBottom()
     }
 
@@ -787,7 +805,8 @@ internal class ChatController(
         addFileToAttachmentAndUploadUseCase.execute(file, object : AddFileToAttachmentAndUploadUseCase.Listener {
             override fun onFinished() {
                 Logger.d(TAG, "fileUploadFinished")
-                takePictureUseCase.deleteCurrent()
+                //We need this file locally, so clearing only file uri reference
+                takePictureUseCase.clearUriReference()
             }
 
             override fun onStarted() {
@@ -857,8 +876,8 @@ internal class ChatController(
         }
     }
 
-    override fun onMessageClicked(messageId: String) {
-        chatManager.onChatAction(ChatManager.Action.MessageClicked(messageId))
+    override fun onRetryClicked(messageId: String) {
+        chatManager.onChatAction(ChatManager.Action.OnRetryClicked(messageId))
     }
 
     private fun scrollChatToBottom() {

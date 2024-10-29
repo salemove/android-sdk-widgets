@@ -2,10 +2,9 @@ package com.glia.widgets.chat.domain
 
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
+import com.glia.androidsdk.chat.SendMessagePayload
 import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.widgets.chat.data.GliaChatRepository
-import com.glia.widgets.chat.model.SendMessagePayload
-import com.glia.widgets.chat.model.Unsent
 import com.glia.widgets.core.engagement.GliaEngagementConfigRepository
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
@@ -18,11 +17,11 @@ internal class SendUnsentMessagesUseCase(
     private val isSecureEngagementUseCase: IsSecureEngagementUseCase
 ) {
     operator fun invoke(
-        message: Unsent,
+        payload: SendMessagePayload,
         onSuccess: (VisitorMessage) -> Unit,
         onFailure: (ex: GliaException) -> Unit
     ) {
-        sendMessage(message.payload) { response, exception ->
+        sendMessage(payload) { response, exception ->
             if (exception != null) {
                 onFailure(exception)
             }

@@ -2,14 +2,12 @@ package com.glia.widgets.chat.model
 
 import android.content.Context
 import android.text.format.DateUtils
-import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.androidsdk.chat.ChatMessage
 import com.glia.androidsdk.chat.SingleChoiceOption
 import com.glia.widgets.chat.adapter.ChatAdapter
 import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.helper.isDownloaded
-import java.util.UUID
 
 internal abstract class ChatItem(@ChatAdapter.Type val viewType: Int) {
     abstract val id: String
@@ -31,25 +29,23 @@ internal abstract class OperatorChatItem(@ChatAdapter.Type viewType: Int) : Serv
     abstract fun withShowChatHead(showChatHead: Boolean): OperatorChatItem
 }
 
-internal sealed class Attachment(val id: String) {
-    val remoteAttachment: AttachmentFile? get() = (this as? Remote)?.attachmentFile
-    val localAttachment: LocalAttachment? get() = (this as? Local)?.fileAttachment
-    data class Remote(val attachmentFile: AttachmentFile) : Attachment(attachmentFile.id)
-    data class Local(val fileAttachment: LocalAttachment) : Attachment(UUID.randomUUID().toString())
+internal interface LocalAttachmentItem {
+    val attachment: LocalAttachment
+    val messageId: String
+
+    val id: String get() = attachment.id
 }
-internal interface AttachmentItem {
-    val attachment: Attachment
+
+internal interface RemoteAttachmentItem {
+    val attachment: AttachmentFile
     val isFileExists: Boolean
     val isDownloading: Boolean
 
-    val attachmentId: String get() = attachment.id
-
-    fun isDownloaded(context: Context): Boolean = when (val attachment = attachment) {
-        is Attachment.Remote -> attachment.attachmentFile.isDownloaded(context)
-        is Attachment.Local -> false
-    }
-
     fun updateWith(isFileExists: Boolean, isDownloading: Boolean): ChatItem
+
+    val id: String get() = attachment.id
+
+    fun isDownloaded(context: Context): Boolean = attachment.isDownloaded(context)
 }
 
 internal data class CustomCardChatItem(
@@ -66,12 +62,12 @@ internal class SystemChatItem(
     override val timestamp: Long
 ) : ServerChatItem(ChatAdapter.SYSTEM_MESSAGE_TYPE)
 
-internal sealed class OperatorAttachmentItem(@ChatAdapter.Type viewType: Int) : OperatorChatItem(viewType), AttachmentItem {
+internal sealed class OperatorAttachmentItem(@ChatAdapter.Type viewType: Int) : OperatorChatItem(viewType), RemoteAttachmentItem {
 
     data class Image(
         override val isFileExists: Boolean = false,
         override val isDownloading: Boolean = false,
-        override val attachment: Attachment,
+        override val attachment: AttachmentFile,
         override val id: String,
         override val timestamp: Long,
         override val showChatHead: Boolean = false,
@@ -87,7 +83,7 @@ internal sealed class OperatorAttachmentItem(@ChatAdapter.Type viewType: Int) : 
     data class File(
         override val isFileExists: Boolean = false,
         override val isDownloading: Boolean = false,
-        override val attachment: Attachment,
+        override val attachment: AttachmentFile,
         override val id: String,
         override val timestamp: Long,
         override val showChatHead: Boolean = false,
@@ -195,91 +191,77 @@ internal sealed class OperatorStatusItem : ChatItem(ChatAdapter.OPERATOR_STATUS_
 }
 
 // Visitor
+internal enum class VisitorItemStatus {
+    PREVIEW,
+    HISTORY,
+    DELIVERED,
+    ERROR,
+    ERROR_INDICATOR;
 
-internal abstract class VisitorChatItem(@ChatAdapter.Type viewType: Int) : ChatItem(viewType) {
-    abstract val showDelivered: Boolean
-    abstract val showError: Boolean
-    abstract fun withDeliveredStatus(delivered: Boolean): VisitorChatItem
+    val isError: Boolean get() = this == ERROR || this == ERROR_INDICATOR
 }
 
-internal sealed class VisitorAttachmentItem(@ChatAdapter.Type viewType: Int) : VisitorChatItem(viewType), AttachmentItem {
+internal abstract class VisitorChatItem(@ChatAdapter.Type viewType: Int) : ChatItem(viewType) {
+    abstract val status: VisitorItemStatus
+    abstract fun withStatus(status: VisitorItemStatus): VisitorChatItem
+}
 
-    data class Image(
+internal sealed class VisitorAttachmentItem(@ChatAdapter.Type viewType: Int) : VisitorChatItem(viewType) {
+
+    data class LocalImage(
         override val id: String,
+        override val messageId: String,
+        override val attachment: LocalAttachment,
+        override val status: VisitorItemStatus = VisitorItemStatus.PREVIEW,
         override val timestamp: Long = System.currentTimeMillis(),
-        override val attachment: Attachment,
-        override val isFileExists: Boolean = false,
-        override val isDownloading: Boolean = false,
-        override val showDelivered: Boolean = false,
-        override val showError: Boolean = false
-    ) : VisitorAttachmentItem(ChatAdapter.VISITOR_IMAGE_VIEW_TYPE) {
-        override fun withDeliveredStatus(delivered: Boolean): VisitorChatItem = copy(showDelivered = delivered)
-
-        override fun updateWith(isFileExists: Boolean, isDownloading: Boolean): ChatItem =
-            copy(isFileExists = isFileExists, isDownloading = isDownloading)
+    ) : VisitorAttachmentItem(ChatAdapter.VISITOR_IMAGE_VIEW_TYPE), LocalAttachmentItem {
+        override fun withStatus(status: VisitorItemStatus): VisitorChatItem = copy(status = status)
     }
 
-    data class File(
+    data class LocalFile(
         override val id: String,
-        override val timestamp: Long = System.currentTimeMillis(),
-        override val attachment: Attachment,
-        override val isFileExists: Boolean = false,
-        override val isDownloading: Boolean = false,
-        override val showDelivered: Boolean = false,
-        override val showError: Boolean = false
-    ) : VisitorAttachmentItem(ChatAdapter.VISITOR_FILE_VIEW_TYPE) {
-        override fun withDeliveredStatus(delivered: Boolean): VisitorChatItem = copy(showDelivered = delivered)
+        override val messageId: String,
+        override val attachment: LocalAttachment,
+        override val status: VisitorItemStatus = VisitorItemStatus.PREVIEW,
+        override val timestamp: Long = System.currentTimeMillis()
+    ) : VisitorAttachmentItem(ChatAdapter.VISITOR_FILE_VIEW_TYPE), LocalAttachmentItem {
+        override fun withStatus(status: VisitorItemStatus): VisitorChatItem = copy(status = status)
+    }
 
+    data class RemoteImage(
+        override val id: String,
+        override val attachment: AttachmentFile,
+        override val isFileExists: Boolean,
+        override val isDownloading: Boolean,
+        override val status: VisitorItemStatus = VisitorItemStatus.PREVIEW,
+        override val timestamp: Long = System.currentTimeMillis(),
+    ) : VisitorAttachmentItem(ChatAdapter.VISITOR_IMAGE_VIEW_TYPE), RemoteAttachmentItem {
         override fun updateWith(isFileExists: Boolean, isDownloading: Boolean): ChatItem =
             copy(isFileExists = isFileExists, isDownloading = isDownloading)
+
+        override fun withStatus(status: VisitorItemStatus): VisitorChatItem = copy(status = status)
+    }
+
+    data class RemoteFile(
+        override val id: String,
+        override val attachment: AttachmentFile,
+        override val isFileExists: Boolean,
+        override val isDownloading: Boolean,
+        override val status: VisitorItemStatus = VisitorItemStatus.PREVIEW,
+        override val timestamp: Long = System.currentTimeMillis()
+    ) : VisitorAttachmentItem(ChatAdapter.VISITOR_FILE_VIEW_TYPE), RemoteAttachmentItem {
+        override fun updateWith(isFileExists: Boolean, isDownloading: Boolean): ChatItem =
+            copy(isFileExists = isFileExists, isDownloading = isDownloading)
+
+        override fun withStatus(status: VisitorItemStatus): VisitorChatItem = copy(status = status)
     }
 }
 
 internal data class VisitorMessageItem(
     val message: String,
-    override val id: String = UUID.randomUUID().toString(),
-    override val timestamp: Long = System.currentTimeMillis(),
-    override val showDelivered: Boolean = false,
-    override val showError: Boolean = false
+    override val id: String,
+    override val status: VisitorItemStatus = VisitorItemStatus.PREVIEW,
+    override val timestamp: Long = System.currentTimeMillis()
 ) : VisitorChatItem(ChatAdapter.VISITOR_MESSAGE_TYPE) {
-
-    override fun withDeliveredStatus(delivered: Boolean): VisitorChatItem {
-        check(!delivered) { "The method should be called only with false value, to hide delivered status" }
-        return copy(showDelivered = delivered)
-    }
-}
-
-internal data class Unsent(
-    val payload: SendMessagePayload,
-    val error: GliaException? = null
-) {
-    val messageId: String = payload.messageId
-    val content: String = payload.content
-
-    private val localAttachments: List<LocalAttachment>? = payload.localAttachments
-    private val hasFileAttachments: Boolean = !localAttachments.isNullOrEmpty()
-
-    val chatMessage: VisitorMessageItem? = if (content.isNotEmpty()) VisitorMessageItem(
-        id = messageId,
-        message = content,
-        showError = error != null && !hasFileAttachments
-    ) else null
-
-    val attachmentItems: List<VisitorAttachmentItem>? = localAttachments?.map {
-        val showError = error != null && localAttachments.indexOf(it) == localAttachments.lastIndex
-        val attachment = Attachment.Local(it)
-        if (it.isImage) {
-            VisitorAttachmentItem.Image(
-                id = messageId,
-                attachment = attachment,
-                showError = showError
-            )
-        } else {
-            VisitorAttachmentItem.File(
-                id = messageId,
-                attachment = attachment,
-                showError = showError
-            )
-        }
-    }
+    override fun withStatus(status: VisitorItemStatus): VisitorChatItem = copy(status = status)
 }

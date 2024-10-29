@@ -1,13 +1,14 @@
 package com.glia.widgets.chat.data;
 
+import androidx.annotation.NonNull;
+
 import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.RequestCallback;
 import com.glia.androidsdk.chat.ChatMessage;
+import com.glia.androidsdk.chat.SendMessagePayload;
 import com.glia.androidsdk.chat.VisitorMessage;
 import com.glia.widgets.chat.domain.GliaSendMessageUseCase.Listener;
-import com.glia.widgets.chat.model.SendMessagePayload;
-import com.glia.widgets.chat.model.Unsent;
 import com.glia.widgets.di.GliaCore;
 
 import java.util.function.Consumer;
@@ -46,17 +47,17 @@ public class GliaChatRepository {
     }
 
     public void sendMessage(SendMessagePayload payload, RequestCallback<VisitorMessage> callback) {
-        gliaCore.getCurrentEngagement().ifPresent(engagement -> engagement.getChat().sendMessage(payload.getPayload(), callback));
+        gliaCore.getCurrentEngagement().ifPresent(engagement -> engagement.getChat().sendMessage(payload, callback));
     }
 
     public void sendMessage(SendMessagePayload payload, Listener listener) {
-        sendMessage(payload, (visitorMessage, ex) -> onMessageReceived(visitorMessage, ex, listener, payload));
+        sendMessage(payload, (visitorMessage, ex) -> onMessageReceived(visitorMessage, ex, listener, payload.getMessageId()));
     }
 
-    private void onMessageReceived(VisitorMessage visitorMessage, GliaException ex, Listener listener, SendMessagePayload payload) {
+    private void onMessageReceived(VisitorMessage visitorMessage, GliaException ex, Listener listener, @NonNull String messageId) {
         if (listener != null) {
             if (ex != null) {
-                listener.error(ex, new Unsent(payload, ex));
+                listener.error(ex, messageId);
             } else {
                 listener.messageSent(visitorMessage);
             }

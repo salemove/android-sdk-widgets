@@ -1,11 +1,14 @@
 package com.glia.widgets.chat.domain
 
 import com.glia.androidsdk.GliaException
+import com.glia.androidsdk.chat.FilesAttachment
+import com.glia.androidsdk.chat.SendMessagePayload
 import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.widgets.chat.data.GliaChatRepository
-import com.glia.widgets.chat.model.SendMessagePayload
-import com.glia.widgets.chat.model.Unsent
+import com.glia.widgets.chat.model.VisitorAttachmentItem
+import com.glia.widgets.chat.model.VisitorChatItem
+import com.glia.widgets.chat.model.VisitorMessageItem
 import com.glia.widgets.core.engagement.GliaEngagementConfigRepository
 import com.glia.widgets.core.fileupload.FileAttachmentRepository
 import com.glia.widgets.core.fileupload.model.LocalAttachment
@@ -24,21 +27,14 @@ internal class GliaSendMessageUseCase(
     interface Listener {
         fun messageSent(message: VisitorMessage?)
         fun onMessageValidated()
-        fun onMessagePrepared(message: Unsent)
-        fun errorOperatorOffline()
-        fun error(ex: GliaException, message: Unsent)
-
-        fun errorMessageInvalid() {
-            // Currently, no need for this method, but have to keep it because it describes case in else branch
-        }
+        fun onMessagePrepared(visitorChatItem: VisitorChatItem, payload: SendMessagePayload)
+        fun onAttachmentsPrepared(items: List<VisitorAttachmentItem>, payload: SendMessagePayload?)
+        fun errorOperatorOffline(messageId: String)
+        fun error(ex: GliaException, messageId: String)
     }
 
     private val isSecureEngagement: Boolean
         get() = isSecureEngagementUseCase()
-
-    private fun hasFileAttachments(localAttachments: List<LocalAttachment>): Boolean {
-        return localAttachments.isNotEmpty()
-    }
 
     private fun sendMessage(payload: SendMessagePayload, listener: Listener) {
         if (isSecureEngagement) {
@@ -49,40 +45,51 @@ internal class GliaSendMessageUseCase(
     }
 
     fun execute(message: String, listener: Listener) {
-        val localAttachments: List<LocalAttachment> =
-            fileAttachmentRepository.readyToSendLocalAttachments
-        if (canSendMessage(message, localAttachments.size)) {
+        val localAttachments: List<LocalAttachment>? = fileAttachmentRepository
+            .readyToSendLocalAttachments
+            .filter { it.engagementFile != null }
+            .takeIf { it.isNotEmpty() }
+
+        if (message.isNotBlank() || localAttachments != null) {
             listener.onMessageValidated()
-            val attachments = if (hasFileAttachments(localAttachments)) localAttachments else null
-            val payload = SendMessagePayload(content = message, localAttachments = attachments)
-            listener.onMessagePrepared(Unsent(payload = payload))
+
+            val messageAttachments = localAttachments
+                ?.map { it.engagementFile!! }
+                ?.run { FilesAttachment.from(toTypedArray()) }
+
+            val payload = SendMessagePayload(content = message, messageAttachments)
+
+            if (message.isNotBlank()) {
+                listener.onMessagePrepared(VisitorMessageItem(message, payload.messageId), payload)
+            }
+
+            localAttachments?.map { it.toVisitorAttachmentItem(payload.messageId) }?.also {
+                listener.onAttachmentsPrepared(it, payload.takeIf { message.isBlank() })
+            }
+
             if (isOperatorOnline || isSecureEngagement) {
                 sendMessage(payload, listener)
             } else {
-                listener.errorOperatorOffline()
+                listener.errorOperatorOffline(payload.messageId)
             }
-            fileAttachmentRepository.detachFiles(localAttachments)
-        } else {
-            listener.errorMessageInvalid()
+
+            fileAttachmentRepository.detachFiles(localAttachments ?: return)
         }
     }
 
     fun execute(singleChoiceAttachment: SingleChoiceAttachment, listener: Listener) {
         val payload = SendMessagePayload(attachment = singleChoiceAttachment)
-        listener.onMessagePrepared(Unsent(payload = payload))
+        val messageItem = VisitorMessageItem(payload.content, payload.messageId)
+        listener.onMessagePrepared(messageItem, payload)
         when {
             isSecureEngagement -> secureConversationsRepository.send(payload, engagementConfigRepository.queueIds, listener)
 
             isOperatorOnline -> chatRepository.sendMessage(payload, listener)
 
-            else -> listener.errorOperatorOffline()
+            else -> listener.errorOperatorOffline(payload.messageId)
         }
     }
 
     private val isOperatorOnline: Boolean
         get() = isOperatorPresentUseCase()
-
-    private fun canSendMessage(message: String, numOfAttachment: Int): Boolean {
-        return message.isNotEmpty() || numOfAttachment > 0
-    }
 }

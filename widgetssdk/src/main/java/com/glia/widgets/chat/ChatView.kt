@@ -37,11 +37,11 @@ import com.glia.widgets.chat.adapter.ChatAdapter.OnFileItemClickListener
 import com.glia.widgets.chat.adapter.ChatAdapter.OnImageItemClickListener
 import com.glia.widgets.chat.adapter.ChatItemHeightManager
 import com.glia.widgets.chat.adapter.UploadAttachmentAdapter
-import com.glia.widgets.chat.model.AttachmentItem
 import com.glia.widgets.chat.model.ChatInputMode
 import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.ChatState
 import com.glia.widgets.chat.model.CustomCardChatItem
+import com.glia.widgets.chat.model.RemoteAttachmentItem
 import com.glia.widgets.core.configuration.EngagementConfiguration
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.dialog.model.DialogState
@@ -115,8 +115,8 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     private var onMinimizeListener: OnMinimizeListener? = null
     private var onNavigateToCallListener: OnNavigateToCallListener? = null
     private var onBackToCallListener: OnBackToCallListener? = null
-    private val onMessageClickListener = ChatAdapter.OnMessageClickListener { messageId: String ->
-        controller?.onMessageClicked(messageId)
+    private val onRetryClickListener = ChatAdapter.OnRetryClickListener {
+        controller?.onRetryClicked(it)
     }
     private val onOptionClickedListener = OnOptionClickedListener { item, selectedOption ->
         Logger.d(TAG, "singleChoiceCardClicked")
@@ -132,7 +132,9 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             super.onScrollStateChanged(recyclerView, newState)
 
             // hide the keyboard on chat scroll
-            insetsController?.hideKeyboard()
+            if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
+                insetsController?.hideKeyboard()
+            }
         }
     }
     private val onCustomCardResponse = OnCustomCardResponse { customCard: CustomCardChatItem, text: String, value: String ->
@@ -182,6 +184,11 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     }
 
     private val getContentLauncher = chatActivity?.registerForActivityResult(ActivityResultContracts.GetContent()) {
+        it?.apply { controller?.onContentChosen(this) }
+    }
+
+    //This will allow us to view picked files with Uri
+    private val openDocumentLauncher = chatActivity?.registerForActivityResult(ActivityResultContracts.OpenDocument()) {
         it?.apply { controller?.onContentChosen(this) }
     }
 
@@ -399,17 +406,21 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         }
     }
 
-    override fun navigateToPreview(
-        attachmentFile: AttachmentFile, view: View
-    ) {
+    override fun navigateToImagePreview(attachmentFile: AttachmentFile, view: View) {
         val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
             context.requireActivity(), view, context.getString(R.string.glia_file_preview_transition_name) // Not translatable
         )
 
-        context.startActivity(
-            FilePreviewActivity.intent(context, attachmentFile), options.toBundle()
+        context.startActivity(FilePreviewActivity.intent(context, attachmentFile), options.toBundle())
+        insetsController?.hideKeyboard()
+    }
+
+    override fun navigateToImagePreview(attachmentFile: LocalAttachment, view: View) {
+        val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+            context.requireActivity(), view, context.getString(R.string.glia_file_preview_transition_name) // Not translatable
         )
 
+        context.startActivity(FilePreviewActivity.intent(context, attachmentFile), options.toBundle())
         insetsController?.hideKeyboard()
     }
 
@@ -524,7 +535,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     }
 
     private fun updateIsFileDownloaded(item: ChatItem): ChatItem = when (item) {
-        is AttachmentItem -> item.run { updateWith(isDownloaded(context), isDownloading) }
+        is RemoteAttachmentItem -> item.run { updateWith(isDownloaded(context), isDownloading) }
         else -> item
     }
 
@@ -617,7 +628,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     private fun setupViewAppearance() {
         adapter = ChatAdapter(
             theme,
-            onMessageClickListener,
+            onRetryClickListener,
             onOptionClickedListener,
             this,
             this,
@@ -719,7 +730,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             }, {
                 controller?.onTakePhotoClicked()
             }, {
-                getContentLauncher?.launch(Constants.MIME_TYPE_ALL)
+                openDocumentLauncher?.launch(arrayOf(Constants.MIME_TYPE_ALL))
             })
         }
     }
@@ -809,7 +820,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     private fun updatedDownloadingItemState(
         attachmentFile: AttachmentFile, currentChatItem: ChatItem, isDownloading: Boolean, isFileExists: Boolean
     ): ChatItem = when {
-        currentChatItem is AttachmentItem && currentChatItem.attachmentId == attachmentFile.id -> currentChatItem.updateWith(
+        currentChatItem is RemoteAttachmentItem && currentChatItem.id == attachmentFile.id -> currentChatItem.updateWith(
             isFileExists,
             isDownloading
         )
@@ -828,8 +839,20 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         } ?: showToast(message = localeProvider.getString(R.string.android_file_view_error))
     }
 
+    override fun onLocalFileOpenClick(attachment: LocalAttachment) {
+        with(Intent(Intent.ACTION_VIEW)) {
+            setDataAndType(attachment.uri, attachment.mimeType)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+            resolveActivity(context.packageManager)?.also { context.startActivity(this) }
+        } ?: showToast(message = localeProvider.getString(R.string.android_file_view_error))
+    }
+
     override fun onImageItemClick(item: AttachmentFile, view: View) {
         controller?.onImageItemClick(item, view)
+    }
+
+    override fun onLocalImageItemClick(attachment: LocalAttachment, view: View) {
+        controller?.onLocalImageItemClick(attachment, view)
     }
 
     fun setConfiguration(configuration: EngagementConfiguration?) {

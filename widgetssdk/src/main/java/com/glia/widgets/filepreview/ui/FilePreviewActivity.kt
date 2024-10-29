@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -20,12 +21,14 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.widgets.R
+import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.databinding.FilePreviewActivityBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.SimpleWindowInsetsAndAnimationHandler
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.fileProviderAuthority
+import com.glia.widgets.helper.getParcelable
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.showToast
 import java.io.File
@@ -41,16 +44,11 @@ internal class FilePreviewActivity : AppCompatActivity(), FilePreviewContract.Vi
     private val localeProvider = Dependencies.localeProvider
 
     private val binding: FilePreviewActivityBinding by lazy {
-        FilePreviewActivityBinding.inflate(
-            layoutInflater
-        )
+        FilePreviewActivityBinding.inflate(layoutInflater)
     }
 
     private val hasExternalStoragePermission: Boolean
-        get() = ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-        ) == PackageManager.PERMISSION_GRANTED
+        get() = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
 
     private var showDownloadIcon = false
     private var showShareIcon = false
@@ -80,10 +78,14 @@ internal class FilePreviewActivity : AppCompatActivity(), FilePreviewContract.Vi
     }
 
     private fun onImageDataReceived(intent: Intent) {
-        val bitmapId = intent.getStringExtra(IMAGE_ID_KEY).orEmpty()
-        val bitmapName = intent.getStringExtra(IMAGE_ID_NAME).orEmpty()
-        filePreviewController?.onImageDataReceived(bitmapId, bitmapName)
-        filePreviewController?.onImageRequested()
+        if (intent.hasExtra(LOCAL_IMAGE_URI)) {
+            filePreviewController?.onLocalImageReceived(intent.getParcelable<Uri>(LOCAL_IMAGE_URI) ?: return)
+        } else {
+            val bitmapId = intent.getStringExtra(IMAGE_ID_KEY).orEmpty()
+            val bitmapName = intent.getStringExtra(IMAGE_ID_NAME).orEmpty()
+            filePreviewController?.onImageDataReceived(bitmapId, bitmapName)
+            filePreviewController?.onImageRequested()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -167,6 +169,10 @@ internal class FilePreviewActivity : AppCompatActivity(), FilePreviewContract.Vi
         binding.filePreviewView.setImageBitmap(loadedImage)
     }
 
+    private fun setImageUri(uri: Uri) {
+        binding.filePreviewView.setImageURI(uri)
+    }
+
     override fun setController(controller: FilePreviewContract.Controller) {
         filePreviewController = controller
         controller.setView(this)
@@ -176,19 +182,22 @@ internal class FilePreviewActivity : AppCompatActivity(), FilePreviewContract.Vi
         showDownloadIcon = state.isShowDownloadButton
         showShareIcon = state.isShowShareButton
         invalidateOptionsMenu()
-        val loadedImage = state.loadedImage
-        loadedImage?.let { setImageBitmap(it) }
+        state.loadedImage?.let { setImageBitmap(it) }
+        state.localImageUri?.let { setImageUri(it) }
     }
 
     override fun shareImageFile(fileName: String) {
-        val file = File(
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                .toString(),
-            fileName
-        )
+        val file = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString(), fileName)
         val contentUri = FileProvider.getUriForFile(this, this.fileProviderAuthority, file)
         val shareIntent = Intent(Intent.ACTION_SEND)
         shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri)
+        shareIntent.type = "image/jpeg"
+        startActivity(shareIntent)
+    }
+
+    override fun shareImageFile(uri: Uri) {
+        val shareIntent = Intent(Intent.ACTION_SEND)
+        shareIntent.putExtra(Intent.EXTRA_STREAM, uri)
         shareIntent.type = "image/jpeg"
         startActivity(shareIntent)
     }
@@ -213,11 +222,18 @@ internal class FilePreviewActivity : AppCompatActivity(), FilePreviewContract.Vi
         private const val WRITE_PERMISSION_REQUEST_CODE = 110011
         private const val IMAGE_ID_KEY = "image_id"
         private const val IMAGE_ID_NAME = "image_name"
+        private const val LOCAL_IMAGE_URI = "local_image_uri"
 
         fun intent(context: Context, attachment: AttachmentFile): Intent {
             return Intent(context, FilePreviewActivity::class.java)
                 .putExtra(IMAGE_ID_KEY, attachment.id)
                 .putExtra(IMAGE_ID_NAME, attachment.name)
+                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        }
+
+        fun intent(context: Context, attachment: LocalAttachment): Intent {
+            return Intent(context, FilePreviewActivity::class.java)
+                .putExtra(LOCAL_IMAGE_URI, attachment.uri)
                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
         }
     }

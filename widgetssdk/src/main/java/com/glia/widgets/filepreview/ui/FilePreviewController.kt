@@ -1,5 +1,6 @@
 package com.glia.widgets.filepreview.ui
 
+import android.net.Uri
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase
 import com.glia.widgets.filepreview.domain.usecase.PutImageFileToDownloadsUseCase
@@ -16,7 +17,7 @@ internal class FilePreviewController @JvmOverloads constructor(
 
     override fun setView(view: FilePreviewContract.View) {
         this.view = view
-        state.reset()
+        state = State()
     }
 
     @Synchronized
@@ -41,7 +42,11 @@ internal class FilePreviewController @JvmOverloads constructor(
     }
 
     override fun onSharePressed() {
-        view?.shareImageFile(state.imageIdName)
+        if (state.imageLoadingState == State.ImageLoadingState.LOCAL) {
+            view?.shareImageFile(state.localImageUri ?: return)
+        } else {
+            view?.shareImageFile(state.imageIdName)
+        }
     }
 
     override fun onDownloadPressed() {
@@ -74,6 +79,10 @@ internal class FilePreviewController @JvmOverloads constructor(
 
     override fun onDestroy() {
         disposables.clear()
-        state.reset()
+        state = State()
+    }
+
+    override fun onLocalImageReceived(uri: Uri) {
+        setState(state.withLocalImage(uri))
     }
 }

@@ -1,7 +1,7 @@
 package com.glia.widgets.chat.model
 
 internal data class ChatState(
-    val integratorChatStarted: Boolean = false,
+    val isChatUnavailable: Boolean = false,
     val isVisible: Boolean = false,
     val isChatInBottom: Boolean = true,
     val messagesNotSeen: Int = 0,
@@ -12,7 +12,9 @@ internal data class ChatState(
     val lastTypedText: String = "",
     val engagementRequested: Boolean = false,
     val operatorStatusItem: OperatorStatusItem? = null,
-    val showSendButton: Boolean = false,
+    val isSendButtonVisible: Boolean = false,
+    val isSendButtonEnabled: Boolean = false,
+    val isSecureMessagingUnavailableLabelVisible: Boolean = false,
     val isAttachmentButtonEnabled: Boolean = false,
     val isAttachmentButtonNeeded: Boolean = false,
     val isOperatorTyping: Boolean = false,
@@ -33,11 +35,12 @@ internal data class ChatState(
     val isAttachmentButtonVisible: Boolean get() = isAttachmentButtonNeeded && isAttachmentAllowed
 
     fun initChat(): ChatState = copy(
-        integratorChatStarted = true,
+        isChatUnavailable = true,
         isVisible = true,
-        showSendButton = false,
-        isAttachmentButtonEnabled = true,
-        isAttachmentAllowed = true
+        isSendButtonVisible = false,
+        isSendButtonEnabled = true,
+        isAttachmentAllowed = true,
+        isAttachmentButtonEnabled = true
     )
 
     fun queueingStarted(): ChatState = copy(
@@ -47,13 +50,24 @@ internal data class ChatState(
         engagementRequested = true
     )
 
+    fun setSecureMessaging(isSecureMessaging: Boolean) =
+        if (isSecureMessaging) {
+            setSecureMessagingState()
+        } else {
+            setLiveChatState()
+        }
+
     fun setSecureMessagingState(): ChatState = copy(
         isSecureMessaging = true,
         chatInputMode = ChatInputMode.ENABLED,
         isAttachmentButtonNeeded = true
     )
 
-    fun setLiveChatState(): ChatState = copy(isSecureMessaging = false)
+    fun setLiveChatState(): ChatState = copy(
+        isSecureMessaging = false,
+        chatInputMode = ChatInputMode.ENABLED_NO_ENGAGEMENT,
+        isSecureMessagingUnavailableLabelVisible = false,
+    )
 
     fun allowSendAttachmentStateChanged(isAttachmentAllowed: Boolean): ChatState = copy(isAttachmentAllowed = isAttachmentAllowed)
 
@@ -69,7 +83,7 @@ internal data class ChatState(
         engagementRequested = false,
         operatorStatusItem = OperatorStatusItem.Transferring,
         chatInputMode = ChatInputMode.DISABLED,
-        showSendButton = false,
+        isSendButtonVisible = false,
         isAttachmentButtonNeeded = false
     )
 
@@ -83,7 +97,7 @@ internal data class ChatState(
         isAttachmentButtonNeeded = true
     )
 
-    fun historyLoaded(): ChatState = copy(
+    fun liveChatHistoryLoaded(): ChatState = copy(
         chatInputMode = ChatInputMode.ENABLED_NO_ENGAGEMENT,
         isAttachmentButtonNeeded = false
     )
@@ -98,17 +112,35 @@ internal data class ChatState(
 
     fun messagesNotSeenChanged(messagesNotSeen: Int): ChatState = copy(messagesNotSeen = messagesNotSeen)
 
-    fun setShowSendButton(isShow: Boolean): ChatState = copy(showSendButton = isShow)
+    fun setShowSendButton(isShow: Boolean): ChatState = copy(isSendButtonVisible = isShow)
+
+    fun setSecureMessagingUnavailable(): ChatState = copy(
+        isSecureMessagingUnavailableLabelVisible = true,
+        isAttachmentButtonNeeded = true,
+        isAttachmentButtonEnabled = false,
+        isSendButtonVisible = true,
+        isSendButtonEnabled = false,
+        chatInputMode = ChatInputMode.DISABLED
+    )
+
+    fun setSecureMessagingAvailable(): ChatState = copy(
+        isSecureMessagingUnavailableLabelVisible = false,
+        isAttachmentButtonNeeded = true,
+        isAttachmentButtonEnabled = true,
+        isSendButtonVisible = true,
+        isSendButtonEnabled = true,
+        chatInputMode = ChatInputMode.ENABLED
+    )
 
     fun setIsOperatorTyping(isOperatorTyping: Boolean): ChatState = copy(isOperatorTyping = isOperatorTyping)
 
     fun setIsAttachmentButtonEnabled(isAttachmentButtonEnabled: Boolean): ChatState = copy(isAttachmentButtonEnabled = isAttachmentButtonEnabled)
 
-    fun stop(): ChatState = copy(
+    fun chatUnavailableState(): ChatState = copy(
         formattedOperatorName = null,
         operatorProfileImgUrl = null,
         isVisible = false,
-        integratorChatStarted = false,
+        isChatUnavailable = false,
         isAttachmentButtonNeeded = false,
         isMediaUpgradeVide = null
     )

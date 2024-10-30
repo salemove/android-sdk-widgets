@@ -219,17 +219,19 @@ internal class ChatController(
         engagementConfigUseCase(chatType)
         updateOperatorDefaultImageUrlUseCase()
 
-        ensureSecureMessagingAvailable()
 
-        if (chatState.integratorChatStarted || dialogController.isShowingUnexpectedErrorDialog) {
-            if (isSecureEngagement) {
-                emitViewState { chatState.setSecureMessagingState() }
-            }
+        if (chatState.isChatUnavailable || dialogController.isShowingUnexpectedErrorDialog) {
+            emitViewState { chatState.initChat().setSecureMessaging(isSecureEngagement) }
             chatManager.onChatAction(ChatManager.Action.ChatRestored)
             return
         }
 
-        emitViewState { chatState.initChat() }
+        emitViewState {
+            chatState.initChat()
+                .setSecureMessaging(isSecureEngagement)
+        }
+        ensureSecureMessagingAvailable()
+
         initChatManager()
     }
 
@@ -254,9 +256,10 @@ internal class ChatController(
         result.onSuccess { isMessagingAvailable ->
             if (!isMessagingAvailable) {
                 Logger.d(TAG, "Messaging is unavailable")
-                dialogController.showMessageCenterUnavailableDialog()
+                emitViewState { chatState.setSecureMessagingUnavailableError() }
             } else {
                 Logger.d(TAG, "Messaging is available")
+                emitViewState { chatState.setSecureMessagingAvailable() }
             }
         }
     }
@@ -295,7 +298,7 @@ internal class ChatController(
 
     override fun onLiveObservationDialogRejected() {
         Logger.d(TAG, "onLiveObservationDialogRejected")
-        stop()
+        endChat()
         dialogController.dismissDialogs()
     }
 
@@ -315,7 +318,6 @@ internal class ChatController(
 
     override fun onDestroy(retain: Boolean) {
         Logger.d(TAG, "onDestroy, retain:$retain")
-        dialogController.dismissMessageCenterUnavailableDialog()
 
         // view is accessed from multiple threads
         // and must be protected from race condition
@@ -425,19 +427,19 @@ internal class ChatController(
 
     override fun noMoreOperatorsAvailableDismissed() {
         Logger.d(TAG, "noMoreOperatorsAvailableDismissed")
-        stop()
+        endChat()
         dialogController.dismissCurrentDialog()
     }
 
     override fun unexpectedErrorDialogDismissed() {
         Logger.d(TAG, "unexpectedErrorDialogDismissed")
-        stop()
+        endChat()
         dialogController.dismissCurrentDialog()
     }
 
     override fun endEngagementDialogYesClicked() {
         Logger.d(TAG, "endEngagementDialogYesClicked")
-        stop()
+        endChat()
         dialogController.dismissDialogs()
     }
 
@@ -521,7 +523,7 @@ internal class ChatController(
             State.StartedOmniCore -> newEngagementLoaded()
             is State.Update -> handleEngagementStateUpdate(state.updateState)
             is State.PreQueuing, is State.Queuing -> queueForEngagementStarted()
-            is State.QueueUnstaffed, is State.UnexpectedErrorHappened, is State.QueueingCanceled -> emitViewState { chatState.stop() }
+            is State.QueueUnstaffed, is State.UnexpectedErrorHappened, is State.QueueingCanceled -> emitViewState { chatState.chatUnavailableState() }
 
             else -> {
                 // no op
@@ -582,7 +584,7 @@ internal class ChatController(
     private fun error(error: String) {
         Logger.e(TAG, error)
         dialogController.showUnexpectedErrorDialog()
-        emitViewState { chatState.stop() }
+        emitViewState { chatState.chatUnavailableState() }
     }
 
     private fun viewInitPreQueueing() {
@@ -622,12 +624,12 @@ internal class ChatController(
         emitViewState { chatState.operatorConnected(formattedOperatorName, profileImgUrl) }
     }
 
-    private fun stop() {
+    private fun endChat() {
         Logger.d(TAG, "Stop, engagement ended")
         endEngagementUseCase()
         chatManager.reset()
         mediaUpgradeDisposable.clear()
-        emitViewState { chatState.stop() }
+        emitViewState { chatState.chatUnavailableState() }
     }
 
     private fun addQuickReplyButtons(options: List<GvaButton>) {
@@ -733,7 +735,7 @@ internal class ChatController(
         when {
             isSecureEngagement -> emitViewState { chatState.setSecureMessagingState() }
             isQueueingOrEngagementUseCase.hasOngoingEngagement -> emitViewState { chatState.engagementStarted() }
-            else -> emitViewState { chatState.historyLoaded() }
+            else -> emitViewState { chatState.liveChatHistoryLoaded() }
         }
 
         prepareChatComponents()

@@ -71,6 +71,7 @@ public class GliaWidgets {
      */
     @NonNull
     public synchronized static EngagementLauncher getEngagementLauncher(@NonNull List<String> queueIds) {
+        Logger.i(TAG, "Returning an Engagement Launcher");
         setupQueueIds(queueIds);
 
         return Dependencies.getEngagementLauncher();

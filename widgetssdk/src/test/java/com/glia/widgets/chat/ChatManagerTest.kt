@@ -1,8 +1,12 @@
 package com.glia.widgets.chat
 
 import android.os.Looper
+import com.glia.androidsdk.GliaException
+import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.androidsdk.chat.ChatMessage
+import com.glia.androidsdk.chat.FilesAttachment
 import com.glia.androidsdk.chat.OperatorMessage
+import com.glia.androidsdk.chat.SendMessagePayload
 import com.glia.androidsdk.chat.SystemMessage
 import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.widgets.chat.domain.AddNewMessagesDividerUseCase
@@ -19,6 +23,10 @@ import com.glia.widgets.chat.model.MediaUpgradeStartedTimerItem
 import com.glia.widgets.chat.model.NewMessagesDividerItem
 import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.chat.model.OperatorStatusItem
+import com.glia.widgets.chat.model.VisitorAttachmentItem
+import com.glia.widgets.chat.model.VisitorChatItem
+import com.glia.widgets.chat.model.VisitorItemStatus
+import com.glia.widgets.chat.model.VisitorMessageItem
 import com.glia.widgets.core.engagement.domain.model.ChatHistoryResponse
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDelayUseCase
@@ -40,6 +48,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
@@ -194,22 +203,54 @@ class ChatManagerTest {
     }
 
     @Test
-    fun `addUnsentMessage adds Unsent message before OperatorStatusItem when chatItems contain OperatorStatusItem_InQueue`() {
-//   TODO     val message = Unsent(SendMessagePayload(content = "message"))
-//        val inQueue = OperatorStatusItem.InQueue("company_name")
-//        assertTrue(state.unsentItems.isEmpty())
-//        assertTrue(state.chatItems.isEmpty())
-//        val newState = subjectUnderTest.addUnsentMessage(message, state)
-//        assertTrue(newState.unsentItems.count() == 1)
-//        assertTrue(newState.chatItems.count() == 1)
-//        assertEquals(newState.unsentItems.last().chatMessage, newState.chatItems.last())
-//        newState.chatItems.add(inQueue)
-//        subjectUnderTest.addUnsentMessage(message, state).apply {
-//            assertTrue(unsentItems.count() == 2)
-//            assertTrue(chatItems.count() == 3)
-//            assertEquals(unsentItems.last().chatMessage, chatItems[1])
-//            assertEquals(chatItems.last(), inQueue)
-//        }
+    fun `mapMessagePreviewAdded adds message preview to the chat items`() {
+        val payload = SendMessagePayload(content = "content")
+        val item = VisitorMessageItem(payload.content, payload.messageId)
+
+        assertTrue(state.messagePreviews.isEmpty())
+        assertTrue(state.chatItems.isEmpty())
+
+        val newState = subjectUnderTest.mapMessagePreviewAdded(item, payload, state)
+        assertEquals(payload, newState.messagePreviews.entries.first().value)
+        assertEquals(item, newState.chatItems.first())
+        assertEquals(1, newState.chatItems.count())
+        assertEquals(1, newState.messagePreviews.count())
+    }
+
+    @Test
+    fun `mapMessagePreviewAdded adds message preview before OperatorStatusItem when chatItems contain OperatorStatusItem_InQueue`() {
+        val payload = SendMessagePayload(content = "content")
+        val item = VisitorMessageItem(payload.content, payload.messageId)
+
+        val inQueue = OperatorStatusItem.InQueue("company_name")
+
+        assertTrue(state.messagePreviews.isEmpty())
+        assertTrue(state.chatItems.isEmpty())
+
+        state.chatItems.add(inQueue)
+
+        val newState = subjectUnderTest.mapMessagePreviewAdded(item, payload, state)
+        assertEquals(payload, newState.messagePreviews.entries.first().value)
+        assertEquals(item, newState.chatItems.first())
+        assertEquals(2, newState.chatItems.count())
+        assertEquals(1, newState.messagePreviews.count())
+    }
+
+    @Test
+    fun `mapAttachmentPreviewAdded adds attachment previews to the chat items`() {
+        val payload = SendMessagePayload(content = "content")
+        val item = VisitorAttachmentItem.LocalImage(id = "tota", messageId = payload.messageId, attachment = mock())
+        val item1 = VisitorAttachmentItem.LocalFile(id = "animal", messageId = payload.messageId, attachment = mock())
+
+        assertTrue(state.messagePreviews.isEmpty())
+        assertTrue(state.chatItems.isEmpty())
+
+        val newState = subjectUnderTest.mapAttachmentPreviewAdded(listOf(item, item1), payload, state)
+        assertEquals(payload, newState.messagePreviews.entries.first().value)
+        assertEquals(item, newState.chatItems.first())
+        assertEquals(item1, newState.chatItems[1])
+        assertEquals(2, newState.chatItems.count())
+        assertEquals(1, newState.messagePreviews.count())
     }
 
     @Test
@@ -298,20 +339,6 @@ class ChatManagerTest {
     }
 
     @Test
-    fun `mapMessageSent adds new Message`() {
-//        val visitorMessage = mock<VisitorMessage> {
-//            on { content } doReturn "mock_content"
-//        }
-//        val action: ChatManager.Action.MessageSent = mock {
-//            on { message } doReturn visitorMessage
-//        }
-//
-//        val subjectUnderTestSpy = spy(subjectUnderTest)
-//        subjectUnderTestSpy.mapMessageSent(action.message, state)
-//        verify(subjectUnderTestSpy).mapNewMessage(any(), eq(state))
-    }
-
-    @Test
     fun `mapCustomCardClicked updates Custom Card`() {
         val action: ChatManager.Action.CustomCardClicked = mock {
             on { customCard } doReturn mock()
@@ -364,17 +391,6 @@ class ChatManagerTest {
         val subjectUnderTestSpy = spy(subjectUnderTest)
         subjectUnderTestSpy.mapAction(action, state)
         verify(subjectUnderTestSpy).mapOperatorJoined(any(), any())
-    }
-
-    @Test
-    fun `mapAction calls addUnsentMessage when Action_UnsentMessageReceived passed`() {
-//        val action: ChatManager.Action.UnsentMessageReceived = mock {
-//            on { message } doReturn mock()
-//        }
-//
-//        val subjectUnderTestSpy = spy(subjectUnderTest)
-//        subjectUnderTestSpy.mapAction(action, state)
-//        verify(subjectUnderTestSpy).addUnsentMessage(any(), any())
     }
 
     @Test
@@ -439,6 +455,49 @@ class ChatManagerTest {
         val subjectUnderTestSpy = spy(subjectUnderTest)
         subjectUnderTestSpy.mapAction(action, state)
         verify(subjectUnderTestSpy).mapCustomCardClicked(any(), any())
+    }
+
+    @Test
+    fun `mapAction calls mapAttachmentPreviewAdded when Action_AttachmentPreviewAdded passed`() {
+        val action: ChatManager.Action.AttachmentPreviewAdded = ChatManager.Action.AttachmentPreviewAdded(emptyList(), mock())
+        val subjectUnderTestSpy = spy(subjectUnderTest)
+        subjectUnderTestSpy.mapAction(action, state)
+        verify(subjectUnderTestSpy).mapAttachmentPreviewAdded(any(), any(), any())
+    }
+
+    @Test
+    fun `mapAction calls mapMessagePreviewAdded when Action_MessagePreviewAdded passed`() {
+        val action: ChatManager.Action.MessagePreviewAdded = ChatManager.Action.MessagePreviewAdded(mock(), mock())
+        val subjectUnderTestSpy = spy(subjectUnderTest)
+        subjectUnderTestSpy.mapAction(action, state)
+        verify(subjectUnderTestSpy).mapMessagePreviewAdded(any(), any(), any())
+    }
+
+    @Test
+    fun `mapAction calls mapSendMessageFailed when Action_OnSendMessageError passed`() {
+        val action: ChatManager.Action.OnSendMessageError = ChatManager.Action.OnSendMessageError("message_id")
+        val subjectUnderTestSpy = spy(subjectUnderTest)
+        subjectUnderTestSpy.mapAction(action, state)
+        verify(subjectUnderTestSpy).mapSendMessageFailed(any(), any())
+    }
+
+    @Test
+    fun `mapAction calls mapRetryClicked when Action_OnRetryClicked passed`() {
+        val action: ChatManager.Action.OnRetryClicked = ChatManager.Action.OnRetryClicked("message_id")
+        val subjectUnderTestSpy = spy(subjectUnderTest)
+        subjectUnderTestSpy.mapAction(action, state)
+        verify(subjectUnderTestSpy).mapRetryClicked(any(), any())
+    }
+
+    @Test
+    fun `mapAction calls mapNewMessage when Action_OnMessageSent passed`() {
+        val message = mock<VisitorMessage> {
+            on { content } doReturn "content"
+        }
+        val action: ChatManager.Action.OnMessageSent = ChatManager.Action.OnMessageSent(message)
+        val subjectUnderTestSpy = spy(subjectUnderTest)
+        subjectUnderTestSpy.mapAction(action, state)
+        verify(subjectUnderTestSpy).mapNewMessage(any(), any())
     }
 
     @Test
@@ -519,19 +578,41 @@ class ChatManagerTest {
     }
 
     @Test
-    fun `checkUnsentMessages calls sendUnsentMessagesUseCase when unsent messages list is not empty`() {
-//        val unsentMessage = Unsent(SendMessagePayload(content = "message"))
-//
-//        whenever(sendUnsentMessagesUseCase(any(), any(), any())).thenAnswer {
-//            (it.getArgument(1) as ((VisitorMessage) -> Unit)).invoke(mock())
-//        }
-//
-//        state.unsentItems.add(unsentMessage)
-//
-//        val subjectUnderTestSpy = spy(subjectUnderTest)
-//        subjectUnderTestSpy.checkUnsentMessages(state)
-//        verify(sendUnsentMessagesUseCase).invoke(any(), any(), any())
-//        verify(subjectUnderTestSpy).onChatAction(any())
+    fun `checkUnsentMessages calls sendUnsentMessagesUseCase when message previews is not empty`() {
+        val unsentMessage = SendMessagePayload(content = "message")
+
+        state.messagePreviews[unsentMessage.messageId] = unsentMessage
+        state.preEngagementChatItemIds.add(unsentMessage.messageId)
+
+        val subjectUnderTestSpy = spy(subjectUnderTest)
+        subjectUnderTestSpy.checkUnsentMessages(state)
+        val successCaptor = argumentCaptor<(VisitorMessage) -> Unit>()
+        val failureCaptor = argumentCaptor<(GliaException) -> Unit>()
+        verify(sendUnsentMessagesUseCase).invoke(eq(unsentMessage), successCaptor.capture(), failureCaptor.capture())
+        successCaptor.lastValue.invoke(mock())
+
+        val actionCaptor = argumentCaptor<ChatManager.Action>()
+        verify(subjectUnderTestSpy).onChatAction(actionCaptor.capture())
+        assertTrue(actionCaptor.lastValue is ChatManager.Action.OnMessageSent)
+    }
+
+    @Test
+    fun `checkUnsentMessages calls OnSendMessageError action when message response is failure`() {
+        val unsentMessage = SendMessagePayload(content = "message")
+
+        state.messagePreviews[unsentMessage.messageId] = unsentMessage
+        state.preEngagementChatItemIds.add(unsentMessage.messageId)
+
+        val subjectUnderTestSpy = spy(subjectUnderTest)
+        subjectUnderTestSpy.checkUnsentMessages(state)
+        val successCaptor = argumentCaptor<(VisitorMessage) -> Unit>()
+        val failureCaptor = argumentCaptor<(GliaException) -> Unit>()
+        verify(sendUnsentMessagesUseCase).invoke(eq(unsentMessage), successCaptor.capture(), failureCaptor.capture())
+        failureCaptor.lastValue.invoke(mock())
+
+        val actionCaptor = argumentCaptor<ChatManager.Action>()
+        verify(subjectUnderTestSpy).onChatAction(actionCaptor.capture())
+        assertTrue(actionCaptor.lastValue is ChatManager.Action.OnSendMessageError)
     }
 
     @Test
@@ -737,6 +818,143 @@ class ChatManagerTest {
         whenever(loadHistoryUseCase()) doReturn Single.just(mock())
         subjectUnderTest.reloadHistoryIfNeeded()
         verify(loadHistoryUseCase).invoke()
+    }
+
+    @Test
+    fun `mapRetryClicked updates chat items with preview status for message without attachments`() {
+        val payload = SendMessagePayload(content = "message")
+        val visitorChatItem = VisitorMessageItem(payload.content, payload.messageId, VisitorItemStatus.ERROR_INDICATOR)
+        state.messagePreviews[payload.messageId] = payload
+        state.chatItems.add(visitorChatItem)
+
+        val newState = subjectUnderTest.mapRetryClicked(payload.messageId, state)
+
+        val updatedItem = newState.chatItems.first() as VisitorMessageItem
+        assertEquals(VisitorItemStatus.PREVIEW, updatedItem.status)
+    }
+
+    @Test
+    fun `mapRetryClicked updates chat items with preview status for attachment without message`() {
+        val messageId = "message_id"
+        val file: AttachmentFile = mock {
+            on { id } doReturn "attachment_id"
+        }
+        val filesAttachment: FilesAttachment = mock {
+            on { files } doReturn arrayOf(file)
+        }
+        val payload = SendMessagePayload(content = "", messageId = messageId, attachment = filesAttachment)
+        val attachmentItem = VisitorAttachmentItem.LocalFile(
+            id = "attachment_id",
+            messageId = messageId,
+            attachment = mock(),
+            status = VisitorItemStatus.ERROR_INDICATOR
+        )
+        state.messagePreviews[messageId] = payload
+        state.chatItems.add(attachmentItem)
+
+        val newState = subjectUnderTest.mapRetryClicked(messageId, state)
+
+        val updatedAttachmentItem = newState.chatItems[0] as VisitorAttachmentItem
+        assertEquals(VisitorItemStatus.PREVIEW, updatedAttachmentItem.status)
+    }
+
+    @Test
+    fun `mapRetryClicked updates chat items with preview status for message with attachments`() {
+        val messageId = "message_id"
+        val file: AttachmentFile = mock {
+            on { id } doReturn "attachment_id"
+        }
+        val filesAttachment: FilesAttachment = mock {
+            on { files } doReturn arrayOf(file)
+        }
+        val payload = SendMessagePayload(content = "message", messageId = messageId, attachment = filesAttachment)
+        val visitorChatItem = VisitorMessageItem(payload.content, payload.messageId, VisitorItemStatus.ERROR)
+        val attachmentItem = VisitorAttachmentItem.LocalFile(
+            id = "attachment_id",
+            messageId = messageId,
+            attachment = mock(),
+            status = VisitorItemStatus.ERROR_INDICATOR
+        )
+        state.messagePreviews[messageId] = payload
+        state.chatItems.add(visitorChatItem)
+        state.chatItems.add(attachmentItem)
+
+        val newState = subjectUnderTest.mapRetryClicked(messageId, state)
+
+        val updatedMessageItem = newState.chatItems.first() as VisitorMessageItem
+        val updatedAttachmentItem = newState.chatItems[1] as VisitorAttachmentItem
+        assertEquals(VisitorItemStatus.PREVIEW, updatedMessageItem.status)
+        assertEquals(VisitorItemStatus.PREVIEW, updatedAttachmentItem.status)
+    }
+
+    @Test
+    fun `mapSendMessageFailed updates chat items with error indicator status for message without attachments`() {
+        val payload = SendMessagePayload(content = "message")
+        val visitorChatItem = VisitorMessageItem(payload.content, payload.messageId)
+        state.messagePreviews[payload.messageId] = payload
+        state.chatItems.add(visitorChatItem)
+
+        val newState = subjectUnderTest.mapSendMessageFailed(payload.messageId, state)
+
+        val updatedItem = newState.chatItems.first() as VisitorChatItem
+        assertEquals(VisitorItemStatus.ERROR_INDICATOR, updatedItem.status)
+    }
+
+    @Test
+    fun `mapSendMessageFailed updates chat items with error indicator status for attachments without message`() {
+        val messageId = "message_id"
+        val file: AttachmentFile = mock {
+            on { id } doReturn "attachment_id"
+        }
+        val filesAttachment: FilesAttachment = mock {
+            on { files } doReturn arrayOf(file)
+        }
+        val payload = SendMessagePayload(content = "", messageId = messageId, attachment = filesAttachment)
+        val attachmentItem = VisitorAttachmentItem.LocalFile(id = "attachment_id", messageId = messageId, attachment = mock())
+        state.messagePreviews[messageId] = payload
+        state.chatItems.add(attachmentItem)
+
+        val newState = subjectUnderTest.mapSendMessageFailed(messageId, state)
+
+        val updatedAttachmentItem = newState.chatItems[0] as VisitorAttachmentItem
+        assertEquals(VisitorItemStatus.ERROR_INDICATOR, updatedAttachmentItem.status)
+    }
+
+    @Test
+    fun `mapSendMessageFailed updates chat items with error status for message with attachments`() {
+        val messageId = "message_id"
+        val file: AttachmentFile = mock {
+            on { id } doReturn "attachment_id"
+        }
+        val filesAttachment: FilesAttachment = mock {
+            on { files } doReturn arrayOf(file)
+        }
+        val payload = SendMessagePayload(content = "message", messageId = messageId, attachment = filesAttachment)
+        val visitorChatItem = VisitorMessageItem(payload.content, payload.messageId)
+        val attachmentItem = VisitorAttachmentItem.LocalFile(id = "attachment_id", messageId = messageId, attachment = mock())
+        state.messagePreviews[messageId] = payload
+        state.chatItems.add(visitorChatItem)
+        state.chatItems.add(attachmentItem)
+
+        val newState = subjectUnderTest.mapSendMessageFailed(messageId, state)
+
+        val updatedMessageItem = newState.chatItems.first() as VisitorChatItem
+        val updatedAttachmentItem = newState.chatItems[1] as VisitorAttachmentItem
+        assertEquals(VisitorItemStatus.ERROR, updatedMessageItem.status)
+        assertEquals(VisitorItemStatus.ERROR_INDICATOR, updatedAttachmentItem.status)
+    }
+
+    @Test
+    fun `mapRetryClicked updates chat items with preview status`() {
+        val payload = SendMessagePayload(content = "message")
+        val visitorChatItem = VisitorMessageItem(payload.content, payload.messageId, VisitorItemStatus.ERROR_INDICATOR)
+        state.messagePreviews[payload.messageId] = payload
+        state.chatItems.add(visitorChatItem)
+
+        val newState = subjectUnderTest.mapRetryClicked(payload.messageId, state)
+
+        val updatedItem = newState.chatItems.first() as VisitorMessageItem
+        assertEquals(VisitorItemStatus.PREVIEW, updatedItem.status)
     }
 
     private inline fun <reified T : ChatMessage> mockChatMessage(): ChatMessageInternal {

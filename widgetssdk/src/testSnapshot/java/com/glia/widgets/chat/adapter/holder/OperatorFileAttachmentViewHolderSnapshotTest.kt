@@ -7,6 +7,7 @@ import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.adapter.ChatAdapter
 import com.glia.widgets.chat.adapter.holder.fileattachment.OperatorFileAttachmentViewHolder
 import com.glia.widgets.chat.model.OperatorAttachmentItem
+import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.databinding.ChatAttachmentOperatorFileLayoutBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.snapshotutils.SnapshotAttachment
@@ -195,12 +196,14 @@ class OperatorFileAttachmentViewHolderSnapshotTest : SnapshotTest(
 
         return OperatorFileAttachmentViewHolder(
             ChatAttachmentOperatorFileLayoutBinding.inflate(layoutInflater),
-            uiTheme
-        ).also { viewHolder ->
-            viewHolder.bind(item, object : ChatAdapter.OnFileItemClickListener {
+            uiTheme,
+            object : ChatAdapter.OnFileItemClickListener {
                 override fun onFileOpenClick(file: AttachmentFile) {}
                 override fun onFileDownloadClick(file: AttachmentFile) {}
-            })
+                override fun onLocalFileOpenClick(attachment: LocalAttachment) {}
+            }
+        ).also { viewHolder ->
+            viewHolder.bind(item)
         }
     }
 }

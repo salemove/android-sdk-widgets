@@ -5,7 +5,7 @@ import com.glia.widgets.SnapshotTest
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.model.ChatState
 import com.glia.widgets.chat.model.OperatorStatusItem
-import com.glia.widgets.core.fileupload.model.FileAttachment
+import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.snapshotutils.SnapshotChatScreen
 import com.glia.widgets.snapshotutils.SnapshotChatView
 import com.glia.widgets.snapshotutils.SnapshotStrings
@@ -37,13 +37,13 @@ internal class ChatViewSnapshotTest : SnapshotTest(), SnapshotChatView, Snapshot
         fileAttachments = listOf(
             fileAttachment(
                 displayName = "test.doc",
-                status = FileAttachment.Status.READY_TO_SEND
+                status = LocalAttachment.Status.READY_TO_SEND
             ),
             fileAttachment(
                 displayName = "photo.jpg",
                 isImage = true,
                 size = 123456,
-                status = FileAttachment.Status.SECURITY_SCAN
+                status = LocalAttachment.Status.SECURITY_SCAN
             ),
             fileAttachment(
                 displayName = "image.jpg",
@@ -52,7 +52,7 @@ internal class ChatViewSnapshotTest : SnapshotTest(), SnapshotChatView, Snapshot
             ),
             fileAttachment(
                 displayName = "failed.file",
-                status = FileAttachment.Status.ERROR_SECURITY_SCAN_FAILED
+                status = LocalAttachment.Status.ERROR_SECURITY_SCAN_FAILED
             )
         ),
         imageResources = listOf(
@@ -121,13 +121,13 @@ internal class ChatViewSnapshotTest : SnapshotTest(), SnapshotChatView, Snapshot
         fileAttachments = listOf(
             fileAttachment(
                 displayName = "test.doc",
-                status = FileAttachment.Status.ERROR_NETWORK_TIMEOUT
+                status = LocalAttachment.Status.ERROR_NETWORK_TIMEOUT
             ),
             fileAttachment(
                 displayName = "photo.jpg",
                 isImage = true,
                 size = 123456,
-                status = FileAttachment.Status.ERROR_SECURITY_SCAN_FAILED
+                status = LocalAttachment.Status.ERROR_SECURITY_SCAN_FAILED
             )
         ),
         imageResources = listOf(

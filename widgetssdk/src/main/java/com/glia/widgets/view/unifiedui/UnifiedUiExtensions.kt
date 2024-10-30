@@ -129,6 +129,10 @@ internal fun TextView.applyTextColorTheme(color: ColorTheme?) {
         paint.shader = null
         setTextColor(color.primaryColor)
     }
+
+    // Line below apply text color to any drawable that are part of this TextVIew
+    // e.g.: app:drawableStartCompat="@drawable/ic_attention"
+    color.primaryColorStateList.let(::setCompoundDrawableTintList)
 }
 
 internal fun TextView.applyTextTheme(

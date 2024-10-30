@@ -157,10 +157,11 @@ internal class ChatViewSnapshotTest : SnapshotTest(), SnapshotChatView, Snapshot
 
     // MARK: Secure messaging
 
-    private fun secureMessagingView(unifiedTheme: UnifiedTheme? = null) = setupView(
+    private fun secureMessagingView(unifiedTheme: UnifiedTheme? = null, isUnavailable: Boolean = false) = setupView(
         chatState = ChatState()
-            .changeVisibility(true)
-            .setSecureMessagingState(),
+            .initChat()
+            .setSecureMessagingState()
+            .let { if (isUnavailable) it.setSecureMessagingUnavailable() else it },
         message = mediumLengthTexts()[2],
         unifiedTheme = unifiedTheme
     )
@@ -195,6 +196,33 @@ internal class ChatViewSnapshotTest : SnapshotTest(), SnapshotChatView, Snapshot
         snapshot(
             secureMessagingView(
                 unifiedTheme = unifiedThemeWithoutChat()
+            ).root
+        )
+    }
+
+    @Test
+    fun secureMessagingUnavailable() {
+        snapshot(
+            secureMessagingView(isUnavailable = true).root
+        )
+    }
+
+    @Test
+    fun secureMessagingUnavailableWithGlobalColors() {
+        snapshot(
+            secureMessagingView(
+                unifiedTheme = unifiedThemeWithGlobalColors(),
+                isUnavailable = true
+            ).root
+        )
+    }
+
+    @Test
+    fun secureMessagingUnavailableWithUnifiedTheme() {
+        snapshot(
+            secureMessagingView(
+                unifiedTheme = unifiedTheme(),
+                isUnavailable = true
             ).root
         )
     }

@@ -72,7 +72,7 @@ internal class QueueRepositoryImpl(private val gliaCore: GliaCore, private val c
 
     private fun reportGetSiteQueuesError(exception: GliaException?) {
         val ex = exception ?: RuntimeException("Fetching queues failed: queues were null")
-        Logger.e(TAG, "Setting up queues. Failed to get site queues", ex)
+        Logger.e(TAG, "Setting up queues. Failed to get site queues.", ex)
         _queuesState.onNext(QueuesState.Error(ex))
     }
 
@@ -87,7 +87,7 @@ internal class QueueRepositoryImpl(private val gliaCore: GliaCore, private val c
         Flowable.combineLatest(configurationManager.queueIdsObservable, siteQueues, ::Pair)
             .distinctUntilChanged()
             .unSafeSubscribe { (integratorQueueIds, siteQueues) ->
-                Logger.i(TAG, "Setting up queues. site has ${siteQueues.count()} queues")
+                Logger.d(TAG, "Setting up queues. Site has ${siteQueues.count()} queues.")
                 onQueuesReceived(integratorQueueIds, siteQueues)
             }
     }
@@ -95,32 +95,28 @@ internal class QueueRepositoryImpl(private val gliaCore: GliaCore, private val c
     private fun onQueuesReceived(queueIds: List<String>, siteQueues: List<Queue>) {
         when {
             siteQueues.isEmpty() -> {
-                Logger.i(TAG, "Setting up queues. Site has no queues")
+                Logger.w(TAG, "Setting up queues. Site has no queues.")
                 _queuesState.onNext(QueuesState.Empty)
             }
 
             queueIds.isEmpty() -> {
-                Logger.i(TAG, "Setting up queues. Integrator queues are empty")
+                Logger.i(TAG, "Setting up queues. Integrator specified an empty list of queues.")
                 setDefaultQueues(siteQueues)
             }
 
             else -> {
-                Logger.i(TAG, "Setting up queues. Matching queues")
                 matchQueues(queueIds, siteQueues)
             }
         }
     }
 
     private fun setDefaultQueues(siteQueues: List<Queue>) {
-        Logger.i(TAG, "Setting up queues. Falling back to default queues")
-
         val defaultQueues = siteQueues.filter { it.isDefault == true }
 
+        Logger.i(TAG, "Setting up queues. Using ${defaultQueues.count()} default queues.")
         if (defaultQueues.isEmpty()) {
-            Logger.w(TAG, "Setting up queues. No default queues")
             _queuesState.onNext(QueuesState.Empty)
         } else {
-            Logger.i(TAG, "Setting up queues. Using default ${defaultQueues.count()} queues")
             _queuesState.onNext(QueuesState.Queues(defaultQueues))
         }
     }
@@ -140,14 +136,13 @@ internal class QueueRepositoryImpl(private val gliaCore: GliaCore, private val c
 
     private fun matchQueues(queueIds: List<String>, siteQueues: List<Queue>) {
         val matchedQueues = siteQueues.filter { queueIds.contains(it.id) }
-
+        Logger.i(
+            TAG,
+            "Setting up queues. ${matchedQueues.count()} out of ${queueIds.count()} queues provided by an integrator match with site queues."
+        )
         if (matchedQueues.isEmpty()) {
             setDefaultQueues(siteQueues)
         } else {
-            Logger.i(
-                TAG,
-                "Setting up queues. ${matchedQueues.count()} out of ${queueIds.count()} queues provided by an integrator match with site queues."
-            )
             _queuesState.onNext(QueuesState.Queues(matchedQueues))
         }
     }

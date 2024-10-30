@@ -590,20 +590,25 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         binding.newMessagesIndicatorImage.setShowRippleAnimation(false)
         binding.newMessagesIndicatorImage.setTheme(theme)
         binding.newMessagesIndicatorCard.shapeAppearanceModel = shapeAppearanceModel
-        theme.brandPrimaryColor?.let(::getColorStateListCompat)?.also {
-            binding.newMessagesBadgeView.backgroundTintList = it
-        }
-        theme.baseLightColor?.let(::getColorCompat)?.also(binding.newMessagesBadgeView::setTextColor)
 
-        // colors
+        // global colors
+        theme.brandPrimaryColor
+            ?.also(binding.operatorTypingAnimationView::addColorFilter)
+            ?.let(::getColorStateListCompat)
+            ?.also(binding.newMessagesBadgeView::setBackgroundTintList)
+
+        theme.baseLightColor?.let(::getColorCompat)
+            ?.also(binding.newMessagesBadgeView::setTextColor)
+            ?.also(binding.scErrorLabel::setTextColor)
+        theme.baseLightColor?.let(::getColorStateListCompat)
+            ?.also(binding.scErrorLabel::setCompoundDrawableTintList)
+
+        theme.systemNegativeColor?.let(::getColorCompat)
+            ?.also(binding.scErrorLabel::setBackgroundColor)
+
         theme.baseShadeColor?.let(::getColorCompat)
             ?.also(binding.chatDivider::setBackgroundColor)
             ?.also(binding.scBottomBannerDivider::setBackgroundColor)
-
-        theme.brandPrimaryColor?.let(::getColorStateListCompat)?.also {
-            binding.newMessagesBadgeView.backgroundTintList = it
-        }
-        binding.sendButton.imageTintList = theme.sendMessageButtonTintColor?.let(::getColorStateListCompat)
 
         theme.baseDarkColor?.let(::getColorCompat)?.also(binding.chatEditText::setTextColor)
         theme.baseNormalColor?.let(::getColorCompat)
@@ -611,21 +616,19 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             ?.also(binding.scBottomBannerLabel::setTextColor)
         theme.systemAgentBubbleColor?.let(::getColorCompat)?.also(binding.scBottomBannerLabel::setBackgroundColor)
 
+        // other
+        theme.sendMessageButtonTintColor?.let(::getColorStateListCompat)?.also(binding.sendButton::setImageTintList)
         theme.gliaChatBackgroundColor?.let(::getColorCompat)?.also(::setBackgroundColor)
+        binding.gvaQuickRepliesLayout.updateTheme(theme)
 
         // fonts
         theme.fontRes?.also { binding.chatEditText.typeface = getFontCompat(it) }
 
-        theme.brandPrimaryColor?.also {
-            binding.operatorTypingAnimationView.addColorFilter(color = it)
-        }
-
-        // secure messaging
+        // remote locales
         binding.scErrorLabel.setLocaleText(R.string.secure_messaging_chat_unavailable_message)
         binding.scBottomBannerLabel.setLocaleText(R.string.secure_messaging_chat_banner_bottom)
-
-        binding.gvaQuickRepliesLayout.updateTheme(theme)
         binding.sendButton.setLocaleContentDescription(R.string.general_send)
+
         applyTheme(Dependencies.gliaThemeManager.theme)
     }
 
@@ -809,6 +812,12 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         binding.scBottomBannerLabel.applyTextTheme(secureMessagingTheme.bottomBannerText)
         binding.scBottomBannerLabel.applyLayerTheme(secureMessagingTheme.bottomBannerBackground)
         binding.scBottomBannerDivider.applyColorTheme(secureMessagingTheme.bottomBannerDividerColor)
+        binding.scErrorLabel.applyLayerTheme(secureMessagingTheme.unavailableStatusBackground)
+        binding.scErrorLabel.applyTextTheme(secureMessagingTheme.unavailableStatusText)
+        binding.scErrorLabel.compoundDrawableTintList = secureMessagingTheme
+            .unavailableStatusText
+            ?.textColor
+            ?.primaryColorStateList
     }
 
     private fun updateSecureMessagingState(state: ChatState) {

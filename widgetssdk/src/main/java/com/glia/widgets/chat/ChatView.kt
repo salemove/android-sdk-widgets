@@ -15,10 +15,8 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.withStyledAttributes
 import androidx.core.view.ViewCompat
-import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
-import androidx.core.view.updatePadding
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.AdapterDataObserver
@@ -304,7 +302,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         // some state updates on core-sdk are coming from the computation thread
         // need to update state on uiThread
         post {
-            updateShowSendButton(chatState)
+            updateSendButtonState(chatState)
             updateChatEditText(chatState)
             updateAppBar(chatState)
             binding.newMessagesIndicatorLayout.isVisible = chatState.showMessagesUnseenIndicator
@@ -321,6 +319,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             binding.operatorTypingAnimationView.isVisible = chatState.isOperatorTyping
             updateAttachmentButton(chatState)
             updateQuickRepliesState(chatState)
+            updateSecureMessagingState(chatState)
         }
     }
 
@@ -448,7 +447,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             if (updateDialogState(it)) {
                 when (it) {
                     DialogState.None -> resetDialogStateAndDismiss()
-                    DialogState.MessageCenterUnavailable -> post { showChatUnavailableView() }
                     DialogState.UnexpectedError -> post { showUnexpectedErrorDialog() }
                     DialogState.ExitQueue -> post { showExitQueueDialog() }
                     DialogState.OverlayPermission -> post { showOverlayPermissionsDialog() }
@@ -475,10 +473,11 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         else -> item
     }
 
-    private fun updateShowSendButton(chatState: ChatState) {
-        if (chatState.showSendButton == binding.sendButton.isVisible) return
-
-        binding.sendButton.isVisible = chatState.showSendButton
+    private fun updateSendButtonState(chatState: ChatState) {
+        binding.sendButton.apply {
+            isVisible = chatState.isSendButtonVisible
+            isEnabled = chatState.isSendButtonEnabled
+        }
     }
 
     private fun updateChatEditText(chatState: ChatState) {
@@ -486,7 +485,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             ChatInputMode.ENABLED_NO_ENGAGEMENT -> binding.chatEditText.setLocaleHint(
                 R.string.chat_message_start_engagement_placeholder
             )
-
             else -> binding.chatEditText.setLocaleHint(R.string.chat_input_placeholder)
         }
         binding.chatEditText.isEnabled = chatState.chatInputMode.isEnabled
@@ -510,7 +508,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             binding.appBarView.hideBackButton()
             binding.appBarView.showXButton()
             binding.secureConversationsBottomBanner.visibility = View.VISIBLE
-            binding.scBottomBannerLabel.setLocaleText(R.string.secure_messaging_chat_banner_bottom)
         } else {
             showToolbar(LocaleString(R.string.engagement_chat_title))
             binding.appBarView.showBackButton()
@@ -605,20 +602,25 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         binding.newMessagesIndicatorImage.setShowRippleAnimation(false)
         binding.newMessagesIndicatorImage.setTheme(theme)
         binding.newMessagesIndicatorCard.shapeAppearanceModel = shapeAppearanceModel
-        theme.brandPrimaryColor?.let(::getColorStateListCompat)?.also {
-            binding.newMessagesBadgeView.backgroundTintList = it
-        }
-        theme.baseLightColor?.let(::getColorCompat)?.also(binding.newMessagesBadgeView::setTextColor)
 
-        // colors
+        // global colors
+        theme.brandPrimaryColor
+            ?.also(binding.operatorTypingAnimationView::addColorFilter)
+            ?.let(::getColorStateListCompat)
+            ?.also(binding.newMessagesBadgeView::setBackgroundTintList)
+
+        theme.baseLightColor?.let(::getColorCompat)
+            ?.also(binding.newMessagesBadgeView::setTextColor)
+            ?.also(binding.scErrorLabel::setTextColor)
+        theme.baseLightColor?.let(::getColorStateListCompat)
+            ?.also(binding.scErrorLabel::setCompoundDrawableTintList)
+
+        theme.systemNegativeColor?.let(::getColorCompat)
+            ?.also(binding.scErrorLabel::setBackgroundColor)
+
         theme.baseShadeColor?.let(::getColorCompat)
             ?.also(binding.chatDivider::setBackgroundColor)
             ?.also(binding.scBottomBannerDivider::setBackgroundColor)
-
-        theme.brandPrimaryColor?.let(::getColorStateListCompat)?.also {
-            binding.newMessagesBadgeView.backgroundTintList = it
-        }
-        binding.sendButton.imageTintList = theme.sendMessageButtonTintColor?.let(::getColorStateListCompat)
 
         theme.baseDarkColor?.let(::getColorCompat)?.also(binding.chatEditText::setTextColor)
         theme.baseNormalColor?.let(::getColorCompat)
@@ -626,17 +628,19 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             ?.also(binding.scBottomBannerLabel::setTextColor)
         theme.systemAgentBubbleColor?.let(::getColorCompat)?.also(binding.scBottomBannerLabel::setBackgroundColor)
 
+        // other
+        theme.sendMessageButtonTintColor?.let(::getColorStateListCompat)?.also(binding.sendButton::setImageTintList)
         theme.gliaChatBackgroundColor?.let(::getColorCompat)?.also(::setBackgroundColor)
+        binding.gvaQuickRepliesLayout.updateTheme(theme)
 
         // fonts
         theme.fontRes?.also { binding.chatEditText.typeface = getFontCompat(it) }
 
-        theme.brandPrimaryColor?.also {
-            binding.operatorTypingAnimationView.addColorFilter(color = it)
-        }
-
-        binding.gvaQuickRepliesLayout.updateTheme(theme)
+        // remote locales
+        binding.scErrorLabel.setLocaleText(R.string.secure_messaging_chat_unavailable_message)
+        binding.scBottomBannerLabel.setLocaleText(R.string.secure_messaging_chat_banner_bottom)
         binding.sendButton.setLocaleContentDescription(R.string.general_send)
+
         applyTheme(Dependencies.gliaThemeManager.theme)
     }
 
@@ -830,21 +834,12 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         binding.scBottomBannerLabel.applyTextTheme(secureMessagingTheme.bottomBannerText)
         binding.scBottomBannerLabel.applyLayerTheme(secureMessagingTheme.bottomBannerBackground)
         binding.scBottomBannerDivider.applyColorTheme(secureMessagingTheme.bottomBannerDividerColor)
+        binding.scErrorLabel.applyLayerTheme(secureMessagingTheme.unavailableStatusBackground)
+        binding.scErrorLabel.applyTextTheme(secureMessagingTheme.unavailableStatusText)
     }
 
-    private fun showChatUnavailableView() = showDialog {
-        Dialogs.showMessageCenterUnavailableDialog(context, theme) {
-            hideChatControls(it.window?.decorView?.height ?: 0)
-        }
-    }
-
-    private fun hideChatControls(dialogHeight: Int) {
-        binding.apply {
-            chatRecyclerView.updatePadding(bottom = dialogHeight)
-            chatRecyclerView.scrollBy(0, dialogHeight)
-            chatMessageLayout.isGone = true
-            operatorTypingAnimationView.isGone = true
-        }
+    private fun updateSecureMessagingState(state: ChatState) {
+        binding.scErrorLabel.isVisible = state.isSecureMessagingUnavailableLabelVisible
     }
 
     @VisibleForTesting

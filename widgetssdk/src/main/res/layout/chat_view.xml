@@ -112,7 +112,7 @@
         android:id="@+id/sc_bottom_banner_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@+id/chat_divider"
+        app:layout_constraintBottom_toTopOf="@+id/chat_sc_error_barrier"
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
         android:paddingStart="16dp"
@@ -120,6 +120,32 @@
         android:background="?attr/gliaSystemAgentBubbleColor"
         android:textAppearance="?attr/textAppearanceCaption"
         tools:text="@string/secure_messaging_chat_banner_bottom" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/chat_sc_error_barrier"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:barrierDirection="top"
+        app:constraint_referenced_ids="sc_error_label, chat_divider"/>
+
+    <TextView
+        android:id="@+id/sc_error_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        app:layout_constraintBottom_toTopOf="@+id/chat_divider"
+        android:background="?attr/gliaSystemNegativeColor"
+        android:textColor="?attr/gliaBaseLightColor"
+        android:textAppearance="?attr/textAppearanceCaption"
+        app:drawableStartCompat="@drawable/ic_attention"
+        app:drawableTint="?attr/gliaBaseLightColor"
+        android:drawablePadding="8dp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        tools:text="@string/message_center_error_unavailable_message" />
 
     <View
         android:id="@+id/chat_divider"
@@ -159,6 +185,7 @@
             android:textColor="?attr/gliaBaseDarkColor"
             android:textColorHint="?attr/gliaBaseNormalColor"
             android:textCursorDrawable="@null"
+            tools:text="@string/chat_input_placeholder"
             tools:ignore="RtlSymmetry"
             tools:textColor="@color/glia_black_color" />
 

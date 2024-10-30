@@ -16,6 +16,7 @@ import com.glia.widgets.chat.domain.TakePictureUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
 import com.glia.widgets.chat.domain.UriToFileAttachmentUseCase
 import com.glia.widgets.chat.domain.gva.DetermineGvaButtonTypeUseCase
+import com.glia.widgets.chat.model.ChatState
 import com.glia.widgets.chat.model.Gva
 import com.glia.widgets.chat.model.GvaButton
 import com.glia.widgets.core.dialog.DialogContract
@@ -56,10 +57,14 @@ import com.glia.widgets.webbrowser.domain.GetUrlFromLinkUseCase
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertFalse
+import junit.framework.TestCase.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -238,6 +243,7 @@ class ChatControllerTest {
     @Test
     fun initChat_setsConfiguration_withInitialParams() {
         whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.never()
+        whenever(isMessagingAvailableUseCase()) doReturn Flowable.never()
 
         chatController.initChat(ChatType.SECURE_MESSAGING)
 
@@ -246,26 +252,30 @@ class ChatControllerTest {
 
     @Test
     fun initChat_setsConfiguration_withAvailableQueues() {
+        val stateCaptor = argumentCaptor<ChatState>()
         whenever(isSecureEngagementUseCase()) doReturn true
         whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.never()
         whenever(isMessagingAvailableUseCase()) doReturn Flowable.just(Result.success(true))
 
         chatController.initChat(ChatType.SECURE_MESSAGING)
 
-        verify(dialogController, never()).showMessageCenterUnavailableDialog()
+        verify(chatView, atLeastOnce()).emitState(stateCaptor.capture())
+        assertFalse(stateCaptor.lastValue.isSecureMessagingUnavailableLabelVisible)
         verify(dialogController, never()).showUnexpectedErrorDialog()
         verify(engagementConfigUseCase).invoke(ChatType.SECURE_MESSAGING)
     }
 
     @Test
-    fun initChat_showsMessageCenterUnavailableDialog_whenNoAvailableQueues() {
+    fun initChat_showsMessageCenterUnavailableLabel_whenNoAvailableQueues() {
+        val stateCaptor = argumentCaptor<ChatState>()
         whenever(isSecureEngagementUseCase()) doReturn true
         whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.never()
         whenever(isMessagingAvailableUseCase()) doReturn Flowable.just(Result.success(false))
 
         chatController.initChat(ChatType.SECURE_MESSAGING)
 
-        verify(dialogController).showMessageCenterUnavailableDialog()
+        verify(chatView, atLeastOnce()).emitState(stateCaptor.capture())
+        assertTrue(stateCaptor.lastValue.isSecureMessagingUnavailableLabelVisible)
         verify(dialogController, never()).showUnexpectedErrorDialog()
     }
 

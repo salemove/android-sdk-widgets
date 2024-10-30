@@ -10,10 +10,10 @@ internal class FilePreviewController @JvmOverloads constructor(
     private val getImageFileFromDownloadsUseCase: GetImageFileFromDownloadsUseCase,
     private val getImageFileFromCacheUseCase: GetImageFileFromCacheUseCase,
     private val putImageFileToDownloadsUseCase: PutImageFileToDownloadsUseCase,
-    private var state: State = State(),
     private val disposables: CompositeDisposable = CompositeDisposable()
 ) : FilePreviewContract.Controller {
     private var view: FilePreviewContract.View? = null
+    private var state: State = State()
 
     override fun setView(view: FilePreviewContract.View) {
         this.view = view

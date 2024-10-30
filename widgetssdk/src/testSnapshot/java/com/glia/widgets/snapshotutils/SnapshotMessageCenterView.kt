@@ -4,7 +4,7 @@ import android.widget.EditText
 import androidx.annotation.DrawableRes
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
-import com.glia.widgets.core.fileupload.model.FileAttachment
+import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.di.ControllerFactory
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.messagecenter.MessageCenterContract
@@ -13,7 +13,6 @@ import com.glia.widgets.messagecenter.MessageCenterState
 import com.glia.widgets.messagecenter.MessageCenterView
 import com.glia.widgets.messagecenter.MessageView
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.util.concurrent.Executor
@@ -48,7 +47,7 @@ internal interface SnapshotMessageCenterView : SnapshotTestLifecycle, SnapshotCo
 
     fun setupView(
         state: MessageCenterState = MessageCenterState(),
-        fileAttachments: List<FileAttachment>? = null,
+        fileAttachments: List<LocalAttachment>? = null,
         @DrawableRes imageResources: List<Int>? = null,
         message: String? = null,
         executor: Executor? = Executor(Runnable::run),

@@ -2,6 +2,7 @@ package com.glia.widgets.chat.adapter.holder
 
 import com.glia.widgets.SnapshotTest
 import com.glia.widgets.UiTheme
+import com.glia.widgets.chat.model.VisitorItemStatus
 import com.glia.widgets.chat.model.VisitorMessageItem
 import com.glia.widgets.databinding.ChatVisitorMessageLayoutBinding
 import com.glia.widgets.snapshotutils.SnapshotChatScreen
@@ -17,7 +18,7 @@ class VisitorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen,
     fun withoutLabels() {
         snapshot(
             setupView(
-                VisitorMessageItem("Visitor message text")
+                VisitorMessageItem("Visitor message text", "ID")
             ).viewHolder.itemView
         )
     }
@@ -26,7 +27,7 @@ class VisitorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen,
     fun withoutLabelsWithUiTheme() {
         snapshot(
             setupView(
-                VisitorMessageItem("Visitor message text"),
+                VisitorMessageItem("Visitor message text", "ID"),
                 uiTheme = uiTheme()
             ).viewHolder.itemView
         )
@@ -36,7 +37,7 @@ class VisitorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen,
     fun withoutLabelsWithGlobalColors() {
         snapshot(
             setupView(
-                VisitorMessageItem("Visitor message text"),
+                VisitorMessageItem("Visitor message text", "ID"),
                 unifiedTheme = unifiedThemeWithGlobalColors()
             ).viewHolder.itemView
         )
@@ -46,7 +47,7 @@ class VisitorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen,
     fun withoutLabelsWithUnifiedTheme() {
         snapshot(
             setupView(
-                VisitorMessageItem("Visitor message text"),
+                VisitorMessageItem("Visitor message text", "ID"),
                 unifiedTheme = unifiedTheme()
             ).viewHolder.itemView
         )
@@ -56,7 +57,7 @@ class VisitorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen,
     fun withoutLabelsWithUnifiedThemeWithoutVisitorMessage() {
         snapshot(
             setupView(
-                VisitorMessageItem("Visitor message text"),
+                VisitorMessageItem("Visitor message text", "ID"),
                 unifiedTheme = unifiedThemeWithoutVisitorMessage()
             ).viewHolder.itemView
         )
@@ -68,7 +69,7 @@ class VisitorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen,
     fun deliveredLabel() {
         snapshot(
             setupView(
-                VisitorMessageItem("Visitor message text", showDelivered = true)
+                VisitorMessageItem("Visitor message text", "ID", status = VisitorItemStatus.DELIVERED)
             ).viewHolder.itemView
         )
     }
@@ -77,7 +78,7 @@ class VisitorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen,
     fun deliveredLabelWithUiTheme() {
         snapshot(
             setupView(
-                VisitorMessageItem("Visitor message text", showDelivered = true),
+                VisitorMessageItem("Visitor message text", "ID", status = VisitorItemStatus.DELIVERED),
                 uiTheme = uiTheme()
             ).viewHolder.itemView
         )
@@ -87,7 +88,7 @@ class VisitorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen,
     fun deliveredLabelWithGlobalColors() {
         snapshot(
             setupView(
-                VisitorMessageItem("Visitor message text", showDelivered = true),
+                VisitorMessageItem("Visitor message text", "ID", status = VisitorItemStatus.DELIVERED),
                 unifiedTheme = unifiedThemeWithGlobalColors()
             ).viewHolder.itemView
         )
@@ -97,7 +98,7 @@ class VisitorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen,
     fun deliveredLabelWithUnifiedTheme() {
         snapshot(
             setupView(
-                VisitorMessageItem("Visitor message text", showDelivered = true),
+                VisitorMessageItem("Visitor message text", "ID", status = VisitorItemStatus.DELIVERED),
                 unifiedTheme = unifiedTheme()
             ).viewHolder.itemView
         )
@@ -107,7 +108,7 @@ class VisitorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen,
     fun deliveredLabelWithUnifiedThemeWithoutVisitorMessage() {
         snapshot(
             setupView(
-                VisitorMessageItem("Visitor message text", showDelivered = true),
+                VisitorMessageItem("Visitor message text", "ID", status = VisitorItemStatus.DELIVERED),
                 unifiedTheme = unifiedThemeWithoutVisitorMessage()
             ).viewHolder.itemView
         )
@@ -119,7 +120,7 @@ class VisitorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen,
     fun errorLabel() {
         snapshot(
             setupView(
-                VisitorMessageItem("Visitor message text", showError = true)
+                VisitorMessageItem("Visitor message text", "ID", status = VisitorItemStatus.ERROR_INDICATOR)
             ).viewHolder.itemView
         )
     }
@@ -128,7 +129,7 @@ class VisitorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen,
     fun errorLabelWithUiTheme() {
         snapshot(
             setupView(
-                VisitorMessageItem("Visitor message text", showError = true),
+                VisitorMessageItem("Visitor message text", "ID", status = VisitorItemStatus.ERROR_INDICATOR),
                 uiTheme = uiTheme()
             ).viewHolder.itemView
         )
@@ -138,7 +139,7 @@ class VisitorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen,
     fun errorLabelWithGlobalColors() {
         snapshot(
             setupView(
-                VisitorMessageItem("Visitor message text", showError = true),
+                VisitorMessageItem("Visitor message text", "ID", status = VisitorItemStatus.ERROR_INDICATOR),
                 unifiedTheme = unifiedThemeWithGlobalColors()
             ).viewHolder.itemView
         )
@@ -148,7 +149,7 @@ class VisitorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen,
     fun errorLabelWithUnifiedTheme() {
         snapshot(
             setupView(
-                VisitorMessageItem("Visitor message text", showError = true),
+                VisitorMessageItem("Visitor message text", "ID", status = VisitorItemStatus.ERROR_INDICATOR),
                 unifiedTheme = unifiedTheme()
             ).viewHolder.itemView
         )
@@ -158,7 +159,7 @@ class VisitorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen,
     fun errorLabelWithUnifiedThemeWithoutVisitorMessage() {
         snapshot(
             setupView(
-                VisitorMessageItem("Visitor message text", showError = true),
+                VisitorMessageItem("Visitor message text", "ID", status = VisitorItemStatus.ERROR_INDICATOR),
                 unifiedTheme = unifiedThemeWithoutVisitorMessage()
             ).viewHolder.itemView
         )

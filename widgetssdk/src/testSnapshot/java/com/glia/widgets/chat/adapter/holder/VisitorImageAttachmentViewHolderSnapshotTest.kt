@@ -1,10 +1,14 @@
 package com.glia.widgets.chat.adapter.holder
 
+import android.view.View
+import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.widgets.R
 import com.glia.widgets.SnapshotTest
 import com.glia.widgets.UiTheme
+import com.glia.widgets.chat.adapter.ChatAdapter
 import com.glia.widgets.chat.adapter.holder.imageattachment.VisitorImageAttachmentViewHolder
 import com.glia.widgets.chat.model.VisitorAttachmentItem
+import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.databinding.ChatAttachmentVisitorImageLayoutBinding
 import com.glia.widgets.snapshotutils.SnapshotAttachment
 import com.glia.widgets.snapshotutils.SnapshotChatScreen
@@ -175,7 +179,7 @@ class VisitorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotCha
     private data class ViewData(val viewHolder: VisitorImageAttachmentViewHolder)
 
     private fun setupView(
-        item: VisitorAttachmentItem.Image,
+        item: VisitorAttachmentItem.RemoteImage,
         unifiedTheme: UnifiedTheme? = null,
         uiTheme: UiTheme = UiTheme()
     ): ViewData {
@@ -185,11 +189,22 @@ class VisitorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotCha
         val binding = ChatAttachmentVisitorImageLayoutBinding.inflate(layoutInflater)
 
         val viewHolder = VisitorImageAttachmentViewHolder(
-            binding, imageFileMock.getImageFileFromCacheUseCaseMock, imageFileMock.getImageFileFromDownloadsUseCaseMock,
-            imageFileMock.getImageFileFromNetworkUseCaseMock, schedulersMock.schedulers, uiTheme, unifiedTheme, localeProviderMock()
+            binding,
+            imageFileMock.getImageFileFromCacheUseCaseMock,
+            imageFileMock.getImageFileFromDownloadsUseCaseMock,
+            imageFileMock.getImageFileFromNetworkUseCaseMock,
+            schedulersMock.schedulers,
+            uiTheme,
+            { },
+            object : ChatAdapter.OnImageItemClickListener {
+                override fun onImageItemClick(item: AttachmentFile, view: View) {}
+                override fun onLocalImageItemClick(attachment: LocalAttachment, view: View) {}
+            },
+            unifiedTheme,
+            localeProviderMock(),
         )
 
-        viewHolder.bind(item, { _, _ -> }) {}
+        viewHolder.bind(item)
 
         schedulersMock.triggerActions()
 

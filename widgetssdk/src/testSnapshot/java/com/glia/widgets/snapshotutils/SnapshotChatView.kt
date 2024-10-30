@@ -3,7 +3,6 @@ package com.glia.widgets.snapshotutils
 import android.view.View
 import android.widget.EditText
 import androidx.annotation.DrawableRes
-import androidx.core.view.isVisible
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.ChatContract
@@ -11,7 +10,7 @@ import com.glia.widgets.chat.ChatView
 import com.glia.widgets.chat.controller.ChatController
 import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.ChatState
-import com.glia.widgets.core.fileupload.model.FileAttachment
+import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.databinding.ChatActivityBinding
 import com.glia.widgets.di.ControllerFactory
 import com.glia.widgets.di.Dependencies
@@ -60,7 +59,7 @@ internal interface SnapshotChatView : SnapshotContent, SnapshotTheme, SnapshotAc
     fun setupView(
         chatState: ChatState? = null,
         chatItems: List<ChatItem>? = null,
-        fileAttachments: List<FileAttachment>? = null,
+        fileAttachments: List<LocalAttachment>? = null,
         @DrawableRes imageResources: List<Int>? = null,
         message: String? = null,
         executor: Executor? = Executor(Runnable::run),

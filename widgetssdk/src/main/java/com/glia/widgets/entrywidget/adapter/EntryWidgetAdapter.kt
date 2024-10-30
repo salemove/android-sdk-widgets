@@ -9,6 +9,8 @@ import com.glia.widgets.databinding.EntryWidgetErrorItemBinding
 import com.glia.widgets.databinding.EntryWidgetMediaTypeItemBinding
 import com.glia.widgets.databinding.EntryWidgetPoweredByItemBinding
 import com.glia.widgets.entrywidget.EntryWidgetContract
+import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.view.unifiedui.theme.base.ButtonTheme
 import com.glia.widgets.view.unifiedui.theme.base.TextTheme
@@ -33,6 +35,16 @@ internal class EntryWidgetAdapter(
         entryWidgetTheme?.errorMessage,
         entryWidgetTheme?.errorButton
     )
+
+    init {
+        when (viewType) {
+            EntryWidgetContract.ViewType.BOTTOM_SHEET,
+            EntryWidgetContract.ViewType.EMBEDDED_VIEW -> Logger.d(TAG, "Creating an EntryWidget for $viewType")
+
+            else -> { /* No need to send a log */
+            }
+        }
+    }
 
     companion object {
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<EntryWidgetContract.ItemType>() {

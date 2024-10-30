@@ -36,7 +36,7 @@ class MapOperatorAttachmentUseCaseTest {
         mockChatMessageInternal.apply {
             val mappedMessage = useCase(mockAttachment, chatMessageInternal, true)
             assertTrue(mappedMessage is OperatorAttachmentItem.Image)
-//  TODO          assertEquals(Attachment.Remote(mockAttachment), mappedMessage.attachment)
+            assertEquals(mockAttachment, mappedMessage.attachment)
             assertEquals(messageTimeStamp, mappedMessage.timestamp)
             assertEquals(true, mappedMessage.showChatHead)
             assertEquals(operatorImageUrl, mappedMessage.operatorProfileImgUrl)
@@ -50,7 +50,7 @@ class MapOperatorAttachmentUseCaseTest {
         mockChatMessageInternal.apply {
             val mappedMessage = useCase(mockAttachment, chatMessageInternal, false)
             assertTrue(mappedMessage is OperatorAttachmentItem.File)
-//            assertEquals(Attachment.Remote(mockAttachment), mappedMessage.attachment)
+            assertEquals(mockAttachment, mappedMessage.attachment)
             assertEquals(messageTimeStamp, mappedMessage.timestamp)
             assertEquals(false, mappedMessage.showChatHead)
             assertEquals(operatorImageUrl, mappedMessage.operatorProfileImgUrl)

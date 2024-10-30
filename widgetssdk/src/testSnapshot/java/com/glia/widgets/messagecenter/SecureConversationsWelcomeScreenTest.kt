@@ -3,7 +3,7 @@ package com.glia.widgets.messagecenter
 import com.android.ide.common.rendering.api.SessionParams
 import com.glia.widgets.R
 import com.glia.widgets.SnapshotTest
-import com.glia.widgets.core.fileupload.model.FileAttachment
+import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.snapshotutils.SnapshotMessageCenterView
 import com.glia.widgets.snapshotutils.SnapshotStrings
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
@@ -66,11 +66,11 @@ internal class SecureConversationsWelcomeScreenTest : SnapshotTest(
             fileAttachment(
                 displayName = "photo.jpg",
                 isImage = true,
-                status = FileAttachment.Status.SECURITY_SCAN
+                status = LocalAttachment.Status.SECURITY_SCAN
             ),
             fileAttachment(
                 displayName = "test.doc",
-                status = FileAttachment.Status.READY_TO_SEND
+                status = LocalAttachment.Status.READY_TO_SEND
             )
         ),
         imageResources = listOf(
@@ -129,11 +129,11 @@ internal class SecureConversationsWelcomeScreenTest : SnapshotTest(
             fileAttachment(
                 displayName = "photo.jpg",
                 isImage = true,
-                status = FileAttachment.Status.ERROR_SECURITY_SCAN_FAILED
+                status = LocalAttachment.Status.ERROR_SECURITY_SCAN_FAILED
             ),
             fileAttachment(
                 displayName = "test.doc",
-                status = FileAttachment.Status.ERROR_NETWORK_TIMEOUT
+                status = LocalAttachment.Status.ERROR_NETWORK_TIMEOUT
             )
         ),
         unifiedTheme = unifiedTheme

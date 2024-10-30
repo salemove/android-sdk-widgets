@@ -153,7 +153,6 @@ internal class ChatManager(
     }
 
     private fun sendMessage(payload: SendMessagePayload) {
-        println("*********************** -> ${payload.content}")
         sendUnsentMessagesUseCase(payload, {
             onChatAction(Action.OnMessageSent(it))
         }, {
@@ -227,7 +226,8 @@ internal class ChatManager(
         preEngagementChatItemIds.add(messageId)
     }
 
-    private fun mapRetryClicked(messageId: String, state: State): State = state.apply {
+    @VisibleForTesting
+    fun mapRetryClicked(messageId: String, state: State): State = state.apply {
         val payload = messagePreviews[messageId] ?: return@apply
 
         sendMessage(payload)
@@ -253,7 +253,8 @@ internal class ChatManager(
         }
     }
 
-    private fun mapSendMessageFailed(messageId: String, state: State): State = state.apply {
+    @VisibleForTesting
+    fun mapSendMessageFailed(messageId: String, state: State): State = state.apply {
         val payload = messagePreviews[messageId] ?: return@apply
 
         val files = (payload.attachment as? FilesAttachment)?.files?.takeIf { it.isNotEmpty() }
@@ -281,13 +282,15 @@ internal class ChatManager(
         }
     }
 
-    private fun mapMessagePreviewAdded(visitorChatItem: VisitorChatItem, payload: SendMessagePayload, state: State): State = state.apply {
+    @VisibleForTesting
+    fun mapMessagePreviewAdded(visitorChatItem: VisitorChatItem, payload: SendMessagePayload, state: State): State = state.apply {
         val index = indexForMessageItem(chatItems)
         chatItems.add(index, visitorChatItem)
         messagePreviews[payload.messageId] = payload
     }
 
-    private fun mapAttachmentPreviewAdded(attachments: List<VisitorAttachmentItem>, payload: SendMessagePayload?, state: State): State = state.apply {
+    @VisibleForTesting
+    fun mapAttachmentPreviewAdded(attachments: List<VisitorAttachmentItem>, payload: SendMessagePayload?, state: State): State = state.apply {
         payload?.also { messagePreviews[it.messageId] = it }
         chatItems.addAll(attachments)
     }

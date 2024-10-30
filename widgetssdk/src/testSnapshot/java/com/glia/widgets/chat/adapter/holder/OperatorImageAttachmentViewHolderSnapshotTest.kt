@@ -1,10 +1,14 @@
 package com.glia.widgets.chat.adapter.holder
 
+import android.view.View
+import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.widgets.R
 import com.glia.widgets.SnapshotTest
 import com.glia.widgets.UiTheme
+import com.glia.widgets.chat.adapter.ChatAdapter
 import com.glia.widgets.chat.adapter.holder.imageattachment.OperatorImageAttachmentViewHolder
 import com.glia.widgets.chat.model.OperatorAttachmentItem
+import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.databinding.ChatAttachmentOperatorImageLayoutBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.snapshotutils.SnapshotAttachment
@@ -195,10 +199,13 @@ class OperatorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotCh
 
         val viewHolder = OperatorImageAttachmentViewHolder(
             binding, imageFileMock.getImageFileFromCacheUseCaseMock, imageFileMock.getImageFileFromDownloadsUseCaseMock,
-            imageFileMock.getImageFileFromNetworkUseCaseMock, schedulersMock.schedulers, uiTheme
+            imageFileMock.getImageFileFromNetworkUseCaseMock, schedulersMock.schedulers, uiTheme, object : ChatAdapter.OnImageItemClickListener {
+                override fun onImageItemClick(item: AttachmentFile, view: View) {}
+                override fun onLocalImageItemClick(attachment: LocalAttachment, view: View) {}
+            }
         )
 
-        viewHolder.bind(item) { _, _ -> }
+        viewHolder.bind(item)
 
         schedulersMock.triggerActions()
 

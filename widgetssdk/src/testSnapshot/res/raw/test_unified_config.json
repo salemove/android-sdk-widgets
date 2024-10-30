@@ -1463,6 +1463,29 @@
       "bottomBannerDividerColor": {
         "type": "fill",
         "value": ["b9000d"]
+      },
+      "unavailableStatusBackground": {
+        "color": {
+          "type": "gradient",
+          "value": ["#70faff", "#db71e7"]
+        },
+        "border": {
+          "type": "fill",
+          "value": ["#3b36a2"]
+        },
+        "borderWidth": 4,
+        "cornerRadius": 30
+      },
+      "unavailableStatusText": {
+        "alignment": "center",
+        "font": {
+          "size": 10,
+          "style": "bold"
+        },
+        "foreground": {
+          "type": "fill",
+          "value": ["#b9000d"]
+        }
       }
     }
   },

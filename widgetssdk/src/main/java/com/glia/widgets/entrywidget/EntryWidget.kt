@@ -3,7 +3,9 @@ package com.glia.widgets.entrywidget
 import android.app.Activity
 import android.content.Context
 import android.view.View
+import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.entrywidget.adapter.EntryWidgetAdapter
+import com.glia.widgets.helper.unSafeSubscribe
 import com.glia.widgets.launcher.ActivityLauncher
 import com.glia.widgets.view.unifiedui.theme.UnifiedThemeManager
 
@@ -34,10 +36,23 @@ interface EntryWidget {
 internal class EntryWidgetImpl(
     private val activityLauncher: ActivityLauncher,
     private val themeManager: UnifiedThemeManager,
-    private val entryWidgetHideController: EntryWidgetHideController
+    private val entryWidgetHideController: EntryWidgetHideController,
+    private val secureConversationsRepository: SecureConversationsRepository
 ) : EntryWidget {
 
-    override fun show(activity: Activity) = activityLauncher.launchEntryWidget(activity)
+    override fun show(activity: Activity) {
+        secureConversationsRepository.getHasPendingSecureConversationsWithTimeout().unSafeSubscribe {
+            handleShowWithPendingSecureConversations(it, activity)
+        }
+    }
+
+    private fun handleShowWithPendingSecureConversations(hasPendingSecureConversations: Boolean, activity: Activity) {
+        if (hasPendingSecureConversations) {
+            activityLauncher.launchSecureMessagingChat(activity)
+        } else {
+            activityLauncher.launchEntryWidget(activity)
+        }
+    }
 
     override fun getView(context: Context): View {
         val adapter = EntryWidgetAdapter(

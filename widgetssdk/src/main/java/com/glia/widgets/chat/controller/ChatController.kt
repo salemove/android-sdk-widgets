@@ -350,14 +350,14 @@ internal class ChatController(
 
     override fun onImageItemClick(item: AttachmentFile, view: View) {
         if (isFileReadyForPreviewUseCase(item)) {
-            this.view?.navigateToPreview(item, view)
+            this.view?.navigateToImagePreview(item, view)
         } else {
             this.view?.fileIsNotReadyForPreview()
         }
     }
 
     override fun onLocalImageItemClick(attachment: LocalAttachment, view: View) {
-        this.view?.navigateToPreview(attachment, view)
+        this.view?.navigateToImagePreview(attachment, view)
     }
 
     override fun onMessageTextChanged(message: String) {
@@ -875,7 +875,7 @@ internal class ChatController(
         }
     }
 
-    override fun onTapToRetryClicked(messageId: String) {
+    override fun onRetryClicked(messageId: String) {
         chatManager.onChatAction(ChatManager.Action.OnRetryClicked(messageId))
     }
 

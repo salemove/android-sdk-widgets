@@ -26,7 +26,7 @@ import com.glia.widgets.view.unifiedui.theme.chat.MessageBalloonTheme
 
 internal class VisitorMessageViewHolder(
     private val binding: ChatVisitorMessageLayoutBinding,
-    private val onTapToRetryClickListener: ChatAdapter.OnTapToRetryClickListener,
+    private val onRetryClickListener: ChatAdapter.OnRetryClickListener,
     uiTheme: UiTheme,
     unifiedTheme: UnifiedTheme? = Dependencies.gliaThemeManager.theme,
     private val localeProvider: LocaleProvider = Dependencies.localeProvider
@@ -85,8 +85,8 @@ internal class VisitorMessageViewHolder(
 
         if (status.isError) {
             itemView.addClickActionAccessibilityLabel(localeProvider.getString(R.string.general_retry))
-            itemView.setOnClickListener { onTapToRetryClickListener.onTapToRetryClicked(id) }
-            binding.content.setOnClickListener { onTapToRetryClickListener.onTapToRetryClicked(id) }
+            itemView.setOnClickListener { onRetryClickListener.onRetryClicked(id) }
+            binding.content.setOnClickListener { onRetryClickListener.onRetryClicked(id) }
         } else {
             itemView.removeAccessibilityClickAction()
             itemView.setOnClickListener(null)

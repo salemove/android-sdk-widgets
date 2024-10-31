@@ -59,7 +59,7 @@ import com.glia.widgets.view.SingleChoiceCardView.OnOptionClickedListener
 
 internal class ChatAdapter(
     private val uiTheme: UiTheme,
-    private val onTapToRetryClickListener: OnTapToRetryClickListener,
+    private val onRetryClickListener: OnRetryClickListener,
     private val onOptionClickedListener: OnOptionClickedListener,
     private val onFileItemClickListener: OnFileItemClickListener,
     private val onImageItemClickListener: OnImageItemClickListener,
@@ -85,7 +85,7 @@ internal class ChatAdapter(
                     ChatAttachmentVisitorFileLayoutBinding.inflate(inflater, parent, false),
                     uiTheme,
                     onFileItemClickListener,
-                    onTapToRetryClickListener
+                    onRetryClickListener
                 )
 
             VISITOR_IMAGE_VIEW_TYPE -> {
@@ -96,7 +96,7 @@ internal class ChatAdapter(
                     getImageFileFromNetworkUseCase,
                     schedulers,
                     uiTheme,
-                    onTapToRetryClickListener,
+                    onRetryClickListener,
                     onImageItemClickListener
                 )
             }
@@ -104,7 +104,7 @@ internal class ChatAdapter(
             VISITOR_MESSAGE_TYPE -> {
                 VisitorMessageViewHolder(
                     ChatVisitorMessageLayoutBinding.inflate(inflater, parent, false),
-                    onTapToRetryClickListener,
+                    onRetryClickListener,
                     uiTheme
                 )
             }
@@ -216,7 +216,7 @@ internal class ChatAdapter(
     private fun updateVisitorImageAttachmentViewHolder(payloads: MutableList<Any>, holder: VisitorImageAttachmentViewHolder): Boolean =
         when (val payload = payloads.lastOrNull { it is ChatAdapterPayload }) {
             is ChatAdapterPayload.StatusChanged -> {
-                holder.updateStatus(payload.status, onTapToRetryClickListener)
+                holder.updateStatus(payload.status, onRetryClickListener)
                 true
             }
 
@@ -299,8 +299,8 @@ internal class ChatAdapter(
         fun onGvaButtonClicked(gvaButton: GvaButton)
     }
 
-    fun interface OnTapToRetryClickListener {
-        fun onTapToRetryClicked(messageId: String)
+    fun interface OnRetryClickListener {
+        fun onRetryClicked(messageId: String)
     }
 
     companion object {

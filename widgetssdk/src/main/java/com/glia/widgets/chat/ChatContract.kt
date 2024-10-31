@@ -23,7 +23,7 @@ internal interface ChatContract {
         fun setView(view: View)
         fun getView(): View?
         fun onDestroy(retain: Boolean)
-        fun onTapToRetryClicked(messageId: String)
+        fun onRetryClicked(messageId: String)
         fun onGvaButtonClicked(button: GvaButton)
         fun isCallVisualizerOngoing(): Boolean
         fun onFileDownloadClicked(attachmentFile: AttachmentFile)
@@ -72,7 +72,6 @@ internal interface ChatContract {
         fun fileDownloadError(attachmentFile: AttachmentFile, error: Throwable)
         fun fileDownloadSuccess(attachmentFile: AttachmentFile)
         fun clearMessageInput()
-        fun navigateToPreview(attachmentFile: AttachmentFile, view: android.view.View)
         fun fileIsNotReadyForPreview()
         fun showBroadcastNotSupportedToast()
         fun requestOpenUri(uri: Uri)
@@ -83,6 +82,7 @@ internal interface ChatContract {
         fun showToast(message: String, duration: Int = Toast.LENGTH_SHORT)
         fun dispatchImageCapture(uri: Uri)
         fun onFileDownload(attachmentFile: AttachmentFile)
-        fun navigateToPreview(attachmentFile: LocalAttachment, view: android.view.View)
+        fun navigateToImagePreview(attachmentFile: AttachmentFile, view: android.view.View)
+        fun navigateToImagePreview(attachmentFile: LocalAttachment, view: android.view.View)
     }
 }

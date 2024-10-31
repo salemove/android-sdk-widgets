@@ -5,7 +5,7 @@ import androidx.core.view.isVisible
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.adapter.ChatAdapter.OnFileItemClickListener
-import com.glia.widgets.chat.adapter.ChatAdapter.OnTapToRetryClickListener
+import com.glia.widgets.chat.adapter.ChatAdapter.OnRetryClickListener
 import com.glia.widgets.chat.model.VisitorAttachmentItem
 import com.glia.widgets.chat.model.VisitorItemStatus
 import com.glia.widgets.databinding.ChatAttachmentVisitorFileLayoutBinding
@@ -27,7 +27,7 @@ internal class VisitorFileAttachmentViewHolder(
     private val binding: ChatAttachmentVisitorFileLayoutBinding,
     uiTheme: UiTheme,
     private val onFileItemClickListener: OnFileItemClickListener,
-    private val onTapToRetryClickListener: OnTapToRetryClickListener,
+    private val onRetryClickListener: OnRetryClickListener,
     unifiedTheme: UnifiedTheme? = Dependencies.gliaThemeManager.theme,
     private val localeProvider: LocaleProvider = Dependencies.localeProvider
 ) : FileAttachmentViewHolder(binding.root) {
@@ -75,7 +75,7 @@ internal class VisitorFileAttachmentViewHolder(
         binding.errorView.isVisible = status == VisitorItemStatus.ERROR_INDICATOR
         setAccessibilityLabels(status, fileExists, name, size)
         if (status.isError) {
-            itemView.setOnClickListener { onTapToRetryClickListener.onTapToRetryClicked(messageId ?: return@setOnClickListener) }
+            itemView.setOnClickListener { onRetryClickListener.onRetryClicked(messageId ?: return@setOnClickListener) }
         } else {
             itemView.setOnClickListener(null)
         }

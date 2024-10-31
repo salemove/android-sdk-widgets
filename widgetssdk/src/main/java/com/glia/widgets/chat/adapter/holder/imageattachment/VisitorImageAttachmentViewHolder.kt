@@ -4,7 +4,7 @@ import androidx.core.view.isVisible
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.adapter.ChatAdapter.OnImageItemClickListener
-import com.glia.widgets.chat.adapter.ChatAdapter.OnTapToRetryClickListener
+import com.glia.widgets.chat.adapter.ChatAdapter.OnRetryClickListener
 import com.glia.widgets.chat.model.VisitorAttachmentItem
 import com.glia.widgets.chat.model.VisitorItemStatus
 import com.glia.widgets.databinding.ChatAttachmentVisitorImageLayoutBinding
@@ -31,7 +31,7 @@ internal class VisitorImageAttachmentViewHolder(
     getImageFileFromNetworkUseCase: GetImageFileFromNetworkUseCase,
     schedulers: Schedulers,
     uiTheme: UiTheme,
-    private val onTapToRetryClickListener: OnTapToRetryClickListener,
+    private val onRetryClickListener: OnRetryClickListener,
     private val onImageItemClickListener: OnImageItemClickListener,
     unifiedTheme: UnifiedTheme? = Dependencies.gliaThemeManager.theme,
     private val localeProvider: LocaleProvider = Dependencies.localeProvider
@@ -56,7 +56,7 @@ internal class VisitorImageAttachmentViewHolder(
         messageId = item.messageId
         super.bind(item.attachment)
 
-        updateStatus(item.status, onTapToRetryClickListener)
+        updateStatus(item.status, onRetryClickListener)
 
         binding.imageLayout.incomingImageAttachment.setOnClickListener {
             onImageItemClickListener.onLocalImageItemClick(item.attachment, it)
@@ -119,9 +119,9 @@ internal class VisitorImageAttachmentViewHolder(
         binding.errorView.applyTextTheme(visitorTheme?.error)
     }
 
-    fun updateStatus(status: VisitorItemStatus, onTapToRetryClickListener: OnTapToRetryClickListener) {
+    fun updateStatus(status: VisitorItemStatus, onRetryClickListener: OnRetryClickListener) {
         if (status.isError) {
-            itemView.setOnClickListener { onTapToRetryClickListener.onTapToRetryClicked(messageId ?: return@setOnClickListener) }
+            itemView.setOnClickListener { onRetryClickListener.onRetryClicked(messageId ?: return@setOnClickListener) }
         } else {
             itemView.setOnClickListener(null)
         }

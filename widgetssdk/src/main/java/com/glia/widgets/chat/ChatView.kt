@@ -115,8 +115,8 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     private var onMinimizeListener: OnMinimizeListener? = null
     private var onNavigateToCallListener: OnNavigateToCallListener? = null
     private var onBackToCallListener: OnBackToCallListener? = null
-    private val onTapToRetryClickListener = ChatAdapter.OnTapToRetryClickListener {
-        controller?.onTapToRetryClicked(it)
+    private val onRetryClickListener = ChatAdapter.OnRetryClickListener {
+        controller?.onRetryClicked(it)
     }
     private val onOptionClickedListener = OnOptionClickedListener { item, selectedOption ->
         Logger.d(TAG, "singleChoiceCardClicked")
@@ -404,7 +404,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         }
     }
 
-    override fun navigateToPreview(attachmentFile: AttachmentFile, view: View) {
+    override fun navigateToImagePreview(attachmentFile: AttachmentFile, view: View) {
         val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
             context.requireActivity(), view, context.getString(R.string.glia_file_preview_transition_name) // Not translatable
         )
@@ -413,7 +413,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         insetsController?.hideKeyboard()
     }
 
-    override fun navigateToPreview(attachmentFile: LocalAttachment, view: View) {
+    override fun navigateToImagePreview(attachmentFile: LocalAttachment, view: View) {
         val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
             context.requireActivity(), view, context.getString(R.string.glia_file_preview_transition_name) // Not translatable
         )
@@ -626,7 +626,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     private fun setupViewAppearance() {
         adapter = ChatAdapter(
             theme,
-            onTapToRetryClickListener,
+            onRetryClickListener,
             onOptionClickedListener,
             this,
             this,

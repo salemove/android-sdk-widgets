@@ -814,10 +814,10 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         binding.scBottomBannerDivider.applyColorTheme(secureMessagingTheme.bottomBannerDividerColor)
         binding.scErrorLabel.applyLayerTheme(secureMessagingTheme.unavailableStatusBackground)
         binding.scErrorLabel.applyTextTheme(secureMessagingTheme.unavailableStatusText)
-        binding.scErrorLabel.compoundDrawableTintList = secureMessagingTheme
-            .unavailableStatusText
+        secureMessagingTheme.unavailableStatusText
             ?.textColor
             ?.primaryColorStateList
+            ?.let(binding.scErrorLabel::setCompoundDrawableTintList)
     }
 
     private fun updateSecureMessagingState(state: ChatState) {

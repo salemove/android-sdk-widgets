@@ -132,7 +132,9 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             super.onScrollStateChanged(recyclerView, newState)
 
             // hide the keyboard on chat scroll
-            insetsController?.hideKeyboard()
+            if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
+                insetsController?.hideKeyboard()
+            }
         }
     }
     private val onCustomCardResponse = OnCustomCardResponse { customCard: CustomCardChatItem, text: String, value: String ->

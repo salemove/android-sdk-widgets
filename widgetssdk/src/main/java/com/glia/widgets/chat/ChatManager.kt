@@ -151,6 +151,10 @@ internal class ChatManager(
             ?.first()
             ?.value ?: return
 
+        sendMessage(payload)
+    }
+
+    private fun sendMessage(payload: SendMessagePayload) {
         sendUnsentMessagesUseCase(payload, {
             onChatAction(Action.OnMessageSent(it))
         }, {
@@ -241,10 +245,14 @@ internal class ChatManager(
         for (index in firstFileIndex until firstFileIndex + files.size) {
             chatItems[index] = (chatItems[index] as VisitorChatItem).withStatus(VisitorItemStatus.PREVIEW)
         }
+
+        sendMessage(payload)
     }
 
     private fun mapSendMessageFailed(messageId: String, state: State): State = state.apply {
         val payload = messagePreviews[messageId] ?: return@apply
+
+        sendMessage(payload)
 
         val files = (payload.attachment as? FilesAttachment)?.files?.takeIf { it.isNotEmpty() }
 

@@ -86,7 +86,8 @@ internal object Dependencies {
         get() = EntryWidgetImpl(
             activityLauncher,
             gliaThemeManager,
-            controllerFactory.entryWidgetHideController
+            controllerFactory.entryWidgetHideController,
+            repositoryFactory.secureConversationsRepository
         )
 
     @JvmStatic

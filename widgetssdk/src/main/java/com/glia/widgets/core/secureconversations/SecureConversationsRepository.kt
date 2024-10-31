@@ -8,10 +8,14 @@ import com.glia.androidsdk.secureconversations.SecureConversations
 import com.glia.widgets.chat.data.GliaChatRepository
 import com.glia.widgets.chat.domain.GliaSendMessageUseCase
 import com.glia.widgets.core.queue.QueueRepository
+import com.glia.widgets.entrywidget.EntryWidget
 import com.glia.widgets.helper.unSafeSubscribe
+import com.glia.widgets.launcher.EngagementLauncher
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.reactivex.rxjava3.subjects.Subject
+import java.util.concurrent.TimeUnit
 
 internal class SecureConversationsRepository(private val secureConversations: SecureConversations, private val queueRepository: QueueRepository) {
     private val _messageSendingObservable: Subject<Boolean> = BehaviorSubject.createDefault(false)
@@ -64,6 +68,21 @@ internal class SecureConversationsRepository(private val secureConversations: Se
         }
     }
 
-    fun getUnreadMessagesCount(callback: RequestCallback<Int>) =
-        secureConversations.getUnreadMessageCount(callback)
+    fun getUnreadMessagesCount(callback: RequestCallback<Int>) = secureConversations.getUnreadMessageCount(callback)
+
+    fun getHasPendingSecureConversations(): Single<Boolean> = Single.create { emitter ->
+        secureConversations.getPendingSecureConversationStatus { hasPendingSecureConversations, _ ->
+            if (!emitter.isDisposed) {
+                emitter.onSuccess(hasPendingSecureConversations ?: false)
+            }
+        }
+    }
+
+    /**
+     * Since we're using this function in [EntryWidget] and [EngagementLauncher] where we need the immediate UI response to the user interaction,
+     * it is important to to avoid delays for the user.
+     */
+    fun getHasPendingSecureConversationsWithTimeout(): Single<Boolean> = getHasPendingSecureConversations()
+        .timeout(1, TimeUnit.SECONDS)
+        .onErrorReturnItem(false)
 }

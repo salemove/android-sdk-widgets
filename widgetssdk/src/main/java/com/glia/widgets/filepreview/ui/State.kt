@@ -24,8 +24,6 @@ internal data class State(
         FAILURE
     }
 
-    fun reset(): State = State()
-
     fun imageLoadingFiled(): State = copy(imageLoadingState = ImageLoadingState.FAILURE)
 
     fun withImageData(id: String, name: String): State = copy(

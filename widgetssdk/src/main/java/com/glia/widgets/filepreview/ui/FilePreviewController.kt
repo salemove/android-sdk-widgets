@@ -17,7 +17,7 @@ internal class FilePreviewController @JvmOverloads constructor(
 
     override fun setView(view: FilePreviewContract.View) {
         this.view = view
-        state.reset()
+        state = State()
     }
 
     @Synchronized
@@ -79,7 +79,7 @@ internal class FilePreviewController @JvmOverloads constructor(
 
     override fun onDestroy() {
         disposables.clear()
-        state.reset()
+        state = State()
     }
 
     override fun onLocalImageReceived(uri: Uri) {

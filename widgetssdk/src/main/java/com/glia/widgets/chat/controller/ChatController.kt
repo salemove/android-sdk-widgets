@@ -154,7 +154,8 @@ internal class ChatController(
             emitViewState { chatState.setLastTypedText("").setShowSendButton(isShowSendButtonUseCase("")) }
         }
 
-        override fun errorOperatorOffline() {
+        override fun errorOperatorOffline(messageId: String) {
+            chatManager.onChatAction(ChatManager.Action.OnSendMessageOperatorOffline(messageId))
             onSendMessageOperatorOffline()
         }
 

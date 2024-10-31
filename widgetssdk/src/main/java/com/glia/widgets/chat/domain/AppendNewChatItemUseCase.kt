@@ -133,6 +133,7 @@ internal class AppendNewVisitorMessageUseCase(private val mapVisitorAttachmentUs
         val message = chatMessageInternal.chatMessage as VisitorMessage
 
         if (state.messagePreviews.remove(message.id) != null) {
+            state.preEngagementChatItemIds.remove(message.id)
             markMessageDelivered(state, message)
             return
         }

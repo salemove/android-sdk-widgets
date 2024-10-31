@@ -145,16 +145,15 @@ internal class ChatManager(
 
     @VisibleForTesting
     fun checkUnsentMessages(state: State) {
-        val payload = state.messagePreviews
-            .takeIf { it.isNotEmpty() }
-            ?.entries
-            ?.first()
-            ?.value ?: return
+        val payload = state.preEngagementChatItemIds.takeIf { it.isNotEmpty() }
+            ?.firstOrNull()
+            ?.let { state.messagePreviews[it] } ?: return
 
         sendMessage(payload)
     }
 
     private fun sendMessage(payload: SendMessagePayload) {
+        println("*********************** -> ${payload.content}")
         sendUnsentMessagesUseCase(payload, {
             onChatAction(Action.OnMessageSent(it))
         }, {
@@ -220,11 +219,18 @@ internal class ChatManager(
             is Action.OnMessageSent -> mapNewMessage(ChatMessageInternal(action.message), state)
             is Action.OnSendMessageError -> mapSendMessageFailed(action.messageId, state)
             is Action.OnRetryClicked -> mapRetryClicked(action.messageId, state)
+            is Action.OnSendMessageOperatorOffline -> mapSendMessageOperatorOffline(action.messageId, state)
         }
+    }
+
+    private fun mapSendMessageOperatorOffline(messageId: String, state: State): State = state.apply {
+        preEngagementChatItemIds.add(messageId)
     }
 
     private fun mapRetryClicked(messageId: String, state: State): State = state.apply {
         val payload = messagePreviews[messageId] ?: return@apply
+
+        sendMessage(payload)
 
         val files = (payload.attachment as? FilesAttachment)?.files.orEmpty()
 
@@ -245,14 +251,10 @@ internal class ChatManager(
         for (index in firstFileIndex until firstFileIndex + files.size) {
             chatItems[index] = (chatItems[index] as VisitorChatItem).withStatus(VisitorItemStatus.PREVIEW)
         }
-
-        sendMessage(payload)
     }
 
     private fun mapSendMessageFailed(messageId: String, state: State): State = state.apply {
         val payload = messagePreviews[messageId] ?: return@apply
-
-        sendMessage(payload)
 
         val files = (payload.attachment as? FilesAttachment)?.files?.takeIf { it.isNotEmpty() }
 
@@ -424,6 +426,7 @@ internal class ChatManager(
     internal data class State(
         val chatItems: MutableList<ChatItem> = mutableListOf(),
         val chatItemIds: MutableSet<String> = mutableSetOf(),
+        val preEngagementChatItemIds: LinkedHashSet<String> = linkedSetOf(),
         val messagePreviews: LinkedHashMap<String, SendMessagePayload> = LinkedHashMap(),
         var lastMessageWithVisibleOperatorImage: OperatorChatItem? = null,
         var operatorStatusItem: OperatorStatusItem? = null,
@@ -462,5 +465,6 @@ internal class ChatManager(
         data class OnMessageSent(val message: VisitorMessage) : Action
         data class OnSendMessageError(val messageId: String) : Action
         data class OnRetryClicked(val messageId: String) : Action
+        data class OnSendMessageOperatorOffline(val messageId: String) : Action
     }
 }

@@ -29,7 +29,7 @@ internal class GliaSendMessageUseCase(
         fun onMessageValidated()
         fun onMessagePrepared(visitorChatItem: VisitorChatItem, payload: SendMessagePayload)
         fun onAttachmentsPrepared(items: List<VisitorAttachmentItem>, payload: SendMessagePayload?)
-        fun errorOperatorOffline()
+        fun errorOperatorOffline(messageId: String)
         fun error(ex: GliaException, messageId: String)
     }
 
@@ -70,7 +70,7 @@ internal class GliaSendMessageUseCase(
             if (isOperatorOnline || isSecureEngagement) {
                 sendMessage(payload, listener)
             } else {
-                listener.errorOperatorOffline()
+                listener.errorOperatorOffline(payload.messageId)
             }
 
             fileAttachmentRepository.detachFiles(localAttachments ?: return)
@@ -86,7 +86,7 @@ internal class GliaSendMessageUseCase(
 
             isOperatorOnline -> chatRepository.sendMessage(payload, listener)
 
-            else -> listener.errorOperatorOffline()
+            else -> listener.errorOperatorOffline(payload.messageId)
         }
     }
 

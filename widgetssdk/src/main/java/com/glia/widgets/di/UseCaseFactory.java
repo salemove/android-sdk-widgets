@@ -78,7 +78,6 @@ import com.glia.widgets.core.dialog.domain.SetOverlayPermissionRequestDialogShow
 import com.glia.widgets.core.engagement.domain.ConfirmationDialogUseCase;
 import com.glia.widgets.core.engagement.domain.GetOperatorUseCase;
 import com.glia.widgets.core.engagement.domain.MapOperatorUseCase;
-import com.glia.widgets.core.engagement.domain.SetEngagementConfigUseCase;
 import com.glia.widgets.core.engagement.domain.ShouldShowMediaEngagementViewUseCase;
 import com.glia.widgets.core.engagement.domain.UpdateOperatorDefaultImageUrlUseCase;
 import com.glia.widgets.core.fileupload.domain.AddFileAttachmentsObserverUseCase;
@@ -396,11 +395,7 @@ public class UseCaseFactory {
 
     @NonNull
     public AddFileToAttachmentAndUploadUseCase createAddFileToAttachmentAndUploadUseCase() {
-        return new AddFileToAttachmentAndUploadUseCase(
-            getIsQueueingOrEngagementUseCase(),
-            repositoryFactory.getGliaFileAttachmentRepository(),
-            repositoryFactory.getEngagementConfigRepository()
-        );
+        return new AddFileToAttachmentAndUploadUseCase(getIsQueueingOrEngagementUseCase(), repositoryFactory.getGliaFileAttachmentRepository());
     }
 
     @NonNull
@@ -583,20 +578,12 @@ public class UseCaseFactory {
 
     @NonNull
     public IsSecureEngagementUseCase createIsSecureEngagementUseCase() {
-        return new IsSecureEngagementUseCase(
-            repositoryFactory.getEngagementConfigRepository(),
-            getIsQueueingOrEngagementUseCase()
-        );
+        return new IsSecureEngagementUseCase(getIsQueueingOrEngagementUseCase());
     }
 
     @NonNull
     public IsAuthenticatedUseCase createIsAuthenticatedUseCase() {
         return new IsAuthenticatedUseCase(authenticationManagerProvider.authenticationManager);
-    }
-
-    @NonNull
-    public SetEngagementConfigUseCase createSetEngagementConfigUseCase() {
-        return new SetEngagementConfigUseCase(repositoryFactory.getEngagementConfigRepository());
     }
 
     @NonNull
@@ -887,7 +874,6 @@ public class UseCaseFactory {
             getReleaseScreenSharingResourcesUseCase(),
             createCallNotificationUseCase(),
             repositoryFactory.getGliaFileAttachmentRepository(),
-            repositoryFactory.getEngagementConfigRepository(),
             createUpdateFromCallScreenUseCase(),
             dialogController
         );

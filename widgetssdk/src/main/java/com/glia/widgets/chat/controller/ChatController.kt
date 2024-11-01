@@ -15,8 +15,8 @@ import com.glia.androidsdk.site.SiteInfo
 import com.glia.widgets.Constants
 import com.glia.widgets.chat.ChatContract
 import com.glia.widgets.chat.ChatManager
-import com.glia.widgets.chat.ChatType
 import com.glia.widgets.chat.ChatView
+import com.glia.widgets.chat.Intention
 import com.glia.widgets.chat.domain.DecideOnQueueingUseCase
 import com.glia.widgets.chat.domain.GliaSendMessagePreviewUseCase
 import com.glia.widgets.chat.domain.GliaSendMessageUseCase
@@ -41,7 +41,6 @@ import com.glia.widgets.core.dialog.domain.ConfirmationDialogLinksUseCase
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
 import com.glia.widgets.core.dialog.model.Link
 import com.glia.widgets.core.engagement.domain.ConfirmationDialogUseCase
-import com.glia.widgets.core.engagement.domain.SetEngagementConfigUseCase
 import com.glia.widgets.core.engagement.domain.UpdateOperatorDefaultImageUrlUseCase
 import com.glia.widgets.core.fileupload.domain.AddFileAttachmentsObserverUseCase
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase
@@ -111,7 +110,6 @@ internal class ChatController(
     private val isFromCallScreenUseCase: IsFromCallScreenUseCase,
     private val updateFromCallScreenUseCase: UpdateFromCallScreenUseCase,
     private val isSecureEngagementUseCase: IsSecureEngagementUseCase,
-    private val engagementConfigUseCase: SetEngagementConfigUseCase,
     private val isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase,
     private val isFileReadyForPreviewUseCase: IsFileReadyForPreviewUseCase,
     private val determineGvaButtonTypeUseCase: DetermineGvaButtonTypeUseCase,
@@ -224,8 +222,8 @@ internal class ChatController(
         screenSharingUseCase.end()
     }
 
-    override fun initChat(chatType: ChatType) {
-        engagementConfigUseCase(chatType)
+    override fun initChat(intention: Intention) {
+        // TODO handle intention here
         updateOperatorDefaultImageUrlUseCase()
 
         ensureSecureMessagingAvailable()

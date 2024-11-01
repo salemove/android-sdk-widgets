@@ -8,6 +8,7 @@ import androidx.activity.result.contract.ActivityResultContracts.GetContent
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.activity.result.contract.ActivityResultContracts.TakePicture
 import com.glia.widgets.base.FadeTransitionActivity
+import com.glia.widgets.chat.Intention
 import com.glia.widgets.databinding.MessageCenterActivityBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
@@ -101,7 +102,7 @@ internal class MessageCenterActivity : FadeTransitionActivity(),
     }
 
     override fun navigateToMessaging() {
-        Dependencies.activityLauncher.launchSecureMessagingChat(this)
+        Dependencies.activityLauncher.launchChat(this, Intention.SC_CHAT)
         finish()
     }
 

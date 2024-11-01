@@ -76,10 +76,12 @@ internal object Dependencies {
     @JvmStatic
     val configurationManager: ConfigurationManager by lazy { ConfigurationManagerImpl() }
 
-    val activityLauncher: ActivityLauncher by lazy { ActivityLauncherImpl(IntentHelperImpl()) }
+    val activityLauncher: ActivityLauncher by lazy {
+        ActivityLauncherImpl(IntentHelperImpl())
+    }
 
     @JvmStatic
-    val engagementLauncher: EngagementLauncher by lazy { EngagementLauncherImpl(activityLauncher) }
+    val engagementLauncher: EngagementLauncher by lazy { EngagementLauncherImpl(activityLauncher, configurationManager) }
 
     @JvmStatic
     val entryWidget: EntryWidget

@@ -14,17 +14,26 @@ internal interface ConfigurationManager {
 
     val queueIdsObservable: Flowable<List<String>>
 
+    val visitorContextAssetId: String?
+
     /**
      * Applies [GliaWidgetsConfig] from the [GliaWidgets.init] configuration step
      */
     fun applyConfiguration(config: GliaWidgetsConfig)
 
     /**
-     * Retrives queue IDs
+     * Sets queue IDs
      * [queueIds] A list of queue IDs to be used for the engagement launcher.
      * When empty or invalid, the default queues will be used.
      */
     fun setQueueIds(queueIds: List<String>)
+
+    /**
+     * Sets the visitor context for the engagement.
+     *
+     * @param visitorContextAssetId a visitor context id from Glia Hub.
+     */
+    fun setVisitorContextAssetId(visitorContextAssetId: String)
 }
 
 internal class ConfigurationManagerImpl : ConfigurationManager {
@@ -43,6 +52,10 @@ internal class ConfigurationManagerImpl : ConfigurationManager {
     private var _queueIdsObservable: BehaviorProcessor<List<String>> = BehaviorProcessor.create()
     override val queueIdsObservable: Flowable<List<String>> = _queueIdsObservable.onBackpressureLatest()
 
+    private var _visitorContextAssetId: String? = null
+    override val visitorContextAssetId: String?
+        get() = _visitorContextAssetId
+
     override fun applyConfiguration(config: GliaWidgetsConfig) {
         config.screenSharingMode?.also { _screenSharingMode = it }
         config.enableBubbleInsideApp?.also { _enableBubbleInsideApp = it }
@@ -51,5 +64,9 @@ internal class ConfigurationManagerImpl : ConfigurationManager {
 
     override fun setQueueIds(queueIds: List<String>) {
         _queueIdsObservable.onNext(queueIds)
+    }
+
+    override fun setVisitorContextAssetId(visitorContextAssetId: String) {
+        _visitorContextAssetId = visitorContextAssetId
     }
 }

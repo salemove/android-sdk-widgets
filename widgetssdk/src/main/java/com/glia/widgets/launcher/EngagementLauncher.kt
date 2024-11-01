@@ -12,46 +12,81 @@ interface EngagementLauncher {
      * Starts a chat engagement.
      *
      * @param activity The Activity used to launch the chat screen
+     * @param visitorContextAssetId Optional visitor context id from Glia Hub
      */
-    fun startChat(activity: Activity)
+    fun startChat(activity: Activity, visitorContextAssetId: String? = null)
 
     /**
      * Starts an audio engagement.
      *
      * @param activity The Activity used to launch the call screen
+     * @param visitorContextAssetId Optional visitor context id from Glia Hub
      */
-    fun startAudioCall(activity: Activity)
+    fun startAudioCall(activity: Activity, visitorContextAssetId: String? = null)
 
     /**
      * Starts a video engagement.
      *
      * @param activity The Activity used to launch the call screen
+     * @param visitorContextAssetId Optional visitor context id from Glia Hub
      */
-    fun startVideoCall(activity: Activity)
+    fun startVideoCall(activity: Activity, visitorContextAssetId: String? = null)
 
     /**
      * Starts a secure messaging.
      *
      * @param activity The Activity used to launch the secure messaging welcome or chat screen
+     * @param visitorContextAssetId Optional visitor context id from Glia Hub
      */
-    fun startSecureMessaging(activity: Activity)
+    fun startSecureMessaging(activity: Activity, visitorContextAssetId: String? = null)
 }
 
-internal class EngagementLauncherImpl(private val activityLauncher: ActivityLauncher) : EngagementLauncher {
+internal class EngagementLauncherImpl(
+    private val activityLauncher: ActivityLauncher,
+    private val configurationManager: ConfigurationManager
+) : EngagementLauncher {
 
-    override fun startChat(activity: Activity) {
+    /**
+     * Starts a chat engagement.
+     *
+     * @param activity The Activity used to launch the chat screen
+     * @param visitorContextAssetId Optional visitor context id from Glia Hub
+     */
+    override fun startChat(activity: Activity, visitorContextAssetId: String?) {
+        visitorContextAssetId?.let { configurationManager.setVisitorContextAssetId(it) }
         activityLauncher.launchChat(activity)
     }
 
-    override fun startAudioCall(activity: Activity) {
+    /**
+     * Starts an audio engagement.
+     *
+     * @param activity The Activity used to launch the call screen
+     * @param visitorContextAssetId Optional visitor context id from Glia Hub
+     */
+    override fun startAudioCall(activity: Activity, visitorContextAssetId: String?) {
+        visitorContextAssetId?.let { configurationManager.setVisitorContextAssetId(it) }
         activityLauncher.launchCall(activity, Engagement.MediaType.AUDIO, false)
     }
 
-    override fun startVideoCall(activity: Activity) {
+    /**
+     * Starts a video engagement.
+     *
+     * @param activity The Activity used to launch the call screen
+     * @param visitorContextAssetId Optional visitor context id from Glia Hub
+     */
+    override fun startVideoCall(activity: Activity, visitorContextAssetId: String?) {
+        visitorContextAssetId?.let { configurationManager.setVisitorContextAssetId(it) }
         activityLauncher.launchCall(activity, Engagement.MediaType.VIDEO, false)
     }
 
-    override fun startSecureMessaging(activity: Activity) {
+    /**
+     * Starts a secure messaging engagement.
+     *
+     * @param activity The Activity used to launch the secure messaging screen
+     * @param visitorContextAssetId Optional visitor context id from Glia Hub
+     */
+    override fun startSecureMessaging(activity: Activity, visitorContextAssetId: String?) {
+        visitorContextAssetId?.let { configurationManager.setVisitorContextAssetId(it) }
         activityLauncher.launchSecureMessagingWelcomeScreen(activity)
     }
 }

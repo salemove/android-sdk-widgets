@@ -7,6 +7,7 @@ import android.os.Bundle
 import com.glia.androidsdk.Engagement.MediaType
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.androidsdk.engagement.Survey
+import com.glia.widgets.chat.Intention
 import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.helper.IntentHelper
 import com.glia.widgets.helper.safeStartActivity
@@ -14,10 +15,8 @@ import com.glia.widgets.locale.LocaleString
 
 
 internal interface ActivityLauncher {
-    fun launchChat(activity: Activity)
-    fun launchChat(context: Context)
+    fun launchChat(context: Context, intention: Intention)
     fun launchCall(context: Context, mediaType: MediaType?, upgradeToCall: Boolean)
-    fun launchSecureMessagingChat(activity: Activity)
     fun launchSecureMessagingWelcomeScreen(activity: Activity)
     fun launchEndScreenSharing(context: Context)
     fun launchWebBrowser(context: Context, title: LocaleString, url: String)
@@ -35,14 +34,10 @@ internal interface ActivityLauncher {
 
 internal class ActivityLauncherImpl(private val intentHelper: IntentHelper) : ActivityLauncher {
 
-    override fun launchChat(activity: Activity) = activity.startActivity(intentHelper.chatIntent(activity))
-
-    override fun launchChat(context: Context) = context.startActivity(intentHelper.chatIntent(context))
+    override fun launchChat(context: Context, intention: Intention) = context.startActivity(intentHelper.chatIntent(context, intention))
 
     override fun launchCall(context: Context, mediaType: MediaType?, upgradeToCall: Boolean) =
         context.startActivity(intentHelper.callIntent(context, mediaType, upgradeToCall))
-
-    override fun launchSecureMessagingChat(activity: Activity) = activity.startActivity(intentHelper.secureMessagingChatIntent(activity))
 
     override fun launchSecureMessagingWelcomeScreen(activity: Activity) =
         activity.startActivity(intentHelper.secureMessagingWelcomeScreenIntent(activity))

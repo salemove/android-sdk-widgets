@@ -18,14 +18,12 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import com.glia.widgets.R
-import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.databinding.ImagePreviewActivityBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.ExtraKeys
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.SimpleWindowInsetsAndAnimationHandler
 import com.glia.widgets.helper.TAG
-import com.glia.widgets.helper.fileProviderAuthority
 import com.glia.widgets.helper.getParcelable
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.showToast
@@ -77,8 +75,8 @@ internal class ImagePreviewActivity : AppCompatActivity(), ImagePreviewContract.
     }
 
     private fun onImageDataReceived(intent: Intent) {
-        if (intent.hasExtra(LOCAL_IMAGE_URI)) {
-            filePreviewController?.onLocalImageReceived(intent.getParcelable<Uri>(LOCAL_IMAGE_URI) ?: return)
+        if (intent.hasExtra(ExtraKeys.IMAGE_PREVIEW_LOCAL_IMAGE_URI)) {
+            imagePreviewController?.onLocalImageReceived(intent.getParcelable<Uri>(ExtraKeys.IMAGE_PREVIEW_LOCAL_IMAGE_URI) ?: return)
         } else {
             val bitmapId = intent.getStringExtra(ExtraKeys.IMAGE_PREVIEW_IMAGE_ID).orEmpty()
             val bitmapName = intent.getStringExtra(ExtraKeys.IMAGE_PREVIEW_IMAGE_NAME).orEmpty()
@@ -169,7 +167,7 @@ internal class ImagePreviewActivity : AppCompatActivity(), ImagePreviewContract.
     }
 
     private fun setImageUri(uri: Uri) {
-        binding.filePreviewView.setImageURI(uri)
+        binding.previewView.setImageURI(uri)
     }
 
     override fun setController(controller: ImagePreviewContract.Controller) {

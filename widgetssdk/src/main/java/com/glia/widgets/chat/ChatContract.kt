@@ -49,7 +49,7 @@ internal interface ChatContract {
         fun onLinkClicked(link: Link)
         fun getConfirmationDialogLinks(): ConfirmationDialogLinks
         fun onEngagementConfirmationDialogRequested()
-        fun initChat(chatType: ChatType)
+        fun initChat(intention: Intention)
         fun show()
         fun onPause()
         fun onResume()

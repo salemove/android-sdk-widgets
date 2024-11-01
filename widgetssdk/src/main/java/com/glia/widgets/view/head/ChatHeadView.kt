@@ -15,6 +15,7 @@ import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.core.view.isVisible
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
+import com.glia.widgets.chat.Intention
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase
 import com.glia.widgets.databinding.ChatHeadViewBinding
 import com.glia.widgets.di.Dependencies
@@ -168,7 +169,7 @@ internal class ChatHeadView @JvmOverloads constructor(
     }
 
     override fun navigateToChat() {
-        activityLauncher.launchChat(context)
+        activityLauncher.launchChat(context, Intention.RESTORE_CHAT)
     }
 
     override fun navigateToCall() {

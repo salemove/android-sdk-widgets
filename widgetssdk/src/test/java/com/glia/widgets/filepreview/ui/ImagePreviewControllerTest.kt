@@ -29,7 +29,7 @@ class ImagePreviewControllerTest {
     private lateinit var getImageFileFromDownloadsUseCase: GetImageFileFromDownloadsUseCase
     private lateinit var getImageFileFromCacheUseCase: GetImageFileFromCacheUseCase
     private lateinit var putImageFileToDownloadsUseCase: PutImageFileToDownloadsUseCase
-    private lateinit var filePreviewController: FilePreviewController
+    private lateinit var imagePreviewController: ImagePreviewController
 
     @Before
     fun setUp() {
@@ -37,7 +37,7 @@ class ImagePreviewControllerTest {
         getImageFileFromDownloadsUseCase = mock()
         getImageFileFromCacheUseCase = mock()
         putImageFileToDownloadsUseCase = mock()
-        filePreviewController = FilePreviewController(
+        imagePreviewController = ImagePreviewController(
             getImageFileFromDownloadsUseCase,
             getImageFileFromCacheUseCase,
             putImageFileToDownloadsUseCase,
@@ -49,7 +49,7 @@ class ImagePreviewControllerTest {
     @Test
     fun onImageDataReceived_updatesState_whenNonNullArguments() {
         val argument = argumentCaptor<State>()
-        filePreviewController.onImageDataReceived(BITMAP_ID, BITMAP_NAME)
+        imagePreviewController.onImageDataReceived(BITMAP_ID, BITMAP_NAME)
         verify(view).onStateUpdated(argument.capture())
         assertEquals(BITMAP_ID, argument.lastValue.imageName)
         assertEquals(BITMAP_NAME, argument.lastValue.imageId)
@@ -118,15 +118,15 @@ class ImagePreviewControllerTest {
 
     @Test
     fun onSharePressed_callsShareImageFile_whenValidArguments() {
-        filePreviewController.onImageDataReceived(BITMAP_ID, BITMAP_NAME)
-        filePreviewController.onSharePressed()
+        imagePreviewController.onImageDataReceived(BITMAP_ID, BITMAP_NAME)
+        imagePreviewController.onSharePressed()
         verify(view).shareImageFile(BITMAP_ID)
     }
 
     @Test
     fun onDownloadPressed_updatesState_whenDownloadSuccessful() {
         whenever(getImageFileFromDownloadsUseCase(any())) doReturn Maybe.just(BITMAP)
-        filePreviewController.onImageRequested()
+        imagePreviewController.onImageRequested()
         val argument = argumentCaptor<State>()
 
         whenever(putImageFileToDownloadsUseCase(any(), any())) doReturn Completable.complete()
@@ -143,7 +143,7 @@ class ImagePreviewControllerTest {
     @Test
     fun onDownloadPressed_callsShowOnImageSaveFailed_whenDownloadFails() {
         whenever(getImageFileFromDownloadsUseCase(any())) doReturn Maybe.just(BITMAP)
-        filePreviewController.onImageRequested()
+        imagePreviewController.onImageRequested()
         whenever(putImageFileToDownloadsUseCase(any(), any())) doReturn Completable.error(EXCEPTION)
         imagePreviewController.onDownloadPressed()
         verify(view).showOnImageSaveFailed()

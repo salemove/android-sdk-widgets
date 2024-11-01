@@ -37,6 +37,7 @@ import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.isAudioOrVideo
 import com.glia.widgets.helper.isQueueUnavailable
 import com.glia.widgets.helper.unSafeSubscribe
+import com.glia.widgets.launcher.ConfigurationManager
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -55,7 +56,8 @@ internal const val SKIP_ASKING_SCREEN_SHARING_PERMISSION_RESULT_CODE = 0x1995
 internal class EngagementRepositoryImpl(
     private val core: GliaCore,
     private val operatorRepository: GliaOperatorRepository,
-    private val queueRepository: QueueRepository
+    private val queueRepository: QueueRepository,
+    private val configurationManager: ConfigurationManager
 ) : EngagementRepository {
     private val engagementRequestCallback = Consumer<IncomingEngagementRequest>(::handleIncomingEngagementRequest)
     private val engagementOutcomeCallback = Consumer<Outcome>(::handleEngagementOutcome)
@@ -213,7 +215,12 @@ internal class EngagementRepositoryImpl(
         queueIngDisposable.add(
             queueRepository.relevantQueueIds.subscribe { ids ->
                 if (ids.isNotEmpty()) {
-                    core.queueForEngagement(ids, mediaType, null, null, MEDIA_PERMISSION_REQUEST_CODE) {
+                    core.queueForEngagement(
+                        ids,
+                        mediaType,
+                        configurationManager.visitorContextAssetId,
+                        null,
+                        MEDIA_PERMISSION_REQUEST_CODE) {
                         handleQueueingResponse(it)
                     }
                 } else {

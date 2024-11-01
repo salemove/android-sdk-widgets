@@ -7,13 +7,11 @@ import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.androidsdk.engagement.EngagementFile
 import com.glia.androidsdk.site.SiteInfo
 import com.glia.widgets.Constants
-import com.glia.widgets.chat.ChatType
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.chat.domain.SiteInfoUseCase
 import com.glia.widgets.chat.domain.TakePictureUseCase
 import com.glia.widgets.chat.domain.UriToFileAttachmentUseCase
 import com.glia.widgets.core.dialog.DialogContract
-import com.glia.widgets.core.engagement.domain.SetEngagementConfigUseCase
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase
 import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.core.permissions.domain.RequestNotificationPermissionIfPushNotificationsSetUpUseCase
@@ -32,7 +30,6 @@ import com.glia.widgets.helper.TAG
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 internal class MessageCenterController(
-    engagementConfigUseCase: SetEngagementConfigUseCase,
     private val sendSecureMessageUseCase: SendSecureMessageUseCase,
     private val addFileAttachmentsObserverUseCase: AddSecureFileAttachmentsObserverUseCase,
     private val addFileToAttachmentAndUploadUseCase: AddSecureFileToAttachmentAndUploadUseCase,
@@ -55,10 +52,6 @@ internal class MessageCenterController(
 
     @Volatile
     private var state = MessageCenterState()
-
-    init {
-        engagementConfigUseCase(ChatType.SECURE_MESSAGING)
-    }
 
     override fun setView(view: MessageCenterContract.View) {
         this.view = view

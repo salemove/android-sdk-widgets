@@ -2,6 +2,7 @@ package com.glia.widgets.launcher
 
 import android.app.Activity
 import com.glia.androidsdk.Engagement
+import com.glia.widgets.chat.Intention
 
 /**
  * An interface for launching different types of engagements, such as chat,
@@ -40,7 +41,7 @@ interface EngagementLauncher {
 internal class EngagementLauncherImpl(private val activityLauncher: ActivityLauncher) : EngagementLauncher {
 
     override fun startChat(activity: Activity) {
-        activityLauncher.launchChat(activity)
+        activityLauncher.launchChat(activity, Intention.LIVE_CHAT_UNAUTHENTICATED)
     }
 
     override fun startAudioCall(activity: Activity) {

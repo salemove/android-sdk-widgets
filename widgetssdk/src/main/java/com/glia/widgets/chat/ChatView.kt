@@ -198,9 +198,9 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     ) : this(context, attrs, defStyleAttr, R.style.Application_Glia_Chat)
 
 
-    fun startChat(chatType: ChatType = ChatType.LIVE_CHAT) {
+    fun startChat(intention: Intention) {
         dialogCallback?.also { dialogController?.addCallback(it) }
-        controller?.initChat(chatType)
+        controller?.initChat(intention)
     }
 
     /**

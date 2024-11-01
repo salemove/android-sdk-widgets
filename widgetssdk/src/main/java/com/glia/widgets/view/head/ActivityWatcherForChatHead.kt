@@ -12,6 +12,7 @@ import com.glia.widgets.R
 import com.glia.widgets.base.BaseActivityStackWatcher
 import com.glia.widgets.callvisualizer.EndScreenSharingView
 import com.glia.widgets.chat.ChatView
+import com.glia.widgets.chat.Intention
 import com.glia.widgets.filepreview.ui.ImagePreviewView
 import com.glia.widgets.helper.DialogHolderView
 import com.glia.widgets.helper.Logger
@@ -170,7 +171,7 @@ internal class ActivityWatcherForChatHead(
     }
 
     private fun navigateToChat(activity: Activity?) {
-        activity?.also(activityLauncher::launchChat)
+        activity?.also { activityLauncher.launchChat(it, Intention.RESTORE_CHAT) }
     }
 
     private fun navigateToEndScreenSharing(activity: Activity?) {

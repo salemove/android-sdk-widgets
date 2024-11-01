@@ -6,6 +6,7 @@ import com.glia.widgets.R
 import com.glia.widgets.base.FadeTransitionActivity
 import com.glia.widgets.call.CallView.OnNavigateToChatListener
 import com.glia.widgets.call.CallView.OnNavigateToWebBrowserListener
+import com.glia.widgets.chat.Intention
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.ExtraKeys
 import com.glia.widgets.helper.Logger
@@ -99,7 +100,7 @@ internal class CallActivity : FadeTransitionActivity() {
 
     private fun navigateToChat() {
         Logger.d(TAG, "navigateToChat")
-        activityLauncher.launchChat(this)
+        activityLauncher.launchChat(this, Intention.RESTORE_CHAT)
     }
 
     private fun navigateToWebBrowser(title: LocaleString, url: String) = activityLauncher.launchWebBrowser(this, title, url)

@@ -62,9 +62,11 @@ internal class ChatActivity : FadeTransitionActivity() {
 
         chatView.setOnMinimizeListener(::finish)
 
-        val chatType = intent.getEnumExtra<ChatType>(ExtraKeys.CHAT_TYPE) ?: ChatType.LIVE_CHAT
+        val intention = intent.getEnumExtra<Intention>(ExtraKeys.OPEN_CHAT_INTENTION)
 
-        chatView.startChat(chatType)
+        check(intention != null) { "Intention must be provided" }
+
+        chatView.startChat(intention)
     }
 
     override fun onResume() {

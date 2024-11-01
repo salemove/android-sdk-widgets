@@ -4,8 +4,6 @@ import android.graphics.Bitmap
 import com.glia.androidsdk.RequestCallback
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.androidsdk.secureconversations.SecureConversations
-import com.glia.widgets.chat.ChatType
-import com.glia.widgets.core.engagement.GliaEngagementConfigRepository
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource
 import com.glia.widgets.filepreview.data.source.local.InAppBitmapCache
@@ -19,8 +17,7 @@ import kotlin.jvm.optionals.getOrNull
 internal class GliaFileRepositoryImpl(
     private val bitmapCache: InAppBitmapCache,
     private val downloadsFolderDataSource: DownloadsFolderDataSource,
-    private val gliaCore: GliaCore,
-    private val engagementConfigRepository: GliaEngagementConfigRepository
+    private val gliaCore: GliaCore
 ) : GliaFileRepository {
     private val secureConversations: SecureConversations by lazy {
         gliaCore.secureConversations
@@ -73,7 +70,7 @@ internal class GliaFileRepositoryImpl(
 
     private fun fetchFile(attachmentFile: AttachmentFile, callback: RequestCallback<InputStream?>) {
         val engagement = gliaCore.currentEngagement.getOrNull()
-        if (engagement == null && engagementConfigRepository.chatType == ChatType.SECURE_MESSAGING) {
+        if (engagement == null /*TODO check here for SC*/) {
             secureConversations.fetchFile(attachmentFile.id, callback)
         } else {
             gliaCore.fetchFile(attachmentFile, callback)

@@ -4,7 +4,6 @@ import com.glia.widgets.chat.data.ChatScreenRepository;
 import com.glia.widgets.chat.data.ChatScreenRepositoryImpl;
 import com.glia.widgets.chat.data.GliaChatRepository;
 import com.glia.widgets.core.callvisualizer.domain.VisitorCodeRepository;
-import com.glia.widgets.core.engagement.GliaEngagementConfigRepository;
 import com.glia.widgets.core.engagement.GliaOperatorRepository;
 import com.glia.widgets.core.engagement.GliaOperatorRepositoryImpl;
 import com.glia.widgets.core.fileupload.FileAttachmentRepository;
@@ -33,7 +32,6 @@ public class RepositoryFactory {
     private static GliaFileRepository gliaFileRepository;
     private static FileAttachmentRepository fileAttachmentRepository;
     private static GliaOperatorRepository operatorRepository;
-    private static GliaEngagementConfigRepository engagementConfigRepository;
     private static SendMessageRepository sendMessageRepository;
     private static VisitorCodeRepository visitorCodeRepository;
     private static PermissionsRequestRepository permissionsRequestRepository;
@@ -66,22 +64,14 @@ public class RepositoryFactory {
 
     public FileAttachmentRepository getGliaFileAttachmentRepository() {
         if (fileAttachmentRepository == null) {
-            fileAttachmentRepository = new FileAttachmentRepository(
-                gliaCore,
-                getEngagementConfigRepository()
-            );
+            fileAttachmentRepository = new FileAttachmentRepository(gliaCore);
         }
         return fileAttachmentRepository;
     }
 
     public GliaFileRepository getGliaFileRepository() {
         if (gliaFileRepository == null) {
-            gliaFileRepository = new GliaFileRepositoryImpl(
-                InAppBitmapCache.getInstance(),
-                downloadsFolderDataSource,
-                gliaCore,
-                getEngagementConfigRepository()
-            );
+            gliaFileRepository = new GliaFileRepositoryImpl(InAppBitmapCache.getInstance(), downloadsFolderDataSource, gliaCore);
         }
         return gliaFileRepository;
     }
@@ -124,13 +114,6 @@ public class RepositoryFactory {
             secureFileAttachmentRepository = new SecureFileAttachmentRepository(gliaCore);
         }
         return secureFileAttachmentRepository;
-    }
-
-    public GliaEngagementConfigRepository getEngagementConfigRepository() {
-        if (engagementConfigRepository == null) {
-            engagementConfigRepository = new GliaEngagementConfigRepository();
-        }
-        return engagementConfigRepository;
     }
 
     public SendMessageRepository getSendMessageRepository() {

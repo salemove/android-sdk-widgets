@@ -17,6 +17,7 @@ import com.glia.widgets.call.CallActivity
 import com.glia.widgets.callvisualizer.EndScreenSharingActivity
 import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.chat.ChatType
+import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.entrywidget.EntryWidgetActivity
 import com.glia.widgets.filepreview.ui.ImagePreviewActivity
 import com.glia.widgets.locale.LocaleString
@@ -31,6 +32,7 @@ internal object ExtraKeys {
 
     const val IMAGE_PREVIEW_IMAGE_ID = "image_preview_image_id"
     const val IMAGE_PREVIEW_IMAGE_NAME = "image_preview_image_name"
+    const val IMAGE_PREVIEW_LOCAL_IMAGE_URI = "image_preview_local_image_uri"
 
     const val CHAT_TYPE = "chat_screen_chat_type"
     const val MEDIA_TYPE = "media_type"
@@ -49,6 +51,8 @@ internal interface IntentHelper {
 
     fun imagePreviewIntent(context: Context, attachment: AttachmentFile): Intent
 
+    fun imagePreviewIntent(context: Context, attachment: LocalAttachment): Intent
+
     fun shareImageIntent(context: Context, fileName: String): Intent
 
     fun surveyIntent(context: Context, survey: Survey): Intent
@@ -65,7 +69,7 @@ internal interface IntentHelper {
 
     fun openUriIntent(uri: Uri): Intent
 
-    fun openFileIntent(contentUri: Uri, fileContentType: String): Intent
+    fun openFileIntent(contentUri: Uri, fileContentType: String?): Intent
     fun entryWidgetIntent(activity: Activity): Intent
 }
 
@@ -94,6 +98,12 @@ internal class IntentHelperImpl : IntentHelper {
         return Intent(context, ImagePreviewActivity::class.java)
             .putExtra(ExtraKeys.IMAGE_PREVIEW_IMAGE_ID, attachment.id)
             .putExtra(ExtraKeys.IMAGE_PREVIEW_IMAGE_NAME, attachment.name)
+            .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+    }
+
+    override fun imagePreviewIntent(context: Context, attachment: LocalAttachment): Intent {
+        return Intent(context, ImagePreviewActivity::class.java)
+            .putExtra(ExtraKeys.IMAGE_PREVIEW_LOCAL_IMAGE_URI, attachment.uri)
             .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
     }
 
@@ -134,7 +144,7 @@ internal class IntentHelperImpl : IntentHelper {
 
     override fun openUriIntent(uri: Uri): Intent = Intent(Intent.ACTION_VIEW, uri).addCategory(Intent.CATEGORY_BROWSABLE)
 
-    override fun openFileIntent(contentUri: Uri, fileContentType: String): Intent = with(Intent(Intent.ACTION_VIEW)) {
+    override fun openFileIntent(contentUri: Uri, fileContentType: String?): Intent = with(Intent(Intent.ACTION_VIEW)) {
         clipData = ClipData.newRawUri("", contentUri)
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
         setDataAndType(contentUri, fileContentType)

@@ -7,6 +7,7 @@ import android.os.Bundle
 import com.glia.androidsdk.Engagement.MediaType
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.androidsdk.engagement.Survey
+import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.helper.IntentHelper
 import com.glia.widgets.helper.safeStartActivity
 import com.glia.widgets.locale.LocaleString
@@ -22,10 +23,11 @@ internal interface ActivityLauncher {
     fun launchWebBrowser(context: Context, title: LocaleString, url: String)
     fun launchOverlayPermission(context: Context, onSuccess: () -> Unit = {}, onFailure: () -> Unit = {})
     fun launchImagePreview(context: Context, attachment: AttachmentFile, options: Bundle? = null)
+    fun launchImagePreview(context: Context, attachment: LocalAttachment, options: Bundle? = null)
     fun launchEmailClient(context: Context, uri: Uri, onFailure: () -> Unit)
     fun launchDialer(context: Context, uri: Uri, onFailure: () -> Unit)
     fun launchUri(context: Context, uri: Uri, onFailure: () -> Unit)
-    fun launchFileReader(context: Context, contentUri: Uri, fileContentType: String, onFailure: () -> Unit)
+    fun launchFileReader(context: Context, contentUri: Uri, fileContentType: String?, onFailure: () -> Unit)
     fun launchShareImage(activity: Activity, fileName: String)
     fun launchEntryWidget(activity: Activity)
     fun launchSurvey(activity: Activity, survey: Survey)
@@ -56,6 +58,9 @@ internal class ActivityLauncherImpl(private val intentHelper: IntentHelper) : Ac
     override fun launchImagePreview(context: Context, attachment: AttachmentFile, options: Bundle?) =
         context.startActivity(intentHelper.imagePreviewIntent(context, attachment), options)
 
+    override fun launchImagePreview(context: Context, attachment: LocalAttachment, options: Bundle?) =
+        context.startActivity(intentHelper.imagePreviewIntent(context, attachment), options)
+
     override fun launchEmailClient(context: Context, uri: Uri, onFailure: () -> Unit) =
         context.safeStartActivity(intentHelper.openEmailIntent(uri), onFailure)
 
@@ -64,7 +69,7 @@ internal class ActivityLauncherImpl(private val intentHelper: IntentHelper) : Ac
 
     override fun launchUri(context: Context, uri: Uri, onFailure: () -> Unit) = context.safeStartActivity(intentHelper.openUriIntent(uri), onFailure)
 
-    override fun launchFileReader(context: Context, contentUri: Uri, fileContentType: String, onFailure: () -> Unit) =
+    override fun launchFileReader(context: Context, contentUri: Uri, fileContentType: String?, onFailure: () -> Unit) =
         context.safeStartActivity(intentHelper.openFileIntent(contentUri, fileContentType), onFailure)
 
     override fun launchShareImage(activity: Activity, fileName: String) = activity.startActivity(intentHelper.shareImageIntent(activity, fileName))

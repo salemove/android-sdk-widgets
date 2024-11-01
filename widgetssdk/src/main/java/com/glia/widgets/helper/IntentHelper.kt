@@ -16,7 +16,7 @@ import com.glia.androidsdk.engagement.Survey
 import com.glia.widgets.call.CallActivity
 import com.glia.widgets.callvisualizer.EndScreenSharingActivity
 import com.glia.widgets.chat.ChatActivity
-import com.glia.widgets.chat.ChatType
+import com.glia.widgets.chat.Intention
 import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.entrywidget.EntryWidgetActivity
 import com.glia.widgets.filepreview.ui.ImagePreviewActivity
@@ -34,16 +34,15 @@ internal object ExtraKeys {
     const val IMAGE_PREVIEW_IMAGE_NAME = "image_preview_image_name"
     const val IMAGE_PREVIEW_LOCAL_IMAGE_URI = "image_preview_local_image_uri"
 
-    const val CHAT_TYPE = "chat_screen_chat_type"
+    const val OPEN_CHAT_INTENTION = "open_chat_intention"
+
     const val MEDIA_TYPE = "media_type"
     const val SURVEY = "survey"
     const val IS_UPGRADE_TO_CALL = "call_screen_is_upgrade_to_call"
 }
 
 internal interface IntentHelper {
-    fun chatIntent(context: Context): Intent
-
-    fun secureMessagingChatIntent(activity: Activity): Intent
+    fun chatIntent(context: Context, intention: Intention): Intent
 
     fun secureMessagingWelcomeScreenIntent(activity: Activity): Intent
 
@@ -75,15 +74,11 @@ internal interface IntentHelper {
 
 internal class IntentHelperImpl : IntentHelper {
 
-    override fun chatIntent(context: Context): Intent =
-        Intent(context, ChatActivity::class.java).apply {
-            setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-            setSafeFlags(context)
-        }
-
-    override fun secureMessagingChatIntent(activity: Activity): Intent = Intent(activity, ChatActivity::class.java)
-        .putEnumExtra(ExtraKeys.CHAT_TYPE, ChatType.SECURE_MESSAGING)
-        .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+    override fun chatIntent(context: Context, intention: Intention): Intent = Intent(context, ChatActivity::class.java).apply {
+        putEnumExtra(ExtraKeys.OPEN_CHAT_INTENTION, intention)
+        setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        setSafeFlags(context)
+    }
 
     override fun secureMessagingWelcomeScreenIntent(activity: Activity): Intent = Intent(activity, MessageCenterActivity::class.java)
         .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)

@@ -5,7 +5,6 @@ import com.glia.androidsdk.chat.FilesAttachment
 import com.glia.androidsdk.chat.SendMessagePayload
 import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.widgets.chat.data.GliaChatRepository
-import com.glia.widgets.core.engagement.GliaEngagementConfigRepository
 import com.glia.widgets.core.fileupload.SecureFileAttachmentRepository
 import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository

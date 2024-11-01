@@ -35,6 +35,7 @@ import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.Data
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.formattedName
+import com.glia.widgets.launcher.ConfigurationManager
 import io.mockk.CapturingSlot
 import io.mockk.MockKAnnotations
 import io.mockk.Runs
@@ -95,6 +96,7 @@ class EngagementRepositoryTest {
     private lateinit var queueRepository: QueueRepository
 
     private lateinit var repository: EngagementRepository
+    private lateinit var configurationManager: ConfigurationManager
 
     @Before
     fun setUp() {
@@ -118,8 +120,11 @@ class EngagementRepositoryTest {
         screenSharingStateCallbackSlot = slot()
 
         every { core.callVisualizer } returns callVisualizer
+        configurationManager = mockk<ConfigurationManager> {
+            every { visitorContextAssetId } returns null
+        }
 
-        repository = EngagementRepositoryImpl(core, operatorRepository, queueRepository)
+        repository = EngagementRepositoryImpl(core, operatorRepository, queueRepository, configurationManager)
         initializeAndVerify()
     }
 
@@ -792,7 +797,7 @@ class EngagementRepositoryTest {
     }
 
     @Test
-    fun `queueForEngagement with produces PreQueueing`() {
+    fun `queueForEngagement produces PreQueueing`() {
         val queueId = "queue_id"
         every { queueRepository.relevantQueueIds } returns Single.just(listOf(queueId))
         val queueForEngagementCallbackSlot = slot<Consumer<GliaException?>>()
@@ -812,8 +817,9 @@ class EngagementRepositoryTest {
         verify { queueRepository.relevantQueueIds }
         verify(exactly = 0) { core.queueForEngagement(listOf(queueId), MediaType.TEXT, "url", any(), any(), capture(queueForEngagementCallbackSlot)) }
     }
+
     @Test
-    fun `queueForEngagement with produces Error when relevant queues are empty`() {
+    fun `queueForEngagement produces Error when relevant queues are empty`() {
         every { queueRepository.relevantQueueIds } returns Single.just(emptyList())
         val testSubscriber = repository.engagementState.test()
 
@@ -1340,4 +1346,45 @@ class EngagementRepositoryTest {
         assertEquals(VisitorCamera.Switching, repository.currentVisitorCamera)
     }
 
+    @Test
+    fun `queueForEngagement uses visitorContextAssetId from configurationManager`() {
+        val queueId = "queue_id"
+        val visitorContextAssetId = "visitor_context_asset_id"
+        every { queueRepository.relevantQueueIds } returns Single.just(listOf(queueId))
+        every { configurationManager.visitorContextAssetId } returns visitorContextAssetId
+        val queueForEngagementCallbackSlot = slot<Consumer<GliaException?>>()
+
+        repository.queueForEngagement(MediaType.TEXT)
+
+        verify(exactly = 1) { core.queueForEngagement(listOf(queueId), MediaType.TEXT, visitorContextAssetId, any(), any(), capture(queueForEngagementCallbackSlot)) }
+        queueForEngagementCallbackSlot.captured.accept(null)
+
+        assertTrue(repository.isQueueing)
+        assertFalse(repository.isQueueingForMedia)
+
+        repository.queueForEngagement(MediaType.TEXT)
+
+        verify { queueRepository.relevantQueueIds }
+        verify(exactly = 1) { core.queueForEngagement(listOf(queueId), MediaType.TEXT, visitorContextAssetId, any(), any(), capture(queueForEngagementCallbackSlot)) }
+    }
+
+    @Test
+    fun `queueForEngagement uses null visitorContextAssetId when configurationManager returns null`() {
+        val queueId = "queue_id"
+        every { queueRepository.relevantQueueIds } returns Single.just(listOf(queueId))
+        every { configurationManager.visitorContextAssetId } returns null
+        val queueForEngagementCallbackSlot = slot<Consumer<GliaException?>>()
+
+        repository.queueForEngagement(MediaType.TEXT)
+
+        verify(exactly = 1) { core.queueForEngagement(listOf(queueId), MediaType.TEXT, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
+        queueForEngagementCallbackSlot.captured.accept(null)
+
+        assertTrue(repository.isQueueing)
+        assertFalse(repository.isQueueingForMedia)
+        repository.queueForEngagement(MediaType.TEXT)
+
+        verify { queueRepository.relevantQueueIds }
+        verify(exactly = 1) { core.queueForEngagement(listOf(queueId), MediaType.TEXT, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
+    }
 }

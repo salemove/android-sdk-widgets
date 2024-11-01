@@ -21,8 +21,8 @@ internal class CallVisualizerManager(
         callVisualizerController.showVisitorCodeDialog()
     }
 
-    override fun addVisitorContext(visitorContext: String) {
-        callVisualizerController.saveVisitorContextAssetId(visitorContext)
+    override fun addVisitorContext(visitorContextAssetId: String) {
+        callVisualizerController.saveVisitorContextAssetId(visitorContextAssetId)
     }
 
     @SuppressLint("CheckResult")

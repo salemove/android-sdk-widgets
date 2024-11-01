@@ -91,14 +91,15 @@ class MainFragment : Fragment() {
                     entryWidget.show(requireActivity())
                 }
             }
+        val visitorContextAssetId = getContextAssetIdFromPrefs(sharedPreferences)
         view.findViewById<View>(R.id.chat_activity_button)
-            .setOnClickListener { engagementLauncher.startChat(requireActivity()) }
+            .setOnClickListener { engagementLauncher.startChat(requireActivity(), visitorContextAssetId) }
         view.findViewById<View>(R.id.audio_call_button)
-            .setOnClickListener { engagementLauncher.startAudioCall(requireActivity()) }
+            .setOnClickListener { engagementLauncher.startAudioCall(requireActivity(), visitorContextAssetId) }
         view.findViewById<View>(R.id.video_call_button)
-            .setOnClickListener { engagementLauncher.startVideoCall(requireActivity()) }
+            .setOnClickListener { engagementLauncher.startVideoCall(requireActivity(), visitorContextAssetId) }
         view.findViewById<View>(R.id.message_center_activity_button)
-            .setOnClickListener { engagementLauncher.startSecureMessaging(requireActivity()) }
+            .setOnClickListener { engagementLauncher.startSecureMessaging(requireActivity(), visitorContextAssetId) }
         view.findViewById<View>(R.id.end_engagement_button)
             .setOnClickListener { GliaWidgets.endEngagement() }
         view.findViewById<View>(R.id.visitor_info_button)
@@ -560,10 +561,10 @@ class MainFragment : Fragment() {
     }
 
     private fun showVisitorCode() {
-        val visitorContext = getContextAssetIdFromPrefs(sharedPreferences)
+        val visitorContextAssetId = getContextAssetIdFromPrefs(sharedPreferences)
         val cv = GliaWidgets.getCallVisualizer()
-        if (!visitorContext.isNullOrBlank()) {
-            cv.addVisitorContext(visitorContext)
+        if (!visitorContextAssetId.isNullOrBlank()) {
+            cv.addVisitorContext(visitorContextAssetId)
         }
         cv.showVisitorCodeDialog()
     }

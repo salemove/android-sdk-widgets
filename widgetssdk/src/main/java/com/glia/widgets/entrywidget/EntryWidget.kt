@@ -3,6 +3,7 @@ package com.glia.widgets.entrywidget
 import android.app.Activity
 import android.content.Context
 import android.view.View
+import com.glia.widgets.chat.Intention
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.entrywidget.adapter.EntryWidgetAdapter
 import com.glia.widgets.helper.unSafeSubscribe
@@ -48,7 +49,7 @@ internal class EntryWidgetImpl(
 
     private fun handleShowWithPendingSecureConversations(hasPendingSecureConversations: Boolean, activity: Activity) {
         if (hasPendingSecureConversations) {
-            activityLauncher.launchSecureMessagingChat(activity)
+            activityLauncher.launchChat(activity, Intention.SC_CHAT)
         } else {
             activityLauncher.launchEntryWidget(activity)
         }

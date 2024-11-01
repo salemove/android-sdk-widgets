@@ -117,7 +117,6 @@ public class ControllerFactory {
                 useCaseFactory.createIsFromCallScreenUseCase(),
                 useCaseFactory.createUpdateFromCallScreenUseCase(),
                 useCaseFactory.createIsSecureEngagementUseCase(),
-                useCaseFactory.createSetEngagementConfigUseCase(),
                 useCaseFactory.getIsCurrentEngagementCallVisualizer(),
                 useCaseFactory.createIsFileReadyForPreviewUseCase(),
                 useCaseFactory.createDetermineGvaButtonTypeUseCase(),
@@ -292,7 +291,6 @@ public class ControllerFactory {
 
     public MessageCenterContract.Controller getMessageCenterController() {
         return new MessageCenterController(
-            useCaseFactory.createSetEngagementConfigUseCase(),
             useCaseFactory.createSendSecureMessageUseCase(),
             useCaseFactory.createAddSecureFileAttachmentsObserverUseCase(),
             useCaseFactory.createAddSecureFileToAttachmentAndUploadUseCase(),

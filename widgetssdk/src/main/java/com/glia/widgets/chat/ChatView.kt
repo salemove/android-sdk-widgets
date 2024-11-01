@@ -38,7 +38,6 @@ import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.ChatState
 import com.glia.widgets.chat.model.CustomCardChatItem
 import com.glia.widgets.chat.model.RemoteAttachmentItem
-import com.glia.widgets.core.configuration.EngagementConfiguration
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.fileupload.model.LocalAttachment
@@ -372,7 +371,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             context.requireActivity(), view, context.getString(R.string.glia_file_preview_transition_name) // Not translatable
         )
 
-        context.startActivity(FilePreviewActivity.intent(context, attachmentFile), options.toBundle())
+        activityLauncher.launchImagePreview(context, attachmentFile, options.toBundle())
         insetsController?.hideKeyboard()
     }
 
@@ -775,11 +774,9 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     }
 
     override fun onLocalFileOpenClick(attachment: LocalAttachment) {
-        with(Intent(Intent.ACTION_VIEW)) {
-            setDataAndType(attachment.uri, attachment.mimeType)
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-            resolveActivity(context.packageManager)?.also { context.startActivity(this) }
-        } ?: showToast(message = localeProvider.getString(R.string.android_file_view_error))
+        activityLauncher.launchFileReader(context, attachment.uri, attachment.mimeType.orEmpty()) {
+            showToast(message = localeProvider.getString(R.string.android_file_view_error))
+        }
     }
 
     override fun onImageItemClick(item: AttachmentFile, view: View) {

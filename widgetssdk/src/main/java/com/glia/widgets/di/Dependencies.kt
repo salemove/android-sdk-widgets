@@ -79,7 +79,9 @@ internal object Dependencies {
     val activityLauncher: ActivityLauncher by lazy { ActivityLauncherImpl(IntentHelperImpl()) }
 
     @JvmStatic
-    val engagementLauncher: EngagementLauncher by lazy { EngagementLauncherImpl(activityLauncher) }
+    val engagementLauncher: EngagementLauncher by lazy {
+        EngagementLauncherImpl(activityLauncher, useCaseFactory.hasPendingSecureConversationsWithTimeoutUseCase)
+    }
 
     @JvmStatic
     val entryWidget: EntryWidget

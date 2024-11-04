@@ -87,7 +87,7 @@ internal object Dependencies {
             activityLauncher,
             gliaThemeManager,
             controllerFactory.entryWidgetHideController,
-            repositoryFactory.secureConversationsRepository
+            useCaseFactory.hasPendingSecureConversationsWithTimeoutUseCase
         )
 
     @JvmStatic

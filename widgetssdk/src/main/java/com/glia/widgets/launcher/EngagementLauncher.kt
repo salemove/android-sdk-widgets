@@ -3,6 +3,8 @@ package com.glia.widgets.launcher
 import android.app.Activity
 import com.glia.androidsdk.Engagement
 import com.glia.widgets.chat.Intention
+import com.glia.widgets.core.secureconversations.domain.HasPendingSecureConversationsWithTimeoutUseCase
+import com.glia.widgets.helper.unSafeSubscribe
 
 /**
  * An interface for launching different types of engagements, such as chat,
@@ -38,7 +40,10 @@ interface EngagementLauncher {
     fun startSecureMessaging(activity: Activity)
 }
 
-internal class EngagementLauncherImpl(private val activityLauncher: ActivityLauncher) : EngagementLauncher {
+internal class EngagementLauncherImpl(
+    private val activityLauncher: ActivityLauncher,
+    private val hasPendingSecureConversationsWithTimeoutUseCase: HasPendingSecureConversationsWithTimeoutUseCase
+) : EngagementLauncher {
 
     override fun startChat(activity: Activity) {
         activityLauncher.launchChat(activity, Intention.LIVE_CHAT_UNAUTHENTICATED)
@@ -52,7 +57,11 @@ internal class EngagementLauncherImpl(private val activityLauncher: ActivityLaun
         activityLauncher.launchCall(activity, Engagement.MediaType.VIDEO, false)
     }
 
-    override fun startSecureMessaging(activity: Activity) {
-        activityLauncher.launchSecureMessagingWelcomeScreen(activity)
+    override fun startSecureMessaging(activity: Activity) = hasPendingSecureConversationsWithTimeoutUseCase().unSafeSubscribe {
+        if (it) {
+            activityLauncher.launchChat(activity, Intention.SC_CHAT)
+        } else {
+            activityLauncher.launchSecureMessagingWelcomeScreen(activity)
+        }
     }
 }

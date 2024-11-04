@@ -105,6 +105,7 @@ import com.glia.widgets.core.secureconversations.domain.AddSecureFileAttachments
 import com.glia.widgets.core.secureconversations.domain.AddSecureFileToAttachmentAndUploadUseCase;
 import com.glia.widgets.core.secureconversations.domain.GetSecureFileAttachmentsUseCase;
 import com.glia.widgets.core.secureconversations.domain.GetUnreadMessagesCountWithTimeoutUseCase;
+import com.glia.widgets.core.secureconversations.domain.HasPendingSecureConversationsWithTimeoutUseCase;
 import com.glia.widgets.core.secureconversations.domain.IsMessagingAvailableUseCase;
 import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase;
 import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDelayUseCase;
@@ -592,7 +593,11 @@ public class UseCaseFactory {
 
     @NonNull
     public GetUnreadMessagesCountWithTimeoutUseCase createSubscribeToUnreadMessagesCountUseCase() {
-        return new GetUnreadMessagesCountWithTimeoutUseCase(repositoryFactory.getSecureConversationsRepository());
+        return new GetUnreadMessagesCountWithTimeoutUseCase(
+            repositoryFactory.getSecureConversationsRepository(),
+            createIsAuthenticatedUseCase(),
+            gliaCore
+        );
     }
 
     @NonNull
@@ -1069,6 +1074,15 @@ public class UseCaseFactory {
         return new FlipCameraButtonStateUseCaseImpl(
             repositoryFactory.getEngagementRepository(),
             getFlipVisitorCameraUseCase()
+        );
+    }
+
+    @NonNull
+    public HasPendingSecureConversationsWithTimeoutUseCase getHasPendingSecureConversationsWithTimeoutUseCase() {
+        return new HasPendingSecureConversationsWithTimeoutUseCase(
+            repositoryFactory.getSecureConversationsRepository(),
+            createIsAuthenticatedUseCase(),
+            gliaCore
         );
     }
 }

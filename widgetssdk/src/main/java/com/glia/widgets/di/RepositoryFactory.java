@@ -104,7 +104,7 @@ public class RepositoryFactory {
 
     public SecureConversationsRepository getSecureConversationsRepository() {
         if (secureConversationsRepository == null) {
-            secureConversationsRepository = new SecureConversationsRepository(gliaCore.getSecureConversations(), getQueueRepository());
+            secureConversationsRepository = new SecureConversationsRepository(gliaCore, getQueueRepository());
         }
         return secureConversationsRepository;
     }

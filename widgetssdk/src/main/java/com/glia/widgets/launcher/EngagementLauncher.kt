@@ -58,7 +58,13 @@ internal class EngagementLauncherImpl(
      */
     override fun startChat(activity: Activity, visitorContextAssetId: String?) {
         visitorContextAssetId?.let { configurationManager.setVisitorContextAssetId(it) }
-        activityLauncher.launchChat(activity, Intention.LIVE_CHAT_UNAUTHENTICATED)
+        hasPendingSecureConversationsWithTimeoutUseCase().unSafeSubscribe {
+            if (it) {
+                activityLauncher.launchChat(activity, Intention.SC_DIALOG_ENQUEUE_FOR_TEXT)
+            } else {
+                activityLauncher.launchChat(activity, Intention.LIVE_CHAT)
+            }
+        }
     }
 
     /**
@@ -69,7 +75,13 @@ internal class EngagementLauncherImpl(
      */
     override fun startAudioCall(activity: Activity, visitorContextAssetId: String?) {
         visitorContextAssetId?.let { configurationManager.setVisitorContextAssetId(it) }
-        activityLauncher.launchCall(activity, Engagement.MediaType.AUDIO, false)
+        hasPendingSecureConversationsWithTimeoutUseCase().unSafeSubscribe {
+            if (it) {
+                activityLauncher.launchChat(activity, Intention.SC_DIALOG_START_AUDIO)
+            } else {
+                activityLauncher.launchCall(activity, Engagement.MediaType.AUDIO, false)
+            }
+        }
     }
 
     /**
@@ -80,7 +92,13 @@ internal class EngagementLauncherImpl(
      */
     override fun startVideoCall(activity: Activity, visitorContextAssetId: String?) {
         visitorContextAssetId?.let { configurationManager.setVisitorContextAssetId(it) }
-        activityLauncher.launchCall(activity, Engagement.MediaType.VIDEO, false)
+        hasPendingSecureConversationsWithTimeoutUseCase().unSafeSubscribe {
+            if (it) {
+                activityLauncher.launchChat(activity, Intention.SC_DIALOG_START_VIDEO)
+            } else {
+                activityLauncher.launchCall(activity, Engagement.MediaType.VIDEO, false)
+            }
+        }
     }
 
     /**

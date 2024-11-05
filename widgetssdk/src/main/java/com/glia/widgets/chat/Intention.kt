@@ -11,27 +11,24 @@ internal enum class Intention {
     SC_DIALOG_START_VIDEO,
 
     /* Open Secure Conversation chat with Leave dialog, and if the visitor chooses to leave, start enqueueing for chat */
-    SC_DIALOG_ENQUEUE,
+    SC_DIALOG_ENQUEUE_FOR_TEXT,
 
     /* Open Secure Conversation chat */
     SC_CHAT,
 
-    /* Open Live chat - visitor is authenticated */
-    LIVE_CHAT_AUTHENTICATED,//TODO The _AUTHENTICATION part might be unnecessary
-
-    /* Open Live chat - visitor is not authenticated */
-    LIVE_CHAT_UNAUTHENTICATED;//TODO The _AUTHENTICATION part might be unnecessary
+    /* Open Live chat */
+    LIVE_CHAT;
 
     val isSecureConversation: Boolean
         get() = when (this) {
-            SC_CHAT, SC_DIALOG_ENQUEUE, SC_DIALOG_START_AUDIO, SC_DIALOG_START_VIDEO -> true
+            SC_CHAT, SC_DIALOG_ENQUEUE_FOR_TEXT, SC_DIALOG_START_AUDIO, SC_DIALOG_START_VIDEO -> true
             else -> false
         }
 
     val isLive: Boolean
         get() = when (this) {
             /*TODO check if we need to include RESTORE_CHAT into this case*/
-            LIVE_CHAT_AUTHENTICATED, LIVE_CHAT_UNAUTHENTICATED, RESTORE_CHAT -> true
+            LIVE_CHAT, RESTORE_CHAT -> true
             else -> false
         }
 }

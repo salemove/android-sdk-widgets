@@ -45,16 +45,28 @@ internal class EngagementLauncherImpl(
     private val hasPendingSecureConversationsWithTimeoutUseCase: HasPendingSecureConversationsWithTimeoutUseCase
 ) : EngagementLauncher {
 
-    override fun startChat(activity: Activity) {
-        activityLauncher.launchChat(activity, Intention.LIVE_CHAT_UNAUTHENTICATED)
+    override fun startChat(activity: Activity) = hasPendingSecureConversationsWithTimeoutUseCase().unSafeSubscribe {
+        if (it) {
+            activityLauncher.launchChat(activity, Intention.SC_DIALOG_ENQUEUE_FOR_TEXT)
+        } else {
+            activityLauncher.launchChat(activity, Intention.LIVE_CHAT)
+        }
     }
 
-    override fun startAudioCall(activity: Activity) {
-        activityLauncher.launchCall(activity, Engagement.MediaType.AUDIO, false)
+    override fun startAudioCall(activity: Activity) = hasPendingSecureConversationsWithTimeoutUseCase().unSafeSubscribe {
+        if (it) {
+            activityLauncher.launchChat(activity, Intention.SC_DIALOG_START_AUDIO)
+        } else {
+            activityLauncher.launchCall(activity, Engagement.MediaType.AUDIO, false)
+        }
     }
 
-    override fun startVideoCall(activity: Activity) {
-        activityLauncher.launchCall(activity, Engagement.MediaType.VIDEO, false)
+    override fun startVideoCall(activity: Activity) = hasPendingSecureConversationsWithTimeoutUseCase().unSafeSubscribe {
+        if (it) {
+            activityLauncher.launchChat(activity, Intention.SC_DIALOG_START_VIDEO)
+        } else {
+            activityLauncher.launchCall(activity, Engagement.MediaType.VIDEO, false)
+        }
     }
 
     override fun startSecureMessaging(activity: Activity) = hasPendingSecureConversationsWithTimeoutUseCase().unSafeSubscribe {

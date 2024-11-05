@@ -1,98 +1,119 @@
 package com.glia.widgets.launcher
 
 import android.app.Activity
-import io.mockk.*
+import com.glia.androidsdk.Engagement
+import com.glia.widgets.chat.Intention
+import com.glia.widgets.core.secureconversations.domain.HasPendingSecureConversationsWithTimeoutUseCase
+import io.mockk.MockKAnnotations
+import io.mockk.every
+import io.mockk.impl.annotations.MockK
+import io.mockk.verify
+import io.reactivex.rxjava3.core.Single
 import org.junit.Before
 import org.junit.Test
 
-class EngagementLauncherTest {
+class EngagementLauncherImplTest {
 
-    private lateinit var activity: Activity
+    @MockK
     private lateinit var activityLauncher: ActivityLauncher
-    private lateinit var engagementLauncher: EngagementLauncher
+
+    @MockK
+    private lateinit var hasPendingSecureConversationsWithTimeoutUseCase: HasPendingSecureConversationsWithTimeoutUseCase
+
+    @MockK
+    private lateinit var activity: Activity
+
+    @MockK(relaxUnitFun = true)
     private lateinit var configurationManager: ConfigurationManager
+
+    private lateinit var engagementLauncher: EngagementLauncherImpl
+
+    private val visitorContextAssetId = "visitor_context_asset_id"
+
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-        activity = mockk(relaxed = true)
-        activityLauncher = mockk<ActivityLauncher> {
-            every { launchChat(any()) } returns  Unit
-            every { launchCall(any(), any(), any()) } returns  Unit
-            every { launchSecureMessagingWelcomeScreen(any()) } returns  Unit
-        }
-        configurationManager = mockk<ConfigurationManager> {
-            every { setVisitorContextAssetId(any()) } just Runs
-        }
-        engagementLauncher = EngagementLauncherImpl(activityLauncher, configurationManager)
+        engagementLauncher = EngagementLauncherImpl(activityLauncher, hasPendingSecureConversationsWithTimeoutUseCase, configurationManager)
     }
 
     @Test
-    fun `startChat with visitorContextAssetId calls setVisitorContextAssetId`() {
-        val visitorContextAssetId = "visitor_context"
-        engagementLauncher.startChat(activity, visitorContextAssetId)
+    fun `startChat launches live chat when no pending secure conversations`() {
+        every { hasPendingSecureConversationsWithTimeoutUseCase() } returns Single.just(false)
 
-        verify { configurationManager.setVisitorContextAssetId(visitorContextAssetId) }
-    }
-
-    @Test
-    fun `startChat without visitorContextAssetId does not call setVisitorContextAssetId`() {
         engagementLauncher.startChat(activity)
 
+        verify { activityLauncher.launchChat(activity, Intention.LIVE_CHAT) }
         verify(exactly = 0) { configurationManager.setVisitorContextAssetId(any()) }
     }
 
     @Test
-    fun `startChat with visitorContextAssetId null does not call setVisitorContextAssetId`() {
-        val visitorContextAssetId = null
+    fun `startChat launches secure conversation dialog when there are pending secure conversations`() {
+        every { hasPendingSecureConversationsWithTimeoutUseCase() } returns Single.just(true)
+
         engagementLauncher.startChat(activity, visitorContextAssetId)
 
-        verify(exactly = 0) { configurationManager.setVisitorContextAssetId(any()) }
+        verify { activityLauncher.launchChat(activity, Intention.SC_DIALOG_ENQUEUE_FOR_TEXT) }
+        verify { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
     }
 
     @Test
-    fun `startAudioCall with visitorContextAssetId calls setVisitorContextAssetId`() {
-        val visitorContextAssetId = "visitor_context"
-        engagementLauncher.startAudioCall(activity, visitorContextAssetId)
+    fun `startAudioCall launches audio call when no pending secure conversations`() {
+        every { hasPendingSecureConversationsWithTimeoutUseCase() } returns Single.just(false)
 
-        verify { configurationManager.setVisitorContextAssetId(visitorContextAssetId) }
-    }
-
-    @Test
-    fun `startAudioCall without visitorContextAssetId does not call setVisitorContextAssetId`() {
         engagementLauncher.startAudioCall(activity)
 
+        verify { activityLauncher.launchCall(activity, Engagement.MediaType.AUDIO, false) }
         verify(exactly = 0) { configurationManager.setVisitorContextAssetId(any()) }
     }
 
     @Test
-    fun `startAudioCall with visitorContextAssetId null does not call setVisitorContextAssetId`() {
-        val visitorContextAssetId = null
+    fun `startAudioCall launches secure conversation audio dialog when there are pending secure conversations`() {
+        every { hasPendingSecureConversationsWithTimeoutUseCase() } returns Single.just(true)
+
         engagementLauncher.startAudioCall(activity, visitorContextAssetId)
 
+        verify { activityLauncher.launchChat(activity, Intention.SC_DIALOG_START_AUDIO) }
+        verify { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
+    }
+
+    @Test
+    fun `startVideoCall launches video call when no pending secure conversations`() {
+        every { hasPendingSecureConversationsWithTimeoutUseCase() } returns Single.just(false)
+
+        engagementLauncher.startVideoCall(activity)
+
+        verify { activityLauncher.launchCall(activity, Engagement.MediaType.VIDEO, false) }
         verify(exactly = 0) { configurationManager.setVisitorContextAssetId(any()) }
     }
 
     @Test
-    fun `startSecureMessaging with visitorContextAssetId calls setVisitorContextAssetId`() {
-        val visitorContextAssetId = "visitor_context"
-        engagementLauncher.startSecureMessaging(activity, visitorContextAssetId)
+    fun `startVideoCall launches secure conversation video dialog when there are pending secure conversations`() {
+        every { hasPendingSecureConversationsWithTimeoutUseCase() } returns Single.just(true)
 
-        verify { configurationManager.setVisitorContextAssetId(visitorContextAssetId) }
+        engagementLauncher.startVideoCall(activity, visitorContextAssetId)
+
+        verify { activityLauncher.launchChat(activity, Intention.SC_DIALOG_START_VIDEO) }
+        verify { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
     }
 
     @Test
-    fun `startSecureMessaging without visitorContextAssetId does not call setVisitorContextAssetId`() {
+    fun `startSecureMessaging launches secure messaging welcome screen when no pending secure conversations`() {
+        every { hasPendingSecureConversationsWithTimeoutUseCase() } returns Single.just(false)
+
         engagementLauncher.startSecureMessaging(activity)
 
+        verify { activityLauncher.launchSecureMessagingWelcomeScreen(activity) }
         verify(exactly = 0) { configurationManager.setVisitorContextAssetId(any()) }
     }
 
     @Test
-    fun `startSecureMessaging with visitorContextAssetId null does not call setVisitorContextAssetId`() {
-        val visitorContextAssetId = null
+    fun `startSecureMessaging launches secure chat when there are pending secure conversations`() {
+        every { hasPendingSecureConversationsWithTimeoutUseCase() } returns Single.just(true)
+
         engagementLauncher.startSecureMessaging(activity, visitorContextAssetId)
 
-        verify(exactly = 0) { configurationManager.setVisitorContextAssetId(any()) }
+        verify { activityLauncher.launchChat(activity, Intention.SC_CHAT) }
+        verify { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
     }
 }

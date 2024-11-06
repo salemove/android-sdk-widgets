@@ -24,6 +24,7 @@ internal val View.insetsController: WindowInsetsControllerCompat?
     get() = context.asActivity()?.let {
         WindowCompat.getInsetsController(it.window, this)
     }
+
 internal val View.rootWindowInsetsCompat: WindowInsetsCompat?
     get() = ViewCompat.getRootWindowInsets(this)
 
@@ -76,16 +77,8 @@ internal class SimpleWindowInsetsAndAnimationHandler(
         keyboardAnimationInProgress = false
     }
 
-    override fun onProgress(
-        insets: WindowInsetsCompat,
-        runningAnimations: MutableList<WindowInsetsAnimationCompat>
-    ): WindowInsetsCompat {
-        val combinedInsets = insets.run {
-            Insets.max(
-                getInsets(WindowInsetsCompat.Type.ime()),
-                getInsets(WindowInsetsCompat.Type.systemBars())
-            )
-        }
+    override fun onProgress(insets: WindowInsetsCompat, runningAnimations: MutableList<WindowInsetsAnimationCompat>): WindowInsetsCompat {
+        val combinedInsets = getCombinedInsets(insets)
 
         target.updateLayoutParams<ViewGroup.MarginLayoutParams> {
             updateMargins(bottom = combinedInsets.bottom)
@@ -97,7 +90,7 @@ internal class SimpleWindowInsetsAndAnimationHandler(
 
     override fun onApplyWindowInsets(v: View, insets: WindowInsetsCompat): WindowInsetsCompat {
         if (!keyboardAnimationInProgress) {
-            insets.getInsets(WindowInsetsCompat.Type.systemBars()).apply {
+            getCombinedInsets(insets).apply {
                 v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
                     updateMargins(left, appBarOrToolBar?.let { 0 } ?: top, right, bottom)
                 }
@@ -106,5 +99,12 @@ internal class SimpleWindowInsetsAndAnimationHandler(
         }
 
         return WindowInsetsCompat.CONSUMED
+    }
+
+    private fun getCombinedInsets(insets: WindowInsetsCompat): Insets = insets.run {
+        Insets.max(
+            getInsets(WindowInsetsCompat.Type.ime()),
+            getInsets(WindowInsetsCompat.Type.systemBars())
+        )
     }
 }

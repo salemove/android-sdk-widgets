@@ -1,6 +1,7 @@
 package com.glia.widgets.core.dialog
 
 import com.glia.widgets.core.dialog.model.DialogState
+import com.glia.widgets.core.dialog.model.LeaveDialogAction
 import com.glia.widgets.engagement.domain.MediaUpgradeOfferData
 import com.glia.widgets.helper.Logger
 
@@ -28,6 +29,7 @@ internal interface DialogContract {
         fun showEngagementConfirmationDialog()
         fun showCVEngagementConfirmationDialog()
         fun showUpgradeDialog(data: MediaUpgradeOfferData)
+        fun showLeaveCurrentConversationDialog(action: LeaveDialogAction)
         fun addCallback(callback: Callback)
         fun removeCallback(callback: Callback)
         fun interface Callback {
@@ -148,6 +150,11 @@ internal class DialogController : DialogContract.Controller {
     override fun showUpgradeDialog(data: MediaUpgradeOfferData) {
         Logger.d(TAG, "Show Media Upgrade Dialog")
         dialogManager.addAndEmit(DialogState.MediaUpgrade(data))
+    }
+
+    override fun showLeaveCurrentConversationDialog(action: LeaveDialogAction) {
+        Logger.d(TAG, "Show Leave Current Conversation Dialog")
+        dialogManager.addAndEmit(DialogState.LeaveCurrentConversation(action))
     }
 
     override fun addCallback(callback: DialogContract.Controller.Callback) {

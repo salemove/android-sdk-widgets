@@ -6,7 +6,6 @@ import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
-import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.core.dialog.model.ConfirmationDialogLinks
@@ -16,6 +15,7 @@ import com.glia.widgets.engagement.domain.MediaUpgradeOfferData
 import com.glia.widgets.helper.isOneWayVideo
 import com.glia.widgets.helper.isTwoWayVideo
 import com.glia.widgets.locale.LocaleProvider
+import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.locale.StringKey
 import com.glia.widgets.locale.StringKeyPair
 import com.glia.widgets.view.dialog.base.DialogPayload
@@ -160,8 +160,8 @@ internal object Dialogs {
             poweredByText = poweredByText,
             positiveButtonClickListener = positiveButtonClickListener,
             negativeButtonClickListener = negativeButtonClickListener,
-            link1ClickListener = { links.link1?.let { linkClickListener(it) } },
-            link2ClickListener = { links.link2?.let { linkClickListener(it) } }
+            link1ClickListener = { links.link1.let { linkClickListener(it) } },
+            link2ClickListener = { links.link2.let { linkClickListener(it) } }
         )
 
         return dialogService.showDialog(context, theme, DialogType.Confirmation(payload))
@@ -265,6 +265,26 @@ internal object Dialogs {
             .setOnCancelListener { Dependencies.controllerFactory.callVisualizerController.dismissVisitorCodeDialog() }
             .show()
     }
+
+    //TODO change this during implementation of the Dialog - https://glia.atlassian.net/browse/MOB-3637
+    fun showLeaveCurrentConversationDialog(
+        context: Context,
+        title: String,
+        onStay: () -> Unit,
+        onLeave: () -> Unit
+    ): AlertDialog = MaterialAlertDialogBuilder(context)
+        .setBackgroundInsetEnd(48)
+        .setBackgroundInsetStart(48)
+        .setBackgroundInsetTop(48)
+        .setBackgroundInsetBottom(48)
+        .setTitle(title)
+        .setIcon(R.drawable.ic_glia_logo)
+        .setMessage("Just random text to make this dialog look not so boring")
+        .setNegativeButton("Stay") { _, _ -> onStay() }
+        .setPositiveButton("Leave") { _, _ -> onLeave() }
+        .setCancelable(true)
+        .setOnCancelListener { onStay() }
+        .show()
 
     private fun Window.allowOutsideTouch() {
         setFlags(

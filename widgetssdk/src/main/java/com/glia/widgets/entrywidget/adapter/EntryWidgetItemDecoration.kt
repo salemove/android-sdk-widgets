@@ -57,6 +57,7 @@ internal class EntryWidgetItemDecoration(
     }
 
     private fun isContactItem(viewType: Int?): Boolean {
-        return viewType == EntryWidgetAdapter.ViewType.CONTACT_ITEM.ordinal
+        return viewType == EntryWidgetAdapter.ViewType.UNAUTHENTICATED_CONTACT_ITEM.ordinal ||
+            viewType == EntryWidgetAdapter.ViewType.AUTHENTICATED_CONTACT_ITEM.ordinal
     }
 }

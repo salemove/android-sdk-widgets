@@ -22,6 +22,7 @@ import androidx.core.view.updatePadding
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.AdapterDataObserver
+import com.glia.androidsdk.Engagement.MediaType
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.widgets.Constants
 import com.glia.widgets.GliaWidgets
@@ -40,6 +41,7 @@ import com.glia.widgets.chat.model.CustomCardChatItem
 import com.glia.widgets.chat.model.RemoteAttachmentItem
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.dialog.model.DialogState
+import com.glia.widgets.core.dialog.model.LeaveDialogAction
 import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.databinding.ChatViewBinding
 import com.glia.widgets.di.Dependencies
@@ -375,6 +377,10 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         insetsController?.hideKeyboard()
     }
 
+    override fun launchCall(mediaType: MediaType) {
+        activityLauncher.launchCall(context, mediaType, false)
+    }
+
     override fun fileIsNotReadyForPreview() {
         showToast(localeProvider.getString(R.string.android_file_not_ready_for_preview))
     }
@@ -454,6 +460,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
                     DialogState.OverlayPermission -> post { showOverlayPermissionsDialog() }
                     DialogState.EndEngagement -> post { showEndEngagementDialog() }
                     DialogState.Confirmation -> post { controller?.onEngagementConfirmationDialogRequested() }
+                    is DialogState.LeaveCurrentConversation -> post { showLeaveCurrentConversationDialog(it.action) }
 
                     DialogState.VisitorCode -> {
                         Logger.e(TAG, "DialogController callback in ChatView with MODE_VISITOR_CODE")
@@ -721,6 +728,21 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             controller?.overlayPermissionsDialogDismissed()
             resetDialogStateAndDismiss()
         })
+    }
+
+    private fun showLeaveCurrentConversationDialog(action: LeaveDialogAction) = showDialog {
+        Dialogs.showLeaveCurrentConversationDialog(
+            context,
+            action.name,
+            onStay = {
+                resetDialogStateAndDismiss()
+                controller?.leaveCurrentConversationDialogStayClicked()
+            },
+            onLeave = {
+                resetDialogStateAndDismiss()
+                controller?.leaveCurrentConversationDialogLeaveClicked(action)
+            }
+        )
     }
 
     private fun chatEnded() {

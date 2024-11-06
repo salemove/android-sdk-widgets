@@ -2,6 +2,7 @@ package com.glia.widgets.chat.controller
 
 import android.net.Uri
 import android.view.View
+import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.Operator
 import com.glia.androidsdk.chat.AttachmentFile
@@ -39,6 +40,7 @@ import com.glia.widgets.chat.model.VisitorChatItem
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.dialog.domain.ConfirmationDialogLinksUseCase
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
+import com.glia.widgets.core.dialog.model.LeaveDialogAction
 import com.glia.widgets.core.dialog.model.Link
 import com.glia.widgets.core.engagement.domain.ConfirmationDialogUseCase
 import com.glia.widgets.core.engagement.domain.UpdateOperatorDefaultImageUrlUseCase
@@ -223,6 +225,14 @@ internal class ChatController(
     }
 
     override fun initChat(intention: Intention) {
+        when (intention) {
+            Intention.RESTORE_CHAT -> TODO()
+            Intention.SC_DIALOG_START_AUDIO -> dialogController.showLeaveCurrentConversationDialog(LeaveDialogAction.AUDIO)
+            Intention.SC_DIALOG_START_VIDEO -> dialogController.showLeaveCurrentConversationDialog(LeaveDialogAction.VIDEO)
+            Intention.SC_DIALOG_ENQUEUE_FOR_TEXT -> dialogController.showLeaveCurrentConversationDialog(LeaveDialogAction.LIVE_CHAT)
+            Intention.SC_CHAT -> TODO()
+            Intention.LIVE_CHAT -> TODO()
+        }
         // TODO handle intention here
         updateOperatorDefaultImageUrlUseCase()
 
@@ -896,5 +906,19 @@ internal class ChatController(
 
     override fun onContentChosen(uri: Uri) {
         uriToFileAttachmentUseCase(uri)?.also(::onAttachmentReceived)
+    }
+
+    override fun leaveCurrentConversationDialogLeaveClicked(action: LeaveDialogAction) {
+        dialogController.dismissCurrentDialog()
+
+        when (action) {
+            LeaveDialogAction.LIVE_CHAT -> viewInitPreQueueing()
+            LeaveDialogAction.VIDEO -> view?.launchCall(Engagement.MediaType.VIDEO)
+            LeaveDialogAction.AUDIO -> view?.launchCall(Engagement.MediaType.AUDIO)
+        }
+    }
+
+    override fun leaveCurrentConversationDialogStayClicked() {
+        dialogController.dismissCurrentDialog()
     }
 }

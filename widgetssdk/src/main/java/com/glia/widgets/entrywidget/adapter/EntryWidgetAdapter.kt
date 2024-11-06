@@ -5,9 +5,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.glia.widgets.databinding.EntryWidgetAuthenticatedContactBinding
 import com.glia.widgets.databinding.EntryWidgetErrorItemBinding
-import com.glia.widgets.databinding.EntryWidgetMediaTypeItemBinding
 import com.glia.widgets.databinding.EntryWidgetPoweredByItemBinding
+import com.glia.widgets.databinding.EntryWidgetUnauthenticatedContactBinding
 import com.glia.widgets.entrywidget.EntryWidgetContract
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
@@ -67,7 +68,8 @@ internal class EntryWidgetAdapter(
     }
 
     enum class ViewType {
-        CONTACT_ITEM,
+        AUTHENTICATED_CONTACT_ITEM,
+        UNAUTHENTICATED_CONTACT_ITEM,
         ERROR_ITEM,
         PROVIDED_BY_ITEM
     }
@@ -86,8 +88,12 @@ internal class EntryWidgetAdapter(
             ViewType.PROVIDED_BY_ITEM.ordinal -> EntryWidgetPoweredByViewHolder(
                 EntryWidgetPoweredByItemBinding.inflate(parent.layoutInflater, parent, false)
             )
-            else -> EntryWidgetMediaTypeItemViewHolder(
-                EntryWidgetMediaTypeItemBinding.inflate(parent.layoutInflater, parent, false),
+            ViewType.AUTHENTICATED_CONTACT_ITEM.ordinal -> EntryWidgetAuthenticatedContactViewHolder(
+                EntryWidgetAuthenticatedContactBinding.inflate(parent.layoutInflater, parent, false),
+                itemTheme = mediaTypeItemsTheme?.mediaTypeItem
+            )
+            else -> EntryWidgetUnauthenticatedContactViewHolder(
+                EntryWidgetUnauthenticatedContactBinding.inflate(parent.layoutInflater, parent, false),
                 itemTheme = mediaTypeItemsTheme?.mediaTypeItem
             )
         }
@@ -107,7 +113,8 @@ internal class EntryWidgetAdapter(
             EntryWidgetContract.ItemType.SDK_NOT_INITIALIZED_STATE,
             EntryWidgetContract.ItemType.ERROR_STATE -> ViewType.ERROR_ITEM.ordinal
             EntryWidgetContract.ItemType.PROVIDED_BY -> ViewType.PROVIDED_BY_ITEM.ordinal
-            else -> ViewType.CONTACT_ITEM.ordinal
+            EntryWidgetContract.ItemType.SECURE_MESSAGE -> ViewType.AUTHENTICATED_CONTACT_ITEM.ordinal
+            else -> ViewType.UNAUTHENTICATED_CONTACT_ITEM.ordinal
         }
     }
 

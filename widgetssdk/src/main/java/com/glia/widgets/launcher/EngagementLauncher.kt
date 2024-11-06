@@ -115,5 +115,6 @@ internal class EngagementLauncherImpl(
             } else {
                 activityLauncher.launchSecureMessagingWelcomeScreen(activity)
             }
+        }
     }
 }

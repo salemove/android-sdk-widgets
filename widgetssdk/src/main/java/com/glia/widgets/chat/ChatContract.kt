@@ -2,6 +2,7 @@ package com.glia.widgets.chat
 
 import android.net.Uri
 import android.widget.Toast
+import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.androidsdk.chat.SingleChoiceOption
 import com.glia.widgets.base.BaseController
@@ -12,6 +13,7 @@ import com.glia.widgets.chat.model.CustomCardChatItem
 import com.glia.widgets.chat.model.GvaButton
 import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.core.dialog.model.ConfirmationDialogLinks
+import com.glia.widgets.core.dialog.model.LeaveDialogAction
 import com.glia.widgets.core.dialog.model.Link
 import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.locale.LocaleString
@@ -58,6 +60,8 @@ internal interface ChatContract {
         fun onImageCaptured(result: Boolean)
         fun onContentChosen(uri: Uri)
         fun onLocalImageItemClick(attachment: LocalAttachment, view: android.view.View)
+        fun leaveCurrentConversationDialogLeaveClicked(action: LeaveDialogAction)
+        fun leaveCurrentConversationDialogStayClicked()
     }
 
     interface View : BaseView<Controller> {
@@ -83,5 +87,6 @@ internal interface ChatContract {
         fun onFileDownload(attachmentFile: AttachmentFile)
         fun navigateToImagePreview(attachmentFile: AttachmentFile, view: android.view.View)
         fun navigateToImagePreview(attachmentFile: LocalAttachment, view: android.view.View)
+        fun launchCall(mediaType: Engagement.MediaType)
     }
 }

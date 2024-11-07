@@ -4075,6 +4075,28 @@
         "loadingTintColor": {
           "type": "gradient",
           "value": ["#FF8E45", "#FF7CB9"]
+        },
+        "badge": {
+          "font": {
+            "size": 16,
+            "style": "regular"
+          },
+          "fontColor": {
+            "type": "gradient",
+            "value": ["6c624f", "#933a6a"]
+          },
+          "background": {
+            "color": {
+              "type": "gradient",
+              "value": ["#ecec10", "#200ca800"]
+            },
+            "border": {
+              "type": "fill",
+              "value": ["#3ee9e5"]
+            },
+            "borderWidth": 1,
+            "cornerRadius": 2
+          }
         }
       },
       "dividerColor": {

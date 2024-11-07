@@ -146,7 +146,7 @@ public class ButtonConfiguration implements Parcelable {
             Logger.logDeprecatedClassUse(ButtonConfiguration.class.getSimpleName() + "." + TAG);
             if (textConfiguration == null) {
                 textConfiguration = new TextConfiguration.Builder()
-                        .textColor(resourceProvider.getColorStateList(R.color.glia_base_light_color))
+                        .textColor(resourceProvider.getColorStateList(R.color.glia_light_color))
                         .build(resourceProvider);
             }
             return new ButtonConfiguration(this);

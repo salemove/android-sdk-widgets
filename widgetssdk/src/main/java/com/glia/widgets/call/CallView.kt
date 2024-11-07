@@ -472,8 +472,8 @@ internal class CallView(
     private fun setAppBarTheme() {
         val builder = UiThemeBuilder()
         builder.setTheme(theme)
-        builder.setSystemNegativeColor(R.color.glia_system_negative_color)
-        builder.setBaseLightColor(R.color.glia_base_light_color)
+        builder.setSystemNegativeColor(R.color.glia_negative_color)
+        builder.setBaseLightColor(R.color.glia_light_color)
         builder.setBrandPrimaryColor(R.color.glia_call_view_background_color)
         builder.setGliaChatHeaderTitleTintColor(android.R.color.white)
         builder.setGliaChatHeaderHomeButtonTintColor(android.R.color.white)

@@ -27,8 +27,6 @@ internal class ImagePreviewTest : SnapshotTest(
         showShareIcon: Boolean = false,
         @DrawableRes imageRes: Int? = R.drawable.test_banner
     ): ImagePreviewActivityBinding {
-        localeProviderMock()
-
         val imagePreviewActivityBinding = ImagePreviewActivityBinding.inflate(layoutInflater)
 
         imagePreviewActivityBinding.toolbar.title = title

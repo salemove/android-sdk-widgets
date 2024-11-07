@@ -15,7 +15,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.util.concurrent.Executor
 
-class VisitorCodeDialogTest : SnapshotTest(
+internal class VisitorCodeDialogTest : SnapshotTest(
     renderingMode = fullWidthRenderMode
 ), SnapshotProviders, SnapshotThemeConfiguration {
 
@@ -180,8 +180,6 @@ class VisitorCodeDialogTest : SnapshotTest(
         executor: Executor? = Executor(Runnable::run)
     ): VisitorCodeView {
         setUnifiedTheme(unifiedTheme)
-        localeProviderMock()
-        resourceProviderMock()
 
         val controllerFactoryMock: ControllerFactory = mock<ControllerFactory>().also {
             whenever(it.visitorCodeController).thenReturn(mock())

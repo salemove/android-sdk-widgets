@@ -90,7 +90,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/glia_medium"
             android:importantForAccessibility="no"
-            android:textColor="@color/glia_normal_color_50"
+            android:textColor="@color/glia_normal_color"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/logo_view"
             app:layout_constraintHorizontal_chainStyle="packed"

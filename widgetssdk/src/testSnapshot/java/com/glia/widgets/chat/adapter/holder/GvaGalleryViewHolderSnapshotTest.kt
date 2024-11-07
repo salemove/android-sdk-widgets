@@ -12,7 +12,7 @@ import com.glia.widgets.snapshotutils.SnapshotProviders
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import org.junit.Test
 
-class GvaGalleryViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, SnapshotProviders {
+internal class GvaGalleryViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, SnapshotProviders {
 
     private fun galleryCardList() = listOf(
         GvaGalleryCard(
@@ -136,8 +136,6 @@ class GvaGalleryViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, SnapshotPr
     private data class ViewData(val binding: ChatGvaGalleryLayoutBinding, val viewHolder: GvaGalleryViewHolder)
 
     private fun setupView(galleryCards: GvaGalleryCards, unifiedTheme: UnifiedTheme? = null): ViewData {
-        localeProviderMock()
-
         val heightManager = ChatItemHeightManager(UiTheme(), layoutInflater, resources, unifiedTheme)
         heightManager.measureHeight(listOf(galleryCards))
 

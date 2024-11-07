@@ -9,7 +9,7 @@ import com.glia.widgets.view.unifiedui.theme.chat.AttachmentsPopupTheme
 import org.junit.Test
 import org.mockito.kotlin.mock
 
-class AttachmentPopupSnapshotTest : SnapshotTest(), SnapshotTheme, SnapshotProviders {
+internal class AttachmentPopupSnapshotTest : SnapshotTest(), SnapshotTheme, SnapshotProviders {
 
     // MARK: Tests
 
@@ -53,7 +53,6 @@ class AttachmentPopupSnapshotTest : SnapshotTest(), SnapshotTheme, SnapshotProvi
         unifiedTheme: AttachmentsPopupTheme? = null,
         viewCallback: (View) -> Unit
     ) : AttachmentPopup {
-        localeProviderMock()
 
         val anchor = LinearLayout(context)
         return AttachmentPopup(

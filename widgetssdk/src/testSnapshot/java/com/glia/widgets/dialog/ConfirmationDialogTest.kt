@@ -6,8 +6,10 @@ import com.glia.widgets.snapshotutils.SnapshotDialog
 import com.glia.widgets.view.dialog.base.DialogPayload
 import com.glia.widgets.view.dialog.base.DialogType
 import org.junit.Test
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.stub
 
-class ConfirmationDialogTest : SnapshotTest(
+internal class ConfirmationDialogTest : SnapshotTest(
     renderingMode = fullWidthRenderMode
 ), SnapshotDialog {
 
@@ -28,8 +30,10 @@ class ConfirmationDialogTest : SnapshotTest(
     )
 
     private fun disableLinkButton(vararg links: Link) {
-        links.forEach {
-            snapshotLocales[it.url.stringKey] = ""
+        links.forEach { item ->
+            localeProviderMock().stub {
+                on { getStringInternal(item.url.stringKey) } doReturn ""
+            }
         }
     }
 

@@ -11,7 +11,7 @@ import com.glia.widgets.snapshotutils.SnapshotProviders
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import org.junit.Test
 
-class GvaPersistentButtonsViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, SnapshotProviders {
+internal class GvaPersistentButtonsViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, SnapshotProviders {
 
     private fun gvaPersistentButtons(showChatHead: Boolean = false) = GvaPersistentButtons(
         content = gvaLongSubtitle(),
@@ -121,8 +121,6 @@ class GvaPersistentButtonsViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, 
         card: GvaPersistentButtons,
         unifiedTheme: UnifiedTheme? = null
     ): ViewData {
-        localeProviderMock()
-
         val chatOperatorMessageLayoutBinding = ChatOperatorMessageLayoutBinding.inflate(layoutInflater)
         val gvaPersistentButtonsContentBinding = ChatGvaPersistentButtonsContentBinding.inflate(
             layoutInflater,

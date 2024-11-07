@@ -54,7 +54,6 @@ internal interface SnapshotDialog: SnapshotTheme, SnapshotProviders {
         get() = LocaleString(R.string.dialog_button_description)
 
     fun inflateView(context: Context, unifiedTheme: UnifiedTheme? = null, dialogType: DialogType): View {
-        localeProviderMock()
         return DialogViewFactory(context, UiTheme(whiteLabel = unifiedTheme != null), unifiedTheme).createView(dialogType)
     }
 

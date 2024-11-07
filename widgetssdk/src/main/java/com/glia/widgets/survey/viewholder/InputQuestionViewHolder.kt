@@ -109,7 +109,7 @@ internal class InputQuestionViewHolder(
         comment.setLocaleHint(R.string.general_comment)
         comment.setTextColor(optionButtonStyle.normalText.textColor)
         if (optionButtonStyle.normalText.isBold) comment.typeface = Typeface.DEFAULT_BOLD
-        comment.setHintTextColor(itemView.getColorCompat(R.color.glia_base_shade_color))
+        comment.setHintTextColor(itemView.getColorCompat(R.color.glia_shade_color))
         val textSize = optionButtonStyle.normalText.textSize
         comment.textSize = textSize
         comment.onFocusChangeListener = View.OnFocusChangeListener { _, _ ->

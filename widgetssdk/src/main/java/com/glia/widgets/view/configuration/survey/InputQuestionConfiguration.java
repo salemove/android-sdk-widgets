@@ -83,7 +83,7 @@ public class InputQuestionConfiguration implements Parcelable {
                     .borderColor(normalColor)
                     .build();
 
-            String errorColor = resourceProvider.getString(R.color.glia_system_negative_color);
+            String errorColor = resourceProvider.getString(R.color.glia_negative_color);
             LayerConfiguration errorLayer = new LayerConfiguration.Builder()
                     .borderColor(errorColor)
                     .build();
@@ -94,7 +94,7 @@ public class InputQuestionConfiguration implements Parcelable {
         }
 
         private TextConfiguration prepareDefaultTitleConfiguration(ResourceProvider resourceProvider) {
-            ColorStateList color = resourceProvider.getColorStateList(R.color.glia_base_dark_color);
+            ColorStateList color = resourceProvider.getColorStateList(R.color.glia_dark_color);
             return new TextConfiguration.Builder()
                     .textColor(color)
                     .bold(true)

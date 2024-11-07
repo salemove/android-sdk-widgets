@@ -93,15 +93,15 @@
     </style>
 
     <style name="ThemeOverlay.Glia.Chat" parent="">
-        <item name="gliaBrandPrimaryColor">@color/glia_brand_primary_color</item>
-        <item name="gliaBaseDarkColor">@color/glia_base_dark_color</item>
-        <item name="gliaBaseLightColor">@color/glia_base_light_color</item>
-        <item name="gliaBaseNormalColor">@color/glia_base_normal_color</item>
-        <item name="gliaBaseShadeColor">@color/glia_base_shade_color</item>
-        <item name="gliaSystemNegativeColor">@color/glia_system_negative_color</item>
-        <item name="gliaSystemAgentBubbleColor">@color/glia_system_agent_bubble_color</item>
+        <item name="gliaBrandPrimaryColor">@color/glia_primary_color</item>
+        <item name="gliaBaseDarkColor">@color/glia_dark_color</item>
+        <item name="gliaBaseLightColor">@color/glia_light_color</item>
+        <item name="gliaBaseNormalColor">@color/glia_normal_color</item>
+        <item name="gliaBaseShadeColor">@color/glia_shade_color</item>
+        <item name="gliaSystemNegativeColor">@color/glia_negative_color</item>
+        <item name="gliaSystemAgentBubbleColor">@color/glia_neutral_color</item>
         <item name="gliaChatBackgroundColor">@color/glia_chat_background_color</item>
-        <item name="gliaEndScreenShareTintColor">@color/glia_base_light_color</item>
+        <item name="gliaEndScreenShareTintColor">@color/glia_light_color</item>
         <item name="gliaIconAppBarBack">@drawable/ic_baseline_arrow_back</item>
         <item name="gliaIconLeaveQueue">@drawable/ic_baseline_close</item>
         <item name="gliaIconSendMessage">@drawable/ic_baseline_send</item>

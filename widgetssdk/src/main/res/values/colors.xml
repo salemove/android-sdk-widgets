@@ -9,8 +9,8 @@
     <color name="glia_base_normal_color">#6C7683</color>
     <color name="glia_base_normal_color_50">#806C7683</color>
     <color name="glia_base_shade_color">#7F6C7683</color>
-    <color name="glia_system_negative_color">#D11149</color>
-    <color name="glia_system_agent_bubble_color">#F3F3F3</color>
+    <color name="glia_system_negative_color">#BC0F42</color>
+    <color name="glia_system_agent_bubble_color">#F7F7F7</color>
 
     <!-- { @deprecated Use glia_call_view_background_color instead.} -->
     <color name="glia_transparent_black_bg">#232323</color>

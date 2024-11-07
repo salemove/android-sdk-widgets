@@ -1,7 +1,6 @@
 package com.glia.widgets.chat.model
 
 internal data class ChatState(
-    val isChatUnavailable: Boolean = false,
     val isVisible: Boolean = false,
     val isChatInBottom: Boolean = true,
     val messagesNotSeen: Int = 0,
@@ -35,7 +34,6 @@ internal data class ChatState(
     val isAttachmentButtonVisible: Boolean get() = isAttachmentButtonNeeded && isAttachmentAllowed
 
     fun initChat(): ChatState = copy(
-        isChatUnavailable = true,
         isVisible = true,
         isSendButtonVisible = false,
         isSendButtonEnabled = true,
@@ -49,13 +47,6 @@ internal data class ChatState(
         chatInputMode = ChatInputMode.ENABLED,
         engagementRequested = true
     )
-
-    fun setSecureMessaging(isSecureMessaging: Boolean) =
-        if (isSecureMessaging) {
-            setSecureMessagingState()
-        } else {
-            setLiveChatState()
-        }
 
     fun setSecureMessagingState(): ChatState = copy(
         isSecureMessaging = true,
@@ -140,7 +131,6 @@ internal data class ChatState(
         formattedOperatorName = null,
         operatorProfileImgUrl = null,
         isVisible = false,
-        isChatUnavailable = false,
         isAttachmentButtonNeeded = false,
         isMediaUpgradeVide = null
     )

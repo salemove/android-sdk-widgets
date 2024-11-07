@@ -169,7 +169,7 @@ internal class ChatHeadView @JvmOverloads constructor(
     }
 
     override fun navigateToChat() {
-        activityLauncher.launchChat(context, Intention.RESTORE_CHAT)
+        activityLauncher.launchChat(context, Intention.RETURN_TO_CHAT)
     }
 
     override fun navigateToCall() {

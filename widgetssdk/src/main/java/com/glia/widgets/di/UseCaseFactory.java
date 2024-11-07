@@ -109,6 +109,7 @@ import com.glia.widgets.core.secureconversations.domain.HasPendingSecureConversa
 import com.glia.widgets.core.secureconversations.domain.IsMessagingAvailableUseCase;
 import com.glia.widgets.core.secureconversations.domain.ManageSecureMessagingStatusUseCase;
 import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDelayUseCase;
+import com.glia.widgets.core.secureconversations.domain.ObserveUnreadMessagesCountUseCase;
 import com.glia.widgets.core.secureconversations.domain.OnNextMessageUseCase;
 import com.glia.widgets.core.secureconversations.domain.RemoveSecureFileAttachmentUseCase;
 import com.glia.widgets.core.secureconversations.domain.ResetMessageCenterUseCase;
@@ -599,6 +600,15 @@ public class UseCaseFactory {
     @NonNull
     public GetUnreadMessagesCountWithTimeoutUseCase createSubscribeToUnreadMessagesCountUseCase() {
         return new GetUnreadMessagesCountWithTimeoutUseCase(
+            repositoryFactory.getSecureConversationsRepository(),
+            createIsAuthenticatedUseCase(),
+            gliaCore
+        );
+    }
+
+    @NonNull
+    public ObserveUnreadMessagesCountUseCase createObserveUnreadMessagesCountUseCase() {
+        return new ObserveUnreadMessagesCountUseCase(
             repositoryFactory.getSecureConversationsRepository(),
             createIsAuthenticatedUseCase(),
             gliaCore

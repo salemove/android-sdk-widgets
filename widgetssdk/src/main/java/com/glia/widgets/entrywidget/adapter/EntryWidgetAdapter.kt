@@ -6,10 +6,10 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.core.secureconversations.domain.ObserveUnreadMessagesCountUseCase
-import com.glia.widgets.databinding.EntryWidgetAuthenticatedContactBinding
 import com.glia.widgets.databinding.EntryWidgetErrorItemBinding
+import com.glia.widgets.databinding.EntryWidgetLiveItemBinding
+import com.glia.widgets.databinding.EntryWidgetMessagingItemBinding
 import com.glia.widgets.databinding.EntryWidgetPoweredByItemBinding
-import com.glia.widgets.databinding.EntryWidgetUnauthenticatedContactBinding
 import com.glia.widgets.entrywidget.EntryWidgetContract
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
@@ -18,7 +18,6 @@ import com.glia.widgets.view.unifiedui.theme.base.ButtonTheme
 import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 import com.glia.widgets.view.unifiedui.theme.entrywidget.EntryWidgetTheme
 import com.glia.widgets.view.unifiedui.theme.entrywidget.MediaTypeItemsTheme
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 internal class EntryWidgetAdapter(
@@ -27,20 +26,20 @@ internal class EntryWidgetAdapter(
     private val errorTitleTheme: TextTheme? = null,
     private val errorMessageTheme: TextTheme? = null,
     private val errorButtonTheme: ButtonTheme? = null,
-    private val observeUnreadMessagesCountUseCase: ObserveUnreadMessagesCountUseCase
+    private val observeUnreadMessagesCountUseCase: ObserveUnreadMessagesCountUseCase,
 ) : ListAdapter<EntryWidgetContract.ItemType, EntryWidgetAdapter.ViewHolder>(DIFF_CALLBACK) {
 
     constructor(
         viewType: EntryWidgetContract.ViewType,
         entryWidgetTheme: EntryWidgetTheme?,
-        observeUnreadMessagesCountUseCase: ObserveUnreadMessagesCountUseCase
+        observeUnreadMessagesCountUseCase: ObserveUnreadMessagesCountUseCase,
     ) : this(
         viewType,
         entryWidgetTheme?.mediaTypeItems,
         entryWidgetTheme?.errorTitle,
         entryWidgetTheme?.errorMessage,
         entryWidgetTheme?.errorButton,
-        observeUnreadMessagesCountUseCase
+        observeUnreadMessagesCountUseCase,
     )
 
     init {
@@ -74,8 +73,8 @@ internal class EntryWidgetAdapter(
     }
 
     enum class ViewType {
-        AUTHENTICATED_CONTACT_ITEM,
-        UNAUTHENTICATED_CONTACT_ITEM,
+        LIVE_MEDIA_TYPE_ITEMS,
+        MESSAGING_MEDIA_TYPE_ITEM,
         ERROR_ITEM,
         PROVIDED_BY_ITEM
     }
@@ -95,12 +94,13 @@ internal class EntryWidgetAdapter(
             ViewType.PROVIDED_BY_ITEM.ordinal -> EntryWidgetPoweredByViewHolder(
                 EntryWidgetPoweredByItemBinding.inflate(parent.layoutInflater, parent, false)
             )
-            ViewType.AUTHENTICATED_CONTACT_ITEM.ordinal -> EntryWidgetAuthenticatedContactViewHolder(
-                EntryWidgetAuthenticatedContactBinding.inflate(parent.layoutInflater, parent, false),
-                itemTheme = mediaTypeItemsTheme?.mediaTypeItem
+            ViewType.MESSAGING_MEDIA_TYPE_ITEM.ordinal -> EntryWidgetMessagingItemViewHolder(
+                EntryWidgetMessagingItemBinding.inflate(parent.layoutInflater, parent, false),
+                itemTheme = mediaTypeItemsTheme?.mediaTypeItem,
+                observeUnreadMessagesCountUseCase
             )
-            else -> EntryWidgetUnauthenticatedContactViewHolder(
-                EntryWidgetUnauthenticatedContactBinding.inflate(parent.layoutInflater, parent, false),
+            else -> EntryWidgetLiveItemViewHolder(
+                EntryWidgetLiveItemBinding.inflate(parent.layoutInflater, parent, false),
                 itemTheme = mediaTypeItemsTheme?.mediaTypeItem
             )
         }
@@ -112,14 +112,6 @@ internal class EntryWidgetAdapter(
                 onItemClickListener?.invoke(item)
             }
         }
-
-        if (holder is EntryWidgetAuthenticatedContactViewHolder) {
-            disposable.add(observeUnreadMessagesCountUseCase()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { count ->
-                    holder.updateUnreadMessageCount(count)
-                })
-        }
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -128,14 +120,16 @@ internal class EntryWidgetAdapter(
             EntryWidgetContract.ItemType.SDK_NOT_INITIALIZED_STATE,
             EntryWidgetContract.ItemType.ERROR_STATE -> ViewType.ERROR_ITEM.ordinal
             EntryWidgetContract.ItemType.PROVIDED_BY -> ViewType.PROVIDED_BY_ITEM.ordinal
-            EntryWidgetContract.ItemType.SECURE_MESSAGE -> ViewType.AUTHENTICATED_CONTACT_ITEM.ordinal
-            else -> ViewType.UNAUTHENTICATED_CONTACT_ITEM.ordinal
+            EntryWidgetContract.ItemType.SECURE_MESSAGE -> ViewType.MESSAGING_MEDIA_TYPE_ITEM.ordinal
+            else -> ViewType.LIVE_MEDIA_TYPE_ITEMS.ordinal
         }
     }
 
-    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
-        super.onDetachedFromRecyclerView(recyclerView)
-        disposable.clear()
+    override fun onViewRecycled(holder: ViewHolder) {
+        super.onViewRecycled(holder)
+        if (holder is EntryWidgetMessagingItemViewHolder) {
+            holder.onStopView()
+        }
     }
 
     abstract class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

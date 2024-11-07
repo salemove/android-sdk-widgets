@@ -88,7 +88,7 @@ public class LayerConfiguration implements Parcelable {
             ResourceProvider resourceProvider = Dependencies.getResourceProvider();
             // Default configuration
             if (this.backgroundColor == null) {
-                this.backgroundColor = resourceProvider.getString(R.color.glia_base_light_color);
+                this.backgroundColor = resourceProvider.getString(R.color.glia_light_color);
             }
             if (this.borderColor == null) {
                 this.borderColor = resourceProvider.getString(R.color.glia_stroke_gray);

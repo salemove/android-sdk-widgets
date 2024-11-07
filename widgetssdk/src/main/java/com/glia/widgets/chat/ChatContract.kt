@@ -52,6 +52,7 @@ internal interface ChatContract {
         fun getConfirmationDialogLinks(): ConfirmationDialogLinks
         fun onEngagementConfirmationDialogRequested()
         fun initChat(intention: Intention)
+        fun restoreChat(intention: Intention)
         fun show()
         fun onPause()
         fun onResume()

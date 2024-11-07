@@ -6,13 +6,13 @@ import com.glia.androidsdk.chat.SendMessagePayload
 import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.widgets.chat.data.GliaChatRepository
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
-import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
+import com.glia.widgets.core.secureconversations.domain.ManageSecureMessagingStatusUseCase
 
 
 internal class SendUnsentMessagesUseCase(
     private val chatRepository: GliaChatRepository,
     private val secureConversationsRepository: SecureConversationsRepository,
-    private val isSecureEngagementUseCase: IsSecureEngagementUseCase
+    private val shouldUseSecureMessagingApis: ManageSecureMessagingStatusUseCase
 ) {
     operator fun invoke(
         payload: SendMessagePayload,
@@ -30,7 +30,7 @@ internal class SendUnsentMessagesUseCase(
     }
 
     private fun sendMessage(payload: SendMessagePayload, callback: RequestCallback<VisitorMessage?>) {
-        if (isSecureEngagementUseCase()) {
+        if (shouldUseSecureMessagingApis.shouldUseSecureMessagingEndpoints()) {
             secureConversationsRepository.send(payload, callback)
         } else {
             chatRepository.sendMessage(payload, callback)

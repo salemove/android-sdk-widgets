@@ -107,7 +107,7 @@ import com.glia.widgets.core.secureconversations.domain.GetSecureFileAttachments
 import com.glia.widgets.core.secureconversations.domain.GetUnreadMessagesCountWithTimeoutUseCase;
 import com.glia.widgets.core.secureconversations.domain.HasPendingSecureConversationsWithTimeoutUseCase;
 import com.glia.widgets.core.secureconversations.domain.IsMessagingAvailableUseCase;
-import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase;
+import com.glia.widgets.core.secureconversations.domain.ManageSecureMessagingStatusUseCase;
 import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDelayUseCase;
 import com.glia.widgets.core.secureconversations.domain.OnNextMessageUseCase;
 import com.glia.widgets.core.secureconversations.domain.RemoveSecureFileAttachmentUseCase;
@@ -345,7 +345,7 @@ public class UseCaseFactory {
         return new GliaLoadHistoryUseCase(
             repositoryFactory.getGliaMessageRepository(),
             repositoryFactory.getSecureConversationsRepository(),
-            createIsSecureEngagementUseCase(),
+            createManageSecureMessagingStatusUseCase(),
             getMapOperatorUseCase(),
             createSubscribeToUnreadMessagesCountUseCase()
         );
@@ -376,7 +376,7 @@ public class UseCaseFactory {
             repositoryFactory.getGliaFileAttachmentRepository(),
             getIsOperatorPresentUseCase(),
             repositoryFactory.getSecureConversationsRepository(),
-            createIsSecureEngagementUseCase()
+            createManageSecureMessagingStatusUseCase()
         );
     }
 
@@ -395,7 +395,11 @@ public class UseCaseFactory {
 
     @NonNull
     public AddFileToAttachmentAndUploadUseCase createAddFileToAttachmentAndUploadUseCase() {
-        return new AddFileToAttachmentAndUploadUseCase(getIsQueueingOrEngagementUseCase(), repositoryFactory.getGliaFileAttachmentRepository());
+        return new AddFileToAttachmentAndUploadUseCase(
+            getIsQueueingOrEngagementUseCase(),
+            repositoryFactory.getGliaFileAttachmentRepository(),
+            createManageSecureMessagingStatusUseCase()
+        );
     }
 
     @NonNull
@@ -423,7 +427,7 @@ public class UseCaseFactory {
         return new IsShowSendButtonUseCase(
             getIsQueueingOrEngagementUseCase(),
             repositoryFactory.getGliaFileAttachmentRepository(),
-            createIsSecureEngagementUseCase()
+            createManageSecureMessagingStatusUseCase()
         );
     }
 
@@ -451,7 +455,8 @@ public class UseCaseFactory {
     public GetImageFileFromNetworkUseCase createGetImageFileFromNetworkUseCase() {
         return new GetImageFileFromNetworkUseCase(
             repositoryFactory.getGliaFileRepository(),
-            createDecodeSampledBitmapFromInputStreamUseCase()
+            createDecodeSampledBitmapFromInputStreamUseCase(),
+            createManageSecureMessagingStatusUseCase()
         );
     }
 
@@ -462,7 +467,7 @@ public class UseCaseFactory {
 
     @NonNull
     public DownloadFileUseCase createDownloadFileUseCase() {
-        return new DownloadFileUseCase(repositoryFactory.getGliaFileRepository());
+        return new DownloadFileUseCase(repositoryFactory.getGliaFileRepository(), createManageSecureMessagingStatusUseCase());
     }
 
     @NonNull
@@ -577,8 +582,8 @@ public class UseCaseFactory {
     }
 
     @NonNull
-    public IsSecureEngagementUseCase createIsSecureEngagementUseCase() {
-        return new IsSecureEngagementUseCase(getIsQueueingOrEngagementUseCase());
+    public ManageSecureMessagingStatusUseCase createManageSecureMessagingStatusUseCase() {
+        return new ManageSecureMessagingStatusUseCase(getIsQueueingOrEngagementUseCase(), repositoryFactory.getEngagementRepository());
     }
 
     @NonNull
@@ -815,7 +820,7 @@ public class UseCaseFactory {
         return new SendUnsentMessagesUseCase(
             repositoryFactory.getGliaMessageRepository(),
             repositoryFactory.getSecureConversationsRepository(),
-            createIsSecureEngagementUseCase()
+            createManageSecureMessagingStatusUseCase()
         );
     }
 

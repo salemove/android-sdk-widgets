@@ -6,7 +6,7 @@ import com.glia.widgets.view.dialog.base.DialogPayload
 import com.glia.widgets.view.dialog.base.DialogType
 import org.junit.Test
 
-class ScreenSharingDialogTest : SnapshotTest(
+internal class ScreenSharingDialogTest : SnapshotTest(
     renderingMode = fullWidthRenderMode
 ), SnapshotDialog {
 

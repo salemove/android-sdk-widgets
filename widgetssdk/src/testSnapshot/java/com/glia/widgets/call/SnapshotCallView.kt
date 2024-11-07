@@ -50,8 +50,6 @@ internal interface SnapshotCallView : SnapshotContent, SnapshotTheme, SnapshotAc
         val schedulersMock = schedulersMock()
 
         lottieMock()
-        localeProviderMock()
-        resourceProviderMock()
 
         val controllerFactoryMock = mock<ControllerFactory>()
         val callControllerMock = mock<CallContract.Controller>()

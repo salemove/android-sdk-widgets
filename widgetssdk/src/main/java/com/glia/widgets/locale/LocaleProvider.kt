@@ -6,6 +6,7 @@ import androidx.annotation.StringRes
 import com.glia.androidsdk.Glia
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.locale.LocaleManager
+import com.glia.widgets.BuildConfig
 import com.glia.widgets.R
 import com.glia.widgets.StringProvider
 import com.glia.widgets.helper.IResourceProvider
@@ -42,6 +43,7 @@ internal open class LocaleProvider @JvmOverloads constructor(
     private val localeObservable: Observable<String>
     private val localeEmitter: Observer<String>
     private lateinit var localeManager: LocaleManager
+    private val isSnapshotTestMode = BuildConfig.BUILD_TYPE == "snapshot"
 
     init {
         val localeSubject = PublishSubject.create<String>()
@@ -99,6 +101,9 @@ internal open class LocaleProvider @JvmOverloads constructor(
     @OpenForTesting
     open fun getStringInternal(stringKey: Int, values: List<StringKeyPair> = emptyList()): String {
         val key = resourceProvider.getResourceKey(stringKey)
+        if (isSnapshotTestMode) {
+            return key
+        }
         return try {
             getLocaleManager().getRemoteString(key)?.let {
                 values.fold(it, ::replaceInsertedValues).run(::cleanupRemainingReferences)

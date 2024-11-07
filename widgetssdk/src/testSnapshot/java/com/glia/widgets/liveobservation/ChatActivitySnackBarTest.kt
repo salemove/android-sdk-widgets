@@ -5,7 +5,7 @@ import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.snapshotutils.SnapshotSnackBar
 import org.junit.Test
 
-class ChatActivitySnackBarTest : SnapshotTest(), SnapshotSnackBar {
+internal class ChatActivitySnackBarTest : SnapshotTest(), SnapshotSnackBar {
 
     @Test
     fun withDefaultTheme() {

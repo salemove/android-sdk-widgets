@@ -6,7 +6,7 @@ import com.glia.widgets.view.dialog.base.DialogPayload
 import com.glia.widgets.view.dialog.base.DialogType
 import org.junit.Test
 
-class OptionDialogTest : SnapshotTest(
+internal class OptionDialogTest : SnapshotTest(
     renderingMode = fullWidthRenderMode
 ), SnapshotDialog {
 

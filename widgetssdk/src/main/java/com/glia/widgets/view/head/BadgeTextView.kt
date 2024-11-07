@@ -44,7 +44,7 @@ internal class BadgeTextView @JvmOverloads constructor(context: Context, attrs: 
             MaterialColors.getColor(
                 context,
                 R.attr.gliaBaseLightColor,
-                getColorCompat(R.color.glia_base_light_color)
+                getColorCompat(R.color.glia_light_color)
             )
         )
     }

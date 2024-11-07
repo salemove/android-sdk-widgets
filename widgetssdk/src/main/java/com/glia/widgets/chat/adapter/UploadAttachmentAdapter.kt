@@ -133,7 +133,7 @@ internal class ViewHolder(
     ) {
         if (attachment.attachmentStatus.isError) {
             extensionContainerView.setCardBackgroundColor(
-                itemView.getColorStateListCompat(R.color.glia_system_agent_bubble_color)
+                itemView.getColorStateListCompat(R.color.glia_neutral_color)
             )
             showExtensionTypeImage()
             extensionTypeImage.setImageResource(R.drawable.ic_info)
@@ -143,7 +143,7 @@ internal class ViewHolder(
             extensionTypeImage.applyImageColorTheme(filePreviewTheme?.errorIcon)
         } else {
             extensionContainerView.setCardBackgroundColor(
-                itemView.getColorCompat(R.color.glia_brand_primary_color)
+                itemView.getColorCompat(R.color.glia_primary_color)
             )
             extensionTypeImage.scaleType = ImageView.ScaleType.FIT_XY
             extensionTypeImage.imageTintList = null
@@ -193,7 +193,7 @@ internal class ViewHolder(
 
     private fun updateTitleAndStatusText(fileName: String, byteSize: String, status: Status) {
         val textColorRes =
-            if (status.isError) Material_R.color.design_default_color_error else R.color.glia_base_normal_color
+            if (status.isError) Material_R.color.design_default_color_error else R.color.glia_normal_color
         titleText.setTextColor(itemView.getColorCompat(textColorRes))
 
         titleText.text =
@@ -241,7 +241,7 @@ internal class ViewHolder(
 
     private fun setProgressIndicatorState(status: Status) {
         val normalColor = theme?.progress?.primaryColor
-            ?: itemView.getColorCompat(R.color.glia_brand_primary_color)
+            ?: itemView.getColorCompat(R.color.glia_primary_color)
         val errorColor = theme?.errorProgress?.primaryColor
             ?: itemView.getColorCompat(com.google.android.material.R.color.design_default_color_error)
 

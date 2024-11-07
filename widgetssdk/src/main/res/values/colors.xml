@@ -3,14 +3,14 @@
     <color name="glia_black_color">#000000</color>
     <color name="glia_white_color">#FFFFFF</color>
 
-    <color name="glia_brand_primary_color">#0F6BFF</color>
-    <color name="glia_base_dark_color">#2C0735</color>
-    <color name="glia_base_light_color">#FFFFFF</color>
-    <color name="glia_base_normal_color">#6C7683</color>
-    <color name="glia_base_normal_color_50">#806C7683</color>
-    <color name="glia_base_shade_color">#7F6C7683</color>
-    <color name="glia_system_negative_color">#BC0F42</color>
-    <color name="glia_system_agent_bubble_color">#F7F7F7</color>
+    <color name="glia_primary_color">#0F6BFF</color>
+    <color name="glia_dark_color">#2C0735</color>
+    <color name="glia_light_color">#FFFFFF</color>
+    <color name="glia_normal_color">#616A75</color>
+    <color name="glia_normal_color_50">#80616A75</color>
+    <color name="glia_shade_color">#B6BBC1</color>
+    <color name="glia_negative_color">#BC0F42</color>
+    <color name="glia_neutral_color">#F7F7F7</color>
 
     <!-- { @deprecated Use glia_call_view_background_color instead.} -->
     <color name="glia_transparent_black_bg">#232323</color>
@@ -27,7 +27,7 @@
     <color name="glia_chat_background_color">#FFFFFF</color>
     <color name="glia_dark_transparent_bg">#99000000</color>
 
-    <color name="glia_disable_button_bg">@color/glia_system_agent_bubble_color</color>
-    <color name="glia_disable_button_border">@color/glia_base_shade_color</color>
-    <color name="glia_disable_button_text">@color/glia_base_shade_color</color>
+    <color name="glia_disable_button_bg">@color/glia_neutral_color</color>
+    <color name="glia_disable_button_border">@color/glia_shade_color</color>
+    <color name="glia_disable_button_text">@color/glia_shade_color</color>
 </resources>

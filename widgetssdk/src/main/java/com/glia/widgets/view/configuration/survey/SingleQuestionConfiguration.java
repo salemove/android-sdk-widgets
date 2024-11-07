@@ -87,7 +87,7 @@ public class SingleQuestionConfiguration implements Parcelable {
                 this.title = prepareDefaultTitleConfiguration(resourceProvider);
             }
             if (this.tintColor == null) {
-                this.tintColor = resourceProvider.getString(R.color.glia_brand_primary_color);
+                this.tintColor = resourceProvider.getString(R.color.glia_primary_color);
             }
             if (this.optionText == null) {
                 this.optionText = prepareDefaultTextConfiguration(resourceProvider);
@@ -96,7 +96,7 @@ public class SingleQuestionConfiguration implements Parcelable {
         }
 
         private TextConfiguration prepareDefaultTextConfiguration(ResourceProvider resourceProvider) {
-            ColorStateList optionTextColor = resourceProvider.getColorStateList(R.color.glia_base_dark_color);
+            ColorStateList optionTextColor = resourceProvider.getColorStateList(R.color.glia_dark_color);
             return new TextConfiguration.Builder()
                     .textColor(optionTextColor)
                     .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
@@ -104,7 +104,7 @@ public class SingleQuestionConfiguration implements Parcelable {
         }
 
         private TextConfiguration prepareDefaultTitleConfiguration(ResourceProvider resourceProvider) {
-            ColorStateList titleColor = resourceProvider.getColorStateList(R.color.glia_base_dark_color);
+            ColorStateList titleColor = resourceProvider.getColorStateList(R.color.glia_dark_color);
             return new TextConfiguration.Builder()
                     .textColor(titleColor)
                     .bold(true)

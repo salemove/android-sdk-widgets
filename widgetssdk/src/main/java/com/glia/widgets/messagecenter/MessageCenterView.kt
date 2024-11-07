@@ -200,8 +200,8 @@ internal class MessageCenterView(
     }
 
     private fun showConfirmationAppBar() {
-        val primaryColorId = theme.brandPrimaryColor ?: R.color.glia_brand_primary_color
-        val baseLightColorId = theme.baseLightColor ?: R.color.glia_base_light_color
+        val primaryColorId = theme.brandPrimaryColor ?: R.color.glia_primary_color
+        val baseLightColorId = theme.baseLightColor ?: R.color.glia_light_color
 
         val appBarTheme = DefaultHeader(
             ColorTheme(getColorCompat(primaryColorId)),

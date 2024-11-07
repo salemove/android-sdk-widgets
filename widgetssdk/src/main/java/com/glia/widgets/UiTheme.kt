@@ -500,14 +500,14 @@ internal data class UiTheme(
 
     private fun toColorPallet(context: Context): ColorPallet = context.run {
         ColorPallet(
-            baseDarkColorTheme = ColorTheme(context.getColor(baseDarkColor ?: R.color.glia_base_dark_color)),
-            baseLightColorTheme = ColorTheme(context.getColor(baseLightColor ?: R.color.glia_base_light_color)),
-            baseNeutralColorTheme = ColorTheme(context.getColor(R.color.glia_system_agent_bubble_color)),
-            baseNormalColorTheme = ColorTheme(context.getColor(baseNormalColor ?: R.color.glia_base_normal_color)),
-            baseShadeColorTheme = ColorTheme(context.getColor(baseShadeColor ?: R.color.glia_base_shade_color)),
-            primaryColorTheme = ColorTheme(context.getColor(brandPrimaryColor ?: R.color.glia_brand_primary_color)),
+            baseDarkColorTheme = ColorTheme(context.getColor(baseDarkColor ?: R.color.glia_dark_color)),
+            baseLightColorTheme = ColorTheme(context.getColor(baseLightColor ?: R.color.glia_light_color)),
+            baseNeutralColorTheme = ColorTheme(context.getColor(R.color.glia_neutral_color)),
+            baseNormalColorTheme = ColorTheme(context.getColor(baseNormalColor ?: R.color.glia_normal_color)),
+            baseShadeColorTheme = ColorTheme(context.getColor(baseShadeColor ?: R.color.glia_shade_color)),
+            primaryColorTheme = ColorTheme(context.getColor(brandPrimaryColor ?: R.color.glia_primary_color)),
             secondaryColorTheme = null,
-            systemNegativeColorTheme = ColorTheme(context.getColor(systemNegativeColor ?: R.color.glia_system_negative_color))
+            systemNegativeColorTheme = ColorTheme(context.getColor(systemNegativeColor ?: R.color.glia_negative_color))
         )
     }
 

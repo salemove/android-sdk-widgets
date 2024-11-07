@@ -5,11 +5,8 @@ import com.glia.androidsdk.RequestCallback
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.di.GliaCore
-import com.glia.widgets.helper.Logger
 import io.reactivex.rxjava3.core.Observable
 import java.util.concurrent.TimeUnit
-
-private const val TAG = "ObserveUnreadMessagesCountUseCase"
 
 internal class ObserveUnreadMessagesCountUseCase(
     private val repository: SecureConversationsRepository,
@@ -38,7 +35,6 @@ internal class ObserveUnreadMessagesCountUseCase(
         return Observable.create { emitter ->
             repository.getUnreadMessagesCount(object : RequestCallback<Int> {
                 override fun onResult(count: Int?, exception: GliaException?) {
-                    Logger.d(TAG, "onResult")
                     if (emitter.isDisposed) return
                     if (exception != null) {
                         emitter.tryOnError(exception)

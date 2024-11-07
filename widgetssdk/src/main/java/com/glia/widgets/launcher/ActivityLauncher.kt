@@ -9,6 +9,7 @@ import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.androidsdk.engagement.Survey
 import com.glia.widgets.chat.Intention
 import com.glia.widgets.core.fileupload.model.LocalAttachment
+import com.glia.widgets.engagement.EngagementRepository
 import com.glia.widgets.helper.IntentHelper
 import com.glia.widgets.helper.safeStartActivity
 import com.glia.widgets.locale.LocaleString
@@ -32,15 +33,25 @@ internal interface ActivityLauncher {
     fun launchSurvey(activity: Activity, survey: Survey)
 }
 
-internal class ActivityLauncherImpl(private val intentHelper: IntentHelper) : ActivityLauncher {
+internal class ActivityLauncherImpl(
+    private val intentHelper: IntentHelper,
+    private val engagementRepository: EngagementRepository
+) : ActivityLauncher {
 
-    override fun launchChat(context: Context, intention: Intention) = context.startActivity(intentHelper.chatIntent(context, intention))
+    override fun launchChat(context: Context, intention: Intention) {
+        engagementRepository.updateIsSecureMessagingRequested(intention.isSecureConversation)
+        context.startActivity(intentHelper.chatIntent(context, intention))
+    }
 
-    override fun launchCall(context: Context, mediaType: MediaType?, upgradeToCall: Boolean) =
+    override fun launchCall(context: Context, mediaType: MediaType?, upgradeToCall: Boolean) {
+        engagementRepository.updateIsSecureMessagingRequested(false)
         context.startActivity(intentHelper.callIntent(context, mediaType, upgradeToCall))
+    }
 
-    override fun launchSecureMessagingWelcomeScreen(activity: Activity) =
+    override fun launchSecureMessagingWelcomeScreen(activity: Activity) {
+        engagementRepository.updateIsSecureMessagingRequested(true)
         activity.startActivity(intentHelper.secureMessagingWelcomeScreenIntent(activity))
+    }
 
     override fun launchEndScreenSharing(context: Context) = context.startActivity(intentHelper.endScreenSharingIntent(context))
 

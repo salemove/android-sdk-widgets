@@ -815,6 +815,7 @@ class ChatManagerTest {
 
             initialize(onHistoryLoaded, onQuickReplyReceived, onOperatorMessageReceived).test().assertNoErrors().awaitCount(1)
 
+            verify(compositeDisposable).clear()
             verify(this).subscribe(onHistoryLoaded, onOperatorMessageReceived, onQuickReplyReceived)
             verify(this).subscribeToState(onHistoryLoaded, onOperatorMessageReceived)
             verify(this).subscribeToQuickReplies(onQuickReplyReceived)

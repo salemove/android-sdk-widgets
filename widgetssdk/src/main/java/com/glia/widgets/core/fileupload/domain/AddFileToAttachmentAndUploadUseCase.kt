@@ -7,11 +7,13 @@ import com.glia.widgets.core.fileupload.exception.RemoveBeforeReUploadingExcepti
 import com.glia.widgets.core.fileupload.exception.SupportedFileCountExceededException
 import com.glia.widgets.core.fileupload.exception.SupportedFileSizeExceededException
 import com.glia.widgets.core.fileupload.model.LocalAttachment
+import com.glia.widgets.core.secureconversations.domain.ManageSecureMessagingStatusUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
 
 internal class AddFileToAttachmentAndUploadUseCase(
     private val isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase,
-    private val fileAttachmentRepository: FileAttachmentRepository
+    private val fileAttachmentRepository: FileAttachmentRepository,
+    private val manageSecureMessagingStatusUseCase: ManageSecureMessagingStatusUseCase
 ) {
     private val isSupportedFileCountExceeded: Boolean
         get() = fileAttachmentRepository.attachedFilesCount > SupportedFileCountCheckUseCase.SUPPORTED_FILE_COUNT
@@ -19,8 +21,6 @@ internal class AddFileToAttachmentAndUploadUseCase(
     private val hasNoOngoingEngagement: Boolean
         get() = !isQueueingOrEngagementUseCase.hasOngoingEngagement
 
-    private val isNotSecureEngagement: Boolean
-        get() = TODO("pass the engagement type to execute() instead")
 
     fun execute(file: LocalAttachment, listener: Listener) {
         if (fileAttachmentRepository.isFileAttached(file.uri)) {
@@ -32,7 +32,7 @@ internal class AddFileToAttachmentAndUploadUseCase(
 
     private fun onFileNotAttached(file: LocalAttachment, listener: Listener) {
         fileAttachmentRepository.attachFile(file)
-        if (hasNoOngoingEngagement && isNotSecureEngagement) {
+        if (hasNoOngoingEngagement && !manageSecureMessagingStatusUseCase.shouldUseSecureMessagingEndpoints()) {
             fileAttachmentRepository.setFileAttachmentEngagementMissing(file.uri)
             listener.onError(EngagementMissingException())
         } else {
@@ -49,7 +49,7 @@ internal class AddFileToAttachmentAndUploadUseCase(
             listener.onError(SupportedFileSizeExceededException())
         } else {
             listener.onStarted()
-            fileAttachmentRepository.uploadFile(file, listener)
+            fileAttachmentRepository.uploadFile(manageSecureMessagingStatusUseCase.shouldUseSecureMessagingEndpoints(), file, listener)
         }
     }
 

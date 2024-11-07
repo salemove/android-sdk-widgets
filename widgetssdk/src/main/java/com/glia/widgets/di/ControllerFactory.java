@@ -116,7 +116,7 @@ public class ControllerFactory {
                 useCaseFactory.createSiteInfoUseCase(),
                 useCaseFactory.createIsFromCallScreenUseCase(),
                 useCaseFactory.createUpdateFromCallScreenUseCase(),
-                useCaseFactory.createIsSecureEngagementUseCase(),
+                useCaseFactory.createManageSecureMessagingStatusUseCase(),
                 useCaseFactory.getIsCurrentEngagementCallVisualizer(),
                 useCaseFactory.createIsFileReadyForPreviewUseCase(),
                 useCaseFactory.createDetermineGvaButtonTypeUseCase(),

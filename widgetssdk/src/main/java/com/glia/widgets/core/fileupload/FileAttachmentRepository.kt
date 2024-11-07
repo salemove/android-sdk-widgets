@@ -41,16 +41,22 @@ internal class FileAttachmentRepository(private val gliaCore: GliaCore) {
         )
     }
 
-    fun uploadFile(file: LocalAttachment, listener: AddFileToAttachmentAndUploadUseCase.Listener) {
-        val isSC = false //TODO: check for secure conversations via passed in parameter
+    fun uploadFile(shouldUseSecureMessagingEndpoints: Boolean, file: LocalAttachment, listener: AddFileToAttachmentAndUploadUseCase.Listener) {
         val engagement = gliaCore.currentEngagement.getOrNull()
-        if (engagement != null) {
-            engagement.uploadFile(file.uri, handleFileUpload(file, listener))
-        } else if (isSC) {
-            secureConversations.uploadFile(file.uri, handleFileUpload(file, listener))
-        } else {
-            setFileAttachmentEngagementMissing(file.uri)
-            listener.onError(EngagementMissingException())
+        when {
+
+            shouldUseSecureMessagingEndpoints -> {
+                secureConversations.uploadFile(file.uri, handleFileUpload(file, listener))
+            }
+
+            engagement != null -> {
+                engagement.uploadFile(file.uri, handleFileUpload(file, listener))
+            }
+
+            else -> {
+                setFileAttachmentEngagementMissing(file.uri)
+                listener.onError(EngagementMissingException())
+            }
         }
     }
 

@@ -12,7 +12,6 @@ import com.glia.widgets.helper.fileName
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Maybe
 import java.io.InputStream
-import kotlin.jvm.optionals.getOrNull
 
 internal class GliaFileRepositoryImpl(
     private val bitmapCache: InAppBitmapCache,
@@ -43,12 +42,12 @@ internal class GliaFileRepositoryImpl(
     override fun putImageToDownloads(fileName: String, bitmap: Bitmap): Completable =
         downloadsFolderDataSource.putImageToDownloads(fileName, bitmap)
 
-    override fun loadImageFileFromNetwork(attachmentFile: AttachmentFile): Maybe<InputStream> {
-        return fetchFileMaybe(attachmentFile)
+    override fun loadImageFileFromNetwork(shouldUseSecureMessagingEndpoints: Boolean, attachmentFile: AttachmentFile): Maybe<InputStream> {
+        return fetchFileMaybe(shouldUseSecureMessagingEndpoints, attachmentFile)
     }
 
-    override fun downloadFileFromNetwork(attachmentFile: AttachmentFile): Completable {
-        return fetchFileMaybe(attachmentFile).flatMapCompletable {
+    override fun downloadFileFromNetwork(shouldUseSecureMessagingEndpoints: Boolean, attachmentFile: AttachmentFile): Completable {
+        return fetchFileMaybe(shouldUseSecureMessagingEndpoints, attachmentFile).flatMapCompletable {
             downloadsFolderDataSource.downloadFileToDownloads(
                 attachmentFile.fileName,
                 attachmentFile.contentType,
@@ -57,9 +56,9 @@ internal class GliaFileRepositoryImpl(
         }
     }
 
-    private fun fetchFileMaybe(attachmentFile: AttachmentFile): Maybe<InputStream> =
+    private fun fetchFileMaybe(shouldUseSecureMessagingEndpoints: Boolean, attachmentFile: AttachmentFile): Maybe<InputStream> =
         Maybe.create { emitter ->
-            fetchFile(attachmentFile) { response, exception ->
+            fetchFile(shouldUseSecureMessagingEndpoints, attachmentFile) { response, exception ->
                 when {
                     exception != null -> emitter.onError(exception)
                     response != null -> emitter.onSuccess(response)
@@ -68,9 +67,8 @@ internal class GliaFileRepositoryImpl(
             }
         }
 
-    private fun fetchFile(attachmentFile: AttachmentFile, callback: RequestCallback<InputStream?>) {
-        val engagement = gliaCore.currentEngagement.getOrNull()
-        if (engagement == null /*TODO check here for SC*/) {
+    private fun fetchFile(shouldUseSecureMessagingEndpoints: Boolean, attachmentFile: AttachmentFile, callback: RequestCallback<InputStream?>) {
+        if (shouldUseSecureMessagingEndpoints) {
             secureConversations.fetchFile(attachmentFile.id, callback)
         } else {
             gliaCore.fetchFile(attachmentFile, callback)

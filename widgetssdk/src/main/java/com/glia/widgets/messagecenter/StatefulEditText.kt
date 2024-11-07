@@ -26,17 +26,17 @@ internal class StatefulEditText @JvmOverloads constructor(context: Context, attr
 
     @get:ColorInt
     private val gliaBaseShadeColor: Int by lazy {
-        getColorCompat(getAttr(R.attr.gliaBaseShadeColor, R.color.glia_base_shade_color))
+        getColorCompat(getAttr(R.attr.gliaBaseShadeColor, R.color.glia_shade_color))
     }
 
     @get:ColorInt
     private val gliaBaseDarkColor: Int by lazy {
-        getColorCompat(getAttr(R.attr.gliaBaseDarkColor, R.color.glia_base_dark_color))
+        getColorCompat(getAttr(R.attr.gliaBaseDarkColor, R.color.glia_dark_color))
     }
 
     @get:ColorInt
     private val gliaBrandPrimaryColor: Int by lazy {
-        getColorCompat(getAttr(R.attr.gliaBrandPrimaryColor, R.color.glia_brand_primary_color))
+        getColorCompat(getAttr(R.attr.gliaBrandPrimaryColor, R.color.glia_primary_color))
     }
 
     @get:ColorInt
@@ -44,7 +44,7 @@ internal class StatefulEditText @JvmOverloads constructor(context: Context, attr
 
     @get:ColorInt
     private val gliaNegativeColor: Int by lazy {
-        getColorCompat(getAttr(R.attr.gliaSystemNegativeColor, R.color.glia_system_negative_color))
+        getColorCompat(getAttr(R.attr.gliaSystemNegativeColor, R.color.glia_negative_color))
     }
 
     enum class State {

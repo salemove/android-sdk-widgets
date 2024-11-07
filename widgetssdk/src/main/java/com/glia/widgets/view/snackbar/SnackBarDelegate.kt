@@ -39,11 +39,11 @@ internal abstract class SnackBarDelegate(
 
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     @get:ColorRes
-    open val fallbackBackgroundColor: Int = R.color.glia_base_dark_color
+    open val fallbackBackgroundColor: Int = R.color.glia_dark_color
 
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     @get:ColorRes
-    open val fallbackTextColor: Int = R.color.glia_base_light_color
+    open val fallbackTextColor: Int = R.color.glia_light_color
 
     @VisibleForTesting
     val snackBar: Snackbar by lazy { makeSnackBar(view, titleStringKey, localeProvider, snackBarTheme) }
@@ -95,8 +95,8 @@ internal class ChatActivitySnackBarDelegate(activity: ChatActivity, titleStringK
 internal class CallActivitySnackBarDelegate(activity: CallActivity, titleStringKey: Int, localeProvider: LocaleProvider, unifiedTheme: UnifiedTheme?) :
     SnackBarDelegate(activity.findViewById(R.id.call_view), titleStringKey, localeProvider, unifiedTheme?.callTheme?.snackBar) {
     override val anchorViewId: Int = R.id.buttons_layout_bg
-    override val fallbackBackgroundColor: Int = R.color.glia_base_light_color
-    override val fallbackTextColor: Int = R.color.glia_base_dark_color
+    override val fallbackBackgroundColor: Int = R.color.glia_light_color
+    override val fallbackTextColor: Int = R.color.glia_dark_color
 }
 
 internal class SnackBarDelegateFactory(

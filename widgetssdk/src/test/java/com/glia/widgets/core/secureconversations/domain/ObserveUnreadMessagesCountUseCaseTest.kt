@@ -5,6 +5,8 @@ import com.glia.androidsdk.RequestCallback
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.di.GliaCore
+import com.glia.widgets.helper.rx.Schedulers
+import io.reactivex.rxjava3.internal.schedulers.TrampolineScheduler
 import io.reactivex.rxjava3.plugins.RxJavaPlugins
 import org.junit.Before
 import org.junit.Test
@@ -28,7 +30,12 @@ class ObserveUnreadMessagesCountUseCaseTest {
         repository = mock()
         isAuthenticatedUseCase = mock()
         core = mock()
-        useCase = ObserveUnreadMessagesCountUseCase(repository, isAuthenticatedUseCase, core)
+
+        val schedulers = mock<Schedulers>()
+        whenever(schedulers.computationScheduler).thenReturn(TrampolineScheduler.instance())
+        whenever(schedulers.mainScheduler).thenReturn(TrampolineScheduler.instance())
+
+        useCase = ObserveUnreadMessagesCountUseCase(repository, isAuthenticatedUseCase, core, schedulers)
     }
 
     @Test

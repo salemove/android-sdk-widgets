@@ -66,7 +66,11 @@ internal class ChatActivity : FadeTransitionActivity() {
 
         check(intention != null) { "Intention must be provided" }
 
-        chatView.startChat(intention)
+        if (savedInstanceState == null) {
+            chatView.startChat(intention)
+        } else {
+            chatView.restoreChat(intention)
+        }
     }
 
     override fun onResume() {

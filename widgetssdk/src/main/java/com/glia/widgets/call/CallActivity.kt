@@ -100,7 +100,7 @@ internal class CallActivity : FadeTransitionActivity() {
 
     private fun navigateToChat() {
         Logger.d(TAG, "navigateToChat")
-        activityLauncher.launchChat(this, Intention.RESTORE_CHAT)
+        activityLauncher.launchChat(this, Intention.RETURN_TO_CHAT)
     }
 
     private fun navigateToWebBrowser(title: LocaleString, url: String) = activityLauncher.launchWebBrowser(this, title, url)

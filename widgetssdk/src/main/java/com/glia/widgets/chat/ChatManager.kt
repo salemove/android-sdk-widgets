@@ -65,6 +65,7 @@ internal class ChatManager(
         onQuickReplyReceived: (List<GvaButton>) -> Unit,
         onOperatorMessageReceived: (count: Int) -> Unit
     ): Flowable<List<ChatItem>> {
+        compositeDisposable.clear()
         subscribe(onHistoryLoaded, onOperatorMessageReceived, onQuickReplyReceived)
         return state
             .doOnNext(::updateQuickReplies)
@@ -476,18 +477,18 @@ internal class ChatManager(
     }
 
     internal sealed interface Action {
-        object QueuingStarted : Action
+        data object QueuingStarted : Action
         data class OperatorConnected(val operatorFormattedName: String, val operatorImageUrl: String?) : Action
-        object Transferring : Action
+        data object Transferring : Action
         data class OperatorJoined(val operatorFormattedName: String, val operatorImageUrl: String?) : Action
         data class ResponseCardClicked(val responseCard: OperatorMessageItem.ResponseCard) : Action
         data class OnMediaUpgradeStarted(val isVideo: Boolean) : Action
         data class OnMediaUpgradeTimerUpdated(val formattedValue: String) : Action
-        object OnMediaUpgradeToVideo : Action
-        object OnMediaUpgradeCanceled : Action
+        data object OnMediaUpgradeToVideo : Action
+        data object OnMediaUpgradeCanceled : Action
         data class CustomCardClicked(val customCard: CustomCardChatItem, val attachment: SingleChoiceAttachment) : Action
-        object ChatRestored : Action
-        object None : Action
+        data object ChatRestored : Action
+        data object None : Action
         data class MessagePreviewAdded(val visitorChatItem: VisitorChatItem, val payload: SendMessagePayload) : Action
         data class AttachmentPreviewAdded(val attachments: List<VisitorAttachmentItem>, val payload: SendMessagePayload?) : Action
         data class OnMessageSent(val message: VisitorMessage) : Action

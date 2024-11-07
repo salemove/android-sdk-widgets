@@ -1,6 +1,5 @@
 package com.glia.widgets.core.secureconversations.domain
 
-import androidx.annotation.VisibleForTesting
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.di.GliaCore
@@ -17,7 +16,6 @@ private const val TAG = "GetUnreadMessagesCountUseCase"
  *
  * @see [GetUnreadMessagesCountWithTimeoutUseCase.invoke]
  */
-@VisibleForTesting
 internal const val TIMEOUT_SEC = 3L
 
 internal const val NO_UNREAD_MESSAGES = 0

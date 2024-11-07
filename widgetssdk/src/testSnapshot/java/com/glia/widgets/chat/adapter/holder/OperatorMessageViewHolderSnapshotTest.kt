@@ -15,7 +15,7 @@ import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.google.gson.JsonObject
 import org.junit.Test
 
-class OperatorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen, SnapshotProviders, SnapshotPicasso, SnapshotOperatorMessage, SnapshotStrings {
+internal class OperatorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen, SnapshotProviders, SnapshotPicasso, SnapshotOperatorMessage, SnapshotStrings {
 
     // MARK: Plain text
 
@@ -151,7 +151,6 @@ class OperatorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen
     // MARK: utils for tests
 
     private fun setupView(item: OperatorMessageItem, unifiedTheme: UnifiedTheme? = null): OperatorMessageViewHolder {
-        localeProviderMock()
         picassoMock(listOf(R.drawable.test_banner, R.drawable.test_launcher2))
         unifiedTheme?.let { Dependencies.gliaThemeManager.theme = it }
 

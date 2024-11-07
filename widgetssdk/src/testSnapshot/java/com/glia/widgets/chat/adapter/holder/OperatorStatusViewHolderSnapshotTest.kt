@@ -13,7 +13,7 @@ import com.glia.widgets.snapshotutils.SnapshotProviders
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import org.junit.Test
 
-class OperatorStatusViewHolderSnapshotTest : SnapshotTest(
+internal class OperatorStatusViewHolderSnapshotTest : SnapshotTest(
     renderingMode = fullWidthRenderMode
 ), SnapshotChatScreen, SnapshotChatView, SnapshotProviders, SnapshotPicasso, SnapshotLottie {
 
@@ -215,7 +215,6 @@ class OperatorStatusViewHolderSnapshotTest : SnapshotTest(
         unifiedTheme: UnifiedTheme? = null
     ): ViewData {
         lottieMock()
-        localeProviderMock()
         picassoMock(imageLoadError = imageLoadError)
 
         unifiedTheme?.let { Dependencies.gliaThemeManager.theme = it }

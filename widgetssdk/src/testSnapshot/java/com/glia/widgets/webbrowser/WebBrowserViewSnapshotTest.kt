@@ -9,7 +9,7 @@ import com.glia.widgets.snapshotutils.SnapshotProviders
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import org.junit.Test
 
-class WebBrowserViewSnapshotTest : SnapshotTest(
+internal class WebBrowserViewSnapshotTest : SnapshotTest(
     renderingMode = SessionParams.RenderingMode.FULL_EXPAND
 ), SnapshotProviders {
 
@@ -49,9 +49,6 @@ class WebBrowserViewSnapshotTest : SnapshotTest(
         title: LocaleString = LocaleString(R.string.dialog_link2_text),
         unifiedTheme: UnifiedTheme? = null
     ): WebBrowserView {
-        localeProviderMock()
-        resourceProviderMock()
-
         unifiedTheme?.let { Dependencies.gliaThemeManager.theme = it }
 
         setOnEndListener {

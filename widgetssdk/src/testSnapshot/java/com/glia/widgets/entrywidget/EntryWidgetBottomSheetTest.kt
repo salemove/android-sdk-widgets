@@ -11,8 +11,6 @@ internal class EntryWidgetBottomSheetTest : EntryWidgetEmbeddedViewTest() {
         viewType: EntryWidgetContract.ViewType,
         unifiedTheme: UnifiedTheme?
     ): View {
-        localeProviderMock()
-
         val entryWidgetFragment = EntryWidgetFragment()
         val binding = EntryWidgetFragmentBinding.inflate(layoutInflater)
 

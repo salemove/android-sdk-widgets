@@ -41,6 +41,7 @@ internal fun DefaultMediaItemTypeTheme(pallet: ColorPallet?): MediaTypeItemTheme
             message = TextTheme(
                 textColor = normalColorTheme
             ),
-            loadingTintColor = shadeColorTheme
+            loadingTintColor = shadeColorTheme,
+            badge = BadgeTheme(this)
         )
     }

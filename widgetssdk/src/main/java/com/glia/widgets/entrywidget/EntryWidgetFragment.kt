@@ -53,7 +53,8 @@ internal class EntryWidgetFragment : BottomSheetDialogFragment() {
     ) {
         val entryWidgetAdapter = EntryWidgetAdapter(
             EntryWidgetContract.ViewType.BOTTOM_SHEET,
-            entryWidgetsTheme
+            entryWidgetsTheme,
+            Dependencies.useCaseFactory.createObserveUnreadMessagesCountUseCase()
         )
 
         EntryWidgetView(

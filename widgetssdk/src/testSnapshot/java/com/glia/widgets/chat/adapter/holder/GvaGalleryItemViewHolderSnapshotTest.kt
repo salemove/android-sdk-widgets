@@ -14,7 +14,7 @@ import com.glia.widgets.snapshotutils.SnapshotPicasso
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import org.junit.Test
 
-class GvaGalleryItemViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, SnapshotPicasso {
+internal class GvaGalleryItemViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, SnapshotPicasso {
 
     // MARK: tests with all views
 

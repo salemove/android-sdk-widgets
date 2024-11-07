@@ -10,7 +10,7 @@ import com.glia.widgets.snapshotutils.SnapshotStrings
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import org.junit.Test
 
-class SystemMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen, SnapshotProviders, SnapshotStrings {
+internal class SystemMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen, SnapshotProviders, SnapshotStrings {
 
     // MARK: Tests
 
@@ -54,7 +54,6 @@ class SystemMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen, 
         message: String = mediumLengthTexts().joinToString(separator = " "),
         unifiedTheme: UnifiedTheme? = null
     ): SystemMessageViewHolder {
-        localeProviderMock()
         unifiedTheme?.let { Dependencies.gliaThemeManager.theme = it }
 
         setOnEndListener {

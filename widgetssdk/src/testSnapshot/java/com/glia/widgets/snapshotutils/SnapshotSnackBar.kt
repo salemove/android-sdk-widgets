@@ -24,8 +24,6 @@ internal interface SnapshotSnackBar : SnapshotContent, SnapshotTestLifecycle, Sn
     )
 
     fun <T : Activity> snackBarMock(kClass: KClass<T>): Mock<T> {
-        val stringProvider = localeProviderMock()
-
         val rootLayout = FrameLayout(context).apply {
             layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
         }
@@ -38,7 +36,7 @@ internal interface SnapshotSnackBar : SnapshotContent, SnapshotTestLifecycle, Sn
             rootLayout.removeAllViews()
         }
 
-        return Mock(stringProvider, rootLayout, mockActivity)
+        return Mock(localeProviderMock(), rootLayout, mockActivity)
     }
 
     fun <T : Activity> setupView(

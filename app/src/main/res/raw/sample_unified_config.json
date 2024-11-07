@@ -5528,6 +5528,37 @@
               "#444444"
             ]
           }
+        },
+        "loadingTintColor": {
+          "type": "gradient",
+          "value": ["#FF8E45", "#FF7CB9"]
+        },
+        "badge": {
+          "background": {
+            "border": {
+              "type": "fill",
+              "value": [
+                "#fdd42b"
+              ]
+            },
+            "borderWidth": 1,
+            "color": {
+              "type": "fill",
+              "value": [
+                "#04728c"
+              ]
+            }
+          },
+          "font": {
+            "size": 12,
+            "style": "bold"
+          },
+          "fontColor": {
+            "type": "fill",
+            "value": [
+              "#fdd42b"
+            ]
+          }
         }
       },
       "dividerColor": {

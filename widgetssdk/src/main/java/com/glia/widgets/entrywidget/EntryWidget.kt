@@ -61,7 +61,7 @@ internal class EntryWidgetImpl(
         val adapter = EntryWidgetAdapter(
             EntryWidgetContract.ViewType.EMBEDDED_VIEW,
             themeManager.theme?.entryWidgetTheme,
-            observeUnreadMessagesCountUseCase
+            observeUnreadMessagesCountUseCase,
         )
         return EntryWidgetView(context, adapter)
     }

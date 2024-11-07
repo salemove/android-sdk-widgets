@@ -611,7 +611,8 @@ public class UseCaseFactory {
         return new ObserveUnreadMessagesCountUseCase(
             repositoryFactory.getSecureConversationsRepository(),
             createIsAuthenticatedUseCase(),
-            gliaCore
+            gliaCore,
+            Dependencies.INSTANCE.getSchedulers()
         );
     }
 

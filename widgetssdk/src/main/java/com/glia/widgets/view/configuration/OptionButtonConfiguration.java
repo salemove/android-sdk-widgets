@@ -113,19 +113,19 @@ public class OptionButtonConfiguration implements Parcelable {
             Logger.logDeprecatedClassUse(OptionButtonConfiguration.class.getSimpleName() + "." + TAG);
             ResourceProvider resourceProvider = Dependencies.getResourceProvider();
             if (this.normalText == null) {
-                this.normalText = prepareDefaultTextConfiguration(resourceProvider, R.color.glia_base_dark_color);
+                this.normalText = prepareDefaultTextConfiguration(resourceProvider, R.color.glia_dark_color);
             }
             if (this.normalLayer == null) {
                 this.normalLayer = prepareDefaultLayerConfiguration();
             }
             if (this.selectedText == null) {
-                this.selectedText = prepareDefaultTextConfiguration(resourceProvider, R.color.glia_base_light_color);
+                this.selectedText = prepareDefaultTextConfiguration(resourceProvider, R.color.glia_light_color);
             }
             if (this.selectedLayer == null) {
                 this.selectedLayer = prepareDefaultLayerConfiguration();
             }
             if (this.highlightedText == null) {
-                this.highlightedText = prepareDefaultTextConfiguration(resourceProvider, R.color.glia_base_dark_color);
+                this.highlightedText = prepareDefaultTextConfiguration(resourceProvider, R.color.glia_dark_color);
             }
             if (this.highlightedLayer == null) {
                 this.highlightedLayer = prepareDefaultLayerConfiguration();

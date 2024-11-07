@@ -36,7 +36,7 @@ import com.glia.widgets.core.permissions.domain.RequestNotificationPermissionIfP
 import com.glia.widgets.core.permissions.domain.WithCameraPermissionUseCase
 import com.glia.widgets.core.permissions.domain.WithReadWritePermissionsUseCase
 import com.glia.widgets.core.secureconversations.domain.IsMessagingAvailableUseCase
-import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
+import com.glia.widgets.core.secureconversations.domain.ManageSecureMessagingStatusUseCase
 import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCase
 import com.glia.widgets.engagement.domain.DeclineMediaUpgradeOfferUseCase
 import com.glia.widgets.engagement.domain.EndEngagementUseCase
@@ -93,7 +93,7 @@ class ChatControllerTest {
     private lateinit var siteInfoUseCase: SiteInfoUseCase
     private lateinit var isFromCallScreenUseCase: IsFromCallScreenUseCase
     private lateinit var updateFromCallScreenUseCase: UpdateFromCallScreenUseCase
-    private lateinit var isSecureEngagementUseCase: IsSecureEngagementUseCase
+    private lateinit var isSecureEngagementUseCase: ManageSecureMessagingStatusUseCase
     private lateinit var engagementConfigUseCase: SetEngagementConfigUseCase
     private lateinit var isFileReadyForPreviewUseCase: IsFileReadyForPreviewUseCase
     private lateinit var determineGvaButtonTypeUseCase: DetermineGvaButtonTypeUseCase
@@ -253,7 +253,7 @@ class ChatControllerTest {
     @Test
     fun initChat_setsConfiguration_withAvailableQueues() {
         val stateCaptor = argumentCaptor<ChatState>()
-        whenever(isSecureEngagementUseCase()) doReturn true
+        whenever(isSecureEngagementUseCase.shouldUseSecureMessagingEndpoints()) doReturn true
         whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.never()
         whenever(isMessagingAvailableUseCase()) doReturn Flowable.just(Result.success(true))
 
@@ -268,7 +268,7 @@ class ChatControllerTest {
     @Test
     fun initChat_showsMessageCenterUnavailableLabel_whenNoAvailableQueues() {
         val stateCaptor = argumentCaptor<ChatState>()
-        whenever(isSecureEngagementUseCase()) doReturn true
+        whenever(isSecureEngagementUseCase.shouldUseSecureMessagingEndpoints()) doReturn true
         whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.never()
         whenever(isMessagingAvailableUseCase()) doReturn Flowable.just(Result.success(false))
 
@@ -281,7 +281,7 @@ class ChatControllerTest {
 
     @Test
     fun initChat_showsUnexpectedErrorDialog_onException() {
-        whenever(isSecureEngagementUseCase()) doReturn true
+        whenever(isSecureEngagementUseCase.shouldUseSecureMessagingEndpoints()) doReturn true
         whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.never()
         whenever(isMessagingAvailableUseCase()) doReturn Flowable.just(Result.failure(RuntimeException()))
 

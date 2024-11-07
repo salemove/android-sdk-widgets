@@ -56,7 +56,7 @@ import com.glia.widgets.core.permissions.domain.RequestNotificationPermissionIfP
 import com.glia.widgets.core.permissions.domain.WithCameraPermissionUseCase
 import com.glia.widgets.core.permissions.domain.WithReadWritePermissionsUseCase
 import com.glia.widgets.core.secureconversations.domain.IsMessagingAvailableUseCase
-import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
+import com.glia.widgets.core.secureconversations.domain.ManageSecureMessagingStatusUseCase
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.EngagementUpdateState
 import com.glia.widgets.engagement.ScreenSharingState
@@ -112,7 +112,7 @@ internal class ChatController(
     private val siteInfoUseCase: SiteInfoUseCase,
     private val isFromCallScreenUseCase: IsFromCallScreenUseCase,
     private val updateFromCallScreenUseCase: UpdateFromCallScreenUseCase,
-    private val isSecureEngagementUseCase: IsSecureEngagementUseCase,
+    private val manageSecureMessagingStatusUseCase: ManageSecureMessagingStatusUseCase,
     private val isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase,
     private val isFileReadyForPreviewUseCase: IsFileReadyForPreviewUseCase,
     private val determineGvaButtonTypeUseCase: DetermineGvaButtonTypeUseCase,
@@ -193,8 +193,6 @@ internal class ChatController(
     @Volatile
     private var chatState: ChatState
 
-    private val isSecureEngagement get() = isSecureEngagementUseCase()
-
     private val isQueueingOrOngoingEngagement get() = isQueueingOrEngagementUseCase()
 
     override val isChatVisible: Boolean
@@ -226,31 +224,37 @@ internal class ChatController(
     }
 
     override fun initChat(intention: Intention) {
-        when (intention) {
-            Intention.RESTORE_CHAT -> TODO()
-            Intention.SC_DIALOG_START_AUDIO -> dialogController.showLeaveCurrentConversationDialog(LeaveDialogAction.AUDIO)
-            Intention.SC_DIALOG_START_VIDEO -> dialogController.showLeaveCurrentConversationDialog(LeaveDialogAction.VIDEO)
-            Intention.SC_DIALOG_ENQUEUE_FOR_TEXT -> dialogController.showLeaveCurrentConversationDialog(LeaveDialogAction.LIVE_CHAT)
-            Intention.SC_CHAT -> TODO()
-            Intention.LIVE_CHAT -> TODO()
-        }
-        // TODO handle intention here
         updateOperatorDefaultImageUrlUseCase()
 
-
-        if (chatState.isChatUnavailable || dialogController.isShowingUnexpectedErrorDialog) {
-            emitViewState { chatState.initChat().setSecureMessaging(isSecureEngagement) }
-            chatManager.onChatAction(ChatManager.Action.ChatRestored)
-            return
+        when (intention) {
+            Intention.RETURN_TO_CHAT -> restoreChat(intention)
+            Intention.SC_DIALOG_START_AUDIO -> initLeaveCurrentConversationDialog(LeaveDialogAction.AUDIO)
+            Intention.SC_DIALOG_START_VIDEO -> initLeaveCurrentConversationDialog(LeaveDialogAction.VIDEO)
+            Intention.SC_DIALOG_ENQUEUE_FOR_TEXT -> initLeaveCurrentConversationDialog(LeaveDialogAction.LIVE_CHAT)
+            Intention.SC_CHAT -> initSecureMessaging()
+            Intention.LIVE_CHAT -> initLiveChat()
         }
+    }
 
-        emitViewState {
-            chatState.initChat()
-                .setSecureMessaging(isSecureEngagement)
-        }
-        ensureSecureMessagingAvailable()
-
+    private fun initLeaveCurrentConversationDialog(action: LeaveDialogAction) {
         initChatManager()
+        emitViewState { chatState.initChat().setSecureMessagingState() }
+        dialogController.showLeaveCurrentConversationDialog(action)
+    }
+
+    private fun initSecureMessaging() {
+        initChatManager()
+        emitViewState { chatState.initChat().setSecureMessagingState() }
+        ensureSecureMessagingAvailable()
+    }
+
+    private fun initLiveChat() {
+        initChatManager()
+        emitViewState { chatState.initChat().setLiveChatState() }
+    }
+
+    override fun restoreChat(intention: Intention) {
+        chatManager.onChatAction(ChatManager.Action.ChatRestored)
     }
 
     private fun subscribeToEngagement() {
@@ -264,8 +268,6 @@ internal class ChatController(
     }
 
     private fun handleMessagingAvailableResult(result: Result<Boolean>) {
-        if (!isSecureEngagement) return
-
         result.onFailure { error ->
             Logger.e(TAG, "Checking for Messaging availability failed", error)
             dialogController.showUnexpectedErrorDialog()
@@ -755,6 +757,8 @@ internal class ChatController(
     private fun onHistoryLoaded(hasHistory: Boolean) {
         Logger.d(TAG, "historyLoaded")
 
+        val isSecureEngagement = manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging()
+
         if (!hasHistory) {
             if (!isSecureEngagement && !isQueueingOrOngoingEngagement) {
                 viewInitPreQueueing()
@@ -919,10 +923,16 @@ internal class ChatController(
         dialogController.dismissCurrentDialog()
 
         when (action) {
-            LeaveDialogAction.LIVE_CHAT -> viewInitPreQueueing()
+            LeaveDialogAction.LIVE_CHAT -> leaveCurrentConversationAndStartEnqueueing()
             LeaveDialogAction.VIDEO -> view?.launchCall(Engagement.MediaType.VIDEO)
             LeaveDialogAction.AUDIO -> view?.launchCall(Engagement.MediaType.AUDIO)
         }
+    }
+
+    private fun leaveCurrentConversationAndStartEnqueueing() {
+        manageSecureMessagingStatusUseCase.updateSecureMessagingStatus(false)
+        emitViewState { chatState.setLiveChatState() }
+        viewInitPreQueueing()
     }
 
     override fun leaveCurrentConversationDialogStayClicked() {

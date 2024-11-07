@@ -38,6 +38,7 @@ internal interface EngagementRepository {
     val isCallVisualizerEngagement: Boolean
     val isOperatorPresent: Boolean
     val isSharingScreen: Boolean
+    val isSecureMessagingRequested: Boolean
     val cameras: List<CameraDevice>?
     val currentVisitorCamera: VisitorCamera
 
@@ -62,4 +63,5 @@ internal interface EngagementRepository {
     fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?)
     fun onActivityResultSkipScreenSharingPermissionRequest(resultCode: Int, intent: Intent?)
     fun onReadyToShareScreen()
+    fun updateIsSecureMessagingRequested(isSecureMessagingRequested: Boolean)
 }

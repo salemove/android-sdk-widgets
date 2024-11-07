@@ -259,8 +259,6 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
         viewType: EntryWidgetContract.ViewType = EntryWidgetContract.ViewType.EMBEDDED_VIEW,
         unifiedTheme: UnifiedTheme? = null
     ) : View {
-        localeProviderMock()
-
         val entryWidgetTheme = unifiedTheme?.entryWidgetTheme
 
         return EntryWidgetView(

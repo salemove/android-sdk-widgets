@@ -16,7 +16,7 @@ import com.glia.widgets.snapshotutils.SnapshotProviders
 import com.glia.widgets.snapshotutils.SnapshotSchedulers
 import org.junit.Test
 
-class VisitorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen, SnapshotAttachment,
+internal class VisitorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen, SnapshotAttachment,
     SnapshotGetImageFile, SnapshotSchedulers, SnapshotProviders {
 
     // MARK: without labels

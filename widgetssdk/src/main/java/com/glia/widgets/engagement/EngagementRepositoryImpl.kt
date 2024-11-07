@@ -156,6 +156,10 @@ internal class EngagementRepositoryImpl(
     override val isSharingScreen: Boolean
         get() = currentEngagement != null && _screenSharingState.run { value == ScreenSharingState.Started || value == ScreenSharingState.RequestAccepted }
 
+    private var _isSecureMessagingRequested: Boolean = false
+    override val isSecureMessagingRequested: Boolean
+        get() = _isSecureMessagingRequested
+
     override val cameras: List<CameraDevice>?
         get() = currentEngagement?.media?.cameraDevices
 
@@ -174,6 +178,7 @@ internal class EngagementRepositoryImpl(
     }
 
     override fun reset() {
+        _isSecureMessagingRequested = false
         currentEngagement?.let { endEngagement(true) } ?: cancelQueuing()
     }
 
@@ -182,6 +187,7 @@ internal class EngagementRepositoryImpl(
     }
 
     private fun resetState() {
+        _isSecureMessagingRequested = false
         _operatorMediaState.onNext(Data.Empty)
         _visitorMediaState.onNext(Data.Empty)
         _currentOperator.onNext(Data.Empty)
@@ -662,5 +668,9 @@ internal class EngagementRepositoryImpl(
 
     override fun onReadyToShareScreen() {
         readyToShareScreenProcessor.onNext(Unit)
+    }
+
+    override fun updateIsSecureMessagingRequested(isSecureMessagingRequested: Boolean) {
+        _isSecureMessagingRequested = isSecureMessagingRequested
     }
 }

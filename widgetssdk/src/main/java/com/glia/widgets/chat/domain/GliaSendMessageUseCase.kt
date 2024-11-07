@@ -12,7 +12,7 @@ import com.glia.widgets.chat.model.VisitorMessageItem
 import com.glia.widgets.core.fileupload.FileAttachmentRepository
 import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
-import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
+import com.glia.widgets.core.secureconversations.domain.ManageSecureMessagingStatusUseCase
 import com.glia.widgets.engagement.domain.IsOperatorPresentUseCase
 
 internal class GliaSendMessageUseCase(
@@ -20,7 +20,7 @@ internal class GliaSendMessageUseCase(
     private val fileAttachmentRepository: FileAttachmentRepository,
     private val isOperatorPresentUseCase: IsOperatorPresentUseCase,
     private val secureConversationsRepository: SecureConversationsRepository,
-    private val isSecureEngagementUseCase: IsSecureEngagementUseCase
+    private val shouldUseSecureMessagingApis: ManageSecureMessagingStatusUseCase
 ) {
     interface Listener {
         fun messageSent(message: VisitorMessage?)
@@ -32,7 +32,7 @@ internal class GliaSendMessageUseCase(
     }
 
     private val isSecureEngagement: Boolean
-        get() = isSecureEngagementUseCase()
+        get() = shouldUseSecureMessagingApis.shouldUseSecureMessagingEndpoints()
 
     private fun sendMessage(payload: SendMessagePayload, listener: Listener) {
         if (isSecureEngagement) {

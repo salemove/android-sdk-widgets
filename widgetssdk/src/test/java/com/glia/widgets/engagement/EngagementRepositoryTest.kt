@@ -1027,7 +1027,12 @@ class EngagementRepositoryTest {
     fun `reset should call cancelQueuing when no ongoing engagement`() {
         val repositorySpy = spyk(repository)
 
+        assertFalse(repositorySpy.isSecureMessagingRequested)
+        repositorySpy.updateIsSecureMessagingRequested(true)
+        assertTrue(repositorySpy.isSecureMessagingRequested)
+
         repositorySpy.reset()
+        assertFalse(repositorySpy.isSecureMessagingRequested)
 
         verify { repositorySpy.cancelQueuing() }
         verify(inverse = true) { repositorySpy.endEngagement(true) }

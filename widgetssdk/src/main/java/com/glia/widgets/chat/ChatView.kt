@@ -203,6 +203,11 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         controller?.initChat(intention)
     }
 
+    fun restoreChat(intention: Intention) {
+        dialogCallback?.also { dialogController?.addCallback(it) }
+        controller?.restoreChat(intention)
+    }
+
     /**
      * Used to force the view to be visible. Will show the current state of the view.
      */
@@ -378,6 +383,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
 
     override fun launchCall(mediaType: MediaType) {
         activityLauncher.launchCall(context, mediaType, false)
+        context.asActivity()?.finish()
     }
 
     override fun fileIsNotReadyForPreview() {

@@ -171,7 +171,7 @@ internal class ActivityWatcherForChatHead(
     }
 
     private fun navigateToChat(activity: Activity?) {
-        activity?.also { activityLauncher.launchChat(it, Intention.RESTORE_CHAT) }
+        activity?.also { activityLauncher.launchChat(it, Intention.RETURN_TO_CHAT) }
     }
 
     private fun navigateToEndScreenSharing(activity: Activity?) {

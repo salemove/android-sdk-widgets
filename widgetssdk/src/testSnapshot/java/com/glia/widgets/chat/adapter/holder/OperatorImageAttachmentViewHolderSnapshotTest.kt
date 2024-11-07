@@ -20,7 +20,7 @@ import com.glia.widgets.snapshotutils.SnapshotSchedulers
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import org.junit.Test
 
-class OperatorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen, SnapshotAttachment, SnapshotGetImageFile,
+internal class OperatorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen, SnapshotAttachment, SnapshotGetImageFile,
     SnapshotSchedulers, SnapshotProviders, SnapshotPicasso {
 
     // MARK: without header
@@ -159,7 +159,6 @@ class OperatorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotCh
         picassoMock(listOf(R.drawable.test_launcher2))
         val imageFileMock = getImageFileMock(R.drawable.test_banner)
         val schedulersMock = schedulersMock()
-        localeProviderMock()
 
         val binding = ChatAttachmentOperatorImageLayoutBinding.inflate(layoutInflater)
 

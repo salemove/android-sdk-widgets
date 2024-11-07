@@ -11,6 +11,7 @@ import app.cash.paparazzi.Paparazzi
 import com.android.ide.common.rendering.api.SessionParams.RenderingMode
 import com.glia.widgets.snapshotutils.OnTestEnded
 import com.glia.widgets.snapshotutils.SnapshotContent
+import com.glia.widgets.snapshotutils.SnapshotProviderImp
 import com.glia.widgets.snapshotutils.SnapshotProviders
 import com.glia.widgets.snapshotutils.SnapshotStrings
 import com.glia.widgets.snapshotutils.SnapshotTestLifecycle
@@ -24,7 +25,7 @@ import org.mockito.kotlin.whenever
 import java.io.BufferedReader
 
 @Suppress("MemberVisibilityCanBePrivate")
-open class SnapshotTest(
+internal open class SnapshotTest(
     val deviceConfig: DeviceConfig = DeviceConfig.PIXEL_4A,
     val renderingMode: RenderingMode = RenderingMode.SHRINK,
     val showSystemUi: Boolean = false,
@@ -58,7 +59,7 @@ open class SnapshotTest(
         }
     }
 
-    override val snapshotLocales: MutableMap<Int, String> = mutableMapOf()
+    override var _snapshotProvider:SnapshotProviderImp = SnapshotProviderImp(mock<Context>())
 
     fun snapshot(
         view: View,
@@ -75,13 +76,14 @@ open class SnapshotTest(
     }
 
     @Before
-    open fun setUp() {}
+    open fun setUp() {
+        providerMockReset()
+    }
 
     @After
     open fun tearDown() {
         onEndListeners.forEach { it() }
         onEndListeners.clear()
-        snapshotLocales.clear()
     }
 
     private val onEndListeners: MutableList<OnTestEnded> = mutableListOf()

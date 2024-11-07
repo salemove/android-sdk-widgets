@@ -12,7 +12,7 @@ import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.google.gson.JsonObject
 import org.junit.Test
 
-class MediaUpgradeStartedViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen, SnapshotProviders {
+internal class MediaUpgradeStartedViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen, SnapshotProviders {
 
     // MARK: Audio
 
@@ -95,7 +95,6 @@ class MediaUpgradeStartedViewHolderSnapshotTest : SnapshotTest(), SnapshotChatSc
     // MARK: utils for tests
 
     private fun setupView(item: MediaUpgradeStartedTimerItem, unifiedTheme: UnifiedTheme? = null): MediaUpgradeStartedViewHolder {
-        localeProviderMock()
         unifiedTheme?.let { Dependencies.gliaThemeManager.theme = it }
 
         setOnEndListener {

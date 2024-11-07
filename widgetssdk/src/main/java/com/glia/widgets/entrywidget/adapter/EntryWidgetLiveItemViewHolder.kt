@@ -3,7 +3,7 @@ package com.glia.widgets.entrywidget.adapter
 import android.view.View
 import androidx.core.view.isVisible
 import com.glia.widgets.R
-import com.glia.widgets.databinding.EntryWidgetUnauthenticatedContactBinding
+import com.glia.widgets.databinding.EntryWidgetLiveItemBinding
 import com.glia.widgets.entrywidget.EntryWidgetContract
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.setLocaleHint
@@ -13,8 +13,8 @@ import com.glia.widgets.view.unifiedui.applyLayerTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.entrywidget.MediaTypeItemTheme
 
-internal class EntryWidgetUnauthenticatedContactViewHolder(
-    private val binding: EntryWidgetUnauthenticatedContactBinding,
+internal class EntryWidgetLiveItemViewHolder(
+    private val binding: EntryWidgetLiveItemBinding,
     itemTheme: MediaTypeItemTheme?
 ) : EntryWidgetAdapter.ViewHolder(binding.root) {
 

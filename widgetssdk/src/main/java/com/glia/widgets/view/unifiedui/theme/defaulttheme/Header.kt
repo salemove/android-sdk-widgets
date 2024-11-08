@@ -35,11 +35,11 @@ internal fun DefaultHeader(
  * Default theme for Chat screen header
  */
 internal fun PrimaryColorHeaderTheme(colorPallet: ColorPallet) = colorPallet.run {
-    composeIfAtLeastOneNotNull(primaryColorTheme, baseLightColorTheme, systemNegativeColorTheme) {
+    composeIfAtLeastOneNotNull(primaryColorTheme, lightColorTheme, negativeColorTheme) {
         DefaultHeader(
             background = primaryColorTheme,
-            lightColor = baseLightColorTheme,
-            negative = systemNegativeColorTheme
+            lightColor = lightColorTheme,
+            negative = negativeColorTheme
         )
     }
 }

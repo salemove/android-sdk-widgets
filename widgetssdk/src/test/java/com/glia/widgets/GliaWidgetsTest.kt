@@ -73,7 +73,6 @@ class GliaWidgetsTest {
         whenever(controllerFactory.callVisualizerController).thenReturn(callVisualizerController)
         val engagementRepository = mock<EngagementRepository>()
         whenever(repositoryFactory.engagementRepository) doReturn engagementRepository
-        whenever(repositoryFactory.engagementConfigRepository) doReturn mock()
         val queueRepository = mock<QueueRepository>()
         whenever(repositoryFactory.queueRepository) doReturn queueRepository
         GliaWidgets.init(widgetsConfig)

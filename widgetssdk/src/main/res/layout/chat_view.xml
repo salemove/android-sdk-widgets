@@ -186,8 +186,7 @@
             android:textColorHint="?attr/gliaBaseNormalColor"
             android:textCursorDrawable="@null"
             tools:text="@string/chat_input_placeholder"
-            tools:ignore="RtlSymmetry"
-            tools:textColor="@color/glia_black_color" />
+            tools:ignore="RtlSymmetry" />
 
         <ImageButton
             android:id="@+id/add_attachment_button"

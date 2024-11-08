@@ -9,7 +9,11 @@ import com.glia.widgets.core.queue.QueueRepository
 import com.glia.widgets.core.queue.QueuesState
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.Logger
+import com.glia.widgets.launcher.EngagementLauncher
+import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
 import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.schedulers.Schedulers
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyList
@@ -27,18 +31,27 @@ class EntryWidgetControllerTest {
     private lateinit var controller: EntryWidgetController
     private lateinit var view: EntryWidgetContract.View
     private lateinit var activity: Activity
+    private lateinit var engagementLauncher: EngagementLauncher
 
     @Before
     fun setUp() {
-        Logger.setIsDebug(false)
-        queueRepository = mock(QueueRepository::class.java)
-        isAuthenticatedUseCase = mock(IsAuthenticatedUseCase::class.java)
-        core = mock(GliaCore::class.java)
-        activity = mock(Activity::class.java)
-        view = mock(EntryWidgetContract.View::class.java)
+        RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
 
-        controller = EntryWidgetController(queueRepository, isAuthenticatedUseCase, core)
+        Logger.setIsDebug(false)
+        queueRepository = mock()
+        isAuthenticatedUseCase = mock()
+        core = mock()
+        activity = mock()
+        view = mock()
+        engagementLauncher = mock()
+
+        controller = EntryWidgetController(queueRepository, isAuthenticatedUseCase, core, engagementLauncher)
         controller.setView(view)
+    }
+
+    @After
+    fun tearDown() {
+        RxAndroidPlugins.reset()
     }
 
     @Test
@@ -141,24 +154,28 @@ class EntryWidgetControllerTest {
     @Test
     fun `onItemClicked calls dismiss when CHAT item clicked`() {
         controller.onItemClicked(EntryWidgetContract.ItemType.CHAT, activity)
+        verify(engagementLauncher).startChat(activity)
         verify(view).dismiss()
     }
 
     @Test
     fun `onItemClicked calls dismiss when AUDIO_CALL item clicked`() {
         controller.onItemClicked(EntryWidgetContract.ItemType.AUDIO_CALL, activity)
+        verify(engagementLauncher).startAudioCall(activity)
         verify(view).dismiss()
     }
 
     @Test
     fun `onItemClicked calls dismiss when VIDEO_CALL item clicked`() {
         controller.onItemClicked(EntryWidgetContract.ItemType.VIDEO_CALL, activity)
+        verify(engagementLauncher).startVideoCall(activity)
         verify(view).dismiss()
     }
 
     @Test
     fun `onItemClicked calls dismiss when SECURE_MESSAGE item clicked`() {
         controller.onItemClicked(EntryWidgetContract.ItemType.SECURE_MESSAGE, activity)
+        verify(engagementLauncher).startSecureMessaging(activity)
         verify(view).dismiss()
     }
 
@@ -168,5 +185,6 @@ class EntryWidgetControllerTest {
         `when`(queueRepository.queuesState).thenReturn(mockQueuesState)
         controller.onItemClicked(EntryWidgetContract.ItemType.ERROR_STATE, activity)
         verify(view, never()).dismiss()
+        verify(queueRepository).fetchQueues()
     }
 }

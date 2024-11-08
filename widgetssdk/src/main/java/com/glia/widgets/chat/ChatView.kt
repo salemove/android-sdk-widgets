@@ -203,9 +203,9 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         controller?.initChat(intention)
     }
 
-    fun restoreChat(intention: Intention) {
+    fun restoreChat() {
         dialogCallback?.also { dialogController?.addCallback(it) }
-        controller?.restoreChat(intention)
+        controller?.restoreChat()
     }
 
     /**

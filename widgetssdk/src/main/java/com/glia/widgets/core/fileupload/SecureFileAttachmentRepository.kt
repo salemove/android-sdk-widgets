@@ -134,9 +134,7 @@ internal class SecureFileAttachmentRepository(private val gliaCore: GliaCore) {
             getFileAttachments()
                 .map { attachment: LocalAttachment ->
                     if (attachment.uri == uri) {
-                        attachment
-                            .setEngagementFile(engagementFile)
-                            .setAttachmentStatus(LocalAttachment.Status.READY_TO_SEND)
+                        attachment.copy(engagementFile = engagementFile, attachmentStatus = LocalAttachment.Status.READY_TO_SEND)
                     } else {
                         attachment
                     }
@@ -157,7 +155,7 @@ internal class SecureFileAttachmentRepository(private val gliaCore: GliaCore) {
             getFileAttachments()
                 .map { localAttachment: LocalAttachment ->
                     if (localAttachment.uri === uri) {
-                        localAttachment.setAttachmentStatus(status)
+                        localAttachment.copy(attachmentStatus = status)
                     } else {
                         localAttachment
                     }

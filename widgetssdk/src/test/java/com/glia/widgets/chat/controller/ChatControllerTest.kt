@@ -1,10 +1,11 @@
 package com.glia.widgets.chat.controller
 
 import android.net.Uri
+import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.widgets.chat.ChatContract
 import com.glia.widgets.chat.ChatManager
-import com.glia.widgets.chat.ChatType
+import com.glia.widgets.chat.Intention
 import com.glia.widgets.chat.domain.DecideOnQueueingUseCase
 import com.glia.widgets.chat.domain.GliaSendMessagePreviewUseCase
 import com.glia.widgets.chat.domain.GliaSendMessageUseCase
@@ -16,14 +17,15 @@ import com.glia.widgets.chat.domain.TakePictureUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
 import com.glia.widgets.chat.domain.UriToFileAttachmentUseCase
 import com.glia.widgets.chat.domain.gva.DetermineGvaButtonTypeUseCase
+import com.glia.widgets.chat.model.ChatInputMode
 import com.glia.widgets.chat.model.ChatState
 import com.glia.widgets.chat.model.Gva
 import com.glia.widgets.chat.model.GvaButton
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.dialog.domain.ConfirmationDialogLinksUseCase
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
+import com.glia.widgets.core.dialog.model.LeaveDialogAction
 import com.glia.widgets.core.engagement.domain.ConfirmationDialogUseCase
-import com.glia.widgets.core.engagement.domain.SetEngagementConfigUseCase
 import com.glia.widgets.core.engagement.domain.UpdateOperatorDefaultImageUrlUseCase
 import com.glia.widgets.core.fileupload.domain.AddFileAttachmentsObserverUseCase
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase
@@ -62,12 +64,15 @@ import junit.framework.TestCase.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
@@ -94,7 +99,6 @@ class ChatControllerTest {
     private lateinit var isFromCallScreenUseCase: IsFromCallScreenUseCase
     private lateinit var updateFromCallScreenUseCase: UpdateFromCallScreenUseCase
     private lateinit var isSecureEngagementUseCase: ManageSecureMessagingStatusUseCase
-    private lateinit var engagementConfigUseCase: SetEngagementConfigUseCase
     private lateinit var isFileReadyForPreviewUseCase: IsFileReadyForPreviewUseCase
     private lateinit var determineGvaButtonTypeUseCase: DetermineGvaButtonTypeUseCase
     private lateinit var updateOperatorDefaultImageUrlUseCase: UpdateOperatorDefaultImageUrlUseCase
@@ -126,6 +130,8 @@ class ChatControllerTest {
     private lateinit var chatView: ChatContract.View
     private lateinit var isMessagingAvailableUseCase: IsMessagingAvailableUseCase
 
+    private lateinit var manageSecureMessagingStatusUseCase: ManageSecureMessagingStatusUseCase
+
     @Before
     fun setUp() {
         callTimer = mock()
@@ -148,7 +154,6 @@ class ChatControllerTest {
         isFromCallScreenUseCase = mock()
         updateFromCallScreenUseCase = mock()
         isSecureEngagementUseCase = mock()
-        engagementConfigUseCase = mock()
         isFileReadyForPreviewUseCase = mock()
         determineGvaButtonTypeUseCase = mock()
         isAuthenticatedUseCase = mock()
@@ -188,6 +193,7 @@ class ChatControllerTest {
         releaseResourcesUseCase = mock()
         getUrlFromLinkUseCase = mock()
         isMessagingAvailableUseCase = mock()
+        manageSecureMessagingStatusUseCase = mock()
 
         chatController = ChatController(
             callTimer = callTimer,
@@ -209,8 +215,6 @@ class ChatControllerTest {
             siteInfoUseCase = siteInfoUseCase,
             isFromCallScreenUseCase = isFromCallScreenUseCase,
             updateFromCallScreenUseCase = updateFromCallScreenUseCase,
-            isSecureEngagementUseCase = isSecureEngagementUseCase,
-            engagementConfigUseCase = engagementConfigUseCase,
             isFileReadyForPreviewUseCase = isFileReadyForPreviewUseCase,
             determineGvaButtonTypeUseCase = determineGvaButtonTypeUseCase,
             isAuthenticatedUseCase = isAuthenticatedUseCase,
@@ -235,60 +239,237 @@ class ChatControllerTest {
             requestNotificationPermissionIfPushNotificationsSetUpUseCase = requestNotificationPermissionIfPushNotificationsSetUpUseCase,
             releaseResourcesUseCase = releaseResourcesUseCase,
             getUrlFromLinkUseCase = getUrlFromLinkUseCase,
-            isMessagingAvailableUseCase = isMessagingAvailableUseCase
+            isMessagingAvailableUseCase = isMessagingAvailableUseCase,
+            manageSecureMessagingStatusUseCase = manageSecureMessagingStatusUseCase
         )
         chatController.setView(chatView)
+        Mockito.clearInvocations(chatView)
+    }
+
+    private fun assertLiveChatState(state: ChatState) {
+        state.apply {
+            // Init chat
+            assertTrue(isVisible)
+            assertFalse(isSendButtonVisible)
+            assertTrue(isSendButtonEnabled)
+            assertTrue(isAttachmentAllowed)
+            assertTrue(isAttachmentButtonEnabled)
+            // Live chat state
+            assertFalse(isSecureMessaging)
+            assertFalse(isSecureMessagingUnavailableLabelVisible)
+            assertEquals(ChatInputMode.ENABLED_NO_ENGAGEMENT, chatInputMode)
+        }
+    }
+
+    private fun assertSecureMessagingState(state: ChatState) {
+        state.apply {
+            // Init chat
+            assertTrue(isVisible)
+            assertFalse(isSendButtonVisible)
+            assertTrue(isSendButtonEnabled)
+            assertTrue(isAttachmentAllowed)
+            assertTrue(isAttachmentButtonEnabled)
+            // Secure Messaging state
+            assertTrue(isSecureMessaging)
+            assertTrue(isAttachmentButtonNeeded)
+            assertEquals(ChatInputMode.ENABLED, chatInputMode)
+        }
+    }
+
+    private fun assertSecureMessagingAvailableState(state: ChatState) {
+        state.apply {
+            assertTrue(isVisible)
+            assertTrue(isSendButtonVisible)
+            assertTrue(isSendButtonEnabled)
+            assertTrue(isAttachmentAllowed)
+            assertTrue(isAttachmentButtonEnabled)
+            assertTrue(isSecureMessaging)
+            assertTrue(isAttachmentButtonNeeded)
+            assertFalse(isSecureMessagingUnavailableLabelVisible)
+            assertEquals(ChatInputMode.ENABLED, chatInputMode)
+        }
+    }
+
+    private fun assertSecureMessagingUnAvailableState(state: ChatState) {
+        state.apply {
+            assertTrue(isVisible)
+            assertTrue(isSendButtonVisible)
+            assertFalse(isSendButtonEnabled)
+            assertTrue(isAttachmentAllowed)
+            assertFalse(isAttachmentButtonEnabled)
+            assertTrue(isSecureMessaging)
+            assertTrue(isAttachmentButtonNeeded)
+            assertTrue(isSecureMessagingUnavailableLabelVisible)
+            assertEquals(ChatInputMode.DISABLED, chatInputMode)
+        }
     }
 
     @Test
-    fun initChat_setsConfiguration_withInitialParams() {
-        whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.never()
-        whenever(isMessagingAvailableUseCase()) doReturn Flowable.never()
-
-        chatController.initChat(ChatType.SECURE_MESSAGING)
-
-        verify(engagementConfigUseCase).invoke(ChatType.SECURE_MESSAGING)
+    fun `restoreChat calls ChatManager with action ChatManager_Action_ChatRestored`() {
+        chatController.restoreChat()
+        verify(chatManager).onChatAction(eq(ChatManager.Action.ChatRestored))
     }
 
     @Test
-    fun initChat_setsConfiguration_withAvailableQueues() {
-        val stateCaptor = argumentCaptor<ChatState>()
-        whenever(isSecureEngagementUseCase.shouldUseSecureMessagingEndpoints()) doReturn true
-        whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.never()
+    fun `initChat calls restoreChat when intention is RETURN_TO_CHAT`() {
+        chatController.initChat(Intention.RETURN_TO_CHAT)
+        verify(updateOperatorDefaultImageUrlUseCase).invoke()
+        verify(chatManager).onChatAction(eq(ChatManager.Action.ChatRestored))
+    }
+
+    @Test
+    fun `initChat emits live chat state when intention is LIVE_CHAT`() {
+        whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.empty()
+
+        chatController.initChat(Intention.LIVE_CHAT)
+        verify(chatManager).initialize(any(), any(), any())
+        val stateKArgumentCaptor = argumentCaptor<ChatState>()
+
+        verify(chatView).emitState(stateKArgumentCaptor.capture())
+
+        assertLiveChatState(stateKArgumentCaptor.lastValue)
+    }
+
+    @Test
+    fun `initChat emits SC chat state when intention is SC_CHAT`() {
+        whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.empty()
         whenever(isMessagingAvailableUseCase()) doReturn Flowable.just(Result.success(true))
 
-        chatController.initChat(ChatType.SECURE_MESSAGING)
+        chatController.initChat(Intention.SC_CHAT)
+        verify(chatManager).initialize(any(), any(), any())
+        val stateKArgumentCaptor = argumentCaptor<ChatState>()
 
-        verify(chatView, atLeastOnce()).emitState(stateCaptor.capture())
-        assertFalse(stateCaptor.lastValue.isSecureMessagingUnavailableLabelVisible)
-        verify(dialogController, never()).showUnexpectedErrorDialog()
-        verify(engagementConfigUseCase).invoke(ChatType.SECURE_MESSAGING)
+        verify(isMessagingAvailableUseCase).invoke()
+        verify(chatView, times(2)).emitState(stateKArgumentCaptor.capture())
+
+        assertSecureMessagingState(stateKArgumentCaptor.firstValue)
+        assertSecureMessagingAvailableState(stateKArgumentCaptor.lastValue)
     }
 
     @Test
-    fun initChat_showsMessageCenterUnavailableLabel_whenNoAvailableQueues() {
-        val stateCaptor = argumentCaptor<ChatState>()
-        whenever(isSecureEngagementUseCase.shouldUseSecureMessagingEndpoints()) doReturn true
-        whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.never()
+    fun `initChat emits SC chat unavailable state when intention is SC_CHAT and messaging is not available`() {
+        whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.empty()
         whenever(isMessagingAvailableUseCase()) doReturn Flowable.just(Result.success(false))
 
-        chatController.initChat(ChatType.SECURE_MESSAGING)
+        chatController.initChat(Intention.SC_CHAT)
+        verify(chatManager).initialize(any(), any(), any())
+        val stateKArgumentCaptor = argumentCaptor<ChatState>()
 
-        verify(chatView, atLeastOnce()).emitState(stateCaptor.capture())
-        assertTrue(stateCaptor.lastValue.isSecureMessagingUnavailableLabelVisible)
-        verify(dialogController, never()).showUnexpectedErrorDialog()
+        verify(isMessagingAvailableUseCase).invoke()
+        verify(chatView, times(2)).emitState(stateKArgumentCaptor.capture())
+
+        assertSecureMessagingState(stateKArgumentCaptor.firstValue)
+        assertSecureMessagingUnAvailableState(stateKArgumentCaptor.lastValue)
     }
 
     @Test
-    fun initChat_showsUnexpectedErrorDialog_onException() {
-        whenever(isSecureEngagementUseCase.shouldUseSecureMessagingEndpoints()) doReturn true
-        whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.never()
+    fun `initChat emits SC chat state and shows unexpected dialog when intention is SC_CHAT and fetching Messaging availability failed`() {
+        whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.empty()
         whenever(isMessagingAvailableUseCase()) doReturn Flowable.just(Result.failure(RuntimeException()))
 
-        chatController.initChat(ChatType.SECURE_MESSAGING)
+        chatController.initChat(Intention.SC_CHAT)
+        verify(chatManager).initialize(any(), any(), any())
+        val stateKArgumentCaptor = argumentCaptor<ChatState>()
 
-        verify(dialogController, never()).showMessageCenterUnavailableDialog()
+        verify(isMessagingAvailableUseCase).invoke()
+        verify(chatView).emitState(stateKArgumentCaptor.capture())
+
+        assertSecureMessagingState(stateKArgumentCaptor.firstValue)
         verify(dialogController).showUnexpectedErrorDialog()
+    }
+
+    @Test
+    fun `initChat calls initLeaveCurrentConversationDialog with AUDIO when intention is SC_DIALOG_START_AUDIO`() {
+        whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.empty()
+        whenever(isMessagingAvailableUseCase()) doReturn Flowable.just(Result.success(true))
+
+        chatController.initChat(Intention.SC_DIALOG_START_AUDIO)
+        verify(chatManager).initialize(any(), any(), any())
+        val stateKArgumentCaptor = argumentCaptor<ChatState>()
+
+        verify(isMessagingAvailableUseCase).invoke()
+        verify(chatView, times(2)).emitState(stateKArgumentCaptor.capture())
+
+        assertSecureMessagingState(stateKArgumentCaptor.firstValue)
+        assertSecureMessagingAvailableState(stateKArgumentCaptor.lastValue)
+        verify(dialogController).showLeaveCurrentConversationDialog(LeaveDialogAction.AUDIO)
+    }
+
+    @Test
+    fun `initChat calls initLeaveCurrentConversationDialog with VIDEO when intention is SC_DIALOG_START_VIDEO`() {
+        whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.empty()
+        whenever(isMessagingAvailableUseCase()) doReturn Flowable.just(Result.success(true))
+
+        chatController.initChat(Intention.SC_DIALOG_START_VIDEO)
+        verify(chatManager).initialize(any(), any(), any())
+        val stateKArgumentCaptor = argumentCaptor<ChatState>()
+
+        verify(isMessagingAvailableUseCase).invoke()
+        verify(chatView, times(2)).emitState(stateKArgumentCaptor.capture())
+
+        assertSecureMessagingState(stateKArgumentCaptor.firstValue)
+        assertSecureMessagingAvailableState(stateKArgumentCaptor.lastValue)
+        verify(dialogController).showLeaveCurrentConversationDialog(LeaveDialogAction.VIDEO)
+    }
+
+    @Test
+    fun `initChat calls initLeaveCurrentConversationDialog with LIVE_CHAT when intention is SC_DIALOG_ENQUEUE_FOR_TEXT`() {
+        whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.empty()
+        whenever(isMessagingAvailableUseCase()) doReturn Flowable.just(Result.success(true))
+
+        chatController.initChat(Intention.SC_DIALOG_ENQUEUE_FOR_TEXT)
+        verify(chatManager).initialize(any(), any(), any())
+        val stateKArgumentCaptor = argumentCaptor<ChatState>()
+
+        verify(isMessagingAvailableUseCase).invoke()
+        verify(chatView, times(2)).emitState(stateKArgumentCaptor.capture())
+
+        assertSecureMessagingState(stateKArgumentCaptor.firstValue)
+        assertSecureMessagingAvailableState(stateKArgumentCaptor.lastValue)
+        verify(dialogController).showLeaveCurrentConversationDialog(LeaveDialogAction.LIVE_CHAT)
+    }
+
+    @Test
+    fun `leaveCurrentConversationDialogLeaveClicked dismisses dialog and starts live chat`() {
+        whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.empty()
+        whenever(isMessagingAvailableUseCase()) doReturn Flowable.never()
+
+        doAnswer {
+            (it.arguments.first() as ((shouldShow: Boolean) -> Unit)).invoke(true)
+        }.whenever(confirmationDialogUseCase)(any())
+
+        val stateKArgumentCaptor = argumentCaptor<ChatState>()
+
+        chatController.initChat(Intention.SC_DIALOG_START_VIDEO)
+        chatController.leaveCurrentConversationDialogLeaveClicked(LeaveDialogAction.LIVE_CHAT)
+        verify(dialogController).dismissCurrentDialog()
+        verify(manageSecureMessagingStatusUseCase).updateSecureMessagingStatus(false)
+
+        verify(chatView, atLeastOnce()).emitState(stateKArgumentCaptor.capture())
+        assertLiveChatState(stateKArgumentCaptor.lastValue)
+
+        verify(chatManager).onChatAction(eq(ChatManager.Action.QueuingStarted))
+        verify(dialogController).showEngagementConfirmationDialog()
+    }
+
+    @Test
+    fun `leaveCurrentConversationDialogLeaveClicked dismisses dialog and launches video call`() {
+        chatController.leaveCurrentConversationDialogLeaveClicked(LeaveDialogAction.VIDEO)
+        verify(dialogController).dismissCurrentDialog()
+        verify(chatView).launchCall(Engagement.MediaType.VIDEO)
+    }
+
+    @Test
+    fun `leaveCurrentConversationDialogLeaveClicked dismisses dialog and launches audio call`() {
+        chatController.leaveCurrentConversationDialogLeaveClicked(LeaveDialogAction.AUDIO)
+        verify(dialogController).dismissCurrentDialog()
+        verify(chatView).launchCall(Engagement.MediaType.AUDIO)
+    }
+
+    @Test
+    fun `leaveCurrentConversationDialogStayClicked dismisses dialog`() {
+        chatController.leaveCurrentConversationDialogStayClicked()
+        verify(dialogController).dismissCurrentDialog()
     }
 
     @Test

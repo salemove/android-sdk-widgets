@@ -388,7 +388,8 @@ public class ControllerFactory {
         return new EntryWidgetController(
             repositoryFactory.getQueueRepository(),
             useCaseFactory.createIsAuthenticatedUseCase(),
-            core
+            core,
+            Dependencies.getEngagementLauncher()
         );
     }
 

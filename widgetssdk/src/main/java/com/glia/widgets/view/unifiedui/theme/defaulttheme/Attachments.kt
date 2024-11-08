@@ -12,17 +12,17 @@ import com.glia.widgets.view.unifiedui.theme.chat.UploadFileTheme
  * Default theme for Attachments popup
  */
 internal fun DefaultAttachmentsPopupTheme(pallet: ColorPallet): AttachmentsPopupTheme? = pallet.run {
-    composeIfAtLeastOneNotNull(baseDarkColorTheme, baseShadeColorTheme, baseNeutralColorTheme) {
+    composeIfAtLeastOneNotNull(darkColorTheme, shadeColorTheme, neutralColorTheme) {
         val attachmentItem = AttachmentItemTheme(
             text = BaseDarkColorTextTheme(this),
-            iconColor = baseDarkColorTheme
+            iconColor = darkColorTheme
         )
         AttachmentsPopupTheme(
             photoLibrary = attachmentItem,
             takePhoto = attachmentItem,
             browse = attachmentItem,
-            dividerColor = baseShadeColorTheme,
-            background = baseNeutralColorTheme
+            dividerColor = shadeColorTheme,
+            background = neutralColorTheme
         )
     }
 }
@@ -31,7 +31,7 @@ internal fun DefaultAttachmentsPopupTheme(pallet: ColorPallet): AttachmentsPopup
  * Default theme for File upload bar item
  */
 internal fun DefaultUploadFileTheme(pallet: ColorPallet): UploadFileTheme? = pallet.run {
-    composeIfAtLeastOneNotNull(baseNormalColorTheme, baseDarkColorTheme) {
+    composeIfAtLeastOneNotNull(normalColorTheme, darkColorTheme) {
         UploadFileTheme(text = BaseNormalColorTextTheme(pallet), info = BaseDarkColorTextTheme(pallet))
     }
 }

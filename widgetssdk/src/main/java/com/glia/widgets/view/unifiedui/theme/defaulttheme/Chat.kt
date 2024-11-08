@@ -22,7 +22,7 @@ import com.glia.widgets.view.unifiedui.theme.chat.UploadFileTheme
  * Default theme for Chat screen
  */
 internal fun ChatTheme(pallet: ColorPallet): ChatTheme = ChatTheme(
-    background = LayerTheme(fill = pallet.baseLightColorTheme),
+    background = LayerTheme(fill = pallet.lightColorTheme),
     header = PrimaryColorHeaderTheme(pallet),
     operatorMessage = ChatOperatorMessageTheme(pallet),
     visitorMessage = ChatVisitorMessageTheme(pallet),
@@ -46,19 +46,19 @@ internal fun ChatTheme(pallet: ColorPallet): ChatTheme = ChatTheme(
  */
 private fun MediaUpgradeTheme(pallet: ColorPallet) = pallet.run {
     composeIfAtLeastOneNotNull(
-        baseDarkColorTheme,
-        baseNormalColorTheme,
+        darkColorTheme,
+        normalColorTheme,
         primaryColorTheme,
-        baseLightColorTheme,
-        baseShadeColorTheme
+        lightColorTheme,
+        shadeColorTheme
     ) {
         MediaUpgradeTheme(
             text = BaseDarkColorTextTheme(this),
-            description = TextTheme(textColor = baseNormalColorTheme),
+            description = TextTheme(textColor = normalColorTheme),
             iconColor = primaryColorTheme,
             background = LayerTheme(
-                fill = baseLightColorTheme,
-                stroke = baseShadeColorTheme?.primaryColor
+                fill = lightColorTheme,
+                stroke = shadeColorTheme?.primaryColor
             )
         )
     }
@@ -69,12 +69,12 @@ private fun MediaUpgradeTheme(pallet: ColorPallet) = pallet.run {
  */
 private fun ChatOperatorMessageTheme(pallet: ColorPallet): MessageBalloonTheme? = pallet.run {
     val userImage = UserImageTheme(this)
-    composeIfAtLeastOneNotNull(userImage, baseDarkColorTheme, baseNeutralColorTheme) {
+    composeIfAtLeastOneNotNull(userImage, darkColorTheme, neutralColorTheme) {
         MessageBalloonTheme(
             text = BaseDarkColorTextTheme(this),
             userImage = userImage,
             background = LayerTheme(
-                fill = baseNeutralColorTheme
+                fill = neutralColorTheme
             )
         )
     }
@@ -84,12 +84,12 @@ private fun ChatOperatorMessageTheme(pallet: ColorPallet): MessageBalloonTheme? 
  * Default theme for Visitor Message
  */
 private fun ChatVisitorMessageTheme(pallet: ColorPallet): MessageBalloonTheme? = pallet.run {
-    composeIfAtLeastOneNotNull(primaryColorTheme, baseLightColorTheme, baseNormalColorTheme) {
+    composeIfAtLeastOneNotNull(primaryColorTheme, lightColorTheme, normalColorTheme) {
         MessageBalloonTheme(
             background = LayerTheme(fill = primaryColorTheme),
             text = BaseLightColorTextTheme(this),
-            status = TextTheme(textColor = baseNormalColorTheme),
-            error = TextTheme(textColor = systemNegativeColorTheme)
+            status = TextTheme(textColor = normalColorTheme),
+            error = TextTheme(textColor = negativeColorTheme)
         )
     }
 }
@@ -98,11 +98,11 @@ private fun ChatVisitorMessageTheme(pallet: ColorPallet): MessageBalloonTheme? =
  * Default theme for Response Card
  */
 private fun ChatResponseCardTheme(pallet: ColorPallet): ResponseCardTheme? = pallet.run {
-    composeIfAtLeastOneNotNull(primaryColorTheme, baseNeutralColorTheme, baseDarkColorTheme) {
+    composeIfAtLeastOneNotNull(primaryColorTheme, neutralColorTheme, darkColorTheme) {
         ResponseCardTheme(
             option = ResponseCardOptionTheme(normal = NeutralDefaultButtonTheme(this)),
             background = LayerTheme(
-                fill = baseNeutralColorTheme,
+                fill = neutralColorTheme,
                 stroke = primaryColorTheme?.primaryColor
             ),
             text = BaseDarkColorTextTheme(this)
@@ -115,31 +115,31 @@ private fun ChatResponseCardTheme(pallet: ColorPallet): ResponseCardTheme? = pal
  */
 private fun ChatInputTheme(pallet: ColorPallet): InputTheme? = pallet.run {
     composeIfAtLeastOneNotNull(
-        baseDarkColorTheme,
-        baseNormalColorTheme,
+        darkColorTheme,
+        normalColorTheme,
         primaryColorTheme,
-        baseShadeColorTheme,
-        systemNegativeColorTheme
+        shadeColorTheme,
+        negativeColorTheme
     ) {
         InputTheme(
             text = BaseDarkColorTextTheme(this),
             placeholder = BaseNormalColorTextTheme(this),
-            divider = baseShadeColorTheme,
+            divider = shadeColorTheme,
             sendButton = ButtonTheme(iconColor = primaryColorTheme),
-            mediaButton = ButtonTheme(iconColor = baseNormalColorTheme),
+            mediaButton = ButtonTheme(iconColor = normalColorTheme),
             fileUploadBar = FileUploadBarTheme(
                 filePreview = FilePreviewTheme(
                     text = BaseLightColorTextTheme(this),
-                    errorIcon = systemNegativeColorTheme,
-                    background = LayerTheme(baseNeutralColorTheme),
-                    errorBackground = LayerTheme(systemNegativeColorTheme)
+                    errorIcon = negativeColorTheme,
+                    background = LayerTheme(neutralColorTheme),
+                    errorBackground = LayerTheme(negativeColorTheme)
                 ),
                 uploading = DefaultUploadFileTheme(this),
                 uploaded = DefaultUploadFileTheme(this),
                 error = UploadFileTheme(text = BaseNegativeColorTextTheme(this), info = BaseDarkColorTextTheme(this)),
                 progress = primaryColorTheme,
-                errorProgress = systemNegativeColorTheme,
-                removeButton = baseNormalColorTheme
+                errorProgress = negativeColorTheme,
+                removeButton = normalColorTheme
             )
         )
     }
@@ -150,9 +150,9 @@ private fun ChatInputTheme(pallet: ColorPallet): InputTheme? = pallet.run {
  */
 private fun ChatUnreadIndicatorTheme(pallet: ColorPallet): UnreadIndicatorTheme? = pallet.run {
     val bubble = BubbleTheme(this)
-    composeIfAtLeastOneNotNull(bubble, baseLightColorTheme) {
+    composeIfAtLeastOneNotNull(bubble, lightColorTheme) {
         UnreadIndicatorTheme(
-            background = baseLightColorTheme,
+            background = lightColorTheme,
             bubble = bubble
         )
     }

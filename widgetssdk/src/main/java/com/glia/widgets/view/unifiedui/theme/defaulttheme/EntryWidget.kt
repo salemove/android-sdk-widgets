@@ -11,13 +11,13 @@ import com.glia.widgets.view.unifiedui.theme.entrywidget.MediaTypeItemsTheme
 
 internal fun EntryWidgetTheme(pallet: ColorPallet?): EntryWidgetTheme? = pallet?.run {
     EntryWidgetTheme(
-        background = LayerTheme(baseLightColorTheme),
+        background = LayerTheme(lightColorTheme),
         mediaTypeItems = DefaultMediaTypeItemsTheme(this),
         errorTitle = TextTheme(
-            textColor = baseDarkColorTheme
+            textColor = darkColorTheme
         ),
         errorMessage = TextTheme(
-            textColor = baseShadeColorTheme
+            textColor = shadeColorTheme
         ),
         errorButton = LinkDefaultButtonTheme(this)
     )
@@ -27,7 +27,7 @@ internal fun DefaultMediaTypeItemsTheme(pallet: ColorPallet?): MediaTypeItemsThe
     pallet?.run {
         MediaTypeItemsTheme(
             mediaTypeItem = DefaultMediaItemTypeTheme(this),
-            dividerColor = baseShadeColorTheme
+            dividerColor = shadeColorTheme
         )
     }
 
@@ -36,11 +36,11 @@ internal fun DefaultMediaItemTypeTheme(pallet: ColorPallet?): MediaTypeItemTheme
         MediaTypeItemTheme(
             iconColor = primaryColorTheme,
             title = TextTheme(
-                textColor = baseDarkColorTheme
+                textColor = darkColorTheme
             ),
             message = TextTheme(
-                textColor = baseNormalColorTheme
+                textColor = normalColorTheme
             ),
-            loadingTintColor = baseShadeColorTheme
+            loadingTintColor = shadeColorTheme
         )
     }

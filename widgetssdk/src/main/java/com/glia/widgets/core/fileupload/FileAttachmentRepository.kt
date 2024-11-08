@@ -165,7 +165,7 @@ internal class FileAttachmentRepository(private val gliaCore: GliaCore) {
             observable.localAttachments
                 .map { localAttachment: LocalAttachment ->
                     if (localAttachment.uri === uri) {
-                        localAttachment.setAttachmentStatus(status)
+                        localAttachment.copy(attachmentStatus = status)
                     } else {
                         localAttachment
                     }
@@ -178,9 +178,7 @@ internal class FileAttachmentRepository(private val gliaCore: GliaCore) {
             observable.localAttachments
                 .map { attachment: LocalAttachment ->
                     if (attachment.uri == uri) {
-                        attachment
-                            .setEngagementFile(engagementFile)
-                            .setAttachmentStatus(LocalAttachment.Status.READY_TO_SEND)
+                        attachment.copy(attachmentStatus = LocalAttachment.Status.READY_TO_SEND, engagementFile = engagementFile)
                     } else {
                         attachment
                     }

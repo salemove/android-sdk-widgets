@@ -6,7 +6,6 @@ import com.glia.widgets.chat.domain.SiteInfoUseCase
 import com.glia.widgets.chat.domain.TakePictureUseCase
 import com.glia.widgets.chat.domain.UriToFileAttachmentUseCase
 import com.glia.widgets.core.dialog.DialogContract
-import com.glia.widgets.core.engagement.domain.SetEngagementConfigUseCase
 import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.core.permissions.domain.RequestNotificationPermissionIfPushNotificationsSetUpUseCase
 import com.glia.widgets.core.secureconversations.domain.AddSecureFileAttachmentsObserverUseCase
@@ -35,7 +34,6 @@ import org.mockito.kotlin.whenever
 
 internal class MessageCenterControllerTest {
     private lateinit var messageCenterController: MessageCenterController
-    private lateinit var engagementConfigUseCase: SetEngagementConfigUseCase
     private lateinit var sendSecureMessageUseCase: SendSecureMessageUseCase
     private lateinit var addFileAttachmentsObserverUseCase: AddSecureFileAttachmentsObserverUseCase
     private lateinit var addFileToAttachmentAndUploadUseCase: AddSecureFileToAttachmentAndUploadUseCase
@@ -56,7 +54,6 @@ internal class MessageCenterControllerTest {
 
     @Before
     fun setUp() {
-        engagementConfigUseCase = mock()
         sendSecureMessageUseCase = mock()
         addFileAttachmentsObserverUseCase = mock()
         addFileToAttachmentAndUploadUseCase = mock()
@@ -75,7 +72,6 @@ internal class MessageCenterControllerTest {
         requestNotificationPermissionIfPushNotificationsSetUpUseCase = mock()
         isMessagingAvailableUseCase = mock()
         messageCenterController = MessageCenterController(
-            engagementConfigUseCase = engagementConfigUseCase,
             sendSecureMessageUseCase = sendSecureMessageUseCase,
             addFileAttachmentsObserverUseCase = addFileAttachmentsObserverUseCase,
             addFileToAttachmentAndUploadUseCase = addFileToAttachmentAndUploadUseCase,

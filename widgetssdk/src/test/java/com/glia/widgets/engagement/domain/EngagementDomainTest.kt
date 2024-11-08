@@ -14,7 +14,6 @@ import com.glia.androidsdk.comms.Video
 import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
 import com.glia.widgets.core.dialog.DialogContract
-import com.glia.widgets.core.engagement.GliaEngagementConfigRepository
 import com.glia.widgets.core.fileupload.FileAttachmentRepository
 import com.glia.widgets.core.notification.domain.CallNotificationUseCase
 import com.glia.widgets.core.permissions.PermissionManager
@@ -312,7 +311,6 @@ class EngagementDomainTest {
     @Test
     fun `EnqueueForEngagementUseCase invoke enqueues with selected type engagement when media type is present`() {
         val repository: EngagementRepository = mockk(relaxUnitFun = true)
-        val queueIds = listOf("queueId1", "queueId2")
         val mediaType: Engagement.MediaType = mockk(relaxUnitFun = true)
 
         val useCase: EnqueueForEngagementUseCase = EnqueueForEngagementUseCaseImpl(engagementRepository = repository)
@@ -479,7 +477,6 @@ class EngagementDomainTest {
         val releaseScreenSharingResourcesUseCase: ReleaseScreenSharingResourcesUseCase = mockk(relaxUnitFun = true)
         val callNotificationUseCase: CallNotificationUseCase = mockk(relaxUnitFun = true)
         val fileAttachmentRepository: FileAttachmentRepository = mockk(relaxUnitFun = true)
-        val gliaEngagementConfigRepository: GliaEngagementConfigRepository = mockk(relaxUnitFun = true)
         val updateFromCallScreenUseCase: UpdateFromCallScreenUseCase = mockk(relaxUnitFun = true)
         val dialogController: DialogContract.Controller = mockk(relaxUnitFun = true)
 
@@ -487,7 +484,6 @@ class EngagementDomainTest {
             releaseScreenSharingResourcesUseCase = releaseScreenSharingResourcesUseCase,
             callNotificationUseCase = callNotificationUseCase,
             fileAttachmentRepository = fileAttachmentRepository,
-            gliaEngagementConfigRepository = gliaEngagementConfigRepository,
             updateFromCallScreenUseCase = updateFromCallScreenUseCase,
             dialogController = dialogController
         )
@@ -500,7 +496,6 @@ class EngagementDomainTest {
             fileAttachmentRepository.detachAllFiles()
             releaseScreenSharingResourcesUseCase()
             callNotificationUseCase.removeAllNotifications()
-            gliaEngagementConfigRepository.reset()
             updateFromCallScreenUseCase(false)
             Dependencies.destroyControllers()
         }

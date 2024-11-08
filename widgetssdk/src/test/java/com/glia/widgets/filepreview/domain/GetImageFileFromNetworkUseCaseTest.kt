@@ -3,6 +3,7 @@ package com.glia.widgets.filepreview.domain
 import android.graphics.Bitmap
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.widgets.chat.domain.DecodeSampledBitmapFromInputStreamUseCase
+import com.glia.widgets.core.secureconversations.domain.ManageSecureMessagingStatusUseCase
 import com.glia.widgets.filepreview.data.GliaFileRepository
 import com.glia.widgets.filepreview.domain.exception.FileNameMissingException
 import com.glia.widgets.filepreview.domain.exception.RemoteFileIsDeletedException
@@ -22,15 +23,18 @@ class GetImageFileFromNetworkUseCaseTest {
     private lateinit var attachmentFile: AttachmentFile
     private lateinit var useCase: GetImageFileFromNetworkUseCase
     private lateinit var decodeSampledBitmapFromInputStreamUseCase: DecodeSampledBitmapFromInputStreamUseCase
+    private lateinit var manageSecureMessagingStatusUseCase: ManageSecureMessagingStatusUseCase
 
     @Before
     fun setUp() {
         fileRepository = mock()
         attachmentFile = mock()
         decodeSampledBitmapFromInputStreamUseCase = mock()
+        manageSecureMessagingStatusUseCase = mock()
         useCase = GetImageFileFromNetworkUseCase(
             fileRepository,
-            decodeSampledBitmapFromInputStreamUseCase
+            decodeSampledBitmapFromInputStreamUseCase,
+            manageSecureMessagingStatusUseCase
         )
     }
 
@@ -51,7 +55,7 @@ class GetImageFileFromNetworkUseCaseTest {
 
     @Test
     fun execute_emitsError_whenDecodingFails() {
-        whenever(fileRepository.loadImageFileFromNetwork(any())) doReturn Maybe.just(INPUT_STREAM)
+        whenever(fileRepository.loadImageFileFromNetwork(any(), any())) doReturn Maybe.just(INPUT_STREAM)
         whenever(attachmentFile.name) doReturn NAME
         whenever(attachmentFile.isDeleted) doReturn false
         whenever(decodeSampledBitmapFromInputStreamUseCase(INPUT_STREAM)) doReturn Maybe.error(
@@ -73,7 +77,7 @@ class GetImageFileFromNetworkUseCaseTest {
 
     @Test
     fun execute_successfullyCompletes_whenValidArgument() {
-        whenever(fileRepository.loadImageFileFromNetwork(any())) doReturn Maybe.just(INPUT_STREAM)
+        whenever(fileRepository.loadImageFileFromNetwork(any(), any())) doReturn Maybe.just(INPUT_STREAM)
         whenever(decodeSampledBitmapFromInputStreamUseCase(INPUT_STREAM)) doReturn Maybe.just(BITMAP)
         whenever(attachmentFile.name) doReturn NAME
         whenever(attachmentFile.isDeleted) doReturn false

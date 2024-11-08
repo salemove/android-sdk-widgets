@@ -153,6 +153,8 @@ internal class DialogController : DialogContract.Controller {
     }
 
     override fun showLeaveCurrentConversationDialog(action: LeaveDialogAction) {
+        if (isShowingUnexpectedErrorDialog) return
+
         Logger.d(TAG, "Show Leave Current Conversation Dialog")
         dialogManager.addAndEmit(DialogState.LeaveCurrentConversation(action))
     }

@@ -14,20 +14,20 @@ import com.glia.widgets.view.unifiedui.theme.base.TextTheme
  * Default theme for Neutral Button
  */
 internal fun NeutralDefaultButtonTheme(pallet: ColorPallet) =
-    DefaultButtonTheme(text = pallet.baseDarkColorTheme)
+    DefaultButtonTheme(text = pallet.darkColorTheme)
 
 /**
  * Default theme for Positive Button
  */
 internal fun PositiveDefaultButtonTheme(pallet: ColorPallet) = pallet.run {
-    DefaultButtonTheme(text = baseLightColorTheme, background = primaryColorTheme)
+    DefaultButtonTheme(text = lightColorTheme, background = primaryColorTheme)
 }
 
 /**
  * Default theme for Negative Button
  */
 internal fun NegativeDefaultButtonTheme(pallet: ColorPallet) = pallet.run {
-    DefaultButtonTheme(text = baseLightColorTheme, background = systemNegativeColorTheme)
+    DefaultButtonTheme(text = lightColorTheme, background = negativeColorTheme)
 }
 
 /**
@@ -61,7 +61,7 @@ internal fun OutlinedButtonTheme(
  * Default theme for GVA Button
  */
 internal fun GvaDefaultButtonTheme(pallet: ColorPallet) = pallet.run {
-    DefaultButtonTheme(text = baseDarkColorTheme, background = baseLightColorTheme)
+    DefaultButtonTheme(text = darkColorTheme, background = lightColorTheme)
 }
 
 private fun DefaultButtonTheme(

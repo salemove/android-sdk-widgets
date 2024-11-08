@@ -16,19 +16,19 @@ internal fun BaseText(colorTheme: ColorTheme?): TextTheme? =
  * Default theme for `baseDarkColor` text
  */
 internal fun BaseDarkColorTextTheme(pallet: ColorPallet): TextTheme? =
-    BaseText(pallet.baseDarkColorTheme)
+    BaseText(pallet.darkColorTheme)
 
 /**
  * Default theme for `baseLightColor` text
  */
 internal fun BaseLightColorTextTheme(pallet: ColorPallet): TextTheme? =
-    BaseText(pallet.baseLightColorTheme)
+    BaseText(pallet.lightColorTheme)
 
 /**
  * Default theme for `baseNormalColor` text
  */
 internal fun BaseNormalColorTextTheme(pallet: ColorPallet): TextTheme? =
-    BaseText(pallet.baseNormalColorTheme)
+    BaseText(pallet.normalColorTheme)
 
 /**
  * Default theme for `basePrimaryColor` text
@@ -40,4 +40,4 @@ internal fun BasePrimaryColorTextTheme(pallet: ColorPallet): TextTheme? =
  * Default theme for `baseNegativeColor` text
  */
 internal fun BaseNegativeColorTextTheme(pallet: ColorPallet): TextTheme? =
-    BaseText(pallet.systemNegativeColorTheme)
+    BaseText(pallet.negativeColorTheme)

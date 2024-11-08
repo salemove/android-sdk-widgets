@@ -18,7 +18,7 @@ import com.glia.widgets.view.unifiedui.theme.survey.SurveyTheme
  */
 internal fun SurveyTheme(pallet: ColorPallet): SurveyTheme =
     SurveyTheme(
-        layer = LayerTheme(fill = pallet.baseLightColorTheme),
+        layer = LayerTheme(fill = pallet.lightColorTheme),
         title = BaseNormalColorTextTheme(pallet),
         submitButton = PositiveDefaultButtonTheme(pallet),
         cancelButton = NegativeDefaultButtonTheme(pallet),
@@ -47,24 +47,24 @@ internal fun SurveyTheme(pallet: ColorPallet): SurveyTheme =
  */
 internal fun SurveyOptionButtonTheme(pallet: ColorPallet): OptionButtonTheme? = pallet.run {
     composeIfAtLeastOneNotNull(
-        baseDarkColorTheme,
-        baseNormalColorTheme,
+        darkColorTheme,
+        normalColorTheme,
         primaryColorTheme,
-        baseLightColorTheme,
-        systemNegativeColorTheme
+        lightColorTheme,
+        negativeColorTheme
     ) {
         OptionButtonTheme(
             normalText = BaseDarkColorTextTheme(this),
             normalLayer = LayerTheme(
-                fill = baseLightColorTheme,
-                stroke = baseNormalColorTheme?.primaryColor
+                fill = lightColorTheme,
+                stroke = normalColorTheme?.primaryColor
             ),
             selectedText = BaseLightColorTextTheme(this),
             selectedLayer = LayerTheme(fill = primaryColorTheme, stroke = Color.TRANSPARENT),
             highlightedText = BaseNegativeColorTextTheme(this),
             highlightedLayer = LayerTheme(
-                fill = baseLightColorTheme,
-                stroke = systemNegativeColorTheme?.primaryColor
+                fill = lightColorTheme,
+                stroke = negativeColorTheme?.primaryColor
             )
         )
     }

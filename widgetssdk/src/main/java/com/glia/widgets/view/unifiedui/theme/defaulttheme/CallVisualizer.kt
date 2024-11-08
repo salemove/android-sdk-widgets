@@ -25,7 +25,7 @@ internal fun EndScreenSharingTheme(pallet: ColorPallet): EndScreenSharingTheme =
         header = PrimaryColorHeaderTheme(pallet),
         endButton = NegativeDefaultButtonTheme(pallet),
         label = BaseDarkColorTextTheme(pallet),
-        background = LayerTheme(fill = pallet.baseLightColorTheme)
+        background = LayerTheme(fill = pallet.lightColorTheme)
     )
 
 /**
@@ -34,10 +34,10 @@ internal fun EndScreenSharingTheme(pallet: ColorPallet): EndScreenSharingTheme =
 internal fun VisitorCodeTheme(pallet: ColorPallet): VisitorCodeTheme =
     VisitorCodeTheme(
         numberSlotText = BaseDarkColorTextTheme(pallet),
-        numberSlotBackground = LayerTheme(fill = pallet.baseLightColorTheme),
-        closeButtonColor = pallet.baseNormalColorTheme,
+        numberSlotBackground = LayerTheme(fill = pallet.lightColorTheme),
+        closeButtonColor = pallet.normalColorTheme,
         refreshButton = PositiveDefaultButtonTheme(pallet),
-        background = LayerTheme(fill = pallet.baseLightColorTheme),
+        background = LayerTheme(fill = pallet.lightColorTheme),
         title = BaseDarkColorTextTheme(pallet),
         loadingProgressBar = pallet.primaryColorTheme
     )

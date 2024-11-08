@@ -12,6 +12,10 @@
     <color name="glia_negative_color">#BC0F42</color>
     <color name="glia_neutral_color">#F7F7F7</color>
 
+    <!--  Glia brand color is same as `glia_shade_color` but should not be tied to global
+    colors to prevent customisation.  -->
+    <color name="glia_branding_color">#B6BBC1</color>
+
     <!-- { @deprecated Use glia_call_view_background_color instead.} -->
     <color name="glia_transparent_black_bg">@color/glia_black_color_transparency_1</color>
     <color name="glia_call_view_background_color">@color/glia_transparent_black_bg</color>

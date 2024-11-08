@@ -17,7 +17,7 @@ import com.glia.widgets.view.unifiedui.theme.securemessaging.SecureMessagingWelc
 internal fun SecureMessagingWelcomeScreenTheme(pallet: ColorPallet):
     SecureMessagingWelcomeScreenTheme {
     return pallet.let {
-        val baseDarkColorText = TextTheme(textColor = pallet.baseDarkColorTheme)
+        val baseDarkColorText = TextTheme(textColor = pallet.darkColorTheme)
 
         SecureMessagingWelcomeScreenTheme(
             headerTheme = PrimaryColorHeaderTheme(it),
@@ -27,20 +27,20 @@ internal fun SecureMessagingWelcomeScreenTheme(pallet: ColorPallet):
             checkMessagesButtonTheme = BasePrimaryColorTextTheme(it),
             messageTitleTheme = baseDarkColorText,
             messageInputNormalTheme = DefaultInputTheme(
-                stroke = it.baseShadeColorTheme?.primaryColor,
-                textColor = it.baseDarkColorTheme
+                stroke = it.shadeColorTheme?.primaryColor,
+                textColor = it.darkColorTheme
             ),
             messageInputActiveTheme = DefaultInputTheme(
                 stroke = it.primaryColorTheme?.primaryColor,
-                textColor = it.baseDarkColorTheme
+                textColor = it.darkColorTheme
             ),
             messageInputDisabledTheme = DefaultInputTheme(
-                stroke = it.baseShadeColorTheme?.primaryColor,
-                textColor = it.baseDarkColorTheme
+                stroke = it.shadeColorTheme?.primaryColor,
+                textColor = it.darkColorTheme
             ),
             messageInputErrorTheme = DefaultInputTheme(
-                stroke = it.systemNegativeColorTheme?.primaryColor,
-                textColor = it.baseDarkColorTheme
+                stroke = it.negativeColorTheme?.primaryColor,
+                textColor = it.darkColorTheme
             ),
             messageInputHintTheme = BaseNormalColorTextTheme(it),
             enabledSendButtonTheme = SecureConversationsEnabledSendButtonTheme(it),
@@ -48,12 +48,12 @@ internal fun SecureMessagingWelcomeScreenTheme(pallet: ColorPallet):
             loadingSendButtonTheme = null,
             activityIndicatorColorTheme = null,
             messageWarningTheme = BaseNegativeColorTextTheme(it),
-            messageWarningIconColorTheme = it.systemNegativeColorTheme,
-            filePickerButtonTheme = it.baseNormalColorTheme,
-            filePickerButtonDisabledTheme = it.baseShadeColorTheme,
+            messageWarningIconColorTheme = it.negativeColorTheme,
+            filePickerButtonTheme = it.normalColorTheme,
+            filePickerButtonDisabledTheme = it.shadeColorTheme,
             attachmentListTheme = null,
             pickMediaTheme = DefaultAttachmentsPopupTheme(it),
-            backgroundTheme = it.baseLightColorTheme
+            backgroundTheme = it.lightColorTheme
         )
     }
 }
@@ -83,7 +83,7 @@ internal fun SecureMessagingConfirmationScreenTheme(pallet: ColorPallet):
     return pallet.let {
         SecureMessagingConfirmationScreenTheme(
             headerTheme = PrimaryColorHeaderTheme(it),
-            backgroundTheme = it.baseLightColorTheme,
+            backgroundTheme = it.lightColorTheme,
             iconColorTheme = it.primaryColorTheme,
             titleTheme = BaseDarkColorTextTheme(it),
             subtitleTheme = BaseDarkColorTextTheme(it),
@@ -95,15 +95,15 @@ internal fun SecureMessagingConfirmationScreenTheme(pallet: ColorPallet):
 internal fun SecureMessagingTheme(pallet: ColorPallet): SecureMessagingTheme {
     return pallet.let {
         SecureMessagingTheme(
-            unavailableStatusBackground = LayerTheme(fill = it.systemNegativeColorTheme),
+            unavailableStatusBackground = LayerTheme(fill = it.negativeColorTheme),
             unavailableStatusText = BaseLightColorTextTheme(it),
-            bottomBannerBackground = LayerTheme(fill = it.baseNeutralColorTheme),
+            bottomBannerBackground = LayerTheme(fill = it.neutralColorTheme),
             bottomBannerText = BaseNormalColorTextTheme(it),
-            bottomBannerDividerColor = it.baseShadeColorTheme,
-            topBannerBackground = LayerTheme(fill = it.baseNeutralColorTheme),
+            bottomBannerDividerColor = it.shadeColorTheme,
+            topBannerBackground = LayerTheme(fill = it.neutralColorTheme),
             topBannerText = BaseDarkColorTextTheme(it),
-            topBannerDividerColor = it.baseShadeColorTheme,
-            topBannerDropDownIconColor = it.baseNormalColorTheme,
+            topBannerDividerColor = it.shadeColorTheme,
+            topBannerDropDownIconColor = it.normalColorTheme,
             mediaTypeItems = DefaultMediaTypeItemsTheme(it)
         )
     }

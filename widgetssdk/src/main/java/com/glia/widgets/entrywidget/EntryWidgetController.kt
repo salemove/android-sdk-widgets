@@ -8,20 +8,20 @@ import com.glia.androidsdk.queuing.QueueState
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.core.queue.QueueRepository
 import com.glia.widgets.core.queue.QueuesState
-import com.glia.widgets.di.Dependencies
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.unSafeSubscribe
+import com.glia.widgets.launcher.EngagementLauncher
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 
 internal class EntryWidgetController(
     private val queueRepository: QueueRepository,
     private val isAuthenticatedUseCase: IsAuthenticatedUseCase,
-    private val core: GliaCore
+    private val core: GliaCore,
+    private val engagementLauncher: EngagementLauncher
 ) : EntryWidgetContract.Controller {
     private lateinit var view: EntryWidgetContract.View
-    private val engagementLauncher = Dependencies.engagementLauncher
 
     override fun setView(view: EntryWidgetContract.View) {
         this.view = view

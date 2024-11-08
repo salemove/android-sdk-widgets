@@ -184,7 +184,7 @@
 
         <!--        TODO remove this two lines during implementation of leave dialog. This was added to make text on the temp dialog visible-->
         <item name="colorOnSurface">@color/glia_black_color</item>
-        <item name="colorPrimary">@color/glia_brand_primary_color</item>
+        <item name="colorPrimary">@color/glia_primary_color</item>
     </style>
 
     <style name="ThemeOverlay.Glia.BottomSheetDialog" parent="ThemeOverlay.MaterialComponents.BottomSheetDialog">

@@ -90,13 +90,13 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/glia_medium"
             android:importantForAccessibility="no"
-            android:textColor="@color/glia_normal_color"
+            android:textColor="@color/glia_branding_color"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/logo_view"
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="Powered by" />
+            tools:text="@string/general_powered" />
 
         <ImageView
             android:id="@+id/logo_view"

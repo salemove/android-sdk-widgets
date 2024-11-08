@@ -226,7 +226,7 @@ internal class ChatController(
         updateOperatorDefaultImageUrlUseCase()
 
         when (intention) {
-            Intention.RETURN_TO_CHAT -> restoreChat(intention)
+            Intention.RETURN_TO_CHAT -> restoreChat()
             Intention.SC_DIALOG_START_AUDIO -> initLeaveCurrentConversationDialog(LeaveDialogAction.AUDIO)
             Intention.SC_DIALOG_START_VIDEO -> initLeaveCurrentConversationDialog(LeaveDialogAction.VIDEO)
             Intention.SC_DIALOG_ENQUEUE_FOR_TEXT -> initLeaveCurrentConversationDialog(LeaveDialogAction.LIVE_CHAT)
@@ -236,8 +236,7 @@ internal class ChatController(
     }
 
     private fun initLeaveCurrentConversationDialog(action: LeaveDialogAction) {
-        initChatManager()
-        emitViewState { chatState.initChat().setSecureMessagingState() }
+        initSecureMessaging()
         dialogController.showLeaveCurrentConversationDialog(action)
     }
 
@@ -252,7 +251,7 @@ internal class ChatController(
         emitViewState { chatState.initChat().setLiveChatState() }
     }
 
-    override fun restoreChat(intention: Intention) {
+    override fun restoreChat() {
         chatManager.onChatAction(ChatManager.Action.ChatRestored)
     }
 

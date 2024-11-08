@@ -69,7 +69,7 @@ internal class ChatActivity : FadeTransitionActivity() {
         if (savedInstanceState == null) {
             chatView.startChat(intention)
         } else {
-            chatView.restoreChat(intention)
+            chatView.restoreChat()
         }
     }
 

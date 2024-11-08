@@ -16,7 +16,7 @@
         android:background="@color/glia_black_color"
         app:navigationIcon="?attr/gliaIconAppBarBack"
         app:titleCentered="true"
-        app:titleTextColor="@color/glia_white_color" />
+        app:titleTextColor="@color/glia_light_color" />
 
     <com.glia.widgets.filepreview.ui.ImagePreviewView
         android:id="@+id/preview_view"

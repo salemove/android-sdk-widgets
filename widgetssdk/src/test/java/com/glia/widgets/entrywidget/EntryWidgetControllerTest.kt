@@ -56,7 +56,7 @@ class EntryWidgetControllerTest {
             core,
             engagementLauncher
         )
-        controller.setView(view)
+        controller.setView(view, EntryWidgetContract.ViewType.BOTTOM_SHEET)
     }
 
     @After
@@ -71,7 +71,7 @@ class EntryWidgetControllerTest {
         `when`(observeUnreadMessagesCountUseCase.invoke()).thenReturn(Observable.just(unreadMessageCount))
         `when`(queueRepository.queuesState).thenReturn(Flowable.just(QueuesState.Loading))
 
-        controller.setView(view)
+        controller.setView(view, EntryWidgetContract.ViewType.BOTTOM_SHEET)
 
         verify(view, atLeast(1)).showItems(anyList())
     }
@@ -80,7 +80,7 @@ class EntryWidgetControllerTest {
     fun `showItems is called with ERROR_STATE if SDK is not initialized`() {
         `when`(core.isInitialized).thenReturn(false)
 
-        controller.setView(view)
+        controller.setView(view, EntryWidgetContract.ViewType.BOTTOM_SHEET)
 
         verify(view, atLeast(1)).showItems(listOf(EntryWidgetContract.ItemType.SdkNotInitializedState))
     }

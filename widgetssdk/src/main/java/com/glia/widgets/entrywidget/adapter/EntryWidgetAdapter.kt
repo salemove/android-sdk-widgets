@@ -79,6 +79,7 @@ internal class EntryWidgetAdapter(
     val disposable: CompositeDisposable = CompositeDisposable()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val isInsideSecureConversation = this.viewType == EntryWidgetContract.ViewType.MESSAGING_LIVE_SUPPORT
         return when (viewType) {
             ViewType.ERROR_ITEM.ordinal -> EntryWidgetErrorStateViewHolder(
                 EntryWidgetErrorItemBinding.inflate(parent.layoutInflater, parent, false),
@@ -96,7 +97,8 @@ internal class EntryWidgetAdapter(
             )
             else -> EntryWidgetLiveItemViewHolder(
                 EntryWidgetLiveItemBinding.inflate(parent.layoutInflater, parent, false),
-                itemTheme = mediaTypeItemsTheme?.mediaTypeItem
+                itemTheme = mediaTypeItemsTheme?.mediaTypeItem,
+                isInsideSecureConversation
             )
         }
     }

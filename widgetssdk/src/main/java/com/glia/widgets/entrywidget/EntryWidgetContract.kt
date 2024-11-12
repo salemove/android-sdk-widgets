@@ -12,16 +12,16 @@ internal interface EntryWidgetContract {
         MESSAGING_LIVE_SUPPORT
     }
 
-    enum class ItemType {
-        CHAT,
-        AUDIO_CALL,
-        VIDEO_CALL,
-        SECURE_MESSAGE,
-        LOADING_STATE,
-        EMPTY_STATE,
-        SDK_NOT_INITIALIZED_STATE,
-        ERROR_STATE,
-        PROVIDED_BY
+    sealed class ItemType {
+        data object Chat : ItemType()
+        data object AudioCall : ItemType()
+        data object VideoCall : ItemType()
+        data class Messaging(val value: Int) : ItemType()
+        data object LoadingState : ItemType()
+        data object EmptyState : ItemType()
+        data object SdkNotInitializedState : ItemType()
+        data object ErrorState : ItemType()
+        data object ProvidedBy : ItemType()
     }
 
     interface Controller : BaseController {

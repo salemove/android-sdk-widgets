@@ -11,7 +11,6 @@ import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import com.glia.widgets.R
-import com.glia.widgets.core.secureconversations.domain.ObserveUnreadMessagesCountUseCase
 import com.glia.widgets.databinding.EntryWidgetFragmentBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.entrywidget.adapter.EntryWidgetAdapter
@@ -40,13 +39,11 @@ internal class EntryWidgetFragment : BottomSheetDialogFragment() {
         val layoutInflater = LayoutInflater.from(requireContext().wrapWithMaterialThemeOverlay())
         val binding = EntryWidgetFragmentBinding.inflate(layoutInflater, container, false)
         val entryWidgetsTheme = Dependencies.gliaThemeManager.theme?.entryWidgetTheme
-        val observeUnreadMessagesCountUseCase = Dependencies.useCaseFactory.createObserveUnreadMessagesCountUseCase()
 
         setupView(
             requireContext(),
             binding,
-            entryWidgetsTheme,
-            observeUnreadMessagesCountUseCase,
+            entryWidgetsTheme
         )
 
         return binding.root
@@ -56,13 +53,11 @@ internal class EntryWidgetFragment : BottomSheetDialogFragment() {
     fun setupView(
         context: Context,
         binding: EntryWidgetFragmentBinding,
-        entryWidgetsTheme: EntryWidgetTheme?,
-        observeUnreadMessagesCountUseCase: ObserveUnreadMessagesCountUseCase,
+        entryWidgetsTheme: EntryWidgetTheme?
     ) {
         val entryWidgetAdapter = EntryWidgetAdapter(
             EntryWidgetContract.ViewType.BOTTOM_SHEET,
-            entryWidgetsTheme,
-            observeUnreadMessagesCountUseCase,
+            entryWidgetsTheme
         )
 
         EntryWidgetView(

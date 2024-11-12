@@ -2,7 +2,6 @@ package com.glia.widgets.entrywidget
 
 import android.view.View
 import androidx.core.view.allViews
-import com.glia.widgets.core.secureconversations.domain.ObserveUnreadMessagesCountUseCase
 import com.glia.widgets.databinding.EntryWidgetFragmentBinding
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 
@@ -10,7 +9,6 @@ internal class EntryWidgetBottomSheetTest : EntryWidgetEmbeddedViewTest() {
     override fun setupView(
         items: List<EntryWidgetContract.ItemType>,
         viewType: EntryWidgetContract.ViewType,
-        observeUnreadMessagesCountUseCase: ObserveUnreadMessagesCountUseCase,
         unifiedTheme: UnifiedTheme?
     ): View {
         localeProviderMock()
@@ -21,8 +19,7 @@ internal class EntryWidgetBottomSheetTest : EntryWidgetEmbeddedViewTest() {
         entryWidgetFragment.setupView(
             context,
             binding,
-            unifiedTheme?.entryWidgetTheme,
-            observeUnreadMessagesCountUseCase,
+            unifiedTheme?.entryWidgetTheme
         )
 
         binding.container.allViews.forEach {

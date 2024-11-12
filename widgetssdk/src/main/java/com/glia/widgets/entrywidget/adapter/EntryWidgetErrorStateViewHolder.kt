@@ -27,19 +27,19 @@ internal class EntryWidgetErrorStateViewHolder(
 
     override fun bind(itemType: EntryWidgetContract.ItemType, onClickListener: View.OnClickListener) {
         when (itemType) {
-            EntryWidgetContract.ItemType.EMPTY_STATE -> {
+            EntryWidgetContract.ItemType.EmptyState -> {
                 binding.title.setLocaleText(R.string.entry_widget_empty_state_title)
                 binding.description.setLocaleText(R.string.entry_widget_empty_state_description)
                 binding.button.isVisible = false
             }
-            EntryWidgetContract.ItemType.ERROR_STATE -> {
+            EntryWidgetContract.ItemType.ErrorState -> {
                 binding.title.setLocaleText(R.string.entry_widget_error_state_title)
                 binding.description.setLocaleText(R.string.entry_widget_error_state_description)
                 binding.button.setLocaleText(R.string.entry_widget_error_state_try_again_button_label)
                 binding.button.setOnClickListener(onClickListener)
                 binding.button.isVisible = true
             }
-            EntryWidgetContract.ItemType.SDK_NOT_INITIALIZED_STATE -> {
+            EntryWidgetContract.ItemType.SdkNotInitializedState -> {
                 binding.title.setLocaleText(R.string.entry_widget_error_state_title)
                 binding.description.setLocaleText(R.string.entry_widget_error_state_description)
                 binding.button.setLocaleText(R.string.entry_widget_error_state_try_again_button_label)

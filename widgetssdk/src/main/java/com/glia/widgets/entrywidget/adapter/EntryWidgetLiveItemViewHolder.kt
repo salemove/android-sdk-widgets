@@ -15,7 +15,8 @@ import com.glia.widgets.view.unifiedui.theme.entrywidget.MediaTypeItemTheme
 
 internal class EntryWidgetLiveItemViewHolder(
     private val binding: EntryWidgetLiveItemBinding,
-    itemTheme: MediaTypeItemTheme?
+    itemTheme: MediaTypeItemTheme?,
+    isInsideSecureConversation: Boolean
 ) : EntryWidgetAdapter.ViewHolder(binding.root) {
 
     init {
@@ -29,6 +30,12 @@ internal class EntryWidgetLiveItemViewHolder(
                 binding.titleLoading.backgroundTintList = tintList
                 binding.descriptionLoading.backgroundTintList = tintList
             }
+        }
+
+
+        if (isInsideSecureConversation) {
+            val mediumPadding = binding.root.resources.getDimension(R.dimen.glia_medium).toInt()
+            binding.root.setPadding(0, mediumPadding, 0, mediumPadding)
         }
     }
 

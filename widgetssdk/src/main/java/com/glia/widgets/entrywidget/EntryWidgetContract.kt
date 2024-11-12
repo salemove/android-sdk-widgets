@@ -12,20 +12,24 @@ internal interface EntryWidgetContract {
         MESSAGING_LIVE_SUPPORT
     }
 
-    sealed class ItemType {
-        data object Chat : ItemType()
-        data object AudioCall : ItemType()
-        data object VideoCall : ItemType()
-        data class Messaging(val value: Int) : ItemType()
-        data object LoadingState : ItemType()
-        data object EmptyState : ItemType()
-        data object SdkNotInitializedState : ItemType()
-        data object ErrorState : ItemType()
-        data object ProvidedBy : ItemType()
+    sealed class ItemType(private val order: Int) : Comparable<ItemType> {
+        data object VideoCall : ItemType(0)
+        data object AudioCall : ItemType(1)
+        data object Chat : ItemType(2)
+        data class Messaging(val value: Int) : ItemType(3)
+        data object LoadingState : ItemType(10)
+        data object EmptyState : ItemType(10)
+        data object SdkNotInitializedState : ItemType(10)
+        data object ErrorState : ItemType(10)
+        data object ProvidedBy : ItemType(11)
+
+        override fun compareTo(other: ItemType): Int {
+            return this.order.compareTo(other.order)
+        }
     }
 
     interface Controller : BaseController {
-        fun setView(view: View)
+        fun setView(view: View, type: ViewType)
         fun onItemClicked(itemType: ItemType, activity: Activity)
     }
 

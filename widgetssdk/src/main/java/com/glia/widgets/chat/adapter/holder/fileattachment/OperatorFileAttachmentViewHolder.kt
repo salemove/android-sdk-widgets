@@ -31,9 +31,11 @@ internal class OperatorFileAttachmentViewHolder @JvmOverloads constructor(
     }
 
     fun bind(item: OperatorAttachmentItem.File) {
-        super.setData(item.isFileExists, item.isDownloading, item.attachment)
+        super.setData(isFileExists(item), item.isDownloading, item.attachment)
         updateOperatorStatusView(item)
     }
+
+    private fun isFileExists(item: OperatorAttachmentItem.File): Boolean = item.isDownloaded(itemView.context)
 
     private fun setupOperatorStatusView(uiTheme: UiTheme) {
         binding.chatHeadView.setTheme(uiTheme)
@@ -60,7 +62,7 @@ internal class OperatorFileAttachmentViewHolder @JvmOverloads constructor(
                 attachmentView.removeAccessibilityClickAction()
             }
 
-            item.isFileExists -> {
+            isFileExists(item) -> {
                 attachmentView.setOnClickListener { onFileItemClickListener.onFileOpenClick(item.attachment) }
                 attachmentView.addClickActionAccessibilityLabel(localeProvider.getString(R.string.general_open))
             }

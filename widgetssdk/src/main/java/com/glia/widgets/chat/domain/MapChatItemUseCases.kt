@@ -17,7 +17,7 @@ internal class MapOperatorAttachmentUseCase {
         if (attachment.isImage) {
             OperatorAttachmentItem.Image(
                 attachment = attachment,
-                id = chatMessage.id,
+                id = attachment.id,
                 timestamp = chatMessage.timestamp,
                 showChatHead = showChatHead,
                 operatorProfileImgUrl = operatorImageUrl,
@@ -26,7 +26,7 @@ internal class MapOperatorAttachmentUseCase {
         } else {
             OperatorAttachmentItem.File(
                 attachment = attachment,
-                id = chatMessage.id,
+                id = attachment.id,
                 timestamp = chatMessage.timestamp,
                 showChatHead = showChatHead,
                 operatorProfileImgUrl = operatorImageUrl,
@@ -43,8 +43,6 @@ internal class MapVisitorAttachmentUseCase {
             VisitorAttachmentItem.RemoteImage(
                 id = attachmentFile.id,
                 attachment = attachmentFile,
-                isFileExists = false,
-                isDownloading = false,
                 status = status,
                 timestamp = timestamp
             )

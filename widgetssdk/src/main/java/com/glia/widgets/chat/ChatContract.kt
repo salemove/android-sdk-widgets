@@ -69,8 +69,8 @@ internal interface ChatContract {
         fun minimizeView()
         fun smoothScrollToBottom()
         fun scrollToBottomImmediate()
-        fun fileDownloadError(attachmentFile: AttachmentFile, error: Throwable)
-        fun fileDownloadSuccess(attachmentFile: AttachmentFile)
+        fun fileDownloadError()
+        fun fileDownloadSuccess()
         fun clearMessageInput()
         fun fileIsNotReadyForPreview()
         fun showBroadcastNotSupportedToast()
@@ -81,7 +81,6 @@ internal interface ChatContract {
         fun navigateToWebBrowserActivity(title: LocaleString, url: String)
         fun showToast(message: String, duration: Int = Toast.LENGTH_SHORT)
         fun dispatchImageCapture(uri: Uri)
-        fun onFileDownload(attachmentFile: AttachmentFile)
         fun navigateToImagePreview(attachmentFile: AttachmentFile, view: android.view.View)
         fun navigateToImagePreview(attachmentFile: LocalAttachment, view: android.view.View)
     }

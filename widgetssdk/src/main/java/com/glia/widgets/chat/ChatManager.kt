@@ -24,6 +24,7 @@ import com.glia.widgets.chat.model.NewMessagesDividerItem
 import com.glia.widgets.chat.model.OperatorChatItem
 import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.chat.model.OperatorStatusItem
+import com.glia.widgets.chat.model.RemoteAttachmentItem
 import com.glia.widgets.chat.model.VisitorAttachmentItem
 import com.glia.widgets.chat.model.VisitorChatItem
 import com.glia.widgets.chat.model.VisitorItemStatus
@@ -219,7 +220,35 @@ internal class ChatManager(
             is Action.OnSendMessageError -> mapSendMessageFailed(action.messageId, state)
             is Action.OnRetryClicked -> mapRetryClicked(action.messageId, state)
             is Action.OnSendMessageOperatorOffline -> mapSendMessageOperatorOffline(action.messageId, state)
+            is Action.OnFileDownloadFailed -> mapFileDownloadFailed(action.attachmentId, state)
+            is Action.OnFileDownloadStarted -> mapFileDownloadStarted(action.attachmentId, state)
+            is Action.OnFileDownloadSucceeded -> mapFileDownloadSucceeded(action.attachmentId, state)
         }
+    }
+
+    @VisibleForTesting
+    fun mapFileDownloadSucceeded(attachmentId: String, state: State): State =
+        updateRemoteAttachmentState(state, attachmentId, isFileExists = true, isDownloading = false)
+
+    @VisibleForTesting
+    fun mapFileDownloadStarted(attachmentId: String, state: State): State =
+        updateRemoteAttachmentState(state, attachmentId, isFileExists = false, isDownloading = true)
+
+    @VisibleForTesting
+    fun mapFileDownloadFailed(attachmentId: String, state: State): State =
+        updateRemoteAttachmentState(state, attachmentId, isFileExists = false, isDownloading = false)
+
+    @VisibleForTesting
+    fun updateRemoteAttachmentState(
+        state: State,
+        attachmentId: String,
+        isFileExists: Boolean,
+        isDownloading: Boolean
+    ): State = state.apply {
+        val index = chatItems.indexOfLast { it.id == attachmentId }.takeIf { it != -1 } ?: return@apply
+
+        val item = chatItems[index] as? RemoteAttachmentItem ?: return@apply
+        state.chatItems[index] = item.updateWith(isFileExists, isDownloading)
     }
 
     private fun mapSendMessageOperatorOffline(messageId: String, state: State): State = state.apply {
@@ -469,5 +498,8 @@ internal class ChatManager(
         data class OnSendMessageError(val messageId: String) : Action
         data class OnRetryClicked(val messageId: String) : Action
         data class OnSendMessageOperatorOffline(val messageId: String) : Action
+        data class OnFileDownloadStarted(val attachmentId: String) : Action
+        data class OnFileDownloadSucceeded(val attachmentId: String) : Action
+        data class OnFileDownloadFailed(val attachmentId: String) : Action
     }
 }

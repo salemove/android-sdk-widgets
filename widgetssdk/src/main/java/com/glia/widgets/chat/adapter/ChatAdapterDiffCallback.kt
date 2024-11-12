@@ -3,6 +3,7 @@ package com.glia.widgets.chat.adapter
 import androidx.recyclerview.widget.DiffUtil
 import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.MediaUpgradeStartedTimerItem
+import com.glia.widgets.chat.model.RemoteAttachmentItem
 import com.glia.widgets.chat.model.VisitorAttachmentItem
 import com.glia.widgets.chat.model.VisitorItemStatus
 import com.glia.widgets.chat.model.VisitorMessageItem
@@ -17,13 +18,14 @@ internal class ChatAdapterDiffCallback : DiffUtil.ItemCallback<ChatItem>() {
         oldItem is VisitorMessageItem && newItem is VisitorMessageItem -> ChatAdapterPayload.MessageUpdated(newItem.status, newItem.message)
         oldItem is VisitorAttachmentItem.LocalImage && newItem is VisitorAttachmentItem.LocalImage -> ChatAdapterPayload.StatusChanged(newItem.status)
         oldItem is VisitorAttachmentItem.LocalFile && newItem is VisitorAttachmentItem.LocalFile -> ChatAdapterPayload.StatusChanged(newItem.status)
-
+        oldItem is RemoteAttachmentItem && newItem is RemoteAttachmentItem -> ChatAdapterPayload.RemoteAttachmentStatusChanged
         else -> null
     }
 }
 
-internal sealed class ChatAdapterPayload {
-    internal data class Time(val time: String) : ChatAdapterPayload()
-    internal data class StatusChanged(val status: VisitorItemStatus) : ChatAdapterPayload()
-    internal data class MessageUpdated(val status: VisitorItemStatus, val message: String) : ChatAdapterPayload()
+internal sealed interface ChatAdapterPayload {
+    data class Time(val time: String) : ChatAdapterPayload
+    data class StatusChanged(val status: VisitorItemStatus) : ChatAdapterPayload
+    data class MessageUpdated(val status: VisitorItemStatus, val message: String) : ChatAdapterPayload
+    object RemoteAttachmentStatusChanged : ChatAdapterPayload
 }

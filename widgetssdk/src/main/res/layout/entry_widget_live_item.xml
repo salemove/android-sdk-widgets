@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:paddingTop="@dimen/glia_large"
+    android:paddingBottom="@dimen/glia_large"
     android:foreground="?attr/selectableItemBackground">
 
     <ImageView
@@ -15,34 +18,34 @@
         app:layout_constraintEnd_toStartOf="@id/title"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:tint="?attr/gliaBrandPrimaryColor" />
+        app:tint="?attr/gliaBrandPrimaryColor"
+        tools:src="@drawable/ic_audio" />
 
     <TextView
         android:id="@+id/title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/glia_large"
         android:layout_marginEnd="@dimen/glia_x_large"
         android:letterSpacing="-0.02"
         android:textColor="?attr/gliaBaseDarkColor"
         app:layout_constraintBottom_toTopOf="@id/description"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/icon"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="@string/entry_widget_audio_button_label" />
 
     <TextView
         android:id="@+id/description"
         style="@style/Application.Glia.Subtitle2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/glia_x_large"
-        android:layout_marginBottom="@dimen/glia_large"
         android:letterSpacing="-0.01"
         android:textColor="?attr/gliaBaseNormalColor"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@id/title"
-        app:layout_constraintTop_toBottomOf="@id/title" />
+        app:layout_constraintTop_toBottomOf="@id/title"
+        tools:text="@string/entry_widget_audio_button_description" />
 
     <View
         android:id="@+id/icon_loading"

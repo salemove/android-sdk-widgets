@@ -26,9 +26,11 @@ internal class EntryWidgetController(
 ) : EntryWidgetContract.Controller {
     private lateinit var view: EntryWidgetContract.View
     private var disposable = CompositeDisposable()
+    private lateinit var type: EntryWidgetContract.ViewType
 
-    override fun setView(view: EntryWidgetContract.View) {
+    override fun setView(view: EntryWidgetContract.View, type: EntryWidgetContract.ViewType) {
         this.view = view
+        this.type = type
 
         if (core.isInitialized) {
             subscribeToQueueState()
@@ -76,27 +78,33 @@ internal class EntryWidgetController(
     )
 
     private fun mapMediaTypes(queues: List<Queue>, count: Int): List<EntryWidgetContract.ItemType> =
-        queues.map { it.state }
+        queues.asSequence()
+            .map { it.state }
             .filter { it.status == QueueState.Status.OPEN }
             .flatMap { it.medias.toList() }
             .distinct()
-            .let { allMedias ->
-                return buildList {
-                    if (allMedias.contains(Engagement.MediaType.VIDEO)) add(EntryWidgetContract.ItemType.VideoCall)
-                    if (allMedias.contains(Engagement.MediaType.AUDIO)) add(EntryWidgetContract.ItemType.AudioCall)
-                    if (allMedias.contains(Engagement.MediaType.TEXT)) add(EntryWidgetContract.ItemType.Chat)
-                    if (allMedias.contains(Engagement.MediaType.MESSAGING) && isAuthenticatedUseCase()) add(EntryWidgetContract.ItemType.Messaging(count))
-
-                    if (allMedias.isEmpty() || allMedias.hasOnlyMessagingAndIsNotAuthenticated()) {
-                        add(EntryWidgetContract.ItemType.EmptyState)
-                    } else {
-                        add(EntryWidgetContract.ItemType.ProvidedBy)
-                    }
+            .filterNot { it == null || it == Engagement.MediaType.UNKNOWN || it == Engagement.MediaType.PHONE }
+            .filterNot { it == Engagement.MediaType.MESSAGING && (!isAuthenticatedUseCase() || type == EntryWidgetContract.ViewType.MESSAGING_LIVE_SUPPORT) }
+            .map {
+                when (it) {
+                    Engagement.MediaType.VIDEO -> EntryWidgetContract.ItemType.VideoCall
+                    Engagement.MediaType.AUDIO -> EntryWidgetContract.ItemType.AudioCall
+                    Engagement.MediaType.TEXT -> EntryWidgetContract.ItemType.Chat
+                    Engagement.MediaType.MESSAGING -> EntryWidgetContract.ItemType.Messaging(count)
+                    // Anything else should be impossible based on filtering few lines above.
+                    // Added `else` to meet `when()` requirement to be exhaustive
+                    else -> EntryWidgetContract.ItemType.ErrorState
                 }
             }
-
-    private fun List<Engagement.MediaType>.hasOnlyMessagingAndIsNotAuthenticated(): Boolean =
-        this.size == 1 && this.contains(Engagement.MediaType.MESSAGING) && !isAuthenticatedUseCase()
+            .toMutableList()
+            .apply {
+                if (isEmpty()) {
+                    add(EntryWidgetContract.ItemType.EmptyState)
+                } else if (type != EntryWidgetContract.ViewType.MESSAGING_LIVE_SUPPORT) {
+                    add(EntryWidgetContract.ItemType.ProvidedBy)
+                }
+                sort()
+            }
 
     override fun onItemClicked(itemType: EntryWidgetContract.ItemType, activity: Activity) {
         Logger.d(TAG, "Item clicked: $itemType")

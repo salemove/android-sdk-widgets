@@ -5,7 +5,6 @@ import android.content.Context
 import android.view.View
 import com.glia.widgets.chat.Intention
 import com.glia.widgets.core.secureconversations.domain.HasPendingSecureConversationsWithTimeoutUseCase
-import com.glia.widgets.core.secureconversations.domain.ObserveUnreadMessagesCountUseCase
 import com.glia.widgets.entrywidget.adapter.EntryWidgetAdapter
 import com.glia.widgets.helper.unSafeSubscribe
 import com.glia.widgets.launcher.ActivityLauncher
@@ -39,8 +38,7 @@ internal class EntryWidgetImpl(
     private val activityLauncher: ActivityLauncher,
     private val themeManager: UnifiedThemeManager,
     private val entryWidgetHideController: EntryWidgetHideController,
-    private val hasPendingSecureConversationsWithTimeoutUseCase: HasPendingSecureConversationsWithTimeoutUseCase,
-    private val observeUnreadMessagesCountUseCase: ObserveUnreadMessagesCountUseCase
+    private val hasPendingSecureConversationsWithTimeoutUseCase: HasPendingSecureConversationsWithTimeoutUseCase
 ) : EntryWidget {
 
     override fun show(activity: Activity) {
@@ -60,8 +58,7 @@ internal class EntryWidgetImpl(
     override fun getView(context: Context): View {
         val adapter = EntryWidgetAdapter(
             EntryWidgetContract.ViewType.EMBEDDED_VIEW,
-            themeManager.theme?.entryWidgetTheme,
-            observeUnreadMessagesCountUseCase,
+            themeManager.theme?.entryWidgetTheme
         )
         return EntryWidgetView(context, adapter)
     }

@@ -2,6 +2,8 @@ package com.glia.widgets.entrywidget
 
 import android.app.Activity
 import android.content.Context
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.InsetDrawable
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
@@ -12,6 +14,7 @@ import com.glia.widgets.helper.getDrawableCompat
 import com.glia.widgets.helper.requireActivity
 import com.glia.widgets.helper.wrapWithMaterialThemeOverlay
 import com.glia.widgets.view.unifiedui.applyLayerTheme
+import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
 import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
 import com.glia.widgets.view.unifiedui.theme.entrywidget.EntryWidgetTheme
 import com.glia.widgets.view.unifiedui.theme.entrywidget.MediaTypeItemsTheme
@@ -60,7 +63,7 @@ internal class EntryWidgetView(
 
     override fun setController(controller: EntryWidgetContract.Controller) {
         this.controller = controller
-        controller.setView(this)
+        controller.setView(this, viewAdapter.viewType)
     }
 
     override fun showItems(items: List<EntryWidgetContract.ItemType>) {
@@ -88,11 +91,23 @@ internal class EntryWidgetView(
 
     private fun applyTheme(backgroundTheme: LayerTheme? = null, mediaTypeItemsTheme: MediaTypeItemsTheme? = null) {
         backgroundTheme?.let { applyLayerTheme(it) }
-        getDrawableCompat(R.drawable.bg_entry_widget_divider)?.let {
-            mediaTypeItemsTheme?.dividerColor?.let { dividerColor ->
-                it.setTint(dividerColor.primaryColor)
-            }
+        createDividerDrawable(mediaTypeItemsTheme?.dividerColor)?.let {
             addItemDecoration(EntryWidgetItemDecoration(it))
         }
+    }
+
+    private fun createDividerDrawable(dividerColor: ColorTheme?): Drawable? {
+        return getDrawableCompat(R.drawable.bg_entry_widget_divider)
+            ?.apply {
+                dividerColor?.primaryColor?.let { setTint(it) }
+            }
+            ?.let {
+                if (viewAdapter.viewType == EntryWidgetContract.ViewType.MESSAGING_LIVE_SUPPORT) {
+                    it
+                } else {
+                    val padding = resources.getDimension(R.dimen.glia_large).toInt()
+                    InsetDrawable(it, padding, 0, padding, 0)
+                }
+            }
     }
 }

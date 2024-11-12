@@ -17,12 +17,15 @@ import com.glia.widgets.chat.domain.GliaOnMessageUseCase
 import com.glia.widgets.chat.domain.HandleCustomCardClickUseCase
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.chat.domain.SendUnsentMessagesUseCase
+import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.GvaButton
 import com.glia.widgets.chat.model.GvaQuickReplies
 import com.glia.widgets.chat.model.MediaUpgradeStartedTimerItem
 import com.glia.widgets.chat.model.NewMessagesDividerItem
+import com.glia.widgets.chat.model.OperatorAttachmentItem
 import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.chat.model.OperatorStatusItem
+import com.glia.widgets.chat.model.RemoteAttachmentItem
 import com.glia.widgets.chat.model.VisitorAttachmentItem
 import com.glia.widgets.chat.model.VisitorChatItem
 import com.glia.widgets.chat.model.VisitorItemStatus
@@ -47,6 +50,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers.anyBoolean
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.atLeastOnce
@@ -507,6 +511,33 @@ class ChatManagerTest {
         assertEquals(state, subjectUnderTest.mapAction(action, state))
     }
 
+    @Test
+    fun `mapAction calls mapFileDownloadFailed when Action_OnFileDownloadFailed passed`() {
+        val attachmentId = "attachment_id"
+        val action: ChatManager.Action.OnFileDownloadFailed = ChatManager.Action.OnFileDownloadFailed(attachmentId)
+        val subjectUnderTestSpy = spy(subjectUnderTest)
+        subjectUnderTestSpy.mapAction(action, state)
+        verify(subjectUnderTestSpy).mapFileDownloadFailed(eq(attachmentId), eq(state))
+    }
+
+    @Test
+    fun `mapAction calls mapFileDownloadStarted when Action_OnFileDownloadStarted passed`() {
+        val attachmentId = "attachment_id"
+        val action: ChatManager.Action.OnFileDownloadStarted = ChatManager.Action.OnFileDownloadStarted(attachmentId)
+        val subjectUnderTestSpy = spy(subjectUnderTest)
+        subjectUnderTestSpy.mapAction(action, state)
+        verify(subjectUnderTestSpy).mapFileDownloadStarted(eq(attachmentId), eq(state))
+    }
+
+    @Test
+    fun `mapAction calls mapFileDownloadSucceeded when Action_OnFileDownloadSucceeded passed`() {
+        val attachmentId = "attachment_id"
+        val action: ChatManager.Action.OnFileDownloadSucceeded = ChatManager.Action.OnFileDownloadSucceeded(attachmentId)
+        val subjectUnderTestSpy = spy(subjectUnderTest)
+        subjectUnderTestSpy.mapAction(action, state)
+        verify(subjectUnderTestSpy).mapFileDownloadSucceeded(eq(attachmentId), eq(state))
+    }
+
     @Test(expected = IllegalStateException::class)
     fun `mapNewMessage throws exception when passed message is invalid`() {
         val chatMessage: VisitorMessage = mock {
@@ -955,6 +986,62 @@ class ChatManagerTest {
 
         val updatedItem = newState.chatItems.first() as VisitorMessageItem
         assertEquals(VisitorItemStatus.PREVIEW, updatedItem.status)
+    }
+
+    @Test
+    fun `updateRemoteAttachmentState updates item when attachment exists`() {
+        val attachmentId = "attachmentId"
+        val isFileExists = true
+        val isDownloading = true
+
+        val remoteAttachmentItem = mock<OperatorAttachmentItem.File>()
+        val updatedRemoteAttachmentItem = mock<OperatorAttachmentItem.File>()
+
+        whenever(remoteAttachmentItem.id).thenReturn(attachmentId)
+        whenever(updatedRemoteAttachmentItem.id).thenReturn(attachmentId)
+        whenever(updatedRemoteAttachmentItem.isFileExists).thenReturn(isFileExists)
+        whenever(updatedRemoteAttachmentItem.isDownloading).thenReturn(isDownloading)
+        whenever(remoteAttachmentItem.updateWith(isFileExists, isDownloading)).thenReturn(updatedRemoteAttachmentItem)
+
+        state.chatItems.add(remoteAttachmentItem)
+
+        val result = subjectUnderTest.updateRemoteAttachmentState(state, attachmentId, isFileExists, isDownloading)
+
+        verify(remoteAttachmentItem).updateWith(isFileExists, isDownloading)
+
+        val item = result.chatItems.first() as OperatorAttachmentItem.File
+
+        assertTrue(item.isFileExists)
+        assertTrue(item.isDownloading)
+    }
+
+    @Test
+    fun `updateRemoteAttachmentState does nothing when attachment does not exist`() {
+        val attachmentId = "nonExistentId"
+        val isFileExists = true
+        val isDownloading = false
+
+        val remoteAttachmentItem = mock<OperatorAttachmentItem.File>()
+        val result = subjectUnderTest.updateRemoteAttachmentState(state, attachmentId, isFileExists, isDownloading)
+
+        verify(remoteAttachmentItem, never()).updateWith(anyBoolean(), anyBoolean())
+        assertTrue(result.chatItems.isEmpty())
+    }
+
+    @Test
+    fun `updateRemoteAttachmentState does nothing when item is not RemoteAttachmentItem`() {
+        val attachmentId = "attachmentId"
+        val isFileExists = true
+        val isDownloading = false
+
+        val nonRemoteAttachmentItem = mock<ChatItem>()
+        whenever(nonRemoteAttachmentItem.id).thenReturn(attachmentId)
+
+        state.chatItems.add(nonRemoteAttachmentItem)
+
+        val result = subjectUnderTest.updateRemoteAttachmentState(state, attachmentId, isFileExists, isDownloading)
+
+        assertFalse(result.chatItems.first() is RemoteAttachmentItem)
     }
 
     private inline fun <reified T : ChatMessage> mockChatMessage(): ChatMessageInternal {

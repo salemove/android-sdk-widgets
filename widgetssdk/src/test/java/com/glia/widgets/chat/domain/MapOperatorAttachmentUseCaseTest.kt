@@ -5,7 +5,6 @@ import com.glia.widgets.chat.MockChatMessageInternal
 import com.glia.widgets.chat.model.OperatorAttachmentItem
 import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.doReturn
@@ -34,8 +33,7 @@ class MapOperatorAttachmentUseCaseTest {
     fun `invoke returns OperatorAttachmentItem_Image when attachment is Image`() {
         whenever(mockAttachment.contentType) doReturn "image_asdfg"
         mockChatMessageInternal.apply {
-            val mappedMessage = useCase(mockAttachment, chatMessageInternal, true)
-            assertTrue(mappedMessage is OperatorAttachmentItem.Image)
+            val mappedMessage = useCase(mockAttachment, chatMessageInternal, true) as OperatorAttachmentItem.Image
             assertEquals(mockAttachment, mappedMessage.attachment)
             assertEquals(messageTimeStamp, mappedMessage.timestamp)
             assertEquals(true, mappedMessage.showChatHead)
@@ -48,8 +46,7 @@ class MapOperatorAttachmentUseCaseTest {
     fun `invoke returns OperatorAttachmentItem_File when attachment is not Image`() {
         whenever(mockAttachment.contentType) doReturn "imagse_asdfg"
         mockChatMessageInternal.apply {
-            val mappedMessage = useCase(mockAttachment, chatMessageInternal, false)
-            assertTrue(mappedMessage is OperatorAttachmentItem.File)
+            val mappedMessage = useCase(mockAttachment, chatMessageInternal, false) as OperatorAttachmentItem.File
             assertEquals(mockAttachment, mappedMessage.attachment)
             assertEquals(messageTimeStamp, mappedMessage.timestamp)
             assertEquals(false, mappedMessage.showChatHead)

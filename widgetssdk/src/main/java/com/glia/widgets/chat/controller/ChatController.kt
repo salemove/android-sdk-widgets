@@ -830,7 +830,7 @@ internal class ChatController(
 
     override fun onFileDownloadClicked(attachmentFile: AttachmentFile) {
         withReadWritePermissionsUseCase {
-            view?.onFileDownload(attachmentFile)
+            chatManager.onChatAction(ChatManager.Action.OnFileDownloadStarted(attachmentFile.id))
 
             val downloadDisposable = downloadFileUseCase(attachmentFile)
                 .subscribeOn(Schedulers.io())
@@ -838,18 +838,20 @@ internal class ChatController(
                 .subscribe({
                     fileDownloadSuccess(attachmentFile)
                 }) {
-                    fileDownloadError(attachmentFile, it)
+                    fileDownloadError(attachmentFile)
                 }
             disposable.add(downloadDisposable)
         }
     }
 
-    private fun fileDownloadError(attachmentFile: AttachmentFile, error: Throwable) {
-        view?.fileDownloadError(attachmentFile, error)
+    private fun fileDownloadError(attachmentFile: AttachmentFile) {
+        chatManager.onChatAction(ChatManager.Action.OnFileDownloadFailed(attachmentFile.id))
+        view?.fileDownloadError()
     }
 
     private fun fileDownloadSuccess(attachmentFile: AttachmentFile) {
-        view?.fileDownloadSuccess(attachmentFile)
+        chatManager.onChatAction(ChatManager.Action.OnFileDownloadSucceeded(attachmentFile.id))
+        view?.fileDownloadSuccess()
     }
 
     private fun updateAllowFileSendState() {

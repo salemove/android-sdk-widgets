@@ -62,12 +62,10 @@ internal class SystemChatItem(
     override val timestamp: Long
 ) : ServerChatItem(ChatAdapter.SYSTEM_MESSAGE_TYPE)
 
-internal sealed class OperatorAttachmentItem(@ChatAdapter.Type viewType: Int) : OperatorChatItem(viewType), RemoteAttachmentItem {
+internal sealed class OperatorAttachmentItem(@ChatAdapter.Type viewType: Int) : OperatorChatItem(viewType) {
 
     data class Image(
-        override val isFileExists: Boolean = false,
-        override val isDownloading: Boolean = false,
-        override val attachment: AttachmentFile,
+        val attachment: AttachmentFile,
         override val id: String,
         override val timestamp: Long,
         override val showChatHead: Boolean = false,
@@ -75,9 +73,6 @@ internal sealed class OperatorAttachmentItem(@ChatAdapter.Type viewType: Int) : 
         override val operatorId: String? = null
     ) : OperatorAttachmentItem(ChatAdapter.OPERATOR_IMAGE_VIEW_TYPE) {
         override fun withShowChatHead(showChatHead: Boolean): OperatorChatItem = copy(showChatHead = showChatHead)
-
-        override fun updateWith(isFileExists: Boolean, isDownloading: Boolean): ChatItem =
-            copy(isFileExists = isFileExists, isDownloading = isDownloading)
     }
 
     data class File(
@@ -89,7 +84,7 @@ internal sealed class OperatorAttachmentItem(@ChatAdapter.Type viewType: Int) : 
         override val showChatHead: Boolean = false,
         override val operatorProfileImgUrl: String? = null,
         override val operatorId: String? = null
-    ) : OperatorAttachmentItem(ChatAdapter.OPERATOR_FILE_VIEW_TYPE) {
+    ) : OperatorAttachmentItem(ChatAdapter.OPERATOR_FILE_VIEW_TYPE), RemoteAttachmentItem {
         override fun withShowChatHead(showChatHead: Boolean): OperatorChatItem = copy(showChatHead = showChatHead)
         override fun updateWith(isFileExists: Boolean, isDownloading: Boolean): ChatItem =
             copy(isFileExists = isFileExists, isDownloading = isDownloading)
@@ -230,14 +225,10 @@ internal sealed class VisitorAttachmentItem(@ChatAdapter.Type viewType: Int) : V
 
     data class RemoteImage(
         override val id: String,
-        override val attachment: AttachmentFile,
-        override val isFileExists: Boolean,
-        override val isDownloading: Boolean,
+        val attachment: AttachmentFile,
         override val status: VisitorItemStatus = VisitorItemStatus.PREVIEW,
         override val timestamp: Long = System.currentTimeMillis(),
-    ) : VisitorAttachmentItem(ChatAdapter.VISITOR_IMAGE_VIEW_TYPE), RemoteAttachmentItem {
-        override fun updateWith(isFileExists: Boolean, isDownloading: Boolean): ChatItem =
-            copy(isFileExists = isFileExists, isDownloading = isDownloading)
+    ) : VisitorAttachmentItem(ChatAdapter.VISITOR_IMAGE_VIEW_TYPE) {
 
         override fun withStatus(status: VisitorItemStatus): VisitorChatItem = copy(status = status)
     }

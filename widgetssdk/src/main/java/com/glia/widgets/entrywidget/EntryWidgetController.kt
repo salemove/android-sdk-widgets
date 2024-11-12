@@ -67,9 +67,9 @@ internal class EntryWidgetController(
             .distinct()
             .let { allMedias ->
                 return buildList {
-                    if (allMedias.contains(Engagement.MediaType.TEXT)) add(EntryWidgetContract.ItemType.CHAT)
-                    if (allMedias.contains(Engagement.MediaType.AUDIO)) add(EntryWidgetContract.ItemType.AUDIO_CALL)
                     if (allMedias.contains(Engagement.MediaType.VIDEO)) add(EntryWidgetContract.ItemType.VIDEO_CALL)
+                    if (allMedias.contains(Engagement.MediaType.AUDIO)) add(EntryWidgetContract.ItemType.AUDIO_CALL)
+                    if (allMedias.contains(Engagement.MediaType.TEXT)) add(EntryWidgetContract.ItemType.CHAT)
                     if (allMedias.contains(Engagement.MediaType.MESSAGING) && isAuthenticatedUseCase()) add(EntryWidgetContract.ItemType.SECURE_MESSAGE)
 
                     if (allMedias.isEmpty() || allMedias.hasOnlyMessagingAndIsNotAuthenticated()) {

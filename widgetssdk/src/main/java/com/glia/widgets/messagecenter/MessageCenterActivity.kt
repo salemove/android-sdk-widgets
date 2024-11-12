@@ -6,7 +6,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.result.contract.ActivityResultContracts.GetContent
+import androidx.activity.result.contract.ActivityResultContracts.OpenDocument
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.activity.result.contract.ActivityResultContracts.TakePicture
 import com.glia.widgets.GliaWidgets
@@ -55,7 +55,7 @@ class MessageCenterActivity :
         Dependencies.controllerFactory.messageCenterController
     }
 
-    private val getContent = registerForActivityResult(GetContent()) { uri: Uri? ->
+    private val getContent = registerForActivityResult(OpenDocument()) { uri: Uri? ->
         uri?.also(controller::onContentChosen)
     }
 
@@ -118,7 +118,7 @@ class MessageCenterActivity :
     }
 
     override fun selectAttachmentFile(type: String) {
-        getContent.launch(type)
+        getContent.launch(arrayOf(type))
     }
 
     override fun takePhoto(uri: Uri) {

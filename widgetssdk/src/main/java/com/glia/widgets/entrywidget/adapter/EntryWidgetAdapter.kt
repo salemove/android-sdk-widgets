@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.glia.widgets.core.secureconversations.domain.ObserveUnreadMessagesCountUseCase
 import com.glia.widgets.databinding.EntryWidgetErrorItemBinding
 import com.glia.widgets.databinding.EntryWidgetLiveItemBinding
 import com.glia.widgets.databinding.EntryWidgetMessagingItemBinding
@@ -25,21 +24,18 @@ internal class EntryWidgetAdapter(
     private val mediaTypeItemsTheme: MediaTypeItemsTheme? = null,
     private val errorTitleTheme: TextTheme? = null,
     private val errorMessageTheme: TextTheme? = null,
-    private val errorButtonTheme: ButtonTheme? = null,
-    private val observeUnreadMessagesCountUseCase: ObserveUnreadMessagesCountUseCase,
+    private val errorButtonTheme: ButtonTheme? = null
 ) : ListAdapter<EntryWidgetContract.ItemType, EntryWidgetAdapter.ViewHolder>(DIFF_CALLBACK) {
 
     constructor(
         viewType: EntryWidgetContract.ViewType,
-        entryWidgetTheme: EntryWidgetTheme?,
-        observeUnreadMessagesCountUseCase: ObserveUnreadMessagesCountUseCase,
+        entryWidgetTheme: EntryWidgetTheme?
     ) : this(
         viewType,
         entryWidgetTheme?.mediaTypeItems,
         entryWidgetTheme?.errorTitle,
         entryWidgetTheme?.errorMessage,
-        entryWidgetTheme?.errorButton,
-        observeUnreadMessagesCountUseCase,
+        entryWidgetTheme?.errorButton
     )
 
     init {
@@ -59,7 +55,7 @@ internal class EntryWidgetAdapter(
                 newItem: EntryWidgetContract.ItemType
             ): Boolean {
                 // Whether items are the same
-                return oldItem.ordinal == newItem.ordinal
+                return oldItem == newItem
             }
 
             override fun areContentsTheSame(
@@ -67,7 +63,7 @@ internal class EntryWidgetAdapter(
                 newItem: EntryWidgetContract.ItemType
             ): Boolean {
                 // Whether content is the same
-                return oldItem.ordinal == newItem.ordinal
+                return oldItem == newItem
             }
         }
     }
@@ -96,8 +92,7 @@ internal class EntryWidgetAdapter(
             )
             ViewType.MESSAGING_MEDIA_TYPE_ITEM.ordinal -> EntryWidgetMessagingItemViewHolder(
                 EntryWidgetMessagingItemBinding.inflate(parent.layoutInflater, parent, false),
-                itemTheme = mediaTypeItemsTheme?.mediaTypeItem,
-                observeUnreadMessagesCountUseCase
+                itemTheme = mediaTypeItemsTheme?.mediaTypeItem
             )
             else -> EntryWidgetLiveItemViewHolder(
                 EntryWidgetLiveItemBinding.inflate(parent.layoutInflater, parent, false),
@@ -108,27 +103,26 @@ internal class EntryWidgetAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         getItem(position)?.let { item ->
-            holder.bind(item) {
-                onItemClickListener?.invoke(item)
+            if (item is EntryWidgetContract.ItemType.Messaging && holder is EntryWidgetMessagingItemViewHolder) {
+                holder.bind(item, item.value) {
+                    onItemClickListener?.invoke(item)
+                }
+            } else {
+                holder.bind(item) {
+                    onItemClickListener?.invoke(item)
+                }
             }
         }
     }
 
     override fun getItemViewType(position: Int): Int {
         return when (getItem(position)) {
-            EntryWidgetContract.ItemType.EMPTY_STATE,
-            EntryWidgetContract.ItemType.SDK_NOT_INITIALIZED_STATE,
-            EntryWidgetContract.ItemType.ERROR_STATE -> ViewType.ERROR_ITEM.ordinal
-            EntryWidgetContract.ItemType.PROVIDED_BY -> ViewType.PROVIDED_BY_ITEM.ordinal
-            EntryWidgetContract.ItemType.SECURE_MESSAGE -> ViewType.MESSAGING_MEDIA_TYPE_ITEM.ordinal
+            EntryWidgetContract.ItemType.EmptyState,
+            EntryWidgetContract.ItemType.SdkNotInitializedState,
+            EntryWidgetContract.ItemType.ErrorState -> ViewType.ERROR_ITEM.ordinal
+            EntryWidgetContract.ItemType.ProvidedBy -> ViewType.PROVIDED_BY_ITEM.ordinal
+            is EntryWidgetContract.ItemType.Messaging -> ViewType.MESSAGING_MEDIA_TYPE_ITEM.ordinal
             else -> ViewType.LIVE_MEDIA_TYPE_ITEMS.ordinal
-        }
-    }
-
-    override fun onViewRecycled(holder: ViewHolder) {
-        super.onViewRecycled(holder)
-        if (holder is EntryWidgetMessagingItemViewHolder) {
-            holder.onStopView()
         }
     }
 

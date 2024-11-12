@@ -36,21 +36,21 @@ internal class EntryWidgetLiveItemViewHolder(
         binding.root.setOnClickListener(onClickListener)
         binding.root.contentDescription = null
         when (itemType) {
-            EntryWidgetContract.ItemType.VIDEO_CALL -> {
+            EntryWidgetContract.ItemType.VideoCall -> {
                 binding.icon.setImageResource(R.drawable.ic_video)
                 binding.title.setLocaleText(R.string.entry_widget_video_button_label)
                 binding.description.setLocaleText(R.string.entry_widget_video_button_description)
                 binding.description.setLocaleHint(R.string.entry_widget_video_button_accessibility_hint)
             }
 
-            EntryWidgetContract.ItemType.AUDIO_CALL -> {
+            EntryWidgetContract.ItemType.AudioCall -> {
                 binding.icon.setImageResource(R.drawable.ic_audio)
                 binding.title.setLocaleText(R.string.entry_widget_audio_button_label)
                 binding.description.setLocaleText(R.string.entry_widget_audio_button_description)
                 binding.description.setLocaleHint(R.string.entry_widget_audio_button_accessibility_hint)
             }
 
-            EntryWidgetContract.ItemType.CHAT -> {
+            EntryWidgetContract.ItemType.Chat -> {
                 binding.icon.setImageResource(R.drawable.ic_chat)
                 binding.title.setLocaleText(R.string.entry_widget_live_chat_button_label)
                 binding.description.setLocaleText(R.string.entry_widget_live_chat_button_description)
@@ -67,6 +67,6 @@ internal class EntryWidgetLiveItemViewHolder(
             }
         }
 
-        binding.loadingGroup.isVisible = itemType == EntryWidgetContract.ItemType.LOADING_STATE
+        binding.loadingGroup.isVisible = itemType == EntryWidgetContract.ItemType.LoadingState
     }
 }

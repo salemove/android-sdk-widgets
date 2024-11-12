@@ -182,7 +182,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         controller?.onImageCaptured(it)
     }
 
-    private val getContentLauncher = chatActivity?.registerForActivityResult(ActivityResultContracts.GetContent()) {
+    private val getContentLauncher = chatActivity?.registerForActivityResult(ActivityResultContracts.OpenDocument()) {
         it?.apply { controller?.onContentChosen(this) }
     }
 
@@ -355,7 +355,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             updateNewMessageOperatorStatusView(chatState.operatorProfileImgUrl)
             isInBottom = chatState.isChatInBottom
             binding.chatRecyclerView.setInBottom(isInBottom)
-            binding.newMessagesBadgeView.text = chatState.messagesNotSeen.toString()
+            binding.newMessagesBadgeView.text = "${chatState.messagesNotSeen}"
             if (chatState.isVisible) {
                 showChat()
             } else {
@@ -719,7 +719,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     private fun setupAddAttachmentButton() {
         binding.addAttachmentButton.setOnClickListener {
             attachmentPopup.show(binding.chatMessageLayout, {
-                getContentLauncher?.launch(Constants.MIME_TYPE_IMAGES)
+                getContentLauncher?.launch(arrayOf(Constants.MIME_TYPE_IMAGES))
             }, {
                 controller?.onTakePhotoClicked()
             }, {

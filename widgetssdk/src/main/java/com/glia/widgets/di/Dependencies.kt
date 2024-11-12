@@ -91,8 +91,7 @@ internal object Dependencies {
             activityLauncher,
             gliaThemeManager,
             controllerFactory.entryWidgetHideController,
-            useCaseFactory.hasPendingSecureConversationsWithTimeoutUseCase,
-            useCaseFactory.createObserveUnreadMessagesCountUseCase()
+            useCaseFactory.hasPendingSecureConversationsWithTimeoutUseCase
         )
 
     @JvmStatic

@@ -12,14 +12,10 @@ import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import io.reactivex.rxjava3.subjects.BehaviorSubject
 
 internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
     renderingMode = fullWidthRenderMode
 ), SnapshotProviders {
-
-    private val observeUnreadMessagesCountZeroUseCaseMock = mock<ObserveUnreadMessagesCountUseCase>()
-    private val observeUnreadMessagesCountFiveUseCaseMock = mock<ObserveUnreadMessagesCountUseCase>()
 
     override fun setUp() {
         super.setUp()
@@ -28,24 +24,22 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
         val entryWidgetControllerMock = mock<EntryWidgetContract.Controller>()
         whenever(controllerFactoryMock.entryWidgetController).thenReturn(entryWidgetControllerMock)
         Dependencies.controllerFactory = controllerFactoryMock
-        whenever(observeUnreadMessagesCountZeroUseCaseMock()).thenReturn(BehaviorSubject.createDefault(0))
-        whenever(observeUnreadMessagesCountFiveUseCaseMock()).thenReturn(BehaviorSubject.createDefault(5))
     }
 
     // MARK: Contacts Tests without unread count badge
 
-    private val contactsItems = listOf(
-        EntryWidgetContract.ItemType.VIDEO_CALL,
-        EntryWidgetContract.ItemType.AUDIO_CALL,
-        EntryWidgetContract.ItemType.CHAT,
-        EntryWidgetContract.ItemType.SECURE_MESSAGE,
-        EntryWidgetContract.ItemType.PROVIDED_BY
+    private val mediaTypesWithoutUnreadMessaging = listOf(
+        EntryWidgetContract.ItemType.VideoCall,
+        EntryWidgetContract.ItemType.AudioCall,
+        EntryWidgetContract.ItemType.Chat,
+        EntryWidgetContract.ItemType.Messaging(0),
+        EntryWidgetContract.ItemType.ProvidedBy
     )
 
     @Test
     fun contactsDefaultTheme() {
         snapshot(
-            setupView(items = contactsItems)
+            setupView(items = mediaTypesWithoutUnreadMessaging)
         )
     }
 
@@ -53,7 +47,7 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
     fun contactsWithUnifiedTheme() {
         snapshot(
             setupView(
-                items = contactsItems,
+                items = mediaTypesWithoutUnreadMessaging,
                 unifiedTheme = unifiedTheme()
             )
         )
@@ -63,7 +57,7 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
     fun contactsWithUnifiedThemeWithGlobalColors() {
         snapshot(
             setupView(
-                items = contactsItems,
+                items = mediaTypesWithoutUnreadMessaging,
                 unifiedTheme = unifiedThemeWithGlobalColors()
             )
         )
@@ -73,7 +67,7 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
     fun contactsWithUnifiedThemeWithoutEntryWidget() {
         snapshot(
             setupView(
-                items = contactsItems,
+                items = mediaTypesWithoutUnreadMessaging,
                 unifiedTheme = unifiedThemeWithoutEntryWidget()
             )
         )
@@ -81,12 +75,19 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
 
     // MARK: Contacts Tests with unread count badge
 
+    private val mediaTypesWithUnreadMessaging = listOf(
+        EntryWidgetContract.ItemType.VideoCall,
+        EntryWidgetContract.ItemType.AudioCall,
+        EntryWidgetContract.ItemType.Chat,
+        EntryWidgetContract.ItemType.Messaging(5),
+        EntryWidgetContract.ItemType.ProvidedBy
+    )
+
     @Test
     fun contactsWithBadgeDefaultTheme() {
         snapshot(
             setupView(
-                items = contactsItems,
-                observeUnreadMessagesCountUseCase = observeUnreadMessagesCountFiveUseCaseMock,
+                items = mediaTypesWithUnreadMessaging,
             )
         )
     }
@@ -95,8 +96,7 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
     fun contactsWithBadgeWithUnifiedTheme() {
         snapshot(
             setupView(
-                items = contactsItems,
-                observeUnreadMessagesCountUseCase = observeUnreadMessagesCountFiveUseCaseMock,
+                items = mediaTypesWithUnreadMessaging,
                 unifiedTheme = unifiedTheme()
             )
         )
@@ -106,8 +106,7 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
     fun contactsWithBadgeWithUnifiedThemeWithGlobalColors() {
         snapshot(
             setupView(
-                items = contactsItems,
-                observeUnreadMessagesCountUseCase = observeUnreadMessagesCountFiveUseCaseMock,
+                items = mediaTypesWithUnreadMessaging,
                 unifiedTheme = unifiedThemeWithGlobalColors()
             )
         )
@@ -117,8 +116,7 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
     fun contactsWithBadgeWithUnifiedThemeWithoutEntryWidget() {
         snapshot(
             setupView(
-                items = contactsItems,
-                observeUnreadMessagesCountUseCase = observeUnreadMessagesCountFiveUseCaseMock,
+                items = mediaTypesWithUnreadMessaging,
                 unifiedTheme = unifiedThemeWithoutEntryWidget()
             )
         )
@@ -127,11 +125,11 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
     // MARK: Loading state tests
 
     private val loadingItems = listOf(
-        EntryWidgetContract.ItemType.LOADING_STATE,
-        EntryWidgetContract.ItemType.LOADING_STATE,
-        EntryWidgetContract.ItemType.LOADING_STATE,
-        EntryWidgetContract.ItemType.LOADING_STATE,
-        EntryWidgetContract.ItemType.PROVIDED_BY
+        EntryWidgetContract.ItemType.LoadingState,
+        EntryWidgetContract.ItemType.LoadingState,
+        EntryWidgetContract.ItemType.LoadingState,
+        EntryWidgetContract.ItemType.LoadingState,
+        EntryWidgetContract.ItemType.ProvidedBy
     )
 
     @Test
@@ -174,8 +172,8 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
     // MARK: Empty state tests
 
     private val emptyItems = listOf(
-        EntryWidgetContract.ItemType.EMPTY_STATE,
-        EntryWidgetContract.ItemType.PROVIDED_BY
+        EntryWidgetContract.ItemType.EmptyState,
+        EntryWidgetContract.ItemType.ProvidedBy
     )
 
     @Test
@@ -219,8 +217,8 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
     // MARK: SDK not initialized state tests
 
     private val sdkNotInitializedItems = listOf(
-        EntryWidgetContract.ItemType.SDK_NOT_INITIALIZED_STATE,
-        EntryWidgetContract.ItemType.PROVIDED_BY
+        EntryWidgetContract.ItemType.SdkNotInitializedState,
+        EntryWidgetContract.ItemType.ProvidedBy
     )
 
     @Test
@@ -263,8 +261,8 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
     // MARK: Error state tests
 
     private val errorItems = listOf(
-        EntryWidgetContract.ItemType.ERROR_STATE,
-        EntryWidgetContract.ItemType.PROVIDED_BY
+        EntryWidgetContract.ItemType.ErrorState,
+        EntryWidgetContract.ItemType.ProvidedBy
     )
 
     @Test
@@ -307,9 +305,8 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
     // MARK: utils for tests
 
     open fun setupView(
-        items: List<EntryWidgetContract.ItemType> = listOf(EntryWidgetContract.ItemType.PROVIDED_BY),
+        items: List<EntryWidgetContract.ItemType> = listOf(EntryWidgetContract.ItemType.ProvidedBy),
         viewType: EntryWidgetContract.ViewType = EntryWidgetContract.ViewType.EMBEDDED_VIEW,
-        observeUnreadMessagesCountUseCase: ObserveUnreadMessagesCountUseCase = observeUnreadMessagesCountZeroUseCaseMock,
         unifiedTheme: UnifiedTheme? = null
     ) : View {
 
@@ -319,8 +316,7 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
             context,
             viewAdapter = EntryWidgetAdapter(
                 viewType,
-                entryWidgetTheme,
-                observeUnreadMessagesCountUseCase,
+                entryWidgetTheme
             ),
             entryWidgetTheme = entryWidgetTheme
         ).apply {

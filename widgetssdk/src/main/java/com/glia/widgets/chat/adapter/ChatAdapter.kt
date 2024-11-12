@@ -183,8 +183,9 @@ internal class ChatAdapter(
         val isHandled: Boolean = when (holder) {
             is MediaUpgradeStartedViewHolder -> updateMediaUpgradeStartedViewHolder(payloads, holder)
             is VisitorMessageViewHolder -> updateVisitorMessageViewHolder(payloads, holder)
-            is VisitorFileAttachmentViewHolder -> updateVisitorFileAttachmentViewHolder(payloads, holder)
+            is VisitorFileAttachmentViewHolder -> updateVisitorFileAttachmentViewHolder(payloads, holder, differ.currentList[position])
             is VisitorImageAttachmentViewHolder -> updateVisitorImageAttachmentViewHolder(payloads, holder)
+            is OperatorFileAttachmentViewHolder -> updateOperatorFileAttachmentViewHolder(payloads, holder, differ.currentList[position])
             else -> false
         }
 
@@ -203,15 +204,40 @@ internal class ChatAdapter(
             else -> false
         }
 
-    private fun updateVisitorFileAttachmentViewHolder(payloads: MutableList<Any>, holder: VisitorFileAttachmentViewHolder): Boolean =
-        when (val payload = payloads.lastOrNull { it is ChatAdapterPayload }) {
-            is ChatAdapterPayload.StatusChanged -> {
-                holder.updateStatus(payload.status)
+    private fun updateOperatorFileAttachmentViewHolder(
+        payloads: MutableList<Any>,
+        holder: OperatorFileAttachmentViewHolder,
+        chatItem: ChatItem
+    ): Boolean {
+        return when (payloads.lastOrNull { it is ChatAdapterPayload }) {
+            ChatAdapterPayload.RemoteAttachmentStatusChanged -> {
+                holder.bind(chatItem as? OperatorAttachmentItem.File ?: return false)
                 true
             }
 
             else -> false
         }
+    }
+
+    private fun updateVisitorFileAttachmentViewHolder(
+        payloads: MutableList<Any>,
+        holder: VisitorFileAttachmentViewHolder,
+        chatItem: ChatItem
+    ): Boolean {
+        return when (val payload = payloads.lastOrNull { it is ChatAdapterPayload }) {
+            is ChatAdapterPayload.StatusChanged -> {
+                holder.updateStatus(payload.status)
+                true
+            }
+
+            ChatAdapterPayload.RemoteAttachmentStatusChanged -> {
+                holder.bind(chatItem as? VisitorAttachmentItem.RemoteFile ?: return false)
+                true
+            }
+
+            else -> false
+        }
+    }
 
     private fun updateVisitorImageAttachmentViewHolder(payloads: MutableList<Any>, holder: VisitorImageAttachmentViewHolder): Boolean =
         when (val payload = payloads.lastOrNull { it is ChatAdapterPayload }) {

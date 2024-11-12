@@ -41,7 +41,6 @@ import com.glia.widgets.chat.model.ChatInputMode
 import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.ChatState
 import com.glia.widgets.chat.model.CustomCardChatItem
-import com.glia.widgets.chat.model.RemoteAttachmentItem
 import com.glia.widgets.core.configuration.EngagementConfiguration
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.dialog.model.DialogState
@@ -370,8 +369,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     }
 
     override fun emitItems(items: List<ChatItem>) {
-        val updatedItems = items.asSequence().map { chatItem: ChatItem -> updateIsFileDownloaded(chatItem) }.toList()
-        post { adapter.submitList(updatedItems) }
+        post { adapter.submitList(items) }
     }
 
     override fun navigateToCall(mediaType: String) {
@@ -532,11 +530,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     private fun updateAttachmentButton(chatState: ChatState) {
         binding.addAttachmentButton.isEnabled = chatState.isAttachmentButtonEnabled
         binding.addAttachmentButton.isVisible = chatState.isAttachmentButtonVisible
-    }
-
-    private fun updateIsFileDownloaded(item: ChatItem): ChatItem = when (item) {
-        is RemoteAttachmentItem -> item.run { updateWith(isDownloaded(context), isDownloading) }
-        else -> item
     }
 
     private fun updateShowSendButton(chatState: ChatState) {
@@ -792,40 +785,12 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         controller?.onFileDownloadClicked(file)
     }
 
-    override fun onFileDownload(attachmentFile: AttachmentFile) {
-        submitUpdatedItems(attachmentFile, isDownloading = true, isFileExists = false)
-    }
-
-    override fun fileDownloadError(attachmentFile: AttachmentFile, error: Throwable) {
-        submitUpdatedItems(attachmentFile, isDownloading = false, isFileExists = false)
+    override fun fileDownloadError() {
         showToast(localeProvider.getString(R.string.chat_download_failed))
     }
 
-    override fun fileDownloadSuccess(attachmentFile: AttachmentFile) {
-        submitUpdatedItems(attachmentFile, isDownloading = false, isFileExists = true)
-        showToast(
-            localeProvider.getString(R.string.android_chat_download_complete_message), Toast.LENGTH_LONG
-        )
-    }
-
-    private fun submitUpdatedItems(
-        attachmentFile: AttachmentFile, isDownloading: Boolean, isFileExists: Boolean
-    ) {
-        val updatedItems =
-            adapter.currentList.asSequence().map { updatedDownloadingItemState(attachmentFile, it, isDownloading, isFileExists) }.toList()
-
-        adapter.submitList(updatedItems)
-    }
-
-    private fun updatedDownloadingItemState(
-        attachmentFile: AttachmentFile, currentChatItem: ChatItem, isDownloading: Boolean, isFileExists: Boolean
-    ): ChatItem = when {
-        currentChatItem is RemoteAttachmentItem && currentChatItem.id == attachmentFile.id -> currentChatItem.updateWith(
-            isFileExists,
-            isDownloading
-        )
-
-        else -> currentChatItem
+    override fun fileDownloadSuccess() {
+        showToast(localeProvider.getString(R.string.android_chat_download_complete_message), Toast.LENGTH_LONG)
     }
 
     override fun onFileOpenClick(file: AttachmentFile) {

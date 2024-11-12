@@ -58,17 +58,21 @@ internal class VisitorFileAttachmentViewHolder(
         name = item.attachment.name
         size = item.attachment.size
 
-        super.setData(item.isFileExists, item.isDownloading, item.attachment)
-        setUpState(status = item.status, fileExists = item.isFileExists, name = item.attachment.name, size = item.attachment.size)
+        val isFileExists = isFileExists(item)
+
+        super.setData(isFileExists, item.isDownloading, item.attachment)
+        setUpState(status = item.status, fileExists = isFileExists, name = item.attachment.name, size = item.attachment.size)
 
         val attachmentView = binding.attachmentFileView.root
 
         when {
             item.isDownloading -> attachmentView.setOnClickListener(null)
-            item.isFileExists -> attachmentView.setOnClickListener { onFileItemClickListener.onFileOpenClick(item.attachment) }
+            isFileExists -> attachmentView.setOnClickListener { onFileItemClickListener.onFileOpenClick(item.attachment) }
             else -> attachmentView.setOnClickListener { onFileItemClickListener.onFileDownloadClick(item.attachment) }
         }
     }
+
+    private fun isFileExists(item: VisitorAttachmentItem.RemoteFile): Boolean = item.isDownloaded(itemView.context)
 
     private fun setUpState(status: VisitorItemStatus, fileExists: Boolean, name: String, size: Long) {
         binding.deliveredView.isVisible = status == VisitorItemStatus.DELIVERED

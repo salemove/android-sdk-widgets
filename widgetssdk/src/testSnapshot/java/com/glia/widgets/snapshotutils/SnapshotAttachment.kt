@@ -39,9 +39,7 @@ internal interface SnapshotAttachment {
         return VisitorAttachmentItem.RemoteImage(
             id = "id",
             attachment = attachment,
-            status = status,
-            isFileExists = true,
-            isDownloading = false
+            status = status
         )
     }
 
@@ -70,8 +68,6 @@ internal interface SnapshotAttachment {
     }
 
     fun operatorAttachmentItemImage(
-        isFileExists: Boolean = false,
-        isDownloading: Boolean = false,
         attachment: AttachmentFile = remoteAttachment(),
         id: String = "operatorImageId",
         timestamp: Long = 1706534848,
@@ -79,7 +75,7 @@ internal interface SnapshotAttachment {
         operatorProfileImgUrl: String? = null,
         operatorId: String? = "operatorId"
     ) = OperatorAttachmentItem.Image(
-        isFileExists, isDownloading, attachment, id, timestamp, showChatHead, operatorProfileImgUrl, operatorId
+        attachment, id, timestamp, showChatHead, operatorProfileImgUrl, operatorId
     )
 
     fun operatorAttachmentItemFile(

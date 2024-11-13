@@ -51,6 +51,7 @@
         android:textAppearance="?attr/textAppearanceCaption"
         android:textColor="?attr/gliaSystemNegativeColor"
         android:visibility="gone"
+        android:clickable="false"
         android:importantForAccessibility="no"
         app:layout_constrainedWidth="true"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"

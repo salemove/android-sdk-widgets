@@ -85,10 +85,14 @@ internal class VisitorMessageViewHolder(
 
         if (status.isError) {
             itemView.addClickActionAccessibilityLabel(localeProvider.getString(R.string.general_retry))
-            itemView.setOnClickListener { onRetryClickListener.onRetryClicked(id) }
+            binding.content.addClickActionAccessibilityLabel(localeProvider.getString(R.string.general_retry))
             binding.content.setOnClickListener { onRetryClickListener.onRetryClicked(id) }
+            binding.content.setTextIsSelectable(false)
+            itemView.setOnClickListener { onRetryClickListener.onRetryClicked(id) }
         } else {
             itemView.removeAccessibilityClickAction()
+            binding.content.removeAccessibilityClickAction()
+            binding.content.setTextIsSelectable(true)
             itemView.setOnClickListener(null)
             binding.content.setOnClickListener(null)
         }

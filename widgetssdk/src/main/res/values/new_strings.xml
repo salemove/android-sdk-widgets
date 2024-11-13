@@ -217,7 +217,7 @@
     <string name="gva_gallery_card_message_accessibility">%1$s \n Card: %2$d of %3$d.</string><!--does not synchronized yet-->
 
     <!--    Entry Widget -->
-    <string name="entry_widget_live_chat_button_label">Live Chat</string>
+    <string name="entry_widget_live_chat_button_label">Chat</string>
     <string name="entry_widget_live_chat_button_description">For the texter in all of us</string>
     <string name="entry_widget_live_chat_button_accessibility_hint">Starts a chat</string>
     <string name="entry_widget_audio_button_label">Audio</string>

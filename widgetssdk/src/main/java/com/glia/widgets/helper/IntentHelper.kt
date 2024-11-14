@@ -44,7 +44,7 @@ internal object ExtraKeys {
 internal interface IntentHelper {
     fun chatIntent(context: Context, intention: Intention): Intent
 
-    fun secureMessagingWelcomeScreenIntent(activity: Activity): Intent
+    fun secureMessagingWelcomeScreenIntent(context: Context): Intent
 
     fun callIntent(context: Context, mediaType: MediaType?, upgradeToCall: Boolean): Intent
 
@@ -80,8 +80,9 @@ internal class IntentHelperImpl : IntentHelper {
         setSafeFlags(context)
     }
 
-    override fun secureMessagingWelcomeScreenIntent(activity: Activity): Intent = Intent(activity, MessageCenterActivity::class.java)
+    override fun secureMessagingWelcomeScreenIntent(context: Context): Intent = Intent(context, MessageCenterActivity::class.java)
         .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        .setSafeFlags(context)
 
     override fun callIntent(context: Context, mediaType: MediaType?, upgradeToCall: Boolean): Intent = Intent(context, CallActivity::class.java)
         .putEnumExtra(ExtraKeys.MEDIA_TYPE, mediaType)

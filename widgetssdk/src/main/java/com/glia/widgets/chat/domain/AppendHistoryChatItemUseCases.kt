@@ -12,7 +12,6 @@ import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.CustomCardChatItem
 import com.glia.widgets.chat.model.OperatorStatusItem
 import com.glia.widgets.chat.model.SystemChatItem
-import com.glia.widgets.chat.model.VisitorItemStatus
 import com.glia.widgets.chat.model.VisitorMessageItem
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 import com.glia.widgets.helper.Logger
@@ -98,7 +97,7 @@ internal class AppendHistoryVisitorChatItemUseCase(
             }
 
             if (content.isNotBlank()) {
-                chatItems += VisitorMessageItem(content, id, VisitorItemStatus.HISTORY, timestamp)
+                chatItems += VisitorMessageItem(content, id, false, timestamp)
             }
         }
     }
@@ -130,7 +129,7 @@ internal class AppendHistoryCustomCardItemUseCase(
         message.attachment?.asSingleChoice()?.selectedOptionText?.takeIf {
             it.isNotBlank()
         }?.let {
-            VisitorMessageItem(it, message.id, VisitorItemStatus.HISTORY, message.timestamp)
+            VisitorMessageItem(it, message.id, false, message.timestamp)
         }?.also {
             chatItems.add(it)
         }

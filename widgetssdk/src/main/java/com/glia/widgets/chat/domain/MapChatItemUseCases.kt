@@ -7,7 +7,6 @@ import com.glia.widgets.chat.model.OperatorAttachmentItem
 import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.chat.model.VisitorAttachmentItem
 import com.glia.widgets.chat.model.VisitorChatItem
-import com.glia.widgets.chat.model.VisitorItemStatus
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 import com.glia.widgets.helper.isImage
 import kotlin.jvm.optionals.getOrNull
@@ -37,13 +36,11 @@ internal class MapOperatorAttachmentUseCase {
 }
 
 internal class MapVisitorAttachmentUseCase {
-    operator fun invoke(attachmentFile: AttachmentFile, message: VisitorMessage, showDelivered: Boolean = false): VisitorChatItem = message.run {
-        val status = if (showDelivered) VisitorItemStatus.DELIVERED else VisitorItemStatus.HISTORY
+    operator fun invoke(attachmentFile: AttachmentFile, message: VisitorMessage): VisitorChatItem = message.run {
         if (attachmentFile.isImage) {
             VisitorAttachmentItem.RemoteImage(
                 id = attachmentFile.id,
                 attachment = attachmentFile,
-                status = status,
                 timestamp = timestamp
             )
         } else {
@@ -52,7 +49,6 @@ internal class MapVisitorAttachmentUseCase {
                 attachment = attachmentFile,
                 isFileExists = false,
                 isDownloading = false,
-                status = status,
                 timestamp = timestamp
             )
         }

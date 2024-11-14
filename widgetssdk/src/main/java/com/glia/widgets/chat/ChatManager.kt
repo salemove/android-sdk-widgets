@@ -25,9 +25,9 @@ import com.glia.widgets.chat.model.OperatorChatItem
 import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.chat.model.OperatorStatusItem
 import com.glia.widgets.chat.model.RemoteAttachmentItem
+import com.glia.widgets.chat.model.TapToRetryItem
 import com.glia.widgets.chat.model.VisitorAttachmentItem
 import com.glia.widgets.chat.model.VisitorChatItem
-import com.glia.widgets.chat.model.VisitorItemStatus
 import com.glia.widgets.core.engagement.domain.model.ChatHistoryResponse
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDelayUseCase
@@ -70,6 +70,8 @@ internal class ChatManager(
             .doOnNext(::updateQuickReplies)
             .map(State::immutableChatItems)
             .onBackpressureLatest()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.computation())
             .share()
     }
 
@@ -100,8 +102,6 @@ internal class ChatManager(
         loadHistory(onHistoryLoaded)
             .concatWith(subscribeToMessages(onOperatorMessageReceived))
             .doOnError { it.printStackTrace() }
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(Schedulers.computation())
             .subscribe(::onNext, ::onError)
     }
 
@@ -261,24 +261,21 @@ internal class ChatManager(
 
         sendMessage(payload)
 
-        val files = (payload.attachment as? FilesAttachment)?.files.orEmpty()
+        val tapToRetryIndex = chatItems.indexOfLast { (it as? TapToRetryItem)?.messageId == payload.messageId }
+        chatItems.removeAt(tapToRetryIndex)
+
+        val files = (payload.attachment as? FilesAttachment)?.files
 
         val messageIndex = chatItems.indexOfLast { it.id == payload.messageId }
 
         if (messageIndex != -1) {
-            chatItems[messageIndex] = (chatItems[messageIndex] as VisitorChatItem).withStatus(VisitorItemStatus.PREVIEW)
+            chatItems[messageIndex] = (chatItems[messageIndex] as VisitorChatItem).copyWithError(false)
         }
 
-        if (files.isEmpty()) return@apply
+        files?.forEach { attachment ->
+            val index = chatItems.indexOfLast { it.id == attachment.id }
 
-        val firstFileIndex = if (messageIndex != -1)
-        //If message exists, the attachments must come right after the message.
-            messageIndex + 1
-        else
-            chatItems.indexOfFirst { it.id == files.first().id }
-
-        for (index in firstFileIndex until firstFileIndex + files.size) {
-            chatItems[index] = (chatItems[index] as VisitorChatItem).withStatus(VisitorItemStatus.PREVIEW)
+            chatItems[index] = (chatItems[index] as VisitorChatItem).copyWithError(false)
         }
     }
 
@@ -286,29 +283,27 @@ internal class ChatManager(
     fun mapSendMessageFailed(messageId: String, state: State): State = state.apply {
         val payload = messagePreviews[messageId] ?: return@apply
 
-        val files = (payload.attachment as? FilesAttachment)?.files?.takeIf { it.isNotEmpty() }
+        val files = (payload.attachment as? FilesAttachment)?.files.orEmpty()
 
         val messageIndex = chatItems.indexOfLast { it.id == payload.messageId }
 
         if (messageIndex != -1) {
-            val messageStatus = if (files != null) {
-                VisitorItemStatus.ERROR
-            } else {
-                VisitorItemStatus.ERROR_INDICATOR
-            }
-            chatItems[messageIndex] = (chatItems[messageIndex] as VisitorChatItem).withStatus(messageStatus)
+            chatItems[messageIndex] = (chatItems[messageIndex] as VisitorChatItem).copyWithError(true)
         }
-
-        if (files == null) return@apply
-
-        val indicatorIndex = chatItems.indexOfLast { (it as? LocalAttachmentItem)?.messageId == payload.messageId }
 
         files.forEach { attachment ->
             val index = chatItems.indexOfLast { it.id == attachment.id }
-            val status = if (index == indicatorIndex) VisitorItemStatus.ERROR_INDICATOR else VisitorItemStatus.ERROR
 
-            chatItems[index] = (chatItems[index] as VisitorChatItem).withStatus(status)
+            chatItems[index] = (chatItems[index] as VisitorChatItem).copyWithError(true)
         }
+
+        val lastItemIndex = if (files.isNotEmpty()) {
+            chatItems.indexOfLast { (it as? LocalAttachmentItem)?.messageId == payload.messageId }
+        } else {
+            messageIndex
+        }
+
+        chatItems.add(lastItemIndex + 1, TapToRetryItem(messageId = payload.messageId))
     }
 
     @VisibleForTesting

@@ -1,6 +1,6 @@
 package com.glia.widgets.launcher
 
-import android.app.Activity
+import android.content.Context
 import com.glia.androidsdk.Engagement
 import com.glia.widgets.chat.Intention
 import com.glia.widgets.core.secureconversations.domain.HasPendingSecureConversationsWithTimeoutUseCase
@@ -14,34 +14,34 @@ interface EngagementLauncher {
     /**
      * Starts a chat engagement.
      *
-     * @param activity The Activity used to launch the chat screen
+     * @param context Activity or Context used to launch the chat screen
      * @param visitorContextAssetId Optional visitor context id from Glia Hub
      */
-    fun startChat(activity: Activity, visitorContextAssetId: String? = null)
+    fun startChat(context: Context, visitorContextAssetId: String? = null)
 
     /**
      * Starts an audio engagement.
      *
-     * @param activity The Activity used to launch the call screen
+     * @param context Activity or Context used to launch the call screen
      * @param visitorContextAssetId Optional visitor context id from Glia Hub
      */
-    fun startAudioCall(activity: Activity, visitorContextAssetId: String? = null)
+    fun startAudioCall(context: Context, visitorContextAssetId: String? = null)
 
     /**
      * Starts a video engagement.
      *
-     * @param activity The Activity used to launch the call screen
+     * @param context Activity or Context used to launch the call screen
      * @param visitorContextAssetId Optional visitor context id from Glia Hub
      */
-    fun startVideoCall(activity: Activity, visitorContextAssetId: String? = null)
+    fun startVideoCall(context: Context, visitorContextAssetId: String? = null)
 
     /**
      * Starts a secure messaging.
      *
-     * @param activity The Activity used to launch the secure messaging welcome or chat screen
+     * @param context Activity or Context used to launch the secure messaging welcome or chat screen
      * @param visitorContextAssetId Optional visitor context id from Glia Hub
      */
-    fun startSecureMessaging(activity: Activity, visitorContextAssetId: String? = null)
+    fun startSecureMessaging(context: Context, visitorContextAssetId: String? = null)
 }
 
 internal class EngagementLauncherImpl(
@@ -50,70 +50,46 @@ internal class EngagementLauncherImpl(
     private val configurationManager: ConfigurationManager
 ) : EngagementLauncher {
 
-    /**
-     * Starts a chat engagement.
-     *
-     * @param activity The Activity used to launch the chat screen
-     * @param visitorContextAssetId Optional visitor context id from Glia Hub
-     */
-    override fun startChat(activity: Activity, visitorContextAssetId: String?) {
+    override fun startChat(context: Context, visitorContextAssetId: String?) {
         visitorContextAssetId?.let { configurationManager.setVisitorContextAssetId(it) }
         hasPendingSecureConversationsWithTimeoutUseCase().unSafeSubscribe {
             if (it) {
-                activityLauncher.launchChat(activity, Intention.SC_DIALOG_ENQUEUE_FOR_TEXT)
+                activityLauncher.launchChat(context, Intention.SC_DIALOG_ENQUEUE_FOR_TEXT)
             } else {
-                activityLauncher.launchChat(activity, Intention.LIVE_CHAT)
+                activityLauncher.launchChat(context, Intention.LIVE_CHAT)
             }
         }
     }
 
-    /**
-     * Starts an audio engagement.
-     *
-     * @param activity The Activity used to launch the call screen
-     * @param visitorContextAssetId Optional visitor context id from Glia Hub
-     */
-    override fun startAudioCall(activity: Activity, visitorContextAssetId: String?) {
+    override fun startAudioCall(context: Context, visitorContextAssetId: String?) {
         visitorContextAssetId?.let { configurationManager.setVisitorContextAssetId(it) }
         hasPendingSecureConversationsWithTimeoutUseCase().unSafeSubscribe {
             if (it) {
-                activityLauncher.launchChat(activity, Intention.SC_DIALOG_START_AUDIO)
+                activityLauncher.launchChat(context, Intention.SC_DIALOG_START_AUDIO)
             } else {
-                activityLauncher.launchCall(activity, Engagement.MediaType.AUDIO, false)
+                activityLauncher.launchCall(context, Engagement.MediaType.AUDIO, false)
             }
         }
     }
 
-    /**
-     * Starts a video engagement.
-     *
-     * @param activity The Activity used to launch the call screen
-     * @param visitorContextAssetId Optional visitor context id from Glia Hub
-     */
-    override fun startVideoCall(activity: Activity, visitorContextAssetId: String?) {
+    override fun startVideoCall(context: Context, visitorContextAssetId: String?) {
         visitorContextAssetId?.let { configurationManager.setVisitorContextAssetId(it) }
         hasPendingSecureConversationsWithTimeoutUseCase().unSafeSubscribe {
             if (it) {
-                activityLauncher.launchChat(activity, Intention.SC_DIALOG_START_VIDEO)
+                activityLauncher.launchChat(context, Intention.SC_DIALOG_START_VIDEO)
             } else {
-                activityLauncher.launchCall(activity, Engagement.MediaType.VIDEO, false)
+                activityLauncher.launchCall(context, Engagement.MediaType.VIDEO, false)
             }
         }
     }
 
-    /**
-     * Starts a secure messaging engagement.
-     *
-     * @param activity The Activity used to launch the secure messaging screen
-     * @param visitorContextAssetId Optional visitor context id from Glia Hub
-     */
-    override fun startSecureMessaging(activity: Activity, visitorContextAssetId: String?) {
+    override fun startSecureMessaging(context: Context, visitorContextAssetId: String?) {
         visitorContextAssetId?.let { configurationManager.setVisitorContextAssetId(it) }
         hasPendingSecureConversationsWithTimeoutUseCase().unSafeSubscribe {
             if (it) {
-                activityLauncher.launchChat(activity, Intention.SC_CHAT)
+                activityLauncher.launchChat(context, Intention.SC_CHAT)
             } else {
-                activityLauncher.launchSecureMessagingWelcomeScreen(activity)
+                activityLauncher.launchSecureMessagingWelcomeScreen(context)
             }
         }
     }

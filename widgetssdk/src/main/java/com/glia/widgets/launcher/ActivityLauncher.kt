@@ -18,7 +18,7 @@ import com.glia.widgets.locale.LocaleString
 internal interface ActivityLauncher {
     fun launchChat(context: Context, intention: Intention)
     fun launchCall(context: Context, mediaType: MediaType?, upgradeToCall: Boolean)
-    fun launchSecureMessagingWelcomeScreen(activity: Activity)
+    fun launchSecureMessagingWelcomeScreen(context: Context)
     fun launchEndScreenSharing(context: Context)
     fun launchWebBrowser(context: Context, title: LocaleString, url: String)
     fun launchOverlayPermission(context: Context, onSuccess: () -> Unit = {}, onFailure: () -> Unit = {})
@@ -48,9 +48,9 @@ internal class ActivityLauncherImpl(
         context.startActivity(intentHelper.callIntent(context, mediaType, upgradeToCall))
     }
 
-    override fun launchSecureMessagingWelcomeScreen(activity: Activity) {
+    override fun launchSecureMessagingWelcomeScreen(context: Context) {
         engagementRepository.updateIsSecureMessagingRequested(true)
-        activity.startActivity(intentHelper.secureMessagingWelcomeScreenIntent(activity))
+        context.startActivity(intentHelper.secureMessagingWelcomeScreenIntent(context))
     }
 
     override fun launchEndScreenSharing(context: Context) = context.startActivity(intentHelper.endScreenSharingIntent(context))

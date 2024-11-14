@@ -1,30 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_marginTop="@dimen/glia_medium"
     android:focusable="true">
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/start_guideline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_end="323dp" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/end_guideline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_end="@dimen/glia_chat_visitor_margin_end" />
 
     <TextView
         android:id="@+id/content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginStart="@dimen/glia_chat_visitor_margin_start"
+        android:layout_marginEnd="@dimen/glia_chat_visitor_margin_end"
         android:paddingHorizontal="@dimen/glia_large"
         android:paddingVertical="@dimen/glia_medium"
         android:background="@drawable/bg_message"
@@ -34,45 +21,6 @@
         android:textColorLink="?attr/gliaBaseLightColor"
         android:textIsSelectable="true"
         android:autoLink="web|email|phone"
-        android:importantForAccessibility="no"
-        app:layout_constrainedWidth="true"
-        app:layout_constraintEnd_toEndOf="@id/end_guideline"
-        app:layout_constraintHorizontal_bias="1"
-        app:layout_constraintStart_toStartOf="@id/start_guideline"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:importantForAccessibility="no" />
 
-    <TextView
-        android:id="@+id/error_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/glia_x_small"
-        tools:text="@string/chat_message_failed_to_deliver_retry"
-        android:gravity="end"
-        android:textAppearance="?attr/textAppearanceCaption"
-        android:textColor="?attr/gliaSystemNegativeColor"
-        android:visibility="gone"
-        android:clickable="false"
-        android:importantForAccessibility="no"
-        app:layout_constrainedWidth="true"
-        app:layout_constraintEnd_toEndOf="@id/end_guideline"
-        app:layout_constraintHorizontal_bias="1"
-        app:layout_constraintStart_toStartOf="@id/start_guideline"
-        app:layout_constraintTop_toBottomOf="@id/content" />
-
-    <TextView
-        android:id="@+id/delivered_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/glia_x_small"
-        tools:text="@string/glia_chat_delivered"
-        android:textAppearance="?attr/textAppearanceCaption"
-        android:textColor="?attr/gliaBaseNormalColor"
-        android:visibility="gone"
-        android:importantForAccessibility="no"
-        app:layout_constrainedWidth="true"
-        app:layout_constraintEnd_toEndOf="@id/end_guideline"
-        app:layout_constraintHorizontal_bias="1"
-        app:layout_constraintStart_toStartOf="@id/start_guideline"
-        app:layout_constraintTop_toBottomOf="@id/content" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>

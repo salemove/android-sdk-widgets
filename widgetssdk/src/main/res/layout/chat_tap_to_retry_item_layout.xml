@@ -1,0 +1,24 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:focusable="true"
+    android:importantForAccessibility="no">
+
+    <TextView
+        android:id="@+id/error_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginStart="@dimen/glia_chat_visitor_margin_start"
+        android:layout_marginTop="@dimen/glia_x_small"
+        android:layout_marginEnd="@dimen/glia_chat_visitor_margin_end"
+        android:clickable="false"
+        android:focusable="false"
+        android:importantForAccessibility="no"
+        android:textAppearance="?attr/textAppearanceCaption"
+        android:textColor="?attr/gliaSystemNegativeColor"
+        tools:text="@string/chat_message_failed_to_deliver_retry" />
+
+</FrameLayout>

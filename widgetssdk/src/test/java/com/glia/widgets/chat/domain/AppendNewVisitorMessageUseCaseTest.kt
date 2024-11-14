@@ -141,8 +141,8 @@ class AppendNewVisitorMessageUseCaseTest {
         state.messagePreviews[messageId1] = mock()
         state.chatItems += VisitorMessageItem(messageContent, messageId, VisitorItemStatus.PREVIEW, messageTimeStamp)
         state.chatItems += VisitorMessageItem(messageContent1, messageId1, VisitorItemStatus.PREVIEW, messageTimeStamp1)
-        state.chatItems += attachmentWithShowDeliveredFalse.withStatus(VisitorItemStatus.PREVIEW)
-        state.chatItems += attachmentWithShowDeliveredTrue.withStatus(VisitorItemStatus.PREVIEW)
+        state.chatItems += attachmentWithShowDeliveredFalse.copyWithError(VisitorItemStatus.PREVIEW)
+        state.chatItems += attachmentWithShowDeliveredTrue.copyWithError(VisitorItemStatus.PREVIEW)
 
         whenever(visitorMessage.content) doReturn messageContent
         whenever(visitorMessage.timestamp) doReturn messageTimeStamp

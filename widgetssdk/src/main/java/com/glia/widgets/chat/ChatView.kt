@@ -369,7 +369,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     }
 
     override fun emitItems(items: List<ChatItem>) {
-        post { adapter.submitList(items) }
+        adapter.submitList(items)
     }
 
     override fun navigateToCall(mediaType: String) {

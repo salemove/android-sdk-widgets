@@ -261,8 +261,9 @@ internal class ChatManager(
 
         sendMessage(payload)
 
-        val tapToRetryIndex = chatItems.indexOfLast { (it as? TapToRetryItem)?.messageId == payload.messageId }
-        chatItems.removeAt(tapToRetryIndex)
+        chatItems.indexOfLast { (it as? TapToRetryItem)?.messageId == payload.messageId }
+            .takeIf { it != -1 }
+            ?.also { chatItems.removeAt(it) }
 
         val files = (payload.attachment as? FilesAttachment)?.files
 

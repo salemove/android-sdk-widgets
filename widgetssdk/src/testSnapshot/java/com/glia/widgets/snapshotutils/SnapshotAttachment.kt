@@ -5,7 +5,6 @@ import androidx.core.net.toUri
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.widgets.chat.model.OperatorAttachmentItem
 import com.glia.widgets.chat.model.VisitorAttachmentItem
-import com.glia.widgets.chat.model.VisitorItemStatus
 import com.glia.widgets.core.fileupload.model.LocalAttachment
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -26,21 +25,8 @@ internal interface SnapshotAttachment {
         override fun getName(): String = name
     }
 
-    fun visitorAttachmentItemImage(
-        attachment: AttachmentFile = remoteAttachment(),
-        showDelivered: Boolean = false,
-        showError: Boolean = false
-    ): VisitorAttachmentItem.RemoteImage {
-        val status = when {
-            showDelivered -> VisitorItemStatus.DELIVERED
-            showError -> VisitorItemStatus.ERROR_INDICATOR
-            else -> VisitorItemStatus.HISTORY
-        }
-        return VisitorAttachmentItem.RemoteImage(
-            id = "id",
-            attachment = attachment,
-            status = status
-        )
+    fun visitorAttachmentItemImage(attachment: AttachmentFile = remoteAttachment()): VisitorAttachmentItem.RemoteImage {
+        return VisitorAttachmentItem.RemoteImage(id = "id", attachment = attachment)
     }
 
     fun visitorAttachmentItemFile(
@@ -49,21 +35,13 @@ internal interface SnapshotAttachment {
             size = 1234567890,
             contentType = "pdf",
             name = "File Name.pdf"
-        ),
-        showDelivered: Boolean = false,
-        showError: Boolean = false
+        )
     ): VisitorAttachmentItem.RemoteFile {
-        val status = when {
-            showDelivered -> VisitorItemStatus.DELIVERED
-            showError -> VisitorItemStatus.ERROR_INDICATOR
-            else -> VisitorItemStatus.HISTORY
-        }
         return VisitorAttachmentItem.RemoteFile(
             id = "fileId",
             attachment = attachment,
             isFileExists = true,
-            isDownloading = false,
-            status = status
+            isDownloading = false
         )
     }
 

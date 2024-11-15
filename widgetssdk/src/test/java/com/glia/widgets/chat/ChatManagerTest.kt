@@ -26,9 +26,9 @@ import com.glia.widgets.chat.model.OperatorAttachmentItem
 import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.chat.model.OperatorStatusItem
 import com.glia.widgets.chat.model.RemoteAttachmentItem
+import com.glia.widgets.chat.model.TapToRetryItem
 import com.glia.widgets.chat.model.VisitorAttachmentItem
 import com.glia.widgets.chat.model.VisitorChatItem
-import com.glia.widgets.chat.model.VisitorItemStatus
 import com.glia.widgets.chat.model.VisitorMessageItem
 import com.glia.widgets.core.engagement.domain.model.ChatHistoryResponse
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
@@ -852,16 +852,32 @@ class ChatManagerTest {
     }
 
     @Test
-    fun `mapRetryClicked updates chat items with preview status for message without attachments`() {
+    fun `mapRetryClicked updates chat items with no Error status for message without attachments when tap to retry item does not exist`() {
         val payload = SendMessagePayload(content = "message")
-        val visitorChatItem = VisitorMessageItem(payload.content, payload.messageId, VisitorItemStatus.ERROR_INDICATOR)
+        val visitorChatItem = VisitorMessageItem(payload.content, payload.messageId, isError = true)
         state.messagePreviews[payload.messageId] = payload
         state.chatItems.add(visitorChatItem)
 
         val newState = subjectUnderTest.mapRetryClicked(payload.messageId, state)
 
         val updatedItem = newState.chatItems.first() as VisitorMessageItem
-        assertEquals(VisitorItemStatus.PREVIEW, updatedItem.status)
+        assertFalse(updatedItem.isError)
+    }
+
+    @Test
+    fun `mapRetryClicked updates chat items with no Error status for message without attachments`() {
+        val payload = SendMessagePayload(content = "message")
+        val visitorChatItem = VisitorMessageItem(payload.content, payload.messageId, isError = true)
+        state.messagePreviews[payload.messageId] = payload
+        state.chatItems.add(visitorChatItem)
+        val tapToRetryItem = TapToRetryItem(payload.messageId)
+        state.chatItems.add(tapToRetryItem)
+
+        val newState = subjectUnderTest.mapRetryClicked(payload.messageId, state)
+
+        val updatedItem = newState.chatItems.last() as VisitorMessageItem
+        assertFalse(updatedItem.isError)
+        assertFalse(newState.chatItems.contains(tapToRetryItem))
     }
 
     @Test
@@ -878,15 +894,18 @@ class ChatManagerTest {
             id = "attachment_id",
             messageId = messageId,
             attachment = mock(),
-            status = VisitorItemStatus.ERROR_INDICATOR
+            isError = true
         )
         state.messagePreviews[messageId] = payload
         state.chatItems.add(attachmentItem)
+        val tapToRetryItem = TapToRetryItem(payload.messageId)
+        state.chatItems.add(tapToRetryItem)
 
         val newState = subjectUnderTest.mapRetryClicked(messageId, state)
 
         val updatedAttachmentItem = newState.chatItems[0] as VisitorAttachmentItem
-        assertEquals(VisitorItemStatus.PREVIEW, updatedAttachmentItem.status)
+        assertFalse(updatedAttachmentItem.isError)
+        assertFalse(newState.chatItems.contains(tapToRetryItem))
     }
 
     @Test
@@ -899,23 +918,26 @@ class ChatManagerTest {
             on { files } doReturn arrayOf(file)
         }
         val payload = SendMessagePayload(content = "message", messageId = messageId, attachment = filesAttachment)
-        val visitorChatItem = VisitorMessageItem(payload.content, payload.messageId, VisitorItemStatus.ERROR)
+        val visitorChatItem = VisitorMessageItem(payload.content, payload.messageId, isError = true)
         val attachmentItem = VisitorAttachmentItem.LocalFile(
             id = "attachment_id",
             messageId = messageId,
             attachment = mock(),
-            status = VisitorItemStatus.ERROR_INDICATOR
+            isError = true
         )
         state.messagePreviews[messageId] = payload
         state.chatItems.add(visitorChatItem)
         state.chatItems.add(attachmentItem)
+        val tapToRetryItem = TapToRetryItem(payload.messageId)
+        state.chatItems.add(tapToRetryItem)
 
         val newState = subjectUnderTest.mapRetryClicked(messageId, state)
 
         val updatedMessageItem = newState.chatItems.first() as VisitorMessageItem
         val updatedAttachmentItem = newState.chatItems[1] as VisitorAttachmentItem
-        assertEquals(VisitorItemStatus.PREVIEW, updatedMessageItem.status)
-        assertEquals(VisitorItemStatus.PREVIEW, updatedAttachmentItem.status)
+        assertFalse(updatedMessageItem.isError)
+        assertFalse(updatedAttachmentItem.isError)
+        assertFalse(newState.chatItems.contains(tapToRetryItem))
     }
 
     @Test
@@ -928,7 +950,8 @@ class ChatManagerTest {
         val newState = subjectUnderTest.mapSendMessageFailed(payload.messageId, state)
 
         val updatedItem = newState.chatItems.first() as VisitorChatItem
-        assertEquals(VisitorItemStatus.ERROR_INDICATOR, updatedItem.status)
+        assertTrue(updatedItem.isError)
+        assertTrue(newState.chatItems.last() is TapToRetryItem)
     }
 
     @Test
@@ -948,7 +971,9 @@ class ChatManagerTest {
         val newState = subjectUnderTest.mapSendMessageFailed(messageId, state)
 
         val updatedAttachmentItem = newState.chatItems[0] as VisitorAttachmentItem
-        assertEquals(VisitorItemStatus.ERROR_INDICATOR, updatedAttachmentItem.status)
+        assertTrue(updatedAttachmentItem.isError)
+        val tapToRetryItem = newState.chatItems.last() as TapToRetryItem
+        assertEquals(messageId, tapToRetryItem.messageId)
     }
 
     @Test
@@ -971,21 +996,10 @@ class ChatManagerTest {
 
         val updatedMessageItem = newState.chatItems.first() as VisitorChatItem
         val updatedAttachmentItem = newState.chatItems[1] as VisitorAttachmentItem
-        assertEquals(VisitorItemStatus.ERROR, updatedMessageItem.status)
-        assertEquals(VisitorItemStatus.ERROR_INDICATOR, updatedAttachmentItem.status)
-    }
-
-    @Test
-    fun `mapRetryClicked updates chat items with preview status`() {
-        val payload = SendMessagePayload(content = "message")
-        val visitorChatItem = VisitorMessageItem(payload.content, payload.messageId, VisitorItemStatus.ERROR_INDICATOR)
-        state.messagePreviews[payload.messageId] = payload
-        state.chatItems.add(visitorChatItem)
-
-        val newState = subjectUnderTest.mapRetryClicked(payload.messageId, state)
-
-        val updatedItem = newState.chatItems.first() as VisitorMessageItem
-        assertEquals(VisitorItemStatus.PREVIEW, updatedItem.status)
+        val tapToRetryItem = newState.chatItems[2] as TapToRetryItem
+        assertTrue(updatedMessageItem.isError)
+        assertTrue(updatedAttachmentItem.isError)
+        assertEquals(messageId, tapToRetryItem.messageId)
     }
 
     @Test

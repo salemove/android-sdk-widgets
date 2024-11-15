@@ -3,8 +3,8 @@ package com.glia.widgets.chat.domain
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.widgets.chat.model.VisitorAttachmentItem
-import com.glia.widgets.chat.model.VisitorItemStatus
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -28,24 +28,24 @@ class MapVisitorAttachmentUseCaseTest {
     }
 
     @Test
-    fun `invoke returns VisitorAttachmentItem_Image when attachment is Image`() {
+    fun `invoke returns VisitorAttachmentItem_RemoteImage when attachment is Image`() {
         whenever(mockAttachment.contentType) doReturn "image_sdj"
-        val newAttachment = useCase(mockAttachment, visitorMessage, true)
+        val newAttachment = useCase(mockAttachment, visitorMessage)
 
         assertTrue(newAttachment is VisitorAttachmentItem.RemoteImage)
         assertEquals(newAttachment.id, mockAttachment.id)
         assertEquals(newAttachment.timestamp, visitorMessage.timestamp)
-        assertEquals(newAttachment.status, VisitorItemStatus.DELIVERED)
+        assertFalse(newAttachment.isError)
     }
 
     @Test
-    fun `invoke returns VisitorAttachmentItem_File when attachment is not Image`() {
+    fun `invoke returns VisitorAttachmentItem_RemoteFile when attachment is not Image`() {
         whenever(mockAttachment.contentType) doReturn "imasge_sdj"
-        val newAttachment = useCase(mockAttachment, visitorMessage, false)
+        val newAttachment = useCase(mockAttachment, visitorMessage)
 
         assertTrue(newAttachment is VisitorAttachmentItem.RemoteFile)
         assertEquals(newAttachment.id, mockAttachment.id)
         assertEquals(newAttachment.timestamp, visitorMessage.timestamp)
-        assertEquals(newAttachment.status, VisitorItemStatus.HISTORY)
+        assertFalse(newAttachment.isError)
     }
 }

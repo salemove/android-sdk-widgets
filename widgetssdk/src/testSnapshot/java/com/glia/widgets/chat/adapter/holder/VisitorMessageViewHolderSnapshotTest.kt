@@ -2,7 +2,6 @@ package com.glia.widgets.chat.adapter.holder
 
 import com.glia.widgets.SnapshotTest
 import com.glia.widgets.UiTheme
-import com.glia.widgets.chat.model.VisitorItemStatus
 import com.glia.widgets.chat.model.VisitorMessageItem
 import com.glia.widgets.databinding.ChatVisitorMessageLayoutBinding
 import com.glia.widgets.snapshotutils.SnapshotChatScreen
@@ -58,108 +57,6 @@ class VisitorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen,
         snapshot(
             setupView(
                 VisitorMessageItem("Visitor message text", "ID"),
-                unifiedTheme = unifiedThemeWithoutVisitorMessage()
-            ).viewHolder.itemView
-        )
-    }
-
-    // MARK: with delivered label
-
-    @Test
-    fun deliveredLabel() {
-        snapshot(
-            setupView(
-                VisitorMessageItem("Visitor message text", "ID", status = VisitorItemStatus.DELIVERED)
-            ).viewHolder.itemView
-        )
-    }
-
-    @Test
-    fun deliveredLabelWithUiTheme() {
-        snapshot(
-            setupView(
-                VisitorMessageItem("Visitor message text", "ID", status = VisitorItemStatus.DELIVERED),
-                uiTheme = uiTheme()
-            ).viewHolder.itemView
-        )
-    }
-
-    @Test
-    fun deliveredLabelWithGlobalColors() {
-        snapshot(
-            setupView(
-                VisitorMessageItem("Visitor message text", "ID", status = VisitorItemStatus.DELIVERED),
-                unifiedTheme = unifiedThemeWithGlobalColors()
-            ).viewHolder.itemView
-        )
-    }
-
-    @Test
-    fun deliveredLabelWithUnifiedTheme() {
-        snapshot(
-            setupView(
-                VisitorMessageItem("Visitor message text", "ID", status = VisitorItemStatus.DELIVERED),
-                unifiedTheme = unifiedTheme()
-            ).viewHolder.itemView
-        )
-    }
-
-    @Test
-    fun deliveredLabelWithUnifiedThemeWithoutVisitorMessage() {
-        snapshot(
-            setupView(
-                VisitorMessageItem("Visitor message text", "ID", status = VisitorItemStatus.DELIVERED),
-                unifiedTheme = unifiedThemeWithoutVisitorMessage()
-            ).viewHolder.itemView
-        )
-    }
-
-    // MARK: with error label
-
-    @Test
-    fun errorLabel() {
-        snapshot(
-            setupView(
-                VisitorMessageItem("Visitor message text", "ID", status = VisitorItemStatus.ERROR_INDICATOR)
-            ).viewHolder.itemView
-        )
-    }
-
-    @Test
-    fun errorLabelWithUiTheme() {
-        snapshot(
-            setupView(
-                VisitorMessageItem("Visitor message text", "ID", status = VisitorItemStatus.ERROR_INDICATOR),
-                uiTheme = uiTheme()
-            ).viewHolder.itemView
-        )
-    }
-
-    @Test
-    fun errorLabelWithGlobalColors() {
-        snapshot(
-            setupView(
-                VisitorMessageItem("Visitor message text", "ID", status = VisitorItemStatus.ERROR_INDICATOR),
-                unifiedTheme = unifiedThemeWithGlobalColors()
-            ).viewHolder.itemView
-        )
-    }
-
-    @Test
-    fun errorLabelWithUnifiedTheme() {
-        snapshot(
-            setupView(
-                VisitorMessageItem("Visitor message text", "ID", status = VisitorItemStatus.ERROR_INDICATOR),
-                unifiedTheme = unifiedTheme()
-            ).viewHolder.itemView
-        )
-    }
-
-    @Test
-    fun errorLabelWithUnifiedThemeWithoutVisitorMessage() {
-        snapshot(
-            setupView(
-                VisitorMessageItem("Visitor message text", "ID", status = VisitorItemStatus.ERROR_INDICATOR),
                 unifiedTheme = unifiedThemeWithoutVisitorMessage()
             ).viewHolder.itemView
         )

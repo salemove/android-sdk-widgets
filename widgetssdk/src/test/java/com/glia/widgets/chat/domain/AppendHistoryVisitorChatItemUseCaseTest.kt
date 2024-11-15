@@ -5,10 +5,9 @@ import com.glia.androidsdk.chat.FilesAttachment
 import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.VisitorAttachmentItem
-import com.glia.widgets.chat.model.VisitorItemStatus
 import com.glia.widgets.chat.model.VisitorMessageItem
 import org.junit.After
-import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -37,8 +36,8 @@ class AppendHistoryVisitorChatItemUseCaseTest {
     }
 
     @Test
-    fun `invoke adds VisitorMessageItem_History item to the list when visitor message content is not empty`() {
-        whenever(mapVisitorAttachmentUseCase.invoke(any(), any(), any())) doReturn mock<VisitorAttachmentItem.RemoteImage>()
+    fun `invoke adds VisitorMessageItem item to the list when visitor message content is not empty`() {
+        whenever(mapVisitorAttachmentUseCase.invoke(any(), any())) doReturn mock<VisitorAttachmentItem.RemoteImage>()
 
         whenever(visitorMessage.id) doReturn "id"
         whenever(visitorMessage.timestamp) doReturn -1
@@ -48,12 +47,12 @@ class AppendHistoryVisitorChatItemUseCaseTest {
 
         assertTrue(items.count() == 1)
         assertTrue(items.last() is VisitorMessageItem)
-        assertEquals(VisitorItemStatus.HISTORY, (items.last() as VisitorMessageItem).status)
+        assertFalse((items.last() as VisitorMessageItem).isError)
     }
 
     @Test
-    fun `invoke does not add VisitorMessageItem_History item to the list when visitor message content is null or empty`() {
-        whenever(mapVisitorAttachmentUseCase.invoke(any(), any(), any())) doReturn mock<VisitorAttachmentItem.RemoteFile>()
+    fun `invoke does not add VisitorMessageItem item to the list when visitor message content is null or empty`() {
+        whenever(mapVisitorAttachmentUseCase.invoke(any(), any())) doReturn mock<VisitorAttachmentItem.RemoteFile>()
         whenever(visitorMessage.content) doReturn ""
         useCase(items, visitorMessage)
 
@@ -61,8 +60,8 @@ class AppendHistoryVisitorChatItemUseCaseTest {
     }
 
     @Test
-    fun `invoke adds VisitorAttachmentItem before VisitorMessageItem_History when both present`() {
-        whenever(mapVisitorAttachmentUseCase.invoke(any(), any(), any())) doReturn mock<VisitorAttachmentItem.RemoteFile>()
+    fun `invoke adds VisitorAttachmentItem before VisitorMessageItem when both present`() {
+        whenever(mapVisitorAttachmentUseCase.invoke(any(), any())) doReturn mock<VisitorAttachmentItem.RemoteFile>()
 
         val filesAttachment: FilesAttachment = mock()
         val file: AttachmentFile = mock()
@@ -90,8 +89,8 @@ class AppendHistoryVisitorChatItemUseCaseTest {
         val visitorAttachment1 = mock<VisitorAttachmentItem.RemoteImage>()
         val visitorAttachment2 = mock<VisitorAttachmentItem.RemoteFile>()
 
-        whenever(mapVisitorAttachmentUseCase.invoke(eq(file1), any(), any())) doReturn visitorAttachment1
-        whenever(mapVisitorAttachmentUseCase.invoke(eq(file2), any(), any())) doReturn visitorAttachment2
+        whenever(mapVisitorAttachmentUseCase.invoke(eq(file1), any())) doReturn visitorAttachment1
+        whenever(mapVisitorAttachmentUseCase.invoke(eq(file2), any())) doReturn visitorAttachment2
 
         whenever(visitorMessage.id) doReturn "id"
         whenever(visitorMessage.timestamp) doReturn -1

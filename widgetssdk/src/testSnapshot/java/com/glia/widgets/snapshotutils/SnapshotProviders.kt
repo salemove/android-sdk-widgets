@@ -27,7 +27,7 @@ internal interface SnapshotProviders: SnapshotContent, SnapshotTestLifecycle {
     }
 }
 
-internal class SnapshotProviderImp (context: Context){
+internal class SnapshotProviderImp(context: Context) {
     val resourceProvider by lazy { spy(ResourceProvider(context)) }
     val localeProvider by lazy { spy(LocaleProvider(resourceProvider)) }
 }

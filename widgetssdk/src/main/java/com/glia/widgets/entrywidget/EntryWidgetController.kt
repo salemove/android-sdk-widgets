@@ -32,11 +32,10 @@ internal class EntryWidgetController(
         this.view = view
         this.type = type
 
-        if (core.isInitialized) {
-            subscribeToQueueState()
-        } else {
+        if (!core.isInitialized) {
             showSdkNotInitializedState()
         }
+        subscribeToQueueState()
     }
 
     private fun showSdkNotInitializedState() {

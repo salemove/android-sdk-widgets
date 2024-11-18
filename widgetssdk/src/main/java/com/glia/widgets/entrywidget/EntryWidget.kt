@@ -55,11 +55,15 @@ internal class EntryWidgetImpl(
     }
 
     override fun getView(context: Context): View {
+        val entryWidgetTheme = themeManager.theme?.entryWidgetTheme
         val adapter = EntryWidgetAdapter(
             EntryWidgetContract.ViewType.EMBEDDED_VIEW,
-            themeManager.theme?.entryWidgetTheme
+            entryWidgetTheme
         )
-        return EntryWidgetView(context, adapter)
+        return EntryWidgetView(context).apply {
+            setAdapter(adapter)
+            setEntryWidgetTheme(entryWidgetTheme)
+        }
     }
 
     override fun hide() {

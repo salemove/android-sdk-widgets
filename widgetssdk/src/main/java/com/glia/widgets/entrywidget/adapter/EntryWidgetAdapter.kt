@@ -17,6 +17,7 @@ import com.glia.widgets.view.unifiedui.theme.base.ButtonTheme
 import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 import com.glia.widgets.view.unifiedui.theme.entrywidget.EntryWidgetTheme
 import com.glia.widgets.view.unifiedui.theme.entrywidget.MediaTypeItemsTheme
+import com.glia.widgets.view.unifiedui.theme.securemessaging.SecureMessagingTheme
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 internal class EntryWidgetAdapter(
@@ -37,6 +38,20 @@ internal class EntryWidgetAdapter(
         entryWidgetTheme?.errorMessage,
         entryWidgetTheme?.errorButton
     )
+
+    constructor(
+        viewType: EntryWidgetContract.ViewType,
+        secureMessagingTheme: SecureMessagingTheme?
+    ) : this(
+        viewType,
+        secureMessagingTheme?.mediaTypeItems,
+        null,
+        null,
+        null
+    )
+
+    var onItemClickListener: ((EntryWidgetContract.ItemType) -> Unit)? = null
+    val disposable: CompositeDisposable = CompositeDisposable()
 
     init {
         when (viewType) {
@@ -74,9 +89,6 @@ internal class EntryWidgetAdapter(
         ERROR_ITEM,
         PROVIDED_BY_ITEM
     }
-
-    var onItemClickListener: ((EntryWidgetContract.ItemType) -> Unit)? = null
-    val disposable: CompositeDisposable = CompositeDisposable()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val isInsideSecureConversation = this.viewType == EntryWidgetContract.ViewType.MESSAGING_LIVE_SUPPORT
@@ -130,6 +142,11 @@ internal class EntryWidgetAdapter(
 
     abstract class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         open fun bind(itemType: EntryWidgetContract.ItemType, onClickListener: View.OnClickListener) {}
+    }
+
+    fun release() {
+        onItemClickListener = null
+        disposable.dispose()
     }
 
 }

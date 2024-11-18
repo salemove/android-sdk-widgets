@@ -8,10 +8,12 @@ import android.text.TextWatcher
 import android.util.AttributeSet
 import android.view.View
 import android.view.accessibility.AccessibilityEvent
+import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.withStyledAttributes
 import androidx.core.view.ViewCompat
@@ -20,6 +22,12 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.AdapterDataObserver
+import androidx.transition.ChangeBounds
+import androidx.transition.ChangeTransform
+import androidx.transition.Fade
+import androidx.transition.Transition
+import androidx.transition.TransitionManager
+import androidx.transition.TransitionSet
 import com.glia.androidsdk.Engagement.MediaType
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.widgets.Constants
@@ -36,13 +44,14 @@ import com.glia.widgets.chat.model.ChatInputMode
 import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.ChatState
 import com.glia.widgets.chat.model.CustomCardChatItem
-import com.glia.widgets.chat.model.RemoteAttachmentItem
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.dialog.model.LeaveDialogAction
 import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.databinding.ChatViewBinding
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.entrywidget.EntryWidgetContract
+import com.glia.widgets.entrywidget.adapter.EntryWidgetAdapter
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.SimpleTextWatcher
 import com.glia.widgets.helper.SimpleWindowInsetsAndAnimationHandler
@@ -66,11 +75,13 @@ import com.glia.widgets.launcher.ActivityLauncher
 import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.view.Dialogs
 import com.glia.widgets.view.SingleChoiceCardView.OnOptionClickedListener
+import com.glia.widgets.view.animation.SimpleTransitionListener
 import com.glia.widgets.view.dialog.base.DialogDelegate
 import com.glia.widgets.view.dialog.base.DialogDelegateImpl
 import com.glia.widgets.view.head.ChatHeadContract
 import com.glia.widgets.view.unifiedui.applyButtonTheme
 import com.glia.widgets.view.unifiedui.applyColorTheme
+import com.glia.widgets.view.unifiedui.applyImageColorTheme
 import com.glia.widgets.view.unifiedui.applyLayerTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
@@ -157,6 +168,8 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     }
 
     private var binding by Delegates.notNull<ChatViewBinding>()
+    private val rootConstraintLayout
+        get() = binding.root as ConstraintLayout
     private val attachmentPopup by lazy {
         AttachmentPopup(
             binding.chatMessageLayout, Dependencies.gliaThemeManager.theme?.chatTheme?.attachmentsPopup
@@ -647,6 +660,16 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         binding.scErrorLabel.setLocaleText(R.string.secure_messaging_chat_unavailable_message)
         binding.scBottomBannerLabel.setLocaleText(R.string.secure_messaging_chat_banner_bottom)
         binding.sendButton.setLocaleContentDescription(R.string.general_send)
+        binding.scTopBannerTitle.setLocaleText(R.string.secure_messaging_chat_banner_top)
+
+        binding.scTopBannerOptions.apply {
+            val entryWidgetTheme = Dependencies.gliaThemeManager.theme?.chatTheme?.secureMessaging
+            val entryWidgetsAdapter = EntryWidgetAdapter(
+                EntryWidgetContract.ViewType.MESSAGING_LIVE_SUPPORT,
+                entryWidgetTheme
+            )
+            setAdapter(entryWidgetsAdapter)
+        }
 
         applyTheme(Dependencies.gliaThemeManager.theme)
     }
@@ -675,6 +698,10 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
                 viewHolder?.itemView?.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_FOCUSED)
             }
         }
+
+        binding.scTopBannerTitle.setOnClickListener(::onNeedSupportButtonClicked)
+        binding.scTopBannerIcon.setOnClickListener(::onNeedSupportButtonClicked)
+        binding.blockingCurtain.setOnClickListener(::onNeedSupportButtonClicked)
     }
 
     private fun setupAddAttachmentButton() {
@@ -830,10 +857,21 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         binding.scBottomBannerDivider.applyColorTheme(secureMessagingTheme.bottomBannerDividerColor)
         binding.scErrorLabel.applyLayerTheme(secureMessagingTheme.unavailableStatusBackground)
         binding.scErrorLabel.applyTextTheme(secureMessagingTheme.unavailableStatusText)
+        binding.scTopBannerBackground.applyLayerTheme(secureMessagingTheme.topBannerBackground)
+        binding.scTopBannerTitle.applyTextTheme(secureMessagingTheme.topBannerText)
+        binding.scTopBannerIcon.applyImageColorTheme(secureMessagingTheme.topBannerDropDownIconColor)
+        binding.scTopBannerDivider.applyColorTheme(secureMessagingTheme.topBannerDividerColor)
+        binding.scTopBannerOptions.setSecureMessagingTheme(secureMessagingTheme)
     }
 
     private fun updateSecureMessagingState(state: ChatState) {
-        binding.scErrorLabel.isVisible = state.isSecureMessagingUnavailableLabelVisible
+        TransitionManager.beginDelayedTransition(rootConstraintLayout)
+        binding.scErrorLabel.isVisible = state.isSecureConversationsUnavailableLabelVisible
+        if (state.isSecureConversationsTopBannerVisible.not() && isNeedSupportDropDownShown()) {
+            onNeedSupportButtonClicked(null)
+        }
+        binding.scTopBannerGroup.isVisible = state.isSecureConversationsTopBannerVisible
+        binding.scTopBannerDivider.isVisible = state.isSecureConversationsTopBannerVisible
     }
 
     @VisibleForTesting
@@ -869,5 +907,59 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
 
     fun interface OnTitleUpdatedListener {
         fun onTitleUpdated(title: LocaleString?)
+    }
+
+    private fun onNeedSupportButtonClicked(ignored: View?) {
+        val animationRules = createSecureConversationAnimationRules()
+
+        TransitionManager.beginDelayedTransition(rootConstraintLayout, animationRules)
+        updateLayoutToNewNeedSupportBannerState(!isNeedSupportDropDownShown())
+    }
+
+    private fun isNeedSupportDropDownShown(): Boolean {
+        return binding.blockingCurtain.isVisible
+    }
+
+    private fun createSecureConversationAnimationRules(): TransitionSet {
+        return TransitionSet()
+            .addTransition(
+                ChangeTransform()
+                    .addTarget(binding.scTopBannerIcon)
+            )
+            .addTransition(
+                Fade()
+                    .addTarget(binding.blockingCurtain)
+                    .addTarget(binding.scTopBannerDivider)
+            )
+            .addTransition(
+                ChangeBounds()
+                    .addTarget(binding.blockingCurtain)
+                    .addTarget(binding.scTopBannerOptions)
+            )
+            .setDuration(500)
+            .addListener(object : SimpleTransitionListener() {
+                override fun onTransitionEnd(transition: Transition) {
+                    binding.blockingCurtain.apply {
+                        if (isInvisible) { visibility = FrameLayout.GONE }
+                    }
+                }
+            })
+    }
+
+    private fun updateLayoutToNewNeedSupportBannerState(shouldShowDropDown: Boolean) {
+        ConstraintSet().apply {
+            clone(rootConstraintLayout)
+            if (shouldShowDropDown) {
+                clear(R.id.sc_top_banner_options, ConstraintSet.BOTTOM)
+                setVisibility(R.id.blocking_curtain, VISIBLE)
+                setVisibility(R.id.sc_top_banner_divider, View.INVISIBLE)
+                setRotation(R.id.sc_top_banner_icon, 180f)
+            } else {
+                connect(R.id.sc_top_banner_options, ConstraintSet.BOTTOM, R.id.header_barrier, ConstraintSet.BOTTOM)
+                setVisibility(R.id.blocking_curtain, INVISIBLE)
+                setVisibility(R.id.sc_top_banner_divider, VISIBLE)
+                setRotation(R.id.sc_top_banner_icon, 0f)
+            }
+        }.applyTo(rootConstraintLayout)
     }
 }

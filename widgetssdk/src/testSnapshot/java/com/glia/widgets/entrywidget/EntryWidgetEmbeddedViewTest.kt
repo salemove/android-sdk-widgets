@@ -312,14 +312,9 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
 
         val entryWidgetTheme = unifiedTheme?.entryWidgetTheme
 
-        return EntryWidgetView(
-            context,
-            viewAdapter = EntryWidgetAdapter(
-                viewType,
-                entryWidgetTheme
-            ),
-            entryWidgetTheme = entryWidgetTheme
-        ).apply {
+        return EntryWidgetView(context).apply {
+            setAdapter(EntryWidgetAdapter(viewType, entryWidgetTheme))
+            setEntryWidgetTheme(entryWidgetTheme)
             showItems(items)
         }
     }

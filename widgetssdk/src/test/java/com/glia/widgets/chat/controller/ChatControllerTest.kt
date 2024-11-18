@@ -39,6 +39,7 @@ import com.glia.widgets.core.permissions.domain.WithCameraPermissionUseCase
 import com.glia.widgets.core.permissions.domain.WithReadWritePermissionsUseCase
 import com.glia.widgets.core.secureconversations.domain.IsMessagingAvailableUseCase
 import com.glia.widgets.core.secureconversations.domain.ManageSecureMessagingStatusUseCase
+import com.glia.widgets.core.secureconversations.domain.SecureConversationTopBannerVisibilityUseCase
 import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCase
 import com.glia.widgets.engagement.domain.DeclineMediaUpgradeOfferUseCase
 import com.glia.widgets.engagement.domain.EndEngagementUseCase
@@ -132,6 +133,7 @@ class ChatControllerTest {
     private lateinit var isMessagingAvailableUseCase: IsMessagingAvailableUseCase
 
     private lateinit var manageSecureMessagingStatusUseCase: ManageSecureMessagingStatusUseCase
+    private lateinit var shouldShowTopBannerVisibilityUseCase: SecureConversationTopBannerVisibilityUseCase
 
     @Before
     fun setUp() {
@@ -195,6 +197,9 @@ class ChatControllerTest {
         getUrlFromLinkUseCase = mock()
         isMessagingAvailableUseCase = mock()
         manageSecureMessagingStatusUseCase = mock()
+        shouldShowTopBannerVisibilityUseCase = mock {
+            on { invoke() } doReturn Flowable.empty()
+        }
 
         chatController = ChatController(
             callTimer = callTimer,
@@ -241,7 +246,8 @@ class ChatControllerTest {
             releaseResourcesUseCase = releaseResourcesUseCase,
             getUrlFromLinkUseCase = getUrlFromLinkUseCase,
             isMessagingAvailableUseCase = isMessagingAvailableUseCase,
-            manageSecureMessagingStatusUseCase = manageSecureMessagingStatusUseCase
+            manageSecureMessagingStatusUseCase = manageSecureMessagingStatusUseCase,
+            shouldShowTopBannerUseCase = shouldShowTopBannerVisibilityUseCase
         )
         chatController.setView(chatView)
         Mockito.clearInvocations(chatView)
@@ -257,7 +263,7 @@ class ChatControllerTest {
             assertTrue(isAttachmentButtonEnabled)
             // Live chat state
             assertFalse(isSecureMessaging)
-            assertFalse(isSecureMessagingUnavailableLabelVisible)
+            assertFalse(isSecureConversationsUnavailableLabelVisible)
             assertEquals(ChatInputMode.ENABLED_NO_ENGAGEMENT, chatInputMode)
         }
     }
@@ -286,7 +292,7 @@ class ChatControllerTest {
             assertTrue(isAttachmentButtonEnabled)
             assertTrue(isSecureMessaging)
             assertTrue(isAttachmentButtonNeeded)
-            assertFalse(isSecureMessagingUnavailableLabelVisible)
+            assertFalse(isSecureConversationsUnavailableLabelVisible)
             assertEquals(ChatInputMode.ENABLED, chatInputMode)
         }
     }
@@ -300,7 +306,7 @@ class ChatControllerTest {
             assertFalse(isAttachmentButtonEnabled)
             assertTrue(isSecureMessaging)
             assertTrue(isAttachmentButtonNeeded)
-            assertTrue(isSecureMessagingUnavailableLabelVisible)
+            assertTrue(isSecureConversationsUnavailableLabelVisible)
             assertEquals(ChatInputMode.DISABLED, chatInputMode)
         }
     }

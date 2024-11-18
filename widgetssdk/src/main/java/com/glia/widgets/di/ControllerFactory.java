@@ -139,7 +139,8 @@ public class ControllerFactory {
                 useCaseFactory.getRequestNotificationPermissionIfPushNotificationsSetUpUseCase(),
                 useCaseFactory.getReleaseResourcesUseCase(getDialogController()),
                 useCaseFactory.createGetUrlFromLinkUseCase(),
-                useCaseFactory.createIsMessagingAvailableUseCase()
+                useCaseFactory.createIsMessagingAvailableUseCase(),
+                useCaseFactory.createSecureConversationTopBannerVisibilityUseCase()
             );
         }
 

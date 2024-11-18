@@ -13,6 +13,7 @@ import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.databinding.ChatActivityBinding
 import com.glia.widgets.di.ControllerFactory
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.entrywidget.EntryWidgetContract
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import org.mockito.kotlin.KArgumentCaptor
 import org.mockito.kotlin.argumentCaptor
@@ -41,7 +42,9 @@ internal interface SnapshotChatView : SnapshotContent, SnapshotTheme, SnapshotAc
 
         val controllerFactoryMock = mock<ControllerFactory>()
         val chatControllerMock = mock<ChatController>()
+        val entryWidgetControllerMock = mock<EntryWidgetContract.Controller>()
         whenever(controllerFactoryMock.chatController).thenReturn(chatControllerMock)
+        whenever(controllerFactoryMock.entryWidgetController).thenReturn(entryWidgetControllerMock)
         Dependencies.controllerFactory = controllerFactoryMock
 
         return Mock(activityMock, imageFileMock, schedulersMock, controllerFactoryMock, chatControllerMock)

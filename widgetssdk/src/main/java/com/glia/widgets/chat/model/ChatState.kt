@@ -13,7 +13,8 @@ internal data class ChatState(
     val operatorStatusItem: OperatorStatusItem? = null,
     val isSendButtonVisible: Boolean = false,
     val isSendButtonEnabled: Boolean = false,
-    val isSecureMessagingUnavailableLabelVisible: Boolean = false,
+    val isSecureConversationsUnavailableLabelVisible: Boolean = false,
+    val isSecureConversationsTopBannerVisible: Boolean = false,
     val isAttachmentButtonEnabled: Boolean = false,
     val isAttachmentButtonNeeded: Boolean = false,
     val isOperatorTyping: Boolean = false,
@@ -59,7 +60,7 @@ internal data class ChatState(
     fun setLiveChatState(): ChatState = copy(
         isSecureMessaging = false,
         chatInputMode = ChatInputMode.ENABLED_NO_ENGAGEMENT,
-        isSecureMessagingUnavailableLabelVisible = false,
+        isSecureConversationsUnavailableLabelVisible = false,
     )
 
     fun allowSendAttachmentStateChanged(isAttachmentAllowed: Boolean): ChatState = copy(isAttachmentAllowed = isAttachmentAllowed)
@@ -108,7 +109,7 @@ internal data class ChatState(
     fun setShowSendButton(isShow: Boolean): ChatState = copy(isSendButtonVisible = isShow)
 
     fun setSecureMessagingUnavailable(): ChatState = copy(
-        isSecureMessagingUnavailableLabelVisible = true,
+        isSecureConversationsUnavailableLabelVisible = true,
         isAttachmentButtonNeeded = true,
         isAttachmentButtonEnabled = false,
         isSendButtonVisible = true,
@@ -117,12 +118,16 @@ internal data class ChatState(
     )
 
     fun setSecureMessagingAvailable(): ChatState = copy(
-        isSecureMessagingUnavailableLabelVisible = false,
+        isSecureConversationsUnavailableLabelVisible = false,
         isAttachmentButtonNeeded = true,
         isAttachmentButtonEnabled = true,
         isSendButtonVisible = true,
         isSendButtonEnabled = true,
         chatInputMode = ChatInputMode.ENABLED
+    )
+
+    fun setSecureConversationsTopBannerVisibility(isVisible: Boolean): ChatState = copy(
+        isSecureConversationsTopBannerVisible = isVisible
     )
 
     fun setIsOperatorTyping(isOperatorTyping: Boolean): ChatState = copy(isOperatorTyping = isOperatorTyping)

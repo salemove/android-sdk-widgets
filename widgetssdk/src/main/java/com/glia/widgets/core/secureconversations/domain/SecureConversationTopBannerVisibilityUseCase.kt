@@ -6,6 +6,7 @@ import com.glia.androidsdk.queuing.QueueState
 import com.glia.widgets.core.queue.QueueRepository
 import com.glia.widgets.core.queue.QueuesState
 import io.reactivex.rxjava3.core.BackpressureStrategy
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Flowable
 
 /**
@@ -26,6 +27,7 @@ internal class SecureConversationTopBannerVisibilityUseCase(
             }
         }
         .map { Result.success(it) }
+        .observeOn(AndroidSchedulers.mainThread())
         .onErrorReturn { Result.failure(it) }
         .distinctUntilChanged()
 

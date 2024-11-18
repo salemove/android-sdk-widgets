@@ -113,6 +113,7 @@ import com.glia.widgets.core.secureconversations.domain.ObserveUnreadMessagesCou
 import com.glia.widgets.core.secureconversations.domain.OnNextMessageUseCase;
 import com.glia.widgets.core.secureconversations.domain.RemoveSecureFileAttachmentUseCase;
 import com.glia.widgets.core.secureconversations.domain.ResetMessageCenterUseCase;
+import com.glia.widgets.core.secureconversations.domain.SecureConversationTopBannerVisibilityUseCase;
 import com.glia.widgets.core.secureconversations.domain.SendMessageButtonStateUseCase;
 import com.glia.widgets.core.secureconversations.domain.SendSecureMessageUseCase;
 import com.glia.widgets.core.secureconversations.domain.ShowMessageLimitErrorUseCase;
@@ -595,6 +596,11 @@ public class UseCaseFactory {
     @NonNull
     public IsMessagingAvailableUseCase createIsMessagingAvailableUseCase() {
         return new IsMessagingAvailableUseCase(repositoryFactory.getQueueRepository());
+    }
+
+    @NonNull
+    public SecureConversationTopBannerVisibilityUseCase createSecureConversationTopBannerVisibilityUseCase() {
+        return new SecureConversationTopBannerVisibilityUseCase(repositoryFactory.getQueueRepository(), getHasPendingSecureConversationsWithTimeoutUseCase());
     }
 
     @NonNull

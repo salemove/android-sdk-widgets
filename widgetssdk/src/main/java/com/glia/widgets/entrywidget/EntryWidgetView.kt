@@ -4,12 +4,14 @@ import android.app.Activity
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.InsetDrawable
+import android.util.AttributeSet
+import android.util.TypedValue
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.entrywidget.adapter.EntryWidgetAdapter
-import com.glia.widgets.entrywidget.adapter.EntryWidgetItemDecoration
+import com.glia.widgets.entrywidget.adapter.EntryWidgetItemDivider
 import com.glia.widgets.helper.getDrawableCompat
 import com.glia.widgets.helper.requireActivity
 import com.glia.widgets.helper.wrapWithMaterialThemeOverlay
@@ -18,34 +20,55 @@ import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
 import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
 import com.glia.widgets.view.unifiedui.theme.entrywidget.EntryWidgetTheme
 import com.glia.widgets.view.unifiedui.theme.entrywidget.MediaTypeItemsTheme
+import com.glia.widgets.view.unifiedui.theme.securemessaging.SecureMessagingTheme
 
 /**
  * EntryWidgetView provides a way to display the entry points for the user to start a chat, audio call, video call, or secure messaging.
  */
-internal class EntryWidgetView(
-    context: Context,
-    private val viewAdapter: EntryWidgetAdapter,
-    backgroundTheme: LayerTheme? = null,
-    mediaTypeItemsTheme: MediaTypeItemsTheme? = null,
-) : RecyclerView(context.wrapWithMaterialThemeOverlay(), null, 0), EntryWidgetContract.View {
+internal class EntryWidgetView : RecyclerView, EntryWidgetContract.View {
+
+    constructor(context: Context) : super(context.wrapWithMaterialThemeOverlay())
 
     constructor(
         context: Context,
-        viewAdapter: EntryWidgetAdapter,
-        entryWidgetTheme: EntryWidgetTheme?
-    ) : this(
-        context.wrapWithMaterialThemeOverlay(),
-        viewAdapter,
-        entryWidgetTheme?.background,
-        entryWidgetTheme?.mediaTypeItems,
-    )
+        attrs: AttributeSet
+    ) : super(context.wrapWithMaterialThemeOverlay(), attrs)
+
+    constructor(
+        context: Context,
+        attrs: AttributeSet,
+        defStyle: Int
+    ) : super(context.wrapWithMaterialThemeOverlay(), attrs, defStyle)
 
     var onDismissListener: (() -> Unit)? = null
 
-    private lateinit var controller: EntryWidgetContract.Controller
+    private var controller: EntryWidgetContract.Controller
+    private var _viewAdapter: EntryWidgetAdapter? = null
+    private val viewAdapter: EntryWidgetAdapter
+        get() = _viewAdapter ?: throw IllegalStateException("Make sure adapter is set up before attempting to show any items")
+    private var dividerView: EntryWidgetItemDivider? = null
 
     init {
-        setAdapter(viewAdapter)
+        controller = Dependencies.controllerFactory.entryWidgetController
+        itemAnimator = null
+        setupDefaultViewAppearance()
+    }
+
+    private fun setupDefaultViewAppearance() {
+        val value = TypedValue()
+        context.theme.resolveAttribute(R.attr.gliaBaseLightColor, value, true)
+        setBackgroundColor(value.data)
+    }
+
+    override fun setController(controller: EntryWidgetContract.Controller) {
+        this.controller = controller
+    }
+
+    fun setAdapter(viewAdapter: EntryWidgetAdapter) {
+        this._viewAdapter?.release()
+        this._viewAdapter = viewAdapter
+
+        super.setAdapter(viewAdapter)
         viewAdapter.onItemClickListener = {
             controller.onItemClicked(it, context.requireActivity())
         }
@@ -56,14 +79,20 @@ internal class EntryWidgetView(
         // Scrolling is only applicable for bottom sheet view.
         enableScrolling(isBottomSheet)
 
-        applyTheme(backgroundTheme, mediaTypeItemsTheme)
-        setController(Dependencies.controllerFactory.entryWidgetController)
-        itemAnimator = null
+        applyTheme(null, null)
+        controller.setView(this, viewAdapter.viewType)
     }
 
-    override fun setController(controller: EntryWidgetContract.Controller) {
-        this.controller = controller
-        controller.setView(this, viewAdapter.viewType)
+    fun setEntryWidgetTheme(entryWidgetTheme: EntryWidgetTheme?) {
+        val backgroundTheme = entryWidgetTheme?.background
+        val mediaTypeItemsTheme = entryWidgetTheme?.mediaTypeItems
+        applyTheme(backgroundTheme, mediaTypeItemsTheme)
+    }
+
+    fun setSecureMessagingTheme(secureMessagingTheme: SecureMessagingTheme?) {
+        val backgroundTheme = secureMessagingTheme?.topBannerBackground
+        val mediaTypeItemsTheme = secureMessagingTheme?.mediaTypeItems
+        applyTheme(backgroundTheme, mediaTypeItemsTheme)
     }
 
     override fun showItems(items: List<EntryWidgetContract.ItemType>) {
@@ -91,9 +120,10 @@ internal class EntryWidgetView(
 
     private fun applyTheme(backgroundTheme: LayerTheme? = null, mediaTypeItemsTheme: MediaTypeItemsTheme? = null) {
         backgroundTheme?.let { applyLayerTheme(it) }
-        createDividerDrawable(mediaTypeItemsTheme?.dividerColor)?.let {
-            addItemDecoration(EntryWidgetItemDecoration(it))
-        }
+        dividerView?.let(::removeItemDecoration)
+        dividerView = createDividerDrawable(mediaTypeItemsTheme?.dividerColor)?.let(::EntryWidgetItemDivider)
+        dividerView?.let(::addItemDecoration)
+
     }
 
     private fun createDividerDrawable(dividerColor: ColorTheme?): Drawable? {

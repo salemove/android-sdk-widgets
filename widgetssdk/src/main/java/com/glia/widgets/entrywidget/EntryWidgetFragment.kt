@@ -60,13 +60,11 @@ internal class EntryWidgetFragment : BottomSheetDialogFragment() {
             entryWidgetsTheme
         )
 
-        EntryWidgetView(
-            context = context,
-            viewAdapter = entryWidgetAdapter,
-            entryWidgetTheme = entryWidgetsTheme
-        ).also {
-            binding.container.addView(it)
-            it.onDismissListener = {
+        EntryWidgetView(context).apply {
+            setAdapter(entryWidgetAdapter)
+            setEntryWidgetTheme(entryWidgetsTheme)
+            binding.container.addView(this)
+            onDismissListener = {
                 dismiss()
             }
         }

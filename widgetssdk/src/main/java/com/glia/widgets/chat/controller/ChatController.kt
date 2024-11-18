@@ -76,6 +76,7 @@ import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.TimeCounter
 import com.glia.widgets.helper.TimeCounter.FormattedTimerStatusListener
+import com.glia.widgets.helper.exists
 import com.glia.widgets.helper.formattedName
 import com.glia.widgets.helper.imageUrl
 import com.glia.widgets.helper.isValid
@@ -358,7 +359,11 @@ internal class ChatController(
     }
 
     override fun onLocalImageItemClick(attachment: LocalAttachment, view: View) {
-        this.view?.navigateToImagePreview(attachment, view)
+        if (attachment.uri.exists(view.context)) {
+            this.view?.navigateToImagePreview(attachment, view)
+        } else {
+            this.view?.fileIsNotReadyForPreview()
+        }
     }
 
     override fun onMessageTextChanged(message: String) {

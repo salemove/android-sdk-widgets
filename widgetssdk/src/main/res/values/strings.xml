@@ -92,6 +92,7 @@
     <string name="message_center_confirmation_screen_message">Your message has been sent. We will get back to you within 1 business day.</string>
     <string name="message_center_bottom_banner">Secure messaging has an expected response time of 1 business day.</string>
     <string name="message_center_error_unavailable_message">Sending messages is currently not available.</string>
+    <string name="need_live_support_label">Need live support?</string>
     <string name="call_visualizer_screen_sharing_title">Screen Sharing</string>
     <string name="call_visualizer_label">Your Screen is Being Shared</string>
     <string name="glia_chat_file_download_success_message">The file has been downloaded.</string>

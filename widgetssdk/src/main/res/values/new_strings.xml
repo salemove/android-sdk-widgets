@@ -169,6 +169,7 @@
     <string name="message_center_welcome_file_picker_accessibility_label">File picker</string>
     <string name="secure_messaging_chat_banner_bottom">@string/message_center_bottom_banner</string>
     <string name="secure_messaging_chat_unavailable_message">@string/message_center_error_unavailable_message</string>
+    <string name="secure_messaging_chat_banner_top">@string/need_live_support_label</string>
 
     <!-- General -->
     <string name="general_refresh">@string/glia_visitor_code_refresh_button</string>

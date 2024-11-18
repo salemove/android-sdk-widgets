@@ -57,6 +57,7 @@ import com.glia.widgets.core.permissions.domain.WithCameraPermissionUseCase
 import com.glia.widgets.core.permissions.domain.WithReadWritePermissionsUseCase
 import com.glia.widgets.core.secureconversations.domain.IsMessagingAvailableUseCase
 import com.glia.widgets.core.secureconversations.domain.ManageSecureMessagingStatusUseCase
+import com.glia.widgets.core.secureconversations.domain.SecureConversationTopBannerVisibilityUseCase
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.EngagementUpdateState
 import com.glia.widgets.engagement.ScreenSharingState
@@ -135,7 +136,8 @@ internal class ChatController(
     private val requestNotificationPermissionIfPushNotificationsSetUpUseCase: RequestNotificationPermissionIfPushNotificationsSetUpUseCase,
     private val releaseResourcesUseCase: ReleaseResourcesUseCase,
     private val getUrlFromLinkUseCase: GetUrlFromLinkUseCase,
-    private val isMessagingAvailableUseCase: IsMessagingAvailableUseCase
+    private val isMessagingAvailableUseCase: IsMessagingAvailableUseCase,
+    private val shouldShowTopBannerUseCase: SecureConversationTopBannerVisibilityUseCase
 ) : ChatContract.Controller {
     private var backClickedListener: ChatView.OnBackClickedListener? = null
     private var view: ChatContract.View? = null
@@ -253,6 +255,24 @@ internal class ChatController(
         initChatManager()
         emitViewState { chatState.initChat().setSecureMessagingState() }
         ensureSecureMessagingAvailable()
+        observeTopBannerUseCase()
+    }
+
+    private fun observeTopBannerUseCase() {
+        disposable.add(shouldShowTopBannerUseCase().subscribe(
+            { result ->
+                result.getOrNull()?.let { shouldBeVisible ->
+                    emitViewState {
+                        chatState.setSecureConversationsTopBannerVisibility(shouldBeVisible)
+                    }
+                } ?: run{
+                    Logger.w(TAG, "Failed to get secure messaging top banner visibility flag.\n ${result.exceptionOrNull()}")
+                }
+            },
+            { error ->
+                Logger.w(TAG, "Secure messaging top banner visibility flag observable failed.\n $error")
+            }
+        ))
     }
 
     private fun initLiveChat() {

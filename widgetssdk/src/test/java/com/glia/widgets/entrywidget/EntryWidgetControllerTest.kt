@@ -56,6 +56,9 @@ class EntryWidgetControllerTest {
             core,
             engagementLauncher
         )
+        val unreadMessageCount = 0
+        `when`(observeUnreadMessagesCountUseCase.invoke()).thenReturn(Observable.just(unreadMessageCount))
+        `when`(queueRepository.queuesState).thenReturn(Flowable.just(QueuesState.Loading))
         controller.setView(view, EntryWidgetContract.ViewType.BOTTOM_SHEET)
     }
 
@@ -67,9 +70,6 @@ class EntryWidgetControllerTest {
     @Test
     fun `showItems is called if sdk is initialized`() {
         `when`(core.isInitialized).thenReturn(true)
-        val unreadMessageCount = 0
-        `when`(observeUnreadMessagesCountUseCase.invoke()).thenReturn(Observable.just(unreadMessageCount))
-        `when`(queueRepository.queuesState).thenReturn(Flowable.just(QueuesState.Loading))
 
         controller.setView(view, EntryWidgetContract.ViewType.BOTTOM_SHEET)
 
@@ -200,8 +200,6 @@ class EntryWidgetControllerTest {
 
     @Test
     fun `onItemClicked does not call dismiss when ERROR_STATE item clicked`() {
-        val mockQueuesState : Flowable<QueuesState> = Flowable.just(QueuesState.Loading)
-        `when`(queueRepository.queuesState).thenReturn(mockQueuesState)
         controller.onItemClicked(EntryWidgetContract.ItemType.ErrorState, activity)
         verify(view, never()).dismiss()
         verify(queueRepository).fetchQueues()

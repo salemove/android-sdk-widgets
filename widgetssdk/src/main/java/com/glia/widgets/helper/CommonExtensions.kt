@@ -1,8 +1,10 @@
 package com.glia.widgets.helper
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.text.Html
 import android.text.Spanned
 import android.text.format.DateUtils
@@ -99,3 +101,7 @@ internal fun Completable.unSafeSubscribe(onComplete: Action) {
 internal fun <T : Any> FlowableProcessor<T>.asStateFlowable(): Flowable<T> = onBackpressureBuffer().observeOn(AndroidSchedulers.mainThread())
 internal fun <T : Any> FlowableProcessor<T>.asOneTimeStateFlowable(): Flowable<OneTimeEvent<T>> =
     onBackpressureBuffer().map(::OneTimeEvent).observeOn(AndroidSchedulers.mainThread())
+
+internal fun Uri.exists(context: Context): Boolean = context.contentResolver.query(this, null, null, null, null)?.use {
+    it.moveToFirst()
+} ?: false

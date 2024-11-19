@@ -227,12 +227,20 @@ internal class ChatController(
         updateOperatorDefaultImageUrlUseCase()
 
         when (intention) {
-            Intention.RETURN_TO_CHAT -> restoreChat()
+            Intention.RETURN_TO_CHAT -> returnToChat()
             Intention.SC_DIALOG_START_AUDIO -> initLeaveCurrentConversationDialog(LeaveDialogAction.AUDIO)
             Intention.SC_DIALOG_START_VIDEO -> initLeaveCurrentConversationDialog(LeaveDialogAction.VIDEO)
             Intention.SC_DIALOG_ENQUEUE_FOR_TEXT -> initLeaveCurrentConversationDialog(LeaveDialogAction.LIVE_CHAT)
             Intention.SC_CHAT -> initSecureMessaging()
             Intention.LIVE_CHAT -> initLiveChat()
+        }
+    }
+
+    private fun returnToChat() {
+        if (chatState.isInitialized) {
+            restoreChat()
+        } else {
+            initLiveChat()
         }
     }
 

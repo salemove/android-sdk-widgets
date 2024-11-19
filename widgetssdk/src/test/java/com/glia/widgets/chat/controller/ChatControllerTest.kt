@@ -72,6 +72,7 @@ import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -311,10 +312,27 @@ class ChatControllerTest {
     }
 
     @Test
-    fun `initChat calls restoreChat when intention is RETURN_TO_CHAT`() {
+    fun `initChat calls restoreChat when intention is RETURN_TO_CHAT and chat is initialized`() {
+        whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.empty()
+        chatController.initChat(Intention.LIVE_CHAT)
         chatController.initChat(Intention.RETURN_TO_CHAT)
-        verify(updateOperatorDefaultImageUrlUseCase).invoke()
+        verify(chatManager, times(1)).initialize(any(), any(), any())
+        verify(updateOperatorDefaultImageUrlUseCase, times(2)).invoke()
         verify(chatManager).onChatAction(eq(ChatManager.Action.ChatRestored))
+    }
+
+    @Test
+    fun `initChat calls initLiveChat when intention is RETURN_TO_CHAT and chat is not initialized`() {
+        whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.empty()
+        chatController.initChat(Intention.RETURN_TO_CHAT)
+        verify(chatManager, times(1)).initialize(any(), any(), any())
+        verify(updateOperatorDefaultImageUrlUseCase, times(1)).invoke()
+        verify(chatManager, never()).onChatAction(eq(ChatManager.Action.ChatRestored))
+        val stateKArgumentCaptor = argumentCaptor<ChatState>()
+
+        verify(chatView).emitState(stateKArgumentCaptor.capture())
+
+        assertLiveChatState(stateKArgumentCaptor.lastValue)
     }
 
     @Test

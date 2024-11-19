@@ -20,7 +20,8 @@ internal data class ChatState(
     val isAttachmentAllowed: Boolean = true,
     val isSecureMessaging: Boolean = false,
     val gvaQuickReplies: List<GvaButton> = emptyList(),
-    val isSharingScreen: Boolean = false
+    val isSharingScreen: Boolean = false,
+    val isInitialized: Boolean = false
 ) {
     val isOperatorOnline: Boolean get() = formattedOperatorName != null
 
@@ -38,7 +39,8 @@ internal data class ChatState(
         isSendButtonVisible = false,
         isSendButtonEnabled = true,
         isAttachmentAllowed = true,
-        isAttachmentButtonEnabled = true
+        isAttachmentButtonEnabled = true,
+        isInitialized = true
     )
 
     fun queueingStarted(): ChatState = copy(

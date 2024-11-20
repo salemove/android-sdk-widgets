@@ -4,9 +4,8 @@ import android.app.Activity
 import android.content.Context
 import android.view.View
 import com.glia.widgets.chat.Intention
-import com.glia.widgets.core.secureconversations.domain.HasPendingSecureConversationsWithTimeoutUseCase
+import com.glia.widgets.core.secureconversations.domain.HasOngoingSecureConversationUseCase
 import com.glia.widgets.entrywidget.adapter.EntryWidgetAdapter
-import com.glia.widgets.helper.unSafeSubscribe
 import com.glia.widgets.launcher.ActivityLauncher
 import com.glia.widgets.view.unifiedui.theme.UnifiedThemeManager
 
@@ -38,11 +37,11 @@ internal class EntryWidgetImpl(
     private val activityLauncher: ActivityLauncher,
     private val themeManager: UnifiedThemeManager,
     private val entryWidgetHideController: EntryWidgetHideController,
-    private val hasPendingSecureConversationsWithTimeoutUseCase: HasPendingSecureConversationsWithTimeoutUseCase
+    private val hasOngoingSecureConversationUseCase: HasOngoingSecureConversationUseCase
 ) : EntryWidget {
 
     override fun show(activity: Activity) {
-        hasPendingSecureConversationsWithTimeoutUseCase().unSafeSubscribe {
+        hasOngoingSecureConversationUseCase {
             handleShowWithPendingSecureConversations(it, activity)
         }
     }

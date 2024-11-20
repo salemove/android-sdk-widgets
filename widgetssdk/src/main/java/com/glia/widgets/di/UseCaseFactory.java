@@ -105,7 +105,7 @@ import com.glia.widgets.core.secureconversations.domain.AddSecureFileAttachments
 import com.glia.widgets.core.secureconversations.domain.AddSecureFileToAttachmentAndUploadUseCase;
 import com.glia.widgets.core.secureconversations.domain.GetSecureFileAttachmentsUseCase;
 import com.glia.widgets.core.secureconversations.domain.GetUnreadMessagesCountWithTimeoutUseCase;
-import com.glia.widgets.core.secureconversations.domain.HasPendingSecureConversationsWithTimeoutUseCase;
+import com.glia.widgets.core.secureconversations.domain.HasOngoingSecureConversationUseCase;
 import com.glia.widgets.core.secureconversations.domain.IsMessagingAvailableUseCase;
 import com.glia.widgets.core.secureconversations.domain.ManageSecureMessagingStatusUseCase;
 import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDelayUseCase;
@@ -1094,8 +1094,8 @@ public class UseCaseFactory {
     }
 
     @NonNull
-    public HasPendingSecureConversationsWithTimeoutUseCase getHasPendingSecureConversationsWithTimeoutUseCase() {
-        return new HasPendingSecureConversationsWithTimeoutUseCase(
+    public HasOngoingSecureConversationUseCase getHasPendingSecureConversationsWithTimeoutUseCase() {
+        return new HasOngoingSecureConversationUseCase(
             repositoryFactory.getSecureConversationsRepository(),
             createIsAuthenticatedUseCase(),
             gliaCore

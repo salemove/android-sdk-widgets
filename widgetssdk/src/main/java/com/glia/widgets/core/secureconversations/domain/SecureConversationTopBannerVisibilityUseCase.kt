@@ -5,6 +5,7 @@ import com.glia.androidsdk.queuing.Queue
 import com.glia.androidsdk.queuing.QueueState
 import com.glia.widgets.core.queue.QueueRepository
 import com.glia.widgets.core.queue.QueuesState
+import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
 
 /**
@@ -14,7 +15,7 @@ import io.reactivex.rxjava3.core.Flowable
  */
 internal class SecureConversationTopBannerVisibilityUseCase(
     private val queueRepository: QueueRepository,
-    private val hasPendingSc: HasPendingSecureConversationsWithTimeoutUseCase
+    private val hasOngoingInteraction: HasOngoingSecureConversationUseCase
 ) {
 
     operator fun invoke(): Flowable<Result<Boolean>> = getPendingSecureConversationState()
@@ -28,7 +29,7 @@ internal class SecureConversationTopBannerVisibilityUseCase(
         .onErrorReturn { Result.failure(it) }
         .distinctUntilChanged()
 
-    private fun getPendingSecureConversationState() = hasPendingSc.invoke().toFlowable()
+    private fun getPendingSecureConversationState() = hasOngoingInteraction.invoke().toFlowable(BackpressureStrategy.LATEST)
 
     private fun checkAvailableQueues() = queueRepository.queuesState
             .filter { it !is QueuesState.Loading }

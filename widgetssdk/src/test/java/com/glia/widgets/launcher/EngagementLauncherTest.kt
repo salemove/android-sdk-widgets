@@ -3,22 +3,21 @@ package com.glia.widgets.launcher
 import android.app.Activity
 import com.glia.androidsdk.Engagement
 import com.glia.widgets.chat.Intention
-import com.glia.widgets.core.secureconversations.domain.HasPendingSecureConversationsWithTimeoutUseCase
+import com.glia.widgets.core.secureconversations.domain.HasOngoingSecureConversationUseCase
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
-import io.reactivex.rxjava3.core.Single
 import org.junit.Before
 import org.junit.Test
 
 class EngagementLauncherImplTest {
 
-    @MockK
+    @MockK(relaxUnitFun = true)
     private lateinit var activityLauncher: ActivityLauncher
 
     @MockK
-    private lateinit var hasPendingSecureConversationsWithTimeoutUseCase: HasPendingSecureConversationsWithTimeoutUseCase
+    private lateinit var hasOngoingSecureConversationUseCase: HasOngoingSecureConversationUseCase
 
     @MockK
     private lateinit var activity: Activity
@@ -34,12 +33,12 @@ class EngagementLauncherImplTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-        engagementLauncher = EngagementLauncherImpl(activityLauncher, hasPendingSecureConversationsWithTimeoutUseCase, configurationManager)
+        engagementLauncher = EngagementLauncherImpl(activityLauncher, hasOngoingSecureConversationUseCase, configurationManager)
     }
 
     @Test
     fun `startChat launches live chat when no pending secure conversations`() {
-        every { hasPendingSecureConversationsWithTimeoutUseCase() } returns Single.just(false)
+        mockOngoingInteractionCallback(false)
 
         engagementLauncher.startChat(activity)
 
@@ -49,7 +48,7 @@ class EngagementLauncherImplTest {
 
     @Test
     fun `startChat launches secure conversation dialog when there are pending secure conversations`() {
-        every { hasPendingSecureConversationsWithTimeoutUseCase() } returns Single.just(true)
+        mockOngoingInteractionCallback(true)
 
         engagementLauncher.startChat(activity, visitorContextAssetId)
 
@@ -59,7 +58,7 @@ class EngagementLauncherImplTest {
 
     @Test
     fun `startAudioCall launches audio call when no pending secure conversations`() {
-        every { hasPendingSecureConversationsWithTimeoutUseCase() } returns Single.just(false)
+        mockOngoingInteractionCallback(false)
 
         engagementLauncher.startAudioCall(activity)
 
@@ -69,7 +68,7 @@ class EngagementLauncherImplTest {
 
     @Test
     fun `startAudioCall launches secure conversation audio dialog when there are pending secure conversations`() {
-        every { hasPendingSecureConversationsWithTimeoutUseCase() } returns Single.just(true)
+        mockOngoingInteractionCallback(true)
 
         engagementLauncher.startAudioCall(activity, visitorContextAssetId)
 
@@ -79,7 +78,7 @@ class EngagementLauncherImplTest {
 
     @Test
     fun `startVideoCall launches video call when no pending secure conversations`() {
-        every { hasPendingSecureConversationsWithTimeoutUseCase() } returns Single.just(false)
+        mockOngoingInteractionCallback(false)
 
         engagementLauncher.startVideoCall(activity)
 
@@ -89,7 +88,7 @@ class EngagementLauncherImplTest {
 
     @Test
     fun `startVideoCall launches secure conversation video dialog when there are pending secure conversations`() {
-        every { hasPendingSecureConversationsWithTimeoutUseCase() } returns Single.just(true)
+        mockOngoingInteractionCallback(true)
 
         engagementLauncher.startVideoCall(activity, visitorContextAssetId)
 
@@ -99,7 +98,7 @@ class EngagementLauncherImplTest {
 
     @Test
     fun `startSecureMessaging launches secure messaging welcome screen when no pending secure conversations`() {
-        every { hasPendingSecureConversationsWithTimeoutUseCase() } returns Single.just(false)
+        mockOngoingInteractionCallback(false)
 
         engagementLauncher.startSecureMessaging(activity)
 
@@ -109,11 +108,17 @@ class EngagementLauncherImplTest {
 
     @Test
     fun `startSecureMessaging launches secure chat when there are pending secure conversations`() {
-        every { hasPendingSecureConversationsWithTimeoutUseCase() } returns Single.just(true)
+        mockOngoingInteractionCallback(true)
 
         engagementLauncher.startSecureMessaging(activity, visitorContextAssetId)
 
         verify { activityLauncher.launchChat(activity, Intention.SC_CHAT) }
         verify { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
+    }
+
+    private fun mockOngoingInteractionCallback(hasOngoingInteraction: Boolean) {
+        every { hasOngoingSecureConversationUseCase(captureLambda()) } answers {
+            firstArg<(Boolean) -> Unit>().invoke(hasOngoingInteraction)
+        }
     }
 }

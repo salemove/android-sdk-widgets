@@ -2,7 +2,7 @@ package com.glia.widgets.chat.domain
 
 import com.glia.widgets.core.fileupload.FileAttachmentRepository
 import com.glia.widgets.core.secureconversations.domain.ManageSecureMessagingStatusUseCase
-import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
+import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -12,7 +12,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 class IsShowSendButtonUseCaseTest {
-    private lateinit var isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase
+    private lateinit var isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase
     private lateinit var fileAttachmentRepository: FileAttachmentRepository
     private lateinit var manageSecureMessagingStatusUseCase: ManageSecureMessagingStatusUseCase
 
@@ -20,12 +20,12 @@ class IsShowSendButtonUseCaseTest {
 
     @Before
     fun setUp() {
-        isQueueingOrEngagementUseCase = mock()
+        isQueueingOrLiveEngagementUseCase = mock()
         fileAttachmentRepository = mock()
         manageSecureMessagingStatusUseCase = mock()
 
         useCase = IsShowSendButtonUseCase(
-            isQueueingOrEngagementUseCase,
+            isQueueingOrLiveEngagementUseCase,
             fileAttachmentRepository,
             manageSecureMessagingStatusUseCase
         )
@@ -33,7 +33,7 @@ class IsShowSendButtonUseCaseTest {
 
     @Test
     fun `invoke returns false if ongoing engagement and the message empty and files are not ready to send`() {
-        whenever(isQueueingOrEngagementUseCase.hasOngoingEngagement) doReturn true
+        whenever(isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement) doReturn true
         whenever(fileAttachmentRepository.readyToSendLocalAttachments) doReturn emptyList()
 
         val result = useCase("")
@@ -43,7 +43,7 @@ class IsShowSendButtonUseCaseTest {
 
     @Test
     fun `invoke returns true if ongoing engagement and the message is not empty and files are not ready to send`() {
-        whenever(isQueueingOrEngagementUseCase.hasOngoingEngagement) doReturn true
+        whenever(isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement) doReturn true
         whenever(fileAttachmentRepository.readyToSendLocalAttachments) doReturn emptyList()
 
         val result = useCase("test")
@@ -53,7 +53,7 @@ class IsShowSendButtonUseCaseTest {
 
     @Test
     fun `invoke returns true if ongoing engagement and the message is empty and files are ready to send`() {
-        whenever(isQueueingOrEngagementUseCase.hasOngoingEngagement) doReturn true
+        whenever(isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement) doReturn true
         whenever(fileAttachmentRepository.readyToSendLocalAttachments) doReturn listOf(mock())
 
         val result = useCase("")
@@ -63,7 +63,7 @@ class IsShowSendButtonUseCaseTest {
 
     @Test
     fun `invoke returns true if ongoing engagement and the message is not empty and files are ready to send`() {
-        whenever(isQueueingOrEngagementUseCase.hasOngoingEngagement) doReturn true
+        whenever(isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement) doReturn true
         whenever(fileAttachmentRepository.readyToSendLocalAttachments) doReturn listOf(mock())
 
         val result = useCase("test")
@@ -73,7 +73,7 @@ class IsShowSendButtonUseCaseTest {
 
     @Test
     fun `invoke returns false if no ongoing engagement and files are ready to send`() {
-        whenever(isQueueingOrEngagementUseCase.hasOngoingEngagement) doReturn false
+        whenever(isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement) doReturn false
         whenever(fileAttachmentRepository.readyToSendLocalAttachments) doReturn listOf(mock())
 
         val result = useCase("")
@@ -83,7 +83,7 @@ class IsShowSendButtonUseCaseTest {
 
     @Test
     fun `invoke returns false if secure engagement and the message empty and files are not ready to send`() {
-        whenever(manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging()) doReturn true
+        whenever(manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging) doReturn true
         whenever(fileAttachmentRepository.readyToSendLocalAttachments) doReturn emptyList()
 
         val result = useCase("")
@@ -93,7 +93,7 @@ class IsShowSendButtonUseCaseTest {
 
     @Test
     fun `invoke returns true if secure engagement and the message is not empty and files are not ready to send`() {
-        whenever(manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging()) doReturn true
+        whenever(manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging) doReturn true
         whenever(fileAttachmentRepository.readyToSendLocalAttachments) doReturn emptyList()
 
         val result = useCase("test")
@@ -103,7 +103,7 @@ class IsShowSendButtonUseCaseTest {
 
     @Test
     fun `invoke returns true if secure engagement and the message is empty and files are ready to send`() {
-        whenever(manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging()) doReturn true
+        whenever(manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging) doReturn true
         whenever(fileAttachmentRepository.readyToSendLocalAttachments) doReturn listOf(mock())
 
         val result = useCase("")
@@ -113,7 +113,7 @@ class IsShowSendButtonUseCaseTest {
 
     @Test
     fun `invoke returns true if secure engagement and the message is not empty and files are ready to send`() {
-        whenever(manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging()) doReturn true
+        whenever(manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging) doReturn true
         whenever(fileAttachmentRepository.readyToSendLocalAttachments) doReturn listOf(mock())
 
         val result = useCase("test")

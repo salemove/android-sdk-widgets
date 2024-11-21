@@ -5,7 +5,7 @@ internal sealed class Data<out T> {
     val valueOrNull: T? get() = (this as? Value)?.result
 
     data class Value<out T>(val result: T) : Data<T>()
-    object Empty : Data<Nothing>()
+    data object Empty : Data<Nothing>()
 
     companion object
 }

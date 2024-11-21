@@ -32,7 +32,7 @@ internal class GliaSendMessageUseCase(
     }
 
     private val isSecureEngagement: Boolean
-        get() = shouldUseSecureMessagingApis.shouldUseSecureMessagingEndpoints()
+        get() = shouldUseSecureMessagingApis.shouldUseSecureMessagingEndpoints
 
     private fun sendMessage(payload: SendMessagePayload, listener: Listener) {
         if (isSecureEngagement) {

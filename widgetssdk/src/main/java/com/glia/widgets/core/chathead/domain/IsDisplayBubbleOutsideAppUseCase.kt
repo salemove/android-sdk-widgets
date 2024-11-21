@@ -4,7 +4,7 @@ import com.glia.widgets.core.chathead.ChatHeadManager
 import com.glia.widgets.core.permissions.PermissionManager
 import com.glia.widgets.engagement.domain.EngagementTypeUseCase
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
-import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
+import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 import com.glia.widgets.engagement.domain.ScreenSharingUseCase
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
@@ -16,7 +16,7 @@ import com.glia.widgets.launcher.ConfigurationManager
  * 2) starts or stops the chat head service (bubble outside the app)
  */
 internal class IsDisplayBubbleOutsideAppUseCase(
-    isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase,
+    isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase,
     isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase,
     screenSharingUseCase: ScreenSharingUseCase,
     private val chatHeadManager: ChatHeadManager,
@@ -24,7 +24,7 @@ internal class IsDisplayBubbleOutsideAppUseCase(
     configurationManager: ConfigurationManager,
     engagementTypeUseCase: EngagementTypeUseCase
 ) : IsDisplayBubbleUseCase(
-    isQueueingOrEngagementUseCase,
+    isQueueingOrLiveEngagementUseCase,
     isCurrentEngagementCallVisualizerUseCase,
     screenSharingUseCase,
     permissionManager,

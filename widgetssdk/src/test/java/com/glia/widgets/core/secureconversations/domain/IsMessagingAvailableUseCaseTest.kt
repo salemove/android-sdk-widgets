@@ -5,6 +5,8 @@ import com.glia.androidsdk.queuing.Queue
 import com.glia.androidsdk.queuing.QueueState
 import com.glia.widgets.core.queue.QueueRepository
 import com.glia.widgets.core.queue.QueuesState
+import com.glia.widgets.engagement.EngagementRepository
+import com.glia.widgets.engagement.State
 import com.glia.widgets.helper.supportMessaging
 import io.mockk.every
 import io.mockk.mockk
@@ -19,12 +21,14 @@ import org.junit.Test
 class IsMessagingAvailableUseCaseTest {
 
     private lateinit var queueRepository: QueueRepository
+    private lateinit var engagementRepository: EngagementRepository
     private lateinit var isMessagingAvailableUseCase: IsMessagingAvailableUseCase
 
     @Before
     fun setUp() {
-        queueRepository = mockk()
-        isMessagingAvailableUseCase = IsMessagingAvailableUseCase(queueRepository)
+        queueRepository = mockk(relaxUnitFun = true)
+        engagementRepository = mockk(relaxUnitFun = true)
+        isMessagingAvailableUseCase = IsMessagingAvailableUseCase(queueRepository, engagementRepository)
         mockkStatic(COMMON_EXTENSIONS_CLASS_PATH)
     }
 
@@ -34,10 +38,24 @@ class IsMessagingAvailableUseCaseTest {
     }
 
     @Test
+    fun `invoke returns true when transferred SC`() {
+        val nonMessagingQueue = createQueueWithStatus(QueueState.Status.OPEN, false)
+        val queuesState = QueuesState.Queues(listOf(nonMessagingQueue))
+        every { queueRepository.queuesState } returns Flowable.just(queuesState)
+        every { engagementRepository.engagementState } returns Flowable.just(State.TransferredToSecureConversation)
+
+        val testSubscriber = TestSubscriber<Result<Boolean>>()
+        isMessagingAvailableUseCase().subscribe(testSubscriber)
+
+        testSubscriber.assertValue(Result.success(true))
+    }
+
+    @Test
     fun `invoke returns true when queue with messaging exists`() {
         val messagingQueue = createQueueWithStatus(QueueState.Status.OPEN, true)
         val queuesState = QueuesState.Queues(listOf(messagingQueue))
         every { queueRepository.queuesState } returns Flowable.just(queuesState)
+        every { engagementRepository.engagementState } returns Flowable.just(State.NoEngagement)
 
         val testSubscriber = TestSubscriber<Result<Boolean>>()
         isMessagingAvailableUseCase().subscribe(testSubscriber)
@@ -50,6 +68,7 @@ class IsMessagingAvailableUseCaseTest {
         val nonMessagingQueue = createQueueWithStatus(QueueState.Status.OPEN, false)
         val queuesState = QueuesState.Queues(listOf(nonMessagingQueue))
         every { queueRepository.queuesState } returns Flowable.just(queuesState)
+        every { engagementRepository.engagementState } returns Flowable.just(State.NoEngagement)
 
         val testSubscriber = TestSubscriber<Result<Boolean>>()
         isMessagingAvailableUseCase().subscribe(testSubscriber)
@@ -62,6 +81,7 @@ class IsMessagingAvailableUseCaseTest {
         val closedQueue = createQueueWithStatus(QueueState.Status.CLOSED, true)
         val queuesState = QueuesState.Queues(listOf(closedQueue))
         every { queueRepository.queuesState } returns Flowable.just(queuesState)
+        every { engagementRepository.engagementState } returns Flowable.just(State.NoEngagement)
 
         val testSubscriber = TestSubscriber<Result<Boolean>>()
         isMessagingAvailableUseCase().subscribe(testSubscriber)
@@ -74,6 +94,7 @@ class IsMessagingAvailableUseCaseTest {
         val unknownQueue = createQueueWithStatus(QueueState.Status.UNKNOWN, true)
         val queuesState = QueuesState.Queues(listOf(unknownQueue))
         every { queueRepository.queuesState } returns Flowable.just(queuesState)
+        every { engagementRepository.engagementState } returns Flowable.just(State.NoEngagement)
 
         val testSubscriber = TestSubscriber<Result<Boolean>>()
         isMessagingAvailableUseCase().subscribe(testSubscriber)
@@ -85,6 +106,7 @@ class IsMessagingAvailableUseCaseTest {
     fun `invoke returns error when queue state is error`() {
         val errorState = QueuesState.Error(Throwable("Error"))
         every { queueRepository.queuesState } returns Flowable.just(errorState)
+        every { engagementRepository.engagementState } returns Flowable.just(State.NoEngagement)
 
         val testSubscriber = TestSubscriber<Result<Boolean>>()
         isMessagingAvailableUseCase().subscribe(testSubscriber)

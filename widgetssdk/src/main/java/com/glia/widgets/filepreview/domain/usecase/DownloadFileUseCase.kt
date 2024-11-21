@@ -14,6 +14,6 @@ internal class DownloadFileUseCase(
     operator fun invoke(file: AttachmentFile): Completable = when {
         file.name.isEmpty() -> Completable.error(FileNameMissingException())
         file.isDeleted -> Completable.error(RemoteFileIsDeletedException())
-        else -> fileRepository.downloadFileFromNetwork(manageSecureMessagingStatusUseCase.shouldUseSecureMessagingEndpoints(), file)
+        else -> fileRepository.downloadFileFromNetwork(manageSecureMessagingStatusUseCase.shouldUseSecureMessagingEndpoints, file)
     }
 }

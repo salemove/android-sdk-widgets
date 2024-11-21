@@ -9,18 +9,18 @@ import com.glia.widgets.core.fileupload.SecureFileAttachmentRepository
 import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.core.secureconversations.SendMessageRepository
-import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
+import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 
 internal class SendSecureMessageUseCase(
     private val sendMessageRepository: SendMessageRepository,
     private val secureConversationsRepository: SecureConversationsRepository,
     private val fileAttachmentRepository: SecureFileAttachmentRepository,
     private val chatRepository: GliaChatRepository,
-    private val isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase
+    private val isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase
 ) {
 
     private val hasOngoingEngagement: Boolean
-        get() = isQueueingOrEngagementUseCase.hasOngoingEngagement
+        get() = isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement
 
     operator fun invoke(
         callback: RequestCallback<VisitorMessage?>

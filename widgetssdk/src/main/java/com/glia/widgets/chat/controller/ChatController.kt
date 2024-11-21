@@ -67,7 +67,7 @@ import com.glia.widgets.engagement.domain.EndEngagementUseCase
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import com.glia.widgets.engagement.domain.EnqueueForEngagementUseCase
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
-import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
+import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 import com.glia.widgets.engagement.domain.OperatorMediaUseCase
 import com.glia.widgets.engagement.domain.OperatorTypingUseCase
 import com.glia.widgets.engagement.domain.ReleaseResourcesUseCase
@@ -125,7 +125,7 @@ internal class ChatController(
     private val engagementStateUseCase: EngagementStateUseCase,
     private val operatorMediaUseCase: OperatorMediaUseCase,
     private val acceptMediaUpgradeOfferUseCase: AcceptMediaUpgradeOfferUseCase,
-    private val isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase,
+    private val isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase,
     private val enqueueForEngagementUseCase: EnqueueForEngagementUseCase,
     private val decideOnQueueingUseCase: DecideOnQueueingUseCase,
     private val screenSharingUseCase: ScreenSharingUseCase,
@@ -195,7 +195,7 @@ internal class ChatController(
     @Volatile
     private var chatState: ChatState
 
-    private val isQueueingOrOngoingEngagement get() = isQueueingOrEngagementUseCase()
+    private val isQueueingOrOngoingEngagement get() = isQueueingOrLiveEngagementUseCase()
 
     override val isChatVisible: Boolean
         get() = chatState.isVisible
@@ -322,7 +322,7 @@ internal class ChatController(
     }
 
     override fun onEngagementConfirmationDialogRequested() {
-        if (isQueueingOrEngagementUseCase()) return
+        if (isQueueingOrLiveEngagementUseCase()) return
         view?.showEngagementConfirmationDialog()
     }
 
@@ -584,11 +584,16 @@ internal class ChatController(
             is State.Update -> handleEngagementStateUpdate(state.updateState)
             is State.PreQueuing, is State.Queuing -> queueForEngagementStarted()
             is State.QueueUnstaffed, is State.UnexpectedErrorHappened, is State.QueueingCanceled -> emitViewState { chatState.chatUnavailableState() }
+            State.TransferredToSecureConversation -> onTransferredToSecureConversation()
 
             else -> {
                 // no op
             }
         }
+    }
+
+    private fun onTransferredToSecureConversation() {
+        emitViewState { chatState.setSecureMessagingState().setSecureMessagingAvailable() }
     }
 
     private fun handleEngagementStateUpdate(state: EngagementUpdateState) {
@@ -681,7 +686,7 @@ internal class ChatController(
         chatManager.onChatAction(
             ChatManager.Action.OperatorJoined(formattedOperatorName, profileImgUrl)
         )
-        emitViewState { chatState.operatorConnected(formattedOperatorName, profileImgUrl) }
+        emitViewState { chatState.operatorConnected(formattedOperatorName, profileImgUrl).setLiveChatState() }
     }
 
     private fun endChat() {
@@ -784,7 +789,7 @@ internal class ChatController(
     private fun onHistoryLoaded(hasHistory: Boolean) {
         Logger.d(TAG, "historyLoaded")
 
-        val isSecureEngagement = manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging()
+        val isSecureEngagement = manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging
 
         if (!hasHistory) {
             if (!isSecureEngagement && !isQueueingOrOngoingEngagement) {
@@ -796,7 +801,7 @@ internal class ChatController(
 
         when {
             isSecureEngagement -> { /* to prevent calling chatState.liveChatHistoryLoaded() */ }
-            isQueueingOrEngagementUseCase.hasOngoingEngagement -> emitViewState { chatState.engagementStarted() }
+            isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement -> emitViewState { chatState.engagementStarted() }
             else -> emitViewState { chatState.liveChatHistoryLoaded() }
         }
 

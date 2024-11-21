@@ -31,7 +31,7 @@ import com.glia.widgets.chat.model.VisitorChatItem
 import com.glia.widgets.core.engagement.domain.model.ChatHistoryResponse
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDelayUseCase
-import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
+import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.isValid
@@ -53,7 +53,7 @@ internal class ChatManager(
     private val sendUnsentMessagesUseCase: SendUnsentMessagesUseCase,
     private val handleCustomCardClickUseCase: HandleCustomCardClickUseCase,
     private val isAuthenticatedUseCase: IsAuthenticatedUseCase,
-    private val isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase,
+    private val isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase,
     private val compositeDisposable: CompositeDisposable = CompositeDisposable(),
     private val state: BehaviorProcessor<State> = BehaviorProcessor.createDefault(State()),
     private val quickReplies: BehaviorProcessor<List<GvaButton>> = BehaviorProcessor.create(),
@@ -108,7 +108,7 @@ internal class ChatManager(
 
     @VisibleForTesting
     fun loadHistory(onHistoryLoaded: (hasHistory: Boolean) -> Unit): Flowable<State> {
-        val historyEvent = if (isAuthenticatedUseCase() || isQueueingOrEngagementUseCase.hasOngoingEngagement) {
+        val historyEvent = if (isAuthenticatedUseCase() || isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement) {
             loadHistoryUseCase()
                 .doOnSuccess { historyLoaded.onNext(true) }
                 .zipWith(state.firstOrError(), ::mapChatHistory)

@@ -31,8 +31,9 @@ internal interface EngagementRepository {
     val visitorCameraState: Flowable<VisitorCamera>
 
     val currentOperatorValue: Operator?
-    val isQueueingOrEngagement: Boolean
-    val hasOngoingEngagement: Boolean
+    val isQueueingOrLiveEngagement: Boolean
+    val hasOngoingLiveEngagement: Boolean
+    val isTransferredSecureConversation: Boolean
     val isQueueing: Boolean
     val isQueueingForMedia: Boolean
     val isCallVisualizerEngagement: Boolean

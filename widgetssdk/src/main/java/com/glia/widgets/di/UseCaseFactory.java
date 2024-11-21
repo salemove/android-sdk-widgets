@@ -148,8 +148,8 @@ import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCa
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCaseImpl;
 import com.glia.widgets.engagement.domain.IsOperatorPresentUseCase;
 import com.glia.widgets.engagement.domain.IsOperatorPresentUseCaseImpl;
-import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase;
-import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCaseImpl;
+import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase;
+import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCaseImpl;
 import com.glia.widgets.engagement.domain.OnIncomingEngagementRequestTimeoutUseCase;
 import com.glia.widgets.engagement.domain.OnIncomingEngagementRequestTimeoutUseCaseImpl;
 import com.glia.widgets.engagement.domain.OperatorMediaUpgradeOfferUseCase;
@@ -585,7 +585,7 @@ public class UseCaseFactory {
 
     @NonNull
     public ManageSecureMessagingStatusUseCase createManageSecureMessagingStatusUseCase() {
-        return new ManageSecureMessagingStatusUseCase(getIsQueueingOrEngagementUseCase(), repositoryFactory.getEngagementRepository());
+        return new ManageSecureMessagingStatusUseCase(repositoryFactory.getEngagementRepository());
     }
 
     @NonNull
@@ -595,7 +595,7 @@ public class UseCaseFactory {
 
     @NonNull
     public IsMessagingAvailableUseCase createIsMessagingAvailableUseCase() {
-        return new IsMessagingAvailableUseCase(repositoryFactory.getQueueRepository());
+        return new IsMessagingAvailableUseCase(repositoryFactory.getQueueRepository(), repositoryFactory.getEngagementRepository());
     }
 
     @NonNull
@@ -871,8 +871,8 @@ public class UseCaseFactory {
     }
 
     @NonNull
-    public IsQueueingOrEngagementUseCase getIsQueueingOrEngagementUseCase() {
-        return new IsQueueingOrEngagementUseCaseImpl(repositoryFactory.getEngagementRepository());
+    public IsQueueingOrLiveEngagementUseCase getIsQueueingOrEngagementUseCase() {
+        return new IsQueueingOrLiveEngagementUseCaseImpl(repositoryFactory.getEngagementRepository());
     }
 
     @NonNull

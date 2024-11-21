@@ -18,7 +18,7 @@ internal class GetImageFileFromNetworkUseCase(
     operator fun invoke(file: AttachmentFile?): Maybe<Bitmap> = when {
         file?.name.isNullOrBlank() -> Maybe.error(FileNameMissingException())
         file!!.isDeleted -> Maybe.error(RemoteFileIsDeletedException())
-        else -> gliaFileRepository.loadImageFileFromNetwork(manageSecureMessagingStatusUseCase.shouldUseSecureMessagingEndpoints(), file)
+        else -> gliaFileRepository.loadImageFileFromNetwork(manageSecureMessagingStatusUseCase.shouldUseSecureMessagingEndpoints, file)
             .flatMap { decodeSampledBitmapFromInputStreamUseCase(it) }
             .doOnSuccess { gliaFileRepository.putImageToCache(file.fileName, it) }
     }

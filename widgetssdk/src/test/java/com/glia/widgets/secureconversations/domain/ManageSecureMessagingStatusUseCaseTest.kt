@@ -2,7 +2,6 @@ package com.glia.widgets.secureconversations.domain
 
 import com.glia.widgets.core.secureconversations.domain.ManageSecureMessagingStatusUseCase
 import com.glia.widgets.engagement.EngagementRepository
-import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -13,23 +12,22 @@ import org.junit.Test
 
 class ManageSecureMessagingStatusUseCaseTest {
 
-    private lateinit var isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase
     private lateinit var engagementRepository: EngagementRepository
     private lateinit var useCase: ManageSecureMessagingStatusUseCase
 
     @Before
     fun setUp() {
-        isQueueingOrEngagementUseCase = mockk()
-        engagementRepository = mockk(relaxed = true)
-        useCase = ManageSecureMessagingStatusUseCase(isQueueingOrEngagementUseCase, engagementRepository)
+        engagementRepository = mockk(relaxUnitFun = true)
+        useCase = ManageSecureMessagingStatusUseCase(engagementRepository)
     }
 
     @Test
     fun `shouldUseSecureMessagingEndpoints returns true when secure messaging is requested and not queueing or engaged`() {
         every { engagementRepository.isSecureMessagingRequested } returns true
-        every { isQueueingOrEngagementUseCase() } returns false
+        every { engagementRepository.isQueueingOrLiveEngagement } returns false
+        every { engagementRepository.isTransferredSecureConversation } returns false
 
-        val result = useCase.shouldUseSecureMessagingEndpoints()
+        val result = useCase.shouldUseSecureMessagingEndpoints
 
         assertTrue(result)
     }
@@ -38,7 +36,7 @@ class ManageSecureMessagingStatusUseCaseTest {
     fun `shouldUseSecureMessagingEndpoints returns false when secure messaging is not requested`() {
         every { engagementRepository.isSecureMessagingRequested } returns false
 
-        val result = useCase.shouldUseSecureMessagingEndpoints()
+        val result = useCase.shouldUseSecureMessagingEndpoints
 
         assertFalse(result)
     }
@@ -46,9 +44,10 @@ class ManageSecureMessagingStatusUseCaseTest {
     @Test
     fun `shouldUseSecureMessagingEndpoints returns false when queueing or engaged`() {
         every { engagementRepository.isSecureMessagingRequested } returns true
-        every { isQueueingOrEngagementUseCase() } returns true
+        every { engagementRepository.isQueueingOrLiveEngagement } returns true
+        every { engagementRepository.isTransferredSecureConversation } returns false
 
-        val result = useCase.shouldUseSecureMessagingEndpoints()
+        val result = useCase.shouldUseSecureMessagingEndpoints
 
         assertFalse(result)
     }
@@ -56,17 +55,29 @@ class ManageSecureMessagingStatusUseCaseTest {
     @Test
     fun `shouldBehaveAsSecureMessaging returns true when secure messaging is requested`() {
         every { engagementRepository.isSecureMessagingRequested } returns true
+        every { engagementRepository.isTransferredSecureConversation } returns false
 
-        val result = useCase.shouldBehaveAsSecureMessaging()
+        val result = useCase.shouldBehaveAsSecureMessaging
 
         assertTrue(result)
     }
 
     @Test
-    fun `shouldBehaveAsSecureMessaging returns false when secure messaging is not requested`() {
+    fun `shouldBehaveAsSecureMessaging returns true when transferred SC`() {
         every { engagementRepository.isSecureMessagingRequested } returns false
+        every { engagementRepository.isTransferredSecureConversation } returns true
 
-        val result = useCase.shouldBehaveAsSecureMessaging()
+        val result = useCase.shouldBehaveAsSecureMessaging
+
+        assertTrue(result)
+    }
+
+    @Test
+    fun `shouldBehaveAsSecureMessaging returns false when secure messaging is not requested and not transferred SC`() {
+        every { engagementRepository.isSecureMessagingRequested } returns false
+        every { engagementRepository.isTransferredSecureConversation } returns false
+
+        val result = useCase.shouldBehaveAsSecureMessaging
 
         assertFalse(result)
     }

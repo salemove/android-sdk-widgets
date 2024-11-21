@@ -8,19 +8,15 @@ import com.glia.widgets.core.fileupload.exception.SupportedFileCountExceededExce
 import com.glia.widgets.core.fileupload.exception.SupportedFileSizeExceededException
 import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.core.secureconversations.domain.ManageSecureMessagingStatusUseCase
-import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
+import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 
 internal class AddFileToAttachmentAndUploadUseCase(
-    private val isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase,
+    private val isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase,
     private val fileAttachmentRepository: FileAttachmentRepository,
     private val manageSecureMessagingStatusUseCase: ManageSecureMessagingStatusUseCase
 ) {
     private val isSupportedFileCountExceeded: Boolean
         get() = fileAttachmentRepository.attachedFilesCount > SupportedFileCountCheckUseCase.SUPPORTED_FILE_COUNT
-
-    private val hasNoOngoingEngagement: Boolean
-        get() = !isQueueingOrEngagementUseCase.hasOngoingEngagement
-
 
     fun execute(file: LocalAttachment, listener: Listener) {
         if (fileAttachmentRepository.isFileAttached(file.uri)) {
@@ -32,11 +28,11 @@ internal class AddFileToAttachmentAndUploadUseCase(
 
     private fun onFileNotAttached(file: LocalAttachment, listener: Listener) {
         fileAttachmentRepository.attachFile(file)
-        if (hasNoOngoingEngagement && !manageSecureMessagingStatusUseCase.shouldUseSecureMessagingEndpoints()) {
+        if (isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement || manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging) {
+            onHasOngoingOrSecureEngagement(file, listener)
+        } else {
             fileAttachmentRepository.setFileAttachmentEngagementMissing(file.uri)
             listener.onError(EngagementMissingException())
-        } else {
-            onHasOngoingOrSecureEngagement(file, listener)
         }
     }
 
@@ -49,7 +45,7 @@ internal class AddFileToAttachmentAndUploadUseCase(
             listener.onError(SupportedFileSizeExceededException())
         } else {
             listener.onStarted()
-            fileAttachmentRepository.uploadFile(manageSecureMessagingStatusUseCase.shouldUseSecureMessagingEndpoints(), file, listener)
+            fileAttachmentRepository.uploadFile(manageSecureMessagingStatusUseCase.shouldUseSecureMessagingEndpoints, file, listener)
         }
     }
 

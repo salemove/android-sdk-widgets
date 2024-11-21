@@ -35,7 +35,7 @@ import com.glia.widgets.engagement.domain.EnqueueForEngagementUseCase
 import com.glia.widgets.engagement.domain.FlipCameraButtonStateUseCase
 import com.glia.widgets.engagement.domain.FlipVisitorCameraUseCase
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
-import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
+import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 import com.glia.widgets.engagement.domain.OperatorMediaUseCase
 import com.glia.widgets.engagement.domain.ScreenSharingUseCase
 import com.glia.widgets.engagement.domain.ToggleVisitorAudioMediaStateUseCase
@@ -88,7 +88,7 @@ internal class CallController(
     private val toggleVisitorVideoMediaStateUseCase: ToggleVisitorVideoMediaStateUseCase,
     private val flipVisitorCameraUseCase: FlipVisitorCameraUseCase,
     private val flipCameraButtonStateUseCase: FlipCameraButtonStateUseCase,
-    private val isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase,
+    private val isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase,
     private val enqueueForEngagementUseCase: EnqueueForEngagementUseCase,
     private val decideOnQueueingUseCase: DecideOnQueueingUseCase,
     private val screenSharingUseCase: ScreenSharingUseCase,
@@ -219,7 +219,7 @@ internal class CallController(
     }
 
     private fun tryToQueueForEngagement() {
-        if (!isQueueingOrEngagementUseCase()) {
+        if (!isQueueingOrLiveEngagementUseCase()) {
             confirmationDialogUseCase { shouldShow: Boolean ->
                 if (shouldShow) {
                     dialogController.showEngagementConfirmationDialog()
@@ -231,7 +231,7 @@ internal class CallController(
     }
 
     override fun onLiveObservationDialogRequested() {
-        if (isQueueingOrEngagementUseCase()) return
+        if (isQueueingOrLiveEngagementUseCase()) return
         view?.showEngagementConfirmationDialog()
     }
 
@@ -403,7 +403,7 @@ internal class CallController(
     }
 
     private fun onNewOperatorMediaState(operatorMediaState: MediaState) {
-        if (!isQueueingOrEngagementUseCase.hasOngoingEngagement) return
+        if (!isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement) return
         d(TAG, "newOperatorMediaState: $operatorMediaState, timer task running: ${callTimer.isRunning}")
         if (operatorMediaState.video != null) {
             onOperatorMediaStateVideo(operatorMediaState)

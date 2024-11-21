@@ -30,7 +30,7 @@ internal class SendUnsentMessagesUseCase(
     }
 
     private fun sendMessage(payload: SendMessagePayload, callback: RequestCallback<VisitorMessage?>) {
-        if (shouldUseSecureMessagingApis.shouldUseSecureMessagingEndpoints()) {
+        if (shouldUseSecureMessagingApis.shouldUseSecureMessagingEndpoints) {
             secureConversationsRepository.send(payload, callback)
         } else {
             chatRepository.sendMessage(payload, callback)

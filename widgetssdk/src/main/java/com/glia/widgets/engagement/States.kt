@@ -16,7 +16,17 @@ internal sealed interface State {
     data object StartedCallVisualizer : State
     data object FinishedOmniCore : State
     data object FinishedCallVisualizer : State
+    data object TransferredToSecureConversation : State
     data class Update(val state: EngagementState, val updateState: EngagementUpdateState) : State
+
+    val isQueueing: Boolean
+        get() = this is Queuing || this is PreQueuing
+
+    val isLiveEngagement: Boolean
+        get() = when (this) {
+            is Update, StartedOmniCore, StartedCallVisualizer -> true
+            else -> false
+        }
 
     val queueingMediaType: MediaType?
         get() = when (this) {

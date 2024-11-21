@@ -5,7 +5,7 @@ import com.glia.widgets.callvisualizer.VisitorCodeContract
 import com.glia.widgets.core.callvisualizer.domain.VisitorCodeRepository
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
-import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
+import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.plugins.RxJavaPlugins
@@ -27,11 +27,11 @@ internal class VisitorCodeControllerTest {
     private val engagementStateUseCase: EngagementStateUseCase = org.mockito.kotlin.mock {
         on { invoke() } doReturn engagementState
     }
-    private val isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase = mock()
+    private val isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase = mock()
     private val callVisualizerController: CallVisualizerContract.Controller = mock()
     private val visitorCodeRepository: VisitorCodeRepository = mock()
     private val controller =
-        VisitorCodeController(callVisualizerController, visitorCodeRepository, engagementStateUseCase, isQueueingOrEngagementUseCase)
+        VisitorCodeController(callVisualizerController, visitorCodeRepository, engagementStateUseCase, isQueueingOrLiveEngagementUseCase)
     private val view: VisitorCodeContract.View = mock()
     private val refreshTime = 1000L
 

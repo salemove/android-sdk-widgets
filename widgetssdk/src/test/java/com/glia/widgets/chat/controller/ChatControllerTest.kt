@@ -46,7 +46,7 @@ import com.glia.widgets.engagement.domain.EndEngagementUseCase
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import com.glia.widgets.engagement.domain.EnqueueForEngagementUseCase
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
-import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
+import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 import com.glia.widgets.engagement.domain.OperatorMediaUseCase
 import com.glia.widgets.engagement.domain.OperatorTypingUseCase
 import com.glia.widgets.engagement.domain.ReleaseResourcesUseCase
@@ -113,7 +113,7 @@ class ChatControllerTest {
     private lateinit var operatorMediaUseCase: OperatorMediaUseCase
     private lateinit var acceptMediaUpgradeOfferUseCase: AcceptMediaUpgradeOfferUseCase
     private lateinit var declineMediaUpgradeOfferUseCase: DeclineMediaUpgradeOfferUseCase
-    private lateinit var isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase
+    private lateinit var isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase
     private lateinit var enqueueForEngagementUseCase: EnqueueForEngagementUseCase
     private lateinit var decideOnQueueingUseCase: DecideOnQueueingUseCase
     private lateinit var screenSharingUseCase: ScreenSharingUseCase
@@ -177,7 +177,7 @@ class ChatControllerTest {
         }
         acceptMediaUpgradeOfferUseCase = mock()
         declineMediaUpgradeOfferUseCase = mock()
-        isQueueingOrEngagementUseCase = mock()
+        isQueueingOrLiveEngagementUseCase = mock()
         enqueueForEngagementUseCase = mock()
         chatView = mock()
         decideOnQueueingUseCase = mock {
@@ -234,7 +234,7 @@ class ChatControllerTest {
             engagementStateUseCase = engagementStateUseCase,
             operatorMediaUseCase = operatorMediaUseCase,
             acceptMediaUpgradeOfferUseCase = acceptMediaUpgradeOfferUseCase,
-            isQueueingOrEngagementUseCase = isQueueingOrEngagementUseCase,
+            isQueueingOrLiveEngagementUseCase = isQueueingOrLiveEngagementUseCase,
             enqueueForEngagementUseCase = enqueueForEngagementUseCase,
             decideOnQueueingUseCase = decideOnQueueingUseCase,
             screenSharingUseCase = screenSharingUseCase,

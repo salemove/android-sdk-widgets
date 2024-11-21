@@ -78,13 +78,13 @@ internal class EngagementRepositoryImpl(
     private val queueTicketCallback = Consumer<QueueTicket>(::handleQueueTicket)
 
     private val _engagementState: BehaviorProcessor<State> = BehaviorProcessor.createDefault(State.NoEngagement)
-    override val engagementState: Flowable<State> = _engagementState.onBackpressureBuffer()
+    override val engagementState: Flowable<State> = _engagementState.onBackpressureBuffer().distinctUntilChanged()
 
     private val _survey: PublishProcessor<SurveyState> = PublishProcessor.create()
     override val survey: Flowable<SurveyState> = _survey
 
     private val _currentOperator: BehaviorProcessor<Data<Operator>> = BehaviorProcessor.createDefault(Data.Empty)
-    override val currentOperator: Flowable<Data<Operator>> = _currentOperator.onBackpressureLatest()
+    override val currentOperator: Flowable<Data<Operator>> = _currentOperator.onBackpressureLatest().distinctUntilChanged()
     override val currentOperatorValue: Operator? get() = with(_currentOperator.value as? Data.Value) { this?.result }
     override val isOperatorPresent: Boolean get() = currentOperatorValue != null
     private val currentState: State? get() = _engagementState.value
@@ -139,19 +139,23 @@ internal class EngagementRepositoryImpl(
 
     private val queueIngDisposable = CompositeDisposable()
 
-    override val hasOngoingEngagement: Boolean
-        get() = currentEngagement != null
+    override val hasOngoingLiveEngagement: Boolean
+        get() = currentEngagement != null && currentState?.isLiveEngagement == true
+
+    override val isTransferredSecureConversation: Boolean
+        get() = currentState is State.TransferredToSecureConversation
 
     override val isQueueing: Boolean
-        get() = currentState is State.Queuing || currentState is State.PreQueuing
+        get() = currentState?.isQueueing == true
+
     override val isQueueingForMedia: Boolean
         get() = currentState?.queueingMediaType?.isAudioOrVideo() == true
 
     override val isCallVisualizerEngagement: Boolean
         get() = currentEngagement is OmnibrowseEngagement
 
-    override val isQueueingOrEngagement: Boolean
-        get() = isQueueing || hasOngoingEngagement
+    override val isQueueingOrLiveEngagement: Boolean
+        get() = isQueueing || hasOngoingLiveEngagement
 
     override val isSharingScreen: Boolean
         get() = currentEngagement != null && _screenSharingState.run { value == ScreenSharingState.Started || value == ScreenSharingState.RequestAccepted }
@@ -212,7 +216,7 @@ internal class EngagementRepositoryImpl(
     }
 
     override fun queueForEngagement(mediaType: MediaType) {
-        if (isQueueingOrEngagement) return
+        if (isQueueingOrLiveEngagement) return
 
         _engagementState.onNext(State.PreQueuing(mediaType))
 
@@ -385,14 +389,22 @@ internal class EngagementRepositoryImpl(
     private fun handleOmniCoreEngagement(engagement: OmnicoreEngagement) {
         Logger.i(TAG, "Omnicore Engagement started")
 
-        currentEngagement?.also {
-            unsubscribeFromEvents(it)
-            currentEngagement = null
-            resetState()
-        } ?: _engagementState.onNext(State.StartedOmniCore)
+        when {
+            currentEngagement != null -> {
+                unsubscribeFromEvents(currentEngagement!!)
+                currentEngagement = null
+                resetState()
+            }
+
+            engagement.state.visitorStatus == EngagementState.VisitorStatus.TRANSFERRING && engagement.state.capabilities.isText -> {
+                _engagementState.onNext(State.TransferredToSecureConversation)
+            }
+
+            else -> _engagementState.onNext(State.StartedOmniCore)
+        }
 
         currentEngagement = engagement
-        operatorRepository.emit(engagement.state.operator)
+        handleEngagementState(engagement.state)
 
         subscribeToEngagementEvents(engagement)
         subscribeToEngagementMediaEvents(engagement.media)
@@ -411,7 +423,7 @@ internal class EngagementRepositoryImpl(
         } ?: _engagementState.onNext(State.StartedCallVisualizer)
 
         currentEngagement = engagement
-        operatorRepository.emit(engagement.state.operator)
+        handleEngagementState(engagement.state)
 
         subscribeToEngagementEvents(engagement)
         subscribeToEngagementMediaEvents(engagement.media)
@@ -474,29 +486,36 @@ internal class EngagementRepositoryImpl(
     }
 
     private fun handleEngagementState(state: EngagementState) {
+        // keeping the current operator value, to use inside this function,
+        // because in some cases we need to globally have up to date operator before emitting new state
+        val currentOperator: Operator? = currentOperatorValue
+
         operatorRepository.emit(state.operator)
-
-        val updateState = when {
-            state.visitorStatus == EngagementState.VisitorStatus.TRANSFERRING -> {
-                Logger.i(TAG, "Transfer engagement")
-                EngagementUpdateState.Transferring
-            }
-
-            !isOperatorPresent -> {
-                Logger.i(TAG, "Operator connected")
-                EngagementUpdateState.OperatorConnected(state.operator)
-            }
-
-            currentOperatorValue?.id != state.operator.id -> {
-                Logger.i(TAG, "Operator changed")
-                EngagementUpdateState.OperatorChanged(state.operator)
-            }
-
-            else -> EngagementUpdateState.Ongoing(state.operator)
-        }
         _currentOperator.onNext(Data.Value(state.operator))
 
-        _engagementState.onNext(State.Update(state, updateState))
+        when {
+            state.visitorStatus == EngagementState.VisitorStatus.TRANSFERRING && state.capabilities.isText -> {
+                Logger.i(TAG, "Transfer to Secure Conversation")
+                _engagementState.onNext(State.TransferredToSecureConversation)
+            }
+
+            state.visitorStatus == EngagementState.VisitorStatus.TRANSFERRING -> {
+                Logger.i(TAG, "Transfer engagement")
+                _engagementState.onNext(State.Update(state, EngagementUpdateState.Transferring))
+            }
+
+            currentOperator == null -> {
+                Logger.i(TAG, "Operator connected")
+                _engagementState.onNext(State.Update(state, EngagementUpdateState.OperatorConnected(state.operator)))
+            }
+
+            currentOperator.id != state.operator.id -> {
+                Logger.i(TAG, "Operator changed")
+                _engagementState.onNext(State.Update(state, EngagementUpdateState.OperatorChanged(state.operator)))
+            }
+
+            currentOperator != state.operator -> _engagementState.onNext(State.Update(state, EngagementUpdateState.Ongoing(state.operator)))
+        }
     }
 
     private fun handleEngagementEnd() {

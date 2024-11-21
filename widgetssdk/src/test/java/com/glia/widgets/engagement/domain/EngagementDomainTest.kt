@@ -215,7 +215,7 @@ class EngagementDomainTest {
 
     @Test
     fun `EngagementTypeUseCase isCallVisualizerScreenSharing returns true when current engagement is call visualizer and has no media`() {
-        val isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase = mockk(relaxUnitFun = true)
+        val isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase = mockk(relaxUnitFun = true)
         val isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase = mockk(relaxUnitFun = true)
         val operatorMediaUseCase: OperatorMediaUseCase = mockk(relaxUnitFun = true)
         val visitorMediaUseCase: VisitorMediaUseCase = mockk(relaxUnitFun = true)
@@ -226,7 +226,7 @@ class EngagementDomainTest {
         every { operatorMediaUseCase.hasMedia } returns false
 
         val useCase: EngagementTypeUseCase = EngagementTypeUseCaseImpl(
-            isQueueingOrEngagementUseCase = isQueueingOrEngagementUseCase,
+            isQueueingOrLiveEngagementUseCase = isQueueingOrLiveEngagementUseCase,
             isCurrentEngagementCallVisualizerUseCase = isCurrentEngagementCallVisualizerUseCase,
             operatorMediaUseCase = operatorMediaUseCase,
             visitorMediaUseCase = visitorMediaUseCase,
@@ -238,7 +238,7 @@ class EngagementDomainTest {
 
     @Test
     fun `EngagementTypeUseCase isCallVisualizerScreenSharing returns false when engagement has media`() {
-        val isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase = mockk(relaxUnitFun = true)
+        val isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase = mockk(relaxUnitFun = true)
         val isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase = mockk(relaxUnitFun = true)
         val operatorMediaUseCase: OperatorMediaUseCase = mockk(relaxUnitFun = true)
         val visitorMediaUseCase: VisitorMediaUseCase = mockk(relaxUnitFun = true)
@@ -249,7 +249,7 @@ class EngagementDomainTest {
         every { operatorMediaUseCase.hasMedia } returns false
 
         val useCase: EngagementTypeUseCase = EngagementTypeUseCaseImpl(
-            isQueueingOrEngagementUseCase = isQueueingOrEngagementUseCase,
+            isQueueingOrLiveEngagementUseCase = isQueueingOrLiveEngagementUseCase,
             isCurrentEngagementCallVisualizerUseCase = isCurrentEngagementCallVisualizerUseCase,
             operatorMediaUseCase = operatorMediaUseCase,
             visitorMediaUseCase = visitorMediaUseCase,
@@ -261,7 +261,7 @@ class EngagementDomainTest {
 
     @Test
     fun `EngagementTypeUseCase isChatEngagement returns true when engagement has no media, is not a cv and operator is present`() {
-        val isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase = mockk(relaxUnitFun = true)
+        val isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase = mockk(relaxUnitFun = true)
         val isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase = mockk(relaxUnitFun = true)
         val operatorMediaUseCase: OperatorMediaUseCase = mockk(relaxUnitFun = true)
         val visitorMediaUseCase: VisitorMediaUseCase = mockk(relaxUnitFun = true)
@@ -270,11 +270,11 @@ class EngagementDomainTest {
         every { isCurrentEngagementCallVisualizerUseCase() } returns false
         every { visitorMediaUseCase.hasMedia } returns false
         every { operatorMediaUseCase.hasMedia } returns false
-        every { isQueueingOrEngagementUseCase.hasOngoingEngagement } returns true
+        every { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement } returns true
         every { isOperatorPresentUseCase() } returns true
 
         val useCase: EngagementTypeUseCase = EngagementTypeUseCaseImpl(
-            isQueueingOrEngagementUseCase = isQueueingOrEngagementUseCase,
+            isQueueingOrLiveEngagementUseCase = isQueueingOrLiveEngagementUseCase,
             isCurrentEngagementCallVisualizerUseCase = isCurrentEngagementCallVisualizerUseCase,
             operatorMediaUseCase = operatorMediaUseCase,
             visitorMediaUseCase = visitorMediaUseCase,
@@ -286,7 +286,7 @@ class EngagementDomainTest {
 
     @Test
     fun `EngagementTypeUseCase isMediaEngagement returns true when engagement has  media and operator is present`() {
-        val isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase = mockk(relaxUnitFun = true)
+        val isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase = mockk(relaxUnitFun = true)
         val isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase = mockk(relaxUnitFun = true)
         val operatorMediaUseCase: OperatorMediaUseCase = mockk(relaxUnitFun = true)
         val visitorMediaUseCase: VisitorMediaUseCase = mockk(relaxUnitFun = true)
@@ -294,11 +294,11 @@ class EngagementDomainTest {
 
         every { visitorMediaUseCase.hasMedia } returns true
         every { operatorMediaUseCase.hasMedia } returns false
-        every { isQueueingOrEngagementUseCase.hasOngoingEngagement } returns true
+        every { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement } returns true
         every { isOperatorPresentUseCase() } returns true
 
         val useCase: EngagementTypeUseCase = EngagementTypeUseCaseImpl(
-            isQueueingOrEngagementUseCase = isQueueingOrEngagementUseCase,
+            isQueueingOrLiveEngagementUseCase = isQueueingOrLiveEngagementUseCase,
             isCurrentEngagementCallVisualizerUseCase = isCurrentEngagementCallVisualizerUseCase,
             operatorMediaUseCase = operatorMediaUseCase,
             visitorMediaUseCase = visitorMediaUseCase,
@@ -322,18 +322,18 @@ class EngagementDomainTest {
     @Test
     fun `IsQueueingOrEngagementUseCase isQueueingForChat returns true when is not queueing for media`() {
         val repository: EngagementRepository = mockk(relaxUnitFun = true) {
-            every { hasOngoingEngagement } returns false
+            every { hasOngoingLiveEngagement } returns false
             every { isQueueing } returns true
             every { isQueueingForMedia } returns false
-            every { isQueueingOrEngagement } returns true
+            every { isQueueingOrLiveEngagement } returns true
         }
 
-        val useCase: IsQueueingOrEngagementUseCase = IsQueueingOrEngagementUseCaseImpl(engagementRepository = repository)
+        val useCase: IsQueueingOrLiveEngagementUseCase = IsQueueingOrLiveEngagementUseCaseImpl(engagementRepository = repository)
 
-        assertTrue(useCase.isQueueingForChat)
+        assertTrue(useCase.isQueueingForLiveChat)
         assertTrue(useCase())
         assertFalse(useCase.isQueueingForMedia)
-        assertFalse(useCase.hasOngoingEngagement)
+        assertFalse(useCase.hasOngoingLiveEngagement)
     }
 
     @Test

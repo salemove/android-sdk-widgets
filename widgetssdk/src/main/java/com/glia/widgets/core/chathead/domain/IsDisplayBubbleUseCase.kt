@@ -6,7 +6,7 @@ import com.glia.widgets.chat.ChatView
 import com.glia.widgets.core.permissions.PermissionManager
 import com.glia.widgets.engagement.domain.EngagementTypeUseCase
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
-import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
+import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 import com.glia.widgets.engagement.domain.ScreenSharingUseCase
 import com.glia.widgets.filepreview.ui.ImagePreviewView
 import com.glia.widgets.helper.DialogHolderView
@@ -14,7 +14,7 @@ import com.glia.widgets.launcher.ConfigurationManager
 import com.glia.widgets.messagecenter.MessageCenterView
 
 internal abstract class IsDisplayBubbleUseCase(
-    private val isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase,
+    private val isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase,
     private val isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase,
     private val screenSharingUseCase: ScreenSharingUseCase,
     val permissionManager: PermissionManager,
@@ -60,8 +60,8 @@ internal abstract class IsDisplayBubbleUseCase(
 
     private val isChatEngagementOrQueueingOngoing: Boolean get() = isChatEngagementOngoing || isChatQueueingOngoing
     private val isMediaEngagementOrQueueingOngoing: Boolean get() = isMediaEngagementOngoing || isMediaQueueingOngoing
-    private val isMediaQueueingOngoing: Boolean get() = isQueueingOrEngagementUseCase.isQueueingForMedia
+    private val isMediaQueueingOngoing: Boolean get() = isQueueingOrLiveEngagementUseCase.isQueueingForMedia
     private val isMediaEngagementOngoing: Boolean get() = engagementTypeUseCase.isMediaEngagement
-    private val isChatQueueingOngoing: Boolean get() = isQueueingOrEngagementUseCase.isQueueingForChat
+    private val isChatQueueingOngoing: Boolean get() = isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat
     private val isChatEngagementOngoing: Boolean get() = engagementTypeUseCase.isChatEngagement
 }

@@ -177,8 +177,8 @@ class EngagementRepositoryTest {
             assertNull(currentOperatorValue)
             assertNull(operatorCurrentMediaState)
             screenSharingStateTest.assertNotComplete().assertNoValues()
-            assertFalse(isQueueingOrEngagement)
-            assertFalse(hasOngoingEngagement)
+            assertFalse(isQueueingOrLiveEngagement)
+            assertFalse(hasOngoingLiveEngagement)
             assertFalse(isQueueing)
             assertFalse(isQueueingForMedia)
             assertFalse(isCallVisualizerEngagement)
@@ -200,29 +200,43 @@ class EngagementRepositoryTest {
         screenSharing = mockk(relaxUnitFun = true)
         cameraDevice = mockk(relaxUnitFun = true)
 
-        operator = mockk(relaxUnitFun = true)
+        operator = mockk(relaxUnitFun = true) {
+            every { id } returns "initial_id"
+            every { formattedName } returns "initial_operator_name"
+        }
         engagementState = mockk(relaxUnitFun = true)
         every { engagementState.operator } returns operator
         every { engagement.state } returns engagementState
+        every { engagementState.visitorStatus } returns EngagementState.VisitorStatus.ENGAGED
         every { engagement.media } returns media
         every { engagement.chat } returns chat
         every { engagement.screenSharing } returns screenSharing
         every { media.currentCameraDevice } returns cameraDevice
 
+        val stateTestSubscriber = repository.engagementState.test()
+
         if (callVisualizer) {
             callVisualizerEngagementCallbackSlot.captured.accept(engagement as OmnibrowseEngagement)
-            repository.engagementState.test().assertValue(State.StartedCallVisualizer).assertValueCount(1).assertNotComplete()
+            stateTestSubscriber.assertValues(
+                State.NoEngagement,
+                State.StartedCallVisualizer,
+                State.Update(engagementState, EngagementUpdateState.OperatorConnected(operator))
+            ).assertValueCount(3).assertNotComplete()
             verify(inverse = true) { chat.on(Chat.Events.OPERATOR_TYPING_STATUS, capture(operatorTypingCallbackSlot)) }
             assertTrue(repository.isCallVisualizerEngagement)
         } else {
             omniCoreEngagementCallbackSlot.captured.accept(engagement as OmnicoreEngagement)
-            repository.engagementState.test().assertValue(State.StartedOmniCore).assertValueCount(1).assertNotComplete()
+            stateTestSubscriber.assertValues(
+                State.NoEngagement,
+                State.StartedOmniCore,
+                State.Update(engagementState, EngagementUpdateState.OperatorConnected(operator))
+            ).assertValueCount(3).assertNotComplete()
             verify { chat.on(Chat.Events.OPERATOR_TYPING_STATUS, capture(operatorTypingCallbackSlot)) }
             assertFalse(repository.isCallVisualizerEngagement)
         }
 
-        assertTrue(repository.hasOngoingEngagement)
-        assertTrue(repository.isQueueingOrEngagement)
+        assertTrue(repository.hasOngoingLiveEngagement)
+        assertTrue(repository.isQueueingOrLiveEngagement)
 
         verify { Logger.i(any(), any()) }
         verify { operatorRepository.emit(operator) }
@@ -240,6 +254,7 @@ class EngagementRepositoryTest {
 
         verify { engagement.state }
         verify { engagementState.operator }
+        verify { engagementState.visitorStatus }
         verify { engagement.media }
         verify { engagement.screenSharing }
 
@@ -381,7 +396,7 @@ class EngagementRepositoryTest {
     }
 
     private fun confirmEngagementVerified() {
-        confirmVerified(engagement, engagementState, operator, chat, media, screenSharing)
+        confirmVerified(engagement, chat, media, screenSharing)
     }
 
     private fun requestScreenSharing(testBody: (ScreenSharingRequest) -> Unit) {
@@ -525,6 +540,31 @@ class EngagementRepositoryTest {
     }
 
     @Test
+    fun `TransferredToSecureConversation state is emitted when visitorStatus is transferring and has text capabilities`() {
+        operator = mockk(relaxUnitFun = true)
+        engagementState = mockk(relaxUnitFun = true)
+        media = mockk(relaxUnitFun = true)
+        chat = mockk(relaxUnitFun = true)
+        screenSharing = mockk(relaxUnitFun = true)
+        cameraDevice = mockk(relaxUnitFun = true)
+        every { engagementState.visitorStatus } returns EngagementState.VisitorStatus.TRANSFERRING
+        every { engagementState.capabilities.isText } returns true
+        every { engagementState.operator } returns operator
+
+        every { media.currentCameraDevice } returns cameraDevice
+
+        engagement = mockk<OmnicoreEngagement>(relaxUnitFun = true)
+        every { engagement.state } returns engagementState
+        every { engagement.media } returns media
+        every { engagement.chat } returns chat
+        every { engagement.screenSharing } returns screenSharing
+
+        omniCoreEngagementCallbackSlot.captured.accept(engagement as OmnicoreEngagement)
+        repository.engagementState.test().assertValue(State.TransferredToSecureConversation).assertValueCount(1).assertNotComplete()
+        verify { operatorRepository.emit(any()) }
+    }
+
+    @Test
     fun `endEngagement() will do nothing when no ongoing engagement`() {
         repository.endEngagement(false)
         verifyEngagementEnd(ongoingEngagement = false)
@@ -626,35 +666,46 @@ class EngagementRepositoryTest {
         val engagementStateTestObserver = repository.engagementState.test()
         val operatorTypingStatusTestObserver = repository.operatorTypingStatus.test()
 
-        val operator1: Operator = mockk(relaxed = true) {
+        val operator1: Operator = mockk(relaxUnitFun = true) {
             every { id } returns "1"
         }
 
-        val operator2: Operator = mockk(relaxed = true) {
+        val operator2: Operator = mockk(relaxUnitFun = true) {
             every { id } returns "2"
         }
-        val state1: EngagementState = mockk(relaxed = true) {
+        val state1: EngagementState = mockk(relaxUnitFun = true) {
             every { operator } returns operator1
             every { visitorStatus } returns EngagementState.VisitorStatus.ENGAGED
             every { id } returns "s_1"
+            every { capabilities.isText } returns false
         }
 
-        val state2: EngagementState = mockk(relaxed = true) {
+        val state2: EngagementState = mockk(relaxUnitFun = true) {
             every { operator } returns operator1
             every { visitorStatus } returns EngagementState.VisitorStatus.TRANSFERRING
             every { id } returns "s_2"
+            every { capabilities.isText } returns false
         }
 
-        val state3: EngagementState = mockk(relaxed = true) {
+        val state3: EngagementState = mockk(relaxUnitFun = true) {
             every { operator } returns operator2
             every { visitorStatus } returns EngagementState.VisitorStatus.ENGAGED
             every { id } returns "s_3"
+            every { capabilities.isText } returns false
         }
 
-        val state4: EngagementState = mockk(relaxed = true) {
+        val state4: EngagementState = mockk(relaxUnitFun = true) {
             every { operator } returns operator2
             every { visitorStatus } returns EngagementState.VisitorStatus.ENGAGED
             every { id } returns "s_4"
+            every { capabilities.isText } returns false
+        }
+
+        val state5: EngagementState = mockk(relaxUnitFun = true) {
+            every { operator } returns operator2
+            every { visitorStatus } returns EngagementState.VisitorStatus.TRANSFERRING
+            every { id } returns "s_5"
+            every { capabilities.isText } returns true
         }
 
         mockEngagementAndStart()
@@ -668,6 +719,8 @@ class EngagementRepositoryTest {
         assertEquals(operator2, repository.currentOperatorValue)
         engagementStateCallbackSlot.captured.accept(state4)
         assertEquals(operator2, repository.currentOperatorValue)
+        engagementStateCallbackSlot.captured.accept(state5)
+        assertEquals(operator2, repository.currentOperatorValue)
 
         operatorTypingCallbackSlot.captured.apply {
             accept(OperatorTypingStatus { false })
@@ -676,7 +729,7 @@ class EngagementRepositoryTest {
         }
 
         verify(exactly = 2) { operatorRepository.emit(operator1) }
-        verify(exactly = 2) { operatorRepository.emit(operator2) }
+        verify(exactly = 3) { operatorRepository.emit(operator2) }
 
         operatorTypingStatusTestObserver
             .assertNotComplete()
@@ -689,26 +742,26 @@ class EngagementRepositoryTest {
 
         currentOperatorTestObserver
             .assertNotComplete()
-            .assertValueCount(5)
+            .assertValueCount(4)
             .assertValuesOnly(
                 Data.Empty,
+                Data.Value(operator),
                 Data.Value(operator1),
-                Data.Value(operator1),
-                Data.Value(operator2),
                 Data.Value(operator2)
             )
 
 
         engagementStateTestObserver
             .assertNotComplete()
-            .assertValueCount(6)
+            .assertValueCount(7)
             .assertValuesOnly(
                 State.NoEngagement,
                 State.StartedOmniCore,
-                State.Update(state1, EngagementUpdateState.OperatorConnected(operator1)),
+                State.Update(engagementState, EngagementUpdateState.OperatorConnected(operator)),
+                State.Update(state1, EngagementUpdateState.OperatorChanged(operator1)),
                 State.Update(state2, EngagementUpdateState.Transferring),
                 State.Update(state3, EngagementUpdateState.OperatorChanged(operator2)),
-                State.Update(state4, EngagementUpdateState.Ongoing(operator2))
+                State.TransferredToSecureConversation
             )
 
         repository.endEngagement(silently = true)
@@ -1213,7 +1266,7 @@ class EngagementRepositoryTest {
         }
         engagementStateCallbackSlot.captured.accept(state1)
         repository.engagementState.test().assertNotComplete().assertValues(
-            State.Update(state1, EngagementUpdateState.OperatorConnected(operator1))
+            State.Update(state1, EngagementUpdateState.OperatorChanged(operator1))
         )
         verify { operatorRepository.emit(operator1) }
         //emit a new state end
@@ -1228,6 +1281,7 @@ class EngagementRepositoryTest {
         val newOperator: Operator = mockk(relaxUnitFun = true)
         val newEngagementState: EngagementState = mockk(relaxUnitFun = true)
         every { newEngagementState.operator } returns newOperator
+        every { newEngagementState.visitorStatus } returns EngagementState.VisitorStatus.ENGAGED
         every { newEngagement.state } returns newEngagementState
         every { newEngagement.media } returns newMedia
         every { newEngagement.chat } returns newChat
@@ -1235,8 +1289,9 @@ class EngagementRepositoryTest {
         every { newMedia.currentCameraDevice } returns null
 
         omniCoreEngagementCallbackSlot.captured.accept(newEngagement)
-        repository.engagementState.test().assertNotComplete().assertValue(State.Update(state1, EngagementUpdateState.OperatorConnected(operator1)))
-        assertTrue(repository.hasOngoingEngagement)
+        repository.engagementState.test().assertNotComplete()
+            .assertValue(State.Update(newEngagementState, EngagementUpdateState.OperatorConnected(newOperator)))
+        assertTrue(repository.hasOngoingLiveEngagement)
 
         verify { operatorRepository.emit(newOperator) }
 
@@ -1261,7 +1316,7 @@ class EngagementRepositoryTest {
         //emit new engagement end
 
         verifyUnsubscribedFromEngagement()
-        confirmVerified(newEngagement, newMedia, newChat, newScreenSharing, newOperator, newEngagementState)
+        confirmVerified(newEngagement, newMedia, newChat, newScreenSharing)
     }
 
 
@@ -1280,7 +1335,7 @@ class EngagementRepositoryTest {
         }
         engagementStateCallbackSlot.captured.accept(state1)
         repository.engagementState.test().assertNotComplete().assertValues(
-            State.Update(state1, EngagementUpdateState.OperatorConnected(operator1))
+            State.Update(state1, EngagementUpdateState.OperatorChanged(operator1))
         )
         verify { operatorRepository.emit(operator1) }
         //emit a new state end
@@ -1294,6 +1349,7 @@ class EngagementRepositoryTest {
 
         val newOperator: Operator = mockk(relaxUnitFun = true)
         val newEngagementState: EngagementState = mockk(relaxUnitFun = true)
+        every { newEngagementState.visitorStatus } returns EngagementState.VisitorStatus.ENGAGED
         every { newEngagementState.operator } returns newOperator
         every { newEngagement.state } returns newEngagementState
         every { newEngagement.media } returns newMedia
@@ -1302,8 +1358,9 @@ class EngagementRepositoryTest {
         every { newMedia.currentCameraDevice } returns mockk()
 
         callVisualizerEngagementCallbackSlot.captured.accept(newEngagement)
-        repository.engagementState.test().assertNotComplete().assertValue(State.Update(state1, EngagementUpdateState.OperatorConnected(operator1)))
-        assertTrue(repository.hasOngoingEngagement)
+        repository.engagementState.test().assertNotComplete()
+            .assertValue(State.Update(newEngagementState, EngagementUpdateState.OperatorConnected(newOperator)))
+        assertTrue(repository.hasOngoingLiveEngagement)
 
         verify { operatorRepository.emit(newOperator) }
 
@@ -1328,7 +1385,7 @@ class EngagementRepositoryTest {
         //emit new engagement end
 
         verifyUnsubscribedFromEngagement()
-        confirmVerified(newEngagement, newMedia, newChat, newScreenSharing, newOperator, newEngagementState)
+        confirmVerified(newEngagement, newMedia, newChat, newScreenSharing)
     }
 
     @Test
@@ -1361,7 +1418,16 @@ class EngagementRepositoryTest {
 
         repository.queueForEngagement(MediaType.TEXT)
 
-        verify(exactly = 1) { core.queueForEngagement(listOf(queueId), MediaType.TEXT, visitorContextAssetId, any(), any(), capture(queueForEngagementCallbackSlot)) }
+        verify(exactly = 1) {
+            core.queueForEngagement(
+                listOf(queueId),
+                MediaType.TEXT,
+                visitorContextAssetId,
+                any(),
+                any(),
+                capture(queueForEngagementCallbackSlot)
+            )
+        }
         queueForEngagementCallbackSlot.captured.accept(null)
 
         assertTrue(repository.isQueueing)
@@ -1370,7 +1436,16 @@ class EngagementRepositoryTest {
         repository.queueForEngagement(MediaType.TEXT)
 
         verify { queueRepository.relevantQueueIds }
-        verify(exactly = 1) { core.queueForEngagement(listOf(queueId), MediaType.TEXT, visitorContextAssetId, any(), any(), capture(queueForEngagementCallbackSlot)) }
+        verify(exactly = 1) {
+            core.queueForEngagement(
+                listOf(queueId),
+                MediaType.TEXT,
+                visitorContextAssetId,
+                any(),
+                any(),
+                capture(queueForEngagementCallbackSlot)
+            )
+        }
     }
 
     @Test

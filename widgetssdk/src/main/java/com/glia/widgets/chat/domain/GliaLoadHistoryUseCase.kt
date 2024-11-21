@@ -18,7 +18,7 @@ internal class GliaLoadHistoryUseCase(
     private val getUnreadMessagesCountUseCase: GetUnreadMessagesCountWithTimeoutUseCase
 ) {
 
-    private val isSecureEngagement get() = shouldUseSecureMessagingApis.shouldUseSecureMessagingEndpoints()
+    private val isSecureEngagement get() = shouldUseSecureMessagingApis.shouldUseSecureMessagingEndpoints
 
     operator fun invoke(): Single<ChatHistoryResponse> = if (isSecureEngagement) {
         loadHistoryWithNewMessagesCount()

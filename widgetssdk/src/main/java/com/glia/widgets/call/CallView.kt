@@ -275,11 +275,19 @@ internal class CallView(
             operatorStatusView.showTransferring()
             operatorNameView.setLocaleText(R.string.engagement_queue_transferring)
         } else {
-            operatorNameView.setLocaleText(R.string.general_company_name)
-            operatorNameView.setLocaleHint(R.string.chat_operator_name_accessibility_label)
+            handleCompanyAndOperatorName(state)
             handleOperatorStatusViewOperatorImage(state)
         }
         operatorStatusView.isVisible = state.showOperatorStatusView()
+    }
+
+    private fun handleCompanyAndOperatorName(state: CallState) {
+        // companyNameView is visible from queueing start till operator picks engagement
+        companyNameView.setLocaleText(R.string.general_company_name)
+        companyNameView.setLocaleHint(R.string.glia_call_company_name_hint)
+        // operatorNameView is visible once operator picks engagement
+        operatorNameView.text = state.callStatus.formattedOperatorName
+        operatorNameView.setLocaleHint(R.string.chat_operator_name_accessibility_label)
     }
 
     private fun handleOperatorStatusViewOperatorImage(state: CallState) {

@@ -15,6 +15,7 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import java.util.concurrent.TimeUnit
 
 class HasOngoingSecureConversationUseCaseTest {
     private lateinit var repository: SecureConversationsRepository
@@ -68,8 +69,7 @@ class HasOngoingSecureConversationUseCaseTest {
         every { repository.pendingSecureConversationsStatusObservable } returns Observable.never()
         every { repository.unreadMessagesCountObservable } returns Observable.never()
 
-        val result = useCase().blockingLast()
-        assertEquals(false, result)
+        useCase().test().awaitCount(1).assertValue(false)
         val callback = mockk<(Boolean) -> Unit>()
         useCase(callback)
         verify(timeout = 1100) { callback.invoke(false) }
@@ -82,8 +82,7 @@ class HasOngoingSecureConversationUseCaseTest {
         every { repository.pendingSecureConversationsStatusObservable } returns Observable.error(Exception("Error"))
         every { repository.unreadMessagesCountObservable } returns Observable.error(Exception("Error"))
 
-        val result = useCase().blockingLast()
-        assertEquals(false, result)
+        useCase().test().assertValue(false)
         val callback = mockk<(Boolean) -> Unit>()
         useCase(callback)
         verify(timeout = 1100) { callback.invoke(false) }
@@ -101,6 +100,26 @@ class HasOngoingSecureConversationUseCaseTest {
         val callback = mockk<(Boolean) -> Unit>()
         useCase(callback)
         verify(timeout = 1100) { callback.invoke(true) }
+    }
+
+    @Test
+    fun `invoke returns false due to timeout and then transmits value based on real state of secure conversations`() {
+        mockInitializedAndAuthenticated()
+
+        every { repository.pendingSecureConversationsStatusObservable } returns Observable.just(true).delay(2, TimeUnit.SECONDS)
+        every { repository.unreadMessagesCountObservable } returns Observable.never()
+
+        useCase().test().awaitCount(2).assertValues(false, true)
+    }
+
+    @Test
+    fun `invoke returns false due to timeout and then transmits value based on real state of unread messages count`() {
+        mockInitializedAndAuthenticated()
+
+        every { repository.pendingSecureConversationsStatusObservable } returns Observable.never()
+        every { repository.unreadMessagesCountObservable } returns Observable.just(2).delay(2, TimeUnit.SECONDS)
+
+        useCase().test().awaitCount(2).assertValues(false, true)
     }
 
     @Test
@@ -140,8 +159,7 @@ class HasOngoingSecureConversationUseCaseTest {
         every { repository.pendingSecureConversationsStatusObservable } returns pendingSC
         every { repository.unreadMessagesCountObservable } returns Observable.just(0)
 
-        val result = useCase().blockingLast()
-        assertEquals(false, result)
+        useCase().test().assertValue(false)
         val callback = mockk<(Boolean) -> Unit>()
         useCase(callback)
         verify(timeout = 1100) { callback.invoke(false) }

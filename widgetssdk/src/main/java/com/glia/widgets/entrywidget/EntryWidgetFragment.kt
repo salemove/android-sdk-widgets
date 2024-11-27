@@ -65,7 +65,7 @@ internal class EntryWidgetFragment : BottomSheetDialogFragment() {
             setEntryWidgetTheme(entryWidgetsTheme)
             binding.container.addView(this)
             onDismissListener = {
-                dismiss()
+                this@EntryWidgetFragment.dismiss()
             }
         }
 

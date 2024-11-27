@@ -4,6 +4,7 @@ import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.rx.Schedulers
+import com.glia.widgets.helper.rx.timeoutFirstWithDefaultUntilChanged
 import io.reactivex.rxjava3.core.Observable
 import java.util.concurrent.TimeUnit
 
@@ -23,8 +24,7 @@ internal class ObserveUnreadMessagesCountUseCase(
 
     private val unreadMessagesCountWithTimeout: Observable<Int>
         get() = repository.unreadMessagesCountObservable
-            .timeout(TIMEOUT_SEC, TimeUnit.SECONDS)
-            .onErrorReturnItem(NO_UNREAD_MESSAGES)
+            .timeoutFirstWithDefaultUntilChanged(TIMEOUT_SEC, TimeUnit.SECONDS, NO_UNREAD_MESSAGES)
 
     /**
      * This function provides a default value instead of an error.

@@ -52,21 +52,21 @@ class ObserveUnreadMessagesCountUseCaseTest {
     }
 
     @Test
-    fun `invoke returns NO_UNREAD_MESSAGES when there is no answer during timeout`() {
+    fun `invoke returns NO_UNREAD_MESSAGES when there is no answer long enough to cause timeout`() {
         mockInitializedAndAuthenticated()
 
         whenever(repository.unreadMessagesCountObservable) doReturn Observable.never()
 
-        useCase().test().awaitDone(TIMEOUT_SEC + 1, TimeUnit.SECONDS).assertComplete().assertValue(NO_UNREAD_MESSAGES)
+        useCase().test().awaitDone(TIMEOUT_SEC + 1, TimeUnit.SECONDS).assertNoErrors().assertValue(NO_UNREAD_MESSAGES)
     }
 
     @Test
-    fun `invoke completes with NO_UNREAD_MESSAGES when error is returned`() {
+    fun `invoke returns NO_UNREAD_MESSAGES when up-stream had an error`() {
         mockInitializedAndAuthenticated()
 
         whenever(repository.unreadMessagesCountObservable) doReturn Observable.error(GliaException("", GliaException.Cause.INTERNAL_ERROR))
 
-        useCase().test().assertComplete().assertValue(NO_UNREAD_MESSAGES)
+        useCase().test().assertValue(NO_UNREAD_MESSAGES)
     }
 
     @Test

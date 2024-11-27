@@ -4,6 +4,7 @@ import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.entrywidget.EntryWidget
+import com.glia.widgets.helper.rx.timeoutFirstWithDefaultUntilChanged
 import com.glia.widgets.helper.unSafeSubscribe
 import com.glia.widgets.launcher.EngagementLauncher
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -23,9 +24,9 @@ internal class HasOngoingSecureConversationUseCase(
      * if the current socket doesn't signal a success value within the specified 1 sec window.
      */
     private val pendingSecureConversationsStatus: Observable<Boolean>
-        get() = secureConversationsRepository.pendingSecureConversationsStatusObservable
-            .timeout(1, TimeUnit.SECONDS)
-            .onErrorReturnItem(false)
+        get() = secureConversationsRepository
+            .pendingSecureConversationsStatusObservable
+            .timeoutFirstWithDefaultUntilChanged(1, TimeUnit.SECONDS, false)
 
     /**Since we're using this property in [EntryWidget] and [EngagementLauncher] where we need the immediate UI response to the user interaction,
      * it is important to to avoid delays for the user.
@@ -34,9 +35,9 @@ internal class HasOngoingSecureConversationUseCase(
      * if the current socket doesn't signal a success value within the specified 1 sec window.
      */
     private val unreadMessagesCountObservable: Observable<Int>
-        get() = secureConversationsRepository.unreadMessagesCountObservable
-            .timeout(1, TimeUnit.SECONDS)
-            .onErrorReturnItem(NO_UNREAD_MESSAGES)
+        get() = secureConversationsRepository
+            .unreadMessagesCountObservable
+            .timeoutFirstWithDefaultUntilChanged(1, TimeUnit.SECONDS, NO_UNREAD_MESSAGES)
 
     /**
      * @return `true` if there are pending secure conversations or unread messages.
@@ -46,6 +47,7 @@ internal class HasOngoingSecureConversationUseCase(
             pendingSecureConversationsStatus,
             unreadMessagesCountObservable
         ) { pendingSecureConversations, unreadMessagesCount -> pendingSecureConversations || unreadMessagesCount > 0 }
+            .onErrorReturnItem(false)
 
     /**
      * @return `false` if the SDK is not initialized or the visitor is not authenticated.

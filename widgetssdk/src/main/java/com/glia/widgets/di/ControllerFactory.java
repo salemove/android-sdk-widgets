@@ -390,6 +390,7 @@ public class ControllerFactory {
             repositoryFactory.getQueueRepository(),
             useCaseFactory.createIsAuthenticatedUseCase(),
             useCaseFactory.createObserveUnreadMessagesCountUseCase(),
+            useCaseFactory.getHasPendingSecureConversationsWithTimeoutUseCase(),
             core,
             Dependencies.getEngagementLauncher()
         );

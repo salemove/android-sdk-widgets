@@ -1,207 +1,528 @@
 package com.glia.widgets.entrywidget
 
+import android.COMMON_EXTENSIONS_CLASS_PATH
 import android.app.Activity
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.queuing.Queue
-import com.glia.androidsdk.queuing.QueueState
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.core.queue.QueueRepository
 import com.glia.widgets.core.queue.QueuesState
+import com.glia.widgets.core.secureconversations.domain.HasOngoingSecureConversationUseCase
 import com.glia.widgets.core.secureconversations.domain.ObserveUnreadMessagesCountUseCase
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.mediaTypes
 import com.glia.widgets.launcher.EngagementLauncher
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.spyk
+import io.mockk.unmockkStatic
+import io.mockk.verify
 import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentMatchers.anyList
-import org.mockito.Mockito.atLeast
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.verify
-import org.mockito.Mockito.`when`
-import org.mockito.kotlin.never
 
 class EntryWidgetControllerTest {
+
+    private val loadingState by lazy {
+        listOf(
+            EntryWidgetContract.ItemType.LoadingState,
+            EntryWidgetContract.ItemType.LoadingState,
+            EntryWidgetContract.ItemType.LoadingState,
+            EntryWidgetContract.ItemType.LoadingState,
+            EntryWidgetContract.ItemType.ProvidedBy
+        )
+    }
+
+    private val emptyState by lazy {
+        listOf(EntryWidgetContract.ItemType.EmptyState)
+    }
+
+    private val errorState by lazy {
+        listOf(EntryWidgetContract.ItemType.EmptyState)
+    }
+
+    private val sdkNotInitializedState by lazy {
+        listOf(EntryWidgetContract.ItemType.SdkNotInitializedState)
+    }
 
     private lateinit var queueRepository: QueueRepository
     private lateinit var isAuthenticatedUseCase: IsAuthenticatedUseCase
     private lateinit var observeUnreadMessagesCountUseCase: ObserveUnreadMessagesCountUseCase
+    private lateinit var hasOngoingSecureConversationUseCase: HasOngoingSecureConversationUseCase
     private lateinit var core: GliaCore
     private lateinit var controller: EntryWidgetController
     private lateinit var view: EntryWidgetContract.View
     private lateinit var activity: Activity
     private lateinit var engagementLauncher: EngagementLauncher
+    private lateinit var disposable: CompositeDisposable
 
     @Before
     fun setUp() {
+        mockkStatic(COMMON_EXTENSIONS_CLASS_PATH)
         RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
 
         Logger.setIsDebug(false)
-        queueRepository = mock()
-        isAuthenticatedUseCase = mock()
-        observeUnreadMessagesCountUseCase = mock()
-        core = mock()
-        activity = mock()
-        view = mock()
-        engagementLauncher = mock()
+
+        disposable = spyk(CompositeDisposable())
+
+        queueRepository = mockk(relaxUnitFun = true)
+        isAuthenticatedUseCase = mockk()
+        observeUnreadMessagesCountUseCase = mockk()
+        hasOngoingSecureConversationUseCase = mockk()
+        core = mockk()
+        activity = mockk()
+        view = mockk(relaxUnitFun = true)
+        engagementLauncher = mockk(relaxUnitFun = true)
 
         controller = EntryWidgetController(
             queueRepository,
             isAuthenticatedUseCase,
             observeUnreadMessagesCountUseCase,
+            hasOngoingSecureConversationUseCase,
             core,
-            engagementLauncher
+            engagementLauncher,
+            disposable
         )
-        val unreadMessageCount = 0
-        `when`(observeUnreadMessagesCountUseCase.invoke()).thenReturn(Observable.just(unreadMessageCount))
-        `when`(queueRepository.queuesState).thenReturn(Flowable.just(QueuesState.Loading))
-        controller.setView(view, EntryWidgetContract.ViewType.BOTTOM_SHEET)
     }
 
     @After
     fun tearDown() {
+        controller.onDestroy()
+        verify { disposable.dispose() }
         RxAndroidPlugins.reset()
+        unmockkStatic(COMMON_EXTENSIONS_CLASS_PATH)
+    }
+
+    private fun mockInputData(
+        coreInitialized: Boolean = false,
+        queuesState: QueuesState? = null,
+        unreadMessagesCount: Int? = null,
+        hasOngoingSc: Boolean? = null,
+        isAuthenticated: Boolean = false
+    ) {
+        every { core.isInitialized } returns coreInitialized
+        every { queueRepository.queuesState } returns (queuesState?.let { Flowable.just(it) } ?: Flowable.never())
+        every { observeUnreadMessagesCountUseCase() } returns (unreadMessagesCount?.let { Observable.just(it) } ?: Observable.never())
+        every { hasOngoingSecureConversationUseCase() } returns (hasOngoingSc?.let { Observable.just(it) } ?: Observable.never())
+        every { isAuthenticatedUseCase() } returns isAuthenticated
     }
 
     @Test
-    fun `showItems is called if sdk is initialized`() {
-        `when`(core.isInitialized).thenReturn(true)
+    fun `showItems is called with ERROR_STATE if SDK is not initialized and view type is not Messaging Live Support`() {
+        mockInputData()
 
         controller.setView(view, EntryWidgetContract.ViewType.BOTTOM_SHEET)
 
-        verify(view, atLeast(1)).showItems(anyList())
+        verify { view.showItems(sdkNotInitializedState) }
+        verify { queueRepository.queuesState }
+        verify { observeUnreadMessagesCountUseCase.invoke() }
+        verify { hasOngoingSecureConversationUseCase.invoke() }
     }
 
     @Test
-    fun `showItems is called with ERROR_STATE if SDK is not initialized`() {
-        `when`(core.isInitialized).thenReturn(false)
+    fun `showItems is called with ERROR_STATE if SDK is not initialized and view type is Messaging Live Support`() {
+        mockInputData()
 
-        controller.setView(view, EntryWidgetContract.ViewType.BOTTOM_SHEET)
+        controller.setView(view, EntryWidgetContract.ViewType.MESSAGING_LIVE_SUPPORT)
 
-        verify(view, atLeast(1)).showItems(listOf(EntryWidgetContract.ItemType.SdkNotInitializedState))
+        verify { view.showItems(sdkNotInitializedState) }
+        verify { queueRepository.queuesState }
+        verify(exactly = 0) { observeUnreadMessagesCountUseCase.invoke() }
+        verify(exactly = 0) { hasOngoingSecureConversationUseCase.invoke() }
     }
 
     @Test
-    fun `mapState returns CHAT and PROVIDED_BY if TEXT media type is available`() {
-        val queue = mock(Queue::class.java)
-        val queueState = mock(QueueState::class.java)
-        `when`(queue.state).thenReturn(queueState)
-        `when`(queueState.status).thenReturn(QueueState.Status.OPEN)
-        `when`(queueState.medias).thenReturn(arrayOf(Engagement.MediaType.TEXT))
+    fun `showItems is called with Empty item when state is Empty and view type is Messaging Live Support`() {
+        mockInputData(coreInitialized = true, queuesState = QueuesState.Empty, unreadMessagesCount = 0, hasOngoingSc = false, isAuthenticated = true)
 
-        val unreadMessageCount = 0
-        val result = controller.mapState(QueuesState.Queues(listOf(queue)), unreadMessageCount)
-        assert(
-            result == listOf(
-                EntryWidgetContract.ItemType.Chat,
-                EntryWidgetContract.ItemType.ProvidedBy
-            )
+        controller.setView(view, EntryWidgetContract.ViewType.MESSAGING_LIVE_SUPPORT)
+
+        verify { view.showItems(emptyState) }
+        verify { queueRepository.queuesState }
+        verify(exactly = 0) { observeUnreadMessagesCountUseCase.invoke() }
+        verify(exactly = 0) { hasOngoingSecureConversationUseCase.invoke() }
+    }
+
+    @Test
+    fun `showItems is called with Loading items when state is Loading and view type is Messaging Live Support`() {
+        mockInputData(
+            coreInitialized = true,
+            queuesState = QueuesState.Loading,
+            unreadMessagesCount = 0,
+            hasOngoingSc = false,
+            isAuthenticated = true
         )
+
+        controller.setView(view, EntryWidgetContract.ViewType.MESSAGING_LIVE_SUPPORT)
+
+        verify { view.showItems(loadingState) }
+        verify { queueRepository.queuesState }
+        verify(exactly = 0) { observeUnreadMessagesCountUseCase.invoke() }
+        verify(exactly = 0) { hasOngoingSecureConversationUseCase.invoke() }
     }
 
     @Test
-    fun `mapState returns SECURE_MESSAGE and PROVIDED_BY if SECURE_MESSAGE media type is available and visitor is authenticates`() {
-        val queue = mock(Queue::class.java)
-        val queueState = mock(QueueState::class.java)
-        `when`(queue.state).thenReturn(queueState)
-        `when`(queueState.status).thenReturn(QueueState.Status.OPEN)
-        `when`(isAuthenticatedUseCase.invoke()).thenReturn(true)
-        `when`(queueState.medias).thenReturn(arrayOf(Engagement.MediaType.MESSAGING))
-
-        val unreadMessageCount = 0
-        val result = controller.mapState(QueuesState.Queues(listOf(queue)), unreadMessageCount)
-        assert(
-            result == listOf(
-                EntryWidgetContract.ItemType.Messaging(unreadMessageCount),
-                EntryWidgetContract.ItemType.ProvidedBy
-            )
+    fun `showItems is called with Error item when state is Error and view type is Messaging Live Support`() {
+        mockInputData(
+            coreInitialized = true,
+            queuesState = QueuesState.Error(mockk()),
+            unreadMessagesCount = 0,
+            hasOngoingSc = false,
+            isAuthenticated = true
         )
+
+        controller.setView(view, EntryWidgetContract.ViewType.MESSAGING_LIVE_SUPPORT)
+
+        verify { view.showItems(errorState) }
+        verify { queueRepository.queuesState }
+        verify(exactly = 0) { observeUnreadMessagesCountUseCase.invoke() }
+        verify(exactly = 0) { hasOngoingSecureConversationUseCase.invoke() }
     }
 
     @Test
-    fun `mapState returns EMPTY_STATE if SECURE_MESSAGE media type is available but visitor is not authenticates`() {
-        val queue = mock(Queue::class.java)
-        val queueState = mock(QueueState::class.java)
-        `when`(queue.state).thenReturn(queueState)
-        `when`(queueState.status).thenReturn(QueueState.Status.OPEN)
-        `when`(isAuthenticatedUseCase.invoke()).thenReturn(false)
-        `when`(queueState.medias).thenReturn(arrayOf(Engagement.MediaType.MESSAGING))
+    fun `showItems is called with empty item when media types are unwanted and view type is Messaging Live Support`() {
+        every { any<List<Queue>>().mediaTypes } returns listOf(Engagement.MediaType.MESSAGING)
 
-        val unreadMessageCount = 0
-        val result = controller.mapState(QueuesState.Queues(listOf(queue)), unreadMessageCount)
-        assert(
-            result == listOf(
-                EntryWidgetContract.ItemType.EmptyState
-            )
+        mockInputData(
+            coreInitialized = true,
+            queuesState = QueuesState.Queues(mockk()),
+            unreadMessagesCount = 0,
+            hasOngoingSc = false,
+            isAuthenticated = true
         )
+
+        controller.setView(view, EntryWidgetContract.ViewType.MESSAGING_LIVE_SUPPORT)
+
+        verify { view.showItems(emptyState) }
+        verify { queueRepository.queuesState }
+        verify(exactly = 0) { observeUnreadMessagesCountUseCase.invoke() }
+        verify(exactly = 0) { hasOngoingSecureConversationUseCase.invoke() }
     }
 
     @Test
-    fun `mapState returns a list of LOADING_STATE if called with a Loading state`() {
-        val unreadMessageCount = 0
-        val result = controller.mapState(QueuesState.Loading, unreadMessageCount)
-        assert(
-            result == listOf(
-                EntryWidgetContract.ItemType.LoadingState,
-                EntryWidgetContract.ItemType.LoadingState,
-                EntryWidgetContract.ItemType.LoadingState,
-                EntryWidgetContract.ItemType.LoadingState,
-                EntryWidgetContract.ItemType.ProvidedBy
-            )
+    fun `showItems is called with properly ordered items when view type is Messaging Live Support`() {
+        every { any<List<Queue>>().mediaTypes } returns listOf(
+            Engagement.MediaType.TEXT,
+            Engagement.MediaType.MESSAGING,
+            Engagement.MediaType.AUDIO,
+            Engagement.MediaType.VIDEO
         )
+
+        mockInputData(
+            coreInitialized = true,
+            queuesState = QueuesState.Queues(mockk()),
+            unreadMessagesCount = 0,
+            hasOngoingSc = false,
+            isAuthenticated = true
+        )
+
+        controller.setView(view, EntryWidgetContract.ViewType.MESSAGING_LIVE_SUPPORT)
+
+        val items = listOf(
+            EntryWidgetContract.ItemType.VideoCall,
+            EntryWidgetContract.ItemType.AudioCall,
+            EntryWidgetContract.ItemType.Chat
+        )
+        verify { view.showItems(items) }
+        verify { queueRepository.queuesState }
+        verify(exactly = 0) { observeUnreadMessagesCountUseCase.invoke() }
+        verify(exactly = 0) { hasOngoingSecureConversationUseCase.invoke() }
     }
 
     @Test
-    fun `mapState returns EMPTY_STATE if called with Empty state`() {
-        val unreadMessageCount = 0
-        val result = controller.mapState(QueuesState.Empty, unreadMessageCount)
-        assert(result == listOf(EntryWidgetContract.ItemType.EmptyState))
+    fun `showItems is called with Empty item when state is Empty and view type is not Messaging Live Support`() {
+        mockInputData(coreInitialized = true, queuesState = QueuesState.Empty, unreadMessagesCount = 0, hasOngoingSc = false, isAuthenticated = true)
+
+        controller.setView(view, EntryWidgetContract.ViewType.EMBEDDED_VIEW)
+
+        verify { view.showItems(emptyState) }
+        verify { queueRepository.queuesState }
+        verify { observeUnreadMessagesCountUseCase.invoke() }
+        verify { hasOngoingSecureConversationUseCase.invoke() }
     }
 
     @Test
-    fun `mapState returns ERROR_STATE if called with Error state`() {
-        val unreadMessageCount = 0
-        val result = controller.mapState(QueuesState.Error(Exception("Error")), unreadMessageCount)
-        assert(result == listOf(EntryWidgetContract.ItemType.ErrorState))
+    fun `showItems is called with Messaging item when state is Empty but has ongoing SC and view type is not Messaging Live Support`() {
+        val unreadMessagesCount = 2
+
+        mockInputData(
+            coreInitialized = true,
+            queuesState = QueuesState.Empty,
+            unreadMessagesCount = unreadMessagesCount,
+            hasOngoingSc = true,
+            isAuthenticated = true
+        )
+
+        controller.setView(view, EntryWidgetContract.ViewType.EMBEDDED_VIEW)
+
+        val messaging = listOf(
+            EntryWidgetContract.ItemType.Messaging(unreadMessagesCount),
+            EntryWidgetContract.ItemType.ProvidedBy
+        )
+
+        verify { view.showItems(messaging) }
+        verify { queueRepository.queuesState }
+        verify { observeUnreadMessagesCountUseCase.invoke() }
+        verify { hasOngoingSecureConversationUseCase.invoke() }
+    }
+
+    @Test
+    fun `showItems is called with Loading item when state is Loading and view type is not Messaging Live Support`() {
+        mockInputData(
+            coreInitialized = true,
+            queuesState = QueuesState.Loading,
+            unreadMessagesCount = 0,
+            hasOngoingSc = false,
+            isAuthenticated = true
+        )
+
+        controller.setView(view, EntryWidgetContract.ViewType.EMBEDDED_VIEW)
+
+        verify { view.showItems(loadingState) }
+        verify { queueRepository.queuesState }
+        verify { observeUnreadMessagesCountUseCase.invoke() }
+        verify { hasOngoingSecureConversationUseCase.invoke() }
+    }
+
+    @Test
+    fun `showItems is called with Messaging item when state is Loading but has ongoing SC and view type is not Messaging Live Support`() {
+        val unreadMessagesCount = 2
+
+        mockInputData(
+            coreInitialized = true,
+            queuesState = QueuesState.Loading,
+            unreadMessagesCount = unreadMessagesCount,
+            hasOngoingSc = true,
+            isAuthenticated = true
+        )
+
+        controller.setView(view, EntryWidgetContract.ViewType.EMBEDDED_VIEW)
+
+        val messaging = listOf(
+            EntryWidgetContract.ItemType.Messaging(unreadMessagesCount),
+            EntryWidgetContract.ItemType.ProvidedBy
+        )
+
+        verify { view.showItems(messaging) }
+        verify { queueRepository.queuesState }
+        verify { observeUnreadMessagesCountUseCase.invoke() }
+        verify { hasOngoingSecureConversationUseCase.invoke() }
+    }
+
+    @Test
+    fun `showItems is called with Error item when state is Erro and view type is not Messaging Live Support`() {
+        mockInputData(
+            coreInitialized = true,
+            queuesState = QueuesState.Error(mockk()),
+            unreadMessagesCount = 0,
+            hasOngoingSc = false,
+            isAuthenticated = true
+        )
+
+        controller.setView(view, EntryWidgetContract.ViewType.EMBEDDED_VIEW)
+
+        verify { view.showItems(emptyState) }
+        verify { queueRepository.queuesState }
+        verify { observeUnreadMessagesCountUseCase.invoke() }
+        verify { hasOngoingSecureConversationUseCase.invoke() }
+    }
+
+    @Test
+    fun `showItems is called with Messaging item when state is Error but has ongoing SC and view type is not Messaging Live Support`() {
+        val unreadMessagesCount = 2
+
+        mockInputData(
+            coreInitialized = true,
+            queuesState = QueuesState.Error(mockk()),
+            unreadMessagesCount = unreadMessagesCount,
+            hasOngoingSc = true,
+            isAuthenticated = true
+        )
+
+        controller.setView(view, EntryWidgetContract.ViewType.EMBEDDED_VIEW)
+
+        val messaging = listOf(
+            EntryWidgetContract.ItemType.Messaging(unreadMessagesCount),
+            EntryWidgetContract.ItemType.ProvidedBy
+        )
+
+        verify { view.showItems(messaging) }
+        verify { queueRepository.queuesState }
+        verify { observeUnreadMessagesCountUseCase.invoke() }
+        verify { hasOngoingSecureConversationUseCase.invoke() }
+    }
+
+    @Test
+    fun `showItems is called with empty item when media types are empty and view type is not Messaging Live Support`() {
+        every { any<List<Queue>>().mediaTypes } returns emptyList()
+
+        mockInputData(
+            coreInitialized = true,
+            queuesState = QueuesState.Queues(mockk()),
+            unreadMessagesCount = 0,
+            hasOngoingSc = false,
+            isAuthenticated = true
+        )
+
+        controller.setView(view, EntryWidgetContract.ViewType.EMBEDDED_VIEW)
+
+        verify { view.showItems(emptyState) }
+        verify { queueRepository.queuesState }
+        verify { observeUnreadMessagesCountUseCase.invoke() }
+        verify { hasOngoingSecureConversationUseCase.invoke() }
+    }
+
+    @Test
+    fun `showItems is called without messaging when not authenticated and view type is not Messaging Live Support`() {
+        every { any<List<Queue>>().mediaTypes } returns listOf(
+            Engagement.MediaType.TEXT,
+            Engagement.MediaType.MESSAGING,
+            Engagement.MediaType.AUDIO,
+            Engagement.MediaType.VIDEO
+        )
+
+        mockInputData(
+            coreInitialized = true,
+            queuesState = QueuesState.Queues(mockk()),
+            unreadMessagesCount = 0,
+            hasOngoingSc = true,
+            isAuthenticated = false
+        )
+
+        controller.setView(view, EntryWidgetContract.ViewType.EMBEDDED_VIEW)
+
+        val items = listOf(
+            EntryWidgetContract.ItemType.VideoCall,
+            EntryWidgetContract.ItemType.AudioCall,
+            EntryWidgetContract.ItemType.Chat,
+            EntryWidgetContract.ItemType.ProvidedBy
+        )
+        verify { view.showItems(items) }
+        verify { queueRepository.queuesState }
+        verify { observeUnreadMessagesCountUseCase.invoke() }
+        verify { hasOngoingSecureConversationUseCase.invoke() }
+    }
+
+    @Test
+    fun `showItems is called with messaging when authenticated, hasOngoingSC and view type is not Messaging Live Support`() {
+        every { any<List<Queue>>().mediaTypes } returns listOf(
+            Engagement.MediaType.TEXT,
+            Engagement.MediaType.AUDIO,
+            Engagement.MediaType.VIDEO
+        )
+
+        val unreadMessagesCount = 2
+        mockInputData(
+            coreInitialized = true,
+            queuesState = QueuesState.Queues(mockk()),
+            unreadMessagesCount = unreadMessagesCount,
+            hasOngoingSc = true,
+            isAuthenticated = true
+        )
+
+        controller.setView(view, EntryWidgetContract.ViewType.EMBEDDED_VIEW)
+
+        val items = listOf(
+            EntryWidgetContract.ItemType.VideoCall,
+            EntryWidgetContract.ItemType.AudioCall,
+            EntryWidgetContract.ItemType.Chat,
+            EntryWidgetContract.ItemType.Messaging(unreadMessagesCount),
+            EntryWidgetContract.ItemType.ProvidedBy
+        )
+        verify { view.showItems(items) }
+        verify { queueRepository.queuesState }
+        verify { observeUnreadMessagesCountUseCase.invoke() }
+        verify { hasOngoingSecureConversationUseCase.invoke() }
+    }
+
+    @Test
+    fun `showItems is called with proper order when view type is not Messaging Live Support`() {
+        every { any<List<Queue>>().mediaTypes } returns listOf(
+            Engagement.MediaType.TEXT,
+            Engagement.MediaType.AUDIO,
+            Engagement.MediaType.MESSAGING,
+            Engagement.MediaType.VIDEO
+        )
+
+        val unreadMessagesCount = 2
+        mockInputData(
+            coreInitialized = true,
+            queuesState = QueuesState.Queues(mockk()),
+            unreadMessagesCount = unreadMessagesCount,
+            hasOngoingSc = false,
+            isAuthenticated = true
+        )
+
+        controller.setView(view, EntryWidgetContract.ViewType.EMBEDDED_VIEW)
+
+        val items = listOf(
+            EntryWidgetContract.ItemType.VideoCall,
+            EntryWidgetContract.ItemType.AudioCall,
+            EntryWidgetContract.ItemType.Chat,
+            EntryWidgetContract.ItemType.Messaging(unreadMessagesCount),
+            EntryWidgetContract.ItemType.ProvidedBy
+        )
+        verify { view.showItems(items) }
+        verify { queueRepository.queuesState }
+        verify { observeUnreadMessagesCountUseCase.invoke() }
+        verify { hasOngoingSecureConversationUseCase.invoke() }
     }
 
     @Test
     fun `onItemClicked calls dismiss when CHAT item clicked`() {
+        mockInputData()
+
+        controller.setView(view, EntryWidgetContract.ViewType.EMBEDDED_VIEW)
+
         controller.onItemClicked(EntryWidgetContract.ItemType.Chat, activity)
-        verify(engagementLauncher).startChat(activity)
-        verify(view).dismiss()
+        verify { engagementLauncher.startChat(activity) }
+        verify { view.dismiss() }
     }
 
     @Test
     fun `onItemClicked calls dismiss when AUDIO_CALL item clicked`() {
+        mockInputData()
+
+        controller.setView(view, EntryWidgetContract.ViewType.EMBEDDED_VIEW)
+
         controller.onItemClicked(EntryWidgetContract.ItemType.AudioCall, activity)
-        verify(engagementLauncher).startAudioCall(activity)
-        verify(view).dismiss()
+        verify { engagementLauncher.startAudioCall(activity) }
+        verify { view.dismiss() }
     }
 
     @Test
     fun `onItemClicked calls dismiss when VIDEO_CALL item clicked`() {
+        mockInputData()
+
+        controller.setView(view, EntryWidgetContract.ViewType.EMBEDDED_VIEW)
+
         controller.onItemClicked(EntryWidgetContract.ItemType.VideoCall, activity)
-        verify(engagementLauncher).startVideoCall(activity)
-        verify(view).dismiss()
+        verify { engagementLauncher.startVideoCall(activity) }
+        verify { view.dismiss() }
     }
 
     @Test
     fun `onItemClicked calls dismiss when SECURE_MESSAGE item clicked`() {
-        val unreadMessageCount = 0
-        controller.onItemClicked(EntryWidgetContract.ItemType.Messaging(unreadMessageCount), activity)
-        verify(engagementLauncher).startSecureMessaging(activity)
-        verify(view).dismiss()
+        mockInputData()
+
+        controller.setView(view, EntryWidgetContract.ViewType.EMBEDDED_VIEW)
+
+        controller.onItemClicked(EntryWidgetContract.ItemType.Messaging(0), activity)
+        verify { engagementLauncher.startSecureMessaging(activity) }
+        verify { view.dismiss() }
     }
 
     @Test
     fun `onItemClicked does not call dismiss when ERROR_STATE item clicked`() {
         controller.onItemClicked(EntryWidgetContract.ItemType.ErrorState, activity)
-        verify(view, never()).dismiss()
-        verify(queueRepository).fetchQueues()
+        verify(exactly = 0) { view.dismiss() }
+        verify { queueRepository.fetchQueues() }
     }
 }

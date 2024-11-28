@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit
 
 internal class HasOngoingSecureConversationUseCase(
     private val secureConversationsRepository: SecureConversationsRepository,
+    /*TODO add transferred SC*/
     private val isAuthenticatedUseCase: IsAuthenticatedUseCase,
     private val core: GliaCore
 ) {
@@ -26,6 +27,10 @@ internal class HasOngoingSecureConversationUseCase(
     private val pendingSecureConversationsStatus: Observable<Boolean>
         get() = secureConversationsRepository
             .pendingSecureConversationsStatusObservable
+            /*TODO rework this timeout
+             * Probably its better to keep one subscription for the entire SDK lifecycle, and start with the default values.
+             * This way we will avoid unnecessary delays, replaced with default values.
+             */
             .timeoutFirstWithDefaultUntilChanged(1, TimeUnit.SECONDS, false)
 
     /**Since we're using this property in [EntryWidget] and [EngagementLauncher] where we need the immediate UI response to the user interaction,

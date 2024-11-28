@@ -69,8 +69,12 @@ internal class EntryWidgetView : RecyclerView, EntryWidgetContract.View {
         this._viewAdapter = viewAdapter
 
         super.setAdapter(viewAdapter)
-        viewAdapter.onItemClickListener = {
-            controller.onItemClicked(it, context.requireActivity())
+
+        //For Chat screen we need to handle Item click inside ChatController
+        if (viewAdapter.viewType != EntryWidgetContract.ViewType.MESSAGING_LIVE_SUPPORT) {
+            viewAdapter.onItemClickListener = {
+                controller.onItemClicked(it, context.requireActivity())
+            }
         }
 
         val isBottomSheet = viewAdapter.viewType == EntryWidgetContract.ViewType.BOTTOM_SHEET

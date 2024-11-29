@@ -15,9 +15,9 @@ internal class EntryWidgetItemDivider(
 
         val left = parent.paddingLeft
         val right = parent.width - parent.paddingRight
-        val childCount = parent.childCount
+        val lastIndex = parent.childCount - 1
 
-        for (i in 0 until childCount) {
+        for (i in 0 until lastIndex) {
             val child = parent.getChildAt(i)
             val position = parent.getChildAdapterPosition(child)
             if (position == RecyclerView.NO_POSITION) {

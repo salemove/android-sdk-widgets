@@ -112,13 +112,16 @@
                 app:layout_constraintBottom_toBottomOf="@id/entry_widget_switch"
                 app:layout_constraintStart_toEndOf="@+id/entry_widget_switch" />
 
-            <FrameLayout
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/entry_widget_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="visible"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/glia_shade_color"
                 android:layout_margin="@dimen/glia_large"
-                android:background="@drawable/bg_container"
-                android:visibility="gone"
+                app:strokeWidth="1dp"
                 app:layout_constraintEnd_toEndOf="@id/end_guideline"
                 app:layout_constraintStart_toStartOf="@id/start_guideline"
                 app:layout_constraintTop_toBottomOf="@id/entry_widget_switch" />

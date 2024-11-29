@@ -6,6 +6,7 @@ import android.view.View
 import com.glia.widgets.chat.Intention
 import com.glia.widgets.core.secureconversations.domain.HasOngoingSecureConversationUseCase
 import com.glia.widgets.entrywidget.adapter.EntryWidgetAdapter
+import com.glia.widgets.helper.wrapWithTheme
 import com.glia.widgets.launcher.ActivityLauncher
 import com.glia.widgets.view.unifiedui.theme.UnifiedThemeManager
 
@@ -60,7 +61,8 @@ internal class EntryWidgetImpl(
             EntryWidgetContract.ViewType.EMBEDDED_VIEW,
             entryWidgetTheme
         )
-        return EntryWidgetView(context).apply {
+        //Wrapping with Glia theme to make the Theme available for embedded view
+        return EntryWidgetView(context.wrapWithTheme()).apply {
             setAdapter(adapter)
             setEntryWidgetTheme(entryWidgetTheme)
         }

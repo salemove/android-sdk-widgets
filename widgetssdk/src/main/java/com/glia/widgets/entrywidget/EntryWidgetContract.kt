@@ -24,7 +24,7 @@ internal interface EntryWidgetContract {
         data object EmptyState : ItemType()
         data object SdkNotInitializedState : ItemType()
         data object ErrorState : ItemType()
-        data object ProvidedBy : ItemType(order = LOWEST_ORDER)
+        data object PoweredBy : ItemType(order = LOWEST_ORDER)
 
         override fun compareTo(other: ItemType): Int {
             return this.order.compareTo(other.order)
@@ -37,6 +37,7 @@ internal interface EntryWidgetContract {
     }
 
     interface View : BaseView<Controller> {
+        val whiteLabel: Boolean
         fun showItems(items: List<ItemType>)
         fun dismiss()
         fun getActivity(): Activity

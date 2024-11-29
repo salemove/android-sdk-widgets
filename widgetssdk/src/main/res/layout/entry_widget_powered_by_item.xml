@@ -9,16 +9,16 @@
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/glia_medium"
-        android:layout_marginEnd="@dimen/glia_small"
-        android:layout_marginBottom="@dimen/glia_pre_large"
         style="@style/Application.Glia.Caption"
+        android:layout_marginEnd="@dimen/glia_small"
+        android:layout_marginTop="@dimen/glia_medium"
+        android:layout_marginBottom="@dimen/glia_pre_large"
         android:textColor="@color/glia_branding_color"
         app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/icon"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         tools:text="@string/general_powered" />
 
     <ImageView
@@ -28,9 +28,9 @@
         android:layout_marginTop="11dp"
         android:layout_marginBottom="@dimen/glia_medium"
         android:src="@drawable/ic_glia_logo"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/title"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

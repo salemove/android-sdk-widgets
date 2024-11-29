@@ -27,19 +27,6 @@ import com.glia.widgets.view.unifiedui.theme.securemessaging.SecureMessagingThem
  */
 internal class EntryWidgetView : RecyclerView, EntryWidgetContract.View {
 
-    constructor(context: Context) : super(context.wrapWithMaterialThemeOverlay())
-
-    constructor(
-        context: Context,
-        attrs: AttributeSet
-    ) : super(context.wrapWithMaterialThemeOverlay(), attrs)
-
-    constructor(
-        context: Context,
-        attrs: AttributeSet,
-        defStyle: Int
-    ) : super(context.wrapWithMaterialThemeOverlay(), attrs, defStyle)
-
     var onDismissListener: (() -> Unit)? = null
 
     private var controller: EntryWidgetContract.Controller
@@ -48,11 +35,25 @@ internal class EntryWidgetView : RecyclerView, EntryWidgetContract.View {
         get() = _viewAdapter ?: throw IllegalStateException("Make sure adapter is set up before attempting to show any items")
     private var dividerView: EntryWidgetItemDivider? = null
 
+    override val whiteLabel by lazy {
+        TypedValue().run {
+            context.theme.resolveAttribute(R.attr.whiteLabel, this, true)
+            data != 0
+        }
+    }
+
     init {
         controller = Dependencies.controllerFactory.entryWidgetController
         itemAnimator = null
         setupDefaultViewAppearance()
     }
+
+    constructor(context: Context) : super(context.wrapWithMaterialThemeOverlay())
+
+    constructor(context: Context, attrs: AttributeSet) : super(context.wrapWithMaterialThemeOverlay(), attrs)
+
+    constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(context.wrapWithMaterialThemeOverlay(), attrs, defStyle)
+
 
     private fun setupDefaultViewAppearance() {
         val value = TypedValue()

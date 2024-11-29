@@ -134,7 +134,7 @@ internal class EntryWidgetAdapter(
             EntryWidgetContract.ItemType.EmptyState,
             EntryWidgetContract.ItemType.SdkNotInitializedState,
             EntryWidgetContract.ItemType.ErrorState -> ViewType.ERROR_ITEM.ordinal
-            EntryWidgetContract.ItemType.ProvidedBy -> ViewType.PROVIDED_BY_ITEM.ordinal
+            EntryWidgetContract.ItemType.PoweredBy -> ViewType.PROVIDED_BY_ITEM.ordinal
             is EntryWidgetContract.ItemType.Messaging -> ViewType.MESSAGING_MEDIA_TYPE_ITEM.ordinal
             else -> ViewType.LIVE_MEDIA_TYPE_ITEMS.ordinal
         }

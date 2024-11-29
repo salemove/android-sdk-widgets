@@ -12,7 +12,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -35,6 +34,7 @@ import com.glia.widgets.core.notification.NotificationActionReceiver
 import com.glia.widgets.entrywidget.EntryWidget
 import com.glia.widgets.launcher.EngagementLauncher
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.card.MaterialCardView
 import kotlin.concurrent.thread
 import kotlin.properties.Delegates
 
@@ -554,7 +554,7 @@ class MainFragment : Fragment() {
     // For testing the embedded Entry Widget
     private fun showEntryWidgetInADedicatedView() {
         val entryWidgetView = entryWidget.getView(requireContext())
-        val container = containerView!!.findViewById<FrameLayout>(R.id.entry_widget_container)
+        val container = containerView!!.findViewById<MaterialCardView>(R.id.entry_widget_container)
         container.removeAllViews()
         container.addView(entryWidgetView)
         container.visibility = View.VISIBLE

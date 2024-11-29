@@ -1,10 +1,13 @@
 package com.glia.widgets.chat
 
+import android.widget.ImageView
 import com.glia.widgets.R
 import com.glia.widgets.SnapshotTest
 import com.glia.widgets.chat.model.ChatState
 import com.glia.widgets.chat.model.OperatorStatusItem
 import com.glia.widgets.core.fileupload.model.LocalAttachment
+import com.glia.widgets.entrywidget.EntryWidgetContract
+import com.glia.widgets.entrywidget.EntryWidgetView
 import com.glia.widgets.snapshotutils.SnapshotChatScreen
 import com.glia.widgets.snapshotutils.SnapshotChatView
 import com.glia.widgets.snapshotutils.SnapshotStrings
@@ -157,14 +160,24 @@ internal class ChatViewSnapshotTest : SnapshotTest(), SnapshotChatView, Snapshot
 
     // MARK: Secure messaging
 
-    private fun secureMessagingView(unifiedTheme: UnifiedTheme? = null, isUnavailable: Boolean = false) = setupView(
+    private fun secureMessagingView(
+        unifiedTheme: UnifiedTheme? = null,
+        isUnavailable: Boolean = false,
+        showTopBanner: Boolean = false,
+        clickTopBanner: Boolean = false,
+    ) = setupView(
         chatState = ChatState()
             .initChat()
             .setSecureMessagingState()
+            .setSecureConversationsTopBannerVisibility(showTopBanner)
             .let { if (isUnavailable) it.setSecureMessagingUnavailable() else it },
         message = mediumLengthTexts()[2],
         unifiedTheme = unifiedTheme
     )
+        .apply { if (clickTopBanner) {
+            chatView.findViewById<EntryWidgetView>(R.id.sc_top_banner_options).showItems(defaultMediaTypesForTopBanner)
+            chatView.findViewById<ImageView>(R.id.sc_top_banner_icon).performClick()
+        } }
 
     @Test
     fun secureMessaging() {
@@ -223,6 +236,51 @@ internal class ChatViewSnapshotTest : SnapshotTest(), SnapshotChatView, Snapshot
             secureMessagingView(
                 unifiedTheme = unifiedTheme(),
                 isUnavailable = true
+            ).root
+        )
+    }
+    private val defaultMediaTypesForTopBanner = listOf(
+        EntryWidgetContract.ItemType.VideoCall,
+        EntryWidgetContract.ItemType.AudioCall,
+        EntryWidgetContract.ItemType.Chat
+    )
+
+    @Test
+    fun secureMessagingWithTopBannerOpen() {
+        snapshot(
+            secureMessagingView(
+                showTopBanner = true,
+                clickTopBanner = true
+            ).root
+        )
+    }
+
+    @Test
+    fun secureMessagingWithTopBannerOpenWithGlobalColors() {
+        snapshot(
+            secureMessagingView(
+                unifiedTheme = unifiedThemeWithGlobalColors(),
+                showTopBanner = true,
+                clickTopBanner = true
+            ).root
+        )
+    }
+
+    @Test
+    fun secureMessagingWithTopBannerClosed() {
+        snapshot(
+            secureMessagingView(
+                showTopBanner = true
+            ).root
+        )
+    }
+
+    @Test
+    fun secureMessagingWithTopBannerClosedWithGlobalColors() {
+        snapshot(
+            secureMessagingView(
+                unifiedTheme = unifiedThemeWithGlobalColors(),
+                showTopBanner = true
             ).root
         )
     }

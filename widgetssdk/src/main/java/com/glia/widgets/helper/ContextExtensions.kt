@@ -1,4 +1,5 @@
 @file:JvmName("ContextExtensions")
+
 package com.glia.widgets.helper
 
 import android.app.Activity
@@ -16,6 +17,7 @@ import androidx.annotation.DimenRes
 import androidx.annotation.IntRange
 import androidx.annotation.StyleRes
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.withStyledAttributes
 import androidx.core.util.TypedValueCompat
 import com.glia.widgets.BuildConfig
@@ -48,6 +50,9 @@ internal fun Context.wrapWithMaterialThemeOverlay(
         defStyleRes
     )
 }
+
+internal fun Context.wrapWithTheme(@StyleRes themeResId: Int = R.style.Application_Glia_Activity_Style): Context =
+    ContextThemeWrapper(this, themeResId)
 
 internal fun Context.showToast(
     message: String,

@@ -33,7 +33,7 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
         EntryWidgetContract.ItemType.AudioCall,
         EntryWidgetContract.ItemType.Chat,
         EntryWidgetContract.ItemType.Messaging(0),
-        EntryWidgetContract.ItemType.ProvidedBy
+        EntryWidgetContract.ItemType.PoweredBy
     )
 
     @Test
@@ -80,7 +80,7 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
         EntryWidgetContract.ItemType.AudioCall,
         EntryWidgetContract.ItemType.Chat,
         EntryWidgetContract.ItemType.Messaging(5),
-        EntryWidgetContract.ItemType.ProvidedBy
+        EntryWidgetContract.ItemType.PoweredBy
     )
 
     @Test
@@ -129,7 +129,7 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
         EntryWidgetContract.ItemType.LoadingState,
         EntryWidgetContract.ItemType.LoadingState,
         EntryWidgetContract.ItemType.LoadingState,
-        EntryWidgetContract.ItemType.ProvidedBy
+        EntryWidgetContract.ItemType.PoweredBy
     )
 
     @Test
@@ -173,7 +173,7 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
 
     private val emptyItems = listOf(
         EntryWidgetContract.ItemType.EmptyState,
-        EntryWidgetContract.ItemType.ProvidedBy
+        EntryWidgetContract.ItemType.PoweredBy
     )
 
     @Test
@@ -218,7 +218,7 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
 
     private val sdkNotInitializedItems = listOf(
         EntryWidgetContract.ItemType.SdkNotInitializedState,
-        EntryWidgetContract.ItemType.ProvidedBy
+        EntryWidgetContract.ItemType.PoweredBy
     )
 
     @Test
@@ -262,7 +262,7 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
 
     private val errorItems = listOf(
         EntryWidgetContract.ItemType.ErrorState,
-        EntryWidgetContract.ItemType.ProvidedBy
+        EntryWidgetContract.ItemType.PoweredBy
     )
 
     @Test
@@ -305,7 +305,7 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
     // MARK: utils for tests
 
     open fun setupView(
-        items: List<EntryWidgetContract.ItemType> = listOf(EntryWidgetContract.ItemType.ProvidedBy),
+        items: List<EntryWidgetContract.ItemType> = listOf(EntryWidgetContract.ItemType.PoweredBy),
         viewType: EntryWidgetContract.ViewType = EntryWidgetContract.ViewType.EMBEDDED_VIEW,
         unifiedTheme: UnifiedTheme? = null
     ) : View {

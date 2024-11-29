@@ -35,8 +35,7 @@ internal class EntryWidgetController @JvmOverloads constructor(
             EntryWidgetContract.ItemType.LoadingState,
             EntryWidgetContract.ItemType.LoadingState,
             EntryWidgetContract.ItemType.LoadingState,
-            EntryWidgetContract.ItemType.LoadingState,
-            EntryWidgetContract.ItemType.ProvidedBy
+            EntryWidgetContract.ItemType.LoadingState
         )
     }
 
@@ -60,7 +59,7 @@ internal class EntryWidgetController @JvmOverloads constructor(
         this.view = view
 
         if (!core.isInitialized) {
-            showSdkNotInitializedState()
+            showSdkNotInitializedState(type == EntryWidgetContract.ViewType.MESSAGING_LIVE_SUPPORT)
         }
 
         itemsObservableBasedOnType(type)
@@ -74,8 +73,13 @@ internal class EntryWidgetController @JvmOverloads constructor(
         else -> entryWidgetObservableItemType
     }
 
-    private fun showSdkNotInitializedState() {
-        view.showItems(listOf(EntryWidgetContract.ItemType.SdkNotInitializedState))
+    private fun showSdkNotInitializedState(isMessaging: Boolean) {
+        val items = if (view.whiteLabel || isMessaging) {
+            listOf(EntryWidgetContract.ItemType.SdkNotInitializedState)
+        } else {
+            listOf(EntryWidgetContract.ItemType.SdkNotInitializedState, EntryWidgetContract.ItemType.PoweredBy)
+        }
+        view.showItems(items)
     }
 
     private fun mapEntryWidgetQueueState(
@@ -86,17 +90,23 @@ internal class EntryWidgetController @JvmOverloads constructor(
 
         val messagingOrDefault: (default: List<EntryWidgetContract.ItemType>) -> List<EntryWidgetContract.ItemType> = { default ->
             if (isAuthenticatedUseCase() && hasOngoingSC)
-                listOf(EntryWidgetContract.ItemType.Messaging(unreadMessagesCount), EntryWidgetContract.ItemType.ProvidedBy)
+                listOf(EntryWidgetContract.ItemType.Messaging(unreadMessagesCount))
             else
                 default
         }
 
-        return when (queuesState) {
+        val items = when (queuesState) {
             QueuesState.Empty -> messagingOrDefault(emptyState)
             QueuesState.Loading -> messagingOrDefault(loadingState)
             is QueuesState.Error -> messagingOrDefault(errorState)
             is QueuesState.Queues -> mapEntryWidgetQueues(queuesState.queues, unreadMessagesCount, hasOngoingSC)
+        }.toMutableList()
+
+        if (!view.whiteLabel) {
+            items.add(EntryWidgetContract.ItemType.PoweredBy)
         }
+
+        return items.apply { sort() }
     }
 
     private fun mapEntryWidgetQueues(queues: List<Queue>, unreadMessagesCount: Int, hasOngoingSC: Boolean): List<EntryWidgetContract.ItemType> {
@@ -111,20 +121,14 @@ internal class EntryWidgetController @JvmOverloads constructor(
 
                 else -> null
             }
-        }.toMutableList()
-
-        if (isAuthenticatedUseCase() && hasOngoingSC && !items.contains(messaging)) {
-            items.add(messaging)
         }
 
-        if (items.isEmpty()) {
-            return emptyState
+        return when {
+            isAuthenticatedUseCase() && hasOngoingSC && !items.contains(messaging) -> items + messaging
+            items.isEmpty() -> emptyState
+            else -> items
         }
 
-        items.add(EntryWidgetContract.ItemType.ProvidedBy)
-        items.sort()
-
-        return items
     }
 
     private fun mapMessagingQueueState(queuesState: QueuesState): List<EntryWidgetContract.ItemType> = when (queuesState) {

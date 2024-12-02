@@ -75,7 +75,7 @@ internal class MessageView(
     }
 
     private val attachmentPopup by lazy {
-        AttachmentPopup(addAttachmentButton, unifiedTheme?.pickMediaTheme)
+        AttachmentPopup(context, unifiedTheme?.pickMediaTheme)
     }
 
     val messageTitleTop: Int get() = messageTitle.top

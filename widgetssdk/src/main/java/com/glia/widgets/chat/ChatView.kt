@@ -168,7 +168,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     private var binding by Delegates.notNull<ChatViewBinding>()
     private val attachmentPopup by lazy {
         AttachmentPopup(
-            binding.chatMessageLayout, Dependencies.gliaThemeManager.theme?.chatTheme?.attachmentsPopup
+            context, Dependencies.gliaThemeManager.theme?.chatTheme?.attachmentsPopup
         )
     }
 
@@ -718,7 +718,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
 
     private fun setupAddAttachmentButton() {
         binding.addAttachmentButton.setOnClickListener {
-            attachmentPopup.show(binding.chatMessageLayout, {
+            attachmentPopup.show(binding.addAttachmentButton, {
                 getContentLauncher?.launch(arrayOf(Constants.MIME_TYPE_IMAGES))
             }, {
                 controller?.onTakePhotoClicked()
@@ -851,7 +851,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         binding.sendButton.applyButtonTheme(inputTheme.sendButton)
         binding.addAttachmentButton.applyButtonTheme(inputTheme.mediaButton)
         binding.dividerView.applyColorTheme(inputTheme.divider)
-        binding.chatMessageLayout.applyLayerTheme(inputTheme.background)
+        binding.messageInputBackground.applyLayerTheme(inputTheme.background)
         binding.chatEditText.applyTextTheme(textTheme = inputTheme.text, withAlignment = false)
         inputTheme.placeholder?.textColor?.primaryColor?.also(binding.chatEditText::setHintTextColor)
     }
@@ -872,7 +872,10 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         binding.apply {
             chatRecyclerView.updatePadding(bottom = dialogHeight)
             chatRecyclerView.scrollBy(0, dialogHeight)
-            chatMessageLayout.isGone = true
+            messageInputBackground.isGone = true
+            chatEditText.isGone = true
+            addAttachmentButton.isGone = true
+            sendButton.isGone = true
             operatorTypingAnimationView.isGone = true
         }
     }

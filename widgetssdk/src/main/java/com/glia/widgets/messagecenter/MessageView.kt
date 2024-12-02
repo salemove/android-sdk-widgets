@@ -77,7 +77,7 @@ internal class MessageView(
     private var theme: UiTheme by Delegates.notNull()
 
     private val attachmentPopup by lazy {
-        AttachmentPopup(addAttachmentButton, unifiedTheme?.pickMediaTheme)
+        AttachmentPopup(context, unifiedTheme?.pickMediaTheme)
     }
 
     val messageTitleTop: Int get() = messageTitle.top

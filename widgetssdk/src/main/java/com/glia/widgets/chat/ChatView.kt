@@ -172,7 +172,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         get() = binding.root as ConstraintLayout
     private val attachmentPopup by lazy {
         AttachmentPopup(
-            binding.chatMessageLayout, Dependencies.gliaThemeManager.theme?.chatTheme?.attachmentsPopup
+            context, Dependencies.gliaThemeManager.theme?.chatTheme?.attachmentsPopup
         )
     }
 
@@ -711,7 +711,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
 
     private fun setupAddAttachmentButton() {
         binding.addAttachmentButton.setOnClickListener {
-            attachmentPopup.show(binding.chatMessageLayout, {
+            attachmentPopup.show(binding.addAttachmentButton, {
                 getContentLauncher?.launch(arrayOf(Constants.MIME_TYPE_IMAGES))
             }, {
                 controller?.onTakePhotoClicked()
@@ -845,7 +845,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         binding.sendButton.applyButtonTheme(inputTheme.sendButton)
         binding.addAttachmentButton.applyButtonTheme(inputTheme.mediaButton)
         binding.chatDivider.applyColorTheme(inputTheme.divider)
-        binding.chatMessageLayout.applyLayerTheme(inputTheme.background)
+        binding.messageInputBackground.applyLayerTheme(inputTheme.background)
         binding.chatEditText.applyTextTheme(textTheme = inputTheme.text, withAlignment = false)
         inputTheme.placeholder?.textColor?.primaryColor?.also(binding.chatEditText::setHintTextColor)
     }

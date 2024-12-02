@@ -80,7 +80,7 @@ class SnackBarDelegateTest {
     fun `anchorViewId returns corresponding ids when chat or call activity is passed`() {
         CommonSnackBarDelegate(commonActivity, titleStringKey, mock(), mock()).apply { assertNull(anchorViewId) }
         CallActivitySnackBarDelegate(callActivity, titleStringKey, mock(), mock()).apply { assertEquals(R.id.buttons_layout_bg, anchorViewId) }
-        ChatActivitySnackBarDelegate(chatActivity, titleStringKey, mock(), mock()).apply { assertEquals(R.id.chat_message_layout, anchorViewId) }
+        ChatActivitySnackBarDelegate(chatActivity, titleStringKey, mock(), mock()).apply { assertEquals(R.id.message_input_background, anchorViewId) }
     }
 
     @Test

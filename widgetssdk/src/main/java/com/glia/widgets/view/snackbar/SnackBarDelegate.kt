@@ -88,7 +88,7 @@ internal class CommonSnackBarDelegate(activity: Activity, titleStringKey: Int, l
 @VisibleForTesting
 internal class ChatActivitySnackBarDelegate(activity: ChatActivity, titleStringKey: Int, localeProvider: LocaleProvider, unifiedTheme: UnifiedTheme?) :
     SnackBarDelegate(activity.findViewById(R.id.chat_view), titleStringKey, localeProvider, unifiedTheme?.snackBarTheme) {
-    override val anchorViewId: Int = R.id.chat_message_layout
+    override val anchorViewId: Int = R.id.message_input_background
 }
 
 @VisibleForTesting

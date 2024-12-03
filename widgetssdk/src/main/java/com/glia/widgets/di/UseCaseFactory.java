@@ -104,7 +104,6 @@ import com.glia.widgets.core.permissions.domain.WithReadWritePermissionsUseCaseI
 import com.glia.widgets.core.secureconversations.domain.AddSecureFileAttachmentsObserverUseCase;
 import com.glia.widgets.core.secureconversations.domain.AddSecureFileToAttachmentAndUploadUseCase;
 import com.glia.widgets.core.secureconversations.domain.GetSecureFileAttachmentsUseCase;
-import com.glia.widgets.core.secureconversations.domain.GetUnreadMessagesCountWithTimeoutUseCase;
 import com.glia.widgets.core.secureconversations.domain.HasOngoingSecureConversationUseCase;
 import com.glia.widgets.core.secureconversations.domain.IsMessagingAvailableUseCase;
 import com.glia.widgets.core.secureconversations.domain.ManageSecureMessagingStatusUseCase;
@@ -348,8 +347,7 @@ public class UseCaseFactory {
             repositoryFactory.getGliaMessageRepository(),
             repositoryFactory.getSecureConversationsRepository(),
             createManageSecureMessagingStatusUseCase(),
-            getMapOperatorUseCase(),
-            createSubscribeToUnreadMessagesCountUseCase()
+            getMapOperatorUseCase()
         );
     }
 
@@ -604,20 +602,9 @@ public class UseCaseFactory {
     }
 
     @NonNull
-    public GetUnreadMessagesCountWithTimeoutUseCase createSubscribeToUnreadMessagesCountUseCase() {
-        return new GetUnreadMessagesCountWithTimeoutUseCase(
-            repositoryFactory.getSecureConversationsRepository(),
-            createIsAuthenticatedUseCase(),
-            gliaCore
-        );
-    }
-
-    @NonNull
     public ObserveUnreadMessagesCountUseCase createObserveUnreadMessagesCountUseCase() {
         return new ObserveUnreadMessagesCountUseCase(
             repositoryFactory.getSecureConversationsRepository(),
-            createIsAuthenticatedUseCase(),
-            gliaCore,
             Dependencies.INSTANCE.getSchedulers()
         );
     }
@@ -1103,8 +1090,7 @@ public class UseCaseFactory {
     public HasOngoingSecureConversationUseCase getHasPendingSecureConversationsWithTimeoutUseCase() {
         return new HasOngoingSecureConversationUseCase(
             repositoryFactory.getSecureConversationsRepository(),
-            createIsAuthenticatedUseCase(),
-            gliaCore
+            getEngagementStateUseCase()
         );
     }
 }

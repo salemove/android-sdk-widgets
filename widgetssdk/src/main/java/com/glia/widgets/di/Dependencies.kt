@@ -195,8 +195,7 @@ internal object Dependencies {
         val gliaConfig = createGliaConfig(gliaWidgetsConfig)
         gliaCore.init(gliaConfig)
         controllerFactory.init()
-        repositoryFactory.engagementRepository.initialize()
-        repositoryFactory.queueRepository.initialize()
+        repositoryFactory.initialize()
         configurationManager.applyConfiguration(gliaWidgetsConfig)
         localeProvider.setCompanyName(gliaWidgetsConfig.companyName)
     }

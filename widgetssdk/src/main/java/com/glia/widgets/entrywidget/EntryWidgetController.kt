@@ -6,28 +6,28 @@ import com.glia.androidsdk.queuing.Queue
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.core.queue.QueueRepository
 import com.glia.widgets.core.queue.QueuesState
+import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.core.secureconversations.domain.HasOngoingSecureConversationUseCase
-import com.glia.widgets.core.secureconversations.domain.ObserveUnreadMessagesCountUseCase
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.mediaTypes
 import com.glia.widgets.launcher.EngagementLauncher
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 internal class EntryWidgetController @JvmOverloads constructor(
     private val queueRepository: QueueRepository,
     private val isAuthenticatedUseCase: IsAuthenticatedUseCase,
-    private val observeUnreadMessagesCountUseCase: ObserveUnreadMessagesCountUseCase,
+    private val secureConversationsRepository: SecureConversationsRepository,
     private val hasOngoingSecureConversationUseCase: HasOngoingSecureConversationUseCase,
     private val core: GliaCore,
     private val engagementLauncher: EngagementLauncher,
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 ) : EntryWidgetContract.Controller {
-    private val queueStateObservable by lazy { queueRepository.queuesState.toObservable() }
-    private val unreadMessagesCountObservable by lazy { observeUnreadMessagesCountUseCase() }
+    private val queueStateObservable by lazy { queueRepository.queuesState }
+    private val unreadMessagesCountObservable by lazy { secureConversationsRepository.unreadMessagesCountObservable }
     private val hasOngoingSCObservable by lazy { hasOngoingSecureConversationUseCase() }
 
     private val loadingState: List<EntryWidgetContract.ItemType> by lazy {
@@ -47,11 +47,11 @@ internal class EntryWidgetController @JvmOverloads constructor(
         listOf(EntryWidgetContract.ItemType.EmptyState)
     }
 
-    private val messagingChatObservableItemType: Observable<List<EntryWidgetContract.ItemType>>
+    private val messagingChatObservableItemType: Flowable<List<EntryWidgetContract.ItemType>>
         get() = queueStateObservable.map(::mapMessagingQueueState)
 
-    private val entryWidgetObservableItemType: Observable<List<EntryWidgetContract.ItemType>>
-        get() = Observable.combineLatest(queueStateObservable, unreadMessagesCountObservable, hasOngoingSCObservable, ::mapEntryWidgetQueueState)
+    private val entryWidgetObservableItemType: Flowable<List<EntryWidgetContract.ItemType>>
+        get() = Flowable.combineLatest(queueStateObservable, unreadMessagesCountObservable, hasOngoingSCObservable, ::mapEntryWidgetQueueState)
 
     private lateinit var view: EntryWidgetContract.View
 
@@ -89,7 +89,11 @@ internal class EntryWidgetController @JvmOverloads constructor(
     ): List<EntryWidgetContract.ItemType> {
 
         val messagingOrDefault: (default: List<EntryWidgetContract.ItemType>) -> List<EntryWidgetContract.ItemType> = { default ->
-            if (isAuthenticatedUseCase() && hasOngoingSC)
+            /* This check may be unreliable due to the asynchronous nature of authentication.
+            *  We lack a callback for authentication completion, making it difficult to track when authentication has finished.
+            *  Sometimes(when we authenticate with opened Entry Widget embedded view),
+            *  we receive updates for ongoing secure conversations before the authentication result is saved, causing this check to return false. */
+            if (hasOngoingSC && isAuthenticatedUseCase())
                 listOf(EntryWidgetContract.ItemType.Messaging(unreadMessagesCount))
             else
                 default
@@ -124,7 +128,7 @@ internal class EntryWidgetController @JvmOverloads constructor(
         }
 
         return when {
-            isAuthenticatedUseCase() && hasOngoingSC && !items.contains(messaging) -> items + messaging
+            hasOngoingSC && !items.contains(messaging) && isAuthenticatedUseCase() -> items + messaging
             items.isEmpty() -> emptyState
             else -> items
         }

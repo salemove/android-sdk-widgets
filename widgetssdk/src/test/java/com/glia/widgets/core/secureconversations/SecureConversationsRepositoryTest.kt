@@ -8,34 +8,109 @@ import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.androidsdk.secureconversations.SecureConversations
 import com.glia.widgets.chat.data.GliaChatRepository
 import com.glia.widgets.core.queue.QueueRepository
-import com.glia.widgets.core.secureconversations.domain.NO_UNREAD_MESSAGES
 import com.glia.widgets.di.GliaCore
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
+import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
 import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.schedulers.Schedulers
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.mock
 
 class SecureConversationsRepositoryTest {
 
     private lateinit var repository: SecureConversationsRepository
+
     private val core: GliaCore = mockk()
     private val queueRepository: QueueRepository = mockk(relaxUnitFun = true)
     private val secureConversations: SecureConversations = mockk(relaxUnitFun = true)
+    private val unreadMessagesSlot = slot<RequestCallback<Int>>()
+    private val pendingSCSlot = slot<RequestCallback<Boolean>>()
+
 
     @Before
     fun setUp() {
+        RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
         every { core.secureConversations } returns secureConversations
         repository = SecureConversationsRepository(core, queueRepository)
+        verify(inverse = true) { secureConversations.subscribeToUnreadMessageCount(any()) }
+        verify(inverse = true) { secureConversations.subscribeToPendingSecureConversationStatus(any()) }
+        repository.unreadMessagesCountObservable.test()
+            .assertNotComplete()
+            .assertValue(0)
+        repository.pendingSecureConversationsStatusObservable.test()
+            .assertNotComplete()
+            .assertValue(false)
+
+        repository.initialize()
+        verify { core.secureConversations }
+        verify { secureConversations.subscribeToUnreadMessageCount(capture(unreadMessagesSlot)) }
+        verify { secureConversations.subscribeToPendingSecureConversationStatus(capture(pendingSCSlot)) }
+        repository.unreadMessagesCountObservable.test()
+            .assertNotComplete()
+            .assertValue(0)
+        repository.pendingSecureConversationsStatusObservable.test()
+            .assertNotComplete()
+            .assertValue(false)
     }
 
     @After
     fun tearDown() {
+        RxAndroidPlugins.reset()
         clearAllMocks()
+    }
+
+    @Test
+    fun `unreadMessagesCountObservable emits value when new value is received`() {
+        unreadMessagesSlot.captured.onResult(3, null)
+        repository.unreadMessagesCountObservable.test()
+            .assertNotComplete()
+            .assertValue(3)
+    }
+
+    @Test
+    fun `unreadMessagesCountObservable emits default value when null received`() {
+        unreadMessagesSlot.captured.onResult(null, null)
+        repository.unreadMessagesCountObservable.test()
+            .assertNotComplete()
+            .assertValue(0)
+    }
+
+    @Test
+    fun `unreadMessagesCountObservable emits default value when error received`() {
+        unreadMessagesSlot.captured.onResult(null, mock())
+        repository.unreadMessagesCountObservable.test()
+            .assertNotComplete()
+            .assertValue(0)
+    }
+
+    @Test
+    fun `pendingSecureConversationsStatusObservable emits value when new value is received`() {
+        pendingSCSlot.captured.onResult(true, null)
+        repository.pendingSecureConversationsStatusObservable.test()
+            .assertNotComplete()
+            .assertValue(true)
+    }
+
+    @Test
+    fun `pendingSecureConversationsStatusObservable emits default value when null received`() {
+        pendingSCSlot.captured.onResult(null, null)
+        repository.pendingSecureConversationsStatusObservable.test()
+            .assertNotComplete()
+            .assertValue(false)
+    }
+
+    @Test
+    fun `pendingSecureConversationsStatusObservable emits default value when error received`() {
+        pendingSCSlot.captured.onResult(null, mock())
+        repository.pendingSecureConversationsStatusObservable.test()
+            .assertNotComplete()
+            .assertValue(false)
     }
 
     @Test
@@ -85,117 +160,5 @@ class SecureConversationsRepositoryTest {
         repository.markMessagesRead(callback)
 
         verify { secureConversations.markMessagesRead(callback) }
-    }
-
-    @Test
-    fun `getUnreadMessagesCount should call secureConversations getUnreadMessageCount`() {
-        val callback: RequestCallback<Int> = mockk(relaxed = true)
-
-        repository.getUnreadMessagesCount(callback)
-
-        verify { secureConversations.getUnreadMessageCount(callback) }
-    }
-
-    @Test
-    fun `subscribeToUnreadMessagesCount should call secureConversations subscribeToUnreadMessageCount`() {
-        val callback: RequestCallback<Int> = mockk(relaxed = true)
-
-        repository.subscribeToUnreadMessagesCount(callback)
-
-        verify { secureConversations.subscribeToUnreadMessageCount(callback) }
-    }
-
-    @Test
-    fun `unsubscribeFromUnreadMessagesCount should call secureConversations unSubscribeFromUnreadMessageCount`() {
-        val callback: RequestCallback<Int> = mockk(relaxed = true)
-
-        repository.unsubscribeFromUnreadMessagesCount(callback)
-
-        verify { secureConversations.unSubscribeFromUnreadMessageCount(callback) }
-    }
-
-    @Test
-    fun `unreadMessagesCountObservable should emit values`() {
-        val count = 5
-        val callbackSlot = slot<RequestCallback<Int>>()
-
-        val testObserver = repository.unreadMessagesCountObservable.test()
-
-        verify { secureConversations.subscribeToUnreadMessageCount(capture(callbackSlot)) }
-
-        callbackSlot.captured.onResult(count, null)
-
-        testObserver.assertValue(count)
-    }
-
-    @Test
-    fun `unreadMessagesCountObservable should emit error when error is returned`() {
-        val callbackSlot = slot<RequestCallback<Int>>()
-
-        val testObserver = repository.unreadMessagesCountObservable.test()
-
-        verify { secureConversations.subscribeToUnreadMessageCount(capture(callbackSlot)) }
-
-        val exception = GliaException("error", GliaException.Cause.INTERNAL_ERROR)
-        callbackSlot.captured.onResult(null, exception)
-
-        testObserver.assertError(exception)
-    }
-
-    @Test
-    fun `unreadMessagesCountObservable should unsubscribe from callback when disposed`() {
-        val callbackSlot = slot<RequestCallback<Int>>()
-
-        val testObserver = repository.unreadMessagesCountObservable.test()
-
-        verify { secureConversations.subscribeToUnreadMessageCount(capture(callbackSlot)) }
-
-        callbackSlot.captured.onResult(null, null)
-
-        testObserver.assertValue(NO_UNREAD_MESSAGES).dispose()
-
-        verify { secureConversations.unSubscribeFromUnreadMessageCount(eq(callbackSlot.captured)) }
-    }
-
-    @Test
-    fun `pendingSecureConversationsStatusObservable should emit values`() {
-        val status = true
-        val callbackSlot = slot<RequestCallback<Boolean>>()
-
-        val testObserver = repository.pendingSecureConversationsStatusObservable.test()
-
-        verify { secureConversations.subscribeToPendingSecureConversationStatus(capture(callbackSlot)) }
-
-        callbackSlot.captured.onResult(status, null)
-
-        testObserver.assertValue(status)
-    }
-
-    @Test
-    fun `pendingSecureConversationsStatusObservable should emit error when error is returned`() {
-        val callbackSlot = slot<RequestCallback<Boolean>>()
-
-        val testObserver = repository.pendingSecureConversationsStatusObservable.test()
-
-        verify { secureConversations.subscribeToPendingSecureConversationStatus(capture(callbackSlot)) }
-        val exception = GliaException("error", GliaException.Cause.INTERNAL_ERROR)
-        callbackSlot.captured.onResult(null, exception)
-
-        testObserver.assertError(exception)
-    }
-
-    @Test
-    fun `pendingSecureConversationsStatusObservable should unsubscribe when disposed`() {
-        val callbackSlot = slot<RequestCallback<Boolean>>()
-
-        val testObserver = repository.pendingSecureConversationsStatusObservable.test()
-
-        verify { secureConversations.subscribeToPendingSecureConversationStatus(capture(callbackSlot)) }
-
-        callbackSlot.captured.onResult(null, null)
-
-        testObserver.assertValue(false).dispose()
-
-        verify { secureConversations.unSubscribeFromPendingSecureConversationStatus(eq(callbackSlot.captured)) }
     }
 }

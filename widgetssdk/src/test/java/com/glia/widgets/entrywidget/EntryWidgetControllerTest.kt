@@ -7,8 +7,8 @@ import com.glia.androidsdk.queuing.Queue
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.core.queue.QueueRepository
 import com.glia.widgets.core.queue.QueuesState
+import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.core.secureconversations.domain.HasOngoingSecureConversationUseCase
-import com.glia.widgets.core.secureconversations.domain.ObserveUnreadMessagesCountUseCase
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.mediaTypes
@@ -21,7 +21,6 @@ import io.mockk.unmockkStatic
 import io.mockk.verify
 import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
 import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import org.junit.After
@@ -55,7 +54,7 @@ class EntryWidgetControllerTest {
 
     private lateinit var queueRepository: QueueRepository
     private lateinit var isAuthenticatedUseCase: IsAuthenticatedUseCase
-    private lateinit var observeUnreadMessagesCountUseCase: ObserveUnreadMessagesCountUseCase
+    private lateinit var secureConversationsRepository: SecureConversationsRepository
     private lateinit var hasOngoingSecureConversationUseCase: HasOngoingSecureConversationUseCase
     private lateinit var core: GliaCore
     private lateinit var controller: EntryWidgetController
@@ -75,7 +74,7 @@ class EntryWidgetControllerTest {
 
         queueRepository = mockk(relaxUnitFun = true)
         isAuthenticatedUseCase = mockk()
-        observeUnreadMessagesCountUseCase = mockk()
+        secureConversationsRepository = mockk()
         hasOngoingSecureConversationUseCase = mockk()
         core = mockk()
         activity = mockk()
@@ -85,7 +84,7 @@ class EntryWidgetControllerTest {
         controller = EntryWidgetController(
             queueRepository,
             isAuthenticatedUseCase,
-            observeUnreadMessagesCountUseCase,
+            secureConversationsRepository,
             hasOngoingSecureConversationUseCase,
             core,
             engagementLauncher,
@@ -111,8 +110,9 @@ class EntryWidgetControllerTest {
     ) {
         every { core.isInitialized } returns coreInitialized
         every { queueRepository.queuesState } returns (queuesState?.let { Flowable.just(it) } ?: Flowable.never())
-        every { observeUnreadMessagesCountUseCase() } returns (unreadMessagesCount?.let { Observable.just(it) } ?: Observable.never())
-        every { hasOngoingSecureConversationUseCase() } returns (hasOngoingSc?.let { Observable.just(it) } ?: Observable.never())
+        every { secureConversationsRepository.unreadMessagesCountObservable } returns (unreadMessagesCount?.let { Flowable.just(it) }
+            ?: Flowable.never())
+        every { hasOngoingSecureConversationUseCase() } returns (hasOngoingSc?.let { Flowable.just(it) } ?: Flowable.never())
         every { isAuthenticatedUseCase() } returns isAuthenticated
         every { view.whiteLabel } returns whiteLabel
     }
@@ -125,7 +125,7 @@ class EntryWidgetControllerTest {
 
         verify { view.showItems(sdkNotInitializedState + poweredByItem) }
         verify { queueRepository.queuesState }
-        verify { observeUnreadMessagesCountUseCase.invoke() }
+        verify { secureConversationsRepository.unreadMessagesCountObservable }
         verify { hasOngoingSecureConversationUseCase.invoke() }
     }
 
@@ -137,7 +137,7 @@ class EntryWidgetControllerTest {
 
         verify { view.showItems(sdkNotInitializedState) }
         verify { queueRepository.queuesState }
-        verify { observeUnreadMessagesCountUseCase.invoke() }
+        verify { secureConversationsRepository.unreadMessagesCountObservable }
         verify { hasOngoingSecureConversationUseCase.invoke() }
     }
 
@@ -149,7 +149,7 @@ class EntryWidgetControllerTest {
 
         verify { view.showItems(sdkNotInitializedState) }
         verify { queueRepository.queuesState }
-        verify(exactly = 0) { observeUnreadMessagesCountUseCase.invoke() }
+        verify(exactly = 0) { secureConversationsRepository.unreadMessagesCountObservable }
         verify(exactly = 0) { hasOngoingSecureConversationUseCase.invoke() }
     }
 
@@ -161,7 +161,7 @@ class EntryWidgetControllerTest {
 
         verify { view.showItems(emptyState) }
         verify { queueRepository.queuesState }
-        verify(exactly = 0) { observeUnreadMessagesCountUseCase.invoke() }
+        verify(exactly = 0) { secureConversationsRepository.unreadMessagesCountObservable }
         verify(exactly = 0) { hasOngoingSecureConversationUseCase.invoke() }
     }
 
@@ -179,7 +179,7 @@ class EntryWidgetControllerTest {
 
         verify { view.showItems(loadingState) }
         verify { queueRepository.queuesState }
-        verify(exactly = 0) { observeUnreadMessagesCountUseCase.invoke() }
+        verify(exactly = 0) { secureConversationsRepository.unreadMessagesCountObservable }
         verify(exactly = 0) { hasOngoingSecureConversationUseCase.invoke() }
     }
 
@@ -197,7 +197,7 @@ class EntryWidgetControllerTest {
 
         verify { view.showItems(errorState) }
         verify { queueRepository.queuesState }
-        verify(exactly = 0) { observeUnreadMessagesCountUseCase.invoke() }
+        verify(exactly = 0) { secureConversationsRepository.unreadMessagesCountObservable }
         verify(exactly = 0) { hasOngoingSecureConversationUseCase.invoke() }
     }
 
@@ -217,7 +217,7 @@ class EntryWidgetControllerTest {
 
         verify { view.showItems(emptyState) }
         verify { queueRepository.queuesState }
-        verify(exactly = 0) { observeUnreadMessagesCountUseCase.invoke() }
+        verify(exactly = 0) { secureConversationsRepository.unreadMessagesCountObservable }
         verify(exactly = 0) { hasOngoingSecureConversationUseCase.invoke() }
     }
 
@@ -247,7 +247,7 @@ class EntryWidgetControllerTest {
         )
         verify { view.showItems(items) }
         verify { queueRepository.queuesState }
-        verify(exactly = 0) { observeUnreadMessagesCountUseCase.invoke() }
+        verify(exactly = 0) { secureConversationsRepository.unreadMessagesCountObservable }
         verify(exactly = 0) { hasOngoingSecureConversationUseCase.invoke() }
     }
 
@@ -259,7 +259,7 @@ class EntryWidgetControllerTest {
 
         verify { view.showItems(emptyState + poweredByItem) }
         verify { queueRepository.queuesState }
-        verify { observeUnreadMessagesCountUseCase.invoke() }
+        verify { secureConversationsRepository.unreadMessagesCountObservable }
         verify { hasOngoingSecureConversationUseCase.invoke() }
     }
 
@@ -278,7 +278,7 @@ class EntryWidgetControllerTest {
 
         verify { view.showItems(emptyState) }
         verify { queueRepository.queuesState }
-        verify { observeUnreadMessagesCountUseCase.invoke() }
+        verify { secureConversationsRepository.unreadMessagesCountObservable }
         verify { hasOngoingSecureConversationUseCase.invoke() }
     }
 
@@ -303,7 +303,7 @@ class EntryWidgetControllerTest {
 
         verify { view.showItems(messaging) }
         verify { queueRepository.queuesState }
-        verify { observeUnreadMessagesCountUseCase.invoke() }
+        verify { secureConversationsRepository.unreadMessagesCountObservable }
         verify { hasOngoingSecureConversationUseCase.invoke() }
     }
 
@@ -322,7 +322,7 @@ class EntryWidgetControllerTest {
 
         verify { view.showItems(loadingState) }
         verify { queueRepository.queuesState }
-        verify { observeUnreadMessagesCountUseCase.invoke() }
+        verify { secureConversationsRepository.unreadMessagesCountObservable }
         verify { hasOngoingSecureConversationUseCase.invoke() }
     }
 
@@ -340,7 +340,7 @@ class EntryWidgetControllerTest {
 
         verify { view.showItems(loadingState + poweredByItem) }
         verify { queueRepository.queuesState }
-        verify { observeUnreadMessagesCountUseCase.invoke() }
+        verify { secureConversationsRepository.unreadMessagesCountObservable }
         verify { hasOngoingSecureConversationUseCase.invoke() }
     }
 
@@ -365,7 +365,7 @@ class EntryWidgetControllerTest {
 
         verify { view.showItems(messaging) }
         verify { queueRepository.queuesState }
-        verify { observeUnreadMessagesCountUseCase.invoke() }
+        verify { secureConversationsRepository.unreadMessagesCountObservable }
         verify { hasOngoingSecureConversationUseCase.invoke() }
     }
 
@@ -384,7 +384,7 @@ class EntryWidgetControllerTest {
 
         verify { view.showItems(emptyState) }
         verify { queueRepository.queuesState }
-        verify { observeUnreadMessagesCountUseCase.invoke() }
+        verify { secureConversationsRepository.unreadMessagesCountObservable }
         verify { hasOngoingSecureConversationUseCase.invoke() }
     }
 
@@ -402,7 +402,7 @@ class EntryWidgetControllerTest {
 
         verify { view.showItems(emptyState + poweredByItem) }
         verify { queueRepository.queuesState }
-        verify { observeUnreadMessagesCountUseCase.invoke() }
+        verify { secureConversationsRepository.unreadMessagesCountObservable }
         verify { hasOngoingSecureConversationUseCase.invoke() }
     }
 
@@ -427,7 +427,7 @@ class EntryWidgetControllerTest {
 
         verify { view.showItems(messaging) }
         verify { queueRepository.queuesState }
-        verify { observeUnreadMessagesCountUseCase.invoke() }
+        verify { secureConversationsRepository.unreadMessagesCountObservable }
         verify { hasOngoingSecureConversationUseCase.invoke() }
     }
 
@@ -447,7 +447,7 @@ class EntryWidgetControllerTest {
 
         verify { view.showItems(emptyState + poweredByItem) }
         verify { queueRepository.queuesState }
-        verify { observeUnreadMessagesCountUseCase.invoke() }
+        verify { secureConversationsRepository.unreadMessagesCountObservable }
         verify { hasOngoingSecureConversationUseCase.invoke() }
     }
 
@@ -468,7 +468,7 @@ class EntryWidgetControllerTest {
 
         verify { view.showItems(emptyState) }
         verify { queueRepository.queuesState }
-        verify { observeUnreadMessagesCountUseCase.invoke() }
+        verify { secureConversationsRepository.unreadMessagesCountObservable }
         verify { hasOngoingSecureConversationUseCase.invoke() }
     }
 
@@ -499,7 +499,7 @@ class EntryWidgetControllerTest {
         )
         verify { view.showItems(items) }
         verify { queueRepository.queuesState }
-        verify { observeUnreadMessagesCountUseCase.invoke() }
+        verify { secureConversationsRepository.unreadMessagesCountObservable }
         verify { hasOngoingSecureConversationUseCase.invoke() }
     }
 
@@ -531,7 +531,7 @@ class EntryWidgetControllerTest {
         )
         verify { view.showItems(items) }
         verify { queueRepository.queuesState }
-        verify { observeUnreadMessagesCountUseCase.invoke() }
+        verify { secureConversationsRepository.unreadMessagesCountObservable }
         verify { hasOngoingSecureConversationUseCase.invoke() }
     }
 
@@ -564,7 +564,7 @@ class EntryWidgetControllerTest {
         )
         verify { view.showItems(items) }
         verify { queueRepository.queuesState }
-        verify { observeUnreadMessagesCountUseCase.invoke() }
+        verify { secureConversationsRepository.unreadMessagesCountObservable }
         verify { hasOngoingSecureConversationUseCase.invoke() }
     }
 

@@ -78,8 +78,7 @@ class GliaWidgetsTest {
         GliaWidgets.init(widgetsConfig)
         val captor = argumentCaptor<GliaConfig>()
         verify(gliaCore).init(captor.capture())
-        verify(engagementRepository).initialize()
-        verify(queueRepository).initialize()
+        verify(repositoryFactory).initialize()
         val gliaConfig = captor.lastValue
         Assert.assertEquals(siteApiKey, gliaConfig.siteApiKey)
         Assert.assertEquals(siteId, gliaConfig.siteId)

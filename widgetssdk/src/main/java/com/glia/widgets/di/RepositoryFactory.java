@@ -51,6 +51,12 @@ public class RepositoryFactory {
         this.configurationManager = configurationManager;
     }
 
+    public void initialize() {
+        getEngagementRepository().initialize();
+        getQueueRepository().initialize();
+        getSecureConversationsRepository().initialize();
+    }
+
     public GliaChatRepository getGliaMessageRepository() {
         return new GliaChatRepository(gliaCore);
     }

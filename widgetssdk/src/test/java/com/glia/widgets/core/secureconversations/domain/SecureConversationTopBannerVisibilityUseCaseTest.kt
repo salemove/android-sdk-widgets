@@ -7,7 +7,6 @@ import com.glia.androidsdk.queuing.QueueState
 import com.glia.widgets.core.queue.QueueRepository
 import com.glia.widgets.core.queue.QueuesState
 import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.functions.Predicate
 import org.junit.Before
 import org.junit.Test
@@ -30,7 +29,7 @@ class SecureConversationTopBannerVisibilityUseCaseTest {
     @Test
     fun `returns error when failed to get pending conversation state`() {
         val error = Throwable("Something went wrong")
-        whenever(pendingConversationsUseCase()).thenReturn(Observable.error(error))
+        whenever(pendingConversationsUseCase()).thenReturn(Flowable.error(error))
 
         shouldShowTopBannerUseCase.invoke().test()
             .assertNoErrors()
@@ -41,7 +40,7 @@ class SecureConversationTopBannerVisibilityUseCaseTest {
     @Test
     fun `returns error when failed to get queue state`() {
         val error = Throwable("Something went wrong")
-        whenever(pendingConversationsUseCase.invoke()).thenReturn(Observable.just(true))
+        whenever(pendingConversationsUseCase.invoke()).thenReturn(Flowable.just(true))
         whenever(queueRepository.queuesState).thenReturn(Flowable.error(error))
 
         shouldShowTopBannerUseCase.invoke().test()
@@ -52,7 +51,7 @@ class SecureConversationTopBannerVisibilityUseCaseTest {
 
     @Test
     fun `returns false when state is 'empty'`() {
-        whenever(pendingConversationsUseCase.invoke()).thenReturn(Observable.just(true))
+        whenever(pendingConversationsUseCase.invoke()).thenReturn(Flowable.just(true))
         whenever(queueRepository.queuesState).thenReturn(Flowable.just(QueuesState.Empty))
 
         shouldShowTopBannerUseCase.invoke().test()
@@ -63,7 +62,7 @@ class SecureConversationTopBannerVisibilityUseCaseTest {
 
     @Test
     fun `returns false when state is 'queues' but list is empty`() {
-        whenever(pendingConversationsUseCase.invoke()).thenReturn(Observable.just(true))
+        whenever(pendingConversationsUseCase.invoke()).thenReturn(Flowable.just(true))
         whenever(queueRepository.queuesState).thenReturn(Flowable.just(QueuesState.Queues(emptyList())))
 
         shouldShowTopBannerUseCase.invoke().test()
@@ -160,7 +159,7 @@ class SecureConversationTopBannerVisibilityUseCaseTest {
     }
 
     private fun scheduleIncomingQueues(vararg queueList: Queue) {
-        whenever(pendingConversationsUseCase.invoke()).thenReturn(Observable.just(true))
+        whenever(pendingConversationsUseCase.invoke()).thenReturn(Flowable.just(true))
         whenever(queueRepository.queuesState).thenReturn(Flowable.just(QueuesState.Queues(queueList.toList())))
     }
 

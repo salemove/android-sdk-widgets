@@ -5,7 +5,6 @@ import com.glia.widgets.core.engagement.domain.MapOperatorUseCase
 import com.glia.widgets.core.engagement.domain.model.ChatHistoryResponse
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
-import com.glia.widgets.core.secureconversations.domain.GetUnreadMessagesCountWithTimeoutUseCase
 import com.glia.widgets.core.secureconversations.domain.ManageSecureMessagingStatusUseCase
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Single
@@ -14,8 +13,7 @@ internal class GliaLoadHistoryUseCase(
     private val gliaChatRepository: GliaChatRepository,
     private val secureConversationsRepository: SecureConversationsRepository,
     private val shouldUseSecureMessagingApis: ManageSecureMessagingStatusUseCase,
-    private val mapOperatorUseCase: MapOperatorUseCase,
-    private val getUnreadMessagesCountUseCase: GetUnreadMessagesCountWithTimeoutUseCase
+    private val mapOperatorUseCase: MapOperatorUseCase
 ) {
 
     private val isSecureEngagement get() = shouldUseSecureMessagingApis.shouldUseSecureMessagingEndpoints
@@ -28,7 +26,7 @@ internal class GliaLoadHistoryUseCase(
 
     private fun loadHistoryWithNewMessagesCount() = Single.zip(
         loadHistoryAndMapOperator(),
-        getUnreadMessagesCountUseCase()
+        secureConversationsRepository.unreadMessagesCountObservable.firstOrError()
     ) { messages, count -> ChatHistoryResponse(messages, count) }
 
     private fun loadHistoryAndMapOperator(): Single<MutableList<ChatMessageInternal>> = loadHistory()

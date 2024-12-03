@@ -3,7 +3,6 @@ package com.glia.widgets.entrywidget
 import android.view.View
 import com.glia.widgets.R
 import com.glia.widgets.SnapshotTest
-import com.glia.widgets.core.secureconversations.domain.ObserveUnreadMessagesCountUseCase
 import com.glia.widgets.di.ControllerFactory
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.entrywidget.adapter.EntryWidgetAdapter

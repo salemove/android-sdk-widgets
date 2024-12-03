@@ -8,10 +8,12 @@ import com.glia.androidsdk.secureconversations.SecureConversations
 import com.glia.widgets.chat.data.GliaChatRepository
 import com.glia.widgets.chat.domain.GliaSendMessageUseCase
 import com.glia.widgets.core.queue.QueueRepository
-import com.glia.widgets.core.secureconversations.domain.NO_UNREAD_MESSAGES
 import com.glia.widgets.di.GliaCore
+import com.glia.widgets.helper.asStateFlowable
 import com.glia.widgets.helper.unSafeSubscribe
+import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.processors.BehaviorProcessor
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.reactivex.rxjava3.subjects.Subject
 
@@ -21,31 +23,20 @@ internal class SecureConversationsRepository(private val core: GliaCore, private
     private val _messageSendingObservable: Subject<Boolean> = BehaviorSubject.createDefault(false)
     val messageSendingObservable: Observable<Boolean> = _messageSendingObservable
 
-    val unreadMessagesCountObservable: Observable<Int>
-        get() = Observable.create { emitter ->
-            val callback = RequestCallback<Int> { count, ex ->
-                when {
-                    ex != null -> emitter.tryOnError(ex)
-                    count != null -> emitter.onNext(count)
-                    else -> emitter.onNext(NO_UNREAD_MESSAGES)
-                }
-            }
-            secureConversations.subscribeToUnreadMessageCount(callback)
-            emitter.setCancellable { secureConversations.unSubscribeFromUnreadMessageCount(callback) }
-        }
+    private val _unreadMessagesCountObservable: BehaviorProcessor<Int> = BehaviorProcessor.createDefault(0)
+    val unreadMessagesCountObservable: Flowable<Int> get() = _unreadMessagesCountObservable.asStateFlowable()
 
-    val pendingSecureConversationsStatusObservable: Observable<Boolean>
-        get() = Observable.create { emitter ->
-            val callback = RequestCallback<Boolean> { hasPendingSecureConversations, ex ->
-                when {
-                    hasPendingSecureConversations != null -> emitter.onNext(hasPendingSecureConversations)
-                    ex != null -> emitter.tryOnError(ex)
-                    else -> emitter.onNext(false)
-                }
+    private val _pendingSecureConversationsStatusObservable: BehaviorProcessor<Boolean> = BehaviorProcessor.createDefault(false)
+    val pendingSecureConversationsStatusObservable: Flowable<Boolean> get() = _pendingSecureConversationsStatusObservable.asStateFlowable()
+
+    fun initialize() {
+        secureConversations.apply {
+            subscribeToUnreadMessageCount { count, _ -> count?.let(_unreadMessagesCountObservable::onNext) }
+            subscribeToPendingSecureConversationStatus { hasPendingSecureConversations, _ ->
+                hasPendingSecureConversations?.let(_pendingSecureConversationsStatusObservable::onNext)
             }
-            secureConversations.subscribeToPendingSecureConversationStatus(callback)
-            emitter.setCancellable { secureConversations.unSubscribeFromPendingSecureConversationStatus(callback) }
         }
+    }
 
     fun fetchChatTranscript(listener: GliaChatRepository.HistoryLoadedListener) {
         secureConversations.fetchChatTranscript { messages, exception ->
@@ -92,10 +83,4 @@ internal class SecureConversationsRepository(private val core: GliaCore, private
             listener.messageSent(visitorMessage)
         }
     }
-
-    fun getUnreadMessagesCount(callback: RequestCallback<Int>) = secureConversations.getUnreadMessageCount(callback)
-
-    fun subscribeToUnreadMessagesCount(callback: RequestCallback<Int>) = secureConversations.subscribeToUnreadMessageCount(callback)
-
-    fun unsubscribeFromUnreadMessagesCount(callback: RequestCallback<Int>) = secureConversations.unSubscribeFromUnreadMessageCount(callback)
 }

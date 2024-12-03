@@ -2,7 +2,6 @@ package com.glia.widgets.chat.domain
 
 import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.ServerChatItem
-import com.glia.widgets.core.secureconversations.domain.NO_UNREAD_MESSAGES
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -29,7 +28,7 @@ class FindNewMessagesDividerIndexUseCaseTest {
 
     @Test
     fun `FindNewMessagesDividerIndexUseCase return NOT_PROVIDED when no unread messages`() {
-        val index = useCase(listOf(mock(), mock()), NO_UNREAD_MESSAGES)
+        val index = useCase(listOf(mock(), mock()), 0)
         assertEquals(NOT_PROVIDED, index)
     }
 

@@ -18,7 +18,6 @@ import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 import com.glia.widgets.view.unifiedui.theme.entrywidget.EntryWidgetTheme
 import com.glia.widgets.view.unifiedui.theme.entrywidget.MediaTypeItemsTheme
 import com.glia.widgets.view.unifiedui.theme.securemessaging.SecureMessagingTheme
-import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 internal class EntryWidgetAdapter(
     val viewType: EntryWidgetContract.ViewType,
@@ -51,7 +50,6 @@ internal class EntryWidgetAdapter(
     )
 
     var onItemClickListener: ((EntryWidgetContract.ItemType) -> Unit)? = null
-    val disposable: CompositeDisposable = CompositeDisposable()
 
     init {
         when (viewType) {
@@ -146,7 +144,6 @@ internal class EntryWidgetAdapter(
 
     fun release() {
         onItemClickListener = null
-        disposable.dispose()
     }
 
 }

@@ -72,6 +72,7 @@ import com.glia.widgets.engagement.domain.OperatorMediaUseCase
 import com.glia.widgets.engagement.domain.OperatorTypingUseCase
 import com.glia.widgets.engagement.domain.ReleaseResourcesUseCase
 import com.glia.widgets.engagement.domain.ScreenSharingUseCase
+import com.glia.widgets.entrywidget.EntryWidgetContract
 import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase
 import com.glia.widgets.filepreview.domain.usecase.IsFileReadyForPreviewUseCase
 import com.glia.widgets.helper.Logger
@@ -265,7 +266,7 @@ internal class ChatController(
                     emitViewState {
                         chatState.setSecureConversationsTopBannerVisibility(shouldBeVisible)
                     }
-                } ?: run{
+                } ?: run {
                     Logger.w(TAG, "Failed to get secure messaging top banner visibility flag.\n ${result.exceptionOrNull()}")
                 }
             },
@@ -800,7 +801,9 @@ internal class ChatController(
         }
 
         when {
-            isSecureEngagement -> { /* to prevent calling chatState.liveChatHistoryLoaded() */ }
+            isSecureEngagement -> { /* to prevent calling chatState.liveChatHistoryLoaded() */
+            }
+
             isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement -> emitViewState { chatState.engagementStarted() }
             else -> emitViewState { chatState.liveChatHistoryLoaded() }
         }
@@ -958,6 +961,17 @@ internal class ChatController(
             LeaveDialogAction.LIVE_CHAT -> leaveCurrentConversationAndStartEnqueueing()
             LeaveDialogAction.VIDEO -> view?.launchCall(Engagement.MediaType.VIDEO)
             LeaveDialogAction.AUDIO -> view?.launchCall(Engagement.MediaType.AUDIO)
+        }
+    }
+
+    override fun onScTopBannerItemClicked(itemType: EntryWidgetContract.ItemType) {
+        when (itemType) {
+            EntryWidgetContract.ItemType.AudioCall -> dialogController.showLeaveCurrentConversationDialog(LeaveDialogAction.AUDIO)
+            EntryWidgetContract.ItemType.Chat -> dialogController.showLeaveCurrentConversationDialog(LeaveDialogAction.LIVE_CHAT)
+            EntryWidgetContract.ItemType.VideoCall -> dialogController.showLeaveCurrentConversationDialog(LeaveDialogAction.VIDEO)
+            else -> {
+                /*no op*/
+            }
         }
     }
 

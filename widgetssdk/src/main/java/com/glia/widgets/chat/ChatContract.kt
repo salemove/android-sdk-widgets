@@ -16,6 +16,7 @@ import com.glia.widgets.core.dialog.model.ConfirmationDialogLinks
 import com.glia.widgets.core.dialog.model.LeaveDialogAction
 import com.glia.widgets.core.dialog.model.Link
 import com.glia.widgets.core.fileupload.model.LocalAttachment
+import com.glia.widgets.entrywidget.EntryWidgetContract
 import com.glia.widgets.locale.LocaleString
 
 internal interface ChatContract {
@@ -63,6 +64,7 @@ internal interface ChatContract {
         fun onLocalImageItemClick(attachment: LocalAttachment, view: android.view.View)
         fun leaveCurrentConversationDialogLeaveClicked(action: LeaveDialogAction)
         fun leaveCurrentConversationDialogStayClicked()
+        fun onScTopBannerItemClicked(itemType: EntryWidgetContract.ItemType)
     }
 
     interface View : BaseView<Controller> {

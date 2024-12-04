@@ -265,6 +265,7 @@ class ChatControllerTest {
             // Live chat state
             assertFalse(isSecureMessaging)
             assertFalse(isSecureConversationsUnavailableLabelVisible)
+            assertFalse(isSecureConversationsTopBannerVisible)
             assertEquals(ChatInputMode.ENABLED_NO_ENGAGEMENT, chatInputMode)
         }
     }
@@ -375,6 +376,7 @@ class ChatControllerTest {
     fun `initChat emits SC chat unavailable state when intention is SC_CHAT and messaging is not available`() {
         whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.empty()
         whenever(isMessagingAvailableUseCase()) doReturn Flowable.just(Result.success(false))
+        whenever(manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging) doReturn true
 
         chatController.initChat(Intention.SC_CHAT)
         verify(chatManager).initialize(any(), any(), any())

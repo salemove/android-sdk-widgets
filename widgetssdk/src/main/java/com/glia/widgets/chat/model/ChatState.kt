@@ -61,6 +61,7 @@ internal data class ChatState(
         isSecureMessaging = false,
         chatInputMode = ChatInputMode.ENABLED_NO_ENGAGEMENT,
         isSecureConversationsUnavailableLabelVisible = false,
+        isSecureConversationsTopBannerVisible = false
     )
 
     fun allowSendAttachmentStateChanged(isAttachmentAllowed: Boolean): ChatState = copy(isAttachmentAllowed = isAttachmentAllowed)

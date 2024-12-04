@@ -505,6 +505,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             ChatInputMode.ENABLED_NO_ENGAGEMENT -> binding.chatEditText.setLocaleHint(
                 R.string.chat_message_start_engagement_placeholder
             )
+
             else -> binding.chatEditText.setLocaleHint(R.string.chat_input_placeholder)
         }
         binding.chatEditText.isEnabled = chatState.chatInputMode.isEnabled
@@ -668,6 +669,10 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
                 EntryWidgetContract.ViewType.MESSAGING_LIVE_SUPPORT,
                 entryWidgetTheme
             )
+            entryWidgetsAdapter.onItemClickListener = {
+                onNeedSupportButtonClicked(null)
+                controller?.onScTopBannerItemClicked(it)
+            }
             setAdapter(entryWidgetsAdapter)
         }
 
@@ -940,7 +945,9 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             .addListener(object : SimpleTransitionListener() {
                 override fun onTransitionEnd(transition: Transition) {
                     binding.blockingCurtain.apply {
-                        if (isInvisible) { visibility = FrameLayout.GONE }
+                        if (isInvisible) {
+                            visibility = FrameLayout.GONE
+                        }
                     }
                 }
             })

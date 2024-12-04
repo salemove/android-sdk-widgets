@@ -6,8 +6,8 @@ import com.glia.androidsdk.queuing.Queue
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.core.queue.QueueRepository
 import com.glia.widgets.core.queue.QueuesState
+import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.core.secureconversations.domain.HasOngoingSecureConversationUseCase
-import com.glia.widgets.core.secureconversations.domain.ObserveUnreadMessagesCountUseCase
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
@@ -20,14 +20,14 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 internal class EntryWidgetController @JvmOverloads constructor(
     private val queueRepository: QueueRepository,
     private val isAuthenticatedUseCase: IsAuthenticatedUseCase,
-    private val observeUnreadMessagesCountUseCase: ObserveUnreadMessagesCountUseCase,
+    private val secureConversationsRepository: SecureConversationsRepository,
     private val hasOngoingSecureConversationUseCase: HasOngoingSecureConversationUseCase,
     private val core: GliaCore,
     private val engagementLauncher: EngagementLauncher,
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 ) : EntryWidgetContract.Controller {
     private val queueStateObservable by lazy { queueRepository.queuesState }
-    private val unreadMessagesCountObservable by lazy { observeUnreadMessagesCountUseCase() }
+    private val unreadMessagesCountObservable by lazy { secureConversationsRepository.unreadMessagesCountObservable }
     private val hasOngoingSCObservable by lazy { hasOngoingSecureConversationUseCase() }
 
     private val loadingState: List<EntryWidgetContract.ItemType> by lazy {

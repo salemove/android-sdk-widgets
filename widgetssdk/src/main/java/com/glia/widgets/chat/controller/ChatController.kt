@@ -264,7 +264,7 @@ internal class ChatController(
             { result ->
                 result.getOrNull()?.let { shouldBeVisible ->
                     emitViewState {
-                        chatState.setSecureConversationsTopBannerVisibility(shouldBeVisible)
+                        chatState.setSecureConversationsTopBannerVisibility(shouldBeVisible && manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging)
                     }
                 } ?: run {
                     Logger.w(TAG, "Failed to get secure messaging top banner visibility flag.\n ${result.exceptionOrNull()}")
@@ -302,7 +302,7 @@ internal class ChatController(
         }
 
         result.onSuccess { isMessagingAvailable ->
-            if (!isMessagingAvailable) {
+            if (!isMessagingAvailable && manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging) {
                 Logger.d(TAG, "Messaging is unavailable")
                 emitViewState { chatState.setSecureMessagingUnavailable() }
             } else {
@@ -595,6 +595,8 @@ internal class ChatController(
 
     private fun onTransferredToSecureConversation() {
         emitViewState { chatState.setSecureMessagingState().setSecureMessagingAvailable() }
+        ensureSecureMessagingAvailable()
+        observeTopBannerUseCase()
     }
 
     private fun handleEngagementStateUpdate(state: EngagementUpdateState) {

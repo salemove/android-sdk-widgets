@@ -51,6 +51,7 @@ import com.glia.widgets.engagement.domain.OperatorMediaUseCase
 import com.glia.widgets.engagement.domain.OperatorTypingUseCase
 import com.glia.widgets.engagement.domain.ReleaseResourcesUseCase
 import com.glia.widgets.engagement.domain.ScreenSharingUseCase
+import com.glia.widgets.entrywidget.EntryWidgetContract
 import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase
 import com.glia.widgets.filepreview.domain.usecase.IsFileReadyForPreviewUseCase
 import com.glia.widgets.helper.TimeCounter
@@ -540,5 +541,31 @@ class ChatControllerTest {
         assertEquals(gvaButton.text, singleChoiceAttachment.selectedOptionText)
         assertEquals(gvaButton.value, singleChoiceAttachment.selectedOption)
         verify(sendMessageUseCase).execute(any<SingleChoiceAttachment>(), any())
+    }
+
+    @Test
+    fun `onScTopBannerItemClicked will show leave current conversation dialog when item type is AudioCall`() {
+        chatController.onScTopBannerItemClicked(itemType = EntryWidgetContract.ItemType.AudioCall)
+        verify(dialogController).showLeaveCurrentConversationDialog(eq(LeaveDialogAction.AUDIO))
+    }
+
+    @Test
+    fun `onScTopBannerItemClicked will show leave current conversation dialog when item type is Chat`() {
+        chatController.onScTopBannerItemClicked(itemType = EntryWidgetContract.ItemType.Chat)
+        verify(dialogController).showLeaveCurrentConversationDialog(eq(LeaveDialogAction.LIVE_CHAT))
+    }
+
+    @Test
+    fun `onScTopBannerItemClicked will show leave current conversation dialog when item type is VideoCall`() {
+        chatController.onScTopBannerItemClicked(itemType = EntryWidgetContract.ItemType.VideoCall)
+        verify(dialogController).showLeaveCurrentConversationDialog(eq(LeaveDialogAction.VIDEO))
+    }
+
+    @Test
+    fun `onScTopBannerItemClicked will not show leave current conversation dialog when item type is different`() {
+        chatController.onScTopBannerItemClicked(itemType = EntryWidgetContract.ItemType.ErrorState)
+        verify(dialogController, never()).showLeaveCurrentConversationDialog(eq(LeaveDialogAction.AUDIO))
+        verify(dialogController, never()).showLeaveCurrentConversationDialog(eq(LeaveDialogAction.LIVE_CHAT))
+        verify(dialogController, never()).showLeaveCurrentConversationDialog(eq(LeaveDialogAction.AUDIO))
     }
 }

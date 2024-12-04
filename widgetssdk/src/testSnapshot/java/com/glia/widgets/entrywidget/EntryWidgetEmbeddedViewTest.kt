@@ -82,11 +82,27 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
         EntryWidgetContract.ItemType.PoweredBy
     )
 
+    private val mediaTypesWithUnreadMessagingWhiteLabel = listOf(
+        EntryWidgetContract.ItemType.VideoCall,
+        EntryWidgetContract.ItemType.AudioCall,
+        EntryWidgetContract.ItemType.Chat,
+        EntryWidgetContract.ItemType.Messaging(5)
+    )
+
     @Test
     fun contactsWithBadgeDefaultTheme() {
         snapshot(
             setupView(
                 items = mediaTypesWithUnreadMessaging,
+            )
+        )
+    }
+
+    @Test
+    fun contactsWithBadgeWhiteLabelDefaultTheme() {
+        snapshot(
+            setupView(
+                items = mediaTypesWithUnreadMessagingWhiteLabel,
             )
         )
     }
@@ -102,10 +118,29 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
     }
 
     @Test
+    fun contactsWithBadgeWhiteLabelWithUnifiedTheme() {
+        snapshot(
+            setupView(
+                items = mediaTypesWithUnreadMessagingWhiteLabel,
+                unifiedTheme = unifiedTheme()
+            )
+        )
+    }
+
+    @Test
     fun contactsWithBadgeWithUnifiedThemeWithGlobalColors() {
         snapshot(
             setupView(
                 items = mediaTypesWithUnreadMessaging,
+                unifiedTheme = unifiedThemeWithGlobalColors()
+            )
+        )
+    }
+    @Test
+    fun contactsWithBadgeWhiteLabelWithUnifiedThemeWithGlobalColors() {
+        snapshot(
+            setupView(
+                items = mediaTypesWithUnreadMessagingWhiteLabel,
                 unifiedTheme = unifiedThemeWithGlobalColors()
             )
         )
@@ -121,6 +156,16 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
         )
     }
 
+    @Test
+    fun contactsWithBadgeWhiteLabelWithUnifiedThemeWithoutEntryWidget() {
+        snapshot(
+            setupView(
+                items = mediaTypesWithUnreadMessagingWhiteLabel,
+                unifiedTheme = unifiedThemeWithoutEntryWidget()
+            )
+        )
+    }
+
     // MARK: Loading state tests
 
     private val loadingItems = listOf(
@@ -131,6 +176,13 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
         EntryWidgetContract.ItemType.PoweredBy
     )
 
+    private val loadingItemsWhiteLabel = listOf(
+        EntryWidgetContract.ItemType.LoadingState,
+        EntryWidgetContract.ItemType.LoadingState,
+        EntryWidgetContract.ItemType.LoadingState,
+        EntryWidgetContract.ItemType.LoadingState
+    )
+
     @Test
     fun loadingDefaultTheme() {
         snapshot(
@@ -139,10 +191,27 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
     }
 
     @Test
+    fun loadingWhiteLabelDefaultTheme() {
+        snapshot(
+            setupView(items = loadingItemsWhiteLabel)
+        )
+    }
+
+    @Test
     fun loadingWithUnifiedTheme() {
         snapshot(
             setupView(
                 items = loadingItems,
+                unifiedTheme = unifiedTheme()
+            )
+        )
+    }
+
+    @Test
+    fun loadingWhiteLabelWithUnifiedTheme() {
+        snapshot(
+            setupView(
+                items = loadingItemsWhiteLabel,
                 unifiedTheme = unifiedTheme()
             )
         )
@@ -159,10 +228,30 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
     }
 
     @Test
+    fun loadingWithUnifiedThemeWhiteLabelWithGlobalColors() {
+        snapshot(
+            setupView(
+                items = loadingItemsWhiteLabel,
+                unifiedTheme = unifiedThemeWithGlobalColors()
+            )
+        )
+    }
+
+    @Test
     fun loadingWithUnifiedThemeWithoutEntryWidget() {
         snapshot(
             setupView(
                 items = loadingItems,
+                unifiedTheme = unifiedThemeWithoutEntryWidget()
+            )
+        )
+    }
+
+    @Test
+    fun loadingWithUnifiedThemeWhiteLabelWithoutEntryWidget() {
+        snapshot(
+            setupView(
+                items = loadingItemsWhiteLabel,
                 unifiedTheme = unifiedThemeWithoutEntryWidget()
             )
         )
@@ -175,6 +264,10 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
         EntryWidgetContract.ItemType.PoweredBy
     )
 
+    private val emptyItemsWhiteLabel = listOf(
+        EntryWidgetContract.ItemType.EmptyState
+    )
+
     @Test
     fun emptyDefaultTheme() {
         snapshot(
@@ -183,10 +276,27 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
     }
 
     @Test
+    fun emptyWhiteLabelDefaultTheme() {
+        snapshot(
+            setupView(items = emptyItemsWhiteLabel)
+        )
+    }
+
+    @Test
     fun emptyWithUnifiedTheme() {
         snapshot(
             setupView(
                 items = emptyItems,
+                unifiedTheme = unifiedTheme()
+            )
+        )
+    }
+
+    @Test
+    fun emptyWhiteLabelWithUnifiedTheme() {
+        snapshot(
+            setupView(
+                items = emptyItemsWhiteLabel,
                 unifiedTheme = unifiedTheme()
             )
         )
@@ -203,10 +313,30 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
     }
 
     @Test
+    fun emptyWhiteLabelWithUnifiedThemeWithGlobalColors() {
+        snapshot(
+            setupView(
+                items = emptyItemsWhiteLabel,
+                unifiedTheme = unifiedThemeWithGlobalColors()
+            )
+        )
+    }
+
+    @Test
     fun emptyWithUnifiedThemeWithoutEntryWidget() {
         snapshot(
             setupView(
                 items = emptyItems,
+                unifiedTheme = unifiedThemeWithoutEntryWidget()
+            )
+        )
+    }
+
+    @Test
+    fun emptyWhiteLabelWithUnifiedThemeWithoutEntryWidget() {
+        snapshot(
+            setupView(
+                items = emptyItemsWhiteLabel,
                 unifiedTheme = unifiedThemeWithoutEntryWidget()
             )
         )
@@ -220,6 +350,10 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
         EntryWidgetContract.ItemType.PoweredBy
     )
 
+    private val sdkNotInitializedItemsWhiteLabel = listOf(
+        EntryWidgetContract.ItemType.SdkNotInitializedState
+    )
+
     @Test
     fun sdkNotInitializedItemsDefaultTheme() {
         snapshot(
@@ -228,10 +362,27 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
     }
 
     @Test
+    fun sdkNotInitializedItemsWhiteLabelDefaultTheme() {
+        snapshot(
+            setupView(items = sdkNotInitializedItemsWhiteLabel)
+        )
+    }
+
+    @Test
     fun sdkNotInitializedItemsWithUnifiedTheme() {
         snapshot(
             setupView(
                 items = sdkNotInitializedItems,
+                unifiedTheme = unifiedTheme()
+            )
+        )
+    }
+
+    @Test
+    fun sdkNotInitializedItemsWhiteLabelWithUnifiedTheme() {
+        snapshot(
+            setupView(
+                items = sdkNotInitializedItemsWhiteLabel,
                 unifiedTheme = unifiedTheme()
             )
         )
@@ -248,10 +399,30 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
     }
 
     @Test
+    fun sdkNotInitializedItemsWhiteLabelWithUnifiedThemeWithGlobalColors() {
+        snapshot(
+            setupView(
+                items = sdkNotInitializedItemsWhiteLabel,
+                unifiedTheme = unifiedThemeWithGlobalColors()
+            )
+        )
+    }
+
+    @Test
     fun sdkNotInitializedItemsWithUnifiedThemeWithoutEntryWidget() {
         snapshot(
             setupView(
                 items = sdkNotInitializedItems,
+                unifiedTheme = unifiedThemeWithoutEntryWidget()
+            )
+        )
+    }
+
+    @Test
+    fun sdkNotInitializedItemsWhiteLabelWithUnifiedThemeWithoutEntryWidget() {
+        snapshot(
+            setupView(
+                items = sdkNotInitializedItemsWhiteLabel,
                 unifiedTheme = unifiedThemeWithoutEntryWidget()
             )
         )
@@ -264,6 +435,10 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
         EntryWidgetContract.ItemType.PoweredBy
     )
 
+    private val errorItemsWhiteLabel = listOf(
+        EntryWidgetContract.ItemType.ErrorState
+    )
+
     @Test
     fun errorDefaultTheme() {
         snapshot(
@@ -272,10 +447,27 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
     }
 
     @Test
+    fun errorWhiteLabelDefaultTheme() {
+        snapshot(
+            setupView(items = errorItemsWhiteLabel)
+        )
+    }
+
+    @Test
     fun errorWithUnifiedTheme() {
         snapshot(
             setupView(
                 items = errorItems,
+                unifiedTheme = unifiedTheme()
+            )
+        )
+    }
+
+    @Test
+    fun errorWhiteLabelWithUnifiedTheme() {
+        snapshot(
+            setupView(
+                items = errorItemsWhiteLabel,
                 unifiedTheme = unifiedTheme()
             )
         )
@@ -292,10 +484,30 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
     }
 
     @Test
+    fun errorWhiteLabelWithUnifiedThemeWithGlobalColors() {
+        snapshot(
+            setupView(
+                items = errorItemsWhiteLabel,
+                unifiedTheme = unifiedThemeWithGlobalColors()
+            )
+        )
+    }
+
+    @Test
     fun errorWithUnifiedThemeWithoutEntryWidget() {
         snapshot(
             setupView(
                 items = errorItems,
+                unifiedTheme = unifiedThemeWithoutEntryWidget()
+            )
+        )
+    }
+
+    @Test
+    fun errorWhiteLabelWithUnifiedThemeWithoutEntryWidget() {
+        snapshot(
+            setupView(
+                items = errorItemsWhiteLabel,
                 unifiedTheme = unifiedThemeWithoutEntryWidget()
             )
         )

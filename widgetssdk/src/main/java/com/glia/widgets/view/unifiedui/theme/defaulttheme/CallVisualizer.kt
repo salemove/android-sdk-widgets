@@ -34,7 +34,7 @@ internal fun EndScreenSharingTheme(pallet: ColorPallet): EndScreenSharingTheme =
 internal fun VisitorCodeTheme(pallet: ColorPallet): VisitorCodeTheme =
     VisitorCodeTheme(
         numberSlotText = BaseDarkColorTextTheme(pallet),
-        numberSlotBackground = LayerTheme(fill = pallet.lightColorTheme),
+        numberSlotBackground = LayerTheme(fill = pallet.lightColorTheme, stroke = pallet.shadeColorTheme?.primaryColor),
         closeButtonColor = pallet.normalColorTheme,
         refreshButton = PositiveDefaultButtonTheme(pallet),
         background = LayerTheme(fill = pallet.lightColorTheme),

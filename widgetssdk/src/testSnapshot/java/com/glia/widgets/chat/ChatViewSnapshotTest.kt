@@ -29,6 +29,7 @@ internal class ChatViewSnapshotTest : SnapshotTest(), SnapshotChatView, Snapshot
 
     private fun attachmentListView(unifiedTheme: UnifiedTheme? = null) = setupView(
         chatState = ChatState()
+            .initChat()
             .changeVisibility(true)
             .engagementStarted()
             .operatorConnected("Snap Test", null)
@@ -100,6 +101,7 @@ internal class ChatViewSnapshotTest : SnapshotTest(), SnapshotChatView, Snapshot
 
     private fun failedAttachmentListView(unifiedTheme: UnifiedTheme? = null) = setupView(
         chatState = ChatState()
+            .initChat()
             .changeVisibility(true)
             .engagementStarted()
             .setIsAttachmentButtonEnabled(false)

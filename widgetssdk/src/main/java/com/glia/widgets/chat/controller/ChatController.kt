@@ -47,7 +47,6 @@ import com.glia.widgets.core.engagement.domain.UpdateOperatorDefaultImageUrlUseC
 import com.glia.widgets.core.fileupload.domain.AddFileAttachmentsObserverUseCase
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase
 import com.glia.widgets.core.fileupload.domain.GetFileAttachmentsUseCase
-import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentObserverUseCase
 import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentUseCase
 import com.glia.widgets.core.fileupload.domain.SupportedFileCountCheckUseCase
 import com.glia.widgets.core.fileupload.model.LocalAttachment
@@ -89,8 +88,8 @@ import com.glia.widgets.view.MinimizeHandler
 import com.glia.widgets.webbrowser.domain.GetUrlFromLinkUseCase
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.schedulers.Schedulers
-import java.util.Observer
 
 internal class ChatController(
     private val callTimer: TimeCounter,
@@ -104,7 +103,6 @@ internal class ChatController(
     private val endEngagementUseCase: EndEngagementUseCase,
     private val addFileToAttachmentAndUploadUseCase: AddFileToAttachmentAndUploadUseCase,
     private val addFileAttachmentsObserverUseCase: AddFileAttachmentsObserverUseCase,
-    private val removeFileAttachmentObserverUseCase: RemoveFileAttachmentObserverUseCase,
     private val getFileAttachmentsUseCase: GetFileAttachmentsUseCase,
     private val removeFileAttachmentUseCase: RemoveFileAttachmentUseCase,
     private val supportedFileCountCheckUseCase: SupportedFileCountCheckUseCase,
@@ -183,10 +181,10 @@ internal class ChatController(
     @Volatile
     private var isChatViewPaused = false
 
-    private val fileAttachmentObserver = Observer { _, _ ->
+    private val fileAttachmentCallback = Consumer<List<LocalAttachment>> { attachments ->
         view?.apply {
-            emitUploadAttachments(getFileAttachmentsUseCase())
             emitViewState {
+                emitUploadAttachments(attachments)
                 chatState.setShowSendButton(isShowSendButtonUseCase(chatState.lastTypedText))
                     .setIsAttachmentButtonEnabled(supportedFileCountCheckUseCase())
             }
@@ -313,7 +311,9 @@ internal class ChatController(
     }
 
     private fun prepareChatComponents() {
-        addFileAttachmentsObserverUseCase.execute(fileAttachmentObserver)
+        disposable.add(
+            addFileAttachmentsObserverUseCase().subscribe(fileAttachmentCallback)
+        )
         minimizeHandler.addListener { minimizeView() }
         timerStatusListener?.also { callTimer.removeFormattedValueListener(it) }
         val newTimerListener = createNewTimerCallback()
@@ -376,7 +376,6 @@ internal class ChatController(
             timerStatusListener = null
             callTimer.clear()
             minimizeHandler.clear()
-            removeFileAttachmentObserverUseCase(fileAttachmentObserver)
             chatManager.reset()
         }
     }
@@ -855,7 +854,7 @@ internal class ChatController(
     }
 
     private fun onAttachmentReceived(file: LocalAttachment) {
-        addFileToAttachmentAndUploadUseCase.execute(file, object : AddFileToAttachmentAndUploadUseCase.Listener {
+        addFileToAttachmentAndUploadUseCase(file, object : AddFileToAttachmentAndUploadUseCase.Listener {
             override fun onFinished() {
                 Logger.d(TAG, "fileUploadFinished")
                 //We need this file locally, so clearing only file uri reference

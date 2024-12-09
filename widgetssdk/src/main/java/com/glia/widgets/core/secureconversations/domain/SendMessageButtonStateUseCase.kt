@@ -1,6 +1,6 @@
 package com.glia.widgets.core.secureconversations.domain
 
-import com.glia.widgets.core.fileupload.SecureFileAttachmentRepository
+import com.glia.widgets.core.fileupload.FileAttachmentRepository
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.core.secureconversations.SendMessageRepository
 import com.glia.widgets.helper.rx.Schedulers
@@ -9,7 +9,7 @@ import io.reactivex.rxjava3.core.Observable
 
 internal class SendMessageButtonStateUseCase(
     private val sendMessageRepository: SendMessageRepository,
-    private val fileAttachmentRepository: SecureFileAttachmentRepository,
+    private val fileAttachmentRepository: FileAttachmentRepository,
     private val secureConversationsRepository: SecureConversationsRepository,
     private val showMessageLimitErrorUseCase: ShowMessageLimitErrorUseCase,
     private val schedulers: Schedulers

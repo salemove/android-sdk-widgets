@@ -1,16 +1,17 @@
 package com.glia.widgets.core.secureconversations.domain
 
-import com.glia.widgets.core.fileupload.SecureFileAttachmentRepository
+import com.glia.widgets.core.fileupload.FileAttachmentRepository
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase
+import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase.Listener
 import com.glia.widgets.core.fileupload.domain.SupportedFileCountCheckUseCase
 import com.glia.widgets.core.fileupload.exception.RemoveBeforeReUploadingException
 import com.glia.widgets.core.fileupload.exception.SupportedFileCountExceededException
 import com.glia.widgets.core.fileupload.exception.SupportedFileSizeExceededException
 import com.glia.widgets.core.fileupload.model.LocalAttachment
 
-internal class AddSecureFileToAttachmentAndUploadUseCase(private val fileAttachmentRepository: SecureFileAttachmentRepository) {
+internal class AddSecureFileToAttachmentAndUploadUseCase(private val fileAttachmentRepository: FileAttachmentRepository) {
 
-    fun execute(file: LocalAttachment, listener: AddFileToAttachmentAndUploadUseCase.Listener) {
+    operator fun invoke(file: LocalAttachment, listener: Listener) {
         if (fileAttachmentRepository.isFileAttached(file.uri)) {
             listener.onError(RemoveBeforeReUploadingException())
         } else {
@@ -31,7 +32,7 @@ internal class AddSecureFileToAttachmentAndUploadUseCase(private val fileAttachm
             listener.onError(SupportedFileSizeExceededException())
         } else {
             listener.onStarted()
-            fileAttachmentRepository.uploadFile(file, listener)
+            fileAttachmentRepository.uploadFile(true, file, listener)
         }
     }
 

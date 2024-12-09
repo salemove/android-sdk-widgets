@@ -7,7 +7,7 @@ import com.glia.widgets.core.callvisualizer.domain.VisitorCodeRepository;
 import com.glia.widgets.core.engagement.GliaOperatorRepository;
 import com.glia.widgets.core.engagement.GliaOperatorRepositoryImpl;
 import com.glia.widgets.core.fileupload.FileAttachmentRepository;
-import com.glia.widgets.core.fileupload.SecureFileAttachmentRepository;
+import com.glia.widgets.core.fileupload.FileAttachmentRepositoryImpl;
 import com.glia.widgets.core.queue.QueueRepository;
 import com.glia.widgets.core.queue.QueueRepositoryImpl;
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository;
@@ -27,7 +27,6 @@ import com.glia.widgets.permissions.PermissionsRequestRepository;
  */
 public class RepositoryFactory {
     private static SecureConversationsRepository secureConversationsRepository;
-    private static SecureFileAttachmentRepository secureFileAttachmentRepository;
     private static QueueRepository queueRepository;
     private static GliaFileRepository gliaFileRepository;
     private static FileAttachmentRepository fileAttachmentRepository;
@@ -70,7 +69,7 @@ public class RepositoryFactory {
 
     public FileAttachmentRepository getGliaFileAttachmentRepository() {
         if (fileAttachmentRepository == null) {
-            fileAttachmentRepository = new FileAttachmentRepository(gliaCore);
+            fileAttachmentRepository = new FileAttachmentRepositoryImpl(gliaCore);
         }
         return fileAttachmentRepository;
     }
@@ -113,13 +112,6 @@ public class RepositoryFactory {
             secureConversationsRepository = new SecureConversationsRepository(gliaCore, getQueueRepository());
         }
         return secureConversationsRepository;
-    }
-
-    public SecureFileAttachmentRepository getSecureFileAttachmentRepository() {
-        if (secureFileAttachmentRepository == null) {
-            secureFileAttachmentRepository = new SecureFileAttachmentRepository(gliaCore);
-        }
-        return secureFileAttachmentRepository;
     }
 
     public SendMessageRepository getSendMessageRepository() {

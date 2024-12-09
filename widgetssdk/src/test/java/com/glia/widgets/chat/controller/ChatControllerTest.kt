@@ -30,7 +30,6 @@ import com.glia.widgets.core.engagement.domain.UpdateOperatorDefaultImageUrlUseC
 import com.glia.widgets.core.fileupload.domain.AddFileAttachmentsObserverUseCase
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase
 import com.glia.widgets.core.fileupload.domain.GetFileAttachmentsUseCase
-import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentObserverUseCase
 import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentUseCase
 import com.glia.widgets.core.fileupload.domain.SupportedFileCountCheckUseCase
 import com.glia.widgets.core.notification.domain.CallNotificationUseCase
@@ -91,7 +90,6 @@ class ChatControllerTest {
     private lateinit var sendMessageUseCase: GliaSendMessageUseCase
     private lateinit var addFileToAttachmentAndUploadUseCase: AddFileToAttachmentAndUploadUseCase
     private lateinit var addFileAttachmentsObserverUseCase: AddFileAttachmentsObserverUseCase
-    private lateinit var removeFileAttachmentObserverUseCase: RemoveFileAttachmentObserverUseCase
     private lateinit var getFileAttachmentsUseCase: GetFileAttachmentsUseCase
     private lateinit var removeFileAttachmentUseCase: RemoveFileAttachmentUseCase
     private lateinit var supportedFileCountCheckUseCase: SupportedFileCountCheckUseCase
@@ -147,7 +145,6 @@ class ChatControllerTest {
         sendMessageUseCase = mock()
         addFileToAttachmentAndUploadUseCase = mock()
         addFileAttachmentsObserverUseCase = mock()
-        removeFileAttachmentObserverUseCase = mock()
         getFileAttachmentsUseCase = mock()
         removeFileAttachmentUseCase = mock()
         supportedFileCountCheckUseCase = mock()
@@ -212,7 +209,6 @@ class ChatControllerTest {
             sendMessageUseCase = sendMessageUseCase,
             addFileToAttachmentAndUploadUseCase = addFileToAttachmentAndUploadUseCase,
             addFileAttachmentsObserverUseCase = addFileAttachmentsObserverUseCase,
-            removeFileAttachmentObserverUseCase = removeFileAttachmentObserverUseCase,
             getFileAttachmentsUseCase = getFileAttachmentsUseCase,
             removeFileAttachmentUseCase = removeFileAttachmentUseCase,
             supportedFileCountCheckUseCase = supportedFileCountCheckUseCase,

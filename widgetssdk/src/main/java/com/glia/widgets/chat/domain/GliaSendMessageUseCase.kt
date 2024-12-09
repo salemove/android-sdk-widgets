@@ -44,7 +44,7 @@ internal class GliaSendMessageUseCase(
 
     fun execute(message: String, listener: Listener) {
         val localAttachments: List<LocalAttachment>? = fileAttachmentRepository
-            .readyToSendLocalAttachments
+            .getReadyToSendFileAttachments()
             .filter { it.engagementFile != null }
             .takeIf { it.isNotEmpty() }
 

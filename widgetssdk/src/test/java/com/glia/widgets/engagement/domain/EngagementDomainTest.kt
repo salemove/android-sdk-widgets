@@ -492,7 +492,6 @@ class EngagementDomainTest {
 
         verifyOrder {
             dialogController.dismissDialogs()
-            fileAttachmentRepository.clearObservers()
             fileAttachmentRepository.detachAllFiles()
             releaseScreenSharingResourcesUseCase()
             callNotificationUseCase.removeAllNotifications()

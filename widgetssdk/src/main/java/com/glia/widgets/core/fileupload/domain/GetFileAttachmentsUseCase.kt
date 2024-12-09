@@ -5,6 +5,6 @@ import com.glia.widgets.core.fileupload.model.LocalAttachment
 
 internal class GetFileAttachmentsUseCase(private val repository: FileAttachmentRepository) {
     operator fun invoke(): List<LocalAttachment> {
-        return repository.localAttachments
+        return repository.getFileAttachments()
     }
 }

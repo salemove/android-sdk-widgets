@@ -83,7 +83,6 @@ import com.glia.widgets.core.engagement.domain.UpdateOperatorDefaultImageUrlUseC
 import com.glia.widgets.core.fileupload.domain.AddFileAttachmentsObserverUseCase;
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase;
 import com.glia.widgets.core.fileupload.domain.GetFileAttachmentsUseCase;
-import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentObserverUseCase;
 import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentUseCase;
 import com.glia.widgets.core.fileupload.domain.SupportedFileCountCheckUseCase;
 import com.glia.widgets.core.notification.device.INotificationManager;
@@ -101,15 +100,12 @@ import com.glia.widgets.core.permissions.domain.WithNotificationPermissionUseCas
 import com.glia.widgets.core.permissions.domain.WithNotificationPermissionUseCaseImpl;
 import com.glia.widgets.core.permissions.domain.WithReadWritePermissionsUseCase;
 import com.glia.widgets.core.permissions.domain.WithReadWritePermissionsUseCaseImpl;
-import com.glia.widgets.core.secureconversations.domain.AddSecureFileAttachmentsObserverUseCase;
 import com.glia.widgets.core.secureconversations.domain.AddSecureFileToAttachmentAndUploadUseCase;
-import com.glia.widgets.core.secureconversations.domain.GetSecureFileAttachmentsUseCase;
 import com.glia.widgets.core.secureconversations.domain.HasOngoingSecureConversationUseCase;
 import com.glia.widgets.core.secureconversations.domain.IsMessagingAvailableUseCase;
 import com.glia.widgets.core.secureconversations.domain.ManageSecureMessagingStatusUseCase;
 import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDelayUseCase;
 import com.glia.widgets.core.secureconversations.domain.OnNextMessageUseCase;
-import com.glia.widgets.core.secureconversations.domain.RemoveSecureFileAttachmentUseCase;
 import com.glia.widgets.core.secureconversations.domain.ResetMessageCenterUseCase;
 import com.glia.widgets.core.secureconversations.domain.SecureConversationTopBannerVisibilityUseCase;
 import com.glia.widgets.core.secureconversations.domain.SendMessageButtonStateUseCase;
@@ -389,7 +385,10 @@ public class UseCaseFactory {
 
     @NonNull
     public AddFileAttachmentsObserverUseCase createAddFileAttachmentsObserverUseCase() {
-        return new AddFileAttachmentsObserverUseCase(repositoryFactory.getGliaFileAttachmentRepository());
+        return new AddFileAttachmentsObserverUseCase(
+            repositoryFactory.getGliaFileAttachmentRepository(),
+            schedulers
+        );
     }
 
     @NonNull
@@ -404,11 +403,6 @@ public class UseCaseFactory {
     @NonNull
     public GetFileAttachmentsUseCase createGetFileAttachmentsUseCase() {
         return new GetFileAttachmentsUseCase(repositoryFactory.getGliaFileAttachmentRepository());
-    }
-
-    @NonNull
-    public RemoveFileAttachmentObserverUseCase createRemoveFileAttachmentObserverUseCase() {
-        return new RemoveFileAttachmentObserverUseCase(repositoryFactory.getGliaFileAttachmentRepository());
     }
 
     @NonNull
@@ -478,7 +472,7 @@ public class UseCaseFactory {
     public SendMessageButtonStateUseCase createEnableSendMessageButtonUseCase() {
         return new SendMessageButtonStateUseCase(
             repositoryFactory.getSendMessageRepository(),
-            repositoryFactory.getSecureFileAttachmentRepository(),
+            repositoryFactory.getGliaFileAttachmentRepository(),
             repositoryFactory.getSecureConversationsRepository(),
             createShowMessageLimitErrorUseCase(),
             schedulers
@@ -496,7 +490,7 @@ public class UseCaseFactory {
     @NonNull
     public ResetMessageCenterUseCase createResetMessageCenterUseCase() {
         return new ResetMessageCenterUseCase(
-            repositoryFactory.getSecureFileAttachmentRepository(),
+            repositoryFactory.getGliaFileAttachmentRepository(),
             repositoryFactory.getSendMessageRepository()
         );
     }
@@ -551,7 +545,7 @@ public class UseCaseFactory {
         return new SendSecureMessageUseCase(
             repositoryFactory.getSendMessageRepository(),
             repositoryFactory.getSecureConversationsRepository(),
-            repositoryFactory.getSecureFileAttachmentRepository(),
+            repositoryFactory.getGliaFileAttachmentRepository(),
             repositoryFactory.getGliaMessageRepository(),
             getIsQueueingOrEngagementUseCase()
         );
@@ -559,25 +553,7 @@ public class UseCaseFactory {
 
     @NonNull
     public AddSecureFileToAttachmentAndUploadUseCase createAddSecureFileToAttachmentAndUploadUseCase() {
-        return new AddSecureFileToAttachmentAndUploadUseCase(repositoryFactory.getSecureFileAttachmentRepository());
-    }
-
-    @NonNull
-    public AddSecureFileAttachmentsObserverUseCase createAddSecureFileAttachmentsObserverUseCase() {
-        return new AddSecureFileAttachmentsObserverUseCase(
-            repositoryFactory.getSecureFileAttachmentRepository(),
-            schedulers
-        );
-    }
-
-    @NonNull
-    public GetSecureFileAttachmentsUseCase createGetSecureFileAttachmentsUseCase() {
-        return new GetSecureFileAttachmentsUseCase(repositoryFactory.getSecureFileAttachmentRepository());
-    }
-
-    @NonNull
-    public RemoveSecureFileAttachmentUseCase createRemoveSecureFileAttachmentUseCase() {
-        return new RemoveSecureFileAttachmentUseCase(repositoryFactory.getSecureFileAttachmentRepository());
+        return new AddSecureFileToAttachmentAndUploadUseCase(repositoryFactory.getGliaFileAttachmentRepository());
     }
 
     @NonNull

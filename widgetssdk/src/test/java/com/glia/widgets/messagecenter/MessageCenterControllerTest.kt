@@ -6,14 +6,14 @@ import com.glia.widgets.chat.domain.SiteInfoUseCase
 import com.glia.widgets.chat.domain.TakePictureUseCase
 import com.glia.widgets.chat.domain.UriToFileAttachmentUseCase
 import com.glia.widgets.core.dialog.DialogContract
+import com.glia.widgets.core.fileupload.domain.AddFileAttachmentsObserverUseCase
+import com.glia.widgets.core.fileupload.domain.GetFileAttachmentsUseCase
+import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentUseCase
 import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.core.permissions.domain.RequestNotificationPermissionIfPushNotificationsSetUpUseCase
-import com.glia.widgets.core.secureconversations.domain.AddSecureFileAttachmentsObserverUseCase
 import com.glia.widgets.core.secureconversations.domain.AddSecureFileToAttachmentAndUploadUseCase
-import com.glia.widgets.core.secureconversations.domain.GetSecureFileAttachmentsUseCase
 import com.glia.widgets.core.secureconversations.domain.IsMessagingAvailableUseCase
 import com.glia.widgets.core.secureconversations.domain.OnNextMessageUseCase
-import com.glia.widgets.core.secureconversations.domain.RemoveSecureFileAttachmentUseCase
 import com.glia.widgets.core.secureconversations.domain.ResetMessageCenterUseCase
 import com.glia.widgets.core.secureconversations.domain.SendMessageButtonStateUseCase
 import com.glia.widgets.core.secureconversations.domain.SendSecureMessageUseCase
@@ -35,10 +35,10 @@ import org.mockito.kotlin.whenever
 internal class MessageCenterControllerTest {
     private lateinit var messageCenterController: MessageCenterController
     private lateinit var sendSecureMessageUseCase: SendSecureMessageUseCase
-    private lateinit var addFileAttachmentsObserverUseCase: AddSecureFileAttachmentsObserverUseCase
+    private lateinit var addFileAttachmentsObserverUseCase: AddFileAttachmentsObserverUseCase
     private lateinit var addFileToAttachmentAndUploadUseCase: AddSecureFileToAttachmentAndUploadUseCase
-    private lateinit var getFileAttachmentsUseCase: GetSecureFileAttachmentsUseCase
-    private lateinit var removeFileAttachmentUseCase: RemoveSecureFileAttachmentUseCase
+    private lateinit var getFileAttachmentsUseCase: GetFileAttachmentsUseCase
+    private lateinit var removeFileAttachmentUseCase: RemoveFileAttachmentUseCase
     private lateinit var siteInfoUseCase: SiteInfoUseCase
     private lateinit var isAuthenticatedUseCase: IsAuthenticatedUseCase
     private lateinit var viewContract: MessageCenterContract.View
@@ -201,14 +201,14 @@ internal class MessageCenterControllerTest {
     fun onAttachmentReceived_ExecutesAddSecureFileToAttachmentAndUploadUseCase_onTrigger() {
         val localAttachment = mock<LocalAttachment>()
         messageCenterController.onAttachmentReceived(localAttachment)
-        verify(addFileToAttachmentAndUploadUseCase, times(1)).execute(eq(localAttachment), any())
+        verify(addFileToAttachmentAndUploadUseCase, times(1)).invoke(eq(localAttachment), any())
     }
 
     @Test
     fun onRemoveAttachment() {
         val localAttachment = mock<LocalAttachment>()
         messageCenterController.onRemoveAttachment(localAttachment)
-        verify(removeFileAttachmentUseCase, times(1)).execute(eq(localAttachment))
+        verify(removeFileAttachmentUseCase, times(1)).invoke(eq(localAttachment))
     }
 
     @Test

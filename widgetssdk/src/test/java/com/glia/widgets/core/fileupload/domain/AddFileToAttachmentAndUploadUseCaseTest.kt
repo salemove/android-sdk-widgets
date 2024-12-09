@@ -34,85 +34,85 @@ class AddFileToAttachmentAndUploadUseCaseTest {
     }
 
     @Test
-    fun `execute calls onError with RemoveBeforeReUploadingException when file is already attached`() {
+    fun `invoke calls onError with RemoveBeforeReUploadingException when file is already attached`() {
         val localAttachment = mockk<LocalAttachment>()
         val listener = mockk<AddFileToAttachmentAndUploadUseCase.Listener>(relaxed = true)
         every { fileAttachmentRepository.isFileAttached(localAttachment.uri) } returns true
 
-        subjectUnderTest.execute(localAttachment, listener)
+        subjectUnderTest.invoke(localAttachment, listener)
 
         verify { listener.onError(any<RemoveBeforeReUploadingException>()) }
     }
 
     @Test
-    fun `execute calls onError with EngagementMissingException when engagement is missing`() {
+    fun `invoke calls onError with EngagementMissingException when engagement is missing`() {
         val localAttachment = mockk<LocalAttachment>()
         val listener = mockk<AddFileToAttachmentAndUploadUseCase.Listener>(relaxed = true)
         every { fileAttachmentRepository.isFileAttached(localAttachment.uri) } returns false
         every { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement } returns false
         every { manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging } returns false
 
-        subjectUnderTest.execute(localAttachment, listener)
+        subjectUnderTest.invoke(localAttachment, listener)
 
         verify { listener.onError(any<EngagementMissingException>()) }
     }
 
     @Test
-    fun `execute calls onError with SupportedFileCountExceededException when too many files are attached`() {
+    fun `invoke calls onError with SupportedFileCountExceededException when too many files are attached`() {
         val localAttachment = mockk<LocalAttachment>()
         every { localAttachment.size } returns AddFileToAttachmentAndUploadUseCase.SUPPORTED_FILE_SIZE - 1
         val listener = mockk<AddFileToAttachmentAndUploadUseCase.Listener>(relaxed = true)
         every { fileAttachmentRepository.isFileAttached(localAttachment.uri) } returns false
-        every { fileAttachmentRepository.attachedFilesCount } returns SupportedFileCountCheckUseCase.SUPPORTED_FILE_COUNT + 1
+        every { fileAttachmentRepository.getAttachedFilesCount() } returns SupportedFileCountCheckUseCase.SUPPORTED_FILE_COUNT + 1
         every { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement } returns true
         every { manageSecureMessagingStatusUseCase.shouldUseSecureMessagingEndpoints } returns false
 
-        subjectUnderTest.execute(localAttachment, listener)
+        subjectUnderTest.invoke(localAttachment, listener)
 
         verify { listener.onError(any<SupportedFileCountExceededException>()) }
     }
 
     @Test
-    fun `execute calls onError with SupportedFileSizeExceededException when file size is too large`() {
+    fun `invoke calls onError with SupportedFileSizeExceededException when file size is too large`() {
         val localAttachment = mockk<LocalAttachment>()
         val listener = mockk<AddFileToAttachmentAndUploadUseCase.Listener>(relaxed = true)
         every { fileAttachmentRepository.isFileAttached(localAttachment.uri) } returns false
-        every { fileAttachmentRepository.attachedFilesCount } returns 1L
+        every { fileAttachmentRepository.getAttachedFilesCount() } returns 1
         every { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement } returns true
         every { localAttachment.size } returns AddFileToAttachmentAndUploadUseCase.SUPPORTED_FILE_SIZE
 
-        subjectUnderTest.execute(localAttachment, listener)
+        subjectUnderTest.invoke(localAttachment, listener)
 
         verify { listener.onError(any<SupportedFileSizeExceededException>()) }
     }
 
     @Test
-    fun `execute calls onStarted when valid argument`() {
+    fun `invoke calls onStarted when valid argument`() {
         val localAttachment = mockk<LocalAttachment>()
         val listener = mockk<AddFileToAttachmentAndUploadUseCase.Listener>(relaxed = true)
         every { fileAttachmentRepository.isFileAttached(localAttachment.uri) } returns false
-        every { fileAttachmentRepository.attachedFilesCount } returns 1L
+        every { fileAttachmentRepository.getAttachedFilesCount() } returns 1
         every { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement } returns true
         every { localAttachment.size } returns AddFileToAttachmentAndUploadUseCase.SUPPORTED_FILE_SIZE - 1
         every { manageSecureMessagingStatusUseCase.shouldUseSecureMessagingEndpoints } returns false
 
-        subjectUnderTest.execute(localAttachment, listener)
+        subjectUnderTest.invoke(localAttachment, listener)
 
         verify { listener.onStarted() }
     }
 
     @Test
-    fun `execute uploads file when is secure engagement`() {
+    fun `invoke uploads file when is secure engagement`() {
         val localAttachment = mockk<LocalAttachment>()
         val listener = mockk<AddFileToAttachmentAndUploadUseCase.Listener>(relaxed = true)
         every { fileAttachmentRepository.isFileAttached(localAttachment.uri) } returns false
         every { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement } returns false
-        every { fileAttachmentRepository.attachedFilesCount } returns 1L
+        every { fileAttachmentRepository.getAttachedFilesCount() } returns 1
         every { localAttachment.size } returns AddFileToAttachmentAndUploadUseCase.SUPPORTED_FILE_SIZE - 1
         every { manageSecureMessagingStatusUseCase.shouldUseSecureMessagingEndpoints } returns true
         every { manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging } returns true
 
-        subjectUnderTest.execute(localAttachment, listener)
+        subjectUnderTest.invoke(localAttachment, listener)
 
         verify { fileAttachmentRepository.uploadFile(true, localAttachment, listener) }
     }

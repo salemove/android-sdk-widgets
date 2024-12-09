@@ -58,13 +58,13 @@ class LocalAttachmentRepositoryTest {
         observer2 = mockk(relaxUnitFun = true)
 
         every { gliaCore.secureConversations } returns secureConversations
-        subjectUnderTest = FileAttachmentRepository(gliaCore)
+        subjectUnderTest = FileAttachmentRepositoryImpl(gliaCore)
     }
 
     @Test
     fun `getAttachedFilesCount returns zero when no file attachments attached`() {
         subjectUnderTest.detachAllFiles()
-        val result = subjectUnderTest.attachedFilesCount
+        val result = subjectUnderTest.getAttachedFilesCount()
         assertEquals(0, result)
     }
 
@@ -72,7 +72,7 @@ class LocalAttachmentRepositoryTest {
     fun `getAttachedFilesCount returns one when one file attachment attached`() {
         subjectUnderTest.detachAllFiles()
         subjectUnderTest.attachFile(fileAttachment1)
-        val result = subjectUnderTest.attachedFilesCount
+        val result = subjectUnderTest.getAttachedFilesCount()
         assertEquals(1, result)
     }
 
@@ -95,7 +95,7 @@ class LocalAttachmentRepositoryTest {
     fun `attachFile attaches file attachment when valid argument`() {
         subjectUnderTest.detachAllFiles()
         subjectUnderTest.attachFile(fileAttachment1)
-        val result = subjectUnderTest.localAttachments
+        val result = subjectUnderTest.getFileAttachments()
         assertTrue(result.contains(fileAttachment1))
     }
 
@@ -115,7 +115,7 @@ class LocalAttachmentRepositoryTest {
         subjectUnderTest.uploadFile(false, fileAttachment1, listener)
 
         verify { listener.onFinished() }
-        assertEquals(LocalAttachment.Status.READY_TO_SEND, subjectUnderTest.localAttachments.first().attachmentStatus)
+        assertEquals(LocalAttachment.Status.READY_TO_SEND, subjectUnderTest.getFileAttachments().first().attachmentStatus)
     }
 
     @Test
@@ -134,14 +134,14 @@ class LocalAttachmentRepositoryTest {
         subjectUnderTest.attachFile(fileAttachment1)
 
         subjectUnderTest.uploadFile(false, fileAttachment1, listener)
-        assertEquals(LocalAttachment.Status.SECURITY_SCAN, subjectUnderTest.localAttachments.first().attachmentStatus)
+        assertEquals(LocalAttachment.Status.SECURITY_SCAN, subjectUnderTest.getFileAttachments().first().attachmentStatus)
         verify { engagementFile.on(eq(EngagementFile.Events.SCAN_RESULT), capture(fileScanCallbackSlot)) }
         verify { listener.onSecurityCheckStarted() }
 
         fileScanCallbackSlot.captured.accept(EngagementFile.ScanResult.CLEAN)
         verify { listener.onSecurityCheckFinished(EngagementFile.ScanResult.CLEAN) }
         verify { listener.onFinished() }
-        assertEquals(LocalAttachment.Status.READY_TO_SEND, subjectUnderTest.localAttachments.first().attachmentStatus)
+        assertEquals(LocalAttachment.Status.READY_TO_SEND, subjectUnderTest.getFileAttachments().first().attachmentStatus)
     }
 
     @Test
@@ -154,7 +154,7 @@ class LocalAttachmentRepositoryTest {
         subjectUnderTest.uploadFile(false, fileAttachment1, listener)
 
         verify { listener.onError(any<EngagementMissingException>()) }
-        assertEquals(LocalAttachment.Status.ERROR_ENGAGEMENT_MISSING, subjectUnderTest.localAttachments.first().attachmentStatus)
+        assertEquals(LocalAttachment.Status.ERROR_ENGAGEMENT_MISSING, subjectUnderTest.getFileAttachments().first().attachmentStatus)
     }
 
     @Test
@@ -171,7 +171,7 @@ class LocalAttachmentRepositoryTest {
         subjectUnderTest.uploadFile(false, fileAttachment1, listener)
 
         verify { listener.onError(gliaException) }
-        assertEquals(LocalAttachment.Status.ERROR_INTERNAL, subjectUnderTest.localAttachments.first().attachmentStatus)
+        assertEquals(LocalAttachment.Status.ERROR_INTERNAL, subjectUnderTest.getFileAttachments().first().attachmentStatus)
     }
 
     @Test
@@ -198,7 +198,7 @@ class LocalAttachmentRepositoryTest {
 
         verify { listener.onSecurityCheckFinished(EngagementFile.ScanResult.INFECTED) }
         verify { listener.onFinished() }
-        assertEquals(LocalAttachment.Status.ERROR_SECURITY_SCAN_FAILED, subjectUnderTest.localAttachments.first().attachmentStatus)
+        assertEquals(LocalAttachment.Status.ERROR_SECURITY_SCAN_FAILED, subjectUnderTest.getFileAttachments().first().attachmentStatus)
     }
 
     @Test
@@ -209,7 +209,7 @@ class LocalAttachmentRepositoryTest {
         subjectUnderTest.attachFile(fileAttachment1)
         subjectUnderTest.uploadFile(false, fileAttachment1, listener)
 
-        assertEquals(LocalAttachment.Status.ERROR_ENGAGEMENT_MISSING, subjectUnderTest.localAttachments.first().attachmentStatus)
+        assertEquals(LocalAttachment.Status.ERROR_ENGAGEMENT_MISSING, subjectUnderTest.getFileAttachments().first().attachmentStatus)
         verify { listener.onError(any<EngagementMissingException>()) }
     }
 
@@ -231,7 +231,7 @@ class LocalAttachmentRepositoryTest {
 
         subjectUnderTest.setFileAttachmentTooLarge(uri1)
 
-        subjectUnderTest.localAttachments.forEach {
+        subjectUnderTest.getFileAttachments().forEach {
             if (it.uri == uri1) {
                 assertEquals(LocalAttachment.Status.ERROR_FILE_TOO_LARGE, it.attachmentStatus)
             } else {
@@ -249,7 +249,7 @@ class LocalAttachmentRepositoryTest {
 
         assertEquals(
             LocalAttachment.Status.ERROR_SUPPORTED_FILE_ATTACHMENT_COUNT_EXCEEDED,
-            subjectUnderTest.localAttachments.first().attachmentStatus
+            subjectUnderTest.getFileAttachments().first().attachmentStatus
         )
     }
 
@@ -260,7 +260,7 @@ class LocalAttachmentRepositoryTest {
 
         subjectUnderTest.setFileAttachmentEngagementMissing(uri1)
 
-        assertEquals(LocalAttachment.Status.ERROR_ENGAGEMENT_MISSING, subjectUnderTest.localAttachments.first().attachmentStatus)
+        assertEquals(LocalAttachment.Status.ERROR_ENGAGEMENT_MISSING, subjectUnderTest.getFileAttachments().first().attachmentStatus)
     }
 
     @Test
@@ -268,7 +268,7 @@ class LocalAttachmentRepositoryTest {
         subjectUnderTest.detachAllFiles()
         subjectUnderTest.attachFile(fileAttachment1)
         subjectUnderTest.attachFile(fileAttachment2)
-        val result = subjectUnderTest.localAttachments
+        val result = subjectUnderTest.getFileAttachments()
         assertTrue(result.containsAll(listOf(fileAttachment1, fileAttachment2)))
     }
 
@@ -277,7 +277,7 @@ class LocalAttachmentRepositoryTest {
         subjectUnderTest.detachAllFiles()
         subjectUnderTest.attachFile(fileAttachment1)
         subjectUnderTest.attachFile(fileAttachment1)
-        val result = subjectUnderTest.localAttachments
+        val result = subjectUnderTest.getFileAttachments()
         assertTrue(result.indexOf(fileAttachment1) != result.lastIndexOf(fileAttachment1))
     }
 
@@ -289,7 +289,7 @@ class LocalAttachmentRepositoryTest {
 
         subjectUnderTest.detachFile(fileAttachment1)
 
-        val result = subjectUnderTest.localAttachments
+        val result = subjectUnderTest.getFileAttachments()
 
         assertFalse(result.contains(fileAttachment1))
         assertTrue(result.contains(fileAttachment2))
@@ -303,7 +303,7 @@ class LocalAttachmentRepositoryTest {
 
         subjectUnderTest.detachFile(fileAttachment1)
 
-        assertTrue(subjectUnderTest.localAttachments.isEmpty())
+        assertTrue(subjectUnderTest.getFileAttachments().isEmpty())
     }
 
     @Test
@@ -312,7 +312,7 @@ class LocalAttachmentRepositoryTest {
 
         subjectUnderTest.detachFile(fileAttachment1)
 
-        assertFalse(subjectUnderTest.localAttachments.contains(fileAttachment1))
+        assertFalse(subjectUnderTest.getFileAttachments().contains(fileAttachment1))
     }
 
     @Test
@@ -324,79 +324,7 @@ class LocalAttachmentRepositoryTest {
 
         subjectUnderTest.detachAllFiles()
 
-        assertTrue(subjectUnderTest.localAttachments.isEmpty())
-    }
-
-    @Test
-    fun `addObserver successful when valid argument`() {
-        clearMocks(observer1)
-        subjectUnderTest.clearObservers()
-
-        subjectUnderTest.addObserver(observer1)
-
-        subjectUnderTest.detachAllFiles()
-        verify { observer1.update(any(), any()) }
-    }
-
-    @Test
-    fun `addObserver calls update once when same observer added twice`() {
-        clearMocks(observer1)
-        subjectUnderTest.clearObservers()
-
-        subjectUnderTest.addObserver(observer1)
-        subjectUnderTest.addObserver(observer1)
-
-        subjectUnderTest.detachAllFiles()
-        verify(exactly = 1) { observer1.update(any(), any()) }
-    }
-
-    @Test(expected = NullPointerException::class)
-    fun `addObserver throws when null argument`() {
-        subjectUnderTest.addObserver(null)
-    }
-
-    @Test
-    fun `removeObserver removes when valid argument`() {
-        clearMocks(observer1)
-        subjectUnderTest.clearObservers()
-        subjectUnderTest.addObserver(observer1)
-
-        subjectUnderTest.removeObserver(observer1)
-
-        subjectUnderTest.detachAllFiles()
-        verify(exactly = 0) { observer1.update(any(), any()) }
-    }
-
-    @Test
-    fun `removeObserver does nothing when observer not added`() {
-        subjectUnderTest.clearObservers()
-
-        subjectUnderTest.removeObserver(observer1)
-    }
-
-    @Test
-    fun `removeObserver not throwing when null argument`() {
-        subjectUnderTest.removeObserver(null)
-    }
-
-    @Test
-    fun `clearObservers clears when observers added`() {
-        clearMocks(observer1, observer2)
-        subjectUnderTest.clearObservers()
-        subjectUnderTest.addObserver(observer1)
-        subjectUnderTest.addObserver(observer2)
-
-        subjectUnderTest.clearObservers()
-
-        subjectUnderTest.detachAllFiles()
-        verify(exactly = 0) { observer1.update(any(), any()) }
-        verify(exactly = 0) { observer2.update(any(), any()) }
-    }
-
-    @Test
-    fun `clearObservers does nothing when no observers added`() {
-        subjectUnderTest.clearObservers()
-        subjectUnderTest.clearObservers()
+        assertTrue(subjectUnderTest.getFileAttachments().isEmpty())
     }
 
     @Test
@@ -404,7 +332,7 @@ class LocalAttachmentRepositoryTest {
         subjectUnderTest.detachAllFiles()
         subjectUnderTest.detachAllFiles()
 
-        assertTrue(subjectUnderTest.localAttachments.isEmpty())
+        assertTrue(subjectUnderTest.getFileAttachments().isEmpty())
     }
 
     @Test
@@ -415,7 +343,7 @@ class LocalAttachmentRepositoryTest {
         subjectUnderTest.attachFile(attachment1)
         subjectUnderTest.attachFile(attachment2)
 
-        val result = subjectUnderTest.readyToSendLocalAttachments
+        val result = subjectUnderTest.getReadyToSendFileAttachments()
 
         assertTrue(result.contains(attachment1))
         assertFalse(result.contains(attachment2))

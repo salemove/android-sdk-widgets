@@ -19,7 +19,6 @@ internal class ReleaseResourcesUseCaseImpl(
 ) : ReleaseResourcesUseCase {
     override fun invoke() {
         dialogController.dismissDialogs()
-        fileAttachmentRepository.clearObservers()
         fileAttachmentRepository.detachAllFiles()
         releaseScreenSharingResourcesUseCase()
         callNotificationUseCase.removeAllNotifications()

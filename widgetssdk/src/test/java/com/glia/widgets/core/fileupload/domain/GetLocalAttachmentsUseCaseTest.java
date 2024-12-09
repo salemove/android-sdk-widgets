@@ -28,7 +28,7 @@ public class GetLocalAttachmentsUseCaseTest {
     public void execute_returnsFileAttachments_whenSingleFileAttachment() {
         List<LocalAttachment> localAttachments =
             Collections.singletonList(mock(LocalAttachment.class));
-        when(repository.getLocalAttachments()).thenReturn(localAttachments);
+        when(repository.getFileAttachments()).thenReturn(localAttachments);
 
         List<LocalAttachment> result = subjectUnderTest.invoke();
 

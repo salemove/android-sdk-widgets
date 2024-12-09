@@ -1,6 +1,6 @@
 package com.glia.widgets.core.secureconversations.domain
 
-import com.glia.widgets.core.fileupload.SecureFileAttachmentRepository
+import com.glia.widgets.core.fileupload.FileAttachmentRepository
 import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.core.secureconversations.SendMessageRepository
@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit
 
 class SendMessageButtonDialogStateUseCaseTest {
     private lateinit var sendMessageRepository: SendMessageRepository
-    private lateinit var fileAttachmentRepository: SecureFileAttachmentRepository
+    private lateinit var fileAttachmentRepository: FileAttachmentRepository
     private lateinit var secureConversationsRepository: SecureConversationsRepository
     private lateinit var showMessageLimitErrorUseCase: ShowMessageLimitErrorUseCase
     private lateinit var testScheduler: TestScheduler

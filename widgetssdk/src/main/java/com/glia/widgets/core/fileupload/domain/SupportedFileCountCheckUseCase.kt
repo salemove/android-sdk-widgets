@@ -4,10 +4,10 @@ import com.glia.widgets.core.fileupload.FileAttachmentRepository
 
 internal class SupportedFileCountCheckUseCase(private val repository: FileAttachmentRepository) {
     operator fun invoke(): Boolean {
-        return repository.localAttachments.size <= SUPPORTED_FILE_COUNT
+        return repository.getAttachedFilesCount() <= SUPPORTED_FILE_COUNT
     }
 
     companion object {
-        const val SUPPORTED_FILE_COUNT: Long = 25
+        const val SUPPORTED_FILE_COUNT: Int = 25
     }
 }

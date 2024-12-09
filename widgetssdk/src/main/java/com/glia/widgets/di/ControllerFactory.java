@@ -106,7 +106,6 @@ public class ControllerFactory {
                 useCaseFactory.getEndEngagementUseCase(),
                 useCaseFactory.createAddFileToAttachmentAndUploadUseCase(),
                 useCaseFactory.createAddFileAttachmentsObserverUseCase(),
-                useCaseFactory.createRemoveFileAttachmentObserverUseCase(),
                 useCaseFactory.createGetFileAttachmentsUseCase(),
                 useCaseFactory.createRemoveFileAttachmentUseCase(),
                 useCaseFactory.createSupportedFileCountCheckUseCase(),
@@ -293,10 +292,10 @@ public class ControllerFactory {
     public MessageCenterContract.Controller getMessageCenterController() {
         return new MessageCenterController(
             useCaseFactory.createSendSecureMessageUseCase(),
-            useCaseFactory.createAddSecureFileAttachmentsObserverUseCase(),
+            useCaseFactory.createAddFileAttachmentsObserverUseCase(),
             useCaseFactory.createAddSecureFileToAttachmentAndUploadUseCase(),
-            useCaseFactory.createGetSecureFileAttachmentsUseCase(),
-            useCaseFactory.createRemoveSecureFileAttachmentUseCase(),
+            useCaseFactory.createGetFileAttachmentsUseCase(),
+            useCaseFactory.createRemoveFileAttachmentUseCase(),
             useCaseFactory.createIsAuthenticatedUseCase(),
             useCaseFactory.createSiteInfoUseCase(),
             useCaseFactory.createOnNextMessageUseCase(),

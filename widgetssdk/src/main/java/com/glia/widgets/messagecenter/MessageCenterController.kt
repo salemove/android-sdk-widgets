@@ -12,15 +12,15 @@ import com.glia.widgets.chat.domain.SiteInfoUseCase
 import com.glia.widgets.chat.domain.TakePictureUseCase
 import com.glia.widgets.chat.domain.UriToFileAttachmentUseCase
 import com.glia.widgets.core.dialog.DialogContract
+import com.glia.widgets.core.fileupload.domain.AddFileAttachmentsObserverUseCase
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase
+import com.glia.widgets.core.fileupload.domain.GetFileAttachmentsUseCase
+import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentUseCase
 import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.core.permissions.domain.RequestNotificationPermissionIfPushNotificationsSetUpUseCase
-import com.glia.widgets.core.secureconversations.domain.AddSecureFileAttachmentsObserverUseCase
 import com.glia.widgets.core.secureconversations.domain.AddSecureFileToAttachmentAndUploadUseCase
-import com.glia.widgets.core.secureconversations.domain.GetSecureFileAttachmentsUseCase
 import com.glia.widgets.core.secureconversations.domain.IsMessagingAvailableUseCase
 import com.glia.widgets.core.secureconversations.domain.OnNextMessageUseCase
-import com.glia.widgets.core.secureconversations.domain.RemoveSecureFileAttachmentUseCase
 import com.glia.widgets.core.secureconversations.domain.ResetMessageCenterUseCase
 import com.glia.widgets.core.secureconversations.domain.SendMessageButtonStateUseCase
 import com.glia.widgets.core.secureconversations.domain.SendSecureMessageUseCase
@@ -31,10 +31,10 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 internal class MessageCenterController(
     private val sendSecureMessageUseCase: SendSecureMessageUseCase,
-    private val addFileAttachmentsObserverUseCase: AddSecureFileAttachmentsObserverUseCase,
+    private val addFileAttachmentsObserverUseCase: AddFileAttachmentsObserverUseCase,
     private val addFileToAttachmentAndUploadUseCase: AddSecureFileToAttachmentAndUploadUseCase,
-    private val getFileAttachmentsUseCase: GetSecureFileAttachmentsUseCase,
-    private val removeFileAttachmentUseCase: RemoveSecureFileAttachmentUseCase,
+    private val getFileAttachmentsUseCase: GetFileAttachmentsUseCase,
+    private val removeFileAttachmentUseCase: RemoveFileAttachmentUseCase,
     private val isAuthenticatedUseCase: IsAuthenticatedUseCase,
     private val siteInfoUseCase: SiteInfoUseCase,
     private val onNextMessageUseCase: OnNextMessageUseCase,
@@ -200,7 +200,7 @@ internal class MessageCenterController(
     }
 
     fun onAttachmentReceived(file: LocalAttachment) {
-        addFileToAttachmentAndUploadUseCase.execute(
+        addFileToAttachmentAndUploadUseCase(
             file,
             object : AddFileToAttachmentAndUploadUseCase.Listener {
                 override fun onFinished() {
@@ -229,7 +229,7 @@ internal class MessageCenterController(
     }
 
     override fun onRemoveAttachment(file: LocalAttachment) {
-        removeFileAttachmentUseCase.execute(file)
+        removeFileAttachmentUseCase(file)
     }
 
     override fun onDestroy() {

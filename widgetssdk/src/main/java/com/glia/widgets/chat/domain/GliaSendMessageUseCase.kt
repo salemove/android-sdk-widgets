@@ -9,7 +9,7 @@ import com.glia.widgets.chat.data.GliaChatRepository
 import com.glia.widgets.chat.model.VisitorAttachmentItem
 import com.glia.widgets.chat.model.VisitorChatItem
 import com.glia.widgets.chat.model.VisitorMessageItem
-import com.glia.widgets.core.fileupload.FileAttachmentRepository
+import com.glia.widgets.core.fileupload.EngagementFileAttachmentRepository
 import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.core.secureconversations.domain.ManageSecureMessagingStatusUseCase
@@ -17,7 +17,7 @@ import com.glia.widgets.engagement.domain.IsOperatorPresentUseCase
 
 internal class GliaSendMessageUseCase(
     private val chatRepository: GliaChatRepository,
-    private val fileAttachmentRepository: FileAttachmentRepository,
+    private val fileAttachmentRepository: EngagementFileAttachmentRepository,
     private val isOperatorPresentUseCase: IsOperatorPresentUseCase,
     private val secureConversationsRepository: SecureConversationsRepository,
     private val shouldUseSecureMessagingApis: ManageSecureMessagingStatusUseCase
@@ -44,7 +44,7 @@ internal class GliaSendMessageUseCase(
 
     fun execute(message: String, listener: Listener) {
         val localAttachments: List<LocalAttachment>? = fileAttachmentRepository
-            .readyToSendLocalAttachments
+            .getReadyToSendFileAttachments()
             .filter { it.engagementFile != null }
             .takeIf { it.isNotEmpty() }
 

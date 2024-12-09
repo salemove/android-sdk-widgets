@@ -2,7 +2,7 @@ package com.glia.widgets.core.fileupload.domain
 
 import com.glia.androidsdk.engagement.EngagementFile
 import com.glia.widgets.core.engagement.exception.EngagementMissingException
-import com.glia.widgets.core.fileupload.FileAttachmentRepository
+import com.glia.widgets.core.fileupload.EngagementFileAttachmentRepository
 import com.glia.widgets.core.fileupload.exception.RemoveBeforeReUploadingException
 import com.glia.widgets.core.fileupload.exception.SupportedFileCountExceededException
 import com.glia.widgets.core.fileupload.exception.SupportedFileSizeExceededException
@@ -12,11 +12,11 @@ import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 
 internal class AddFileToAttachmentAndUploadUseCase(
     private val isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase,
-    private val fileAttachmentRepository: FileAttachmentRepository,
+    private val fileAttachmentRepository: EngagementFileAttachmentRepository,
     private val manageSecureMessagingStatusUseCase: ManageSecureMessagingStatusUseCase
 ) {
     private val isSupportedFileCountExceeded: Boolean
-        get() = fileAttachmentRepository.attachedFilesCount > SupportedFileCountCheckUseCase.SUPPORTED_FILE_COUNT
+        get() = fileAttachmentRepository.getAttachedFilesCount() > SupportedFileCountCheckUseCase.SUPPORTED_FILE_COUNT
 
     fun execute(file: LocalAttachment, listener: Listener) {
         if (fileAttachmentRepository.isFileAttached(file.uri)) {
@@ -45,7 +45,7 @@ internal class AddFileToAttachmentAndUploadUseCase(
             listener.onError(SupportedFileSizeExceededException())
         } else {
             listener.onStarted()
-            fileAttachmentRepository.uploadFile(manageSecureMessagingStatusUseCase.shouldUseSecureMessagingEndpoints, file, listener)
+            fileAttachmentRepository.uploadFile(file, listener)
         }
     }
 

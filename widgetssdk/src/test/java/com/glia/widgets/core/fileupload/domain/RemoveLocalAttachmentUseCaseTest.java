@@ -3,7 +3,7 @@ package com.glia.widgets.core.fileupload.domain;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import com.glia.widgets.core.fileupload.FileAttachmentRepository;
+import com.glia.widgets.core.fileupload.EngagementFileAttachmentRepository;
 import com.glia.widgets.core.fileupload.model.LocalAttachment;
 
 import org.junit.Before;
@@ -11,12 +11,12 @@ import org.junit.Test;
 
 public class RemoveLocalAttachmentUseCaseTest {
 
-    private FileAttachmentRepository repository;
+    private EngagementFileAttachmentRepository repository;
     private RemoveFileAttachmentUseCase subjectUnderTest;
 
     @Before
     public void setUp() {
-        repository = mock(FileAttachmentRepository.class);
+        repository = mock(EngagementFileAttachmentRepository.class);
         subjectUnderTest = new RemoveFileAttachmentUseCase(repository);
     }
 

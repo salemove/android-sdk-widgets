@@ -6,7 +6,7 @@ import com.glia.widgets.chat.data.GliaChatRepository;
 import com.glia.widgets.core.callvisualizer.domain.VisitorCodeRepository;
 import com.glia.widgets.core.engagement.GliaOperatorRepository;
 import com.glia.widgets.core.engagement.GliaOperatorRepositoryImpl;
-import com.glia.widgets.core.fileupload.FileAttachmentRepository;
+import com.glia.widgets.core.fileupload.EngagementFileAttachmentRepository;
 import com.glia.widgets.core.fileupload.SecureFileAttachmentRepository;
 import com.glia.widgets.core.queue.QueueRepository;
 import com.glia.widgets.core.queue.QueueRepositoryImpl;
@@ -30,7 +30,7 @@ public class RepositoryFactory {
     private static SecureFileAttachmentRepository secureFileAttachmentRepository;
     private static QueueRepository queueRepository;
     private static GliaFileRepository gliaFileRepository;
-    private static FileAttachmentRepository fileAttachmentRepository;
+    private static EngagementFileAttachmentRepository fileAttachmentRepository;
     private static GliaOperatorRepository operatorRepository;
     private static SendMessageRepository sendMessageRepository;
     private static VisitorCodeRepository visitorCodeRepository;
@@ -68,9 +68,9 @@ public class RepositoryFactory {
         return queueRepository;
     }
 
-    public FileAttachmentRepository getGliaFileAttachmentRepository() {
+    public EngagementFileAttachmentRepository getGliaFileAttachmentRepository() {
         if (fileAttachmentRepository == null) {
-            fileAttachmentRepository = new FileAttachmentRepository(gliaCore);
+            fileAttachmentRepository = new EngagementFileAttachmentRepository(gliaCore);
         }
         return fileAttachmentRepository;
     }

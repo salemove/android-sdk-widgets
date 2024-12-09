@@ -1,7 +1,7 @@
 package com.glia.widgets.core.fileupload.domain
 
 import com.glia.widgets.core.engagement.exception.EngagementMissingException
-import com.glia.widgets.core.fileupload.FileAttachmentRepository
+import com.glia.widgets.core.fileupload.EngagementFileAttachmentRepository
 import com.glia.widgets.core.fileupload.exception.RemoveBeforeReUploadingException
 import com.glia.widgets.core.fileupload.exception.SupportedFileCountExceededException
 import com.glia.widgets.core.fileupload.exception.SupportedFileSizeExceededException
@@ -16,7 +16,7 @@ import org.junit.Test
 
 class AddFileToAttachmentAndUploadUseCaseTest {
 
-    private lateinit var fileAttachmentRepository: FileAttachmentRepository
+    private lateinit var fileAttachmentRepository: EngagementFileAttachmentRepository
     private lateinit var isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase
     private lateinit var manageSecureMessagingStatusUseCase: ManageSecureMessagingStatusUseCase
     private lateinit var subjectUnderTest: AddFileToAttachmentAndUploadUseCase
@@ -63,7 +63,7 @@ class AddFileToAttachmentAndUploadUseCaseTest {
         every { localAttachment.size } returns AddFileToAttachmentAndUploadUseCase.SUPPORTED_FILE_SIZE - 1
         val listener = mockk<AddFileToAttachmentAndUploadUseCase.Listener>(relaxed = true)
         every { fileAttachmentRepository.isFileAttached(localAttachment.uri) } returns false
-        every { fileAttachmentRepository.attachedFilesCount } returns SupportedFileCountCheckUseCase.SUPPORTED_FILE_COUNT + 1
+        every { fileAttachmentRepository.getAttachedFilesCount } returns SupportedFileCountCheckUseCase.SUPPORTED_FILE_COUNT + 1
         every { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement } returns true
         every { manageSecureMessagingStatusUseCase.shouldUseSecureMessagingEndpoints } returns false
 
@@ -77,7 +77,7 @@ class AddFileToAttachmentAndUploadUseCaseTest {
         val localAttachment = mockk<LocalAttachment>()
         val listener = mockk<AddFileToAttachmentAndUploadUseCase.Listener>(relaxed = true)
         every { fileAttachmentRepository.isFileAttached(localAttachment.uri) } returns false
-        every { fileAttachmentRepository.attachedFilesCount } returns 1L
+        every { fileAttachmentRepository.getAttachedFilesCount } returns 1L
         every { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement } returns true
         every { localAttachment.size } returns AddFileToAttachmentAndUploadUseCase.SUPPORTED_FILE_SIZE
 
@@ -91,7 +91,7 @@ class AddFileToAttachmentAndUploadUseCaseTest {
         val localAttachment = mockk<LocalAttachment>()
         val listener = mockk<AddFileToAttachmentAndUploadUseCase.Listener>(relaxed = true)
         every { fileAttachmentRepository.isFileAttached(localAttachment.uri) } returns false
-        every { fileAttachmentRepository.attachedFilesCount } returns 1L
+        every { fileAttachmentRepository.getAttachedFilesCount } returns 1L
         every { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement } returns true
         every { localAttachment.size } returns AddFileToAttachmentAndUploadUseCase.SUPPORTED_FILE_SIZE - 1
         every { manageSecureMessagingStatusUseCase.shouldUseSecureMessagingEndpoints } returns false
@@ -107,7 +107,7 @@ class AddFileToAttachmentAndUploadUseCaseTest {
         val listener = mockk<AddFileToAttachmentAndUploadUseCase.Listener>(relaxed = true)
         every { fileAttachmentRepository.isFileAttached(localAttachment.uri) } returns false
         every { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement } returns false
-        every { fileAttachmentRepository.attachedFilesCount } returns 1L
+        every { fileAttachmentRepository.getAttachedFilesCount } returns 1L
         every { localAttachment.size } returns AddFileToAttachmentAndUploadUseCase.SUPPORTED_FILE_SIZE - 1
         every { manageSecureMessagingStatusUseCase.shouldUseSecureMessagingEndpoints } returns true
         every { manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging } returns true

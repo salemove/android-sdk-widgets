@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.glia.widgets.core.fileupload.FileAttachmentRepository;
+import com.glia.widgets.core.fileupload.EngagementFileAttachmentRepository;
 import com.glia.widgets.core.fileupload.model.LocalAttachment;
 
 import org.junit.Before;
@@ -15,12 +15,12 @@ import java.util.List;
 
 public class GetLocalAttachmentsUseCaseTest {
 
-    private FileAttachmentRepository repository;
+    private EngagementFileAttachmentRepository repository;
     private GetFileAttachmentsUseCase subjectUnderTest;
 
     @Before
     public void setUp() {
-        repository = mock(FileAttachmentRepository.class);
+        repository = mock(EngagementFileAttachmentRepository.class);
         subjectUnderTest = new GetFileAttachmentsUseCase(repository);
     }
 
@@ -28,7 +28,7 @@ public class GetLocalAttachmentsUseCaseTest {
     public void execute_returnsFileAttachments_whenSingleFileAttachment() {
         List<LocalAttachment> localAttachments =
             Collections.singletonList(mock(LocalAttachment.class));
-        when(repository.getLocalAttachments()).thenReturn(localAttachments);
+        when(repository.getGetFileAttachments()).thenReturn(localAttachments);
 
         List<LocalAttachment> result = subjectUnderTest.invoke();
 

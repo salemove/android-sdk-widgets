@@ -6,7 +6,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.glia.widgets.core.fileupload.FileAttachmentRepository;
+import com.glia.widgets.core.fileupload.EngagementFileAttachmentRepository;
 import com.glia.widgets.core.fileupload.model.LocalAttachment;
 
 import org.junit.Before;
@@ -18,12 +18,12 @@ import java.util.List;
 
 public class SupportedFileCountCheckUseCaseTest {
 
-    private FileAttachmentRepository repository;
+    private EngagementFileAttachmentRepository repository;
     private SupportedFileCountCheckUseCase subjectUnderTest;
 
     @Before
     public void setUp() {
-        repository = mock(FileAttachmentRepository.class);
+        repository = mock(EngagementFileAttachmentRepository.class);
         subjectUnderTest = new SupportedFileCountCheckUseCase(repository);
     }
 
@@ -31,7 +31,7 @@ public class SupportedFileCountCheckUseCaseTest {
 
     @Test
     public void execute_returnsTrue_whenSingleFileAttachment() {
-        when(repository.getLocalAttachments())
+        when(repository.getGetFileAttachments())
                 .thenReturn(Collections.singletonList(FILE_ATTACHMENT));
 
         assertTrue(subjectUnderTest.invoke());
@@ -39,7 +39,7 @@ public class SupportedFileCountCheckUseCaseTest {
 
     @Test
     public void execute_returnsTrue_whenNoFileAttachment() {
-        when(repository.getLocalAttachments())
+        when(repository.getGetFileAttachments())
                 .thenReturn(Collections.emptyList());
 
         assertTrue(subjectUnderTest.invoke());
@@ -51,7 +51,7 @@ public class SupportedFileCountCheckUseCaseTest {
         for (int i = 0; i < SUPPORTED_FILE_COUNT; i++) {
             localAttachmentList.add(FILE_ATTACHMENT);
         }
-        when(repository.getLocalAttachments()).thenReturn(localAttachmentList);
+        when(repository.getGetFileAttachments()).thenReturn(localAttachmentList);
 
         assertTrue(subjectUnderTest.invoke());
     }
@@ -62,7 +62,7 @@ public class SupportedFileCountCheckUseCaseTest {
         for (int i = 0; i < SUPPORTED_FILE_COUNT + 1; i++) {
             localAttachmentList.add(FILE_ATTACHMENT);
         }
-        when(repository.getLocalAttachments()).thenReturn(localAttachmentList);
+        when(repository.getGetFileAttachments()).thenReturn(localAttachmentList);
 
         assertFalse(subjectUnderTest.invoke());
     }

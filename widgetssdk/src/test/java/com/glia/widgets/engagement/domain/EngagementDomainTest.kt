@@ -14,7 +14,7 @@ import com.glia.androidsdk.comms.Video
 import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
 import com.glia.widgets.core.dialog.DialogContract
-import com.glia.widgets.core.fileupload.FileAttachmentRepository
+import com.glia.widgets.core.fileupload.EngagementFileAttachmentRepository
 import com.glia.widgets.core.notification.domain.CallNotificationUseCase
 import com.glia.widgets.core.permissions.PermissionManager
 import com.glia.widgets.core.screensharing.MEDIA_PROJECTION_SERVICE_ACTION_START
@@ -476,7 +476,7 @@ class EngagementDomainTest {
         every { Dependencies.destroyControllers() } just Runs
         val releaseScreenSharingResourcesUseCase: ReleaseScreenSharingResourcesUseCase = mockk(relaxUnitFun = true)
         val callNotificationUseCase: CallNotificationUseCase = mockk(relaxUnitFun = true)
-        val fileAttachmentRepository: FileAttachmentRepository = mockk(relaxUnitFun = true)
+        val fileAttachmentRepository: EngagementFileAttachmentRepository = mockk(relaxUnitFun = true)
         val updateFromCallScreenUseCase: UpdateFromCallScreenUseCase = mockk(relaxUnitFun = true)
         val dialogController: DialogContract.Controller = mockk(relaxUnitFun = true)
 

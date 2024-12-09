@@ -389,7 +389,10 @@ public class UseCaseFactory {
 
     @NonNull
     public AddFileAttachmentsObserverUseCase createAddFileAttachmentsObserverUseCase() {
-        return new AddFileAttachmentsObserverUseCase(repositoryFactory.getGliaFileAttachmentRepository());
+        return new AddFileAttachmentsObserverUseCase(
+            repositoryFactory.getGliaFileAttachmentRepository(),
+            schedulers
+        );
     }
 
     @NonNull

@@ -1,12 +1,12 @@
 package com.glia.widgets.chat.domain
 
-import com.glia.widgets.core.fileupload.FileAttachmentRepository
+import com.glia.widgets.core.fileupload.EngagementFileAttachmentRepository
 import com.glia.widgets.core.secureconversations.domain.ManageSecureMessagingStatusUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 
 internal class IsShowSendButtonUseCase(
     private val isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase,
-    private val fileAttachmentRepository: FileAttachmentRepository,
+    private val fileAttachmentRepository: EngagementFileAttachmentRepository,
     private val manageSecureMessagingStatusUseCase: ManageSecureMessagingStatusUseCase
 ) {
     operator fun invoke(message: String?): Boolean {
@@ -21,7 +21,7 @@ internal class IsShowSendButtonUseCase(
     }
 
     private fun hadReadyToSendUnsentAttachments(): Boolean {
-        return fileAttachmentRepository.readyToSendLocalAttachments.isNotEmpty()
+        return fileAttachmentRepository.getReadyToSendFileAttachments().isNotEmpty()
     }
 
     private fun hasEngagementOngoingAndReadyToSendUnsentAttachments(): Boolean {

@@ -81,8 +81,12 @@ import com.glia.widgets.view.dialog.base.DialogDelegateImpl
 import com.glia.widgets.view.head.ChatHeadContract
 import com.glia.widgets.view.unifiedui.applyButtonTheme
 import com.glia.widgets.view.unifiedui.applyColorTheme
+import com.glia.widgets.view.unifiedui.applyHintColor
+import com.glia.widgets.view.unifiedui.applyHintTheme
+import com.glia.widgets.view.unifiedui.applyImageColor
 import com.glia.widgets.view.unifiedui.applyImageColorTheme
 import com.glia.widgets.view.unifiedui.applyLayerTheme
+import com.glia.widgets.view.unifiedui.applyTextColor
 import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.glia.widgets.view.unifiedui.theme.base.HeaderTheme
@@ -509,6 +513,12 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             else -> binding.chatEditText.setLocaleHint(R.string.chat_input_placeholder)
         }
         binding.chatEditText.isEnabled = chatState.chatInputMode.isEnabled
+        Dependencies.gliaThemeManager.theme?.chatTheme?.let {
+            binding.chatEditText.apply{
+                val inputTheme = if (isEnabled) it.input else it.inputDisabled
+                applyTextTheme(inputTheme?.text, withAlignment = false)
+            }
+        }
     }
 
     private fun updateAppBar(chatState: ChatState) {
@@ -643,14 +653,17 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             ?.also(binding.chatDivider::setBackgroundColor)
             ?.also(binding.scBottomBannerDivider::setBackgroundColor)
 
-        theme.baseDarkColor?.let(::getColorCompat)?.also(binding.chatEditText::setTextColor)
+        theme.baseDarkColor?.let(::getColorCompat)
+            ?.also{ binding.chatEditText.applyTextColor(it, theme.baseShadeColor) }
         theme.baseNormalColor?.let(::getColorCompat)
-            ?.also(binding.chatEditText::setHintTextColor)
+            ?.also{ binding.chatEditText.applyHintColor(it, theme.baseShadeColor) }
+            ?.also{ binding.addAttachmentButton.applyImageColor(it, theme.baseShadeColor) }
             ?.also(binding.scBottomBannerLabel::setTextColor)
         theme.systemAgentBubbleColor?.let(::getColorCompat)?.also(binding.scBottomBannerLabel::setBackgroundColor)
 
         // other
-        theme.sendMessageButtonTintColor?.let(::getColorStateListCompat)?.also(binding.sendButton::setImageTintList)
+        theme.sendMessageButtonTintColor?.let(::getColorCompat)
+            ?.also { binding.sendButton.applyImageColor(it, theme.baseShadeColor) }
         theme.gliaChatBackgroundColor?.let(::getColorCompat)?.also(::setBackgroundColor)
         binding.gvaQuickRepliesLayout.updateTheme(theme)
 
@@ -828,7 +841,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
 
         chatTheme.header?.also(::applyHeaderTheme)
 
-        chatTheme.input?.also(::applyInputTheme)
+        chatTheme.input?.also{ applyInputTheme(it, chatTheme.inputDisabled) }
 
         chatTheme.typingIndicator?.primaryColor?.also(binding.operatorTypingAnimationView::addColorFilter)
 
@@ -841,13 +854,15 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         binding.appBarView.applyHeaderTheme(headerTheme)
     }
 
-    private fun applyInputTheme(inputTheme: InputTheme) {
-        binding.sendButton.applyButtonTheme(inputTheme.sendButton)
-        binding.addAttachmentButton.applyButtonTheme(inputTheme.mediaButton)
-        binding.chatDivider.applyColorTheme(inputTheme.divider)
-        binding.messageInputBackground.applyLayerTheme(inputTheme.background)
-        binding.chatEditText.applyTextTheme(textTheme = inputTheme.text, withAlignment = false)
-        inputTheme.placeholder?.textColor?.primaryColor?.also(binding.chatEditText::setHintTextColor)
+    private fun applyInputTheme(defaultTheme: InputTheme, disabledTheme: InputTheme?) {
+        binding.sendButton.applyButtonTheme(defaultTheme.sendButton, disabledTheme?.sendButton)
+        binding.addAttachmentButton.applyButtonTheme(defaultTheme.mediaButton, disabledTheme?.mediaButton)
+        binding.chatDivider.applyColorTheme(defaultTheme.divider, disabledTheme?.divider)
+        binding.messageInputBackground.applyLayerTheme(defaultTheme.background, disabledTheme?.background)
+        // It is impossible to support all possible change to text view related to disabled state
+        // So it is achived manually in [updateChatEditText] method
+        binding.chatEditText.applyTextTheme(textTheme = defaultTheme.text, withAlignment = false)
+        binding.chatEditText.applyHintTheme(defaultTheme.placeholder, disabledTheme?.placeholder)
     }
 
     private fun applyUnreadMessagesTheme(unreadIndicatorTheme: UnreadIndicatorTheme) {

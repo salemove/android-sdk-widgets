@@ -29,6 +29,9 @@ internal data class ChatRemoteConfig(
     @SerializedName("input")
     val inputRemoteConfig: InputRemoteConfig?,
 
+    @SerializedName("inputDisabled")
+    val inputDisabledRemoteConfig: InputRemoteConfig?,
+
     @SerializedName("responseCard")
     val responseCardRemoteConfig: ResponseCardRemoteConfig?,
 
@@ -69,6 +72,7 @@ internal data class ChatRemoteConfig(
         visitorMessage = visitorMessage?.toMessageBalloonTheme(),
         connect = connect?.toEngagementStatesTheme(),
         input = inputRemoteConfig?.toInputTheme(),
+        inputDisabled = inputDisabledRemoteConfig?.toInputTheme(),
         responseCard = responseCardRemoteConfig?.toResponseCardTheme(),
         audioUpgrade = audioUpgradeRemoteConfig?.toUpgradeTheme(),
         videoUpgrade = videoUpgradeRemoteConfig?.toUpgradeTheme(),

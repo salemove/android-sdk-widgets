@@ -28,6 +28,7 @@ internal fun ChatTheme(pallet: ColorPallet): ChatTheme = ChatTheme(
     visitorMessage = ChatVisitorMessageTheme(pallet),
     connect = ChatEngagementStatesTheme(pallet),
     input = ChatInputTheme(pallet),
+    inputDisabled = ChatInputDisabledTheme(pallet),
     responseCard = ChatResponseCardTheme(pallet),
     audioUpgrade = MediaUpgradeTheme(pallet),
     videoUpgrade = MediaUpgradeTheme(pallet),
@@ -127,6 +128,41 @@ private fun ChatInputTheme(pallet: ColorPallet): InputTheme? = pallet.run {
             divider = shadeColorTheme,
             sendButton = ButtonTheme(iconColor = primaryColorTheme),
             mediaButton = ButtonTheme(iconColor = normalColorTheme),
+            fileUploadBar = FileUploadBarTheme(
+                filePreview = FilePreviewTheme(
+                    text = BaseLightColorTextTheme(this),
+                    errorIcon = negativeColorTheme,
+                    background = LayerTheme(neutralColorTheme),
+                    errorBackground = LayerTheme(negativeColorTheme)
+                ),
+                uploading = DefaultUploadFileTheme(this),
+                uploaded = DefaultUploadFileTheme(this),
+                error = UploadFileTheme(text = BaseNegativeColorTextTheme(this), info = BaseDarkColorTextTheme(this)),
+                progress = primaryColorTheme,
+                errorProgress = negativeColorTheme,
+                removeButton = normalColorTheme
+            )
+        )
+    }
+}
+
+/**
+ * Default theme for Disabled Input
+ */
+private fun ChatInputDisabledTheme(pallet: ColorPallet): InputTheme? = pallet.run {
+    composeIfAtLeastOneNotNull(
+        darkColorTheme,
+        normalColorTheme,
+        primaryColorTheme,
+        shadeColorTheme,
+        negativeColorTheme
+    ) {
+        InputTheme(
+            text = BaseShaderColorTextTheme(this),
+            placeholder = BaseShaderColorTextTheme(this),
+            divider = shadeColorTheme,
+            sendButton = ButtonTheme(iconColor = shadeColorTheme),
+            mediaButton = ButtonTheme(iconColor = shadeColorTheme),
             fileUploadBar = FileUploadBarTheme(
                 filePreview = FilePreviewTheme(
                     text = BaseLightColorTextTheme(this),

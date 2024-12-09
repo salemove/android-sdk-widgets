@@ -1,5 +1,6 @@
 package com.glia.widgets.view.unifiedui
 
+import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.LinearGradient
@@ -7,7 +8,9 @@ import android.graphics.Shader
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.StateListDrawable
 import android.os.Build
+import android.util.StateSet
 import android.util.TypedValue
 import android.view.View
 import android.widget.ImageButton
@@ -17,6 +20,7 @@ import android.widget.TextView
 import com.glia.widgets.R
 import com.glia.widgets.helper.applyShadow
 import com.glia.widgets.helper.colorForState
+import com.glia.widgets.helper.setCompoundDrawableTintListCompat
 import com.glia.widgets.view.button.GliaSurveyOptionButton
 import com.glia.widgets.view.unifiedui.theme.base.ButtonTheme
 import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
@@ -32,9 +36,11 @@ import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.shape.CornerFamily
 
-internal fun View.applyColorTheme(color: ColorTheme?) {
-    background = createBackgroundFromTheme(color ?: return)
-    backgroundTintList = null
+internal fun View.applyColorTheme(defaultColor: ColorTheme?, disabledColor: ColorTheme? = null) {
+    createDrawableStateList(defaultColor, disabledColor)?.let {
+        background = it
+        backgroundTintList = null
+    }
 }
 
 internal fun createBackgroundFromTheme(color: ColorTheme): Drawable = color.run {
@@ -49,34 +55,76 @@ internal fun createBackgroundFromTheme(color: ColorTheme): Drawable = color.run 
  * will update whole background without keeping an old background or stroke
  * in case when the old background differs from [GradientDrawable]
  */
-internal fun View.applyLayerTheme(layer: LayerTheme?) {
-    if (layer?.fill == null && layer?.stroke == null) return
+internal fun View.applyLayerTheme(defTheme: LayerTheme?, disabledTheme: LayerTheme? = null) {
+    if (defTheme?.fill == null && defTheme?.stroke == null) return
 
-    val drawable = (background as? GradientDrawable) ?: GradientDrawable()
+    var drawable: GradientDrawable? = null
+    // The part below is needed to preserve GradientDrawable/background properties that are `null`.
+    // For example without this implementation if `cornerRadius = null` but `stroke = Color.RED` then
+    // whatever corner radios is in the default UI implementation it would automatically become 0 instead
+    if (background is StateListDrawable) {
+        drawable = background.current as? GradientDrawable
+    } else if (background is GradientDrawable) {
+        drawable = background as GradientDrawable
+    }
+    if (drawable == null) {
+        drawable = GradientDrawable()
+    }
 
     if (backgroundTintList != null) {
         drawable.color = backgroundTintList
         backgroundTintList = null
     }
 
-    layer.fill?.also {
+    applyLayerTheme(drawable, defTheme, disabledTheme)
+}
+
+private fun View.applyLayerTheme(originalDrawable: GradientDrawable?, defTheme: LayerTheme?, disabledTheme: LayerTheme?) {
+    if (originalDrawable == null || defTheme == null) return
+    val newBackground = StateListDrawable()
+    newBackground.addState(
+        StateSet.WILD_CARD,
+        originalDrawable.mutateWithSettings(defTheme, context)
+    )
+    if (disabledTheme != null) {
+        newBackground.addState(
+            intArrayOf(-android.R.attr.state_enabled),
+            originalDrawable.mutateWithSettings(disabledTheme, context)
+        )
+    }
+
+    background = newBackground
+}
+
+
+private fun GradientDrawable.mutateWithSettings(theme: LayerTheme?, context: Context): GradientDrawable {
+    return mutateWithSettings(theme, context.resources.getDimensionPixelSize(R.dimen.glia_px))
+}
+
+private fun GradientDrawable.mutateWithSettings(theme: LayerTheme?, fallbackStrokeWidth: Int): GradientDrawable {
+    val clone = (mutate() as? GradientDrawable) ?: GradientDrawable()
+
+    if (theme == null) return clone
+    theme.fill?.let {
         if (it.isGradient) {
-            drawable.colors = it.valuesArray
+            clone.colors = it.valuesArray
         } else {
-            drawable.setColor(it.primaryColor)
+            clone.setColor(it.primaryColor)
         }
     }
 
-    layer.stroke?.also {
-        drawable.setStroke(
-            layer.borderWidthInt ?: context.resources.getDimensionPixelSize(R.dimen.glia_px),
+    theme.stroke?.let {
+        clone.setStroke(
+            theme.borderWidthInt ?: fallbackStrokeWidth,
             it
         )
     }
 
-    layer.cornerRadius?.also { drawable.cornerRadius = it }
+    theme.cornerRadius?.let {
+        clone.cornerRadius = it
+    }
 
-    background = drawable
+    return clone
 }
 
 internal fun ShapeableImageView.applyLayerTheme(layer: LayerTheme?) {
@@ -135,6 +183,21 @@ internal fun TextView.applyTextColorTheme(color: ColorTheme?) {
     color.primaryColorStateList.let(::setCompoundDrawableTintList)
 }
 
+internal fun TextView.applyTextColor(defaultColor: Int, disabledColor: Int? = null) {
+    setTextColor(createColorStateList(defaultColor, disabledColor))
+    setCompoundDrawableTintListCompat(createColorStateList(defaultColor, disabledColor))
+}
+
+internal fun TextView.applyHintColor(defaultColor: Int, disabledColor: Int? = null) {
+    setHintTextColor(createColorStateList(defaultColor, disabledColor))
+}
+
+internal fun TextView.applyHintTheme(defaultTheme: TextTheme?, disabledTheme: TextTheme? = null) {
+    defaultTheme?.textColor?.primaryColor?.let {
+        applyHintColor(it, disabledTheme?.textColor?.primaryColor)
+    }
+}
+
 internal fun TextView.applyTextTheme(
     textTheme: TextTheme?,
     withBackground: Boolean = false,
@@ -184,8 +247,8 @@ internal fun MaterialButton.applyButtonTheme(buttonTheme: ButtonTheme?) {
     }
 }
 
-internal fun ImageView.applyButtonTheme(buttonTheme: ButtonTheme?) {
-    applyImageColorTheme(buttonTheme?.iconColor)
+internal fun ImageView.applyButtonTheme(buttonMainTheme: ButtonTheme?, buttonDisabledTheme: ButtonTheme? = null) {
+    applyImageColorTheme(buttonMainTheme?.iconColor, buttonDisabledTheme?.iconColor)
 }
 
 internal fun CircularProgressIndicator.applyIndicatorColorTheme(colorTheme: ColorTheme?) {
@@ -196,8 +259,40 @@ internal fun ProgressBar.applyProgressColorTheme(colorTheme: ColorTheme?) {
     colorTheme?.primaryColorStateList?.also(::setIndeterminateTintList)
 }
 
-internal fun ImageView.applyImageColorTheme(colorTheme: ColorTheme?) {
-    colorTheme?.primaryColorStateList?.also(::setImageTintList)
+internal fun ImageView.applyImageColor(defaultColor: Int, disabledColor: Int? = null) {
+    imageTintList = createColorStateList(defaultColor, disabledColor)
+}
+
+internal fun ImageView.applyImageColorTheme(defaultTheme: ColorTheme?, disabledTheme: ColorTheme? = null) {
+    defaultTheme?.primaryColor?.let { applyImageColor(it, disabledTheme?.primaryColor) }
+}
+
+private fun createColorStateList(defaultColor: Int?, disabledColor: Int?): ColorStateList? {
+    if (defaultColor == null) return null
+    if (disabledColor == null) return ColorStateList.valueOf(defaultColor)
+
+    // For future -> default state list can be found here:
+    // https://developer.android.com/guide/topics/resources/color-list-resource
+    return ColorStateList(
+        arrayOf( // Reminder: order maters
+            intArrayOf(-android.R.attr.state_enabled),
+            intArrayOf(), // empty array -> default fallback
+        ),
+        intArrayOf(
+            disabledColor,
+            defaultColor
+        )
+    )
+}
+
+private fun createDrawableStateList(defColor: ColorTheme?, disabledColor: ColorTheme? = null): StateListDrawable? {
+    if (defColor == null) return null
+    val stateList = StateListDrawable()
+    stateList.addState(StateSet.WILD_CARD, createBackgroundFromTheme(defColor))
+
+    if (disabledColor == null) return stateList
+    stateList.addState(intArrayOf(-android.R.attr.state_enabled), createBackgroundFromTheme(disabledColor))
+    return stateList
 }
 
 internal fun FloatingActionButton.applyBarButtonStatesTheme(barButtonStatesTheme: BarButtonStatesTheme?) {

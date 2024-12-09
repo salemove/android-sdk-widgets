@@ -31,6 +31,12 @@ internal fun BaseNormalColorTextTheme(pallet: ColorPallet): TextTheme? =
     BaseText(pallet.normalColorTheme)
 
 /**
+ * Default theme for `shadeColor` text
+ */
+internal fun BaseShaderColorTextTheme(pallet: ColorPallet): TextTheme? =
+    BaseText(pallet.shadeColorTheme)
+
+/**
  * Default theme for `basePrimaryColor` text
  */
 internal fun BasePrimaryColorTextTheme(pallet: ColorPallet): TextTheme? =

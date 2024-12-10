@@ -82,6 +82,8 @@ import com.glia.widgets.core.engagement.domain.ShouldShowMediaEngagementViewUseC
 import com.glia.widgets.core.engagement.domain.UpdateOperatorDefaultImageUrlUseCase;
 import com.glia.widgets.core.fileupload.domain.AddFileAttachmentsObserverUseCase;
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase;
+import com.glia.widgets.core.fileupload.domain.ChatFileAttachmentRepositoryUseCase;
+import com.glia.widgets.core.fileupload.domain.ChatFileAttachmentRepositoryUseCaseImpl;
 import com.glia.widgets.core.fileupload.domain.GetFileAttachmentsUseCase;
 import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentObserverUseCase;
 import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentUseCase;
@@ -372,7 +374,7 @@ public class UseCaseFactory {
     public GliaSendMessageUseCase createGliaSendMessageUseCase() {
         return new GliaSendMessageUseCase(
             repositoryFactory.getGliaMessageRepository(),
-            repositoryFactory.getGliaFileAttachmentRepository(),
+            getChatFileAttachmentRepositoryUseCase(),
             getIsOperatorPresentUseCase(),
             repositoryFactory.getSecureConversationsRepository(),
             createManageSecureMessagingStatusUseCase()
@@ -390,7 +392,7 @@ public class UseCaseFactory {
     @NonNull
     public AddFileAttachmentsObserverUseCase createAddFileAttachmentsObserverUseCase() {
         return new AddFileAttachmentsObserverUseCase(
-            repositoryFactory.getGliaFileAttachmentRepository(),
+            getChatFileAttachmentRepositoryUseCase(),
             schedulers
         );
     }
@@ -399,14 +401,14 @@ public class UseCaseFactory {
     public AddFileToAttachmentAndUploadUseCase createAddFileToAttachmentAndUploadUseCase() {
         return new AddFileToAttachmentAndUploadUseCase(
             getIsQueueingOrEngagementUseCase(),
-            repositoryFactory.getGliaFileAttachmentRepository(),
+            getChatFileAttachmentRepositoryUseCase(),
             createManageSecureMessagingStatusUseCase()
         );
     }
 
     @NonNull
     public GetFileAttachmentsUseCase createGetFileAttachmentsUseCase() {
-        return new GetFileAttachmentsUseCase(repositoryFactory.getGliaFileAttachmentRepository());
+        return new GetFileAttachmentsUseCase(getChatFileAttachmentRepositoryUseCase());
     }
 
     @NonNull
@@ -416,19 +418,19 @@ public class UseCaseFactory {
 
     @NonNull
     public RemoveFileAttachmentUseCase createRemoveFileAttachmentUseCase() {
-        return new RemoveFileAttachmentUseCase(repositoryFactory.getGliaFileAttachmentRepository());
+        return new RemoveFileAttachmentUseCase(getChatFileAttachmentRepositoryUseCase());
     }
 
     @NonNull
     public SupportedFileCountCheckUseCase createSupportedFileCountCheckUseCase() {
-        return new SupportedFileCountCheckUseCase(repositoryFactory.getGliaFileAttachmentRepository());
+        return new SupportedFileCountCheckUseCase(getChatFileAttachmentRepositoryUseCase());
     }
 
     @NonNull
     public IsShowSendButtonUseCase createIsShowSendButtonUseCase() {
         return new IsShowSendButtonUseCase(
             getIsQueueingOrEngagementUseCase(),
-            repositoryFactory.getGliaFileAttachmentRepository(),
+            getChatFileAttachmentRepositoryUseCase(),
             createManageSecureMessagingStatusUseCase()
         );
     }
@@ -1085,6 +1087,15 @@ public class UseCaseFactory {
         return new HasOngoingSecureConversationUseCase(
             repositoryFactory.getSecureConversationsRepository(),
             getEngagementStateUseCase()
+        );
+    }
+
+    @NonNull
+    public ChatFileAttachmentRepositoryUseCase getChatFileAttachmentRepositoryUseCase() {
+        return new ChatFileAttachmentRepositoryUseCaseImpl(
+            repositoryFactory.getEngagementRepository(),
+            repositoryFactory.getGliaFileAttachmentRepository(),
+            repositoryFactory.getSecureFileAttachmentRepository()
         );
     }
 }

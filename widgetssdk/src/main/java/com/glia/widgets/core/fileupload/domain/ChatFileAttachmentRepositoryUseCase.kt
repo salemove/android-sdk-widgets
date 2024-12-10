@@ -4,16 +4,16 @@ import com.glia.widgets.core.fileupload.FileAttachmentRepository
 import com.glia.widgets.engagement.EngagementRepository
 import io.reactivex.rxjava3.core.Flowable
 
-internal interface FileAttachmentRepositoryUseCase {
+internal interface ChatFileAttachmentRepositoryUseCase {
     operator fun invoke(): FileAttachmentRepository
     fun flowable(): Flowable<FileAttachmentRepository>
 }
 
-internal class FileAttachmentRepositoryUseCaseImpl(
+internal class ChatFileAttachmentRepositoryUseCaseImpl(
     private val engagementRepository: EngagementRepository,
     private val engagementFileAttachmentRepository: FileAttachmentRepository,
     private val secureFileAttachmentRepository: FileAttachmentRepository
-) : FileAttachmentRepositoryUseCase {
+) : ChatFileAttachmentRepositoryUseCase {
 
     override fun invoke(): FileAttachmentRepository = when {
         engagementRepository.isQueueingOrLiveEngagement -> engagementFileAttachmentRepository

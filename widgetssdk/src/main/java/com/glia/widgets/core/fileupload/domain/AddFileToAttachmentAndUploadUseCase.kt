@@ -2,7 +2,6 @@ package com.glia.widgets.core.fileupload.domain
 
 import com.glia.androidsdk.engagement.EngagementFile
 import com.glia.widgets.core.engagement.exception.EngagementMissingException
-import com.glia.widgets.core.fileupload.EngagementFileAttachmentRepository
 import com.glia.widgets.core.fileupload.exception.RemoveBeforeReUploadingException
 import com.glia.widgets.core.fileupload.exception.SupportedFileCountExceededException
 import com.glia.widgets.core.fileupload.exception.SupportedFileSizeExceededException
@@ -12,14 +11,14 @@ import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 
 internal class AddFileToAttachmentAndUploadUseCase(
     private val isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase,
-    private val fileAttachmentRepository: EngagementFileAttachmentRepository,
+    private val fileAttachmentUseCase: ChatFileAttachmentRepositoryUseCase,
     private val manageSecureMessagingStatusUseCase: ManageSecureMessagingStatusUseCase
 ) {
     private val isSupportedFileCountExceeded: Boolean
-        get() = fileAttachmentRepository.getAttachedFilesCount() > SupportedFileCountCheckUseCase.SUPPORTED_FILE_COUNT
+        get() = fileAttachmentUseCase().getAttachedFilesCount() > SupportedFileCountCheckUseCase.SUPPORTED_FILE_COUNT
 
     fun execute(file: LocalAttachment, listener: Listener) {
-        if (fileAttachmentRepository.isFileAttached(file.uri)) {
+        if (fileAttachmentUseCase().isFileAttached(file.uri)) {
             listener.onError(RemoveBeforeReUploadingException())
         } else {
             onFileNotAttached(file, listener)
@@ -27,25 +26,25 @@ internal class AddFileToAttachmentAndUploadUseCase(
     }
 
     private fun onFileNotAttached(file: LocalAttachment, listener: Listener) {
-        fileAttachmentRepository.attachFile(file)
+        fileAttachmentUseCase().attachFile(file)
         if (isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement || manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging) {
             onHasOngoingOrSecureEngagement(file, listener)
         } else {
-            fileAttachmentRepository.setFileAttachmentEngagementMissing(file.uri)
+            fileAttachmentUseCase().setFileAttachmentEngagementMissing(file.uri)
             listener.onError(EngagementMissingException())
         }
     }
 
     private fun onHasOngoingOrSecureEngagement(file: LocalAttachment, listener: Listener) {
         if (isSupportedFileCountExceeded) {
-            fileAttachmentRepository.setSupportedFileAttachmentCountExceeded(file.uri)
+            fileAttachmentUseCase().setSupportedFileAttachmentCountExceeded(file.uri)
             listener.onError(SupportedFileCountExceededException())
         } else if (isSupportedFileSizeExceeded(file)) {
-            fileAttachmentRepository.setFileAttachmentTooLarge(file.uri)
+            fileAttachmentUseCase().setFileAttachmentTooLarge(file.uri)
             listener.onError(SupportedFileSizeExceededException())
         } else {
             listener.onStarted()
-            fileAttachmentRepository.uploadFile(file, listener)
+            fileAttachmentUseCase().uploadFile(file, listener)
         }
     }
 

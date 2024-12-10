@@ -23,6 +23,7 @@ internal interface FileAttachmentRepository {
     fun detachAllFiles()
     fun setFileAttachmentTooLarge(uri: Uri)
     fun setSupportedFileAttachmentCountExceeded(uri: Uri)
+    fun setFileAttachmentEngagementMissing(uri: Uri)
 }
 
 internal abstract class BaseFileAttachmentRepository : FileAttachmentRepository {
@@ -161,7 +162,7 @@ internal abstract class BaseFileAttachmentRepository : FileAttachmentRepository 
         setFileAttachmentStatus(uri, LocalAttachment.Status.ERROR_SUPPORTED_FILE_ATTACHMENT_COUNT_EXCEEDED)
     }
 
-    fun setFileAttachmentEngagementMissing(uri: Uri) {
+    override fun setFileAttachmentEngagementMissing(uri: Uri) {
         setFileAttachmentStatus(uri, LocalAttachment.Status.ERROR_ENGAGEMENT_MISSING)
     }
 

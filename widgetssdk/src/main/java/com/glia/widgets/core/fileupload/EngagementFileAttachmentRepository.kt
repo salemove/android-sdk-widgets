@@ -4,7 +4,6 @@ import com.glia.widgets.core.engagement.exception.EngagementMissingException
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase
 import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.di.GliaCore
-import java.util.Observable
 import java.util.Observer
 import kotlin.jvm.optionals.getOrNull
 
@@ -15,10 +14,6 @@ internal class EngagementFileAttachmentRepository(
     override fun uploadFile(file: LocalAttachment, listener: AddFileToAttachmentAndUploadUseCase.Listener) {
         val engagement = gliaCore.currentEngagement.getOrNull()
         when {
-
-//            shouldUseSecureMessagingEndpoints -> {
-//                secureConversations.uploadFile(file.uri, handleFileUpload(file, listener))
-//            }
 
             engagement != null -> {
                 engagement.uploadFile(file.uri, handleFileUpload(file, listener))

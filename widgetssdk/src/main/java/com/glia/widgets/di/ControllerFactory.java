@@ -106,7 +106,6 @@ public class ControllerFactory {
                 useCaseFactory.getEndEngagementUseCase(),
                 useCaseFactory.createAddFileToAttachmentAndUploadUseCase(),
                 useCaseFactory.createAddFileAttachmentsObserverUseCase(),
-                useCaseFactory.createRemoveFileAttachmentObserverUseCase(),
                 useCaseFactory.createGetFileAttachmentsUseCase(),
                 useCaseFactory.createRemoveFileAttachmentUseCase(),
                 useCaseFactory.createSupportedFileCountCheckUseCase(),

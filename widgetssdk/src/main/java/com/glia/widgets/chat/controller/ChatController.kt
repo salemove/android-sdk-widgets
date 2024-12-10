@@ -47,7 +47,6 @@ import com.glia.widgets.core.engagement.domain.UpdateOperatorDefaultImageUrlUseC
 import com.glia.widgets.core.fileupload.domain.AddFileAttachmentsObserverUseCase
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase
 import com.glia.widgets.core.fileupload.domain.GetFileAttachmentsUseCase
-import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentObserverUseCase
 import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentUseCase
 import com.glia.widgets.core.fileupload.domain.SupportedFileCountCheckUseCase
 import com.glia.widgets.core.fileupload.model.LocalAttachment
@@ -104,7 +103,6 @@ internal class ChatController(
     private val endEngagementUseCase: EndEngagementUseCase,
     private val addFileToAttachmentAndUploadUseCase: AddFileToAttachmentAndUploadUseCase,
     private val addFileAttachmentsObserverUseCase: AddFileAttachmentsObserverUseCase,
-    private val removeFileAttachmentObserverUseCase: RemoveFileAttachmentObserverUseCase,
     private val getFileAttachmentsUseCase: GetFileAttachmentsUseCase,
     private val removeFileAttachmentUseCase: RemoveFileAttachmentUseCase,
     private val supportedFileCountCheckUseCase: SupportedFileCountCheckUseCase,

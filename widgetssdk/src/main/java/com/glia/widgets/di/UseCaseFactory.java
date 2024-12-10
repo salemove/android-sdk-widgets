@@ -85,7 +85,6 @@ import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCa
 import com.glia.widgets.core.fileupload.domain.ChatFileAttachmentRepositoryUseCase;
 import com.glia.widgets.core.fileupload.domain.ChatFileAttachmentRepositoryUseCaseImpl;
 import com.glia.widgets.core.fileupload.domain.GetFileAttachmentsUseCase;
-import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentObserverUseCase;
 import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentUseCase;
 import com.glia.widgets.core.fileupload.domain.SupportedFileCountCheckUseCase;
 import com.glia.widgets.core.notification.device.INotificationManager;
@@ -409,11 +408,6 @@ public class UseCaseFactory {
     @NonNull
     public GetFileAttachmentsUseCase createGetFileAttachmentsUseCase() {
         return new GetFileAttachmentsUseCase(getChatFileAttachmentRepositoryUseCase());
-    }
-
-    @NonNull
-    public RemoveFileAttachmentObserverUseCase createRemoveFileAttachmentObserverUseCase() {
-        return new RemoveFileAttachmentObserverUseCase(repositoryFactory.getGliaFileAttachmentRepository());
     }
 
     @NonNull

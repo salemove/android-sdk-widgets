@@ -266,25 +266,24 @@ internal object Dialogs {
             .show()
     }
 
-    //TODO change this during implementation of the Dialog - https://glia.atlassian.net/browse/MOB-3637
     fun showLeaveCurrentConversationDialog(
         context: Context,
-        title: String,
-        onStay: () -> Unit,
-        onLeave: () -> Unit
-    ): AlertDialog = MaterialAlertDialogBuilder(context)
-        .setBackgroundInsetEnd(48)
-        .setBackgroundInsetStart(48)
-        .setBackgroundInsetTop(48)
-        .setBackgroundInsetBottom(48)
-        .setTitle(title)
-        .setIcon(R.drawable.ic_glia_logo)
-        .setMessage("Just random text to make this dialog look not so boring")
-        .setNegativeButton("Stay") { _, _ -> onStay() }
-        .setPositiveButton("Leave") { _, _ -> onLeave() }
-        .setCancelable(true)
-        .setOnCancelListener { onStay() }
-        .show()
+        theme: UiTheme,
+        onStay: View.OnClickListener,
+        onLeave: View.OnClickListener
+    ): AlertDialog {
+        val payload = DialogPayload.Option(
+            title = LocaleString(R.string.secure_messaging_chat_leave_current_conversation_title),
+            message = LocaleString(R.string.secure_messaging_chat_leave_current_conversation_message),
+            positiveButtonText = LocaleString(R.string.secure_messaging_chat_leave_current_conversation_button_positive),
+            negativeButtonText = LocaleString(R.string.secure_messaging_chat_leave_current_conversation_button_negative),
+            poweredByText = poweredByText,
+            positiveButtonClickListener = onStay,
+            negativeButtonClickListener = onLeave
+        )
+
+        return dialogService.showDialog(context, theme, DialogType.OptionWithNegativeNeutral(payload))
+    }
 
     private fun Window.allowOutsideTouch() {
         setFlags(

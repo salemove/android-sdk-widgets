@@ -31,6 +31,17 @@ internal fun NegativeDefaultButtonTheme(pallet: ColorPallet) = pallet.run {
 }
 
 /**
+ * Default theme for Negative Neutral Button
+ */
+internal fun NegativeNeutralDefaultButtonTheme(pallet: ColorPallet) = pallet.run {
+    OutlinedButtonTheme(
+        text = negativeColorTheme,
+        background = lightColorTheme,
+        stroke = shadeColorTheme,
+    )
+}
+
+/**
  * Default theme for Link Button
  */
 internal fun LinkDefaultButtonTheme(pallet: ColorPallet) = pallet.run {
@@ -46,13 +57,14 @@ internal fun LinkDefaultButtonTheme(pallet: ColorPallet) = pallet.run {
  */
 internal fun OutlinedButtonTheme(
     text: ColorTheme?,
-    stroke: ColorTheme?
-): ButtonTheme? = composeIfAtLeastOneNotNull(text, stroke) {
+    stroke: ColorTheme?,
+    background: ColorTheme? = null,
+): ButtonTheme? = composeIfAtLeastOneNotNull(text, stroke, background) {
     ButtonTheme(
         text = TextTheme(textColor = text),
-        background = LayerTheme(stroke = stroke?.primaryColor),
+        background = LayerTheme(fill = background, stroke = stroke?.primaryColor),
         iconColor = null,
-        elevation = null,
+        elevation = 0f,
         shadowColor = null
     )
 }

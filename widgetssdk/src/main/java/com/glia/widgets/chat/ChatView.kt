@@ -769,7 +769,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     private fun showLeaveCurrentConversationDialog(action: LeaveDialogAction) = showDialog {
         Dialogs.showLeaveCurrentConversationDialog(
             context,
-            action.name,
+            theme,
             onStay = {
                 resetDialogStateAndDismiss()
                 controller?.leaveCurrentConversationDialogStayClicked()

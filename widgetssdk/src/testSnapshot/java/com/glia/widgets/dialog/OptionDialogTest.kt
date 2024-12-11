@@ -10,34 +10,47 @@ internal class OptionDialogTest : SnapshotTest(
     renderingMode = fullWidthRenderMode
 ), SnapshotDialog {
 
-    private val dialogType: DialogType = DialogType.Option(
-        DialogPayload.Option(
-            title = title,
-            message = message,
-            positiveButtonText = positiveButtonText,
-            negativeButtonText = negativeButtonText,
-            poweredByText = poweredByText,
-            positiveButtonClickListener = {},
-            negativeButtonClickListener = {}
+    private val dialogPayload = DialogPayload.Option(
+        title = title,
+        message = message,
+        positiveButtonText = positiveButtonText,
+        negativeButtonText = negativeButtonText,
+        poweredByText = poweredByText,
+        positiveButtonClickListener = {},
+        negativeButtonClickListener = {}
 
-        )
     )
+
+    private val default = DialogType.Option(dialogPayload)
+    private val negativeNeutral = DialogType.OptionWithNegativeNeutral(dialogPayload)
 
     @Test
     fun withDefaultTheme() {
-        val view = inflateView(context = context, dialogType = dialogType)
+        val view = inflateView(context = context, dialogType = default)
         snapshot(view)
     }
 
     @Test
     fun withUnifiedTheme() {
-        val view = inflateView(context = context, unifiedTheme(), dialogType = dialogType)
+        val view = inflateView(context = context, unifiedTheme(), dialogType = default)
         snapshot(view)
     }
 
     @Test
     fun withGlobalColors() {
-        val view = inflateView(context = context, unifiedThemeWithGlobalColors(), dialogType = dialogType)
+        val view = inflateView(context = context, unifiedThemeWithGlobalColors(), dialogType = default)
+        snapshot(view)
+    }
+
+    @Test
+    fun negativeNeutralDefaultTheme() {
+        val view = inflateView(context = context, dialogType = negativeNeutral)
+        snapshot(view)
+    }
+
+    @Test
+    fun negativeNeutralGlobalColors() {
+        val view = inflateView(context = context, unifiedThemeWithGlobalColors(), dialogType = negativeNeutral)
         snapshot(view)
     }
 }

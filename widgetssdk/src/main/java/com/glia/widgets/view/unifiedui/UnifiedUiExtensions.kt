@@ -161,9 +161,12 @@ internal fun TextView.applyTextTheme(
 internal fun MaterialButton.applyButtonTheme(buttonTheme: ButtonTheme?) {
     buttonTheme?.background?.also { bg ->
         bg.fill?.also { backgroundTintList = it.primaryColorStateList }
-        bg.stroke?.also { strokeColor = ColorStateList.valueOf(it) }
-        bg.cornerRadiusInt?.also { cornerRadius = it }
-        bg.borderWidthInt?.also { strokeWidth = it }
+        bg.stroke?.also { borderColor ->
+            strokeColor = ColorStateList.valueOf(borderColor)
+            // If `borderWidth` is `null` even though `strokeColor` is provided then use default border width
+            strokeWidth = bg.borderWidthInt ?: resources.getDimensionPixelSize(R.dimen.glia_px)
+            bg.cornerRadiusInt?.also { cornerRadius = it }
+        }
     }
 
     buttonTheme?.elevation?.also {

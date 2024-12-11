@@ -98,3 +98,39 @@ internal class VerticalReversedOptionDialogViewInflater(
     themeWrapper,
     payload
 )
+
+
+internal class OptionWithNegativeNeutralDialogViewInflater(layoutInflater: LayoutInflater, themeWrapper: AlertDialogConfiguration, payload: DialogPayload.Option) :
+    DefaultOptionWithNegativeNeutralDialogViewInflater<OptionDialogViewBinding>(OptionDialogViewBinding(layoutInflater), themeWrapper, payload)
+
+internal class VerticalOptionWithNegativeNeutralDialogViewInflater(
+    layoutInflater: LayoutInflater,
+    themeWrapper: AlertDialogConfiguration,
+    payload: DialogPayload.Option
+) :
+    DefaultOptionWithNegativeNeutralDialogViewInflater<VerticalOptionDialogViewBinding>(VerticalOptionDialogViewBinding(layoutInflater), themeWrapper, payload)
+
+internal open class DefaultOptionWithNegativeNeutralDialogViewInflater<T : DefaultOptionDialogViewBinding<*>>(
+    binding: T,
+    themeWrapper: AlertDialogConfiguration,
+    payload: DialogPayload.Option
+) : BaseOptionDialogViewInflater<T>(binding, themeWrapper, payload) {
+    final override fun setup(binding: T, configuration: AlertDialogConfiguration, payload: DialogPayload.Option) {
+        super.setup(binding, configuration, payload)
+        val theme = configuration.theme
+        setupButton(
+            binding.negativeButton,      // Reversed button positions: negative button takes all properties of positive
+            payload.positiveButtonText,
+            theme.positiveButton,
+            configuration.properties.typeface,
+            payload.positiveButtonClickListener
+        )
+        setupButton(
+            binding.positiveButton,      // Reversed button positions: positive button takes all properties of negative
+            payload.negativeButtonText,
+            theme.negativeNeutralButton, // Not 'negative' theme but from 'negative neutral' theme
+            configuration.properties.typeface,
+            payload.negativeButtonClickListener
+        )
+    }
+}

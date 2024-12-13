@@ -243,7 +243,8 @@ public class ControllerFactory {
                 useCaseFactory.getEngagementStateUseCase(),
                 useCaseFactory.getCurrentOperatorUseCase(),
                 useCaseFactory.getVisitorMediaUseCase(),
-                useCaseFactory.getScreenSharingUseCase()
+                useCaseFactory.getScreenSharingUseCase(),
+                useCaseFactory.getEngagementTypeUseCase()
             );
         }
         return serviceChatHeadController;
@@ -259,7 +260,8 @@ public class ControllerFactory {
                 useCaseFactory.getEngagementStateUseCase(),
                 useCaseFactory.getCurrentOperatorUseCase(),
                 useCaseFactory.getVisitorMediaUseCase(),
-                useCaseFactory.getScreenSharingUseCase()
+                useCaseFactory.getScreenSharingUseCase(),
+                useCaseFactory.getEngagementTypeUseCase()
             );
         }
         return applicationChatHeadController;
@@ -390,8 +392,11 @@ public class ControllerFactory {
             useCaseFactory.createIsAuthenticatedUseCase(),
             repositoryFactory.getSecureConversationsRepository(),
             useCaseFactory.getHasPendingSecureConversationsWithTimeoutUseCase(),
+            useCaseFactory.getEngagementStateUseCase(),
+            useCaseFactory.getEngagementTypeUseCase(),
             core,
-            Dependencies.getEngagementLauncher()
+            Dependencies.getEngagementLauncher(),
+            Dependencies.getActivityLauncher()
         );
     }
 

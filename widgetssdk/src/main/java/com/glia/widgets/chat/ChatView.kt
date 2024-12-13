@@ -22,6 +22,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.AdapterDataObserver
+import androidx.transition.AutoTransition
 import androidx.transition.ChangeBounds
 import androidx.transition.ChangeTransform
 import androidx.transition.Fade
@@ -885,7 +886,13 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     }
 
     private fun updateSecureMessagingState(state: ChatState) {
-        TransitionManager.beginDelayedTransition(rootConstraintLayout)
+        TransitionManager.beginDelayedTransition(rootConstraintLayout, AutoTransition()
+            .addTarget(binding.scErrorLabel)
+            .addTarget(binding.scTopBannerTitle)
+            .addTarget(binding.scTopBannerIcon)
+            .addTarget(binding.scTopBannerBackground)
+            .addTarget(binding.scTopBannerDivider)
+        )
         binding.scErrorLabel.isVisible = state.isSecureConversationsUnavailableLabelVisible
         if (state.isSecureConversationsTopBannerVisible.not() && isNeedSupportDropDownShown()) {
             onNeedSupportButtonClicked(null)

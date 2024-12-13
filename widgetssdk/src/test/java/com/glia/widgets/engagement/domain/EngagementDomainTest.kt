@@ -214,9 +214,10 @@ class EngagementDomainTest {
     }
 
     @Test
-    fun `EngagementTypeUseCase isCallVisualizerScreenSharing returns true when current engagement is call visualizer and has no media`() {
+    fun `EngagementTypeUseCase isCallVisualizerScreenSharing returns true when current engagement is call visualizer`() {
         val isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase = mockk(relaxUnitFun = true)
         val isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase = mockk(relaxUnitFun = true)
+        val screenSharingUseCase: ScreenSharingUseCase = mockk(relaxUnitFun = true)
         val operatorMediaUseCase: OperatorMediaUseCase = mockk(relaxUnitFun = true)
         val visitorMediaUseCase: VisitorMediaUseCase = mockk(relaxUnitFun = true)
         val isOperatorPresentUseCase: IsOperatorPresentUseCase = mockk(relaxUnitFun = true)
@@ -224,10 +225,12 @@ class EngagementDomainTest {
         every { isCurrentEngagementCallVisualizerUseCase() } returns true
         every { visitorMediaUseCase.hasMedia } returns false
         every { operatorMediaUseCase.hasMedia } returns false
+        every { screenSharingUseCase.isSharing } returns true
 
         val useCase: EngagementTypeUseCase = EngagementTypeUseCaseImpl(
             isQueueingOrLiveEngagementUseCase = isQueueingOrLiveEngagementUseCase,
             isCurrentEngagementCallVisualizerUseCase = isCurrentEngagementCallVisualizerUseCase,
+            screenSharingUseCase = screenSharingUseCase,
             operatorMediaUseCase = operatorMediaUseCase,
             visitorMediaUseCase = visitorMediaUseCase,
             isOperatorPresentUseCase = isOperatorPresentUseCase
@@ -237,32 +240,36 @@ class EngagementDomainTest {
     }
 
     @Test
-    fun `EngagementTypeUseCase isCallVisualizerScreenSharing returns false when engagement has media`() {
+    fun `EngagementTypeUseCase isCallVisualizerScreenSharing returns true even when engagement has media`() {
         val isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase = mockk(relaxUnitFun = true)
         val isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase = mockk(relaxUnitFun = true)
+        val screenSharingUseCase: ScreenSharingUseCase = mockk(relaxUnitFun = true)
         val operatorMediaUseCase: OperatorMediaUseCase = mockk(relaxUnitFun = true)
         val visitorMediaUseCase: VisitorMediaUseCase = mockk(relaxUnitFun = true)
         val isOperatorPresentUseCase: IsOperatorPresentUseCase = mockk(relaxUnitFun = true)
 
         every { isCurrentEngagementCallVisualizerUseCase() } returns true
         every { visitorMediaUseCase.hasMedia } returns true
-        every { operatorMediaUseCase.hasMedia } returns false
+        every { operatorMediaUseCase.hasMedia } returns true
+        every { screenSharingUseCase.isSharing } returns true
 
         val useCase: EngagementTypeUseCase = EngagementTypeUseCaseImpl(
             isQueueingOrLiveEngagementUseCase = isQueueingOrLiveEngagementUseCase,
             isCurrentEngagementCallVisualizerUseCase = isCurrentEngagementCallVisualizerUseCase,
+            screenSharingUseCase = screenSharingUseCase,
             operatorMediaUseCase = operatorMediaUseCase,
             visitorMediaUseCase = visitorMediaUseCase,
             isOperatorPresentUseCase = isOperatorPresentUseCase
         )
 
-        assertFalse(useCase.isCallVisualizerScreenSharing)
+        assertTrue(useCase.isCallVisualizerScreenSharing)
     }
 
     @Test
     fun `EngagementTypeUseCase isChatEngagement returns true when engagement has no media, is not a cv and operator is present`() {
         val isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase = mockk(relaxUnitFun = true)
         val isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase = mockk(relaxUnitFun = true)
+        val screenSharingUseCase: ScreenSharingUseCase = mockk(relaxUnitFun = true)
         val operatorMediaUseCase: OperatorMediaUseCase = mockk(relaxUnitFun = true)
         val visitorMediaUseCase: VisitorMediaUseCase = mockk(relaxUnitFun = true)
         val isOperatorPresentUseCase: IsOperatorPresentUseCase = mockk(relaxUnitFun = true)
@@ -276,6 +283,7 @@ class EngagementDomainTest {
         val useCase: EngagementTypeUseCase = EngagementTypeUseCaseImpl(
             isQueueingOrLiveEngagementUseCase = isQueueingOrLiveEngagementUseCase,
             isCurrentEngagementCallVisualizerUseCase = isCurrentEngagementCallVisualizerUseCase,
+            screenSharingUseCase = screenSharingUseCase,
             operatorMediaUseCase = operatorMediaUseCase,
             visitorMediaUseCase = visitorMediaUseCase,
             isOperatorPresentUseCase = isOperatorPresentUseCase
@@ -288,6 +296,7 @@ class EngagementDomainTest {
     fun `EngagementTypeUseCase isMediaEngagement returns true when engagement has  media and operator is present`() {
         val isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase = mockk(relaxUnitFun = true)
         val isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase = mockk(relaxUnitFun = true)
+        val screenSharingUseCase: ScreenSharingUseCase = mockk(relaxUnitFun = true)
         val operatorMediaUseCase: OperatorMediaUseCase = mockk(relaxUnitFun = true)
         val visitorMediaUseCase: VisitorMediaUseCase = mockk(relaxUnitFun = true)
         val isOperatorPresentUseCase: IsOperatorPresentUseCase = mockk(relaxUnitFun = true)
@@ -300,6 +309,7 @@ class EngagementDomainTest {
         val useCase: EngagementTypeUseCase = EngagementTypeUseCaseImpl(
             isQueueingOrLiveEngagementUseCase = isQueueingOrLiveEngagementUseCase,
             isCurrentEngagementCallVisualizerUseCase = isCurrentEngagementCallVisualizerUseCase,
+            screenSharingUseCase = screenSharingUseCase,
             operatorMediaUseCase = operatorMediaUseCase,
             visitorMediaUseCase = visitorMediaUseCase,
             isOperatorPresentUseCase = isOperatorPresentUseCase
@@ -385,7 +395,7 @@ class EngagementDomainTest {
     }
 
     @Test
-    fun `OperatorMediaUseCase invoke will emit data only when data is present`() {
+    fun `OperatorMediaUseCase invoke will emit empty media state even when data is absent`() {
         val video = mockk<Video>(relaxUnitFun = true)
 
         val mediaState = mockk<MediaState>(relaxUnitFun = true) {
@@ -406,13 +416,12 @@ class EngagementDomainTest {
 
         verify { engagementRepository.operatorMediaState }
 
-        mediaStateFlow.test().assertNoValues()
+        assertFalse(operatorMediaUseCase.hasMedia)
 
         mediaStateSubject.onNext(Data.Empty)
         mediaStateSubject.onNext(Data.Empty)
         mediaStateSubject.onNext(Data.Empty)
 
-        mediaStateFlow.test().assertNoValues()
         assertFalse(operatorMediaUseCase.hasMedia)
 
         mediaStateSubject.onNext(Data.Value(mediaState))
@@ -426,7 +435,7 @@ class EngagementDomainTest {
     }
 
     @Test
-    fun `VisitorMediaUseCase invoke will emit data only when data is present`() {
+    fun `VisitorMediaUseCase invoke will emit empty media state even when data is absent`() {
         val video = mockk<Video>(relaxUnitFun = true)
 
         val mediaState = mockk<MediaState>(relaxUnitFun = true) {
@@ -448,13 +457,12 @@ class EngagementDomainTest {
 
         verify { engagementRepository.visitorMediaState }
 
-        mediaStateFlow.test().assertNoValues()
+        assertFalse(visitorMediaUseCase.hasMedia)
 
         mediaStateSubject.onNext(Data.Empty)
         mediaStateSubject.onNext(Data.Empty)
         mediaStateSubject.onNext(Data.Empty)
 
-        mediaStateFlow.test().assertNoValues()
         assertFalse(visitorMediaUseCase.hasMedia)
 
         mediaStateSubject.onNext(Data.Value(mediaState))

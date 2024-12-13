@@ -76,6 +76,7 @@ internal object Dependencies {
     @JvmStatic
     val configurationManager: ConfigurationManager by lazy { ConfigurationManagerImpl() }
 
+    @JvmStatic
     val activityLauncher: ActivityLauncher by lazy {
         ActivityLauncherImpl(IntentHelperImpl(), repositoryFactory.engagementRepository)
     }

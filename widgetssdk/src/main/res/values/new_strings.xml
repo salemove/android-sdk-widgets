@@ -240,5 +240,9 @@
     <string name="entry_widget_error_state_description">We couldn\'t load the contacts at this time. This may be due to a temporary syncing issue or network problem.</string>
     <string name="entry_widget_error_state_try_again_button_label">Try again</string>
     <string name="entry_widget_loading_accessibility_label">Loading indicator. Waiting for available options.</string>
+    <string name="entry_widget_ongoing_engagement_description">Ongoing • Tap to return</string>
+    <string name="entry_widget_ongoing_engagement_button_accessibility_hint">Returns to ongoing engagement</string>
+    <string name="entry_widget_call_visualizer_button_label">Call Visualizer</string>
+    <string name="entry_widget_call_visualizer_description">You are already in contact with the support team</string>
 
 </resources>

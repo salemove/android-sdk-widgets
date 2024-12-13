@@ -2,7 +2,8 @@ package com.glia.widgets.entrywidget
 
 import android.COMMON_EXTENSIONS_CLASS_PATH
 import android.app.Activity
-import com.glia.androidsdk.Engagement
+import com.glia.androidsdk.Engagement.MediaType
+import com.glia.androidsdk.engagement.EngagementState
 import com.glia.androidsdk.queuing.Queue
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.core.queue.QueueRepository
@@ -10,8 +11,13 @@ import com.glia.widgets.core.queue.QueuesState
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.core.secureconversations.domain.HasOngoingSecureConversationUseCase
 import com.glia.widgets.di.GliaCore
+import com.glia.widgets.engagement.EngagementUpdateState
+import com.glia.widgets.engagement.State
+import com.glia.widgets.engagement.domain.EngagementStateUseCase
+import com.glia.widgets.engagement.domain.EngagementTypeUseCase
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.mediaTypes
+import com.glia.widgets.launcher.ActivityLauncher
 import com.glia.widgets.launcher.EngagementLauncher
 import io.mockk.every
 import io.mockk.mockk
@@ -24,8 +30,10 @@ import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.mock
 
 class EntryWidgetControllerTest {
 
@@ -56,11 +64,14 @@ class EntryWidgetControllerTest {
     private lateinit var isAuthenticatedUseCase: IsAuthenticatedUseCase
     private lateinit var secureConversationsRepository: SecureConversationsRepository
     private lateinit var hasOngoingSecureConversationUseCase: HasOngoingSecureConversationUseCase
+    private lateinit var engagementStateUseCase: EngagementStateUseCase
+    private lateinit var engagementTypeUseCase: EngagementTypeUseCase
     private lateinit var core: GliaCore
     private lateinit var controller: EntryWidgetController
     private lateinit var view: EntryWidgetContract.View
     private lateinit var activity: Activity
     private lateinit var engagementLauncher: EngagementLauncher
+    private lateinit var activityLauncher: ActivityLauncher
     private lateinit var disposable: CompositeDisposable
 
     @Before
@@ -76,18 +87,24 @@ class EntryWidgetControllerTest {
         isAuthenticatedUseCase = mockk()
         secureConversationsRepository = mockk()
         hasOngoingSecureConversationUseCase = mockk()
+        engagementStateUseCase = mockk()
+        engagementTypeUseCase = mockk()
         core = mockk()
         activity = mockk()
         view = mockk(relaxUnitFun = true)
         engagementLauncher = mockk(relaxUnitFun = true)
+        activityLauncher = mockk(relaxUnitFun = true)
 
         controller = EntryWidgetController(
             queueRepository,
             isAuthenticatedUseCase,
             secureConversationsRepository,
             hasOngoingSecureConversationUseCase,
+            engagementStateUseCase,
+            engagementTypeUseCase,
             core,
             engagementLauncher,
+            activityLauncher,
             disposable
         )
     }
@@ -106,7 +123,9 @@ class EntryWidgetControllerTest {
         unreadMessagesCount: Int? = null,
         hasOngoingSc: Boolean? = null,
         isAuthenticated: Boolean = false,
-        whiteLabel: Boolean = false
+        whiteLabel: Boolean = false,
+        engagementState: State = State.NoEngagement,
+        engagementType: MediaType = MediaType.UNKNOWN
     ) {
         every { core.isInitialized } returns coreInitialized
         every { queueRepository.queuesState } returns (queuesState?.let { Flowable.just(it) } ?: Flowable.never())
@@ -114,6 +133,8 @@ class EntryWidgetControllerTest {
             ?: Flowable.never())
         every { hasOngoingSecureConversationUseCase() } returns (hasOngoingSc?.let { Flowable.just(it) } ?: Flowable.never())
         every { isAuthenticatedUseCase() } returns isAuthenticated
+        every { engagementStateUseCase() } returns Flowable.just(engagementState)
+        every { engagementTypeUseCase() } returns Flowable.just(engagementType)
         every { view.whiteLabel } returns whiteLabel
     }
 
@@ -203,7 +224,7 @@ class EntryWidgetControllerTest {
 
     @Test
     fun `showItems is called with empty item when media types are unwanted and view type is Messaging Live Support`() {
-        every { any<List<Queue>>().mediaTypes } returns listOf(Engagement.MediaType.MESSAGING)
+        every { any<List<Queue>>().mediaTypes } returns listOf(MediaType.MESSAGING)
 
         mockInputData(
             coreInitialized = true,
@@ -224,10 +245,10 @@ class EntryWidgetControllerTest {
     @Test
     fun `showItems is called with properly ordered items when view type is Messaging Live Support`() {
         every { any<List<Queue>>().mediaTypes } returns listOf(
-            Engagement.MediaType.TEXT,
-            Engagement.MediaType.MESSAGING,
-            Engagement.MediaType.AUDIO,
-            Engagement.MediaType.VIDEO
+            MediaType.TEXT,
+            MediaType.MESSAGING,
+            MediaType.AUDIO,
+            MediaType.VIDEO
         )
 
         mockInputData(
@@ -283,21 +304,27 @@ class EntryWidgetControllerTest {
     }
 
     @Test
-    fun `showItems is called with Messaging item when state is Empty but has ongoing SC and view type is not Messaging Live Support`() {
+    fun `showItems is called with MessagingOngoing item when state is Empty but has ongoing SC and view type is not Messaging Live Support`() {
         val unreadMessagesCount = 2
+        val engagementState = mock<EngagementState>()
+        val engagementUpdateState = EngagementUpdateState.Ongoing(mockk())
 
         mockInputData(
             coreInitialized = true,
             queuesState = QueuesState.Empty,
             unreadMessagesCount = unreadMessagesCount,
             hasOngoingSc = true,
-            isAuthenticated = true
+            isAuthenticated = true,
+            engagementState = State.Update(engagementState, engagementUpdateState),
+            engagementType = MediaType.MESSAGING,
         )
+
+        every { engagementTypeUseCase.isCallVisualizer } returns false
 
         controller.setView(view, EntryWidgetContract.ViewType.EMBEDDED_VIEW)
 
         val messaging = listOf(
-            EntryWidgetContract.ItemType.Messaging(unreadMessagesCount),
+            EntryWidgetContract.ItemType.MessagingOngoing(unreadMessagesCount),
             EntryWidgetContract.ItemType.PoweredBy
         )
 
@@ -345,7 +372,7 @@ class EntryWidgetControllerTest {
     }
 
     @Test
-    fun `showItems is called with Messaging item when state is Loading but has ongoing SC and view type is not Messaging Live Support`() {
+    fun `showItems is called with MessagingOngoing item when state is Loading but has ongoing SC and view type is not Messaging Live Support`() {
         val unreadMessagesCount = 2
 
         mockInputData(
@@ -353,13 +380,14 @@ class EntryWidgetControllerTest {
             queuesState = QueuesState.Loading,
             unreadMessagesCount = unreadMessagesCount,
             hasOngoingSc = true,
-            isAuthenticated = true
+            isAuthenticated = true,
+            engagementType = MediaType.MESSAGING
         )
 
         controller.setView(view, EntryWidgetContract.ViewType.EMBEDDED_VIEW)
 
         val messaging = listOf(
-            EntryWidgetContract.ItemType.Messaging(unreadMessagesCount),
+            EntryWidgetContract.ItemType.MessagingOngoing(unreadMessagesCount),
             EntryWidgetContract.ItemType.PoweredBy
         )
 
@@ -407,7 +435,7 @@ class EntryWidgetControllerTest {
     }
 
     @Test
-    fun `showItems is called with Messaging item when state is Error but has ongoing SC and view type is not Messaging Live Support`() {
+    fun `showItems is called with MessagingOngoing item when state is Error but has ongoing SC and view type is not Messaging Live Support`() {
         val unreadMessagesCount = 2
 
         mockInputData(
@@ -415,13 +443,14 @@ class EntryWidgetControllerTest {
             queuesState = QueuesState.Error(mockk()),
             unreadMessagesCount = unreadMessagesCount,
             hasOngoingSc = true,
-            isAuthenticated = true
+            isAuthenticated = true,
+            engagementType = MediaType.MESSAGING
         )
 
         controller.setView(view, EntryWidgetContract.ViewType.EMBEDDED_VIEW)
 
         val messaging = listOf(
-            EntryWidgetContract.ItemType.Messaging(unreadMessagesCount),
+            EntryWidgetContract.ItemType.MessagingOngoing(unreadMessagesCount),
             EntryWidgetContract.ItemType.PoweredBy
         )
 
@@ -475,10 +504,10 @@ class EntryWidgetControllerTest {
     @Test
     fun `showItems is called without messaging when not authenticated and view type is not Messaging Live Support`() {
         every { any<List<Queue>>().mediaTypes } returns listOf(
-            Engagement.MediaType.TEXT,
-            Engagement.MediaType.MESSAGING,
-            Engagement.MediaType.AUDIO,
-            Engagement.MediaType.VIDEO
+            MediaType.TEXT,
+            MediaType.MESSAGING,
+            MediaType.AUDIO,
+            MediaType.VIDEO
         )
 
         mockInputData(
@@ -506,9 +535,9 @@ class EntryWidgetControllerTest {
     @Test
     fun `showItems is called with messaging when authenticated, hasOngoingSC and view type is not Messaging Live Support`() {
         every { any<List<Queue>>().mediaTypes } returns listOf(
-            Engagement.MediaType.TEXT,
-            Engagement.MediaType.AUDIO,
-            Engagement.MediaType.VIDEO
+            MediaType.TEXT,
+            MediaType.AUDIO,
+            MediaType.VIDEO
         )
 
         val unreadMessagesCount = 2
@@ -538,10 +567,10 @@ class EntryWidgetControllerTest {
     @Test
     fun `showItems is called with proper order when view type is not Messaging Live Support`() {
         every { any<List<Queue>>().mediaTypes } returns listOf(
-            Engagement.MediaType.TEXT,
-            Engagement.MediaType.AUDIO,
-            Engagement.MediaType.MESSAGING,
-            Engagement.MediaType.VIDEO
+            MediaType.TEXT,
+            MediaType.AUDIO,
+            MediaType.MESSAGING,
+            MediaType.VIDEO
         )
 
         val unreadMessagesCount = 2
@@ -566,6 +595,128 @@ class EntryWidgetControllerTest {
         verify { queueRepository.queuesState }
         verify { secureConversationsRepository.unreadMessagesCountObservable }
         verify { hasOngoingSecureConversationUseCase.invoke() }
+    }
+
+    @Test
+    fun `prepareItemsBasedOnOngoingEngagement is called when State Update`() {
+        every { any<List<Queue>>().mediaTypes } returns listOf(
+            MediaType.TEXT,
+            MediaType.AUDIO,
+            MediaType.MESSAGING,
+            MediaType.VIDEO
+        )
+
+        val unreadMessagesCount = 2
+        val hasOngoingSc = false
+        val engagementType = MediaType.TEXT
+        mockInputData(
+            coreInitialized = true,
+            queuesState = QueuesState.Queues(mockk()),
+            unreadMessagesCount = unreadMessagesCount,
+            hasOngoingSc = hasOngoingSc,
+            isAuthenticated = false,
+            whiteLabel = true,
+            engagementState = State.Update(mockk(), mockk()),
+            engagementType = engagementType
+        )
+        every { engagementTypeUseCase.isCallVisualizer } returns false
+
+        controller.setView(view, EntryWidgetContract.ViewType.EMBEDDED_VIEW)
+
+        verify { controller.prepareItemsBasedOnOngoingEngagement(engagementType, unreadMessagesCount, hasOngoingSc) }
+    }
+
+    @Test
+    fun `prepareItemsBasedOnQueues is called when State is not Update`() {
+        testPrepareItemsBasedOnQueuesCalledForEngagementState(State.NoEngagement)
+        testPrepareItemsBasedOnQueuesCalledForEngagementState(State.PreQueuing(MediaType.TEXT))
+        testPrepareItemsBasedOnQueuesCalledForEngagementState(State.Queuing("id", MediaType.TEXT))
+        testPrepareItemsBasedOnQueuesCalledForEngagementState(State.QueueUnstaffed)
+        testPrepareItemsBasedOnQueuesCalledForEngagementState(State.UnexpectedErrorHappened)
+        testPrepareItemsBasedOnQueuesCalledForEngagementState(State.QueueingCanceled)
+        testPrepareItemsBasedOnQueuesCalledForEngagementState(State.StartedOmniCore)
+        testPrepareItemsBasedOnQueuesCalledForEngagementState(State.StartedCallVisualizer)
+        testPrepareItemsBasedOnQueuesCalledForEngagementState(State.FinishedOmniCore)
+        testPrepareItemsBasedOnQueuesCalledForEngagementState(State.FinishedCallVisualizer)
+        testPrepareItemsBasedOnQueuesCalledForEngagementState(State.TransferredToSecureConversation)
+    }
+
+    private fun testPrepareItemsBasedOnQueuesCalledForEngagementState(engagementState: State) {
+        val engagementType = MediaType.TEXT
+        val queuesState = QueuesState.Queues(mockk())
+        val unreadMessagesCount = 2
+        val hasOngoingSc = false
+        val isViewWhiteLabel = true
+
+        val entryWidgetController = mockk<EntryWidgetController>(relaxed = true)
+        every { entryWidgetController.prepareItemsBasedOnQueues(mockk(), mockk(), mockk()) } returns mock()
+        every { entryWidgetController.mapToEntryWidgetItems(engagementState, engagementType, queuesState, unreadMessagesCount, hasOngoingSc, isViewWhiteLabel) } answers {
+            callOriginal()
+        }
+
+        entryWidgetController.mapToEntryWidgetItems(engagementState, engagementType, queuesState, unreadMessagesCount, hasOngoingSc, isViewWhiteLabel)
+
+        verify { entryWidgetController.prepareItemsBasedOnQueues(queuesState, unreadMessagesCount, hasOngoingSc) }
+    }
+
+    @Test
+    fun `prepareItemsBasedOnOngoingEngagement returns ChatOngoing when ongoing engagement media type is TEXT`() {
+        val mediaType = MediaType.TEXT
+        val unreadMessagesCount = 2
+        val hasOngoingSC = false
+
+        every { engagementTypeUseCase.isCallVisualizer } returns false
+        every { isAuthenticatedUseCase() } returns false
+        val expectedItem = listOf(EntryWidgetContract.ItemType.ChatOngoing)
+
+        val actualItem = controller.prepareItemsBasedOnOngoingEngagement(mediaType, unreadMessagesCount, hasOngoingSC)
+
+        assertEquals(expectedItem, actualItem)
+    }
+
+    @Test
+    fun `prepareItemsBasedOnOngoingEngagement returns AudioCallOngoing when ongoing engagement media type is AUDIO`() {
+        val mediaType = MediaType.AUDIO
+        val unreadMessagesCount = 2
+        val hasOngoingSC = false
+
+        every { engagementTypeUseCase.isCallVisualizer } returns false
+        every { isAuthenticatedUseCase() } returns false
+        val expectedItem = listOf(EntryWidgetContract.ItemType.AudioCallOngoing)
+
+        val actualItem = controller.prepareItemsBasedOnOngoingEngagement(mediaType, unreadMessagesCount, hasOngoingSC)
+
+        assertEquals(expectedItem, actualItem)
+    }
+
+    @Test
+    fun `prepareItemsBasedOnOngoingEngagement returns VideoCallOngoing when ongoing engagement media type is VIDEO`() {
+        val mediaType = MediaType.VIDEO
+        val unreadMessagesCount = 2
+        val hasOngoingSC = false
+
+        every { engagementTypeUseCase.isCallVisualizer } returns false
+        every { isAuthenticatedUseCase() } returns false
+        val expectedItem = listOf(EntryWidgetContract.ItemType.VideoCallOngoing)
+
+        val actualItem = controller.prepareItemsBasedOnOngoingEngagement(mediaType, unreadMessagesCount, hasOngoingSC)
+
+        assertEquals(expectedItem, actualItem)
+    }
+
+    @Test
+    fun `prepareItemsBasedOnOngoingEngagement returns MessagingOngoing when ongoing engagement media type is MESSAGING`() {
+        val mediaType = MediaType.MESSAGING
+        val unreadMessagesCount = 2
+        val hasOngoingSC = true
+
+        every { engagementTypeUseCase.isCallVisualizer } returns false
+        every { isAuthenticatedUseCase() } returns false
+        val expectedItem = listOf(EntryWidgetContract.ItemType.MessagingOngoing(unreadMessagesCount))
+
+        val actualItem = controller.prepareItemsBasedOnOngoingEngagement(mediaType, unreadMessagesCount, hasOngoingSC)
+
+        assertEquals(expectedItem, actualItem)
     }
 
     @Test

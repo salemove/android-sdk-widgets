@@ -1,5 +1,6 @@
 package com.glia.widgets.core.secureconversations.domain
 
+import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
@@ -20,6 +21,7 @@ class HasOngoingSecureConversationUseCaseTest {
     private lateinit var repository: SecureConversationsRepository
     private lateinit var useCase: HasOngoingSecureConversationUseCase
     private lateinit var engagementStateUseCase: EngagementStateUseCase
+    private lateinit var isAuthenticatedUseCase: IsAuthenticatedUseCase
 
     @Before
     fun setUp() {
@@ -27,7 +29,8 @@ class HasOngoingSecureConversationUseCaseTest {
         RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
         repository = mockk()
         engagementStateUseCase = mockk()
-        useCase = HasOngoingSecureConversationUseCase(repository, engagementStateUseCase)
+        isAuthenticatedUseCase = mockk()
+        useCase = HasOngoingSecureConversationUseCase(repository, isAuthenticatedUseCase, engagementStateUseCase)
     }
 
     @After
@@ -36,15 +39,21 @@ class HasOngoingSecureConversationUseCaseTest {
         RxAndroidPlugins.reset()
     }
 
-    private fun mockInitialState(pendingSC: Boolean = false, unreadMessagesCount: Int = 0, transferredSC: Boolean = false) {
+    private fun mockInitialState(
+        pendingSC: Boolean = false,
+        unreadMessagesCount: Int = 0,
+        transferredSC: Boolean = false,
+        isAuthenticated: Boolean = false
+        ) {
         every { repository.pendingSecureConversationsStatusObservable } returns Flowable.just(pendingSC)
         every { repository.unreadMessagesCountObservable } returns Flowable.just(unreadMessagesCount)
         every { engagementStateUseCase() } returns Flowable.just(if (transferredSC) State.TransferredToSecureConversation else State.NoEngagement)
+        every { isAuthenticatedUseCase() } returns isAuthenticated
     }
 
     @Test
     fun `invoke returns true when there are pending secure conversations`() {
-        mockInitialState(pendingSC = true)
+        mockInitialState(pendingSC = true, isAuthenticated = true)
 
         val result = useCase().blockingLast()
         assertEquals(true, result)
@@ -55,7 +64,7 @@ class HasOngoingSecureConversationUseCaseTest {
 
     @Test
     fun `invoke returns true when there are positive unread messages count`() {
-        mockInitialState(unreadMessagesCount = 3)
+        mockInitialState(unreadMessagesCount = 3, isAuthenticated = true)
 
         val result = useCase().blockingLast()
         assertEquals(true, result)
@@ -66,7 +75,7 @@ class HasOngoingSecureConversationUseCaseTest {
 
     @Test
     fun `invoke returns true when there is transferred sc`() {
-        mockInitialState(transferredSC = true)
+        mockInitialState(transferredSC = true, isAuthenticated = true)
 
         val result = useCase().blockingLast()
         assertEquals(true, result)
@@ -87,12 +96,29 @@ class HasOngoingSecureConversationUseCaseTest {
     }
 
     @Test
+    fun `invoke returns false when only isAuthenticated false`() {
+        mockInitialState(
+            pendingSC = true,
+            unreadMessagesCount = 3,
+            transferredSC = true,
+            isAuthenticated = false
+        )
+
+        val result = useCase().blockingLast()
+        assertEquals(false, result)
+        val callback = mockk<(Boolean) -> Unit>()
+        useCase(callback)
+        verify(timeout = 1100) { callback.invoke(false) }
+    }
+
+    @Test
     fun `callback emits only once`() {
         val pendingSC = BehaviorProcessor.createDefault(false)
 
         every { repository.pendingSecureConversationsStatusObservable } returns pendingSC
         every { repository.unreadMessagesCountObservable } returns Flowable.just(0)
         every { engagementStateUseCase() } returns Flowable.just(State.NoEngagement)
+        every { isAuthenticatedUseCase() } returns false
 
         useCase().test().assertValue(false)
         val callback = mockk<(Boolean) -> Unit>()
@@ -100,6 +126,7 @@ class HasOngoingSecureConversationUseCaseTest {
         verify(timeout = 1100) { callback.invoke(false) }
 
         pendingSC.onNext(true)
+        every { isAuthenticatedUseCase() } returns true
         useCase().test().assertValue(true)
 
         verify(timeout = 1100, exactly = 1) { callback.invoke(false) }

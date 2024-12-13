@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.glia.widgets.databinding.EntryWidgetCallVisualizerItemBinding
 import com.glia.widgets.databinding.EntryWidgetErrorItemBinding
 import com.glia.widgets.databinding.EntryWidgetLiveItemBinding
 import com.glia.widgets.databinding.EntryWidgetMessagingItemBinding
@@ -84,6 +85,7 @@ internal class EntryWidgetAdapter(
     enum class ViewType {
         LIVE_MEDIA_TYPE_ITEMS,
         MESSAGING_MEDIA_TYPE_ITEM,
+        CALL_VISUALIZER_ITEM,
         ERROR_ITEM,
         PROVIDED_BY_ITEM
     }
@@ -105,6 +107,10 @@ internal class EntryWidgetAdapter(
                 EntryWidgetMessagingItemBinding.inflate(parent.layoutInflater, parent, false),
                 itemTheme = mediaTypeItemsTheme?.mediaTypeItem
             )
+            ViewType.CALL_VISUALIZER_ITEM.ordinal -> EntryWidgetCallVisualizerItemViewHolder(
+                EntryWidgetCallVisualizerItemBinding.inflate(parent.layoutInflater, parent, false),
+                itemTheme = mediaTypeItemsTheme?.mediaTypeItem
+            )
             else -> EntryWidgetLiveItemViewHolder(
                 EntryWidgetLiveItemBinding.inflate(parent.layoutInflater, parent, false),
                 itemTheme = mediaTypeItemsTheme?.mediaTypeItem,
@@ -116,6 +122,12 @@ internal class EntryWidgetAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         getItem(position)?.let { item ->
             if (item is EntryWidgetContract.ItemType.Messaging && holder is EntryWidgetMessagingItemViewHolder) {
+                holder.bind(item, item.value) {
+                    onItemClickListener?.invoke(item)
+                }
+            } else if (item is EntryWidgetContract.ItemType.MessagingOngoing &&
+                holder is EntryWidgetMessagingItemViewHolder
+            ) {
                 holder.bind(item, item.value) {
                     onItemClickListener?.invoke(item)
                 }
@@ -133,7 +145,9 @@ internal class EntryWidgetAdapter(
             EntryWidgetContract.ItemType.SdkNotInitializedState,
             EntryWidgetContract.ItemType.ErrorState -> ViewType.ERROR_ITEM.ordinal
             EntryWidgetContract.ItemType.PoweredBy -> ViewType.PROVIDED_BY_ITEM.ordinal
-            is EntryWidgetContract.ItemType.Messaging -> ViewType.MESSAGING_MEDIA_TYPE_ITEM.ordinal
+            is EntryWidgetContract.ItemType.Messaging,
+            is EntryWidgetContract.ItemType.MessagingOngoing -> ViewType.MESSAGING_MEDIA_TYPE_ITEM.ordinal
+            is EntryWidgetContract.ItemType.CallVisualizerOngoing -> ViewType.CALL_VISUALIZER_ITEM.ordinal
             else -> ViewType.LIVE_MEDIA_TYPE_ITEMS.ordinal
         }
     }

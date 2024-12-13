@@ -17,9 +17,14 @@ internal interface EntryWidgetContract {
 
     sealed class ItemType(private val order: Int = HIGHEST_ORDER) : Comparable<ItemType> {
         data object VideoCall : ItemType(order = 0)
-        data object AudioCall : ItemType(order = 1)
-        data object Chat : ItemType(order = 2)
-        data class Messaging(val value: Int) : ItemType(order = 3)
+        data object VideoCallOngoing : ItemType(order = 1)
+        data object AudioCall : ItemType(order = 2)
+        data object AudioCallOngoing : ItemType(order = 3)
+        data object Chat : ItemType(order = 4)
+        data object ChatOngoing : ItemType(order = 5)
+        data class Messaging(val value: Int) : ItemType(order = 6)
+        data class MessagingOngoing(val value: Int) : ItemType(order = 7)
+        data object CallVisualizerOngoing : ItemType(order = 8)
         data object LoadingState : ItemType()
         data object EmptyState : ItemType()
         data object SdkNotInitializedState : ItemType()

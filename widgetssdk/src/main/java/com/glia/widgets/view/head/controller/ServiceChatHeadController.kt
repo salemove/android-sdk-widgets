@@ -8,6 +8,7 @@ import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase
 import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase.Destinations
 import com.glia.widgets.engagement.domain.CurrentOperatorUseCase
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
+import com.glia.widgets.engagement.domain.EngagementTypeUseCase
 import com.glia.widgets.engagement.domain.ScreenSharingUseCase
 import com.glia.widgets.engagement.domain.VisitorMediaUseCase
 import com.glia.widgets.helper.Logger.d
@@ -28,7 +29,8 @@ internal class ServiceChatHeadController(
     engagementStateUseCase: EngagementStateUseCase,
     currentOperatorUseCase: CurrentOperatorUseCase,
     visitorMediaUseCase: VisitorMediaUseCase,
-    screenSharingUseCase: ScreenSharingUseCase
+    screenSharingUseCase: ScreenSharingUseCase,
+    private val engagementTypeUseCase: EngagementTypeUseCase
 ) : ChatHeadContract.Controller {
     private var chatHeadView: ChatHeadContract.View? = null
     private var state = State.ENDED
@@ -181,7 +183,8 @@ internal class ServiceChatHeadController(
     private fun decideOnBubbleDesign() {
         val view = chatHeadView ?: return
 
-        if (isCallVisualizerScreenSharingUseCase()) {
+        if (isCallVisualizerScreenSharingUseCase() && !engagementTypeUseCase.isMediaEngagement) {
+            // Show screen sharing icon only if there is no 1 or 2 way video
             view.showScreenSharing()
             return
         }

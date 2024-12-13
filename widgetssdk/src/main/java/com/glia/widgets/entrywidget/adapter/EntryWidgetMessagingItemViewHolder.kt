@@ -53,8 +53,17 @@ internal class EntryWidgetMessagingItemViewHolder(
         binding.root.contentDescription = null
         binding.icon.setImageResource(R.drawable.ic_secure_message)
         binding.title.setLocaleText(R.string.entry_widget_secure_messaging_button_label)
-        binding.description.setLocaleText(R.string.entry_widget_secure_messaging_button_description)
-        binding.description.setLocaleHint(R.string.entry_widget_secure_messaging_button_accessibility_hint)
         binding.loadingGroup.isVisible = itemType == EntryWidgetContract.ItemType.LoadingState
+
+        when (itemType) {
+            is EntryWidgetContract.ItemType.Messaging -> {
+                binding.description.setLocaleText(R.string.entry_widget_secure_messaging_button_description)
+                binding.description.setLocaleHint(R.string.entry_widget_secure_messaging_button_accessibility_hint)
+            }
+            else -> {
+                binding.description.setLocaleText(R.string.entry_widget_ongoing_engagement_description)
+                binding.description.setLocaleHint(R.string.entry_widget_ongoing_engagement_button_accessibility_hint)
+            }
+        }
     }
 }

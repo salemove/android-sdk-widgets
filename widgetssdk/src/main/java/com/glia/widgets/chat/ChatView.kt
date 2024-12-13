@@ -650,21 +650,21 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         theme.systemNegativeColor?.let(::getColorCompat)
             ?.also(binding.scErrorLabel::setBackgroundColor)
 
-        theme.baseShadeColor?.let(::getColorCompat)
+        val disabledInputColor = theme.baseShadeColor?.let(::getColorCompat)
             ?.also(binding.chatDivider::setBackgroundColor)
             ?.also(binding.scBottomBannerDivider::setBackgroundColor)
 
         theme.baseDarkColor?.let(::getColorCompat)
-            ?.also{ binding.chatEditText.applyTextColor(it, theme.baseShadeColor) }
+            ?.also{ binding.chatEditText.applyTextColor(it, disabledInputColor) }
         theme.baseNormalColor?.let(::getColorCompat)
-            ?.also{ binding.chatEditText.applyHintColor(it, theme.baseShadeColor) }
-            ?.also{ binding.addAttachmentButton.applyImageColor(it, theme.baseShadeColor) }
+            ?.also{ binding.chatEditText.applyHintColor(it, disabledInputColor) }
+            ?.also{ binding.addAttachmentButton.applyImageColor(it, disabledInputColor) }
             ?.also(binding.scBottomBannerLabel::setTextColor)
         theme.systemAgentBubbleColor?.let(::getColorCompat)?.also(binding.scBottomBannerLabel::setBackgroundColor)
 
         // other
         theme.sendMessageButtonTintColor?.let(::getColorCompat)
-            ?.also { binding.sendButton.applyImageColor(it, theme.baseShadeColor) }
+            ?.also { binding.sendButton.applyImageColor(it, disabledInputColor) }
         theme.gliaChatBackgroundColor?.let(::getColorCompat)?.also(::setBackgroundColor)
         binding.gvaQuickRepliesLayout.updateTheme(theme)
 

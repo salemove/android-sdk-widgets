@@ -58,6 +58,7 @@ internal class EntryWidgetItemDivider(
 
     private fun isContactItem(viewType: Int?): Boolean {
         return viewType == EntryWidgetAdapter.ViewType.LIVE_MEDIA_TYPE_ITEMS.ordinal ||
-            viewType == EntryWidgetAdapter.ViewType.MESSAGING_MEDIA_TYPE_ITEM.ordinal
+            viewType == EntryWidgetAdapter.ViewType.MESSAGING_MEDIA_TYPE_ITEM.ordinal ||
+            viewType == EntryWidgetAdapter.ViewType.CALL_VISUALIZER_ITEM.ordinal
     }
 }

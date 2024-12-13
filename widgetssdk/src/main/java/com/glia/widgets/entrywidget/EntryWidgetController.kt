@@ -1,17 +1,23 @@
 package com.glia.widgets.entrywidget
 
 import android.app.Activity
-import com.glia.androidsdk.Engagement
+import androidx.annotation.VisibleForTesting
+import com.glia.androidsdk.Engagement.MediaType
 import com.glia.androidsdk.queuing.Queue
+import com.glia.widgets.chat.Intention
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.core.queue.QueueRepository
 import com.glia.widgets.core.queue.QueuesState
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.core.secureconversations.domain.HasOngoingSecureConversationUseCase
 import com.glia.widgets.di.GliaCore
+import com.glia.widgets.engagement.State
+import com.glia.widgets.engagement.domain.EngagementStateUseCase
+import com.glia.widgets.engagement.domain.EngagementTypeUseCase
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.mediaTypes
+import com.glia.widgets.launcher.ActivityLauncher
 import com.glia.widgets.launcher.EngagementLauncher
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Flowable
@@ -22,13 +28,18 @@ internal class EntryWidgetController @JvmOverloads constructor(
     private val isAuthenticatedUseCase: IsAuthenticatedUseCase,
     private val secureConversationsRepository: SecureConversationsRepository,
     private val hasOngoingSecureConversationUseCase: HasOngoingSecureConversationUseCase,
+    private val engagementStateUseCase: EngagementStateUseCase,
+    private val engagementTypeUseCase: EngagementTypeUseCase,
     private val core: GliaCore,
     private val engagementLauncher: EngagementLauncher,
+    private val activityLauncher: ActivityLauncher,
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 ) : EntryWidgetContract.Controller {
     private val queueStateObservable by lazy { queueRepository.queuesState }
     private val unreadMessagesCountObservable by lazy { secureConversationsRepository.unreadMessagesCountObservable }
     private val hasOngoingSCObservable by lazy { hasOngoingSecureConversationUseCase() }
+    private val engagementStateObservable by lazy { engagementStateUseCase() }
+    private val mediaTypeObservable by lazy { engagementTypeUseCase() }
 
     private val loadingState: List<EntryWidgetContract.ItemType> by lazy {
         listOf(
@@ -51,7 +62,14 @@ internal class EntryWidgetController @JvmOverloads constructor(
         get() = queueStateObservable.map(::mapMessagingQueueState)
 
     private val entryWidgetObservableItemType: Flowable<List<EntryWidgetContract.ItemType>>
-        get() = Flowable.combineLatest(queueStateObservable, unreadMessagesCountObservable, hasOngoingSCObservable, ::mapEntryWidgetQueueState)
+        get() = Flowable.combineLatest(
+            engagementStateObservable,
+            mediaTypeObservable,
+            queueStateObservable,
+            unreadMessagesCountObservable,
+            hasOngoingSCObservable,
+            ::mapToEntryWidgetItems
+        )
 
     private lateinit var view: EntryWidgetContract.View
 
@@ -68,6 +86,40 @@ internal class EntryWidgetController @JvmOverloads constructor(
             .let(compositeDisposable::add)
     }
 
+    @VisibleForTesting
+    fun mapToEntryWidgetItems(
+        engagementState: State,
+        mediaType: MediaType,
+        queuesState: QueuesState,
+        unreadMessagesCount: Int,
+        hasOngoingSC: Boolean,
+        isViewWhiteLabel: Boolean = view.whiteLabel
+    ): List<EntryWidgetContract.ItemType> {
+        val items = when (engagementState) {
+            is State.Update -> prepareItemsBasedOnOngoingEngagement(mediaType, unreadMessagesCount, hasOngoingSC)
+            else -> prepareItemsBasedOnQueues(queuesState, unreadMessagesCount, hasOngoingSC)
+        }.toMutableList()
+        if (isViewWhiteLabel.not()) {
+            items.add(EntryWidgetContract.ItemType.PoweredBy)
+        }
+        return items.apply { sort() }
+    }
+
+    @VisibleForTesting
+    fun prepareItemsBasedOnOngoingEngagement(
+        mediaType: MediaType,
+        unreadMessagesCount: Int,
+        hasOngoingSC: Boolean
+    ): List<EntryWidgetContract.ItemType> {
+        return when {
+            engagementTypeUseCase.isCallVisualizer -> listOf(EntryWidgetContract.ItemType.CallVisualizerOngoing)
+            hasOngoingSC -> listOf(EntryWidgetContract.ItemType.MessagingOngoing(unreadMessagesCount))
+            mediaType == MediaType.VIDEO -> listOf(EntryWidgetContract.ItemType.VideoCallOngoing)
+            mediaType == MediaType.AUDIO -> listOf(EntryWidgetContract.ItemType.AudioCallOngoing)
+            else -> listOf(EntryWidgetContract.ItemType.ChatOngoing)
+        }
+    }
+
     private fun itemsObservableBasedOnType(type: EntryWidgetContract.ViewType) = when (type) {
         EntryWidgetContract.ViewType.MESSAGING_LIVE_SUPPORT -> messagingChatObservableItemType
         else -> entryWidgetObservableItemType
@@ -82,7 +134,8 @@ internal class EntryWidgetController @JvmOverloads constructor(
         view.showItems(items)
     }
 
-    private fun mapEntryWidgetQueueState(
+    @VisibleForTesting
+    fun prepareItemsBasedOnQueues(
         queuesState: QueuesState,
         unreadMessagesCount: Int,
         hasOngoingSC: Boolean
@@ -94,23 +147,17 @@ internal class EntryWidgetController @JvmOverloads constructor(
             *  Sometimes(when we authenticate with opened Entry Widget embedded view),
             *  we receive updates for ongoing secure conversations before the authentication result is saved, causing this check to return false. */
             if (hasOngoingSC && isAuthenticatedUseCase())
-                listOf(EntryWidgetContract.ItemType.Messaging(unreadMessagesCount))
+                listOf(EntryWidgetContract.ItemType.MessagingOngoing(unreadMessagesCount))
             else
                 default
         }
 
-        val items = when (queuesState) {
+        return when (queuesState) {
             QueuesState.Empty -> messagingOrDefault(emptyState)
             QueuesState.Loading -> messagingOrDefault(loadingState)
             is QueuesState.Error -> messagingOrDefault(errorState)
             is QueuesState.Queues -> mapEntryWidgetQueues(queuesState.queues, unreadMessagesCount, hasOngoingSC)
-        }.toMutableList()
-
-        if (!view.whiteLabel) {
-            items.add(EntryWidgetContract.ItemType.PoweredBy)
         }
-
-        return items.apply { sort() }
     }
 
     private fun mapEntryWidgetQueues(queues: List<Queue>, unreadMessagesCount: Int, hasOngoingSC: Boolean): List<EntryWidgetContract.ItemType> {
@@ -118,10 +165,10 @@ internal class EntryWidgetController @JvmOverloads constructor(
 
         val items = queues.mediaTypes.mapNotNull {
             when {
-                it == Engagement.MediaType.VIDEO -> EntryWidgetContract.ItemType.VideoCall
-                it == Engagement.MediaType.AUDIO -> EntryWidgetContract.ItemType.AudioCall
-                it == Engagement.MediaType.TEXT -> EntryWidgetContract.ItemType.Chat
-                it == Engagement.MediaType.MESSAGING && isAuthenticatedUseCase() -> messaging
+                it == MediaType.VIDEO -> EntryWidgetContract.ItemType.VideoCall
+                it == MediaType.AUDIO -> EntryWidgetContract.ItemType.AudioCall
+                it == MediaType.TEXT -> EntryWidgetContract.ItemType.Chat
+                it == MediaType.MESSAGING && isAuthenticatedUseCase() -> messaging
 
                 else -> null
             }
@@ -141,9 +188,9 @@ internal class EntryWidgetController @JvmOverloads constructor(
         is QueuesState.Error -> errorState
         is QueuesState.Queues -> queuesState.queues.mediaTypes.mapNotNull { mediaType ->
             when (mediaType) {
-                Engagement.MediaType.VIDEO -> EntryWidgetContract.ItemType.VideoCall
-                Engagement.MediaType.AUDIO -> EntryWidgetContract.ItemType.AudioCall
-                Engagement.MediaType.TEXT -> EntryWidgetContract.ItemType.Chat
+                MediaType.VIDEO -> EntryWidgetContract.ItemType.VideoCall
+                MediaType.AUDIO -> EntryWidgetContract.ItemType.AudioCall
+                MediaType.TEXT -> EntryWidgetContract.ItemType.Chat
                 else -> null
             }
         }.takeIf { it.isNotEmpty() }?.sorted() ?: emptyState
@@ -153,10 +200,20 @@ internal class EntryWidgetController @JvmOverloads constructor(
         Logger.d(TAG, "Item clicked: $itemType")
 
         when (itemType) {
-            EntryWidgetContract.ItemType.Chat -> engagementLauncher.startChat(activity)
-            EntryWidgetContract.ItemType.AudioCall -> engagementLauncher.startAudioCall(activity)
             EntryWidgetContract.ItemType.VideoCall -> engagementLauncher.startVideoCall(activity)
-            is EntryWidgetContract.ItemType.Messaging -> engagementLauncher.startSecureMessaging(activity)
+            EntryWidgetContract.ItemType.VideoCallOngoing -> activityLauncher.launchCall(activity, null, false)
+            EntryWidgetContract.ItemType.AudioCall -> engagementLauncher.startAudioCall(activity)
+            EntryWidgetContract.ItemType.AudioCallOngoing -> activityLauncher.launchCall(activity, null, false)
+            EntryWidgetContract.ItemType.Chat -> engagementLauncher.startChat(activity)
+            EntryWidgetContract.ItemType.ChatOngoing -> activityLauncher.launchChat(activity, Intention.RETURN_TO_CHAT)
+            is EntryWidgetContract.ItemType.Messaging,
+            is EntryWidgetContract.ItemType.MessagingOngoing -> engagementLauncher.startSecureMessaging(activity)
+
+            is EntryWidgetContract.ItemType.CallVisualizerOngoing -> {
+                if (engagementTypeUseCase.isMediaEngagement) activityLauncher.launchCall(activity, null, false)
+                else if (engagementTypeUseCase.isCallVisualizerScreenSharing) activityLauncher.launchEndScreenSharing(activity)
+            }
+
             EntryWidgetContract.ItemType.ErrorState -> onRetryButtonClicked()
             else -> {}
         }

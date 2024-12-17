@@ -139,7 +139,8 @@ public class ControllerFactory {
                 useCaseFactory.getReleaseResourcesUseCase(getDialogController()),
                 useCaseFactory.createGetUrlFromLinkUseCase(),
                 useCaseFactory.createIsMessagingAvailableUseCase(),
-                useCaseFactory.createSecureConversationTopBannerVisibilityUseCase()
+                useCaseFactory.createSecureConversationTopBannerVisibilityUseCase(),
+                useCaseFactory.createSetLeaveSecureConversationDialogVisibleUseCase()
             );
         }
 

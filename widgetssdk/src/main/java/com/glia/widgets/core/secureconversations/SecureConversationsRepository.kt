@@ -29,6 +29,9 @@ internal class SecureConversationsRepository(private val core: GliaCore, private
     private val _pendingSecureConversationsStatusObservable: BehaviorProcessor<Boolean> = BehaviorProcessor.createDefault(false)
     val pendingSecureConversationsStatusObservable: Flowable<Boolean> get() = _pendingSecureConversationsStatusObservable.asStateFlowable()
 
+    private val _isLeaveSecureConversationDialogVisibleObservable: BehaviorProcessor<Boolean> = BehaviorProcessor.createDefault(false)
+    val isLeaveSecureConversationDialogVisibleObservable: Flowable<Boolean> get() = _isLeaveSecureConversationDialogVisibleObservable.asStateFlowable()
+
     fun initialize() {
         secureConversations.apply {
             subscribeToUnreadMessageCount { count, _ -> count?.let(_unreadMessagesCountObservable::onNext) }
@@ -62,6 +65,10 @@ internal class SecureConversationsRepository(private val core: GliaCore, private
 
     fun markMessagesRead(callback: RequestCallback<Void>) {
         secureConversations.markMessagesRead(callback)
+    }
+
+    fun setLeaveSecureConversationDialogVisible(visible: Boolean) {
+        _isLeaveSecureConversationDialogVisibleObservable.onNext(visible)
     }
 
     private fun handleResult(callback: RequestCallback<VisitorMessage?>): RequestCallback<VisitorMessage?> {

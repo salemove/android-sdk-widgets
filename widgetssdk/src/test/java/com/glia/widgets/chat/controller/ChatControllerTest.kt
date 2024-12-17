@@ -39,6 +39,7 @@ import com.glia.widgets.core.permissions.domain.WithReadWritePermissionsUseCase
 import com.glia.widgets.core.secureconversations.domain.IsMessagingAvailableUseCase
 import com.glia.widgets.core.secureconversations.domain.ManageSecureMessagingStatusUseCase
 import com.glia.widgets.core.secureconversations.domain.SecureConversationTopBannerVisibilityUseCase
+import com.glia.widgets.core.secureconversations.domain.SetLeaveSecureConversationDialogVisibleUseCase
 import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCase
 import com.glia.widgets.engagement.domain.DeclineMediaUpgradeOfferUseCase
 import com.glia.widgets.engagement.domain.EndEngagementUseCase
@@ -133,6 +134,7 @@ class ChatControllerTest {
 
     private lateinit var manageSecureMessagingStatusUseCase: ManageSecureMessagingStatusUseCase
     private lateinit var shouldShowTopBannerVisibilityUseCase: SecureConversationTopBannerVisibilityUseCase
+    private lateinit var setLeaveSecureConversationDialogVisibleUseCase: SetLeaveSecureConversationDialogVisibleUseCase
 
     @Before
     fun setUp() {
@@ -198,6 +200,7 @@ class ChatControllerTest {
         shouldShowTopBannerVisibilityUseCase = mock {
             on { invoke() } doReturn Flowable.empty()
         }
+        setLeaveSecureConversationDialogVisibleUseCase = mock()
 
         chatController = ChatController(
             callTimer = callTimer,
@@ -244,7 +247,8 @@ class ChatControllerTest {
             getUrlFromLinkUseCase = getUrlFromLinkUseCase,
             isMessagingAvailableUseCase = isMessagingAvailableUseCase,
             manageSecureMessagingStatusUseCase = manageSecureMessagingStatusUseCase,
-            shouldShowTopBannerUseCase = shouldShowTopBannerVisibilityUseCase
+            shouldShowTopBannerUseCase = shouldShowTopBannerVisibilityUseCase,
+            setLeaveSecureConversationDialogVisibleUseCase = setLeaveSecureConversationDialogVisibleUseCase
         )
         chatController.setView(chatView)
         Mockito.clearInvocations(chatView)

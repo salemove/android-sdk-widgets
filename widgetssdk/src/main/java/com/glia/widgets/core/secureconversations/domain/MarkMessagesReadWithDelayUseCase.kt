@@ -13,7 +13,11 @@ const val DELAY_SEC = 6L
 
 internal class MarkMessagesReadWithDelayUseCase(private val repository: SecureConversationsRepository) {
 
-    operator fun invoke(): Completable = Completable.timer(DELAY_SEC, TimeUnit.SECONDS)
+    operator fun invoke(): Completable = repository.isLeaveSecureConversationDialogVisibleObservable
+        .filter { !it }
+        .take(1)
+        .delay(DELAY_SEC, TimeUnit.SECONDS)
+        .ignoreElements()
         .andThen(markMessagesRead())
         .doOnComplete { Logger.d(TAG, "Messages successfully marked as read") }
 

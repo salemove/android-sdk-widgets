@@ -57,6 +57,7 @@ import com.glia.widgets.core.permissions.domain.WithReadWritePermissionsUseCase
 import com.glia.widgets.core.secureconversations.domain.IsMessagingAvailableUseCase
 import com.glia.widgets.core.secureconversations.domain.ManageSecureMessagingStatusUseCase
 import com.glia.widgets.core.secureconversations.domain.SecureConversationTopBannerVisibilityUseCase
+import com.glia.widgets.core.secureconversations.domain.SetLeaveSecureConversationDialogVisibleUseCase
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.EngagementUpdateState
 import com.glia.widgets.engagement.ScreenSharingState
@@ -136,7 +137,8 @@ internal class ChatController(
     private val releaseResourcesUseCase: ReleaseResourcesUseCase,
     private val getUrlFromLinkUseCase: GetUrlFromLinkUseCase,
     private val isMessagingAvailableUseCase: IsMessagingAvailableUseCase,
-    private val shouldShowTopBannerUseCase: SecureConversationTopBannerVisibilityUseCase
+    private val shouldShowTopBannerUseCase: SecureConversationTopBannerVisibilityUseCase,
+    private val setLeaveSecureConversationDialogVisibleUseCase: SetLeaveSecureConversationDialogVisibleUseCase
 ) : ChatContract.Controller {
     private var backClickedListener: ChatView.OnBackClickedListener? = null
     private var view: ChatContract.View? = null
@@ -246,6 +248,7 @@ internal class ChatController(
     }
 
     private fun initLeaveCurrentConversationDialog(action: LeaveDialogAction) {
+        setLeaveSecureConversationDialogVisibleUseCase(true)
         initSecureMessaging()
         dialogController.showLeaveCurrentConversationDialog(action)
     }
@@ -963,6 +966,8 @@ internal class ChatController(
             LeaveDialogAction.VIDEO -> view?.launchCall(Engagement.MediaType.VIDEO)
             LeaveDialogAction.AUDIO -> view?.launchCall(Engagement.MediaType.AUDIO)
         }
+
+        setLeaveSecureConversationDialogVisibleUseCase(false)
     }
 
     override fun onScTopBannerItemClicked(itemType: EntryWidgetContract.ItemType) {
@@ -984,5 +989,6 @@ internal class ChatController(
 
     override fun leaveCurrentConversationDialogStayClicked() {
         dialogController.dismissCurrentDialog()
+        setLeaveSecureConversationDialogVisibleUseCase(false)
     }
 }

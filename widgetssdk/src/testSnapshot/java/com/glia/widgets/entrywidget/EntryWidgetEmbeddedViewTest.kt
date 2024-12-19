@@ -25,7 +25,7 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
         Dependencies.controllerFactory = controllerFactoryMock
     }
 
-    // MARK: Contacts Tests without unread count badge
+    // MARK: Tests for available engagement items without unread count badge
 
     private val mediaTypesWithoutUnreadMessaging = listOf(
         EntryWidgetContract.ItemType.VideoCall,
@@ -72,7 +72,7 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
         )
     }
 
-    // MARK: Contacts Tests with unread count badge
+    // MARK: Tests for available engagement items with unread count badge
 
     private val mediaTypesWithUnreadMessaging = listOf(
         EntryWidgetContract.ItemType.VideoCall,
@@ -508,6 +508,221 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
         snapshot(
             setupView(
                 items = errorItemsWhiteLabel,
+                unifiedTheme = unifiedThemeWithoutEntryWidget()
+            )
+        )
+    }
+
+    // MARK: Tests for VideoCallOngoing engagement item
+
+    private val videoCallOngoing = listOf(
+        EntryWidgetContract.ItemType.VideoCallOngoing,
+    )
+
+    @Test
+    fun videoCallOngoingDefaultTheme() {
+        snapshot(
+            setupView(items = videoCallOngoing)
+        )
+    }
+
+    @Test
+    fun videoCallOngoingWithUnifiedTheme() {
+        snapshot(
+            setupView(
+                items = videoCallOngoing,
+                unifiedTheme = unifiedTheme()
+            )
+        )
+    }
+
+    @Test
+    fun videoCallOngoingWithUnifiedThemeWithGlobalColors() {
+        snapshot(
+            setupView(
+                items = videoCallOngoing,
+                unifiedTheme = unifiedThemeWithGlobalColors()
+            )
+        )
+    }
+
+    @Test
+    fun videoCallOngoingWithUnifiedThemeWithoutEntryWidget() {
+        snapshot(
+            setupView(
+                items = videoCallOngoing,
+                unifiedTheme = unifiedThemeWithoutEntryWidget()
+            )
+        )
+    }
+
+    // MARK: Tests for AudioCallOngoing engagement item
+
+    private val audioCallOngoing = listOf(
+        EntryWidgetContract.ItemType.AudioCallOngoing,
+    )
+
+    @Test
+    fun audioCallOngoingDefaultTheme() {
+        snapshot(
+            setupView(items = audioCallOngoing)
+        )
+    }
+
+    @Test
+    fun audioCallOngoingWithUnifiedTheme() {
+        snapshot(
+            setupView(
+                items = audioCallOngoing,
+                unifiedTheme = unifiedTheme()
+            )
+        )
+    }
+
+    @Test
+    fun audioCallOngoingWithUnifiedThemeWithGlobalColors() {
+        snapshot(
+            setupView(
+                items = audioCallOngoing,
+                unifiedTheme = unifiedThemeWithGlobalColors()
+            )
+        )
+    }
+
+    @Test
+    fun audioCallOngoingWithUnifiedThemeWithoutEntryWidget() {
+        snapshot(
+            setupView(
+                items = audioCallOngoing,
+                unifiedTheme = unifiedThemeWithoutEntryWidget()
+            )
+        )
+    }
+
+    // MARK: Tests for ChatOngoing engagement item
+
+    private val chatOngoing = listOf(
+        EntryWidgetContract.ItemType.ChatOngoing,
+    )
+
+    @Test
+    fun chatOngoingDefaultTheme() {
+        snapshot(
+            setupView(items = chatOngoing)
+        )
+    }
+
+    @Test
+    fun chatOngoingWithUnifiedTheme() {
+        snapshot(
+            setupView(
+                items = chatOngoing,
+                unifiedTheme = unifiedTheme()
+            )
+        )
+    }
+
+    @Test
+    fun chatOngoingWithUnifiedThemeWithGlobalColors() {
+        snapshot(
+            setupView(
+                items = chatOngoing,
+                unifiedTheme = unifiedThemeWithGlobalColors()
+            )
+        )
+    }
+
+    @Test
+    fun chatOngoingWithUnifiedThemeWithoutEntryWidget() {
+        snapshot(
+            setupView(
+                items = chatOngoing,
+                unifiedTheme = unifiedThemeWithoutEntryWidget()
+            )
+        )
+    }
+
+    // MARK: Tests for MessagingOngoing engagement item without unread count badge
+
+    private val messagingOngoing = listOf(
+        EntryWidgetContract.ItemType.MessagingOngoing(0),
+    )
+
+    @Test
+    fun messagingOngoingDefaultTheme() {
+        snapshot(
+            setupView(items = messagingOngoing)
+        )
+    }
+
+    @Test
+    fun messagingOngoingWithUnifiedTheme() {
+        snapshot(
+            setupView(
+                items = messagingOngoing,
+                unifiedTheme = unifiedTheme()
+            )
+        )
+    }
+
+    @Test
+    fun messagingOngoingWithUnifiedThemeWithGlobalColors() {
+        snapshot(
+            setupView(
+                items = messagingOngoing,
+                unifiedTheme = unifiedThemeWithGlobalColors()
+            )
+        )
+    }
+
+    @Test
+    fun messagingOngoingWithUnifiedThemeWithoutEntryWidget() {
+        snapshot(
+            setupView(
+                items = messagingOngoing,
+                unifiedTheme = unifiedThemeWithoutEntryWidget()
+            )
+        )
+    }
+
+    // MARK: Tests for MessagingOngoing engagement item with unread count badge
+
+    private val messagingOngoingWithUnread = listOf(
+        EntryWidgetContract.ItemType.MessagingOngoing(5),
+    )
+
+    @Test
+    fun messagingOngoingWithUnreadDefaultTheme() {
+        snapshot(
+            setupView(items = messagingOngoingWithUnread)
+        )
+    }
+
+    @Test
+    fun messagingOngoingWithUnreadWithUnifiedTheme() {
+        snapshot(
+            setupView(
+                items = messagingOngoingWithUnread,
+                unifiedTheme = unifiedTheme()
+            )
+        )
+    }
+
+    @Test
+    fun messagingOngoingWithUnreadWithUnifiedThemeWithGlobalColors() {
+        snapshot(
+            setupView(
+                items = messagingOngoingWithUnread,
+                unifiedTheme = unifiedThemeWithGlobalColors()
+            )
+        )
+    }
+
+    @Test
+    fun messagingOngoingWithUnreadWithUnifiedThemeWithoutEntryWidget() {
+        snapshot(
+            setupView(
+                items = messagingOngoingWithUnread,
                 unifiedTheme = unifiedThemeWithoutEntryWidget()
             )
         )

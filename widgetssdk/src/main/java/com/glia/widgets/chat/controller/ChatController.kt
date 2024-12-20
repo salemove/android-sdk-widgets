@@ -146,6 +146,7 @@ internal class ChatController(
 
     private val disposable = CompositeDisposable()
     private val mediaUpgradeDisposable = CompositeDisposable()
+    private val engagementDisposable = CompositeDisposable()
 
     private val sendMessageCallback: GliaSendMessageUseCase.Listener = object : GliaSendMessageUseCase.Listener {
         override fun messageSent(message: VisitorMessage?) {
@@ -258,6 +259,10 @@ internal class ChatController(
         emitViewState { chatState.initChat().setSecureMessagingState() }
         ensureSecureMessagingAvailable()
         observeTopBannerUseCase()
+
+        // When the chat screen opens with the secure conversation state, resubscribe to the engagement streams.
+        // This solves the upgrade to chat state issue.
+        subscribeToEngagement()
     }
 
     private fun observeTopBannerUseCase() {
@@ -287,9 +292,10 @@ internal class ChatController(
     }
 
     private fun subscribeToEngagement() {
-        engagementStateUseCase().unSafeSubscribe(::onEngagementStateChanged)
-        operatorMediaUseCase().unSafeSubscribe(::onNewOperatorMediaState)
-        onOperatorTypingUseCase().unSafeSubscribe(::onOperatorTyping)
+        engagementDisposable.clear()
+        engagementDisposable.add(engagementStateUseCase().subscribe(::onEngagementStateChanged))
+        engagementDisposable.add(operatorMediaUseCase().subscribe(::onNewOperatorMediaState))
+        engagementDisposable.add(onOperatorTypingUseCase().subscribe(::onOperatorTyping))
     }
 
     private fun ensureSecureMessagingAvailable() {
@@ -376,6 +382,7 @@ internal class ChatController(
         backClickedListener = null
         if (!retain) {
             disposable.clear()
+            engagementDisposable.clear()
             timerStatusListener = null
             callTimer.clear()
             minimizeHandler.clear()

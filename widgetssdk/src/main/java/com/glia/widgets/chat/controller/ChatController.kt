@@ -231,9 +231,9 @@ internal class ChatController(
 
         when (intention) {
             Intention.RETURN_TO_CHAT -> returnToChat()
-            Intention.SC_DIALOG_START_AUDIO -> initLeaveCurrentConversationDialog(LeaveDialogAction.AUDIO)
-            Intention.SC_DIALOG_START_VIDEO -> initLeaveCurrentConversationDialog(LeaveDialogAction.VIDEO)
-            Intention.SC_DIALOG_ENQUEUE_FOR_TEXT -> initLeaveCurrentConversationDialog(LeaveDialogAction.LIVE_CHAT)
+            Intention.SC_DIALOG_START_AUDIO -> secureConversationIntention(LeaveDialogAction.AUDIO)
+            Intention.SC_DIALOG_START_VIDEO -> secureConversationIntention(LeaveDialogAction.VIDEO)
+            Intention.SC_DIALOG_ENQUEUE_FOR_TEXT -> secureConversationIntention(LeaveDialogAction.LIVE_CHAT)
             Intention.SC_CHAT -> initSecureMessaging()
             Intention.LIVE_CHAT -> initLiveChat()
         }
@@ -244,6 +244,14 @@ internal class ChatController(
             restoreChat()
         } else {
             initLiveChat()
+        }
+    }
+
+    private fun secureConversationIntention(action: LeaveDialogAction) {
+        if (isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement) {
+            initLiveChat()
+        } else {
+            initLeaveCurrentConversationDialog(action)
         }
     }
 

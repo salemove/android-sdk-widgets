@@ -12,6 +12,7 @@ import com.glia.widgets.chat.domain.GliaSendMessageUseCase
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
 import com.glia.widgets.chat.domain.IsShowSendButtonUseCase
+import com.glia.widgets.chat.domain.SetChatScreenOpenUseCase
 import com.glia.widgets.chat.domain.SiteInfoUseCase
 import com.glia.widgets.chat.domain.TakePictureUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
@@ -135,6 +136,7 @@ class ChatControllerTest {
     private lateinit var manageSecureMessagingStatusUseCase: ManageSecureMessagingStatusUseCase
     private lateinit var shouldShowTopBannerVisibilityUseCase: SecureConversationTopBannerVisibilityUseCase
     private lateinit var setLeaveSecureConversationDialogVisibleUseCase: SetLeaveSecureConversationDialogVisibleUseCase
+    private lateinit var setChatScreenOpenUseCase: SetChatScreenOpenUseCase
 
     @Before
     fun setUp() {
@@ -201,6 +203,7 @@ class ChatControllerTest {
             on { invoke() } doReturn Flowable.empty()
         }
         setLeaveSecureConversationDialogVisibleUseCase = mock()
+        setChatScreenOpenUseCase = mock()
 
         chatController = ChatController(
             callTimer = callTimer,
@@ -248,7 +251,8 @@ class ChatControllerTest {
             isMessagingAvailableUseCase = isMessagingAvailableUseCase,
             manageSecureMessagingStatusUseCase = manageSecureMessagingStatusUseCase,
             shouldShowTopBannerUseCase = shouldShowTopBannerVisibilityUseCase,
-            setLeaveSecureConversationDialogVisibleUseCase = setLeaveSecureConversationDialogVisibleUseCase
+            setLeaveSecureConversationDialogVisibleUseCase = setLeaveSecureConversationDialogVisibleUseCase,
+            setChatScreenOpenUseCase = setChatScreenOpenUseCase
         )
         chatController.setView(chatView)
         Mockito.clearInvocations(chatView)

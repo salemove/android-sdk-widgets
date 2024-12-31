@@ -30,6 +30,7 @@ import com.glia.widgets.chat.model.VisitorAttachmentItem
 import com.glia.widgets.chat.model.VisitorChatItem
 import com.glia.widgets.core.engagement.domain.model.ChatHistoryResponse
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
+import com.glia.widgets.core.secureconversations.domain.HasOngoingSecureConversationUseCase
 import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDelayUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 import com.glia.widgets.helper.Logger
@@ -53,8 +54,10 @@ internal class ChatManager(
     private val sendUnsentMessagesUseCase: SendUnsentMessagesUseCase,
     private val handleCustomCardClickUseCase: HandleCustomCardClickUseCase,
     private val isAuthenticatedUseCase: IsAuthenticatedUseCase,
+    private val hasOngoingSecureConversationUseCase: HasOngoingSecureConversationUseCase,
     private val isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase,
     private val compositeDisposable: CompositeDisposable = CompositeDisposable(),
+    private val markMessagesReadDisposable: CompositeDisposable = CompositeDisposable(),
     private val state: BehaviorProcessor<State> = BehaviorProcessor.createDefault(State()),
     private val quickReplies: BehaviorProcessor<List<GvaButton>> = BehaviorProcessor.create(),
     private val action: BehaviorProcessor<Action> = BehaviorProcessor.create(),
@@ -90,6 +93,7 @@ internal class ChatManager(
         state.onNext(State())
         quickReplies.onNext(emptyList())
         compositeDisposable.clear()
+        markMessagesReadDisposable.clear()
         action.onNext(Action.None)
         historyLoaded.onNext(false)
     }
@@ -195,6 +199,12 @@ internal class ChatManager(
             appendNewChatMessageUseCase(messagesState, chatMessage)
             if (chatMessage.chatMessage is VisitorMessage) {
                 checkUnsentMessages(messagesState)
+            } else {
+                hasOngoingSecureConversationUseCase {
+                    if (it && !isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement) {
+                        markMessagesRead()
+                    }
+                }
             }
         }
 
@@ -430,12 +440,21 @@ internal class ChatManager(
     }
 
     @VisibleForTesting
+    fun markMessagesRead() {
+        val disposable = markMessagesReadWithDelayUseCase(delay = 0)
+            .andThen(state.firstOrError())
+            .map(::removeNewMessagesDivider)
+            .subscribe(state::onNext, Throwable::printStackTrace)
+        markMessagesReadDisposable.add(disposable)
+    }
+
+    @VisibleForTesting
     fun markMessagesReadWithDelay() {
         val disposable = markMessagesReadWithDelayUseCase()
             .andThen(state.firstOrError())
             .map(::removeNewMessagesDivider)
             .subscribe(state::onNext, Throwable::printStackTrace)
-        compositeDisposable.add(disposable)
+        markMessagesReadDisposable.add(disposable)
     }
 
     @VisibleForTesting

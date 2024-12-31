@@ -111,6 +111,7 @@ internal class EntryWidgetController @JvmOverloads constructor(
         unreadMessagesCount: Int,
         hasOngoingSC: Boolean
     ): List<EntryWidgetContract.ItemType> {
+        Logger.i(TAG, "Preparing items based on ongoing engagement")
         return when {
             engagementTypeUseCase.isCallVisualizer -> listOf(EntryWidgetContract.ItemType.CallVisualizerOngoing)
             hasOngoingSC -> listOf(EntryWidgetContract.ItemType.MessagingOngoing(unreadMessagesCount))

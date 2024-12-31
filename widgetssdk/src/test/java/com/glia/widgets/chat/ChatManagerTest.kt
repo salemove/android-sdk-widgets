@@ -32,6 +32,7 @@ import com.glia.widgets.chat.model.VisitorChatItem
 import com.glia.widgets.chat.model.VisitorMessageItem
 import com.glia.widgets.core.engagement.domain.model.ChatHistoryResponse
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
+import com.glia.widgets.core.secureconversations.domain.HasOngoingSecureConversationUseCase
 import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDelayUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
@@ -76,10 +77,12 @@ class ChatManagerTest {
     private lateinit var sendUnsentMessagesUseCase: SendUnsentMessagesUseCase
     private lateinit var handleCustomCardClickUseCase: HandleCustomCardClickUseCase
     private lateinit var isAuthenticatedUseCase: IsAuthenticatedUseCase
+    private lateinit var hasOngoingSecureConversationUseCase: HasOngoingSecureConversationUseCase
     private lateinit var isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase
     private lateinit var subjectUnderTest: ChatManager
     private lateinit var state: ChatManager.State
     private lateinit var compositeDisposable: CompositeDisposable
+    private lateinit var markMessagesReadDisposable: CompositeDisposable
     private lateinit var stateProcessor: BehaviorProcessor<ChatManager.State>
     private lateinit var quickReplies: BehaviorProcessor<List<GvaButton>>
     private lateinit var action: BehaviorProcessor<ChatManager.Action>
@@ -98,8 +101,10 @@ class ChatManagerTest {
         sendUnsentMessagesUseCase = mock()
         handleCustomCardClickUseCase = mock()
         isAuthenticatedUseCase = mock()
+        hasOngoingSecureConversationUseCase = mock()
         isQueueingOrLiveEngagementUseCase = mock()
         compositeDisposable = spy()
+        markMessagesReadDisposable = spy()
         stateProcessor = BehaviorProcessor.createDefault(state)
         quickReplies = BehaviorProcessor.create()
         action = BehaviorProcessor.create()
@@ -115,8 +120,10 @@ class ChatManagerTest {
             sendUnsentMessagesUseCase,
             handleCustomCardClickUseCase,
             isAuthenticatedUseCase,
+            hasOngoingSecureConversationUseCase,
             isQueueingOrLiveEngagementUseCase,
             compositeDisposable,
+            markMessagesReadDisposable,
             stateProcessor,
             quickReplies,
             action,
@@ -151,7 +158,7 @@ class ChatManagerTest {
         subjectUnderTestSpy.markMessagesReadWithDelay()
         verify(subjectUnderTestSpy).removeNewMessagesDivider(any())
         assertFalse(stateProcessorSpy.value!!.chatItems.contains(NewMessagesDividerItem))
-        verify(compositeDisposable).add(any())
+        verify(markMessagesReadDisposable).add(any())
         verify(stateProcessorSpy).onNext(any())
     }
 
@@ -781,6 +788,7 @@ class ChatManagerTest {
         subjectUnderTest.reset()
 
         verify(compositeDisposable).clear()
+        verify(markMessagesReadDisposable).clear()
         assertEquals(stateProcessor.value, ChatManager.State())
         assertEquals(quickReplies.value, emptyList<GvaButton>())
         assertEquals(historyLoaded.value, false)

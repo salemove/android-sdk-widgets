@@ -24,6 +24,7 @@ import com.glia.widgets.chat.domain.GliaSendMessageUseCase
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
 import com.glia.widgets.chat.domain.IsShowSendButtonUseCase
+import com.glia.widgets.chat.domain.SetChatScreenOpenUseCase
 import com.glia.widgets.chat.domain.SiteInfoUseCase
 import com.glia.widgets.chat.domain.TakePictureUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
@@ -138,7 +139,8 @@ internal class ChatController(
     private val getUrlFromLinkUseCase: GetUrlFromLinkUseCase,
     private val isMessagingAvailableUseCase: IsMessagingAvailableUseCase,
     private val shouldShowTopBannerUseCase: SecureConversationTopBannerVisibilityUseCase,
-    private val setLeaveSecureConversationDialogVisibleUseCase: SetLeaveSecureConversationDialogVisibleUseCase
+    private val setLeaveSecureConversationDialogVisibleUseCase: SetLeaveSecureConversationDialogVisibleUseCase,
+    private val setChatScreenOpenUseCase: SetChatScreenOpenUseCase
 ) : ChatContract.Controller {
     private var backClickedListener: ChatView.OnBackClickedListener? = null
     private var view: ChatContract.View? = null
@@ -388,6 +390,7 @@ internal class ChatController(
     }
 
     override fun onPause() {
+        setChatScreenOpenUseCase(false)
         mediaUpgradeDisposable.clear()
         isChatViewPaused = true
         messagesNotSeenHandler.onChatWentBackground()
@@ -554,6 +557,7 @@ internal class ChatController(
     }
 
     private fun onResumeSetup() {
+        setChatScreenOpenUseCase(true)
         subscribeToMediaUpgradeEvents()
         isChatViewPaused = false
         messagesNotSeenHandler.callChatButtonClicked()

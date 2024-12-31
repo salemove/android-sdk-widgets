@@ -140,7 +140,8 @@ public class ControllerFactory {
                 useCaseFactory.createGetUrlFromLinkUseCase(),
                 useCaseFactory.createIsMessagingAvailableUseCase(),
                 useCaseFactory.createSecureConversationTopBannerVisibilityUseCase(),
-                useCaseFactory.createSetLeaveSecureConversationDialogVisibleUseCase()
+                useCaseFactory.createSetLeaveSecureConversationDialogVisibleUseCase(),
+                useCaseFactory.getSetChatScreenOpenUseCase()
             );
         }
 

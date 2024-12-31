@@ -42,6 +42,7 @@ import com.glia.widgets.chat.domain.MapOperatorPlainTextUseCase;
 import com.glia.widgets.chat.domain.MapResponseCardUseCase;
 import com.glia.widgets.chat.domain.MapVisitorAttachmentUseCase;
 import com.glia.widgets.chat.domain.SendUnsentMessagesUseCase;
+import com.glia.widgets.chat.domain.SetChatScreenOpenUseCase;
 import com.glia.widgets.chat.domain.SiteInfoUseCase;
 import com.glia.widgets.chat.domain.TakePictureUseCase;
 import com.glia.widgets.chat.domain.TakePictureUseCaseImpl;
@@ -580,7 +581,7 @@ public class UseCaseFactory {
 
     @NonNull
     public MarkMessagesReadWithDelayUseCase createMarkMessagesReadUseCase() {
-        return new MarkMessagesReadWithDelayUseCase(repositoryFactory.getSecureConversationsRepository());
+        return new MarkMessagesReadWithDelayUseCase(repositoryFactory.getSecureConversationsRepository(), repositoryFactory.getChatScreenRepository());
     }
 
     @NonNull
@@ -1068,5 +1069,10 @@ public class UseCaseFactory {
             createIsAuthenticatedUseCase(),
             getEngagementStateUseCase()
         );
+    }
+
+    @NonNull
+    public SetChatScreenOpenUseCase getSetChatScreenOpenUseCase() {
+        return new SetChatScreenOpenUseCase(repositoryFactory.getChatScreenRepository());
     }
 }

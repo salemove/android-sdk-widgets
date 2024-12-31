@@ -26,7 +26,7 @@ allprojects {
     // Needed for some automated and manual testing (e.g: acceptance tests)
     mavenLocal()
     //TODO switch to the release version before releasing core SDK
-    maven { url = "https://s01.oss.sonatype.org/content/repositories/comglia-1336" }
+    maven { url = "https://s01.oss.sonatype.org/content/repositories/comglia-1337" }
   }
 }
 

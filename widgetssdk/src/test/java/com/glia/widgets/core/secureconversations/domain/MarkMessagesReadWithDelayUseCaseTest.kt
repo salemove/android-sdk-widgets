@@ -1,6 +1,7 @@
 package com.glia.widgets.core.secureconversations.domain
 
 import com.glia.androidsdk.RequestCallback
+import com.glia.widgets.chat.data.ChatScreenRepository
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.plugins.RxJavaPlugins
@@ -23,13 +24,18 @@ import kotlin.properties.Delegates
 
 @RunWith(RobolectricTestRunner::class)
 class MarkMessagesReadWithDelayUseCaseTest {
-    private var repository: SecureConversationsRepository by Delegates.notNull()
+    private var secureConversationsRepository: SecureConversationsRepository by Delegates.notNull()
+    private var chatScreenRepository: ChatScreenRepository by Delegates.notNull()
     private var useCase: MarkMessagesReadWithDelayUseCase by Delegates.notNull()
 
     @Before
     fun setUp() {
-        repository = mock()
-        useCase = MarkMessagesReadWithDelayUseCase(repository)
+        secureConversationsRepository = mock()
+        chatScreenRepository = mock()
+        useCase = MarkMessagesReadWithDelayUseCase(
+            secureConversationsRepository,
+            chatScreenRepository
+        )
         RxJavaPlugins.reset()
     }
 
@@ -44,13 +50,14 @@ class MarkMessagesReadWithDelayUseCaseTest {
         doAnswer {
             val callback: RequestCallback<Void> = it.getArgument(0)
             callback.onResult(null, null)
-        }.whenever(repository).markMessagesRead(any())
-        whenever(repository.isLeaveSecureConversationDialogVisibleObservable) doReturn Flowable.just(false)
+        }.whenever(secureConversationsRepository).markMessagesRead(any())
+        whenever(secureConversationsRepository.isLeaveSecureConversationDialogVisibleObservable) doReturn Flowable.just(false)
+        whenever(chatScreenRepository.isChatScreenOpenObservable) doReturn Flowable.just(true)
 
         val testObservable = useCase().test()
-        verify(repository, never()).markMessagesRead(any())
+        verify(secureConversationsRepository, never()).markMessagesRead(any())
         testScheduler.advanceTimeBy(DELAY_SEC, TimeUnit.SECONDS)
-        verify(repository).markMessagesRead(any())
+        verify(secureConversationsRepository).markMessagesRead(any())
 
         testObservable.assertComplete()
     }
@@ -63,17 +70,43 @@ class MarkMessagesReadWithDelayUseCaseTest {
         doAnswer {
             val callback: RequestCallback<Void> = it.getArgument(0)
             callback.onResult(null, null)
-        }.whenever(repository).markMessagesRead(any())
+        }.whenever(secureConversationsRepository).markMessagesRead(any())
         val isLeaveSecureConversationDialogVisibleBehaviorProcessor = BehaviorProcessor.createDefault(true)
-        whenever(repository.isLeaveSecureConversationDialogVisibleObservable) doReturn isLeaveSecureConversationDialogVisibleBehaviorProcessor
+        whenever(secureConversationsRepository.isLeaveSecureConversationDialogVisibleObservable) doReturn isLeaveSecureConversationDialogVisibleBehaviorProcessor
+        whenever(chatScreenRepository.isChatScreenOpenObservable) doReturn Flowable.just(true)
 
         val testObservable = useCase().test()
         testScheduler.advanceTimeBy(DELAY_SEC, TimeUnit.SECONDS)
-        verify(repository, never()).markMessagesRead(any())
+        verify(secureConversationsRepository, never()).markMessagesRead(any())
         isLeaveSecureConversationDialogVisibleBehaviorProcessor.onNext(false)
-        verify(repository, never()).markMessagesRead(any())
+        verify(secureConversationsRepository, never()).markMessagesRead(any())
         testScheduler.advanceTimeBy(DELAY_SEC, TimeUnit.SECONDS)
-        verify(repository).markMessagesRead(any())
+        verify(secureConversationsRepository).markMessagesRead(any())
+
+        testObservable.assertComplete()
+    }
+
+    @Test
+    fun `invoke calls mark messages read after resume to chat screen`() {
+        val testScheduler = TestScheduler()
+        RxJavaPlugins.setComputationSchedulerHandler { testScheduler }
+
+        doAnswer {
+            val callback: RequestCallback<Void> = it.getArgument(0)
+            callback.onResult(null, null)
+        }.whenever(secureConversationsRepository).markMessagesRead(any())
+        val isLeaveSecureConversationDialogVisibleBehaviorProcessor = BehaviorProcessor.createDefault(false)
+        whenever(secureConversationsRepository.isLeaveSecureConversationDialogVisibleObservable) doReturn isLeaveSecureConversationDialogVisibleBehaviorProcessor
+        val isChatScreenOpenBehaviorProcessor = BehaviorProcessor.createDefault(false)
+        whenever(chatScreenRepository.isChatScreenOpenObservable) doReturn isChatScreenOpenBehaviorProcessor
+
+        val testObservable = useCase().test()
+        testScheduler.advanceTimeBy(DELAY_SEC, TimeUnit.SECONDS)
+        verify(secureConversationsRepository, never()).markMessagesRead(any())
+        isChatScreenOpenBehaviorProcessor.onNext(true)
+        verify(secureConversationsRepository, never()).markMessagesRead(any())
+        testScheduler.advanceTimeBy(DELAY_SEC, TimeUnit.SECONDS)
+        verify(secureConversationsRepository).markMessagesRead(any())
 
         testObservable.assertComplete()
     }

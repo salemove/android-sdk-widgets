@@ -37,6 +37,7 @@ import com.airbnb.lottie.model.KeyPath
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.locale.StringKeyPair
+import com.glia.widgets.view.textview.SingleLineHintEditText
 import com.google.android.material.button.MaterialButton
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
@@ -157,7 +158,11 @@ internal fun TextView.setText(locale: LocaleString?, listener: ((String) -> Unit
 
 internal fun TextView.setLocaleHint(@StringRes stringKey: Int, vararg values: StringKeyPair) {
     registerLocaleListener(stringKey, *values) { upToDateTranslation ->
-        hint = upToDateTranslation
+        if (this is SingleLineHintEditText) {
+            setHintOverride(upToDateTranslation)
+        } else {
+            hint = upToDateTranslation
+        }
     }
 }
 

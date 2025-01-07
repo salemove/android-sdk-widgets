@@ -398,7 +398,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         post {
             binding.chatEditText.apply {
                 removeTextChangedListener(textWatcher)
-                text.clear()
+                text?.clear()
                 addTextChangedListener(textWatcher)
             }
         }

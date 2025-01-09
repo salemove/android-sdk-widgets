@@ -17,13 +17,8 @@
     colors to prevent customisation.  -->
     <color name="glia_branding_color">#B6BBC1</color>
 
-    <!-- { @deprecated Use glia_call_view_background_color instead.} -->
-    <color name="glia_transparent_black_bg">@color/glia_black_color_transparency_1</color>
-    <color name="glia_call_view_background_color">@color/glia_transparent_black_bg</color>
-
-    <!-- {@deprecated Use glia_call_control_buttons_color instead.} -->
-    <color name="glia_transparent_black_buttons_bg">@color/glia_black_color</color>
-    <color name="glia_call_control_buttons_color">@color/glia_transparent_black_buttons_bg</color>
+    <color name="glia_call_view_background_color">@color/glia_black_color_transparency_1</color>
+    <color name="glia_call_control_buttons_color">@color/glia_black_color</color>
 
     <color name="glia_stroke_light">@color/glia_shade_color</color>
     <color name="glia_stroke_gray">@color/glia_shade_color</color>

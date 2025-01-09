@@ -55,16 +55,15 @@ class AttachmentPopupSnapshotTest : SnapshotTest(), SnapshotTheme, SnapshotProvi
     ) : AttachmentPopup {
         localeProviderMock()
 
-        val anchor = LinearLayout(context)
         return AttachmentPopup(
-            anchor,
+            context,
             unifiedTheme
         ) {
             it.layoutParams = LinearLayout.LayoutParams(650, LinearLayout.LayoutParams.WRAP_CONTENT)
             viewCallback(it)
             mock()
         }.apply {
-            show(anchor, mock(), mock(), mock())
+            show(View(context), mock(), mock(), mock())
         }
     }
 }

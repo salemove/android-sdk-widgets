@@ -18,16 +18,6 @@ internal class AuthenticationManager(
         authentication.setBehavior(behavior)
     }
 
-    @Deprecated(
-        "Please use authenticate(String, String?, RequestCallback<Void>)",
-        ReplaceWith("authenticate(jwtToken, null, requestCallback)")
-    )
-    override fun authenticate(requestCallback: RequestCallback<Void>, jwtToken: String) {
-        Logger.logDeprecatedMethodUse(TAG, "authenticate(RequestCallback<Void>, String)")
-        cleanup()
-        authentication.authenticate(jwtToken, null, requestCallback)
-    }
-
     override fun authenticate(
         jwtToken: String,
         externalAccessToken: String?,

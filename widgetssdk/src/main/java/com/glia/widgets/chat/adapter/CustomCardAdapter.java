@@ -13,7 +13,6 @@ import androidx.collection.SparseArrayCompat;
 import com.glia.androidsdk.chat.ChatMessage;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.adapter.holder.CustomCardViewHolder;
-import com.glia.widgets.helper.Logger;
 
 /**
  * The base class of CustomCardAdapter.
@@ -23,7 +22,6 @@ import com.glia.widgets.helper.Logger;
  * @see WebViewCardAdapter
  */
 public abstract class CustomCardAdapter {
-    private final String TAG = CustomCardAdapter.class.getSimpleName();
 
     @VisibleForTesting
     // Map of relations between custom card view types and adapter view types.
@@ -95,24 +93,6 @@ public abstract class CustomCardAdapter {
                                                             @NonNull LayoutInflater inflater,
                                                             @NonNull UiTheme uiTheme,
                                                             int viewType);
-
-    /**
-     *
-     * @param message a chat message with metadata.
-     * @param viewType the view type of the new view.
-     *                 The type is provided by {@link #getItemViewType(ChatMessage)}.
-     * @return a boolean indicating if the input field should be locked
-     *         until a visitor selects an option from the card.
-     *         The default implementation returns {@code true}.
-     *
-     * @deprecated The result does not affect the behavior of the input field.
-     *             The chat input field will always be active.
-     */
-    @Deprecated
-    public boolean isInteractable(ChatMessage message, int viewType) {
-        Logger.logDeprecatedMethodUse(TAG, "isInteractable(ChatMessage, int)");
-        return true;
-    }
 
     /**
      *

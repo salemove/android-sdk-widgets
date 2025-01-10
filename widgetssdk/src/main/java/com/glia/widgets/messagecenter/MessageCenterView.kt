@@ -230,6 +230,10 @@ internal class MessageCenterView(
         this.onNavigateToMessagingListener?.navigateToMessaging()
     }
 
+    override fun returnToLiveChat() {
+        this.onNavigateToMessagingListener?.returnToLiveChat()
+    }
+
     override fun onStateUpdated(state: MessageCenterState) {
         post { messageView?.onStateUpdated(state) }
     }
@@ -296,6 +300,7 @@ internal class MessageCenterView(
 
     interface OnNavigateToMessagingListener {
         fun navigateToMessaging()
+        fun returnToLiveChat()
     }
 
     interface OnAttachFileListener {

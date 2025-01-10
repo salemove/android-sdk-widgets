@@ -33,11 +33,13 @@ import com.glia.widgets.GliaWidgets
 import com.glia.widgets.core.notification.NotificationActionReceiver
 import com.glia.widgets.entrywidget.EntryWidget
 import com.glia.widgets.launcher.EngagementLauncher
+import com.glia.widgets.launcher.FeatureUnderConsiderationForRemoval
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.card.MaterialCardView
 import kotlin.concurrent.thread
 import kotlin.properties.Delegates
 
+@OptIn(FeatureUnderConsiderationForRemoval::class)
 class MainFragment : Fragment() {
 
     private var containerView: ConstraintLayout? = null

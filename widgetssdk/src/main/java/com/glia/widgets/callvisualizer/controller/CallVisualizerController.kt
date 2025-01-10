@@ -23,11 +23,12 @@ import com.glia.widgets.engagement.State as EngagementState
 internal interface CallVisualizerContract {
 
     sealed interface State {
-        object DisplayVisitorCodeDialog : State
+        data object DisplayVisitorCodeDialog : State
         data class DisplayConfirmationDialog(val links: ConfirmationDialogLinks) : State
-        object DismissDialog : State
-        object ShowTimeoutSnackBar : State
-        object CloseHolderActivity : State
+        data object DismissDialog : State
+        data object ShowTimeoutSnackBar : State
+        data object ShowAlreadyInCallSnackBar : State
+        data object CloseHolderActivity : State
         data class OpenWebBrowserScreen(val title: LocaleString, val url: String) : State
     }
 
@@ -43,6 +44,7 @@ internal interface CallVisualizerContract {
         fun onLinkClicked(link: Link)
         fun dismissVisitorCodeDialog()
         fun onWebBrowserOpened()
+        fun showAlreadyInCallSnackBar()
     }
 }
 
@@ -140,6 +142,10 @@ internal class CallVisualizerController(
 
     override fun onWebBrowserOpened() {
         dialogController.showCVEngagementConfirmationDialog()
+    }
+
+    override fun showAlreadyInCallSnackBar() {
+        _state.onNext(CallVisualizerContract.State.ShowAlreadyInCallSnackBar)
     }
 
     private fun closeHolderActivity() {

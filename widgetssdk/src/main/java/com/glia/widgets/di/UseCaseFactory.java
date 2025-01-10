@@ -1065,7 +1065,6 @@ public class UseCaseFactory {
     public HasOngoingSecureConversationUseCase getHasPendingSecureConversationsWithTimeoutUseCase() {
         return new HasOngoingSecureConversationUseCase(
             repositoryFactory.getSecureConversationsRepository(),
-            createIsAuthenticatedUseCase(),
             getEngagementStateUseCase()
         );
     }

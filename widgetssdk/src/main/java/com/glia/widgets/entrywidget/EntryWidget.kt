@@ -42,25 +42,16 @@ internal class EntryWidgetImpl(
 ) : EntryWidget {
 
     override fun show(activity: Activity) {
-        hasOngoingSecureConversationUseCase {
-            handleShowWithPendingSecureConversations(it, activity)
-        }
-    }
-
-    private fun handleShowWithPendingSecureConversations(hasPendingSecureConversations: Boolean, activity: Activity) {
-        if (hasPendingSecureConversations) {
-            activityLauncher.launchChat(activity, Intention.SC_CHAT)
-        } else {
-            activityLauncher.launchEntryWidget(activity)
-        }
+        hasOngoingSecureConversationUseCase(
+            onHasOngoingSecureConversation = { activityLauncher.launchChat(activity, Intention.SC_CHAT) },
+            onNoOngoingSecureConversation = { activityLauncher.launchEntryWidget(activity) }
+        )
     }
 
     override fun getView(context: Context): View {
         val entryWidgetTheme = themeManager.theme?.entryWidgetTheme
-        val adapter = EntryWidgetAdapter(
-            EntryWidgetContract.ViewType.EMBEDDED_VIEW,
-            entryWidgetTheme
-        )
+        val adapter = EntryWidgetAdapter(EntryWidgetContract.ViewType.EMBEDDED_VIEW, entryWidgetTheme)
+
         //Wrapping with Glia theme to make the Theme available for embedded view
         return EntryWidgetView(context.wrapWithTheme()).apply {
             setAdapter(adapter)

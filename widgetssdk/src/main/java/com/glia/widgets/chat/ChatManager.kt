@@ -200,11 +200,9 @@ internal class ChatManager(
             if (chatMessage.chatMessage is VisitorMessage) {
                 checkUnsentMessages(messagesState)
             } else {
-                hasOngoingSecureConversationUseCase {
-                    if (it && !isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement) {
-                        markMessagesRead()
-                    }
-                }
+                hasOngoingSecureConversationUseCase(onHasOngoingSecureConversation = {
+                    markMessagesRead()
+                })
             }
         }
 

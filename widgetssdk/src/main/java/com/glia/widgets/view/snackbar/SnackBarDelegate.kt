@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
 import androidx.annotation.ColorRes
 import androidx.annotation.IdRes
+import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -24,10 +25,11 @@ import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.google.android.material.snackbar.Snackbar
 
 internal abstract class SnackBarDelegate(
-    view: View,
-    titleStringKey: Int,
-    localeProvider: LocaleProvider,
-    snackBarTheme: SnackBarTheme?
+    private val view: View,
+    @StringRes
+    private val titleStringKey: Int,
+    private val localeProvider: LocaleProvider,
+    private val snackBarTheme: SnackBarTheme?
 ) {
 
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
@@ -46,14 +48,14 @@ internal abstract class SnackBarDelegate(
     open val fallbackTextColor: Int = R.color.glia_light_color
 
     @VisibleForTesting
-    val snackBar: Snackbar by lazy { makeSnackBar(view, titleStringKey, localeProvider, snackBarTheme) }
+    val snackBar: Snackbar by lazy { makeSnackBar() }
 
     fun show() = snackBar.show()
 
-    private fun makeSnackBar(view: View, titleStringKey: Int, stringProvider: LocaleProvider, snackBarTheme: SnackBarTheme?): Snackbar {
+    private fun makeSnackBar(): Snackbar {
         val bgColor = snackBarTheme?.backgroundColorTheme?.primaryColor ?: view.getColorCompat(fallbackBackgroundColor)
         val textColor = snackBarTheme?.textColorTheme?.primaryColor ?: view.getColorCompat(fallbackTextColor)
-        val message = stringProvider.getRemoteString(titleStringKey)
+        val message = localeProvider.getString(titleStringKey)
 
         return Snackbar.make(view, message, Snackbar.LENGTH_SHORT)
             .setBackgroundTint(bgColor)
@@ -71,7 +73,12 @@ internal abstract class SnackBarDelegate(
 }
 
 @VisibleForTesting
-internal class CommonSnackBarDelegate(activity: Activity, titleStringKey: Int, localeProvider: LocaleProvider, unifiedTheme: UnifiedTheme?) :
+internal class CommonSnackBarDelegate(
+    activity: Activity,
+    @StringRes titleStringKey: Int,
+    localeProvider: LocaleProvider,
+    unifiedTheme: UnifiedTheme?
+) :
     SnackBarDelegate(activity.rootView, titleStringKey, localeProvider, unifiedTheme?.snackBarTheme) {
     override val marginBottom: Int = calculateBottomMargin(activity.rootView)
 
@@ -86,13 +93,23 @@ internal class CommonSnackBarDelegate(activity: Activity, titleStringKey: Int, l
 }
 
 @VisibleForTesting
-internal class ChatActivitySnackBarDelegate(activity: ChatActivity, titleStringKey: Int, localeProvider: LocaleProvider, unifiedTheme: UnifiedTheme?) :
+internal class ChatActivitySnackBarDelegate(
+    activity: ChatActivity,
+    @StringRes titleStringKey: Int,
+    localeProvider: LocaleProvider,
+    unifiedTheme: UnifiedTheme?
+) :
     SnackBarDelegate(activity.findViewById(R.id.chat_view), titleStringKey, localeProvider, unifiedTheme?.snackBarTheme) {
     override val anchorViewId: Int = R.id.message_input_background
 }
 
 @VisibleForTesting
-internal class CallActivitySnackBarDelegate(activity: CallActivity, titleStringKey: Int, localeProvider: LocaleProvider, unifiedTheme: UnifiedTheme?) :
+internal class CallActivitySnackBarDelegate(
+    activity: CallActivity,
+    @StringRes titleStringKey: Int,
+    localeProvider: LocaleProvider,
+    unifiedTheme: UnifiedTheme?
+) :
     SnackBarDelegate(activity.findViewById(R.id.call_view), titleStringKey, localeProvider, unifiedTheme?.callTheme?.snackBar) {
     override val anchorViewId: Int = R.id.buttons_layout_bg
     override val fallbackBackgroundColor: Int = R.color.glia_light_color

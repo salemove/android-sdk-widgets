@@ -310,7 +310,8 @@ public class ControllerFactory {
             useCaseFactory.getTakePictureUseCase(),
             useCaseFactory.getUriToFileAttachmentUseCase(),
             useCaseFactory.getRequestNotificationPermissionIfPushNotificationsSetUpUseCase(),
-            useCaseFactory.createIsMessagingAvailableUseCase()
+            useCaseFactory.createIsMessagingAvailableUseCase(),
+            useCaseFactory.getIsQueueingOrEngagementUseCase()
         );
     }
 

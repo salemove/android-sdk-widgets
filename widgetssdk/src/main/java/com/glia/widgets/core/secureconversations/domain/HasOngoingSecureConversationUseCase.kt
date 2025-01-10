@@ -1,6 +1,5 @@
 package com.glia.widgets.core.secureconversations.domain
 
-import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
@@ -10,7 +9,6 @@ import io.reactivex.rxjava3.core.Flowable
 
 internal class HasOngoingSecureConversationUseCase(
     private val secureConversationsRepository: SecureConversationsRepository,
-    private val isAuthenticatedUseCase: IsAuthenticatedUseCase,
     private val engagementStateUseCase: EngagementStateUseCase
 ) {
     /**
@@ -22,12 +20,19 @@ internal class HasOngoingSecureConversationUseCase(
             secureConversationsRepository.unreadMessagesCountObservable,
             engagementStateUseCase()
         ) { pendingSecureConversations, unreadMessagesCount, state ->
-            isAuthenticatedUseCase() &&
-                (pendingSecureConversations || unreadMessagesCount > 0 || state is State.TransferredToSecureConversation)
+            !state.isLiveEngagement && !state.isQueueing && (pendingSecureConversations || unreadMessagesCount > 0 || state is State.TransferredToSecureConversation)
         }
 
     operator fun invoke(): Flowable<Boolean> = hasOngoingInteraction.distinctUntilChanged().observeOn(AndroidSchedulers.mainThread())
 
-    operator fun invoke(callback: (Boolean) -> Unit) = invoke().firstOrError().unSafeSubscribe(callback)
+    operator fun invoke(onHasOngoingSecureConversation: () -> Unit, onNoOngoingSecureConversation: () -> Unit = {}) {
+        invoke().firstOrError().unSafeSubscribe { hasOngoing ->
+            if (hasOngoing) {
+                onHasOngoingSecureConversation()
+            } else {
+                onNoOngoingSecureConversation()
+            }
+        }
+    }
 
 }

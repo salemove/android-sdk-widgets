@@ -18,6 +18,8 @@ import com.glia.widgets.core.secureconversations.domain.ResetMessageCenterUseCas
 import com.glia.widgets.core.secureconversations.domain.SendMessageButtonStateUseCase
 import com.glia.widgets.core.secureconversations.domain.SendSecureMessageUseCase
 import com.glia.widgets.core.secureconversations.domain.ShowMessageLimitErrorUseCase
+import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
+import com.glia.widgets.helper.Logger
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Observable
 import org.junit.Before
@@ -51,9 +53,11 @@ internal class MessageCenterControllerTest {
     private lateinit var uriToFileAttachmentUseCase: UriToFileAttachmentUseCase
     private lateinit var requestNotificationPermissionIfPushNotificationsSetUpUseCase: RequestNotificationPermissionIfPushNotificationsSetUpUseCase
     private lateinit var isMessagingAvailableUseCase: IsMessagingAvailableUseCase
+    private lateinit var isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase
 
     @Before
     fun setUp() {
+        Logger.setIsDebug(false)
         sendSecureMessageUseCase = mock()
         addFileAttachmentsObserverUseCase = mock()
         addFileToAttachmentAndUploadUseCase = mock()
@@ -71,6 +75,7 @@ internal class MessageCenterControllerTest {
         uriToFileAttachmentUseCase = mock()
         requestNotificationPermissionIfPushNotificationsSetUpUseCase = mock()
         isMessagingAvailableUseCase = mock()
+        isQueueingOrLiveEngagementUseCase = mock()
         messageCenterController = MessageCenterController(
             sendSecureMessageUseCase = sendSecureMessageUseCase,
             addFileAttachmentsObserverUseCase = addFileAttachmentsObserverUseCase,
@@ -87,7 +92,8 @@ internal class MessageCenterControllerTest {
             takePictureUseCase = takePictureUseCase,
             uriToFileAttachmentUseCase = uriToFileAttachmentUseCase,
             requestNotificationPermissionIfPushNotificationsSetUpUseCase = requestNotificationPermissionIfPushNotificationsSetUpUseCase,
-            isMessagingAvailableUseCase = isMessagingAvailableUseCase
+            isMessagingAvailableUseCase = isMessagingAvailableUseCase,
+            isQueueingOrLiveEngagementUseCase = isQueueingOrLiveEngagementUseCase
         )
     }
 
@@ -212,9 +218,22 @@ internal class MessageCenterControllerTest {
     }
 
     @Test
-    fun onCheckMessagesClicked_ExecutesResetMessageCenterUseCase_onTrigger() {
+    fun onCheckMessagesClicked_returnsToLiveChat_whenHasOngoingEngagement() {
+        whenever(isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement) doReturn true
+        messageCenterController.setView(viewContract)
         messageCenterController.onCheckMessagesClicked()
 
+        verify(viewContract, times(1)).returnToLiveChat()
+        verify(resetMessageCenterUseCase, times(1)).invoke()
+    }
+
+    @Test
+    fun onCheckMessagesClicked_navigatesToMessaging_whenDoNotHaveOngoingEngagement() {
+        whenever(isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement) doReturn false
+        messageCenterController.setView(viewContract)
+        messageCenterController.onCheckMessagesClicked()
+
+        verify(viewContract, times(1)).navigateToMessaging()
         verify(resetMessageCenterUseCase, times(1)).invoke()
     }
 

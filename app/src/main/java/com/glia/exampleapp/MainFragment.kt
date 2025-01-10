@@ -93,13 +93,25 @@ class MainFragment : Fragment() {
             }
         val visitorContextAssetId = getContextAssetIdFromPrefs(sharedPreferences)
         view.findViewById<View>(R.id.chat_activity_button)
-            .setOnClickListener { engagementLauncher.startChat(requireActivity(), visitorContextAssetId) }
+            .setOnClickListener {
+                visitorContextAssetId?.run { engagementLauncher.startChat(requireActivity(), this) }
+                    ?: engagementLauncher.startChat(requireActivity())
+            }
         view.findViewById<View>(R.id.audio_call_button)
-            .setOnClickListener { engagementLauncher.startAudioCall(requireActivity(), visitorContextAssetId) }
+            .setOnClickListener {
+                visitorContextAssetId?.run { engagementLauncher.startAudioCall(requireActivity(), this) }
+                    ?: engagementLauncher.startAudioCall(requireActivity())
+            }
         view.findViewById<View>(R.id.video_call_button)
-            .setOnClickListener { engagementLauncher.startVideoCall(requireActivity(), visitorContextAssetId) }
+            .setOnClickListener {
+                visitorContextAssetId?.run { engagementLauncher.startVideoCall(requireActivity(), this) }
+                    ?: engagementLauncher.startVideoCall(requireActivity())
+            }
         view.findViewById<View>(R.id.message_center_activity_button)
-            .setOnClickListener { engagementLauncher.startSecureMessaging(requireActivity(), visitorContextAssetId) }
+            .setOnClickListener {
+                visitorContextAssetId?.run { engagementLauncher.startSecureMessaging(requireActivity(), this) }
+                    ?: engagementLauncher.startSecureMessaging(requireActivity())
+            }
         view.findViewById<View>(R.id.end_engagement_button)
             .setOnClickListener { GliaWidgets.endEngagement() }
         view.findViewById<View>(R.id.visitor_info_button)

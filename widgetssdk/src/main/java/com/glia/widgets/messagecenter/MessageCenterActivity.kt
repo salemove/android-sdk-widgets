@@ -106,4 +106,9 @@ internal class MessageCenterActivity : FadeTransitionActivity(),
         finish()
     }
 
+    override fun returnToLiveChat() {
+        Dependencies.activityLauncher.launchChat(this, Intention.RETURN_TO_CHAT)
+        finish()
+    }
+
 }

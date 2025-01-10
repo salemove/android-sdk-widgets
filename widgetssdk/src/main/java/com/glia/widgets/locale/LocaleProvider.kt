@@ -34,7 +34,7 @@ data class LocaleString(
 }
 
 @OpenForTesting
-internal open class LocaleProvider @JvmOverloads constructor(
+internal open class LocaleProvider(
     private val resourceProvider: IResourceProvider
 ) : StringProvider {
 

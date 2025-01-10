@@ -184,7 +184,6 @@ class CallVisualizerControllerTest {
         testState.assertNotComplete().assertValue { it.value is CallVisualizerContract.State.CloseHolderActivity }
         verify { engagementRequestUseCase.accept(any()) }
         verify { dialogController.dismissCurrentDialog() }
-
     }
 
     @Test
@@ -196,7 +195,6 @@ class CallVisualizerControllerTest {
         testState.assertNotComplete().assertValue { it.value is CallVisualizerContract.State.CloseHolderActivity }
         verify { engagementRequestUseCase.decline() }
         verify { dialogController.dismissCurrentDialog() }
-
     }
 
     @Test
@@ -207,7 +205,15 @@ class CallVisualizerControllerTest {
 
         testState.assertNotComplete().assertValue { it.value is CallVisualizerContract.State.CloseHolderActivity }
         verify { dialogController.dismissVisitorCodeDialog() }
+    }
 
+    @Test
+    fun `showAlreadyInCallSnackBar will show snackBar`() {
+        val testState = controller.state.test()
+
+        controller.showAlreadyInCvSnackBar()
+
+        testState.assertNotComplete().assertValue { it.value is CallVisualizerContract.State.ShowAlreadyInCvSnackBar }
     }
 
     @Test

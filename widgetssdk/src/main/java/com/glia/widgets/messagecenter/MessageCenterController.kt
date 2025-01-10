@@ -25,6 +25,7 @@ import com.glia.widgets.core.secureconversations.domain.ResetMessageCenterUseCas
 import com.glia.widgets.core.secureconversations.domain.SendMessageButtonStateUseCase
 import com.glia.widgets.core.secureconversations.domain.SendSecureMessageUseCase
 import com.glia.widgets.core.secureconversations.domain.ShowMessageLimitErrorUseCase
+import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -45,7 +46,8 @@ internal class MessageCenterController(
     private val takePictureUseCase: TakePictureUseCase,
     private val uriToFileAttachmentUseCase: UriToFileAttachmentUseCase,
     private val requestNotificationPermissionIfPushNotificationsSetUpUseCase: RequestNotificationPermissionIfPushNotificationsSetUpUseCase,
-    private val isMessagingAvailableUseCase: IsMessagingAvailableUseCase
+    private val isMessagingAvailableUseCase: IsMessagingAvailableUseCase,
+    private val isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase
 ) : MessageCenterContract.Controller {
     private var view: MessageCenterContract.View? = null
     private val disposables = CompositeDisposable()
@@ -101,7 +103,11 @@ internal class MessageCenterController(
     }
 
     override fun onCheckMessagesClicked() {
-        view?.navigateToMessaging()
+        if (isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement) {
+            view?.returnToLiveChat()
+        } else {
+            view?.navigateToMessaging()
+        }
         reset()
     }
 

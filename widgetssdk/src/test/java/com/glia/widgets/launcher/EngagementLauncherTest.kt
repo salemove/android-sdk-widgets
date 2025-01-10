@@ -7,6 +7,7 @@ import com.glia.widgets.core.secureconversations.domain.HasOngoingSecureConversa
 import com.glia.widgets.di.ControllerFactory
 import com.glia.widgets.engagement.domain.EndEngagementUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
+import com.glia.widgets.helper.Logger
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -45,6 +46,7 @@ class EngagementLauncherImplTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
+        Logger.setIsDebug(false)
         engagementLauncher = EngagementLauncherImpl(
             activityLauncher,
             hasOngoingSecureConversationUseCase,
@@ -58,7 +60,7 @@ class EngagementLauncherImplTest {
     @Test
     fun `startChat launches live chat when no pending secure conversations`() {
         mockOngoingInteractionCallback(false)
-        every { isQueueingOrLiveEngagementUseCase.isQueueing } returns false
+        mockNoQueueing()
 
         engagementLauncher.startChat(activity)
 
@@ -69,7 +71,7 @@ class EngagementLauncherImplTest {
     @Test
     fun `startChat launches secure conversation dialog when there are pending secure conversations`() {
         mockOngoingInteractionCallback(true)
-        every { isQueueingOrLiveEngagementUseCase.isQueueing } returns false
+        mockNoQueueing()
 
         engagementLauncher.startChat(activity, visitorContextAssetId)
 
@@ -80,7 +82,7 @@ class EngagementLauncherImplTest {
     @Test
     fun `startAudioCall launches audio call when no pending secure conversations`() {
         mockOngoingInteractionCallback(false)
-        every { isQueueingOrLiveEngagementUseCase.isQueueing } returns false
+        mockNoQueueing()
 
         engagementLauncher.startAudioCall(activity)
 
@@ -91,7 +93,7 @@ class EngagementLauncherImplTest {
     @Test
     fun `startAudioCall launches secure conversation audio dialog when there are pending secure conversations`() {
         mockOngoingInteractionCallback(true)
-        every { isQueueingOrLiveEngagementUseCase.isQueueing } returns false
+        mockNoQueueing()
 
         engagementLauncher.startAudioCall(activity, visitorContextAssetId)
 
@@ -102,7 +104,7 @@ class EngagementLauncherImplTest {
     @Test
     fun `startVideoCall launches video call when no pending secure conversations`() {
         mockOngoingInteractionCallback(false)
-        every { isQueueingOrLiveEngagementUseCase.isQueueing } returns false
+        mockNoQueueing()
 
         engagementLauncher.startVideoCall(activity)
 
@@ -113,7 +115,7 @@ class EngagementLauncherImplTest {
     @Test
     fun `startVideoCall launches secure conversation video dialog when there are pending secure conversations`() {
         mockOngoingInteractionCallback(true)
-        every { isQueueingOrLiveEngagementUseCase.isQueueing } returns false
+        mockNoQueueing()
 
         engagementLauncher.startVideoCall(activity, visitorContextAssetId)
 
@@ -124,7 +126,7 @@ class EngagementLauncherImplTest {
     @Test
     fun `startSecureMessaging launches secure messaging welcome screen when no pending secure conversations`() {
         mockOngoingInteractionCallback(false)
-        every { isQueueingOrLiveEngagementUseCase.isQueueing } returns false
+        mockNoQueueing()
 
         engagementLauncher.startSecureMessaging(activity)
 
@@ -135,7 +137,7 @@ class EngagementLauncherImplTest {
     @Test
     fun `startSecureMessaging launches secure chat when there are pending secure conversations`() {
         mockOngoingInteractionCallback(true)
-        every { isQueueingOrLiveEngagementUseCase.isQueueing } returns false
+        mockNoQueueing()
 
         engagementLauncher.startSecureMessaging(activity, visitorContextAssetId)
 
@@ -149,10 +151,17 @@ class EngagementLauncherImplTest {
         }
     }
 
+    private fun mockNoQueueing() {
+        every { isQueueingOrLiveEngagementUseCase.isQueueingForMedia } returns false
+        every { isQueueingOrLiveEngagementUseCase.isQueueingForVideo } returns false
+        every { isQueueingOrLiveEngagementUseCase.isQueueingForAudio } returns false
+        every { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat } returns false
+    }
+
     @Test
-    fun `startChat ends engagement and destroys chat controller when queueing`() {
+    fun `startChat ends engagement and destroys chat controller when queueing for media`() {
         mockOngoingInteractionCallback(false)
-        every { isQueueingOrLiveEngagementUseCase.isQueueing } returns true
+        every { isQueueingOrLiveEngagementUseCase.isQueueingForMedia } returns true
 
         engagementLauncher.startChat(activity)
 
@@ -162,9 +171,22 @@ class EngagementLauncherImplTest {
     }
 
     @Test
-    fun `startAudioCall ends engagement and destroys call controller when queueing`() {
+    fun `startChat does not end engagement and does not destroy chat controller when queueing for chat`() {
         mockOngoingInteractionCallback(false)
-        every { isQueueingOrLiveEngagementUseCase.isQueueing } returns true
+        every { isQueueingOrLiveEngagementUseCase.isQueueingForMedia } returns false
+
+        engagementLauncher.startChat(activity)
+
+        verify(exactly = 0) { endEngagementUseCase() }
+        verify(exactly = 0) { controllerFactory.destroyChatController() }
+        verify { activityLauncher.launchChat(activity, Intention.LIVE_CHAT) }
+    }
+
+    @Test
+    fun `startAudioCall ends engagement and destroys call controller when queueing for chat`() {
+        mockOngoingInteractionCallback(false)
+        every { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat } returns true
+        every { isQueueingOrLiveEngagementUseCase.isQueueingForVideo } returns false
 
         engagementLauncher.startAudioCall(activity)
 
@@ -174,14 +196,67 @@ class EngagementLauncherImplTest {
     }
 
     @Test
-    fun `startVideoCall ends engagement and destroys call controller when queueing`() {
+    fun `startAudioCall ends engagement and destroys call controller when queueing for video`() {
         mockOngoingInteractionCallback(false)
-        every { isQueueingOrLiveEngagementUseCase.isQueueing } returns true
+        every { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat } returns false
+        every { isQueueingOrLiveEngagementUseCase.isQueueingForVideo } returns true
+
+        engagementLauncher.startAudioCall(activity)
+
+        verify { endEngagementUseCase() }
+        verify { controllerFactory.destroyCallController() }
+        verify { activityLauncher.launchCall(activity, Engagement.MediaType.AUDIO, false) }
+    }
+
+    @Test
+    fun `startAudioCall does not end engagement and does not destroy call controller when queueing for audio`() {
+        mockOngoingInteractionCallback(false)
+        every { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat } returns false
+        every { isQueueingOrLiveEngagementUseCase.isQueueingForVideo } returns false
+
+        engagementLauncher.startAudioCall(activity)
+
+        verify(exactly = 0) { endEngagementUseCase() }
+        verify(exactly = 0) { controllerFactory.destroyCallController() }
+        verify { activityLauncher.launchCall(activity, Engagement.MediaType.AUDIO, false) }
+    }
+
+    @Test
+    fun `startVideoCall ends engagement and destroys call controller when queueing for chat`() {
+        mockOngoingInteractionCallback(false)
+        every { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat } returns true
+        every { isQueueingOrLiveEngagementUseCase.isQueueingForAudio } returns false
 
         engagementLauncher.startVideoCall(activity)
 
         verify { endEngagementUseCase() }
         verify { controllerFactory.destroyCallController() }
+        verify { activityLauncher.launchCall(activity, Engagement.MediaType.VIDEO, false) }
+    }
+
+    @Test
+    fun `startVideoCall ends engagement and destroys call controller when queueing for audio`() {
+        mockOngoingInteractionCallback(false)
+        every { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat } returns false
+        every { isQueueingOrLiveEngagementUseCase.isQueueingForAudio } returns true
+
+        engagementLauncher.startVideoCall(activity)
+
+        verify { endEngagementUseCase() }
+        verify { controllerFactory.destroyCallController() }
+        verify { activityLauncher.launchCall(activity, Engagement.MediaType.VIDEO, false) }
+    }
+
+    @Test
+    fun `startVideoCall does not end engagement and does not destroy call controller when queueing for video`() {
+        mockOngoingInteractionCallback(false)
+        every { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat } returns false
+        every { isQueueingOrLiveEngagementUseCase.isQueueingForAudio } returns false
+
+        engagementLauncher.startVideoCall(activity)
+
+        verify(exactly = 0) { endEngagementUseCase() }
+        verify(exactly = 0) { controllerFactory.destroyCallController() }
         verify { activityLauncher.launchCall(activity, Engagement.MediaType.VIDEO, false) }
     }
 }

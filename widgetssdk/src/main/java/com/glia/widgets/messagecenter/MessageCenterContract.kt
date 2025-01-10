@@ -40,5 +40,6 @@ internal interface MessageCenterContract {
         fun showAttachmentPopup()
         fun showConfirmationScreen()
         fun hideSoftKeyboard()
+        fun returnToLiveChat()
     }
 }

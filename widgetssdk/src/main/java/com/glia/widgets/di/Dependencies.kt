@@ -84,12 +84,16 @@ internal object Dependencies {
     @JvmStatic
     val engagementLauncher: EngagementLauncher by lazy {
         EngagementLauncherImpl(
-            activityLauncher,
-            useCaseFactory.hasPendingSecureConversationsWithTimeoutUseCase,
-            useCaseFactory.isQueueingOrEngagementUseCase,
-            useCaseFactory.endEngagementUseCase,
-            configurationManager,
-            controllerFactory)
+            activityLauncher = activityLauncher,
+            hasOngoingSecureConversationUseCase = useCaseFactory.hasPendingSecureConversationsWithTimeoutUseCase,
+            isQueueingOrLiveEngagementUseCase = useCaseFactory.isQueueingOrEngagementUseCase,
+            endEngagementUseCase = useCaseFactory.endEngagementUseCase,
+            configurationManager = configurationManager,
+            engagementTypeUseCase = useCaseFactory.engagementTypeUseCase,
+            callVisualizerController = controllerFactory.callVisualizerController,
+            destroyChatController = controllerFactory::destroyChatController,
+            destroyCallController = controllerFactory::destroyCallController
+        )
     }
 
     @JvmStatic

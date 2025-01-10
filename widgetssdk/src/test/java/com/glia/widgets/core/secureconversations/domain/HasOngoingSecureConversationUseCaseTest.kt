@@ -1,6 +1,6 @@
 package com.glia.widgets.core.secureconversations.domain
 
-import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
+import com.glia.androidsdk.Engagement
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
@@ -21,7 +21,6 @@ class HasOngoingSecureConversationUseCaseTest {
     private lateinit var repository: SecureConversationsRepository
     private lateinit var useCase: HasOngoingSecureConversationUseCase
     private lateinit var engagementStateUseCase: EngagementStateUseCase
-    private lateinit var isAuthenticatedUseCase: IsAuthenticatedUseCase
 
     @Before
     fun setUp() {
@@ -29,8 +28,7 @@ class HasOngoingSecureConversationUseCaseTest {
         RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
         repository = mockk()
         engagementStateUseCase = mockk()
-        isAuthenticatedUseCase = mockk()
-        useCase = HasOngoingSecureConversationUseCase(repository, isAuthenticatedUseCase, engagementStateUseCase)
+        useCase = HasOngoingSecureConversationUseCase(repository, engagementStateUseCase)
     }
 
     @After
@@ -39,49 +37,46 @@ class HasOngoingSecureConversationUseCaseTest {
         RxAndroidPlugins.reset()
     }
 
-    private fun mockInitialState(
-        pendingSC: Boolean = false,
-        unreadMessagesCount: Int = 0,
-        transferredSC: Boolean = false,
-        isAuthenticated: Boolean = false
-        ) {
+    private fun mockInitialState(pendingSC: Boolean = false, unreadMessagesCount: Int = 0, engagementState: State = State.NoEngagement) {
         every { repository.pendingSecureConversationsStatusObservable } returns Flowable.just(pendingSC)
         every { repository.unreadMessagesCountObservable } returns Flowable.just(unreadMessagesCount)
-        every { engagementStateUseCase() } returns Flowable.just(if (transferredSC) State.TransferredToSecureConversation else State.NoEngagement)
-        every { isAuthenticatedUseCase() } returns isAuthenticated
+        every { engagementStateUseCase() } returns Flowable.just(engagementState)
     }
 
     @Test
     fun `invoke returns true when there are pending secure conversations`() {
-        mockInitialState(pendingSC = true, isAuthenticated = true)
+        mockInitialState(pendingSC = true)
 
         val result = useCase().blockingLast()
         assertEquals(true, result)
-        val callback = mockk<(Boolean) -> Unit>()
-        useCase(callback)
-        verify(timeout = 1100) { callback.invoke(true) }
+        val onHasOngoingSecureConversation = mockk<() -> Unit>()
+        val onNoOngoingSecureConversation = mockk<() -> Unit>()
+        useCase(onHasOngoingSecureConversation, onNoOngoingSecureConversation)
+        verify(timeout = 1100) { onHasOngoingSecureConversation() }
     }
 
     @Test
     fun `invoke returns true when there are positive unread messages count`() {
-        mockInitialState(unreadMessagesCount = 3, isAuthenticated = true)
+        mockInitialState(unreadMessagesCount = 3)
 
         val result = useCase().blockingLast()
         assertEquals(true, result)
-        val callback = mockk<(Boolean) -> Unit>()
-        useCase(callback)
-        verify(timeout = 1100) { callback.invoke(true) }
+        val onHasOngoingSecureConversation = mockk<() -> Unit>()
+        val onNoOngoingSecureConversation = mockk<() -> Unit>()
+        useCase(onHasOngoingSecureConversation, onNoOngoingSecureConversation)
+        verify(timeout = 1100) { onHasOngoingSecureConversation() }
     }
 
     @Test
     fun `invoke returns true when there is transferred sc`() {
-        mockInitialState(transferredSC = true, isAuthenticated = true)
+        mockInitialState(engagementState = State.TransferredToSecureConversation)
 
         val result = useCase().blockingLast()
         assertEquals(true, result)
-        val callback = mockk<(Boolean) -> Unit>()
-        useCase(callback)
-        verify(timeout = 1100) { callback.invoke(true) }
+        val onHasOngoingSecureConversation = mockk<() -> Unit>()
+        val onNoOngoingSecureConversation = mockk<() -> Unit>()
+        useCase(onHasOngoingSecureConversation, onNoOngoingSecureConversation)
+        verify(timeout = 1100) { onHasOngoingSecureConversation() }
     }
 
     @Test
@@ -90,25 +85,34 @@ class HasOngoingSecureConversationUseCaseTest {
 
         val result = useCase().blockingLast()
         assertEquals(false, result)
-        val callback = mockk<(Boolean) -> Unit>()
-        useCase(callback)
-        verify(timeout = 1100) { callback.invoke(false) }
+        val onHasOngoingSecureConversation = mockk<() -> Unit>()
+        val onNoOngoingSecureConversation = mockk<() -> Unit>()
+        useCase(onHasOngoingSecureConversation, onNoOngoingSecureConversation)
+        verify(timeout = 1100) { onNoOngoingSecureConversation() }
     }
 
     @Test
-    fun `invoke returns false when only isAuthenticated false`() {
-        mockInitialState(
-            pendingSC = true,
-            unreadMessagesCount = 3,
-            transferredSC = true,
-            isAuthenticated = false
-        )
+    fun `invoke returns false when ongoing engagement`() {
+        mockInitialState(engagementState = State.StartedOmniCore, pendingSC = true)
 
         val result = useCase().blockingLast()
         assertEquals(false, result)
-        val callback = mockk<(Boolean) -> Unit>()
-        useCase(callback)
-        verify(timeout = 1100) { callback.invoke(false) }
+        val onHasOngoingSecureConversation = mockk<() -> Unit>()
+        val onNoOngoingSecureConversation = mockk<() -> Unit>()
+        useCase(onHasOngoingSecureConversation, onNoOngoingSecureConversation)
+        verify(timeout = 1100) { onNoOngoingSecureConversation() }
+    }
+
+    @Test
+    fun `invoke returns false when enqueueing`() {
+        mockInitialState(engagementState = State.PreQueuing(Engagement.MediaType.AUDIO), unreadMessagesCount = 10)
+
+        val result = useCase().blockingLast()
+        assertEquals(false, result)
+        val onHasOngoingSecureConversation = mockk<() -> Unit>()
+        val onNoOngoingSecureConversation = mockk<() -> Unit>()
+        useCase(onHasOngoingSecureConversation, onNoOngoingSecureConversation)
+        verify(timeout = 1100) { onNoOngoingSecureConversation() }
     }
 
     @Test
@@ -118,18 +122,17 @@ class HasOngoingSecureConversationUseCaseTest {
         every { repository.pendingSecureConversationsStatusObservable } returns pendingSC
         every { repository.unreadMessagesCountObservable } returns Flowable.just(0)
         every { engagementStateUseCase() } returns Flowable.just(State.NoEngagement)
-        every { isAuthenticatedUseCase() } returns false
 
         useCase().test().assertValue(false)
-        val callback = mockk<(Boolean) -> Unit>()
-        useCase(callback)
-        verify(timeout = 1100) { callback.invoke(false) }
+        val onHasOngoingSecureConversation = mockk<() -> Unit>()
+        val onNoOngoingSecureConversation = mockk<() -> Unit>()
+        useCase(onHasOngoingSecureConversation, onNoOngoingSecureConversation)
+        verify(timeout = 1100) { onNoOngoingSecureConversation() }
 
         pendingSC.onNext(true)
-        every { isAuthenticatedUseCase() } returns true
         useCase().test().assertValue(true)
 
-        verify(timeout = 1100, exactly = 1) { callback.invoke(false) }
-        verify(timeout = 1100, inverse = true) { callback.invoke(true) }
+        verify(timeout = 1100, exactly = 1) { onNoOngoingSecureConversation() }
+        verify(timeout = 1100, inverse = true) { onHasOngoingSecureConversation() }
     }
 }

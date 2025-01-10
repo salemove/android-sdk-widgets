@@ -58,7 +58,7 @@ internal class EngagementLauncherImpl(
 ) : EngagementLauncher {
 
     override fun startChat(context: Context, visitorContextAssetId: String?) {
-        if (isQueueingOrLiveEngagementUseCase.isQueueing) {
+        if (isQueueingOrLiveEngagementUseCase.isQueueingForMedia) {
             Logger.i(TAG, "Canceling ongoing queue ticket to create a new one")
             endEngagementUseCase()
             controllerFactory.destroyChatController()
@@ -75,7 +75,7 @@ internal class EngagementLauncherImpl(
     }
 
     override fun startAudioCall(context: Context, visitorContextAssetId: String?) {
-        if (isQueueingOrLiveEngagementUseCase.isQueueing) {
+        if (isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat || isQueueingOrLiveEngagementUseCase.isQueueingForVideo) {
             Logger.i(TAG, "Canceling ongoing queue ticket to create a new one")
             endEngagementUseCase()
             controllerFactory.destroyCallController()
@@ -92,7 +92,7 @@ internal class EngagementLauncherImpl(
     }
 
     override fun startVideoCall(context: Context, visitorContextAssetId: String?) {
-        if (isQueueingOrLiveEngagementUseCase.isQueueing) {
+        if (isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat || isQueueingOrLiveEngagementUseCase.isQueueingForAudio) {
             Logger.i(TAG, "Canceling ongoing queue ticket to create a new one")
             endEngagementUseCase()
             controllerFactory.destroyCallController()

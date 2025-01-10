@@ -151,6 +151,12 @@ internal class EngagementRepositoryImpl(
     override val isQueueingForMedia: Boolean
         get() = currentState?.queueingMediaType?.isAudioOrVideo() == true
 
+    override val isQueueingForAudio: Boolean
+        get() = (currentState?.queueingMediaType == MediaType.AUDIO)
+
+    override val isQueueingForVideo: Boolean
+        get() = (currentState?.queueingMediaType == MediaType.VIDEO)
+
     override val isCallVisualizerEngagement: Boolean
         get() = currentEngagement is OmnibrowseEngagement
 

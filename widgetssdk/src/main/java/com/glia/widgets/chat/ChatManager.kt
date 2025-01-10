@@ -424,7 +424,8 @@ internal class ChatManager(
     fun mapInQueue(state: State): State = state.apply {
         OperatorStatusItem.InQueue.also {
             operatorStatusItem = it
-            chatItems += it
+            val isQueueingItemAlreadyDisplayed = chatItems.size > 0 && chatItems[chatItems.lastIndex] == it
+            if (!isQueueingItemAlreadyDisplayed) chatItems += it
         }
     }
 

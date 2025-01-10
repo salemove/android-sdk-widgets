@@ -36,6 +36,8 @@ internal interface EngagementRepository {
     val isTransferredSecureConversation: Boolean
     val isQueueing: Boolean
     val isQueueingForMedia: Boolean
+    val isQueueingForVideo: Boolean
+    val isQueueingForAudio: Boolean
     val isCallVisualizerEngagement: Boolean
     val isOperatorPresent: Boolean
     val isSharingScreen: Boolean

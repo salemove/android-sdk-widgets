@@ -6,69 +6,65 @@ import com.glia.androidsdk.queuing.Queue
 import com.glia.androidsdk.queuing.QueueState
 import com.glia.widgets.core.queue.QueueRepository
 import com.glia.widgets.core.queue.QueuesState
+import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
 import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.functions.Predicate
+import io.reactivex.rxjava3.schedulers.Schedulers
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.mock
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.whenever
 
 class SecureConversationTopBannerVisibilityUseCaseTest {
 
     private lateinit var queueRepository: QueueRepository
-    private lateinit var pendingConversationsUseCase: HasOngoingSecureConversationUseCase
+    private lateinit var manageSecureMessagingStatusUseCase: ManageSecureMessagingStatusUseCase
     private lateinit var shouldShowTopBannerUseCase: SecureConversationTopBannerVisibilityUseCase
 
     @Before
     fun setUp() {
+        RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
         queueRepository = mock()
-        pendingConversationsUseCase = mock()
-        shouldShowTopBannerUseCase = SecureConversationTopBannerVisibilityUseCase(queueRepository, pendingConversationsUseCase)
+        manageSecureMessagingStatusUseCase = mock()
+        shouldShowTopBannerUseCase = SecureConversationTopBannerVisibilityUseCase(queueRepository, manageSecureMessagingStatusUseCase)
     }
 
-    @Test
-    fun `returns error when failed to get pending conversation state`() {
-        val error = Throwable("Something went wrong")
-        whenever(pendingConversationsUseCase()).thenReturn(Flowable.error(error))
-
-        shouldShowTopBannerUseCase.invoke().test()
-            .assertNoErrors()
-            .assertValueCount(1)
-            .assertCurrentValue(Predicate { it.isFailure && it.exceptionOrNull() == error })
-    }
-
-    @Test
-    fun `returns error when failed to get queue state`() {
-        val error = Throwable("Something went wrong")
-        whenever(pendingConversationsUseCase.invoke()).thenReturn(Flowable.just(true))
-        whenever(queueRepository.queuesState).thenReturn(Flowable.error(error))
-
-        shouldShowTopBannerUseCase.invoke().test()
-            .assertNoErrors()
-            .assertValueCount(1)
-            .assertCurrentValue(Predicate { it.isFailure && it.exceptionOrNull() == error })
+    @After
+    fun tearDown() {
+        RxAndroidPlugins.reset()
     }
 
     @Test
     fun `returns false when state is 'empty'`() {
-        whenever(pendingConversationsUseCase.invoke()).thenReturn(Flowable.just(true))
+        whenever(manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging) doReturn true
         whenever(queueRepository.queuesState).thenReturn(Flowable.just(QueuesState.Empty))
 
-        shouldShowTopBannerUseCase.invoke().test()
+        shouldShowTopBannerUseCase().test()
             .assertNoErrors()
             .assertValueCount(1)
-            .assertCurrentValue(Predicate { it.isSuccess && it.getOrNull() == false })
+            .assertCurrentValue(false)
+    }
+
+    @Test
+    fun `returns false when state is 'Error'`() {
+        whenever(manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging) doReturn true
+        whenever(queueRepository.queuesState).thenReturn(Flowable.just(QueuesState.Error(Exception())))
+
+        shouldShowTopBannerUseCase().test()
+            .assertNoErrors()
+            .assertValueCount(1)
+            .assertCurrentValue(false)
     }
 
     @Test
     fun `returns false when state is 'queues' but list is empty`() {
-        whenever(pendingConversationsUseCase.invoke()).thenReturn(Flowable.just(true))
-        whenever(queueRepository.queuesState).thenReturn(Flowable.just(QueuesState.Queues(emptyList())))
+        scheduleIncomingQueues()
 
-        shouldShowTopBannerUseCase.invoke().test()
+        shouldShowTopBannerUseCase().test()
             .assertNoErrors()
             .assertValueCount(1)
-            .assertCurrentValue(Predicate { it.isSuccess && it.getOrNull() == false })
+            .assertCurrentValue(false)
     }
 
     @Test
@@ -87,7 +83,7 @@ class SecureConversationTopBannerVisibilityUseCaseTest {
         shouldShowTopBannerUseCase.invoke().test()
             .assertNoErrors()
             .assertValueCount(1)
-            .assertCurrentValue(Predicate { it.isSuccess && it.getOrNull() == false })
+            .assertCurrentValue(false)
     }
 
     @Test
@@ -110,7 +106,7 @@ class SecureConversationTopBannerVisibilityUseCaseTest {
         shouldShowTopBannerUseCase.invoke().test()
             .assertNoErrors()
             .assertValueCount(1)
-            .assertCurrentValue(Predicate { it.isSuccess && it.getOrNull() == false })
+            .assertCurrentValue(false)
     }
 
     @Test
@@ -125,7 +121,7 @@ class SecureConversationTopBannerVisibilityUseCaseTest {
         shouldShowTopBannerUseCase.invoke().test()
             .assertNoErrors()
             .assertValueCount(1)
-            .assertCurrentValue(Predicate { it.isSuccess && it.getOrNull() == true })
+            .assertCurrentValue(true)
     }
 
     @Test
@@ -140,7 +136,7 @@ class SecureConversationTopBannerVisibilityUseCaseTest {
         shouldShowTopBannerUseCase.invoke().test()
             .assertNoErrors()
             .assertValueCount(1)
-            .assertCurrentValue(Predicate { it.isSuccess && it.getOrNull() == true })
+            .assertCurrentValue(true)
     }
 
     @Test
@@ -155,12 +151,12 @@ class SecureConversationTopBannerVisibilityUseCaseTest {
         shouldShowTopBannerUseCase.invoke().test()
             .assertNoErrors()
             .assertValueCount(1)
-            .assertCurrentValue(Predicate { it.isSuccess && it.getOrNull() == true })
+            .assertCurrentValue(true)
     }
 
     private fun scheduleIncomingQueues(vararg queueList: Queue) {
-        whenever(pendingConversationsUseCase.invoke()).thenReturn(Flowable.just(true))
-        whenever(queueRepository.queuesState).thenReturn(Flowable.just(QueuesState.Queues(queueList.toList())))
+        whenever(manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging) doReturn true
+        whenever(queueRepository.queuesState) doReturn Flowable.just(QueuesState.Queues(queueList.toList()))
     }
 
     private fun newQueue(status: QueueState.Status, media: Array<Engagement.MediaType>): Queue {

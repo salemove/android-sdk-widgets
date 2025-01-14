@@ -263,20 +263,11 @@ internal class ChatController(
     }
 
     private fun observeTopBannerUseCase() {
-        disposable.add(shouldShowTopBannerUseCase().subscribe(
-            { result ->
-                result.getOrNull()?.let { shouldBeVisible ->
-                    emitViewState {
-                        chatState.setSecureConversationsTopBannerVisibility(shouldBeVisible && manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging)
-                    }
-                } ?: run {
-                    Logger.w(TAG, "Failed to get secure messaging top banner visibility flag.\n ${result.exceptionOrNull()}")
-                }
-            },
-            { error ->
-                Logger.w(TAG, "Secure messaging top banner visibility flag observable failed.\n $error")
-            }
-        ))
+        disposable.add(shouldShowTopBannerUseCase().subscribe({
+            emitViewState { chatState.setSecureConversationsTopBannerVisibility(it) }
+        }) { error ->
+            Logger.w(TAG, "Secure messaging top banner visibility flag observable failed.\n $error")
+        })
     }
 
     private fun initLiveChat() {

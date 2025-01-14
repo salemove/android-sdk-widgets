@@ -576,7 +576,7 @@ public class UseCaseFactory {
 
     @NonNull
     public SecureConversationTopBannerVisibilityUseCase createSecureConversationTopBannerVisibilityUseCase() {
-        return new SecureConversationTopBannerVisibilityUseCase(repositoryFactory.getQueueRepository(), getHasPendingSecureConversationsWithTimeoutUseCase());
+        return new SecureConversationTopBannerVisibilityUseCase(repositoryFactory.getQueueRepository(), createManageSecureMessagingStatusUseCase());
     }
 
     @NonNull

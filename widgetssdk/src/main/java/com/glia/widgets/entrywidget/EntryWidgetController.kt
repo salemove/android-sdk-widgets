@@ -96,6 +96,8 @@ internal class EntryWidgetController @JvmOverloads constructor(
         isViewWhiteLabel: Boolean = view.whiteLabel
     ): List<EntryWidgetContract.ItemType> {
         val items = when (engagementState) {
+            is State.PreQueuing -> prepareItemsBasedOnOngoingEngagement(engagementState.mediaType, unreadMessagesCount, hasOngoingSC)
+            is State.Queuing -> prepareItemsBasedOnOngoingEngagement(engagementState.mediaType, unreadMessagesCount, hasOngoingSC)
             is State.Update -> prepareItemsBasedOnOngoingEngagement(mediaType, unreadMessagesCount, hasOngoingSC)
             else -> prepareItemsBasedOnQueues(queuesState, unreadMessagesCount, hasOngoingSC)
         }.toMutableList()

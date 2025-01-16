@@ -627,10 +627,38 @@ class EntryWidgetControllerTest {
     }
 
     @Test
-    fun `prepareItemsBasedOnQueues is called when State is not Update`() {
+    fun `prepareItemsBasedOnOngoingEngagement is called when State Queueing`() {
+        val spyController = spyk(controller)
+        every { any<List<Queue>>().mediaTypes } returns listOf(
+            MediaType.TEXT,
+            MediaType.AUDIO,
+            MediaType.MESSAGING,
+            MediaType.VIDEO
+        )
+
+        val unreadMessagesCount = 2
+        val hasOngoingSc = false
+        val engagementType = MediaType.TEXT
+        mockInputData(
+            coreInitialized = true,
+            queuesState = QueuesState.Queues(mockk()),
+            unreadMessagesCount = unreadMessagesCount,
+            hasOngoingSc = hasOngoingSc,
+            isAuthenticated = false,
+            whiteLabel = true,
+            engagementState = State.Queuing("ticket_id", engagementType),
+            engagementType = engagementType
+        )
+        every { engagementTypeUseCase.isCallVisualizer } returns false
+
+        spyController.setView(view, EntryWidgetContract.ViewType.EMBEDDED_VIEW)
+
+        verify { spyController.prepareItemsBasedOnOngoingEngagement(engagementType, unreadMessagesCount, hasOngoingSc) }
+    }
+
+    @Test
+    fun `prepareItemsBasedOnQueues is called when State is not Update, Queuing or PreQueuing`() {
         testPrepareItemsBasedOnQueuesCalledForEngagementState(State.NoEngagement)
-        testPrepareItemsBasedOnQueuesCalledForEngagementState(State.PreQueuing(MediaType.TEXT))
-        testPrepareItemsBasedOnQueuesCalledForEngagementState(State.Queuing("id", MediaType.TEXT))
         testPrepareItemsBasedOnQueuesCalledForEngagementState(State.QueueUnstaffed)
         testPrepareItemsBasedOnQueuesCalledForEngagementState(State.UnexpectedErrorHappened)
         testPrepareItemsBasedOnQueuesCalledForEngagementState(State.QueueingCanceled)
@@ -712,6 +740,66 @@ class EntryWidgetControllerTest {
 
         every { engagementTypeUseCase.isCallVisualizer } returns false
         every { isAuthenticatedUseCase() } returns false
+        val expectedItem = listOf(EntryWidgetContract.ItemType.MessagingOngoing(unreadMessagesCount))
+
+        val actualItem = controller.prepareItemsBasedOnOngoingEngagement(mediaType, unreadMessagesCount, hasOngoingSC)
+
+        assertEquals(expectedItem, actualItem)
+    }
+
+    @Test
+    fun `prepareItemsBasedOnOngoingEngagement returns ChatOngoing when queueing media type is TEXT`() {
+        val mediaType = MediaType.TEXT
+        val unreadMessagesCount = 2
+        val hasOngoingSC = false
+
+        every { engagementTypeUseCase.isCallVisualizer } returns false
+        every { isAuthenticatedUseCase() } returns false
+        val expectedItem = listOf(EntryWidgetContract.ItemType.ChatOngoing)
+
+        val actualItem = controller.prepareItemsBasedOnOngoingEngagement(mediaType, unreadMessagesCount, hasOngoingSC)
+
+        assertEquals(expectedItem, actualItem)
+    }
+
+    @Test
+    fun `prepareItemsBasedOnOngoingEngagement returns AudioCallOngoing when queueing media type is AUDIO`() {
+        val mediaType = MediaType.AUDIO
+        val unreadMessagesCount = 2
+        val hasOngoingSC = false
+
+        every { engagementTypeUseCase.isCallVisualizer } returns false
+        every { isAuthenticatedUseCase() } returns false
+        val expectedItem = listOf(EntryWidgetContract.ItemType.AudioCallOngoing)
+
+        val actualItem = controller.prepareItemsBasedOnOngoingEngagement(mediaType, unreadMessagesCount, hasOngoingSC)
+
+        assertEquals(expectedItem, actualItem)
+    }
+
+    @Test
+    fun `prepareItemsBasedOnOngoingEngagement returns VideoCallOngoing when queueing media type is VIDEO`() {
+        val mediaType = MediaType.VIDEO
+        val unreadMessagesCount = 2
+        val hasOngoingSC = false
+
+        every { engagementTypeUseCase.isCallVisualizer } returns false
+        every { isAuthenticatedUseCase() } returns false
+        val expectedItem = listOf(EntryWidgetContract.ItemType.VideoCallOngoing)
+
+        val actualItem = controller.prepareItemsBasedOnOngoingEngagement(mediaType, unreadMessagesCount, hasOngoingSC)
+
+        assertEquals(expectedItem, actualItem)
+    }
+
+    @Test
+    fun `prepareItemsBasedOnOngoingEngagement returns MessagingOngoing when queueing media type is MESSAGING`() {
+        val mediaType = MediaType.MESSAGING
+        val unreadMessagesCount = 2
+        val hasOngoingSC = true
+
+        every { engagementTypeUseCase.isCallVisualizer } returns false
+        every { isAuthenticatedUseCase() } returns true
         val expectedItem = listOf(EntryWidgetContract.ItemType.MessagingOngoing(unreadMessagesCount))
 
         val actualItem = controller.prepareItemsBasedOnOngoingEngagement(mediaType, unreadMessagesCount, hasOngoingSC)

@@ -59,6 +59,7 @@ internal data class ChatState(
 
     fun setLiveChatState(): ChatState = copy(
         isSecureMessaging = false,
+        isSendButtonEnabled = true,
         chatInputMode = ChatInputMode.ENABLED_NO_ENGAGEMENT,
         isSecureConversationsUnavailableLabelVisible = false,
         isSecureConversationsTopBannerVisible = false

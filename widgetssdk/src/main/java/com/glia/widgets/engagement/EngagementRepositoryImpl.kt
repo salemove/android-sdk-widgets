@@ -206,6 +206,9 @@ internal class EngagementRepositoryImpl(
     }
 
     override fun endEngagement(silently: Boolean) {
+        //This is required to not end the transferred engagement
+        if (isTransferredSecureConversation) return
+
         currentEngagement?.also {
             currentEngagement = null
             Logger.i(TAG, "Engagement ended locally, silently:$silently")
@@ -236,7 +239,8 @@ internal class EngagementRepositoryImpl(
                         mediaType,
                         configurationManager.visitorContextAssetId,
                         null,
-                        MEDIA_PERMISSION_REQUEST_CODE) {
+                        MEDIA_PERMISSION_REQUEST_CODE
+                    ) {
                         handleQueueingResponse(it)
                     }
                 } else {
@@ -402,9 +406,7 @@ internal class EngagementRepositoryImpl(
                 resetState()
             }
 
-            engagement.state.visitorStatus == EngagementState.VisitorStatus.TRANSFERRING && engagement.state.capabilities.isText -> {
-                _engagementState.onNext(State.TransferredToSecureConversation)
-            }
+            engagement.state.isLiveEngagementTransferredToSecureConversation -> _engagementState.onNext(State.TransferredToSecureConversation)
 
             else -> _engagementState.onNext(State.StartedOmniCore)
         }
@@ -500,7 +502,7 @@ internal class EngagementRepositoryImpl(
         _currentOperator.onNext(Data.Value(state.operator))
 
         when {
-            state.visitorStatus == EngagementState.VisitorStatus.TRANSFERRING && state.capabilities.isText -> {
+            state.isLiveEngagementTransferredToSecureConversation -> {
                 Logger.i(TAG, "Transfer to Secure Conversation")
                 _engagementState.onNext(State.TransferredToSecureConversation)
             }

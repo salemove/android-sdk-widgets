@@ -296,7 +296,7 @@ internal class ChatController(
         }
 
         result.onSuccess { isMessagingAvailable ->
-            if (!isMessagingAvailable && manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging) {
+            if (!isMessagingAvailable && manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging && !isQueueingOrOngoingEngagement) {
                 Logger.d(TAG, "Messaging is unavailable")
                 emitViewState { chatState.setSecureMessagingUnavailable() }
             } else {

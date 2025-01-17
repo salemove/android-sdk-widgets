@@ -3,11 +3,10 @@ package com.glia.widgets.dialog
 import com.glia.androidsdk.omnibrowse.VisitorCode
 import com.glia.widgets.R
 import com.glia.widgets.SnapshotTest
-import com.glia.widgets.UiTheme
-import com.glia.widgets.core.configuration.GliaSdkConfigurationManager
 import com.glia.widgets.di.ControllerFactory
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.snapshotutils.SnapshotProviders
+import com.glia.widgets.snapshotutils.SnapshotThemeConfiguration
 import com.glia.widgets.view.VisitorCodeView
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.google.gson.JsonObject
@@ -16,9 +15,9 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.util.concurrent.Executor
 
-class VisitorCodeDialogTest : SnapshotTest(
+internal class VisitorCodeDialogTest : SnapshotTest(
     renderingMode = fullWidthRenderMode
-), SnapshotProviders {
+), SnapshotProviders, SnapshotThemeConfiguration {
 
     // MARK: Show visitor code
 
@@ -26,19 +25,6 @@ class VisitorCodeDialogTest : SnapshotTest(
     fun visitorCode() {
         snapshot(
             setupView().apply {
-                startLoading()
-                showVisitorCode(code())
-            },
-            offsetMillis = 200
-        )
-    }
-
-    @Test
-    fun visitorCodeWithUiTheme() {
-        snapshot(
-            setupView(
-                uiTheme = uiTheme()
-            ).apply {
                 startLoading()
                 showVisitorCode(code())
             },
@@ -91,20 +77,6 @@ class VisitorCodeDialogTest : SnapshotTest(
     fun error() {
         snapshot(
             setupView().apply {
-                setClosable(true)
-                startLoading()
-                showError(Throwable())
-            },
-            offsetMillis = 200
-        )
-    }
-
-    @Test
-    fun errorWithUiTheme() {
-        snapshot(
-            setupView(
-                uiTheme = uiTheme()
-            ).apply {
                 setClosable(true)
                 startLoading()
                 showError(Throwable())
@@ -168,18 +140,6 @@ class VisitorCodeDialogTest : SnapshotTest(
     }
 
     @Test
-    fun loadingWithUiTheme() {
-        snapshot(
-            setupView(
-                uiTheme = uiTheme()
-            ).apply {
-                setClosable(true)
-                startLoading()
-            }
-        )
-    }
-
-    @Test
     fun loadingWithGlobalColors() {
         snapshot(
             setupView(
@@ -216,28 +176,15 @@ class VisitorCodeDialogTest : SnapshotTest(
     }
 
     private fun setupView(
-        uiTheme: UiTheme = UiTheme(),
         unifiedTheme: UnifiedTheme? = null,
         executor: Executor? = Executor(Runnable::run)
     ): VisitorCodeView {
-        localeProviderMock()
-        resourceProviderMock()
+        setUnifiedTheme(unifiedTheme)
 
-        unifiedTheme?.let { Dependencies.gliaThemeManager.theme = it }
-        val configurationManager = GliaSdkConfigurationManager().also {
-            it.uiTheme = uiTheme
-        }
         val controllerFactoryMock: ControllerFactory = mock<ControllerFactory>().also {
             whenever(it.visitorCodeController).thenReturn(mock())
         }
-        Dependencies.sdkConfigurationManager = configurationManager
         Dependencies.controllerFactory = controllerFactoryMock
-
-        setOnEndListener {
-            Dependencies.gliaThemeManager.theme = null
-            Dependencies.sdkConfigurationManager = GliaSdkConfigurationManager()
-//            Dependencies.controllerFactory = null
-        }
 
         return VisitorCodeView(context, executor).apply {
             notifySetupComplete()

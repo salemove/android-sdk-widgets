@@ -29,9 +29,6 @@ internal interface SnapshotMessageCenterView : SnapshotTestLifecycle, SnapshotCo
     fun messageCenterViewMock(): Mock {
         val activityMock = activityWindowMock()
 
-        localeProviderMock()
-        resourceProviderMock()
-
         val messageCenterControllerMock = mock<MessageCenterController>()
         val controllerFactoryMock = mock<ControllerFactory>()
         whenever(controllerFactoryMock.messageCenterController).thenReturn(messageCenterControllerMock)
@@ -83,10 +80,10 @@ internal interface SnapshotMessageCenterView : SnapshotTestLifecycle, SnapshotCo
     }
 
     fun unifiedThemeWithoutWelcomeScreen(): UnifiedTheme = unifiedTheme(R.raw.test_unified_config) { unifiedTheme ->
-        unifiedTheme.remove("secureConversationsWelcomeScreen")
+        unifiedTheme.remove("secureMessagingWelcomeScreen")
     }
 
     fun unifiedThemeWithoutConfirmationScreen(): UnifiedTheme = unifiedTheme(R.raw.test_unified_config) { unifiedTheme ->
-        unifiedTheme.remove("secureConversationsConfirmationScreen")
+        unifiedTheme.remove("secureMessagingConfirmationScreen")
     }
 }

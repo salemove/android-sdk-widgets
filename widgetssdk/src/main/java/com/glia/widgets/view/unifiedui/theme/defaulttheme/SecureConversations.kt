@@ -10,15 +10,16 @@ import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
 import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
 import com.glia.widgets.view.unifiedui.theme.base.TextInputTheme
 import com.glia.widgets.view.unifiedui.theme.base.TextTheme
-import com.glia.widgets.view.unifiedui.theme.secureconversations.SecureConversationsConfirmationScreenTheme
-import com.glia.widgets.view.unifiedui.theme.secureconversations.SecureConversationsWelcomeScreenTheme
+import com.glia.widgets.view.unifiedui.theme.securemessaging.SecureMessagingConfirmationScreenTheme
+import com.glia.widgets.view.unifiedui.theme.securemessaging.SecureMessagingTheme
+import com.glia.widgets.view.unifiedui.theme.securemessaging.SecureMessagingWelcomeScreenTheme
 
-internal fun SecureConversationsWelcomeScreenTheme(pallet: ColorPallet):
-    SecureConversationsWelcomeScreenTheme {
+internal fun SecureMessagingWelcomeScreenTheme(pallet: ColorPallet):
+    SecureMessagingWelcomeScreenTheme {
     return pallet.let {
-        val baseDarkColorText = TextTheme(textColor = pallet.baseDarkColorTheme)
+        val baseDarkColorText = TextTheme(textColor = pallet.darkColorTheme)
 
-        SecureConversationsWelcomeScreenTheme(
+        SecureMessagingWelcomeScreenTheme(
             headerTheme = PrimaryColorHeaderTheme(it),
             welcomeTitleTheme = baseDarkColorText,
             titleImageTheme = it.primaryColorTheme,
@@ -26,20 +27,20 @@ internal fun SecureConversationsWelcomeScreenTheme(pallet: ColorPallet):
             checkMessagesButtonTheme = BasePrimaryColorTextTheme(it),
             messageTitleTheme = baseDarkColorText,
             messageInputNormalTheme = DefaultInputTheme(
-                stroke = it.baseShadeColorTheme?.primaryColor,
-                textColor = it.baseDarkColorTheme
+                stroke = it.shadeColorTheme?.primaryColor,
+                textColor = it.darkColorTheme
             ),
             messageInputActiveTheme = DefaultInputTheme(
                 stroke = it.primaryColorTheme?.primaryColor,
-                textColor = it.baseDarkColorTheme
+                textColor = it.darkColorTheme
             ),
             messageInputDisabledTheme = DefaultInputTheme(
-                stroke = it.baseShadeColorTheme?.primaryColor,
-                textColor = it.baseDarkColorTheme
+                stroke = it.shadeColorTheme?.primaryColor,
+                textColor = it.darkColorTheme
             ),
             messageInputErrorTheme = DefaultInputTheme(
-                stroke = it.systemNegativeColorTheme?.primaryColor,
-                textColor = it.baseDarkColorTheme
+                stroke = it.negativeColorTheme?.primaryColor,
+                textColor = it.darkColorTheme
             ),
             messageInputHintTheme = BaseNormalColorTextTheme(it),
             enabledSendButtonTheme = SecureConversationsEnabledSendButtonTheme(it),
@@ -47,12 +48,12 @@ internal fun SecureConversationsWelcomeScreenTheme(pallet: ColorPallet):
             loadingSendButtonTheme = null,
             activityIndicatorColorTheme = null,
             messageWarningTheme = BaseNegativeColorTextTheme(it),
-            messageWarningIconColorTheme = it.systemNegativeColorTheme,
-            filePickerButtonTheme = it.baseNormalColorTheme,
-            filePickerButtonDisabledTheme = it.baseShadeColorTheme,
+            messageWarningIconColorTheme = it.negativeColorTheme,
+            filePickerButtonTheme = it.normalColorTheme,
+            filePickerButtonDisabledTheme = it.shadeColorTheme,
             attachmentListTheme = null,
             pickMediaTheme = DefaultAttachmentsPopupTheme(it),
-            backgroundTheme = it.baseLightColorTheme
+            backgroundTheme = it.lightColorTheme
         )
     }
 }
@@ -77,12 +78,12 @@ private fun DefaultInputTheme(
     )
 }
 
-internal fun SecureConversationsConfirmationScreenTheme(pallet: ColorPallet):
-    SecureConversationsConfirmationScreenTheme {
+internal fun SecureMessagingConfirmationScreenTheme(pallet: ColorPallet):
+    SecureMessagingConfirmationScreenTheme {
     return pallet.let {
-        SecureConversationsConfirmationScreenTheme(
+        SecureMessagingConfirmationScreenTheme(
             headerTheme = PrimaryColorHeaderTheme(it),
-            backgroundTheme = it.baseLightColorTheme,
+            backgroundTheme = it.lightColorTheme,
             iconColorTheme = it.primaryColorTheme,
             titleTheme = BaseDarkColorTextTheme(it),
             subtitleTheme = BaseDarkColorTextTheme(it),
@@ -90,3 +91,21 @@ internal fun SecureConversationsConfirmationScreenTheme(pallet: ColorPallet):
         )
     }
 }
+
+internal fun SecureMessagingTheme(pallet: ColorPallet): SecureMessagingTheme {
+    return pallet.let {
+        SecureMessagingTheme(
+            unavailableStatusBackground = LayerTheme(fill = it.negativeColorTheme),
+            unavailableStatusText = BaseLightColorTextTheme(it),
+            bottomBannerBackground = LayerTheme(fill = it.neutralColorTheme),
+            bottomBannerText = BaseNormalColorTextTheme(it),
+            bottomBannerDividerColor = it.shadeColorTheme,
+            topBannerBackground = LayerTheme(fill = it.neutralColorTheme),
+            topBannerText = BaseDarkColorTextTheme(it),
+            topBannerDividerColor = it.shadeColorTheme,
+            topBannerDropDownIconColor = it.normalColorTheme,
+            mediaTypeItems = DefaultMediaTypeItemsTheme(it)
+        )
+    }
+}
+

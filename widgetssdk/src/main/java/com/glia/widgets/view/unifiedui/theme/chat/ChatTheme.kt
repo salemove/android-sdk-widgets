@@ -8,6 +8,7 @@ import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
 import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 import com.glia.widgets.view.unifiedui.theme.bubble.BubbleTheme
 import com.glia.widgets.view.unifiedui.theme.gva.GvaTheme
+import com.glia.widgets.view.unifiedui.theme.securemessaging.SecureMessagingTheme
 
 internal data class ChatTheme(
     val background: LayerTheme? = null,
@@ -16,6 +17,7 @@ internal data class ChatTheme(
     val visitorMessage: MessageBalloonTheme? = null,
     val connect: EngagementStatesTheme? = null,
     val input: InputTheme? = null,
+    val inputDisabled: InputTheme? = null,
     val responseCard: ResponseCardTheme? = null,
     val audioUpgrade: MediaUpgradeTheme? = null,
     val videoUpgrade: MediaUpgradeTheme? = null,
@@ -25,7 +27,8 @@ internal data class ChatTheme(
     val typingIndicator: ColorTheme? = null,
     val newMessagesDividerColorTheme: ColorTheme? = null,
     val newMessagesDividerTextTheme: TextTheme? = null,
-    val gva: GvaTheme? = null
+    val gva: GvaTheme? = null,
+    val secureMessaging: SecureMessagingTheme? = null
 ) : Mergeable<ChatTheme> {
     override fun merge(other: ChatTheme): ChatTheme = ChatTheme(
         background = background merge other.background,
@@ -34,6 +37,7 @@ internal data class ChatTheme(
         visitorMessage = visitorMessage merge other.visitorMessage,
         connect = connect merge other.connect,
         input = input merge other.input,
+        inputDisabled = inputDisabled merge other.inputDisabled,
         responseCard = responseCard merge other.responseCard,
         audioUpgrade = audioUpgrade merge other.audioUpgrade,
         videoUpgrade = videoUpgrade merge other.videoUpgrade,
@@ -43,6 +47,7 @@ internal data class ChatTheme(
         typingIndicator = typingIndicator merge other.typingIndicator,
         newMessagesDividerColorTheme = newMessagesDividerColorTheme merge other.newMessagesDividerColorTheme,
         newMessagesDividerTextTheme = newMessagesDividerTextTheme merge other.newMessagesDividerTextTheme,
-        gva = gva merge other.gva
+        gva = gva merge other.gva,
+        secureMessaging = secureMessaging merge other.secureMessaging
     )
 }

@@ -6,7 +6,6 @@ import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
-import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.core.dialog.model.ConfirmationDialogLinks
@@ -16,6 +15,7 @@ import com.glia.widgets.engagement.domain.MediaUpgradeOfferData
 import com.glia.widgets.helper.isOneWayVideo
 import com.glia.widgets.helper.isTwoWayVideo
 import com.glia.widgets.locale.LocaleProvider
+import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.locale.StringKey
 import com.glia.widgets.locale.StringKeyPair
 import com.glia.widgets.view.dialog.base.DialogPayload
@@ -160,8 +160,8 @@ internal object Dialogs {
             poweredByText = poweredByText,
             positiveButtonClickListener = positiveButtonClickListener,
             negativeButtonClickListener = negativeButtonClickListener,
-            link1ClickListener = { links.link1?.let { linkClickListener(it) } },
-            link2ClickListener = { links.link2?.let { linkClickListener(it) } }
+            link1ClickListener = { links.link1.let { linkClickListener(it) } },
+            link2ClickListener = { links.link2.let { linkClickListener(it) } }
         )
 
         return dialogService.showDialog(context, theme, DialogType.Confirmation(payload))
@@ -264,6 +264,25 @@ internal object Dialogs {
             .setCancelable(true)
             .setOnCancelListener { Dependencies.controllerFactory.callVisualizerController.dismissVisitorCodeDialog() }
             .show()
+    }
+
+    fun showLeaveCurrentConversationDialog(
+        context: Context,
+        theme: UiTheme,
+        onStay: View.OnClickListener,
+        onLeave: View.OnClickListener
+    ): AlertDialog {
+        val payload = DialogPayload.Option(
+            title = LocaleString(R.string.secure_messaging_chat_leave_current_conversation_title),
+            message = LocaleString(R.string.secure_messaging_chat_leave_current_conversation_message),
+            positiveButtonText = LocaleString(R.string.secure_messaging_chat_leave_current_conversation_button_positive),
+            negativeButtonText = LocaleString(R.string.secure_messaging_chat_leave_current_conversation_button_negative),
+            poweredByText = poweredByText,
+            positiveButtonClickListener = onStay,
+            negativeButtonClickListener = onLeave
+        )
+
+        return dialogService.showDialog(context, theme, DialogType.OptionWithNegativeNeutral(payload))
     }
 
     private fun Window.allowOutsideTouch() {

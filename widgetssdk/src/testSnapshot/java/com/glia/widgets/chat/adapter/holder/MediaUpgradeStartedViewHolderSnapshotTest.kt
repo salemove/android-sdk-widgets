@@ -12,7 +12,7 @@ import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.google.gson.JsonObject
 import org.junit.Test
 
-class MediaUpgradeStartedViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen, SnapshotProviders {
+internal class MediaUpgradeStartedViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen, SnapshotProviders {
 
     // MARK: Audio
 
@@ -20,16 +20,6 @@ class MediaUpgradeStartedViewHolderSnapshotTest : SnapshotTest(), SnapshotChatSc
     fun audio() {
         snapshot(
             setupView(MediaUpgradeStartedTimerItem.Audio()).itemView
-        )
-    }
-
-    @Test
-    fun audioUiTheme() {
-        snapshot(
-            setupView(
-                MediaUpgradeStartedTimerItem.Audio(),
-                uiTheme = uiTheme()
-            ).itemView
         )
     }
 
@@ -73,16 +63,6 @@ class MediaUpgradeStartedViewHolderSnapshotTest : SnapshotTest(), SnapshotChatSc
     }
 
     @Test
-    fun videoUiTheme() {
-        snapshot(
-            setupView(
-                MediaUpgradeStartedTimerItem.Video(),
-                uiTheme = uiTheme()
-            ).itemView
-        )
-    }
-
-    @Test
     fun videoWithGlobalColors() {
         snapshot(
             setupView(
@@ -114,12 +94,7 @@ class MediaUpgradeStartedViewHolderSnapshotTest : SnapshotTest(), SnapshotChatSc
 
     // MARK: utils for tests
 
-    private fun setupView(
-        item: MediaUpgradeStartedTimerItem,
-        unifiedTheme: UnifiedTheme? = null,
-        uiTheme: UiTheme = UiTheme(iconChatVideoUpgrade = R.drawable.ic_baseline_videocam)
-    ): MediaUpgradeStartedViewHolder {
-        localeProviderMock()
+    private fun setupView(item: MediaUpgradeStartedTimerItem, unifiedTheme: UnifiedTheme? = null): MediaUpgradeStartedViewHolder {
         unifiedTheme?.let { Dependencies.gliaThemeManager.theme = it }
 
         setOnEndListener {
@@ -128,7 +103,7 @@ class MediaUpgradeStartedViewHolderSnapshotTest : SnapshotTest(), SnapshotChatSc
 
         return MediaUpgradeStartedViewHolder(
             ChatMediaUpgradeLayoutBinding.inflate(layoutInflater),
-            uiTheme
+            UiTheme(iconChatVideoUpgrade = R.drawable.ic_baseline_videocam)
         ).also { viewHolder ->
             viewHolder.bind(item)
         }

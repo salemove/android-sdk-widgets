@@ -9,7 +9,7 @@ import com.glia.widgets.view.unifiedui.theme.chat.AttachmentsPopupTheme
 import org.junit.Test
 import org.mockito.kotlin.mock
 
-class AttachmentPopupSnapshotTest : SnapshotTest(), SnapshotTheme, SnapshotProviders {
+internal class AttachmentPopupSnapshotTest : SnapshotTest(), SnapshotTheme, SnapshotProviders {
 
     // MARK: Tests
 
@@ -39,9 +39,9 @@ class AttachmentPopupSnapshotTest : SnapshotTest(), SnapshotTheme, SnapshotProvi
     }
 
     @Test
-    fun secureConversationsWithUnifiedTheme() {
+    fun secureMessagingWithUnifiedTheme() {
         setupView(
-            unifiedTheme().secureConversationsWelcomeScreenTheme?.pickMediaTheme
+            unifiedTheme().secureMessagingWelcomeScreenTheme?.pickMediaTheme
         ) {
             snapshot(it)
         }
@@ -53,18 +53,16 @@ class AttachmentPopupSnapshotTest : SnapshotTest(), SnapshotTheme, SnapshotProvi
         unifiedTheme: AttachmentsPopupTheme? = null,
         viewCallback: (View) -> Unit
     ) : AttachmentPopup {
-        localeProviderMock()
 
-        val anchor = LinearLayout(context)
         return AttachmentPopup(
-            anchor,
+            context,
             unifiedTheme
         ) {
             it.layoutParams = LinearLayout.LayoutParams(650, LinearLayout.LayoutParams.WRAP_CONTENT)
             viewCallback(it)
             mock()
         }.apply {
-            show(anchor, mock(), mock(), mock())
+            show(View(context), mock(), mock(), mock())
         }
     }
 }

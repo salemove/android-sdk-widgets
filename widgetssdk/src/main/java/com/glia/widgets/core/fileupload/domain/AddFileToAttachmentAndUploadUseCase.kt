@@ -1,31 +1,24 @@
 package com.glia.widgets.core.fileupload.domain
 
 import com.glia.androidsdk.engagement.EngagementFile
-import com.glia.widgets.chat.ChatType
-import com.glia.widgets.core.engagement.GliaEngagementConfigRepository
 import com.glia.widgets.core.engagement.exception.EngagementMissingException
 import com.glia.widgets.core.fileupload.FileAttachmentRepository
 import com.glia.widgets.core.fileupload.exception.RemoveBeforeReUploadingException
 import com.glia.widgets.core.fileupload.exception.SupportedFileCountExceededException
 import com.glia.widgets.core.fileupload.exception.SupportedFileSizeExceededException
 import com.glia.widgets.core.fileupload.model.LocalAttachment
-import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
+import com.glia.widgets.core.secureconversations.domain.ManageSecureMessagingStatusUseCase
+import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 
 internal class AddFileToAttachmentAndUploadUseCase(
-    private val isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase,
+    private val isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase,
     private val fileAttachmentRepository: FileAttachmentRepository,
-    private val engagementConfigRepository: GliaEngagementConfigRepository
+    private val manageSecureMessagingStatusUseCase: ManageSecureMessagingStatusUseCase
 ) {
     private val isSupportedFileCountExceeded: Boolean
-        get() = fileAttachmentRepository.attachedFilesCount > SupportedFileCountCheckUseCase.SUPPORTED_FILE_COUNT
+        get() = fileAttachmentRepository.getAttachedFilesCount() > SupportedFileCountCheckUseCase.SUPPORTED_FILE_COUNT
 
-    private val hasNoOngoingEngagement: Boolean
-        get() = !isQueueingOrEngagementUseCase.hasOngoingEngagement
-
-    private val isNotSecureEngagement: Boolean
-        get() = engagementConfigRepository.chatType != ChatType.SECURE_MESSAGING
-
-    fun execute(file: LocalAttachment, listener: Listener) {
+    operator fun invoke(file: LocalAttachment, listener: Listener) {
         if (fileAttachmentRepository.isFileAttached(file.uri)) {
             listener.onError(RemoveBeforeReUploadingException())
         } else {
@@ -35,11 +28,11 @@ internal class AddFileToAttachmentAndUploadUseCase(
 
     private fun onFileNotAttached(file: LocalAttachment, listener: Listener) {
         fileAttachmentRepository.attachFile(file)
-        if (hasNoOngoingEngagement && isNotSecureEngagement) {
+        if (isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement || manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging) {
+            onHasOngoingOrSecureEngagement(file, listener)
+        } else {
             fileAttachmentRepository.setFileAttachmentEngagementMissing(file.uri)
             listener.onError(EngagementMissingException())
-        } else {
-            onHasOngoingOrSecureEngagement(file, listener)
         }
     }
 
@@ -52,7 +45,7 @@ internal class AddFileToAttachmentAndUploadUseCase(
             listener.onError(SupportedFileSizeExceededException())
         } else {
             listener.onStarted()
-            fileAttachmentRepository.uploadFile(file, listener)
+            fileAttachmentRepository.uploadFile(manageSecureMessagingStatusUseCase.shouldUseSecureMessagingEndpoints, file, listener)
         }
     }
 

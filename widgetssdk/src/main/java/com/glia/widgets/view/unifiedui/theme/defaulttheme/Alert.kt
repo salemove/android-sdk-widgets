@@ -13,10 +13,11 @@ internal fun AlertTheme(pallet: ColorPallet): AlertTheme = pallet.run {
         title = BaseDarkColorTextTheme(this),
         titleImageColor = primaryColorTheme,
         message = BaseDarkColorTextTheme(this),
-        backgroundColor = baseLightColorTheme,
-        closeButtonColor = baseNormalColorTheme,
+        backgroundColor = lightColorTheme,
+        closeButtonColor = normalColorTheme,
         linkButton = LinkDefaultButtonTheme(this),
         positiveButton = PositiveDefaultButtonTheme(this),
-        negativeButton = NegativeDefaultButtonTheme(this)
+        negativeButton = NegativeDefaultButtonTheme(this),
+        negativeNeutralButton = NegativeNeutralDefaultButtonTheme(this),
     )
 }

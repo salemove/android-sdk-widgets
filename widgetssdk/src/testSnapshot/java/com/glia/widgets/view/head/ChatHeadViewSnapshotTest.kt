@@ -2,9 +2,7 @@ package com.glia.widgets.view.head
 
 import com.glia.widgets.R
 import com.glia.widgets.SnapshotTest
-import com.glia.widgets.UiTheme
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase
-import com.glia.widgets.core.configuration.EngagementConfiguration
 import com.glia.widgets.di.ControllerFactory
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.di.UseCaseFactory
@@ -13,24 +11,22 @@ import com.glia.widgets.snapshotutils.SnapshotChatView
 import com.glia.widgets.snapshotutils.SnapshotLottie
 import com.glia.widgets.snapshotutils.SnapshotPicasso
 import com.glia.widgets.snapshotutils.SnapshotProviders
-import com.glia.widgets.view.configuration.ChatHeadConfiguration
+import com.glia.widgets.snapshotutils.SnapshotThemeConfiguration
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.util.concurrent.Executor
 
-class ChatHeadViewSnapshotTest : SnapshotTest(
+internal class ChatHeadViewSnapshotTest : SnapshotTest(
     maxPercentDifference = 0.01
-), SnapshotChatView, SnapshotProviders, SnapshotLottie, SnapshotPicasso {
+), SnapshotChatView, SnapshotProviders, SnapshotLottie, SnapshotPicasso, SnapshotThemeConfiguration {
 
     // MARK: Default state
 
     @Test
     fun defaultState() {
-        snapshot(
-            setupView()
-        )
+        snapshot(setupView())
     }
 
     // MARK: Operator Image
@@ -303,9 +299,7 @@ class ChatHeadViewSnapshotTest : SnapshotTest(
 
     private fun setupView(
         unifiedTheme: UnifiedTheme? = null,
-        uiTheme: UiTheme = UiTheme(),
         executor: Executor? = Executor(Runnable::run),
-        sdkConfiguration: EngagementConfiguration? = sdkConfiguration(uiTheme),
         isCallVisualizerScreenSharingUseCase: Boolean = false
     ): ChatHeadView {
         lottieMock()
@@ -326,34 +320,11 @@ class ChatHeadViewSnapshotTest : SnapshotTest(
         whenever(useCaseFactoryMock.isCurrentEngagementCallVisualizer).thenReturn(isCurrentEngagementCallVisualizerUseCaseMock)
         Dependencies.useCaseFactory = useCaseFactoryMock
 
-        unifiedTheme?.let { Dependencies.gliaThemeManager.theme = it }
-
-        setOnEndListener {
-            Dependencies.gliaThemeManager.theme = null
-        }
+        setUnifiedTheme(unifiedTheme)
 
         return ChatHeadView(context).also {
             it.executor = executor
-            it.updateConfiguration(uiTheme, sdkConfiguration)
         }
     }
-
-    private fun sdkConfiguration(
-        uiTheme: UiTheme = UiTheme(),
-        chatHeadConfiguration: ChatHeadConfiguration = chatHeadConfiguration()
-    ) = mock<EngagementConfiguration>().also {
-        whenever(it.runTimeTheme).thenReturn(uiTheme.copy(chatHeadConfiguration = chatHeadConfiguration))
-    }
-    private fun chatHeadConfiguration() = ChatHeadConfiguration.Builder()
-        .operatorPlaceholderBackgroundColor(R.color.glia_brand_primary_color)
-        .operatorPlaceholderIcon(R.drawable.ic_person)
-        .operatorPlaceholderIconTintList(R.color.call_fab_icon_color_states)
-        .badgeBackgroundTintList(R.color.call_fab_bg_color_states)
-        .badgeTextColor(R.color.glia_base_light_color)
-        .backgroundColorRes(R.color.glia_system_negative_color)
-        .iconOnHold(R.drawable.ic_pause_circle)
-        .iconOnHoldTintList(R.color.call_fab_icon_color_states)
-        .iconScreenSharingDialog(R.drawable.ic_screensharing)
-        .build()
 
 }

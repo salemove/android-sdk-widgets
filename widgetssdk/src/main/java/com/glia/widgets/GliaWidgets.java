@@ -10,21 +10,18 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.glia.androidsdk.GliaException;
-import com.glia.androidsdk.RequestCallback;
 import com.glia.androidsdk.visitor.Authentication;
-import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest;
 import com.glia.widgets.chat.adapter.CustomCardAdapter;
 import com.glia.widgets.chat.adapter.WebViewCardAdapter;
 import com.glia.widgets.core.authentication.AuthenticationManager;
 import com.glia.widgets.core.callvisualizer.domain.CallVisualizer;
-import com.glia.widgets.core.visitor.GliaVisitorInfo;
-import com.glia.widgets.core.visitor.GliaWidgetException;
-import com.glia.widgets.core.visitor.VisitorInfoUpdate;
 import com.glia.widgets.di.Dependencies;
+import com.glia.widgets.entrywidget.EntryWidget;
 import com.glia.widgets.helper.Logger;
+import com.glia.widgets.launcher.EngagementLauncher;
 
 import java.io.IOException;
-import java.util.function.Consumer;
+import java.util.List;
 
 import io.reactivex.rxjava3.exceptions.UndeliverableException;
 import io.reactivex.rxjava3.plugins.RxJavaPlugins;
@@ -35,99 +32,8 @@ import io.reactivex.rxjava3.plugins.RxJavaPlugins;
  */
 public class GliaWidgets {
 
-    /**
-     * Use with {@link android.os.Bundle} to pass in a {@link UiTheme} as a navigation argument when
-     * navigating to {@link com.glia.widgets.chat.ChatActivity}
-     *
-     * @deprecated While UiTheme can still be used for UI customization,
-     * we strongly encourage adopting remote configurations {@link GliaWidgetsConfig.Builder#setUiJsonRemoteConfig(String)}.
-     * The remote configurations approach is more versatile and better suited for future development.
-     */
-    @Deprecated
-    public static final String UI_THEME = "ui_theme";
-    /**
-     * Use with {@link android.os.Bundle} to pass in the name of your company as a navigation
-     * argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
-     *
-     * @deprecated Use {@link com.glia.widgets.GliaWidgetsConfig.Builder#companyName}
-     * or customize the strings from GliaHub
-     */
-    @Deprecated
-    public static final String COMPANY_NAME = "company_name";
-
-    /**
-     * Use with {@link android.os.Bundle} to pass in the ID of the queue you wish to enroll in
-     * as a navigation argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
-     * or {@link com.glia.widgets.call.CallActivity}
-     *
-     * @deprecated Use {QUEUE_IDS} instead.
-     */
-    @Deprecated
-    public static final String QUEUE_ID = "queue_id";
-
-    /**
-     * Use with {@link android.os.Bundle} to pass in an {@link java.util.ArrayList} of {@link String} of the queues IDs
-     * you wish to enroll in as a navigation argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
-     * or {@link com.glia.widgets.call.CallActivity}
-     */
-    public static final String QUEUE_IDS = "queue_ids";
-    /**
-     * Use with {@link android.os.Bundle} to pass in a context url as a navigation
-     * argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
-     *
-     * @deprecated Use {@link com.glia.widgets.GliaWidgets#CONTEXT_ASSET_ID}
-     */
-    @Deprecated
-    public static final String CONTEXT_URL = "context_url";
-    /**
-     * Use with {@link android.os.Bundle} to pass in a context asset ID as a navigation
-     * argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
-     */
-    public static final String CONTEXT_ASSET_ID = "context_asset_id";
-    /**
-     * It's recommended to use {@link GliaWidgetsConfig.Builder#setUseOverlay(boolean)} ()} instead of this constant directly.
-     * Use with {@link android.os.Bundle}  to pass in a boolean which represents if you would like to use the chat head bubble
-     * as an overlay outside your application for navigating to {@link com.glia.widgets.chat.ChatActivity}.
-     * If set to true then the SDK will ask for overlay permissions and try to always show the navigation bubble outside
-     * the application. However, it will be shown only if the user has accepted the permissions.
-     * If false, then overlay permission is not requested and the navigation bubble is shown when the application is active.
-     * Default value is true.
-     * @deprecated Use {@link com.glia.widgets.GliaWidgetsConfig#isEnableBubbleOutsideApp() and
-     * @link GliaWidgetsConfig#isEnableBubbleInsideApp()}
-     */
-    @Deprecated
-    public static final String USE_OVERLAY = "use_overlay";
-    /**
-     * Use with {@link android.os.Bundle} to pass an input parameter to the call activity to
-     * tell it which type of engagement you would like to start. Can be one of:
-     * {@link MEDIA_TYPE_AUDIO} or {@link MEDIA_TYPE_VIDEO}.
-     * If no parameter is passed then will default to {@link MEDIA_TYPE_AUDIO}
-     */
-    public static final String MEDIA_TYPE = "media_type";
-    /**
-     * Pass this parameter as an input parameter with {@link MEDIA_TYPE} as its key to
-     * {@link com.glia.widgets.call.CallActivity} to start an audio call media engagement.
-     */
-    public static final String MEDIA_TYPE_AUDIO = "media_type_audio";
-    /**
-     * Pass this parameter as an input parameter with {@link MEDIA_TYPE} as its key to
-     * {@link com.glia.widgets.call.CallActivity} to start a video call media engagement.
-     */
-    public static final String MEDIA_TYPE_VIDEO = "media_type_video";
-    /**
-     * Pass this parameter to call activity to tell it that upgrade to audio/video call is ongoing
-     * If no parameter is passed then will default to false
-     */
-    public static final String IS_UPGRADE_TO_CALL = "upgrade_to_call";
-    public static final String SURVEY = "survey";
-    /**
-     * Use with {@link android.os.Bundle} to pass in
-     * {@link com.glia.androidsdk.screensharing.ScreenSharing.Mode} as a navigation
-     * argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
-     */
-    public static final String SCREEN_SHARING_MODE = "screens_haring_mode";
-    public static final String CHAT_TYPE = "chat_type";
     private final static String TAG = "GliaWidgets";
+
     @Nullable
     private static CustomCardAdapter customCardAdapter = new WebViewCardAdapter();
 
@@ -156,6 +62,46 @@ public class GliaWidgets {
     }
 
     /**
+     * Retrieves an instance of {@link EngagementLauncher}.
+     *
+     * @param queueIds A list of queue IDs to be used for the engagement launcher.
+     *                 When empty or invalid, the default queues will be used.
+     * @return An instance of {@link EngagementLauncher}.
+     * @throws GliaException with the {@link GliaException.Cause#INVALID_INPUT} if the SDK is not initialized.
+     */
+    @NonNull
+    public synchronized static EngagementLauncher getEngagementLauncher(@NonNull List<String> queueIds) {
+        Logger.i(TAG, "Returning an Engagement Launcher");
+        setupQueueIds(queueIds);
+
+        return Dependencies.getEngagementLauncher();
+    }
+
+    /**
+     * Retrieves an instance of {@link EntryWidget}.
+     *
+     * @param queueIds A list of queue IDs to be used for the entry widget.
+     *                 When empty or invalid, the default queues will be used.
+     * @return An instance of {@link EntryWidget}.
+     * @throws GliaException with the {@link GliaException.Cause#INVALID_INPUT} if the SDK is not initialized.
+     */
+    @NonNull
+    public synchronized static EntryWidget getEntryWidget(@NonNull List<String> queueIds) {
+        if (!Dependencies.glia().isInitialized()) {
+            Logger.e(TAG, "Attempt to get EntryWidget before SDK initialization");
+        }
+
+        Dependencies.getConfigurationManager().setQueueIds(queueIds);
+        return Dependencies.getEntryWidget();
+    }
+
+    private static void setupQueueIds(@NonNull List<String> queueIds) {
+        Dependencies.glia().ensureInitialized();
+
+        Dependencies.getConfigurationManager().setQueueIds(queueIds);
+    }
+
+    /**
      * Accepts permissions request results.
      *
      * <p>Some functionalities, for example Video or Audio calls, require to request runtime permissions via
@@ -167,7 +113,9 @@ public class GliaWidgets {
      * Your activity in turn must call this method to pass the results of the request to Glia SDK.</p>
      *
      * <p>This method is no-op for other non-Glia triggered results.</p>
+     * @deprecated This method is no longer required, as all the required permissions are now managed internally.
      */
+    @Deprecated(forRemoval = true)
     public static void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         Logger.d(TAG, "onRequestPermissionsResult");
         Dependencies.glia().onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -185,7 +133,9 @@ public class GliaWidgets {
      * Your activity in turn must call this method to pass the results of the request to Glia SDK.</p>
      *
      * <p>This method is no-op for other non-Glia triggered results.</p>
+     * @deprecated This method is no longer required, as required activity results are now managed internally.
      */
+    @Deprecated(forRemoval = true)
     public static void onActivityResult(int requestCode, int resultCode, Intent data) {
         Logger.d(TAG, "onActivityResult");
         Dependencies.getRepositoryFactory().getEngagementRepository().onActivityResult(requestCode, resultCode, data);
@@ -208,53 +158,6 @@ public class GliaWidgets {
     public static void endEngagement() {
         Logger.i(TAG, "End engagement by integrator");
         Dependencies.getUseCaseFactory().getEndEngagementUseCase().invoke(true);
-    }
-
-    /**
-     * Updates the visitor's information
-     * <p>
-     * Updates the visitor's information stored on the server. This information will also be displayed to the operator.
-     *
-     * @deprecated since 1.9.0 use @see {@link com.glia.androidsdk.Glia#updateVisitorInfo(VisitorInfoUpdateRequest, Consumer)}
-     */
-    @Deprecated
-    public static void updateVisitorInfo(VisitorInfoUpdate visitorInfoUpdate, Consumer<GliaWidgetException> exceptionConsumer) {
-        Logger.logDeprecatedMethodUse(TAG, "updateVisitorInfo(VisitorInfoUpdate, Consumer<GliaWidgetException>)");
-        Dependencies.glia().updateVisitorInfo(new VisitorInfoUpdateRequest.Builder()
-            .setName(visitorInfoUpdate.getName())
-            .setEmail(visitorInfoUpdate.getEmail())
-            .setPhone(visitorInfoUpdate.getPhone())
-            .setNote(visitorInfoUpdate.getNote())
-            .setCustomAttributes(visitorInfoUpdate.getCustomAttributes())
-            .setCustomAttrsUpdateMethod(visitorInfoUpdate.getCustomAttrsUpdateMethod())
-            .setNoteUpdateMethod(visitorInfoUpdate.getNoteUpdateMethod())
-            .build(), e -> {
-            if (e != null) {
-                exceptionConsumer.accept(new GliaWidgetException(e.debugMessage, e.cause));
-            } else {
-                exceptionConsumer.accept(null);
-            }
-        });
-    }
-
-    /**
-     * Fetches the visitor's information
-     * <p>
-     * If a visitor is authenticated, the response will include the attributes and tokens fetched from the authentication provider.
-     *
-     * @deprecated since 1.9.0 use @see {@link com.glia.androidsdk.Glia#getVisitorInfo(RequestCallback)}
-     */
-    @Deprecated
-    public static void getVisitorInfo(Consumer<GliaVisitorInfo> visitorCallback, Consumer<GliaWidgetException> exceptionConsumer) {
-        Logger.logDeprecatedMethodUse(TAG, "getVisitorInfo(Consumer<GliaVisitorInfo>, Consumer<GliaWidgetException>)");
-        Dependencies.glia().getVisitorInfo((visitorInfo, e) -> {
-            if (visitorInfo != null) {
-                visitorCallback.accept(new GliaVisitorInfo(visitorInfo));
-            }
-            if (e != null) {
-                exceptionConsumer.accept(new GliaWidgetException(e.debugMessage, e.cause));
-            }
-        });
     }
 
     /**

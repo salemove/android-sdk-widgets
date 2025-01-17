@@ -9,7 +9,7 @@ import com.glia.widgets.snapshotutils.SnapshotProviders
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import org.junit.Test
 
-class VisitorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen, SnapshotProviders {
+internal class VisitorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen, SnapshotProviders {
 
     // MARK: without labels
 
@@ -18,16 +18,6 @@ class VisitorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen,
         snapshot(
             setupView(
                 VisitorMessageItem("Visitor message text", "ID")
-            ).viewHolder.itemView
-        )
-    }
-
-    @Test
-    fun withoutLabelsWithUiTheme() {
-        snapshot(
-            setupView(
-                VisitorMessageItem("Visitor message text", "ID"),
-                uiTheme = uiTheme()
             ).viewHolder.itemView
         )
     }
@@ -66,13 +56,9 @@ class VisitorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen,
 
     private data class ViewData(val binding: ChatVisitorMessageLayoutBinding, val viewHolder: VisitorMessageViewHolder)
 
-    private fun setupView(
-        item: VisitorMessageItem,
-        unifiedTheme: UnifiedTheme? = null,
-        uiTheme: UiTheme = UiTheme()
-    ): ViewData {
+    private fun setupView(item: VisitorMessageItem, unifiedTheme: UnifiedTheme? = null): ViewData {
         val binding = ChatVisitorMessageLayoutBinding.inflate(layoutInflater)
-        val viewHolder = VisitorMessageViewHolder(binding, {}, uiTheme, unifiedTheme, localeProviderMock())
+        val viewHolder = VisitorMessageViewHolder(binding, {}, UiTheme(), unifiedTheme, localeProviderMock())
 
         viewHolder.bind(item)
 

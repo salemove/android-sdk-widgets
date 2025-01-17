@@ -55,16 +55,16 @@ internal class ProgressButton @JvmOverloads constructor(context: Context, attrs:
     private val progressBar get() = binding.progressBar
 
     // End Widgets + Binding
-    private val localeProvider = Dependencies.localeProvider
+    private val localeProvider get() = Dependencies.localeProvider
 
     @get:ColorInt
     private val gliaBrandPrimaryColor: Int by lazy { // btn bg
-        getColorCompat(getAttr(R.attr.gliaBrandPrimaryColor, R.color.glia_brand_primary_color))
+        getColorCompat(getAttr(R.attr.gliaBrandPrimaryColor, R.color.glia_primary_color))
     }
 
     @get:ColorInt
     private val gliaBaseLightColor: Int by lazy { // text
-        getColorCompat(getAttr(R.attr.gliaBaseLightColor, R.color.glia_base_light_color))
+        getColorCompat(getAttr(R.attr.gliaBaseLightColor, R.color.glia_light_color))
     }
 
     @get:ColorInt
@@ -157,7 +157,8 @@ internal class ProgressButton @JvmOverloads constructor(context: Context, attrs:
             text = defaultText.copy(textColor = ColorTheme(gliaDisabledTextColor)),
             background = defaultLayer.copy(
                 fill = ColorTheme(gliaDisabledBackgroundColor),
-                stroke = gliaDisabledBorderColor
+                stroke = gliaDisabledBorderColor,
+                borderWidth = context.getDimenRes(R.dimen.glia_px),
             ),
             elevation = 0f
         )

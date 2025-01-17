@@ -37,7 +37,7 @@
         android:layout_marginStart="@dimen/glia_pre_xx_large"
         android:layout_marginEnd="@dimen/glia_pre_xx_large"
         tools:text="@string/call_visualizer_button"
-        app:icon="@drawable/ic_screensharing_off"
+        app:icon="?attr/gliaIconEndScreenShare"
         app:iconTint="?attr/gliaBaseLightColor"
         app:iconGravity="textStart"
         app:cornerRadius="5dp"

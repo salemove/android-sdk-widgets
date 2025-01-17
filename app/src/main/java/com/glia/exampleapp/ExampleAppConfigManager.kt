@@ -7,7 +7,6 @@ import androidx.preference.PreferenceManager
 import com.glia.androidsdk.SiteApiKey
 import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.widgets.GliaWidgetsConfig
-import com.glia.widgets.UiTheme
 
 /**
  * Helper class to obtain Glia Config params from deep-link or preferences.
@@ -103,7 +102,6 @@ object ExampleAppConfigManager {
     fun createDefaultConfig(
         context: Context,
         uiJsonRemoteConfig: String? = null,
-        runtimeConfig: UiTheme? = null,
         region: String? = null,
         baseDomain: String = DEFAULT_BASE_DOMAIN,
         preferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
@@ -157,7 +155,6 @@ object ExampleAppConfigManager {
             .setScreenSharingMode(screenSharingMode)
             .setContext(context)
             .setUiJsonRemoteConfig(uiJsonRemoteConfig ?: Utils.getRemoteThemeByPrefs(preferences, context.resources))
-            .setUiTheme(runtimeConfig ?: Utils.getRunTimeThemeByPrefs(preferences, context.resources))
             .setManualLocaleOverride(manualLocaleOverride)
             .build()
     }

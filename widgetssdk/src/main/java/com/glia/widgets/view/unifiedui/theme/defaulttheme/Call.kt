@@ -35,8 +35,8 @@ internal fun CallTheme(pallet: ColorPallet) = pallet.run {
  */
 private fun CallHeaderTheme(colorPallet: ColorPallet) = DefaultHeader(
     background = null, // must be null for default them to imitate native dialler
-    lightColor = colorPallet.baseLightColorTheme,
-    negative = colorPallet.systemNegativeColorTheme
+    lightColor = colorPallet.lightColorTheme,
+    negative = colorPallet.negativeColorTheme
 )
 
 private fun ButtonBarTheme(pallet: ColorPallet) = ButtonBarTheme(
@@ -49,18 +49,18 @@ private fun ButtonBarTheme(pallet: ColorPallet) = ButtonBarTheme(
 )
 
 private fun CallButtonBarButtonTheme(pallet: ColorPallet) = pallet.run {
-    composeIfAtLeastOneNotNull(baseLightColorTheme) {
+    composeIfAtLeastOneNotNull(lightColorTheme) {
         BarButtonStatesTheme(
             disabled = BarButtonStyleTheme(
-                imageColor = baseLightColorTheme?.withAlpha(20f),
+                imageColor = lightColorTheme?.withAlpha(20f),
                 title = BaseLightColorTextTheme(this)
             ),
             enabled = BarButtonStyleTheme(
-                imageColor = baseLightColorTheme,
+                imageColor = lightColorTheme,
                 title = BaseLightColorTextTheme(this)
             ),
             activated = BarButtonStyleTheme(
-                imageColor = baseDarkColorTheme,
+                imageColor = darkColorTheme,
                 title = BaseLightColorTextTheme(this)
             )
         )
@@ -68,10 +68,10 @@ private fun CallButtonBarButtonTheme(pallet: ColorPallet) = pallet.run {
 }
 
 private fun VisitorVideoTheme(pallet: ColorPallet) = pallet.run {
-    composeIfAtLeastOneNotNull(baseLightColorTheme) {
+    composeIfAtLeastOneNotNull(lightColorTheme) {
         VisitorVideoTheme(
             flipCameraButton = BarButtonStyleTheme(
-                imageColor = baseLightColorTheme,
+                imageColor = lightColorTheme,
                 title = BaseLightColorTextTheme(this)
             )
         )

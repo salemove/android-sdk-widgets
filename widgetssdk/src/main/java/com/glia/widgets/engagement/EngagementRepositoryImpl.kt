@@ -30,14 +30,17 @@ import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.androidsdk.screensharing.ScreenSharingRequest
 import com.glia.androidsdk.screensharing.VisitorScreenSharingState
 import com.glia.widgets.core.engagement.GliaOperatorRepository
+import com.glia.widgets.core.queue.QueueRepository
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.Data
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.isAudioOrVideo
 import com.glia.widgets.helper.isQueueUnavailable
 import com.glia.widgets.helper.unSafeSubscribe
+import com.glia.widgets.launcher.ConfigurationManager
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.processors.BehaviorProcessor
 import io.reactivex.rxjava3.processors.PublishProcessor
 import java.util.function.Consumer
@@ -50,7 +53,12 @@ internal const val MEDIA_PERMISSION_REQUEST_CODE = 0x3E9
 @VisibleForTesting
 internal const val SKIP_ASKING_SCREEN_SHARING_PERMISSION_RESULT_CODE = 0x1995
 
-internal class EngagementRepositoryImpl(private val core: GliaCore, private val operatorRepository: GliaOperatorRepository) : EngagementRepository {
+internal class EngagementRepositoryImpl(
+    private val core: GliaCore,
+    private val operatorRepository: GliaOperatorRepository,
+    private val queueRepository: QueueRepository,
+    private val configurationManager: ConfigurationManager
+) : EngagementRepository {
     private val engagementRequestCallback = Consumer<IncomingEngagementRequest>(::handleIncomingEngagementRequest)
     private val engagementOutcomeCallback = Consumer<Outcome>(::handleEngagementOutcome)
 
@@ -70,13 +78,13 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
     private val queueTicketCallback = Consumer<QueueTicket>(::handleQueueTicket)
 
     private val _engagementState: BehaviorProcessor<State> = BehaviorProcessor.createDefault(State.NoEngagement)
-    override val engagementState: Flowable<State> = _engagementState.onBackpressureBuffer()
+    override val engagementState: Flowable<State> = _engagementState.onBackpressureBuffer().distinctUntilChanged()
 
     private val _survey: PublishProcessor<SurveyState> = PublishProcessor.create()
     override val survey: Flowable<SurveyState> = _survey
 
     private val _currentOperator: BehaviorProcessor<Data<Operator>> = BehaviorProcessor.createDefault(Data.Empty)
-    override val currentOperator: Flowable<Data<Operator>> = _currentOperator.onBackpressureLatest()
+    override val currentOperator: Flowable<Data<Operator>> = _currentOperator.onBackpressureLatest().distinctUntilChanged()
     override val currentOperatorValue: Operator? get() = with(_currentOperator.value as? Data.Value) { this?.result }
     override val isOperatorPresent: Boolean get() = currentOperatorValue != null
     private val currentState: State? get() = _engagementState.value
@@ -123,29 +131,44 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
     private val _screenSharingState: BehaviorProcessor<ScreenSharingState> = BehaviorProcessor.create()
     override val screenSharingState: Flowable<ScreenSharingState> = _screenSharingState.onBackpressureLatest()
 
-
     private val readyToShareScreenProcessor: PublishProcessor<Unit> = PublishProcessor.create()
     private val mediaProjectionActivityResultProcessor: PublishProcessor<Pair<Int, Intent?>> = PublishProcessor.create()
 
     private var currentScreenSharingRequest: ScreenSharingRequest? = null
     private var currentScreenSharingScreen: LocalScreen? = null
 
-    override val hasOngoingEngagement: Boolean
-        get() = currentEngagement != null
+    private val queueIngDisposable = CompositeDisposable()
+
+    override val hasOngoingLiveEngagement: Boolean
+        get() = currentEngagement != null && currentState?.isLiveEngagement == true
+
+    override val isTransferredSecureConversation: Boolean
+        get() = currentState is State.TransferredToSecureConversation
 
     override val isQueueing: Boolean
-        get() = currentState is State.Queuing || currentState is State.PreQueuing
+        get() = currentState?.isQueueing == true
+
     override val isQueueingForMedia: Boolean
         get() = currentState?.queueingMediaType?.isAudioOrVideo() == true
+
+    override val isQueueingForAudio: Boolean
+        get() = (currentState?.queueingMediaType == MediaType.AUDIO)
+
+    override val isQueueingForVideo: Boolean
+        get() = (currentState?.queueingMediaType == MediaType.VIDEO)
 
     override val isCallVisualizerEngagement: Boolean
         get() = currentEngagement is OmnibrowseEngagement
 
-    override val isQueueingOrEngagement: Boolean
-        get() = isQueueing || hasOngoingEngagement
+    override val isQueueingOrLiveEngagement: Boolean
+        get() = isQueueing || hasOngoingLiveEngagement
 
     override val isSharingScreen: Boolean
         get() = currentEngagement != null && _screenSharingState.run { value == ScreenSharingState.Started || value == ScreenSharingState.RequestAccepted }
+
+    private var _isSecureMessagingRequested: Boolean = false
+    override val isSecureMessagingRequested: Boolean
+        get() = _isSecureMessagingRequested
 
     override val cameras: List<CameraDevice>?
         get() = currentEngagement?.media?.cameraDevices
@@ -165,6 +188,7 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
     }
 
     override fun reset() {
+        _isSecureMessagingRequested = false
         currentEngagement?.let { endEngagement(true) } ?: cancelQueuing()
     }
 
@@ -173,6 +197,7 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
     }
 
     private fun resetState() {
+        _isSecureMessagingRequested = false
         _operatorMediaState.onNext(Data.Empty)
         _visitorMediaState.onNext(Data.Empty)
         _currentOperator.onNext(Data.Empty)
@@ -196,17 +221,34 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
         }
     }
 
-    override fun queueForEngagement(queueIds: List<String>, mediaType: MediaType, visitorContextAssetId: String?) {
-        if (isQueueingOrEngagement) return
+    override fun queueForEngagement(mediaType: MediaType) {
+        if (isQueueingOrLiveEngagement) return
+
+        _engagementState.onNext(State.PreQueuing(mediaType))
 
         Logger.i(TAG, "Start queueing for media engagement")
-        core.queueForEngagement(queueIds.toTypedArray(), mediaType, visitorContextAssetId, null, MEDIA_PERMISSION_REQUEST_CODE) {
-            handleQueueingResponse(it, queueIds, mediaType)
-        }
+
+        queueIngDisposable.add(
+            queueRepository.relevantQueueIds.subscribe { ids ->
+                if (ids.isNotEmpty()) {
+                    core.queueForEngagement(
+                        ids,
+                        mediaType,
+                        configurationManager.visitorContextAssetId,
+                        null,
+                        MEDIA_PERMISSION_REQUEST_CODE) {
+                        handleQueueingResponse(it)
+                    }
+                } else {
+                    handleQueueingResponse(GliaException("relevant queues are empty", GliaException.Cause.INVALID_INPUT))
+                }
+            }
+        )
     }
 
     override fun cancelQueuing() {
         (_engagementState.value as? State.PreQueuing)?.apply {
+            queueIngDisposable.clear()
             _engagementState.onNext(State.QueueingCanceled)
             return
         }
@@ -320,7 +362,7 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
         }
 
         if (currentState is State.PreQueuing) {
-            _engagementState.onNext(State.Queuing(currentState.queueIds, ticket.id, currentState.mediaType))
+            _engagementState.onNext(State.Queuing(ticket.id, currentState.mediaType))
             trackQueueTicketUpdates(ticket)
         }
     }
@@ -334,10 +376,9 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
         }
     }
 
-    private fun handleQueueingResponse(exception: GliaException?, queueIds: List<String>, mediaType: MediaType) {
+    private fun handleQueueingResponse(exception: GliaException?) {
         when {
-            exception == null || exception.cause == GliaException.Cause.ALREADY_QUEUED ->
-                _engagementState.onNext(State.PreQueuing(queueIds, mediaType))
+            exception == null || exception.cause == GliaException.Cause.ALREADY_QUEUED -> return
 
             exception.isQueueUnavailable -> {
                 _engagementState.onNext(State.QueueUnstaffed)
@@ -354,14 +395,22 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
     private fun handleOmniCoreEngagement(engagement: OmnicoreEngagement) {
         Logger.i(TAG, "Omnicore Engagement started")
 
-        currentEngagement?.also {
-            unsubscribeFromEvents(it)
-            currentEngagement = null
-            resetState()
-        } ?: _engagementState.onNext(State.StartedOmniCore)
+        when {
+            currentEngagement != null -> {
+                unsubscribeFromEvents(currentEngagement!!)
+                currentEngagement = null
+                resetState()
+            }
+
+            engagement.state.visitorStatus == EngagementState.VisitorStatus.TRANSFERRING && engagement.state.capabilities.isText -> {
+                _engagementState.onNext(State.TransferredToSecureConversation)
+            }
+
+            else -> _engagementState.onNext(State.StartedOmniCore)
+        }
 
         currentEngagement = engagement
-        operatorRepository.emit(engagement.state.operator)
+        handleEngagementState(engagement.state)
 
         subscribeToEngagementEvents(engagement)
         subscribeToEngagementMediaEvents(engagement.media)
@@ -380,7 +429,7 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
         } ?: _engagementState.onNext(State.StartedCallVisualizer)
 
         currentEngagement = engagement
-        operatorRepository.emit(engagement.state.operator)
+        handleEngagementState(engagement.state)
 
         subscribeToEngagementEvents(engagement)
         subscribeToEngagementMediaEvents(engagement.media)
@@ -443,29 +492,36 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
     }
 
     private fun handleEngagementState(state: EngagementState) {
+        // keeping the current operator value, to use inside this function,
+        // because in some cases we need to globally have up to date operator before emitting new state
+        val currentOperator: Operator? = currentOperatorValue
+
         operatorRepository.emit(state.operator)
-
-        val updateState = when {
-            state.visitorStatus == EngagementState.VisitorStatus.TRANSFERRING -> {
-                Logger.i(TAG, "Transfer engagement")
-                EngagementUpdateState.Transferring
-            }
-
-            !isOperatorPresent -> {
-                Logger.i(TAG, "Operator connected")
-                EngagementUpdateState.OperatorConnected(state.operator)
-            }
-
-            currentOperatorValue?.id != state.operator.id -> {
-                Logger.i(TAG, "Operator changed")
-                EngagementUpdateState.OperatorChanged(state.operator)
-            }
-
-            else -> EngagementUpdateState.Ongoing(state.operator)
-        }
         _currentOperator.onNext(Data.Value(state.operator))
 
-        _engagementState.onNext(State.Update(state, updateState))
+        when {
+            state.visitorStatus == EngagementState.VisitorStatus.TRANSFERRING && state.capabilities.isText -> {
+                Logger.i(TAG, "Transfer to Secure Conversation")
+                _engagementState.onNext(State.TransferredToSecureConversation)
+            }
+
+            state.visitorStatus == EngagementState.VisitorStatus.TRANSFERRING -> {
+                Logger.i(TAG, "Transfer engagement")
+                _engagementState.onNext(State.Update(state, EngagementUpdateState.Transferring))
+            }
+
+            currentOperator == null -> {
+                Logger.i(TAG, "Operator connected")
+                _engagementState.onNext(State.Update(state, EngagementUpdateState.OperatorConnected(state.operator)))
+            }
+
+            currentOperator.id != state.operator.id -> {
+                Logger.i(TAG, "Operator changed")
+                _engagementState.onNext(State.Update(state, EngagementUpdateState.OperatorChanged(state.operator)))
+            }
+
+            currentOperator != state.operator -> _engagementState.onNext(State.Update(state, EngagementUpdateState.Ongoing(state.operator)))
+        }
     }
 
     private fun handleEngagementEnd() {
@@ -637,5 +693,9 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
 
     override fun onReadyToShareScreen() {
         readyToShareScreenProcessor.onNext(Unit)
+    }
+
+    override fun updateIsSecureMessagingRequested(isSecureMessagingRequested: Boolean) {
+        _isSecureMessagingRequested = isSecureMessagingRequested
     }
 }

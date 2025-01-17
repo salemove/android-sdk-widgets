@@ -51,7 +51,7 @@ public class FileAttachmentViewHolder extends RecyclerView.ViewHolder {
     }
 
     private void setupExtensionContainer(@NonNull View itemView) {
-        extensionContainerView.setCardBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.glia_brand_primary_color));
+        extensionContainerView.setCardBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.glia_primary_color));
     }
 
     private void updateTitle(String name, long byteSize) {

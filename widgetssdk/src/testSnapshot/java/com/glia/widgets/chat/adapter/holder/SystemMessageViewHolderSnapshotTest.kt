@@ -10,7 +10,7 @@ import com.glia.widgets.snapshotutils.SnapshotStrings
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import org.junit.Test
 
-class SystemMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen, SnapshotProviders, SnapshotStrings {
+internal class SystemMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen, SnapshotProviders, SnapshotStrings {
 
     // MARK: Tests
 
@@ -18,15 +18,6 @@ class SystemMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen, 
     fun defaultView() {
         snapshot(
             setupView().itemView
-        )
-    }
-
-    @Test
-    fun withUiTheme() {
-        snapshot(
-            setupView(
-                uiTheme = uiTheme()
-            ).itemView
         )
     }
 
@@ -61,10 +52,8 @@ class SystemMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen, 
 
     private fun setupView(
         message: String = mediumLengthTexts().joinToString(separator = " "),
-        unifiedTheme: UnifiedTheme? = null,
-        uiTheme: UiTheme = UiTheme()
+        unifiedTheme: UnifiedTheme? = null
     ): SystemMessageViewHolder {
-        localeProviderMock()
         unifiedTheme?.let { Dependencies.gliaThemeManager.theme = it }
 
         setOnEndListener {
@@ -73,7 +62,7 @@ class SystemMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen, 
 
         return SystemMessageViewHolder(
             ChatReceiveMessageContentBinding.inflate(layoutInflater),
-            uiTheme
+            UiTheme()
         ).also { viewHolder ->
             viewHolder.bind(message)
         }

@@ -28,11 +28,4 @@ public class RemoveLocalAttachmentUseCaseTest {
 
         verify(repository).detachFile(localAttachment);
     }
-
-    @Test
-    public void execute_callsRepositoryDetachFile_whenNullArgument() {
-        subjectUnderTest.invoke(null);
-
-        verify(repository).detachFile(null);
-    }
 }

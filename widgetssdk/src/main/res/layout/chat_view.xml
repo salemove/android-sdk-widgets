@@ -9,9 +9,59 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/chat_recycler_view"
         app:layout_constraintTop_toTopOf="parent"
         tools:visibility="visible" />
+
+    <View
+        android:id="@+id/sc_top_banner_background"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="@+id/sc_top_banner_title"
+        app:layout_constraintBottom_toBottomOf="@+id/sc_top_banner_title"/>
+
+    <TextView
+        android:id="@+id/sc_top_banner_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="?attr/textAppearanceBody1"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:foreground="?attr/selectableItemBackground"
+        app:layout_constraintTop_toBottomOf="@id/app_bar_view"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/sc_top_banner_icon"
+        tools:text="@string/need_live_support_label" />
+
+    <ImageView
+        android:id="@+id/sc_top_banner_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:paddingEnd="16dp"
+        android:paddingStart="16dp"
+        app:layout_constraintTop_toTopOf="@id/sc_top_banner_title"
+        app:layout_constraintBottom_toBottomOf="@id/sc_top_banner_title"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:foreground="?attr/selectableItemBackground"
+        android:src="@drawable/ic_minimalistic_arrow_down"
+        app:tint="?attr/gliaBaseNormalColor" />
+
+    <View
+        android:id="@+id/sc_top_banner_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?attr/gliaBaseShadeColor"
+        app:layout_constraintTop_toBottomOf="@id/sc_top_banner_title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/header_barrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="sc_top_banner_title, sc_top_banner_icon, app_bar_view, sc_top_banner_divider" />
 
     <com.glia.widgets.chat.ChatRecyclerView
         android:id="@+id/chat_recycler_view"
@@ -19,8 +69,8 @@
         android:layout_height="0dp"
         android:clipToPadding="false"
         android:paddingBottom="@dimen/glia_medium"
+        app:layout_constraintTop_toBottomOf="@+id/header_barrier"
         app:layout_constraintBottom_toTopOf="@+id/gva_quick_replies_layout"
-        app:layout_constraintTop_toBottomOf="@+id/app_bar_view"
         tools:listitem="@layout/chat_visitor_message_layout" />
 
     <com.glia.widgets.chat.GvaChipGroup
@@ -30,7 +80,8 @@
         android:paddingVertical="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/chat_recycler_view" />
+        app:layout_constraintTop_toBottomOf="@id/chat_recycler_view"
+        app:layout_constraintBottom_toTopOf="@+id/operator_typing_animation_view"/>
 
 
     <RelativeLayout
@@ -40,10 +91,10 @@
         android:clipChildren="false"
         android:clipToPadding="false"
         android:padding="@dimen/glia_large"
-        app:layout_constraintBottom_toTopOf="@id/divider_view"
+        app:layout_constraintBottom_toTopOf="@id/chat_bottom_divider_barrier"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        tools:visibility="gone">
+        tools:visibility="visible">
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/new_messages_indicator_card"
@@ -81,79 +132,170 @@
         android:layout_height="36dp"
         android:layout_marginStart="@dimen/glia_medium"
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/divider_view"
+        app:layout_constraintBottom_toTopOf="@+id/chat_bottom_divider_barrier"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/gva_quick_replies_layout"
         app:lottie_autoPlay="true"
         app:lottie_loop="true"
         app:lottie_rawRes="@raw/chat_typing_indicator"
         tools:visibility="visible" />
 
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/chat_bottom_divider_barrier"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:barrierDirection="top"
+        app:constraint_referenced_ids="sc_bottom_banner_divider, chat_divider"/>
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/secure_conversations_bottom_banner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="sc_bottom_banner_divider, sc_bottom_banner_label" />
+
     <View
-        android:id="@+id/divider_view"
+        android:id="@+id/sc_bottom_banner_divider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="?attr/gliaBaseShadeColor"
-        app:layout_constraintBottom_toTopOf="@+id/add_attachment_queue"
-        app:layout_constraintTop_toBottomOf="@+id/operator_typing_animation_view"
-        tools:background="@android:color/holo_red_dark" />
+        app:layout_constraintBottom_toTopOf="@+id/sc_bottom_banner_label"/>
+
+    <TextView
+        android:id="@+id/sc_bottom_banner_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/chat_sc_error_barrier"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:background="?attr/gliaSystemAgentBubbleColor"
+        android:textAppearance="?attr/textAppearanceCaption"
+        tools:text="@string/secure_messaging_chat_banner_bottom" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/chat_sc_error_barrier"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:barrierDirection="top"
+        app:constraint_referenced_ids="sc_error_label, chat_divider"/>
+
+    <TextView
+        android:id="@+id/sc_error_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        app:layout_constraintBottom_toTopOf="@+id/chat_divider"
+        android:background="?attr/gliaSystemNegativeColor"
+        android:textColor="?attr/gliaBaseLightColor"
+        android:textAppearance="?attr/textAppearanceCaption"
+        app:drawableStartCompat="@drawable/ic_attention"
+        app:drawableTint="?attr/gliaBaseLightColor"
+        android:drawablePadding="8dp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        tools:text="@string/message_center_error_unavailable_message" />
+
+    <View
+        android:id="@+id/chat_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?attr/gliaBaseShadeColor"
+        app:layout_constraintBottom_toTopOf="@+id/add_attachment_queue" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/add_attachment_queue"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:scrollbars="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/chat_message_layout"
+        app:layout_constraintBottom_toTopOf="@+id/chat_edit_text"
         app:layout_constraintHeight_max="216dp"
-        app:layout_constraintTop_toBottomOf="@+id/divider_view"
         tools:itemCount="6"
         tools:listitem="@layout/chat_attachment_uploaded_item" />
 
-    <LinearLayout
-        android:id="@+id/chat_message_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/add_attachment_queue">
+    <View
+        android:id="@+id/message_input_background"
+        android:layout_height="0dp"
+        android:layout_width="0dp"
+        app:layout_constraintTop_toTopOf="@+id/chat_edit_text"
+        app:layout_constraintBottom_toBottomOf="@+id/chat_edit_text"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <com.glia.widgets.view.textview.SingleLineHintEditText
         android:id="@+id/chat_edit_text"
         style="@style/Application.Glia.Chat.Edittext"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/add_attachment_button"
         android:importantForAutofill="no"
         android:maxLength="10000"
         android:maxLines="4"
         android:minHeight="@dimen/glia_chat_edit_text_min_height"
         android:paddingStart="@dimen/glia_large"
-        android:textColor="?attr/gliaBaseDarkColor"
-        android:textColorHint="?attr/gliaBaseNormalColor"
+        android:textColor="@color/input_dark_color_state_list"
+        android:textColorHint="@color/input_normal_color_state_list"
         android:textCursorDrawable="@null"
-        tools:ignore="RtlSymmetry"
-        tools:textColor="@color/glia_black_color" />
+        tools:text="@string/chat_input_placeholder" />
 
-        <ImageButton
-            android:id="@+id/add_attachment_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:background="?attr/selectableItemBackground"
-            android:padding="@dimen/glia_large"
-            android:src="@drawable/ic_add_attachment" />
+    <ImageButton
+        android:id="@+id/add_attachment_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@+id/chat_edit_text"
+        app:layout_constraintBottom_toBottomOf="@+id/chat_edit_text"
+        app:layout_constraintStart_toEndOf="@+id/chat_edit_text"
+        app:layout_constraintEnd_toStartOf="@+id/send_button"
+        app:tint="@color/input_normal_color_state_list"
+        android:background="?attr/selectableItemBackground"
+        android:padding="@dimen/glia_large"
+        android:src="@drawable/ic_add_attachment" />
 
-        <ImageButton
-            android:id="@+id/send_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:background="?attr/selectableItemBackground"
-            android:padding="@dimen/glia_large"
-            android:src="?attr/gliaIconSendMessage"
-            app:tint="?attr/gliaBrandPrimaryColor"
-            tools:src="@drawable/ic_baseline_send"
-            tools:tint="@color/glia_brand_primary_color" />
-    </LinearLayout>
+    <ImageButton
+        android:id="@+id/send_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/glia_large"
+        app:layout_constraintBottom_toBottomOf="@+id/chat_edit_text"
+        app:layout_constraintTop_toTopOf="@+id/chat_edit_text"
+        app:layout_constraintStart_toEndOf="@+id/add_attachment_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="?attr/selectableItemBackground"
+        android:src="?attr/gliaIconSendMessage"
+        app:tint="@color/input_primary_color_state_list"
+        tools:src="@drawable/ic_baseline_send" />
+
+    <View
+        android:id="@+id/blocking_curtain"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/header_barrier"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:focusable="true"
+        android:clickable="true"
+        android:background="@color/glia_black_color_transparency_2"
+        android:visibility="gone" />
+
+    <com.glia.widgets.entrywidget.EntryWidgetView
+        android:id="@+id/sc_top_banner_options"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/header_barrier"
+        app:layout_constraintBottom_toBottomOf="@id/header_barrier"
+        tools:listitem="@layout/entry_widget_live_item" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/sc_top_banner_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="sc_top_banner_background, sc_top_banner_title, sc_top_banner_icon" />
 
 </merge>

@@ -1,11 +1,13 @@
 package com.glia.widgets.chat
 
+import android.widget.ImageView
 import com.glia.widgets.R
 import com.glia.widgets.SnapshotTest
-import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.model.ChatState
 import com.glia.widgets.chat.model.OperatorStatusItem
 import com.glia.widgets.core.fileupload.model.LocalAttachment
+import com.glia.widgets.entrywidget.EntryWidgetContract
+import com.glia.widgets.entrywidget.EntryWidgetView
 import com.glia.widgets.snapshotutils.SnapshotChatScreen
 import com.glia.widgets.snapshotutils.SnapshotChatView
 import com.glia.widgets.snapshotutils.SnapshotStrings
@@ -25,11 +27,9 @@ internal class ChatViewSnapshotTest : SnapshotTest(), SnapshotChatView, Snapshot
 
     // MARK: Attachment list
 
-    private fun attachmentListView(
-        unifiedTheme: UnifiedTheme? = null,
-        uiTheme: UiTheme? = null
-    ) = setupView(
+    private fun attachmentListView(unifiedTheme: UnifiedTheme? = null) = setupView(
         chatState = ChatState()
+            .initChat()
             .changeVisibility(true)
             .engagementStarted()
             .operatorConnected("Snap Test", null)
@@ -60,23 +60,13 @@ internal class ChatViewSnapshotTest : SnapshotTest(), SnapshotChatView, Snapshot
             R.drawable.test_launcher
         ),
         message = mediumLengthTexts()[0],
-        unifiedTheme = unifiedTheme,
-        uiTheme = uiTheme
+        unifiedTheme = unifiedTheme
     )
 
     @Test
     fun attachmentList() {
         snapshot(
             attachmentListView().root
-        )
-    }
-
-    @Test
-    fun attachmentListWithUiTheme() {
-        snapshot(
-            attachmentListView(
-                uiTheme = uiTheme()
-            ).root
         )
     }
 
@@ -109,11 +99,9 @@ internal class ChatViewSnapshotTest : SnapshotTest(), SnapshotChatView, Snapshot
 
     // MARK: Failed attachment list
 
-    private fun failedAttachmentListView(
-        unifiedTheme: UnifiedTheme? = null,
-        uiTheme: UiTheme? = null
-    ) = setupView(
+    private fun failedAttachmentListView(unifiedTheme: UnifiedTheme? = null) = setupView(
         chatState = ChatState()
+            .initChat()
             .changeVisibility(true)
             .engagementStarted()
             .setIsAttachmentButtonEnabled(false)
@@ -135,23 +123,13 @@ internal class ChatViewSnapshotTest : SnapshotTest(), SnapshotChatView, Snapshot
             R.drawable.test_launcher
         ),
         message = mediumLengthTexts()[1],
-        unifiedTheme = unifiedTheme,
-        uiTheme = uiTheme
+        unifiedTheme = unifiedTheme
     )
 
     @Test
     fun failedAttachmentList() {
         snapshot(
             failedAttachmentListView().root
-        )
-    }
-
-    @Test
-    fun failedAttachmentListWithUiTheme() {
-        snapshot(
-            failedAttachmentListView(
-                uiTheme = uiTheme()
-            ).root
         )
     }
 
@@ -186,29 +164,27 @@ internal class ChatViewSnapshotTest : SnapshotTest(), SnapshotChatView, Snapshot
 
     private fun secureMessagingView(
         unifiedTheme: UnifiedTheme? = null,
-        uiTheme: UiTheme? = null
+        isUnavailable: Boolean = false,
+        showTopBanner: Boolean = false,
+        clickTopBanner: Boolean = false,
     ) = setupView(
         chatState = ChatState()
-            .changeVisibility(true)
-            .setSecureMessagingState(),
+            .initChat()
+            .setSecureMessagingState()
+            .setSecureConversationsTopBannerVisibility(showTopBanner)
+            .let { if (isUnavailable) it.setSecureMessagingUnavailable() else it },
         message = mediumLengthTexts()[2],
-        unifiedTheme = unifiedTheme,
-        uiTheme = uiTheme
+        unifiedTheme = unifiedTheme
     )
+        .apply { if (clickTopBanner) {
+            chatView.findViewById<EntryWidgetView>(R.id.sc_top_banner_options).showItems(defaultMediaTypesForTopBanner)
+            chatView.findViewById<ImageView>(R.id.sc_top_banner_icon).performClick()
+        } }
 
     @Test
     fun secureMessaging() {
         snapshot(
             secureMessagingView().root
-        )
-    }
-
-    @Test
-    fun secureMessagingWithUiTheme() {
-        snapshot(
-            secureMessagingView(
-                uiTheme = uiTheme()
-            ).root
         )
     }
 
@@ -239,33 +215,92 @@ internal class ChatViewSnapshotTest : SnapshotTest(), SnapshotChatView, Snapshot
         )
     }
 
+    @Test
+    fun secureMessagingUnavailable() {
+        snapshot(
+            secureMessagingView(isUnavailable = true).root
+        )
+    }
+
+    @Test
+    fun secureMessagingUnavailableWithGlobalColors() {
+        snapshot(
+            secureMessagingView(
+                unifiedTheme = unifiedThemeWithGlobalColors(),
+                isUnavailable = true
+            ).root
+        )
+    }
+
+    @Test
+    fun secureMessagingUnavailableWithUnifiedTheme() {
+        snapshot(
+            secureMessagingView(
+                unifiedTheme = unifiedTheme(),
+                isUnavailable = true
+            ).root
+        )
+    }
+    private val defaultMediaTypesForTopBanner = listOf(
+        EntryWidgetContract.ItemType.VideoCall,
+        EntryWidgetContract.ItemType.AudioCall,
+        EntryWidgetContract.ItemType.Chat
+    )
+
+    @Test
+    fun secureMessagingWithTopBannerOpen() {
+        snapshot(
+            secureMessagingView(
+                showTopBanner = true,
+                clickTopBanner = true
+            ).root
+        )
+    }
+
+    @Test
+    fun secureMessagingWithTopBannerOpenWithGlobalColors() {
+        snapshot(
+            secureMessagingView(
+                unifiedTheme = unifiedThemeWithGlobalColors(),
+                showTopBanner = true,
+                clickTopBanner = true
+            ).root
+        )
+    }
+
+    @Test
+    fun secureMessagingWithTopBannerClosed() {
+        snapshot(
+            secureMessagingView(
+                showTopBanner = true
+            ).root
+        )
+    }
+
+    @Test
+    fun secureMessagingWithTopBannerClosedWithGlobalColors() {
+        snapshot(
+            secureMessagingView(
+                unifiedTheme = unifiedThemeWithGlobalColors(),
+                showTopBanner = true
+            ).root
+        )
+    }
+
     // MARK: Transferring
 
-    private fun transferringView(
-        unifiedTheme: UnifiedTheme? = null,
-        uiTheme: UiTheme? = null
-    ) = setupView(
+    private fun transferringView(unifiedTheme: UnifiedTheme? = null) = setupView(
         chatState = ChatState()
             .changeVisibility(true)
             .transferring(),
         chatItems = listOf(OperatorStatusItem.Transferring),
-        unifiedTheme = unifiedTheme,
-        uiTheme = uiTheme
+        unifiedTheme = unifiedTheme
     )
 
     @Test
     fun transferring() {
         snapshot(
             transferringView().root
-        )
-    }
-
-    @Test
-    fun transferringWithUiTheme() {
-        snapshot(
-            transferringView(
-                uiTheme = uiTheme()
-            ).root
         )
     }
 

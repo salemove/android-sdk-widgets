@@ -2,15 +2,13 @@ package com.glia.widgets.view.head.controller
 
 import android.view.View
 import com.glia.androidsdk.Operator
-import com.glia.widgets.UiTheme
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase
+import com.glia.widgets.core.chathead.domain.IsDisplayBubbleOutsideAppUseCase
 import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase
 import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase.Destinations
-import com.glia.widgets.core.chathead.domain.IsDisplayBubbleOutsideAppUseCase
-import com.glia.widgets.core.configuration.EngagementConfiguration
-import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.domain.CurrentOperatorUseCase
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
+import com.glia.widgets.engagement.domain.EngagementTypeUseCase
 import com.glia.widgets.engagement.domain.ScreenSharingUseCase
 import com.glia.widgets.engagement.domain.VisitorMediaUseCase
 import com.glia.widgets.helper.Logger.d
@@ -31,15 +29,14 @@ internal class ServiceChatHeadController(
     engagementStateUseCase: EngagementStateUseCase,
     currentOperatorUseCase: CurrentOperatorUseCase,
     visitorMediaUseCase: VisitorMediaUseCase,
-    screenSharingUseCase: ScreenSharingUseCase
+    screenSharingUseCase: ScreenSharingUseCase,
+    private val engagementTypeUseCase: EngagementTypeUseCase
 ) : ChatHeadContract.Controller {
     private var chatHeadView: ChatHeadContract.View? = null
     private var state = State.ENDED
     private var operatorProfileImgUrl: String? = null
     private var unreadMessagesCount = 0
     private var isOnHold = false
-    private var engagementConfiguration: EngagementConfiguration? = null
-    private var buildTimeTheme: UiTheme? = null
 
     /*
      * We need to keep track of the currently active (topmost) view. This can be either ChatView
@@ -101,9 +98,6 @@ internal class ServiceChatHeadController(
         updateChatHeadView()
     }
 
-    override fun setEngagementConfiguration(engagementConfiguration: EngagementConfiguration?) {
-        this.engagementConfiguration = engagementConfiguration
-    }
 
     private fun handleEngagementState(state: com.glia.widgets.engagement.State) {
         when (state) {
@@ -138,16 +132,11 @@ internal class ServiceChatHeadController(
     }
 
     override fun updateChatHeadView() {
-        if (chatHeadView != null && buildTimeTheme != null) {
+        if (chatHeadView != null) {
             updateChatHeadViewState()
             updateOnHold()
             chatHeadView!!.showUnreadMessageCount(unreadMessagesCount)
-            chatHeadView!!.updateConfiguration(buildTimeTheme!!, engagementConfiguration)
         }
-    }
-
-    override fun setBuildTimeTheme(uiTheme: UiTheme?) {
-        buildTimeTheme = uiTheme
     }
 
     private fun engagementEnded() {
@@ -164,18 +153,12 @@ internal class ServiceChatHeadController(
         isOnHold = false
         state = State.ENGAGEMENT
         isDisplayBubbleOutsideAppUseCase(resumedViewName)
-        if (engagementConfiguration == null) setEngagementConfiguration(
-            Dependencies.sdkConfigurationManager.buildEngagementConfiguration()
-        )
         updateChatHeadView()
     }
 
     private fun queueingStarted() {
         state = State.QUEUEING
         isDisplayBubbleOutsideAppUseCase(resumedViewName)
-        if (engagementConfiguration == null) setEngagementConfiguration(
-            Dependencies.sdkConfigurationManager.buildEngagementConfiguration()
-        )
         updateChatHeadView()
     }
 
@@ -200,7 +183,8 @@ internal class ServiceChatHeadController(
     private fun decideOnBubbleDesign() {
         val view = chatHeadView ?: return
 
-        if (isCallVisualizerScreenSharingUseCase()) {
+        if (isCallVisualizerScreenSharingUseCase() && !engagementTypeUseCase.isMediaEngagement) {
+            // Show screen sharing icon only if there is no 1 or 2 way video
             view.showScreenSharing()
             return
         }

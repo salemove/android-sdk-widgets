@@ -2,7 +2,6 @@ package com.glia.widgets.view.head
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Intent
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
@@ -11,25 +10,23 @@ import androidx.core.util.Pair
 import androidx.core.view.contains
 import com.glia.widgets.R
 import com.glia.widgets.base.BaseActivityStackWatcher
-import com.glia.widgets.call.CallActivity
-import com.glia.widgets.call.CallConfiguration
-import com.glia.widgets.callvisualizer.EndScreenSharingActivity
 import com.glia.widgets.callvisualizer.EndScreenSharingView
-import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.chat.ChatView
-import com.glia.widgets.di.Dependencies
-import com.glia.widgets.filepreview.ui.FilePreviewView
+import com.glia.widgets.chat.Intention
+import com.glia.widgets.filepreview.ui.ImagePreviewView
 import com.glia.widgets.helper.DialogHolderView
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.WeakReferenceDelegate
 import com.glia.widgets.helper.hasChildOfType
+import com.glia.widgets.launcher.ActivityLauncher
 import com.glia.widgets.messagecenter.MessageCenterView
 import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadContract
 
 @SuppressLint("CheckResult")
 internal class ActivityWatcherForChatHead(
-    val controller: ActivityWatcherForChatHeadContract.Controller
+    val controller: ActivityWatcherForChatHeadContract.Controller,
+    private val activityLauncher: ActivityLauncher
 ) : BaseActivityStackWatcher(), ActivityWatcherForChatHeadContract.Watcher {
 
     init {
@@ -69,7 +66,7 @@ internal class ActivityWatcherForChatHead(
     }
 
     private fun createChatHeadLayout(activity: Activity) {
-        val chatHeadLayout = ChatHeadLayout(activity.baseContext)
+        val chatHeadLayout = ChatHeadLayout(activity)
         chatHeadLayout.layoutParams = ConstraintLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.MATCH_PARENT
@@ -135,7 +132,7 @@ internal class ActivityWatcherForChatHead(
     }
 
     private fun saveBubblePosition() {
-        chatHeadLayout?.getPosition()?.let {
+        chatHeadLayout?.position?.let {
             if (it.first == null || it.second == null) return
             chatHeadViewPosition = Pair(it.first, it.second)
         }
@@ -154,7 +151,7 @@ internal class ActivityWatcherForChatHead(
         var gliaView: View? = null
         activity?.let {
             gliaView = it.findViewById(R.id.call_view)
-                ?: it.findViewById<FilePreviewView>(R.id.file_preview_view)
+                ?: it.findViewById<ImagePreviewView>(R.id.preview_view)
                     ?: it.findViewById<EndScreenSharingView>(R.id.screen_sharing_screen_view)
         }
         return gliaView != null
@@ -163,7 +160,7 @@ internal class ActivityWatcherForChatHead(
     override fun fetchGliaOrRootView(): View? {
         return resumedActivity?.let {
             return it.findViewById(R.id.call_view)
-                ?: it.findViewById<FilePreviewView>(R.id.file_preview_view)
+                ?: it.findViewById<ImagePreviewView>(R.id.preview_view)
                 ?: it.findViewById<ChatView>(R.id.chat_view)
                 ?: it.findViewById<EndScreenSharingView>(R.id.screen_sharing_screen_view)
                 ?: it.findViewById<MessageCenterView>(R.id.message_center_view)
@@ -173,35 +170,15 @@ internal class ActivityWatcherForChatHead(
         }
     }
 
-    private fun geCallConfigurationBuilder(): CallConfiguration.Builder {
-        val configuration = Dependencies.sdkConfigurationManager.buildEngagementConfiguration()
-        return CallConfiguration.Builder().setEngagementConfiguration(configuration)
-    }
-
     private fun navigateToChat(activity: Activity?) {
-        activity?.let {
-            val intent = ChatActivity.getIntent(
-                it,
-                null, // No need to set contextId because engagement is already ongoing
-                null // No need to set queueId because engagement is already ongoing
-            )
-            it.startActivity(intent)
-        }
+        activity?.also { activityLauncher.launchChat(it, Intention.RETURN_TO_CHAT) }
     }
 
     private fun navigateToEndScreenSharing(activity: Activity?) {
-        val intent = Intent(activity, EndScreenSharingActivity::class.java)
-        // No need to set contextId because engagement is already ongoing
-        activity?.startActivity(intent)
+        activity?.also(activityLauncher::launchEndScreenSharing)
     }
 
     private fun navigateToCall(activity: Activity?) {
-        activity?.let {
-            val intent = CallActivity.getIntent(
-                it,
-                geCallConfigurationBuilder().setIsUpgradeToCall(true).build()
-            )
-            it.startActivity(intent)
-        }
+        activity?.also { activityLauncher.launchCall(it, null, false) }
     }
 }

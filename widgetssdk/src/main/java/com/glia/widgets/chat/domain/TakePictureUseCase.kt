@@ -3,8 +3,8 @@ package com.glia.widgets.chat.domain
 import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
-import android.os.Environment
 import com.glia.widgets.core.fileupload.model.LocalAttachment
+import com.glia.widgets.helper.createTempFileCompat
 import java.io.File
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -59,9 +59,6 @@ internal class TakePictureUseCaseImpl(
         uri = null
     }
 
-    private fun createTempPhotoFile(): File = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES).let {
-        it?.deleteOnExit()
-        File.createTempFile(fileName, FILE_SUFFIX, it)
-    }
+    private fun createTempPhotoFile(): File = createTempFileCompat(fileName, FILE_SUFFIX, context.filesDir).apply { deleteOnExit() }
 
 }

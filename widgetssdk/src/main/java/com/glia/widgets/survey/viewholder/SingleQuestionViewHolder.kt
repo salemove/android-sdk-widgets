@@ -81,7 +81,7 @@ internal class SingleQuestionViewHolder(
                 val border =
                     drawable.findDrawableByLayerId(R.id.border_item) as GradientDrawable
                 val strokeColor =
-                    ContextCompat.getColorStateList(context, R.color.glia_base_shade_color)
+                    ContextCompat.getColorStateList(context, R.color.glia_shade_color)
                 val width = context.resources.getDimensionPixelSize(R.dimen.glia_px)
                 border.setStroke(width, strokeColor)
             }

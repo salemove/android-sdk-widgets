@@ -2,22 +2,22 @@ package com.glia.widgets.core.chathead.domain;
 
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase;
 import com.glia.widgets.engagement.domain.EngagementTypeUseCase;
-import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase;
+import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase;
 
 /**
  * @hide
  */
 public class ResolveChatHeadNavigationUseCase {
-    private final IsQueueingOrEngagementUseCase isQueueingOrEngagementUseCase;
+    private final IsQueueingOrLiveEngagementUseCase isQueueingOrLiveEngagementUseCase;
     private final EngagementTypeUseCase engagementTypeUseCase;
     private final IsCallVisualizerScreenSharingUseCase isCallVisualizerScreenSharingUseCase;
 
     public ResolveChatHeadNavigationUseCase(
-        IsQueueingOrEngagementUseCase isQueueingOrEngagementUseCase,
+        IsQueueingOrLiveEngagementUseCase isQueueingOrLiveEngagementUseCase,
         EngagementTypeUseCase engagementTypeUseCase,
         IsCallVisualizerScreenSharingUseCase isCallVisualizerScreenSharingUseCase
     ) {
-        this.isQueueingOrEngagementUseCase = isQueueingOrEngagementUseCase;
+        this.isQueueingOrLiveEngagementUseCase = isQueueingOrLiveEngagementUseCase;
         this.engagementTypeUseCase = engagementTypeUseCase;
         this.isCallVisualizerScreenSharingUseCase = isCallVisualizerScreenSharingUseCase;
     }
@@ -42,11 +42,11 @@ public class ResolveChatHeadNavigationUseCase {
     }
 
     private boolean isMediaQueueingOngoing() {
-        return isQueueingOrEngagementUseCase.isQueueingForMedia();
+        return isQueueingOrLiveEngagementUseCase.isQueueingForMedia();
     }
 
     private boolean isMediaEngagementOngoing() {
-        return isQueueingOrEngagementUseCase.getHasOngoingEngagement() && engagementTypeUseCase.isMediaEngagement();
+        return isQueueingOrLiveEngagementUseCase.getHasOngoingLiveEngagement() && engagementTypeUseCase.isMediaEngagement();
     }
 
     private boolean isSharingScreen() {

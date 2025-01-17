@@ -1,7 +1,7 @@
 package com.glia.widgets.view.unifiedui.theme.defaulttheme
 
 import com.glia.widgets.view.unifiedui.theme.ColorPallet
-import com.glia.widgets.view.unifiedui.webbrowser.WebBrowserTheme
+import com.glia.widgets.view.unifiedui.theme.webbrowser.WebBrowserTheme
 
 /**
  * Default theme for Chat screen

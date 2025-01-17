@@ -1,32 +1,36 @@
 package com.glia.widgets.chat
 
-import android.content.ClipData
 import android.content.Context
-import android.content.Intent
 import android.content.res.TypedArray
 import android.net.Uri
-import android.provider.Settings
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.AttributeSet
 import android.view.View
 import android.view.accessibility.AccessibilityEvent
+import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.withStyledAttributes
 import androidx.core.view.ViewCompat
-import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
-import androidx.core.view.updatePadding
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.AdapterDataObserver
+import androidx.transition.AutoTransition
+import androidx.transition.ChangeBounds
+import androidx.transition.ChangeTransform
+import androidx.transition.Fade
+import androidx.transition.Transition
+import androidx.transition.TransitionManager
+import androidx.transition.TransitionSet
+import com.glia.androidsdk.Engagement.MediaType
 import com.glia.androidsdk.chat.AttachmentFile
-import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.widgets.Constants
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.R
@@ -41,13 +45,14 @@ import com.glia.widgets.chat.model.ChatInputMode
 import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.ChatState
 import com.glia.widgets.chat.model.CustomCardChatItem
-import com.glia.widgets.core.configuration.EngagementConfiguration
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.dialog.model.DialogState
+import com.glia.widgets.core.dialog.model.LeaveDialogAction
 import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.databinding.ChatViewBinding
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.filepreview.ui.FilePreviewActivity
+import com.glia.widgets.entrywidget.EntryWidgetContract
+import com.glia.widgets.entrywidget.adapter.EntryWidgetAdapter
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.SimpleTextWatcher
 import com.glia.widgets.helper.SimpleWindowInsetsAndAnimationHandler
@@ -60,28 +65,35 @@ import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getColorStateListCompat
 import com.glia.widgets.helper.getContentUriCompat
 import com.glia.widgets.helper.getFontCompat
-import com.glia.widgets.helper.getFullHybridTheme
 import com.glia.widgets.helper.hideKeyboard
 import com.glia.widgets.helper.insetsController
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.requireActivity
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.setLocaleHint
+import com.glia.widgets.helper.setLocaleText
+import com.glia.widgets.launcher.ActivityLauncher
 import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.view.Dialogs
 import com.glia.widgets.view.SingleChoiceCardView.OnOptionClickedListener
+import com.glia.widgets.view.animation.SimpleTransitionListener
 import com.glia.widgets.view.dialog.base.DialogDelegate
 import com.glia.widgets.view.dialog.base.DialogDelegateImpl
 import com.glia.widgets.view.head.ChatHeadContract
 import com.glia.widgets.view.unifiedui.applyButtonTheme
 import com.glia.widgets.view.unifiedui.applyColorTheme
+import com.glia.widgets.view.unifiedui.applyHintColor
+import com.glia.widgets.view.unifiedui.applyHintTheme
+import com.glia.widgets.view.unifiedui.applyImageColor
+import com.glia.widgets.view.unifiedui.applyImageColorTheme
 import com.glia.widgets.view.unifiedui.applyLayerTheme
+import com.glia.widgets.view.unifiedui.applyTextColor
 import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.glia.widgets.view.unifiedui.theme.base.HeaderTheme
 import com.glia.widgets.view.unifiedui.theme.chat.InputTheme
 import com.glia.widgets.view.unifiedui.theme.chat.UnreadIndicatorTheme
-import com.glia.widgets.webbrowser.WebBrowserActivity
+import com.glia.widgets.view.unifiedui.theme.securemessaging.SecureMessagingTheme
 import com.google.android.material.shape.MarkerEdgeTreatment
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import java.util.concurrent.Executor
@@ -90,11 +102,7 @@ import kotlin.properties.Delegates
 internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : ConstraintLayout(
     MaterialThemeOverlay.wrap(context, attrs, defStyleAttr, defStyleRes), attrs, defStyleAttr, defStyleRes
 ), OnFileItemClickListener, OnImageItemClickListener, ChatContract.View, DialogDelegate by DialogDelegateImpl() {
-
-    @JvmOverloads
-    constructor(
-        context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = R.attr.gliaChatStyle
-    ) : this(context, attrs, defStyleAttr, R.style.Application_Glia_Chat)
+    private val activityLauncher: ActivityLauncher by lazy { Dependencies.activityLauncher }
 
     private var controller: ChatContract.Controller? = null
     private var dialogCallback: DialogContract.Controller.Callback? = null
@@ -112,7 +120,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     private var onTitleUpdatedListener: OnTitleUpdatedListener? = null
     private var onEndListener: OnEndListener? = null
     private var onMinimizeListener: OnMinimizeListener? = null
-    private var onNavigateToCallListener: OnNavigateToCallListener? = null
     private var onBackToCallListener: OnBackToCallListener? = null
     private val onRetryClickListener = ChatAdapter.OnRetryClickListener {
         controller?.onRetryClicked(it)
@@ -166,9 +173,11 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     }
 
     private var binding by Delegates.notNull<ChatViewBinding>()
+    private val rootConstraintLayout
+        get() = binding.root as ConstraintLayout
     private val attachmentPopup by lazy {
         AttachmentPopup(
-            binding.chatMessageLayout, Dependencies.gliaThemeManager.theme?.chatTheme?.attachmentsPopup
+            context, Dependencies.gliaThemeManager.theme?.chatTheme?.attachmentsPopup
         )
     }
 
@@ -201,36 +210,20 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         SimpleWindowInsetsAndAnimationHandler(this, appBarOrToolBar = binding.appBarView)
     }
 
-    /**
-     * @param uiTheme sets this view's appearance using the parameters provided in the
-     * [com.glia.widgets.UiTheme]
-     */
-    fun setUiTheme(uiTheme: UiTheme?) {
-        if (uiTheme == null) return
-        theme = theme.getFullHybridTheme(uiTheme)
-        setupViewAppearance()
+    @JvmOverloads
+    constructor(
+        context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = R.attr.gliaChatStyle
+    ) : this(context, attrs, defStyleAttr, R.style.Application_Glia_Chat)
+
+
+    fun startChat(intention: Intention) {
+        dialogCallback?.also { dialogController?.addCallback(it) }
+        controller?.initChat(intention)
     }
 
-    /**
-     * Used to start the chat functionality.
-     *
-     * @param companyName Text shown in the chat while waiting in a queue.
-     * @param queueIds    The queue ids to which you would like to queue to and speak to operators from.
-     * @param visitorContextAssetId  Provide some context asset ID as to from where are you initiating the chat from.
-     * @see [com.glia.widgets.GliaWidgets].USE_OVERLAY to see its full usage description.
-     * Important! This parameter is ignored if the view is not used in the sdk's [ChatActivity]
-     */
-    @JvmOverloads
-    fun startChat(
-        companyName: String?,
-        queueIds: List<String>?,
-        visitorContextAssetId: String?,
-        screenSharingMode: ScreenSharing.Mode? = null,
-        chatType: ChatType = ChatType.LIVE_CHAT
-    ) {
-        Dependencies.sdkConfigurationManager.screenSharingMode = screenSharingMode
+    fun restoreChat() {
         dialogCallback?.also { dialogController?.addCallback(it) }
-        controller?.initChat(companyName, queueIds, visitorContextAssetId, chatType)
+        controller?.restoreChat()
     }
 
     /**
@@ -275,19 +268,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         this.onMinimizeListener = onMinimizeListener
     }
 
-    /**
-     * Add a listener here for when the user has accepted an audio or video call and should navigate
-     * to a call.
-     * Important! Should be used together with [.navigateToCallSuccess] to notify the view
-     * of a completed navigation.
-     *
-     * @param onNavigateToCallListener The callback which is fired when the user accepts a media
-     * upgrade offer.
-     */
-    fun setOnNavigateToCallListener(onNavigateToCallListener: OnNavigateToCallListener?) {
-        this.onNavigateToCallListener = onNavigateToCallListener
-    }
-
     fun setOnBackToCallListener(onBackToCallListener: OnBackToCallListener?) {
         this.onBackToCallListener = onBackToCallListener
     }
@@ -314,7 +294,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         resetDialogStateAndDismiss()
 
         onEndListener = null
-        onNavigateToCallListener = null
         destroyController()
         adapter.unregisterAdapterDataObserver(dataObserver)
         binding.chatRecyclerView.adapter = null
@@ -348,7 +327,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         // some state updates on core-sdk are coming from the computation thread
         // need to update state on uiThread
         post {
-            updateShowSendButton(chatState)
+            updateSendButtonState(chatState)
             updateChatEditText(chatState)
             updateAppBar(chatState)
             binding.newMessagesIndicatorLayout.isVisible = chatState.showMessagesUnseenIndicator
@@ -365,15 +344,12 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             binding.operatorTypingAnimationView.isVisible = chatState.isOperatorTyping
             updateAttachmentButton(chatState)
             updateQuickRepliesState(chatState)
+            updateSecureMessagingState(chatState)
         }
     }
 
     override fun emitItems(items: List<ChatItem>) {
         adapter.submitList(items)
-    }
-
-    override fun navigateToCall(mediaType: String) {
-        onNavigateToCallListener?.call(theme, mediaType)
     }
 
     override fun backToCall() {
@@ -409,7 +385,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             context.requireActivity(), view, context.getString(R.string.glia_file_preview_transition_name) // Not translatable
         )
 
-        context.startActivity(FilePreviewActivity.intent(context, attachmentFile), options.toBundle())
+        activityLauncher.launchImagePreview(context, attachmentFile, options.toBundle())
         insetsController?.hideKeyboard()
     }
 
@@ -418,8 +394,13 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             context.requireActivity(), view, context.getString(R.string.glia_file_preview_transition_name) // Not translatable
         )
 
-        context.startActivity(FilePreviewActivity.intent(context, attachmentFile), options.toBundle())
+        activityLauncher.launchImagePreview(context, attachmentFile, options.toBundle())
         insetsController?.hideKeyboard()
+    }
+
+    override fun launchCall(mediaType: MediaType) {
+        activityLauncher.launchCall(context, mediaType, false)
+        context.asActivity()?.finish()
     }
 
     override fun fileIsNotReadyForPreview() {
@@ -431,9 +412,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     }
 
     override fun navigateToWebBrowserActivity(title: LocaleString, url: String) {
-        context.startActivity(
-            WebBrowserActivity.intent(context, title, url)
-        )
+        activityLauncher.launchWebBrowser(context, title, url)
     }
 
     override fun showEngagementConfirmationDialog() {
@@ -462,36 +441,23 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     }
 
     override fun requestOpenEmailClient(uri: Uri) {
-        val intent = Intent(Intent.ACTION_SENDTO).setData(Uri.parse("mailto:")) // This step makes sure that only email apps handle this.
-            .putExtra(Intent.EXTRA_EMAIL, arrayOf(uri.schemeSpecificPart))
-
-        if (intent.resolveActivity(context.packageManager) != null) {
-            context.startActivity(intent)
-        } else {
+        activityLauncher.launchEmailClient(context, uri) {
             Logger.e(TAG, "No email client, uri - $uri")
             showToast(localeProvider.getString(R.string.error_general))
         }
     }
 
     override fun requestOpenDialer(uri: Uri) {
-        val intent = Intent(Intent.ACTION_DIAL).setData(uri)
-
-        if (intent.resolveActivity(context.packageManager) != null) {
-            context.startActivity(intent)
-        } else {
+        activityLauncher.launchDialer(context, uri) {
             Logger.e(TAG, "No dialer uri - $uri")
             showToast(localeProvider.getString(R.string.error_general))
         }
     }
 
     override fun requestOpenUri(uri: Uri) {
-        Intent(Intent.ACTION_VIEW, uri).addCategory(Intent.CATEGORY_BROWSABLE).also {
-            if (it.resolveActivity(context.packageManager) != null) {
-                context.startActivity(it)
-            } else {
-                Logger.e(TAG, "No app to open url - $uri")
-                showToast(localeProvider.getString(R.string.error_general))
-            }
+        activityLauncher.launchUri(context, uri) {
+            Logger.e(TAG, "No app to open url - $uri")
+            showToast(localeProvider.getString(R.string.error_general))
         }
     }
 
@@ -510,12 +476,12 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             if (updateDialogState(it)) {
                 when (it) {
                     DialogState.None -> resetDialogStateAndDismiss()
-                    DialogState.MessageCenterUnavailable -> post { showChatUnavailableView() }
                     DialogState.UnexpectedError -> post { showUnexpectedErrorDialog() }
                     DialogState.ExitQueue -> post { showExitQueueDialog() }
                     DialogState.OverlayPermission -> post { showOverlayPermissionsDialog() }
                     DialogState.EndEngagement -> post { showEndEngagementDialog() }
                     DialogState.Confirmation -> post { controller?.onEngagementConfirmationDialogRequested() }
+                    is DialogState.LeaveCurrentConversation -> post { showLeaveCurrentConversationDialog(it.action) }
 
                     DialogState.VisitorCode -> {
                         Logger.e(TAG, "DialogController callback in ChatView with MODE_VISITOR_CODE")
@@ -532,10 +498,11 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         binding.addAttachmentButton.isVisible = chatState.isAttachmentButtonVisible
     }
 
-    private fun updateShowSendButton(chatState: ChatState) {
-        if (chatState.showSendButton == binding.sendButton.isVisible) return
-
-        binding.sendButton.isVisible = chatState.showSendButton
+    private fun updateSendButtonState(chatState: ChatState) {
+        binding.sendButton.apply {
+            isVisible = chatState.isSendButtonVisible
+            isEnabled = chatState.isSendButtonEnabled
+        }
     }
 
     private fun updateChatEditText(chatState: ChatState) {
@@ -547,6 +514,12 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             else -> binding.chatEditText.setLocaleHint(R.string.chat_input_placeholder)
         }
         binding.chatEditText.isEnabled = chatState.chatInputMode.isEnabled
+        Dependencies.gliaThemeManager.theme?.chatTheme?.let {
+            binding.chatEditText.apply{
+                val inputTheme = if (isEnabled) it.input else it.inputDisabled
+                applyTextTheme(inputTheme?.text, withAlignment = false)
+            }
+        }
     }
 
     private fun updateAppBar(chatState: ChatState) {
@@ -566,9 +539,11 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             showToolbar(LocaleString(R.string.message_center_header))
             binding.appBarView.hideBackButton()
             binding.appBarView.showXButton()
+            binding.secureConversationsBottomBanner.visibility = View.VISIBLE
         } else {
             showToolbar(LocaleString(R.string.engagement_chat_title))
             binding.appBarView.showBackButton()
+            binding.secureConversationsBottomBanner.visibility = View.GONE
         }
     }
 
@@ -605,7 +580,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
 
     private fun setDefaultTheme(typedArray: TypedArray) {
         theme = Utils.getThemeFromTypedArray(typedArray, this.context)
-        theme = theme.getFullHybridTheme(Dependencies.sdkConfigurationManager.uiTheme)
     }
 
     private fun initConfigurations() {
@@ -660,33 +634,62 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         binding.newMessagesIndicatorImage.setShowRippleAnimation(false)
         binding.newMessagesIndicatorImage.setTheme(theme)
         binding.newMessagesIndicatorCard.shapeAppearanceModel = shapeAppearanceModel
-        theme.brandPrimaryColor?.let(::getColorStateListCompat)?.also {
-            binding.newMessagesBadgeView.backgroundTintList = it
-        }
-        theme.baseLightColor?.let(::getColorCompat)?.also(binding.newMessagesBadgeView::setTextColor)
 
-        // colors
-        theme.baseShadeColor?.let(::getColorCompat)?.also(binding.dividerView::setBackgroundColor)
+        // global colors
+        theme.brandPrimaryColor
+            ?.also(binding.operatorTypingAnimationView::addColorFilter)
+            ?.let(::getColorStateListCompat)
+            ?.also(binding.newMessagesBadgeView::setBackgroundTintList)
 
-        theme.brandPrimaryColor?.let(::getColorStateListCompat)?.also {
-            binding.newMessagesBadgeView.backgroundTintList = it
-        }
-        binding.sendButton.imageTintList = theme.sendMessageButtonTintColor?.let(::getColorStateListCompat)
+        theme.baseLightColor?.let(::getColorCompat)
+            ?.also(binding.newMessagesBadgeView::setTextColor)
+            ?.also(binding.scErrorLabel::setTextColor)
+        theme.baseLightColor?.let(::getColorStateListCompat)
+            ?.also(binding.scErrorLabel::setCompoundDrawableTintList)
 
-        theme.baseDarkColor?.let(::getColorCompat)?.also(binding.chatEditText::setTextColor)
-        theme.baseNormalColor?.let(::getColorCompat)?.also(binding.chatEditText::setHintTextColor)
+        theme.systemNegativeColor?.let(::getColorCompat)
+            ?.also(binding.scErrorLabel::setBackgroundColor)
 
+        val disabledInputColor = theme.baseShadeColor?.let(::getColorCompat)
+            ?.also(binding.chatDivider::setBackgroundColor)
+            ?.also(binding.scBottomBannerDivider::setBackgroundColor)
+
+        theme.baseDarkColor?.let(::getColorCompat)
+            ?.also{ binding.chatEditText.applyTextColor(it, disabledInputColor) }
+        theme.baseNormalColor?.let(::getColorCompat)
+            ?.also{ binding.chatEditText.applyHintColor(it, disabledInputColor) }
+            ?.also{ binding.addAttachmentButton.applyImageColor(it, disabledInputColor) }
+            ?.also(binding.scBottomBannerLabel::setTextColor)
+        theme.systemAgentBubbleColor?.let(::getColorCompat)?.also(binding.scBottomBannerLabel::setBackgroundColor)
+
+        // other
+        theme.sendMessageButtonTintColor?.let(::getColorCompat)
+            ?.also { binding.sendButton.applyImageColor(it, disabledInputColor) }
         theme.gliaChatBackgroundColor?.let(::getColorCompat)?.also(::setBackgroundColor)
+        binding.gvaQuickRepliesLayout.updateTheme(theme)
 
         // fonts
         theme.fontRes?.also { binding.chatEditText.typeface = getFontCompat(it) }
 
-        theme.brandPrimaryColor?.also {
-            binding.operatorTypingAnimationView.addColorFilter(color = it)
+        // remote locales
+        binding.scErrorLabel.setLocaleText(R.string.secure_messaging_chat_unavailable_message)
+        binding.scBottomBannerLabel.setLocaleText(R.string.secure_messaging_chat_banner_bottom)
+        binding.sendButton.setLocaleContentDescription(R.string.general_send)
+        binding.scTopBannerTitle.setLocaleText(R.string.secure_messaging_chat_banner_top)
+
+        binding.scTopBannerOptions.apply {
+            val entryWidgetTheme = Dependencies.gliaThemeManager.theme?.chatTheme?.secureMessaging
+            val entryWidgetsAdapter = EntryWidgetAdapter(
+                EntryWidgetContract.ViewType.MESSAGING_LIVE_SUPPORT,
+                entryWidgetTheme
+            )
+            entryWidgetsAdapter.onItemClickListener = {
+                onNeedSupportButtonClicked(null)
+                controller?.onScTopBannerItemClicked(it)
+            }
+            setAdapter(entryWidgetsAdapter)
         }
 
-        binding.gvaQuickRepliesLayout.updateTheme(theme)
-        binding.sendButton.setLocaleContentDescription(R.string.general_send)
         applyTheme(Dependencies.gliaThemeManager.theme)
     }
 
@@ -714,11 +717,15 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
                 viewHolder?.itemView?.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_FOCUSED)
             }
         }
+
+        binding.scTopBannerTitle.setOnClickListener(::onNeedSupportButtonClicked)
+        binding.scTopBannerIcon.setOnClickListener(::onNeedSupportButtonClicked)
+        binding.blockingCurtain.setOnClickListener(::onNeedSupportButtonClicked)
     }
 
     private fun setupAddAttachmentButton() {
         binding.addAttachmentButton.setOnClickListener {
-            attachmentPopup.show(binding.chatMessageLayout, {
+            attachmentPopup.show(binding.addAttachmentButton, {
                 getContentLauncher?.launch(arrayOf(Constants.MIME_TYPE_IMAGES))
             }, {
                 controller?.onTakePhotoClicked()
@@ -766,15 +773,26 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         Dialogs.showOverlayPermissionsDialog(context = context, uiTheme = theme, positiveButtonClickListener = {
             controller?.overlayPermissionsDialogDismissed()
             resetDialogStateAndDismiss()
-            val overlayIntent = Intent(
-                Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + this.context.packageName)
-            )
-            overlayIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            this.context.startActivity(overlayIntent)
+            activityLauncher.launchOverlayPermission(context)
         }, negativeButtonClickListener = {
             controller?.overlayPermissionsDialogDismissed()
             resetDialogStateAndDismiss()
         })
+    }
+
+    private fun showLeaveCurrentConversationDialog(action: LeaveDialogAction) = showDialog {
+        Dialogs.showLeaveCurrentConversationDialog(
+            context,
+            theme,
+            onStay = {
+                resetDialogStateAndDismiss()
+                controller?.leaveCurrentConversationDialogStayClicked()
+            },
+            onLeave = {
+                resetDialogStateAndDismiss()
+                controller?.leaveCurrentConversationDialogLeaveClicked(action)
+            }
+        )
     }
 
     private fun chatEnded() {
@@ -794,22 +812,15 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     }
 
     override fun onFileOpenClick(file: AttachmentFile) {
-        val contentUri = getContentUriCompat(file.fileName, context)
-
-        with(Intent(Intent.ACTION_VIEW)) {
-            clipData = ClipData.newRawUri("", contentUri)
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-            setDataAndType(contentUri, file.contentType)
-            resolveActivity(context.packageManager)?.also { context.startActivity(this) }
-        } ?: showToast(message = localeProvider.getString(R.string.android_file_view_error))
+        activityLauncher.launchFileReader(context, getContentUriCompat(file.fileName, context), file.contentType) {
+            showToast(message = localeProvider.getString(R.string.android_file_view_error))
+        }
     }
 
     override fun onLocalFileOpenClick(attachment: LocalAttachment) {
-        with(Intent(Intent.ACTION_VIEW)) {
-            setDataAndType(attachment.uri, attachment.mimeType)
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-            resolveActivity(context.packageManager)?.also { context.startActivity(this) }
-        } ?: showToast(message = localeProvider.getString(R.string.android_file_view_error))
+        activityLauncher.launchFileReader(context, attachment.uri, attachment.mimeType.orEmpty()) {
+            showToast(message = localeProvider.getString(R.string.android_file_view_error))
+        }
     }
 
     override fun onImageItemClick(item: AttachmentFile, view: View) {
@@ -818,11 +829,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
 
     override fun onLocalImageItemClick(attachment: LocalAttachment, view: View) {
         controller?.onLocalImageItemClick(attachment, view)
-    }
-
-    fun setConfiguration(configuration: EngagementConfiguration?) {
-        serviceChatHeadController?.setBuildTimeTheme(theme)
-        serviceChatHeadController?.setEngagementConfiguration(configuration)
     }
 
     override fun showToast(message: String, duration: Int) {
@@ -836,24 +842,28 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
 
         chatTheme.header?.also(::applyHeaderTheme)
 
-        chatTheme.input?.also(::applyInputTheme)
+        chatTheme.input?.also{ applyInputTheme(it, chatTheme.inputDisabled) }
 
         chatTheme.typingIndicator?.primaryColor?.also(binding.operatorTypingAnimationView::addColorFilter)
 
         chatTheme.unreadIndicator?.also(::applyUnreadMessagesTheme)
+
+        chatTheme.secureMessaging?.also(::applySecureMessagingTheme)
     }
 
     private fun applyHeaderTheme(headerTheme: HeaderTheme) {
         binding.appBarView.applyHeaderTheme(headerTheme)
     }
 
-    private fun applyInputTheme(inputTheme: InputTheme) {
-        binding.sendButton.applyButtonTheme(inputTheme.sendButton)
-        binding.addAttachmentButton.applyButtonTheme(inputTheme.mediaButton)
-        binding.dividerView.applyColorTheme(inputTheme.divider)
-        binding.chatMessageLayout.applyLayerTheme(inputTheme.background)
-        binding.chatEditText.applyTextTheme(textTheme = inputTheme.text, withAlignment = false)
-        inputTheme.placeholder?.textColor?.primaryColor?.also(binding.chatEditText::setHintTextColor)
+    private fun applyInputTheme(defaultTheme: InputTheme, disabledTheme: InputTheme?) {
+        binding.sendButton.applyButtonTheme(defaultTheme.sendButton, disabledTheme?.sendButton)
+        binding.addAttachmentButton.applyButtonTheme(defaultTheme.mediaButton, disabledTheme?.mediaButton)
+        binding.chatDivider.applyColorTheme(defaultTheme.divider, disabledTheme?.divider)
+        binding.messageInputBackground.applyLayerTheme(defaultTheme.background, disabledTheme?.background)
+        // It is impossible to support all possible change to text view related to disabled state
+        // So it is achived manually in [updateChatEditText] method
+        binding.chatEditText.applyTextTheme(textTheme = defaultTheme.text, withAlignment = false)
+        binding.chatEditText.applyHintTheme(defaultTheme.placeholder, disabledTheme?.placeholder)
     }
 
     private fun applyUnreadMessagesTheme(unreadIndicatorTheme: UnreadIndicatorTheme) {
@@ -862,19 +872,33 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         unreadIndicatorTheme.background?.primaryColor?.also(binding.newMessagesIndicatorCard::setCardBackgroundColor)
     }
 
-    private fun showChatUnavailableView() = showDialog {
-        Dialogs.showMessageCenterUnavailableDialog(context, theme) {
-            hideChatControls(it.window?.decorView?.height ?: 0)
-        }
+    private fun applySecureMessagingTheme(secureMessagingTheme: SecureMessagingTheme) {
+        binding.scBottomBannerLabel.applyTextTheme(secureMessagingTheme.bottomBannerText)
+        binding.scBottomBannerLabel.applyLayerTheme(secureMessagingTheme.bottomBannerBackground)
+        binding.scBottomBannerDivider.applyColorTheme(secureMessagingTheme.bottomBannerDividerColor)
+        binding.scErrorLabel.applyLayerTheme(secureMessagingTheme.unavailableStatusBackground)
+        binding.scErrorLabel.applyTextTheme(secureMessagingTheme.unavailableStatusText)
+        binding.scTopBannerBackground.applyLayerTheme(secureMessagingTheme.topBannerBackground)
+        binding.scTopBannerTitle.applyTextTheme(secureMessagingTheme.topBannerText)
+        binding.scTopBannerIcon.applyImageColorTheme(secureMessagingTheme.topBannerDropDownIconColor)
+        binding.scTopBannerDivider.applyColorTheme(secureMessagingTheme.topBannerDividerColor)
+        binding.scTopBannerOptions.setSecureMessagingTheme(secureMessagingTheme)
     }
 
-    private fun hideChatControls(dialogHeight: Int) {
-        binding.apply {
-            chatRecyclerView.updatePadding(bottom = dialogHeight)
-            chatRecyclerView.scrollBy(0, dialogHeight)
-            chatMessageLayout.isGone = true
-            operatorTypingAnimationView.isGone = true
+    private fun updateSecureMessagingState(state: ChatState) {
+        TransitionManager.beginDelayedTransition(rootConstraintLayout, AutoTransition()
+            .addTarget(binding.scErrorLabel)
+            .addTarget(binding.scTopBannerTitle)
+            .addTarget(binding.scTopBannerIcon)
+            .addTarget(binding.scTopBannerBackground)
+            .addTarget(binding.scTopBannerDivider)
+        )
+        binding.scErrorLabel.isVisible = state.isSecureConversationsUnavailableLabelVisible
+        if (state.isSecureConversationsTopBannerVisible.not() && isNeedSupportDropDownShown()) {
+            onNeedSupportButtonClicked(null)
         }
+        binding.scTopBannerGroup.isVisible = state.isSecureConversationsTopBannerVisible
+        binding.scTopBannerDivider.isVisible = state.isSecureConversationsTopBannerVisible
     }
 
     @VisibleForTesting
@@ -904,22 +928,67 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         fun onMinimize()
     }
 
-    fun interface OnNavigateToCallListener {
-        /**
-         * Callback which is fired when the user has accepted a media upgrade offer and should be
-         * navigated to a view where they can visually see data about their media upgrade.
-         *
-         * @param theme Used to pass the finalized [UiTheme]
-         * to the activity which is being navigated to.
-         */
-        fun call(theme: UiTheme?, mediaType: String?)
-    }
-
     fun interface OnBackToCallListener {
         fun onBackToCall()
     }
 
     fun interface OnTitleUpdatedListener {
         fun onTitleUpdated(title: LocaleString?)
+    }
+
+    private fun onNeedSupportButtonClicked(ignored: View?) {
+        val animationRules = createSecureConversationAnimationRules()
+
+        TransitionManager.beginDelayedTransition(rootConstraintLayout, animationRules)
+        updateLayoutToNewNeedSupportBannerState(!isNeedSupportDropDownShown())
+    }
+
+    private fun isNeedSupportDropDownShown(): Boolean {
+        return binding.blockingCurtain.isVisible
+    }
+
+    private fun createSecureConversationAnimationRules(): TransitionSet {
+        return TransitionSet()
+            .addTransition(
+                ChangeTransform()
+                    .addTarget(binding.scTopBannerIcon)
+            )
+            .addTransition(
+                Fade()
+                    .addTarget(binding.blockingCurtain)
+                    .addTarget(binding.scTopBannerDivider)
+            )
+            .addTransition(
+                ChangeBounds()
+                    .addTarget(binding.blockingCurtain)
+                    .addTarget(binding.scTopBannerOptions)
+            )
+            .setDuration(500)
+            .addListener(object : SimpleTransitionListener() {
+                override fun onTransitionEnd(transition: Transition) {
+                    binding.blockingCurtain.apply {
+                        if (isInvisible) {
+                            visibility = FrameLayout.GONE
+                        }
+                    }
+                }
+            })
+    }
+
+    private fun updateLayoutToNewNeedSupportBannerState(shouldShowDropDown: Boolean) {
+        ConstraintSet().apply {
+            clone(rootConstraintLayout)
+            if (shouldShowDropDown) {
+                clear(R.id.sc_top_banner_options, ConstraintSet.BOTTOM)
+                setVisibility(R.id.blocking_curtain, VISIBLE)
+                setVisibility(R.id.sc_top_banner_divider, View.INVISIBLE)
+                setRotation(R.id.sc_top_banner_icon, 180f)
+            } else {
+                connect(R.id.sc_top_banner_options, ConstraintSet.BOTTOM, R.id.header_barrier, ConstraintSet.BOTTOM)
+                setVisibility(R.id.blocking_curtain, INVISIBLE)
+                setVisibility(R.id.sc_top_banner_divider, VISIBLE)
+                setRotation(R.id.sc_top_banner_icon, 0f)
+            }
+        }.applyTo(rootConstraintLayout)
     }
 }

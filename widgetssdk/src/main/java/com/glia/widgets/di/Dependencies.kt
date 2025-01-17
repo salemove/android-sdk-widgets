@@ -5,7 +5,6 @@ import android.os.Build
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
 import com.glia.androidsdk.Glia
 import com.glia.androidsdk.GliaConfig
 import com.glia.widgets.GliaWidgetsConfig
@@ -16,20 +15,26 @@ import com.glia.widgets.core.audio.domain.OnAudioStartedUseCase
 import com.glia.widgets.core.authentication.AuthenticationManager
 import com.glia.widgets.core.callvisualizer.CallVisualizerManager
 import com.glia.widgets.core.chathead.ChatHeadManager
-import com.glia.widgets.core.configuration.GliaSdkConfigurationManager
 import com.glia.widgets.core.dialog.PermissionDialogManager
 import com.glia.widgets.core.notification.device.INotificationManager
 import com.glia.widgets.core.notification.device.NotificationManager
 import com.glia.widgets.core.permissions.PermissionManager
 import com.glia.widgets.engagement.completion.EngagementCompletionActivityWatcher
+import com.glia.widgets.entrywidget.EntryWidget
+import com.glia.widgets.entrywidget.EntryWidgetImpl
 import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource
 import com.glia.widgets.helper.ApplicationLifecycleManager
 import com.glia.widgets.helper.GliaActivityManagerImpl
-import com.glia.widgets.helper.IntentConfigurationHelper
-import com.glia.widgets.helper.IntentConfigurationHelperImpl
+import com.glia.widgets.helper.IntentHelperImpl
 import com.glia.widgets.helper.ResourceProvider
 import com.glia.widgets.helper.rx.GliaWidgetsSchedulers
 import com.glia.widgets.helper.rx.Schedulers
+import com.glia.widgets.launcher.ActivityLauncher
+import com.glia.widgets.launcher.ActivityLauncherImpl
+import com.glia.widgets.launcher.ConfigurationManager
+import com.glia.widgets.launcher.ConfigurationManagerImpl
+import com.glia.widgets.launcher.EngagementLauncher
+import com.glia.widgets.launcher.EngagementLauncherImpl
 import com.glia.widgets.locale.LocaleProvider
 import com.glia.widgets.operator.OperatorRequestActivityWatcher
 import com.glia.widgets.permissions.ActivityWatcherForPermissionsRequest
@@ -43,19 +48,23 @@ internal object Dependencies {
     @JvmStatic
     val gliaThemeManager = UnifiedThemeManager()
     private val authenticationManagerProvider = AuthenticationManagerProvider()
+
     @JvmStatic
     lateinit var controllerFactory: ControllerFactory
         @VisibleForTesting set
     private lateinit var notificationManager: INotificationManager
+
     @JvmStatic
     lateinit var callVisualizerManager: CallVisualizerManager
         private set
+
     @JvmStatic
     lateinit var useCaseFactory: UseCaseFactory
         @VisibleForTesting set
     private lateinit var managerFactory: ManagerFactory
     var gliaCore: GliaCore = GliaCoreImpl()
         @VisibleForTesting set
+
     @JvmStatic
     lateinit var resourceProvider: ResourceProvider
         @VisibleForTesting set
@@ -63,10 +72,39 @@ internal object Dependencies {
         @VisibleForTesting set
     var schedulers: Schedulers = GliaWidgetsSchedulers()
         @VisibleForTesting set
+
     @JvmStatic
-    var sdkConfigurationManager: GliaSdkConfigurationManager = GliaSdkConfigurationManager()
-        @VisibleForTesting set
-    val intentConfigurationHelper: IntentConfigurationHelper = IntentConfigurationHelperImpl()
+    val configurationManager: ConfigurationManager by lazy { ConfigurationManagerImpl() }
+
+    @JvmStatic
+    val activityLauncher: ActivityLauncher by lazy {
+        ActivityLauncherImpl(IntentHelperImpl(), repositoryFactory.engagementRepository)
+    }
+
+    @JvmStatic
+    val engagementLauncher: EngagementLauncher by lazy {
+        EngagementLauncherImpl(
+            activityLauncher = activityLauncher,
+            hasOngoingSecureConversationUseCase = useCaseFactory.hasPendingSecureConversationsWithTimeoutUseCase,
+            isQueueingOrLiveEngagementUseCase = useCaseFactory.isQueueingOrEngagementUseCase,
+            endEngagementUseCase = useCaseFactory.endEngagementUseCase,
+            configurationManager = configurationManager,
+            engagementTypeUseCase = useCaseFactory.engagementTypeUseCase,
+            callVisualizerController = controllerFactory.callVisualizerController,
+            destroyChatController = controllerFactory::destroyChatController,
+            destroyCallController = controllerFactory::destroyCallController
+        )
+    }
+
+    @JvmStatic
+    val entryWidget: EntryWidget
+        get() = EntryWidgetImpl(
+            activityLauncher,
+            gliaThemeManager,
+            controllerFactory.entryWidgetHideController,
+            useCaseFactory.hasPendingSecureConversationsWithTimeoutUseCase
+        )
+
     @JvmStatic
     lateinit var repositoryFactory: RepositoryFactory
         @VisibleForTesting set
@@ -77,7 +115,7 @@ internal object Dependencies {
         localeProvider = LocaleProvider(resourceProvider)
         notificationManager = NotificationManager(application)
         val downloadsFolderDataSource = DownloadsFolderDataSource(application)
-        repositoryFactory = RepositoryFactory(gliaCore, downloadsFolderDataSource)
+        repositoryFactory = RepositoryFactory(gliaCore, downloadsFolderDataSource, configurationManager)
 
         val permissionManager = PermissionManager(
             application,
@@ -91,7 +129,7 @@ internal object Dependencies {
             permissionManager,
             PermissionDialogManager(application),
             notificationManager,
-            sdkConfigurationManager,
+            configurationManager,
             ChatHeadManager(application),
             audioControlManager,
             authenticationManagerProvider,
@@ -107,8 +145,8 @@ internal object Dependencies {
         controllerFactory = ControllerFactory(
             repositoryFactory,
             useCaseFactory,
-            sdkConfigurationManager,
-            managerFactory
+            managerFactory,
+            gliaCore
         )
         initApplicationLifecycleObserver(
             ApplicationLifecycleManager(),
@@ -119,14 +157,16 @@ internal object Dependencies {
             controllerFactory.callVisualizerController,
             GliaActivityManagerImpl(),
             localeProvider,
-            gliaThemeManager
+            gliaThemeManager,
+            activityLauncher
         )
 
         application.registerActivityLifecycleCallbacks(callVisualizerActivityWatcher)
 
         val activityWatcherForChatHead = ActivityWatcherForChatHead(
-                controllerFactory.activityWatcherForChatHeadController
-            )
+            controllerFactory.activityWatcherForChatHeadController,
+            activityLauncher
+        )
         application.registerActivityLifecycleCallbacks(activityWatcherForChatHead)
 
         val activityWatcherForLiveObservation = ActivityWatcherForLiveObservation(
@@ -137,8 +177,8 @@ internal object Dependencies {
         application.registerActivityLifecycleCallbacks(activityWatcherForLiveObservation)
 
         val activityWatcherForPermissionsRequest = ActivityWatcherForPermissionsRequest(
-                controllerFactory.permissionsController
-            )
+            controllerFactory.permissionsController
+        )
         application.registerActivityLifecycleCallbacks(activityWatcherForPermissionsRequest)
 
         callVisualizerManager = CallVisualizerManager(
@@ -148,13 +188,14 @@ internal object Dependencies {
 
         val engagementCompletionActivityWatcher = EngagementCompletionActivityWatcher(
             controllerFactory.endEngagementController,
-            GliaActivityManagerImpl()
+            GliaActivityManagerImpl(),
+            activityLauncher
         )
         application.registerActivityLifecycleCallbacks(engagementCompletionActivityWatcher)
 
         val operatorRequestActivityWatcher = OperatorRequestActivityWatcher(
             controllerFactory.operatorRequestController,
-            intentConfigurationHelper,
+            activityLauncher,
             GliaActivityManagerImpl()
         )
         application.registerActivityLifecycleCallbacks(operatorRequestActivityWatcher)
@@ -165,8 +206,8 @@ internal object Dependencies {
         val gliaConfig = createGliaConfig(gliaWidgetsConfig)
         gliaCore.init(gliaConfig)
         controllerFactory.init()
-        repositoryFactory.engagementRepository.initialize()
-        sdkConfigurationManager.fromConfiguration(gliaWidgetsConfig)
+        repositoryFactory.initialize()
+        configurationManager.applyConfiguration(gliaWidgetsConfig)
         localeProvider.setCompanyName(gliaWidgetsConfig.companyName)
     }
 
@@ -202,7 +243,7 @@ internal object Dependencies {
         lifecycleManager: ApplicationLifecycleManager,
         chatBubbleController: ChatHeadContract.Controller
     ) {
-        lifecycleManager.addObserver { source: LifecycleOwner?, event: Lifecycle.Event ->
+        lifecycleManager.addObserver { _, event: Lifecycle.Event ->
             if (event == Lifecycle.Event.ON_STOP) {
                 chatBubbleController.onApplicationStop()
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S && Glia.isInitialized()) {

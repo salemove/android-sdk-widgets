@@ -21,32 +21,6 @@ internal data class LocalAttachment(
     val id: String
         get() = engagementFile?.id ?: UUID.randomUUID().toString()
 
-    constructor(attachment: LocalAttachment, status: Status) : this(
-        uri = attachment.uri,
-        engagementFile = attachment.engagementFile,
-        displayName = attachment.displayName,
-        size = attachment.size,
-        attachmentStatus = status,
-        mimeType = attachment.mimeType,
-    )
-
-    constructor(attachment: LocalAttachment, engagementFile: EngagementFile?) : this(
-        uri = attachment.uri,
-        attachmentStatus = attachment.attachmentStatus,
-        displayName = attachment.displayName,
-        size = attachment.size,
-        engagementFile = engagementFile,
-        mimeType = attachment.mimeType
-    )
-
-    fun setEngagementFile(engagementFile: EngagementFile?): LocalAttachment {
-        return LocalAttachment(this, engagementFile)
-    }
-
-    fun setAttachmentStatus(status: Status): LocalAttachment {
-        return LocalAttachment(this, status)
-    }
-
     fun toVisitorAttachmentItem(messageId: String): VisitorAttachmentItem = if (isImage) {
         VisitorAttachmentItem.LocalImage(id, messageId, this)
     } else {

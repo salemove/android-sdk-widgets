@@ -2,6 +2,7 @@ package com.glia.widgets.chat.controller
 
 import android.net.Uri
 import android.view.View
+import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.Operator
 import com.glia.androidsdk.chat.AttachmentFile
@@ -15,14 +16,15 @@ import com.glia.androidsdk.site.SiteInfo
 import com.glia.widgets.Constants
 import com.glia.widgets.chat.ChatContract
 import com.glia.widgets.chat.ChatManager
-import com.glia.widgets.chat.ChatType
 import com.glia.widgets.chat.ChatView
+import com.glia.widgets.chat.Intention
 import com.glia.widgets.chat.domain.DecideOnQueueingUseCase
 import com.glia.widgets.chat.domain.GliaSendMessagePreviewUseCase
 import com.glia.widgets.chat.domain.GliaSendMessageUseCase
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
 import com.glia.widgets.chat.domain.IsShowSendButtonUseCase
+import com.glia.widgets.chat.domain.SetChatScreenOpenUseCase
 import com.glia.widgets.chat.domain.SiteInfoUseCase
 import com.glia.widgets.chat.domain.TakePictureUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
@@ -39,14 +41,13 @@ import com.glia.widgets.chat.model.VisitorChatItem
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.dialog.domain.ConfirmationDialogLinksUseCase
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
+import com.glia.widgets.core.dialog.model.LeaveDialogAction
 import com.glia.widgets.core.dialog.model.Link
 import com.glia.widgets.core.engagement.domain.ConfirmationDialogUseCase
-import com.glia.widgets.core.engagement.domain.SetEngagementConfigUseCase
 import com.glia.widgets.core.engagement.domain.UpdateOperatorDefaultImageUrlUseCase
 import com.glia.widgets.core.fileupload.domain.AddFileAttachmentsObserverUseCase
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase
 import com.glia.widgets.core.fileupload.domain.GetFileAttachmentsUseCase
-import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentObserverUseCase
 import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentUseCase
 import com.glia.widgets.core.fileupload.domain.SupportedFileCountCheckUseCase
 import com.glia.widgets.core.fileupload.model.LocalAttachment
@@ -54,8 +55,10 @@ import com.glia.widgets.core.notification.domain.CallNotificationUseCase
 import com.glia.widgets.core.permissions.domain.RequestNotificationPermissionIfPushNotificationsSetUpUseCase
 import com.glia.widgets.core.permissions.domain.WithCameraPermissionUseCase
 import com.glia.widgets.core.permissions.domain.WithReadWritePermissionsUseCase
-import com.glia.widgets.core.secureconversations.domain.GetAvailableQueueIdsForSecureMessagingUseCase
-import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
+import com.glia.widgets.core.secureconversations.domain.IsMessagingAvailableUseCase
+import com.glia.widgets.core.secureconversations.domain.ManageSecureMessagingStatusUseCase
+import com.glia.widgets.core.secureconversations.domain.SecureConversationTopBannerVisibilityUseCase
+import com.glia.widgets.core.secureconversations.domain.SetLeaveSecureConversationDialogVisibleUseCase
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.EngagementUpdateState
 import com.glia.widgets.engagement.ScreenSharingState
@@ -65,11 +68,12 @@ import com.glia.widgets.engagement.domain.EndEngagementUseCase
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import com.glia.widgets.engagement.domain.EnqueueForEngagementUseCase
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
-import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
+import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 import com.glia.widgets.engagement.domain.OperatorMediaUseCase
 import com.glia.widgets.engagement.domain.OperatorTypingUseCase
 import com.glia.widgets.engagement.domain.ReleaseResourcesUseCase
 import com.glia.widgets.engagement.domain.ScreenSharingUseCase
+import com.glia.widgets.entrywidget.EntryWidgetContract
 import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase
 import com.glia.widgets.filepreview.domain.usecase.IsFileReadyForPreviewUseCase
 import com.glia.widgets.helper.Logger
@@ -86,8 +90,8 @@ import com.glia.widgets.view.MinimizeHandler
 import com.glia.widgets.webbrowser.domain.GetUrlFromLinkUseCase
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.schedulers.Schedulers
-import java.util.Observer
 
 internal class ChatController(
     private val callTimer: TimeCounter,
@@ -101,7 +105,6 @@ internal class ChatController(
     private val endEngagementUseCase: EndEngagementUseCase,
     private val addFileToAttachmentAndUploadUseCase: AddFileToAttachmentAndUploadUseCase,
     private val addFileAttachmentsObserverUseCase: AddFileAttachmentsObserverUseCase,
-    private val removeFileAttachmentObserverUseCase: RemoveFileAttachmentObserverUseCase,
     private val getFileAttachmentsUseCase: GetFileAttachmentsUseCase,
     private val removeFileAttachmentUseCase: RemoveFileAttachmentUseCase,
     private val supportedFileCountCheckUseCase: SupportedFileCountCheckUseCase,
@@ -111,9 +114,7 @@ internal class ChatController(
     private val siteInfoUseCase: SiteInfoUseCase,
     private val isFromCallScreenUseCase: IsFromCallScreenUseCase,
     private val updateFromCallScreenUseCase: UpdateFromCallScreenUseCase,
-    private val isSecureEngagementUseCase: IsSecureEngagementUseCase,
-    private val engagementConfigUseCase: SetEngagementConfigUseCase,
-    private val getAvailableQueueIdsForSecureMessagingUseCase: GetAvailableQueueIdsForSecureMessagingUseCase,
+    private val manageSecureMessagingStatusUseCase: ManageSecureMessagingStatusUseCase,
     private val isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase,
     private val isFileReadyForPreviewUseCase: IsFileReadyForPreviewUseCase,
     private val determineGvaButtonTypeUseCase: DetermineGvaButtonTypeUseCase,
@@ -125,7 +126,7 @@ internal class ChatController(
     private val engagementStateUseCase: EngagementStateUseCase,
     private val operatorMediaUseCase: OperatorMediaUseCase,
     private val acceptMediaUpgradeOfferUseCase: AcceptMediaUpgradeOfferUseCase,
-    private val isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase,
+    private val isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase,
     private val enqueueForEngagementUseCase: EnqueueForEngagementUseCase,
     private val decideOnQueueingUseCase: DecideOnQueueingUseCase,
     private val screenSharingUseCase: ScreenSharingUseCase,
@@ -135,7 +136,11 @@ internal class ChatController(
     private val withReadWritePermissionsUseCase: WithReadWritePermissionsUseCase,
     private val requestNotificationPermissionIfPushNotificationsSetUpUseCase: RequestNotificationPermissionIfPushNotificationsSetUpUseCase,
     private val releaseResourcesUseCase: ReleaseResourcesUseCase,
-    private val getUrlFromLinkUseCase: GetUrlFromLinkUseCase
+    private val getUrlFromLinkUseCase: GetUrlFromLinkUseCase,
+    private val isMessagingAvailableUseCase: IsMessagingAvailableUseCase,
+    private val shouldShowTopBannerUseCase: SecureConversationTopBannerVisibilityUseCase,
+    private val setLeaveSecureConversationDialogVisibleUseCase: SetLeaveSecureConversationDialogVisibleUseCase,
+    private val setChatScreenOpenUseCase: SetChatScreenOpenUseCase
 ) : ChatContract.Controller {
     private var backClickedListener: ChatView.OnBackClickedListener? = null
     private var view: ChatContract.View? = null
@@ -180,10 +185,10 @@ internal class ChatController(
     @Volatile
     private var isChatViewPaused = false
 
-    private val fileAttachmentObserver = Observer { _, _ ->
+    private val fileAttachmentCallback = Consumer<List<LocalAttachment>> { attachments ->
         view?.apply {
-            emitUploadAttachments(getFileAttachmentsUseCase())
             emitViewState {
+                emitUploadAttachments(attachments)
                 chatState.setShowSendButton(isShowSendButtonUseCase(chatState.lastTypedText))
                     .setIsAttachmentButtonEnabled(supportedFileCountCheckUseCase())
             }
@@ -193,9 +198,7 @@ internal class ChatController(
     @Volatile
     private var chatState: ChatState
 
-    private val isSecureEngagement get() = isSecureEngagementUseCase()
-
-    private val isQueueingOrOngoingEngagement get() = isQueueingOrEngagementUseCase()
+    private val isQueueingOrOngoingEngagement get() = isQueueingOrLiveEngagementUseCase()
 
     override val isChatVisible: Boolean
         get() = chatState.isVisible
@@ -225,22 +228,55 @@ internal class ChatController(
         screenSharingUseCase.end()
     }
 
-    override fun initChat(companyName: String?, queueIds: List<String>?, visitorContextAssetId: String?, chatType: ChatType) {
-        engagementConfigUseCase(chatType, queueIds ?: emptyList())
+    override fun initChat(intention: Intention) {
         updateOperatorDefaultImageUrlUseCase()
 
-        ensureSecureMessagingAvailable()
-
-        if (chatState.integratorChatStarted || dialogController.isShowingUnexpectedErrorDialog) {
-            if (isSecureEngagement) {
-                emitViewState { chatState.setSecureMessagingState() }
-            }
-            chatManager.onChatAction(ChatManager.Action.ChatRestored)
-            return
+        when (intention) {
+            Intention.RETURN_TO_CHAT -> returnToChat()
+            Intention.SC_DIALOG_START_AUDIO -> initLeaveCurrentConversationDialog(LeaveDialogAction.AUDIO)
+            Intention.SC_DIALOG_START_VIDEO -> initLeaveCurrentConversationDialog(LeaveDialogAction.VIDEO)
+            Intention.SC_DIALOG_ENQUEUE_FOR_TEXT -> initLeaveCurrentConversationDialog(LeaveDialogAction.LIVE_CHAT)
+            Intention.SC_CHAT -> initSecureMessaging()
+            Intention.LIVE_CHAT -> initLiveChat()
         }
+    }
 
-        emitViewState { chatState.initChat(companyName, queueIds, visitorContextAssetId) }
+    private fun returnToChat() {
+        if (chatState.isInitialized) {
+            restoreChat()
+        } else {
+            initLiveChat()
+        }
+    }
+
+    private fun initLeaveCurrentConversationDialog(action: LeaveDialogAction) {
+        setLeaveSecureConversationDialogVisibleUseCase(true)
+        initSecureMessaging()
+        dialogController.showLeaveCurrentConversationDialog(action)
+    }
+
+    private fun initSecureMessaging() {
         initChatManager()
+        emitViewState { chatState.initChat().setSecureMessagingState() }
+        ensureSecureMessagingAvailable()
+        observeTopBannerUseCase()
+    }
+
+    private fun observeTopBannerUseCase() {
+        disposable.add(shouldShowTopBannerUseCase().subscribe({
+            emitViewState { chatState.setSecureConversationsTopBannerVisibility(it) }
+        }) { error ->
+            Logger.w(TAG, "Secure messaging top banner visibility flag observable failed.\n $error")
+        })
+    }
+
+    private fun initLiveChat() {
+        initChatManager()
+        emitViewState { chatState.initChat().setLiveChatState() }
+    }
+
+    override fun restoreChat() {
+        chatManager.onChatAction(ChatManager.Action.ChatRestored)
     }
 
     private fun subscribeToEngagement() {
@@ -250,26 +286,30 @@ internal class ChatController(
     }
 
     private fun ensureSecureMessagingAvailable() {
-        if (!isSecureEngagement) return
+        disposable.add(isMessagingAvailableUseCase().subscribe(::handleMessagingAvailableResult))
+    }
 
-        disposable.add(
-            getAvailableQueueIdsForSecureMessagingUseCase().subscribe({
-                if (it.result != null) {
-                    Logger.d(TAG, "Messaging is available")
-                    engagementConfigUseCase(ChatType.SECURE_MESSAGING, it.result)
-                } else {
-                    Logger.d(TAG, "Messaging is unavailable")
-                    dialogController.showMessageCenterUnavailableDialog()
-                }
-            }, {
-                Logger.e(TAG, "Checking for Messaging availability failed", it)
-                dialogController.showUnexpectedErrorDialog()
-            })
-        )
+    private fun handleMessagingAvailableResult(result: Result<Boolean>) {
+        result.onFailure { error ->
+            Logger.e(TAG, "Checking for Messaging availability failed", error)
+            dialogController.showUnexpectedErrorDialog()
+        }
+
+        result.onSuccess { isMessagingAvailable ->
+            if (!isMessagingAvailable && manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging) {
+                Logger.d(TAG, "Messaging is unavailable")
+                emitViewState { chatState.setSecureMessagingUnavailable() }
+            } else {
+                Logger.d(TAG, "Messaging is available")
+                emitViewState { chatState.setSecureMessagingAvailable() }
+            }
+        }
     }
 
     private fun prepareChatComponents() {
-        addFileAttachmentsObserverUseCase.execute(fileAttachmentObserver)
+        disposable.add(
+            addFileAttachmentsObserverUseCase().subscribe(fileAttachmentCallback)
+        )
         minimizeHandler.addListener { minimizeView() }
         timerStatusListener?.also { callTimer.removeFormattedValueListener(it) }
         val newTimerListener = createNewTimerCallback()
@@ -279,7 +319,7 @@ internal class ChatController(
     }
 
     override fun onEngagementConfirmationDialogRequested() {
-        if (isQueueingOrEngagementUseCase()) return
+        if (isQueueingOrLiveEngagementUseCase()) return
         view?.showEngagementConfirmationDialog()
     }
 
@@ -302,14 +342,12 @@ internal class ChatController(
 
     override fun onLiveObservationDialogRejected() {
         Logger.d(TAG, "onLiveObservationDialogRejected")
-        stop()
+        endChat()
         dialogController.dismissDialogs()
     }
 
     private fun enqueueForEngagement() {
-        requestNotificationPermissionIfPushNotificationsSetUpUseCase {
-            enqueueForEngagementUseCase(queueIds = chatState.queueIds, visitorContextAssetId = chatState.visitorContextAssetId)
-        }
+        requestNotificationPermissionIfPushNotificationsSetUpUseCase(enqueueForEngagementUseCase::invoke)
     }
 
     @Synchronized
@@ -324,7 +362,6 @@ internal class ChatController(
 
     override fun onDestroy(retain: Boolean) {
         Logger.d(TAG, "onDestroy, retain:$retain")
-        dialogController.dismissMessageCenterUnavailableDialog()
 
         // view is accessed from multiple threads
         // and must be protected from race condition
@@ -335,7 +372,6 @@ internal class ChatController(
             timerStatusListener = null
             callTimer.clear()
             minimizeHandler.clear()
-            removeFileAttachmentObserverUseCase(fileAttachmentObserver)
             chatManager.reset()
         }
     }
@@ -345,6 +381,7 @@ internal class ChatController(
     }
 
     override fun onPause() {
+        setChatScreenOpenUseCase(false)
         mediaUpgradeDisposable.clear()
         isChatViewPaused = true
         messagesNotSeenHandler.onChatWentBackground()
@@ -447,19 +484,19 @@ internal class ChatController(
 
     override fun noMoreOperatorsAvailableDismissed() {
         Logger.d(TAG, "noMoreOperatorsAvailableDismissed")
-        stop()
+        endChat()
         dialogController.dismissCurrentDialog()
     }
 
     override fun unexpectedErrorDialogDismissed() {
         Logger.d(TAG, "unexpectedErrorDialogDismissed")
-        stop()
+        endChat()
         dialogController.dismissCurrentDialog()
     }
 
     override fun endEngagementDialogYesClicked() {
         Logger.d(TAG, "endEngagementDialogYesClicked")
-        stop()
+        endChat()
         dialogController.dismissDialogs()
     }
 
@@ -511,6 +548,7 @@ internal class ChatController(
     }
 
     private fun onResumeSetup() {
+        setChatScreenOpenUseCase(true)
         subscribeToMediaUpgradeEvents()
         isChatViewPaused = false
         messagesNotSeenHandler.callChatButtonClicked()
@@ -543,12 +581,19 @@ internal class ChatController(
             State.StartedOmniCore -> newEngagementLoaded()
             is State.Update -> handleEngagementStateUpdate(state.updateState)
             is State.PreQueuing, is State.Queuing -> queueForEngagementStarted()
-            is State.QueueUnstaffed, is State.UnexpectedErrorHappened, is State.QueueingCanceled -> emitViewState { chatState.stop() }
+            is State.QueueUnstaffed, is State.UnexpectedErrorHappened, is State.QueueingCanceled -> emitViewState { chatState.chatUnavailableState() }
+            State.TransferredToSecureConversation -> onTransferredToSecureConversation()
 
             else -> {
                 // no op
             }
         }
+    }
+
+    private fun onTransferredToSecureConversation() {
+        emitViewState { chatState.setSecureMessagingState().setSecureMessagingAvailable() }
+        ensureSecureMessagingAvailable()
+        observeTopBannerUseCase()
     }
 
     private fun handleEngagementStateUpdate(state: EngagementUpdateState) {
@@ -604,14 +649,14 @@ internal class ChatController(
     private fun error(error: String) {
         Logger.e(TAG, error)
         dialogController.showUnexpectedErrorDialog()
-        emitViewState { chatState.stop() }
+        emitViewState { chatState.chatUnavailableState() }
     }
 
     private fun viewInitPreQueueing() {
         if (isQueueingOrOngoingEngagement) return
 
         Logger.d(TAG, "viewInitPreQueueing")
-        chatManager.onChatAction(ChatManager.Action.QueuingStarted(chatState.companyName.orEmpty()))
+        chatManager.onChatAction(ChatManager.Action.QueuingStarted)
         confirmationDialogUseCase { shouldShow ->
             if (shouldShow) {
                 dialogController.showEngagementConfirmationDialog()
@@ -632,28 +677,24 @@ internal class ChatController(
 
     private fun operatorConnected(formattedOperatorName: String, profileImgUrl: String?) {
         chatManager.onChatAction(
-            ChatManager.Action.OperatorConnected(
-                chatState.companyName.orEmpty(), formattedOperatorName, profileImgUrl
-            )
+            ChatManager.Action.OperatorConnected(formattedOperatorName, profileImgUrl)
         )
         emitViewState { chatState.operatorConnected(formattedOperatorName, profileImgUrl).setLiveChatState() }
     }
 
     private fun operatorChanged(formattedOperatorName: String, profileImgUrl: String?) {
         chatManager.onChatAction(
-            ChatManager.Action.OperatorJoined(
-                chatState.companyName.orEmpty(), formattedOperatorName, profileImgUrl
-            )
+            ChatManager.Action.OperatorJoined(formattedOperatorName, profileImgUrl)
         )
-        emitViewState { chatState.operatorConnected(formattedOperatorName, profileImgUrl) }
+        emitViewState { chatState.operatorConnected(formattedOperatorName, profileImgUrl).setLiveChatState() }
     }
 
-    private fun stop() {
+    private fun endChat() {
         Logger.d(TAG, "Stop, engagement ended")
         endEngagementUseCase()
         chatManager.reset()
         mediaUpgradeDisposable.clear()
-        emitViewState { chatState.stop() }
+        emitViewState { chatState.chatUnavailableState() }
     }
 
     private fun addQuickReplyButtons(options: List<GvaButton>) {
@@ -748,18 +789,22 @@ internal class ChatController(
     private fun onHistoryLoaded(hasHistory: Boolean) {
         Logger.d(TAG, "historyLoaded")
 
+        val isSecureEngagement = manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging
+
         if (!hasHistory) {
             if (!isSecureEngagement && !isQueueingOrOngoingEngagement) {
                 viewInitPreQueueing()
             } else {
-                Logger.d(TAG, "Opened empty Secure Conversations chat")
+                Logger.d(TAG, "Opened empty Secure Messaging chat")
             }
         }
 
         when {
-            isSecureEngagement -> emitViewState { chatState.setSecureMessagingState() }
-            isQueueingOrEngagementUseCase.hasOngoingEngagement -> emitViewState { chatState.engagementStarted() }
-            else -> emitViewState { chatState.historyLoaded() }
+            isSecureEngagement -> { /* to prevent calling chatState.liveChatHistoryLoaded() */
+            }
+
+            isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement -> emitViewState { chatState.engagementStarted() }
+            else -> emitViewState { chatState.liveChatHistoryLoaded() }
         }
 
         prepareChatComponents()
@@ -807,7 +852,7 @@ internal class ChatController(
     }
 
     private fun onAttachmentReceived(file: LocalAttachment) {
-        addFileToAttachmentAndUploadUseCase.execute(file, object : AddFileToAttachmentAndUploadUseCase.Listener {
+        addFileToAttachmentAndUploadUseCase(file, object : AddFileToAttachmentAndUploadUseCase.Listener {
             override fun onFinished() {
                 Logger.d(TAG, "fileUploadFinished")
                 //We need this file locally, so clearing only file uri reference
@@ -906,5 +951,39 @@ internal class ChatController(
 
     override fun onContentChosen(uri: Uri) {
         uriToFileAttachmentUseCase(uri)?.also(::onAttachmentReceived)
+    }
+
+    override fun leaveCurrentConversationDialogLeaveClicked(action: LeaveDialogAction) {
+        dialogController.dismissCurrentDialog()
+
+        when (action) {
+            LeaveDialogAction.LIVE_CHAT -> leaveCurrentConversationAndStartEnqueueing()
+            LeaveDialogAction.VIDEO -> view?.launchCall(Engagement.MediaType.VIDEO)
+            LeaveDialogAction.AUDIO -> view?.launchCall(Engagement.MediaType.AUDIO)
+        }
+
+        setLeaveSecureConversationDialogVisibleUseCase(false)
+    }
+
+    override fun onScTopBannerItemClicked(itemType: EntryWidgetContract.ItemType) {
+        when (itemType) {
+            EntryWidgetContract.ItemType.AudioCall -> dialogController.showLeaveCurrentConversationDialog(LeaveDialogAction.AUDIO)
+            EntryWidgetContract.ItemType.Chat -> dialogController.showLeaveCurrentConversationDialog(LeaveDialogAction.LIVE_CHAT)
+            EntryWidgetContract.ItemType.VideoCall -> dialogController.showLeaveCurrentConversationDialog(LeaveDialogAction.VIDEO)
+            else -> {
+                /*no op*/
+            }
+        }
+    }
+
+    private fun leaveCurrentConversationAndStartEnqueueing() {
+        manageSecureMessagingStatusUseCase.updateSecureMessagingStatus(false)
+        emitViewState { chatState.setLiveChatState() }
+        viewInitPreQueueing()
+    }
+
+    override fun leaveCurrentConversationDialogStayClicked() {
+        dialogController.dismissCurrentDialog()
+        setLeaveSecureConversationDialogVisibleUseCase(false)
     }
 }

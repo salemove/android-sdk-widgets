@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.os.Build
 import android.text.Html
 import android.text.Spanned
 import android.text.format.DateUtils
@@ -21,15 +22,16 @@ import com.glia.androidsdk.comms.MediaDirection
 import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.androidsdk.queuing.Queue
+import com.glia.androidsdk.queuing.QueueState
 import com.glia.widgets.UiTheme
-import com.glia.widgets.di.Dependencies
-import com.glia.widgets.view.unifiedui.merge
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.functions.Action
 import io.reactivex.rxjava3.processors.FlowableProcessor
+import java.io.File
+import kotlin.io.path.createTempFile
 import kotlin.jvm.optionals.getOrNull
 
 internal fun Drawable.setTintCompat(@ColorInt color: Int) = DrawableCompat.setTint(this, color)
@@ -41,6 +43,18 @@ internal fun ColorStateList?.colorForState(state: IntArray): Int? = this?.getCol
 internal fun String.separateStringWithSymbol(symbol: String): String = asSequence().joinToString(symbol)
 
 internal fun Queue.supportMessaging() = state.medias.contains(MediaType.MESSAGING)
+
+internal fun Queue.supportedMediaTypes(): List<MediaType>? = state.run {
+    when {
+        status == QueueState.Status.OPEN -> medias.filterNot { it == MediaType.PHONE || it == MediaType.UNKNOWN }.takeIf { it.isNotEmpty() }
+        status == QueueState.Status.FULL && medias.contains(MediaType.MESSAGING) -> listOf(MediaType.MESSAGING)
+        status == QueueState.Status.UNSTAFFED && medias.contains(MediaType.MESSAGING) -> listOf(MediaType.MESSAGING)
+        else -> null
+    }
+}
+
+internal val List<Queue>.mediaTypes: List<MediaType>
+    get() = this.mapNotNull { it.supportedMediaTypes() }.flatten().distinct()
 
 internal fun MediaType.isAudioOrVideo() = this == MediaType.AUDIO || this == MediaType.VIDEO
 
@@ -55,11 +69,6 @@ internal val Operator.formattedName: String get() = name.substringBefore(' ')
 internal val Operator.imageUrl: String? get() = picture?.url?.getOrNull()
 
 internal fun UiTheme?.isAlertDialogButtonUseVerticalAlignment(): Boolean = this?.gliaAlertDialogButtonUseVerticalAlignment ?: false
-
-internal fun UiTheme?.getFullHybridTheme(newTheme: UiTheme?): UiTheme = merge(newTheme) ?: UiTheme.UiThemeBuilder().build()
-
-internal val UiTheme?.withConfigurationTheme: UiTheme
-    get() = getFullHybridTheme(Dependencies.sdkConfigurationManager.uiTheme)
 
 /**
  * Returns styled text from the provided HTML string. Replaces \n to <br> regardless of the operating system where the string was created.
@@ -105,3 +114,10 @@ internal fun <T : Any> FlowableProcessor<T>.asOneTimeStateFlowable(): Flowable<O
 internal fun Uri.exists(context: Context): Boolean = context.contentResolver.query(this, null, null, null, null)?.use {
     it.moveToFirst()
 } ?: false
+
+internal fun createTempFileCompat(prefix: String, suffix: String? = null, directory: File? = null): File =
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        createTempFile(directory?.toPath(), prefix, suffix).toFile()
+    } else {
+        File.createTempFile(prefix, suffix, directory)
+    }

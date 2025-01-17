@@ -6,30 +6,30 @@ import com.google.gson.annotations.SerializedName
 
 internal data class GlobalColorsConfig(
     @SerializedName("baseDark")
-    val baseDarkColorConfig: ColorRemoteConfig?,
+    val darkColorConfig: ColorRemoteConfig?,
     @SerializedName("baseLight")
-    val baseLightColorConfig: ColorRemoteConfig?,
+    val lightColorConfig: ColorRemoteConfig?,
     @SerializedName("baseNeutral")
-    val baseNeutralColorConfig: ColorRemoteConfig?,
+    val neutralColorConfig: ColorRemoteConfig?,
     @SerializedName("baseNormal")
-    val baseNormalColorConfig: ColorRemoteConfig?,
+    val normalColorConfig: ColorRemoteConfig?,
     @SerializedName("baseShade")
-    val baseShadeColorConfig: ColorRemoteConfig?,
+    val shadeColorConfig: ColorRemoteConfig?,
     @SerializedName("primary")
     val primaryColorConfig: ColorRemoteConfig?,
     @SerializedName("secondary")
     val secondaryColorConfig: ColorRemoteConfig?,
     @SerializedName("systemNegative")
-    val systemNegativeColorConfig: ColorRemoteConfig?
+    val negativeColorConfig: ColorRemoteConfig?
 ) {
     fun toColorPallet(): ColorPallet = ColorPallet(
-        baseDarkColorTheme = baseDarkColorConfig?.toColorTheme(),
-        baseLightColorTheme = baseLightColorConfig?.toColorTheme(),
-        baseNeutralColorTheme = baseNeutralColorConfig?.toColorTheme(),
-        baseNormalColorTheme = baseNormalColorConfig?.toColorTheme(),
-        baseShadeColorTheme = baseShadeColorConfig?.toColorTheme(),
+        darkColorTheme = darkColorConfig?.toColorTheme(),
+        lightColorTheme = lightColorConfig?.toColorTheme(),
+        neutralColorTheme = neutralColorConfig?.toColorTheme(),
+        normalColorTheme = normalColorConfig?.toColorTheme(),
+        shadeColorTheme = shadeColorConfig?.toColorTheme(),
         primaryColorTheme = primaryColorConfig?.toColorTheme(),
         secondaryColorTheme = secondaryColorConfig?.toColorTheme(),
-        systemNegativeColorTheme = systemNegativeColorConfig?.toColorTheme()
+        negativeColorTheme = negativeColorConfig?.toColorTheme()
     )
 }

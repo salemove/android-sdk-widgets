@@ -13,7 +13,6 @@ data class StringKeyPair(val key: StringKey, val value: String): Parcelable {
         deprecatedStringKeyPair.value
     )
 }
-
 /**
  * @hide
  */

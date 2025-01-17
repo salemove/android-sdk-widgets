@@ -31,13 +31,17 @@ internal interface EngagementRepository {
     val visitorCameraState: Flowable<VisitorCamera>
 
     val currentOperatorValue: Operator?
-    val isQueueingOrEngagement: Boolean
-    val hasOngoingEngagement: Boolean
+    val isQueueingOrLiveEngagement: Boolean
+    val hasOngoingLiveEngagement: Boolean
+    val isTransferredSecureConversation: Boolean
     val isQueueing: Boolean
     val isQueueingForMedia: Boolean
+    val isQueueingForVideo: Boolean
+    val isQueueingForAudio: Boolean
     val isCallVisualizerEngagement: Boolean
     val isOperatorPresent: Boolean
     val isSharingScreen: Boolean
+    val isSecureMessagingRequested: Boolean
     val cameras: List<CameraDevice>?
     val currentVisitorCamera: VisitorCamera
 
@@ -45,7 +49,7 @@ internal interface EngagementRepository {
     fun reset()
     fun resetQueueing()
     fun endEngagement(silently: Boolean)
-    fun queueForEngagement(queueIds: List<String>, mediaType: MediaType, visitorContextAssetId: String?)
+    fun queueForEngagement(mediaType: MediaType)
     fun cancelQueuing()
     fun acceptCurrentEngagementRequest(visitorContextAssetId: String)
     fun declineCurrentEngagementRequest()
@@ -62,4 +66,5 @@ internal interface EngagementRepository {
     fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?)
     fun onActivityResultSkipScreenSharingPermissionRequest(resultCode: Int, intent: Intent?)
     fun onReadyToShareScreen()
+    fun updateIsSecureMessagingRequested(isSecureMessagingRequested: Boolean)
 }

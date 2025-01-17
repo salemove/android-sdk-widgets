@@ -17,7 +17,6 @@ import androidx.core.view.isVisible
 import com.glia.widgets.Constants
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
-import com.glia.widgets.core.configuration.EngagementConfiguration
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.fileupload.model.LocalAttachment
@@ -108,7 +107,7 @@ internal class MessageCenterView(
         SimpleWindowInsetsAndAnimationHandler(this, appBar) { onKeyboardAnimation(it) }
 
         controller?.ensureMessageCenterAvailability()
-        setupAppBarUnifiedTheme(unifiedTheme?.secureConversationsWelcomeScreenTheme?.headerTheme)
+        setupAppBarUnifiedTheme(unifiedTheme?.secureMessagingWelcomeScreenTheme?.headerTheme)
         appBar?.hideBackButton()
         appBar?.setTitle(LocaleString(R.string.engagement_secure_messaging_title))
         initCallbacks()
@@ -157,10 +156,6 @@ internal class MessageCenterView(
         }
     }
 
-    fun setConfiguration(configuration: EngagementConfiguration?) {
-        controller?.setConfiguration(theme, configuration)
-    }
-
     private fun showUnAuthenticatedDialog() {
         showDialog {
             Dialogs.showUnAuthenticatedDialog(context, theme) {
@@ -205,14 +200,14 @@ internal class MessageCenterView(
     }
 
     private fun showConfirmationAppBar() {
-        val primaryColorId = theme.brandPrimaryColor ?: R.color.glia_brand_primary_color
-        val baseLightColorId = theme.baseLightColor ?: R.color.glia_base_light_color
+        val primaryColorId = theme.brandPrimaryColor ?: R.color.glia_primary_color
+        val baseLightColorId = theme.baseLightColor ?: R.color.glia_light_color
 
         val appBarTheme = DefaultHeader(
             ColorTheme(getColorCompat(primaryColorId)),
             ColorTheme(getColorCompat(baseLightColorId)),
             null
-        ) merge unifiedTheme?.secureConversationsConfirmationScreenTheme?.headerTheme
+        ) merge unifiedTheme?.secureMessagingConfirmationScreenTheme?.headerTheme
 
         appBar?.resetTheme()
         setupAppBarUnifiedTheme(appBarTheme)
@@ -233,6 +228,10 @@ internal class MessageCenterView(
 
     override fun navigateToMessaging() {
         this.onNavigateToMessagingListener?.navigateToMessaging()
+    }
+
+    override fun returnToLiveChat() {
+        this.onNavigateToMessagingListener?.returnToLiveChat()
     }
 
     override fun onStateUpdated(state: MessageCenterState) {
@@ -301,6 +300,7 @@ internal class MessageCenterView(
 
     interface OnNavigateToMessagingListener {
         fun navigateToMessaging()
+        fun returnToLiveChat()
     }
 
     interface OnAttachFileListener {

@@ -30,8 +30,9 @@ import com.glia.widgets.chat.model.VisitorAttachmentItem
 import com.glia.widgets.chat.model.VisitorChatItem
 import com.glia.widgets.core.engagement.domain.model.ChatHistoryResponse
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
+import com.glia.widgets.core.secureconversations.domain.HasOngoingSecureConversationUseCase
 import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDelayUseCase
-import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
+import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.isValid
@@ -53,8 +54,10 @@ internal class ChatManager(
     private val sendUnsentMessagesUseCase: SendUnsentMessagesUseCase,
     private val handleCustomCardClickUseCase: HandleCustomCardClickUseCase,
     private val isAuthenticatedUseCase: IsAuthenticatedUseCase,
-    private val isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase,
+    private val hasOngoingSecureConversationUseCase: HasOngoingSecureConversationUseCase,
+    private val isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase,
     private val compositeDisposable: CompositeDisposable = CompositeDisposable(),
+    private val markMessagesReadDisposable: CompositeDisposable = CompositeDisposable(),
     private val state: BehaviorProcessor<State> = BehaviorProcessor.createDefault(State()),
     private val quickReplies: BehaviorProcessor<List<GvaButton>> = BehaviorProcessor.create(),
     private val action: BehaviorProcessor<Action> = BehaviorProcessor.create(),
@@ -65,6 +68,7 @@ internal class ChatManager(
         onQuickReplyReceived: (List<GvaButton>) -> Unit,
         onOperatorMessageReceived: (count: Int) -> Unit
     ): Flowable<List<ChatItem>> {
+        compositeDisposable.clear()
         subscribe(onHistoryLoaded, onOperatorMessageReceived, onQuickReplyReceived)
         return state
             .doOnNext(::updateQuickReplies)
@@ -89,6 +93,7 @@ internal class ChatManager(
         state.onNext(State())
         quickReplies.onNext(emptyList())
         compositeDisposable.clear()
+        markMessagesReadDisposable.clear()
         action.onNext(Action.None)
         historyLoaded.onNext(false)
     }
@@ -107,7 +112,7 @@ internal class ChatManager(
 
     @VisibleForTesting
     fun loadHistory(onHistoryLoaded: (hasHistory: Boolean) -> Unit): Flowable<State> {
-        val historyEvent = if (isAuthenticatedUseCase() || isQueueingOrEngagementUseCase.hasOngoingEngagement) {
+        val historyEvent = if (isAuthenticatedUseCase() || isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement) {
             loadHistoryUseCase()
                 .doOnSuccess { historyLoaded.onNext(true) }
                 .zipWith(state.firstOrError(), ::mapChatHistory)
@@ -194,6 +199,10 @@ internal class ChatManager(
             appendNewChatMessageUseCase(messagesState, chatMessage)
             if (chatMessage.chatMessage is VisitorMessage) {
                 checkUnsentMessages(messagesState)
+            } else {
+                hasOngoingSecureConversationUseCase(onHasOngoingSecureConversation = {
+                    markMessagesRead()
+                })
             }
         }
 
@@ -203,7 +212,7 @@ internal class ChatManager(
     @VisibleForTesting
     fun mapAction(action: Action, state: State): State {
         return when (action) {
-            is Action.QueuingStarted -> mapInQueue(action.companyName, state)
+            Action.QueuingStarted -> mapInQueue(state)
             is Action.OperatorConnected -> mapOperatorConnected(action, state)
             Action.Transferring -> mapTransferring(state)
             is Action.OperatorJoined -> mapOperatorJoined(action, state)
@@ -371,7 +380,7 @@ internal class ChatManager(
     fun mapOperatorJoined(action: Action.OperatorJoined, state: State): State = state.apply {
         chatItems -= OperatorStatusItem.Transferring
         chatItems += action.run {
-            OperatorStatusItem.Joined(companyName, operatorFormattedName, operatorImageUrl)
+            OperatorStatusItem.Joined(operatorFormattedName, operatorImageUrl)
         }
     }
 
@@ -390,7 +399,7 @@ internal class ChatManager(
 
     @VisibleForTesting
     fun mapOperatorConnected(action: Action.OperatorConnected, state: State): State {
-        val operatorStatusItem = action.run { OperatorStatusItem.Connected(companyName, operatorFormattedName, operatorImageUrl) }
+        val operatorStatusItem = action.run { OperatorStatusItem.Connected(operatorFormattedName, operatorImageUrl) }
         val oldOperatorStatusItem: OperatorStatusItem? = state.operatorStatusItem
         state.operatorStatusItem = operatorStatusItem
 
@@ -420,11 +429,21 @@ internal class ChatManager(
     }
 
     @VisibleForTesting
-    fun mapInQueue(companyName: String, state: State): State = state.apply {
-        OperatorStatusItem.InQueue(companyName).also {
+    fun mapInQueue(state: State): State = state.apply {
+        OperatorStatusItem.InQueue.also {
             operatorStatusItem = it
-            chatItems += it
+            val isQueueingItemAlreadyDisplayed = chatItems.size > 0 && chatItems[chatItems.lastIndex] == it
+            if (!isQueueingItemAlreadyDisplayed) chatItems += it
         }
+    }
+
+    @VisibleForTesting
+    fun markMessagesRead() {
+        val disposable = markMessagesReadWithDelayUseCase(delay = 0)
+            .andThen(state.firstOrError())
+            .map(::removeNewMessagesDivider)
+            .subscribe(state::onNext, Throwable::printStackTrace)
+        markMessagesReadDisposable.add(disposable)
     }
 
     @VisibleForTesting
@@ -433,7 +452,7 @@ internal class ChatManager(
             .andThen(state.firstOrError())
             .map(::removeNewMessagesDivider)
             .subscribe(state::onNext, Throwable::printStackTrace)
-        compositeDisposable.add(disposable)
+        markMessagesReadDisposable.add(disposable)
     }
 
     @VisibleForTesting
@@ -476,18 +495,18 @@ internal class ChatManager(
     }
 
     internal sealed interface Action {
-        data class QueuingStarted(val companyName: String) : Action
-        data class OperatorConnected(val companyName: String, val operatorFormattedName: String, val operatorImageUrl: String?) : Action
-        object Transferring : Action
-        data class OperatorJoined(val companyName: String, val operatorFormattedName: String, val operatorImageUrl: String?) : Action
+        data object QueuingStarted : Action
+        data class OperatorConnected(val operatorFormattedName: String, val operatorImageUrl: String?) : Action
+        data object Transferring : Action
+        data class OperatorJoined(val operatorFormattedName: String, val operatorImageUrl: String?) : Action
         data class ResponseCardClicked(val responseCard: OperatorMessageItem.ResponseCard) : Action
         data class OnMediaUpgradeStarted(val isVideo: Boolean) : Action
         data class OnMediaUpgradeTimerUpdated(val formattedValue: String) : Action
-        object OnMediaUpgradeToVideo : Action
-        object OnMediaUpgradeCanceled : Action
+        data object OnMediaUpgradeToVideo : Action
+        data object OnMediaUpgradeCanceled : Action
         data class CustomCardClicked(val customCard: CustomCardChatItem, val attachment: SingleChoiceAttachment) : Action
-        object ChatRestored : Action
-        object None : Action
+        data object ChatRestored : Action
+        data object None : Action
         data class MessagePreviewAdded(val visitorChatItem: VisitorChatItem, val payload: SendMessagePayload) : Action
         data class AttachmentPreviewAdded(val attachments: List<VisitorAttachmentItem>, val payload: SendMessagePayload?) : Action
         data class OnMessageSent(val message: VisitorMessage) : Action

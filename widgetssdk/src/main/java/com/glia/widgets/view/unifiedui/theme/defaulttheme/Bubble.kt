@@ -28,9 +28,9 @@ internal fun BubbleTheme(pallet: ColorPallet): BubbleTheme? =
  * Default theme for User image
  */
 internal fun UserImageTheme(pallet: ColorPallet): UserImageTheme? = pallet.run {
-    composeIfAtLeastOneNotNull(primaryColorTheme, baseLightColorTheme) {
+    composeIfAtLeastOneNotNull(primaryColorTheme, lightColorTheme) {
         UserImageTheme(
-            placeholderColor = baseLightColorTheme,
+            placeholderColor = lightColorTheme,
             placeholderBackgroundColor = primaryColorTheme,
             imageBackgroundColor = primaryColorTheme
         )
@@ -41,9 +41,9 @@ internal fun UserImageTheme(pallet: ColorPallet): UserImageTheme? = pallet.run {
  * Default theme for Badge
  */
 internal fun BadgeTheme(pallet: ColorPallet): BadgeTheme? = pallet.run {
-    composeIfAtLeastOneNotNull(baseNormalColorTheme, primaryColorTheme) {
+    composeIfAtLeastOneNotNull(normalColorTheme, primaryColorTheme) {
         BadgeTheme(
-            textColor = baseNormalColorTheme,
+            textColor = normalColorTheme,
             background = LayerTheme(fill = primaryColorTheme)
 
         )

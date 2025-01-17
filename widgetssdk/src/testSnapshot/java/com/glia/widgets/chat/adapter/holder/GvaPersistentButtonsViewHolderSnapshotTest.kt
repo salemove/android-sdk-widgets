@@ -11,7 +11,7 @@ import com.glia.widgets.snapshotutils.SnapshotProviders
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import org.junit.Test
 
-class GvaPersistentButtonsViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, SnapshotProviders {
+internal class GvaPersistentButtonsViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, SnapshotProviders {
 
     private fun gvaPersistentButtons(showChatHead: Boolean = false) = GvaPersistentButtons(
         content = gvaLongSubtitle(),
@@ -26,16 +26,6 @@ class GvaPersistentButtonsViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, 
         snapshot(
             setupView(
                 gvaPersistentButtons()
-            ).viewHolder.itemView
-        )
-    }
-
-    @Test
-    fun withoutChatHeadWithUiTheme() {
-        snapshot(
-            setupView(
-                gvaPersistentButtons(),
-                uiTheme = uiTheme()
             ).viewHolder.itemView
         )
     }
@@ -79,18 +69,6 @@ class GvaPersistentButtonsViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, 
                 gvaPersistentButtons(
                     showChatHead = true
                 )
-            ).viewHolder.itemView
-        )
-    }
-
-    @Test
-    fun withChatHeadWithUiTheme() {
-        snapshot(
-            setupView(
-                gvaPersistentButtons(
-                    showChatHead = true
-                ),
-                uiTheme = uiTheme()
             ).viewHolder.itemView
         )
     }
@@ -141,11 +119,8 @@ class GvaPersistentButtonsViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, 
 
     private fun setupView(
         card: GvaPersistentButtons,
-        unifiedTheme: UnifiedTheme? = null,
-        uiTheme: UiTheme = UiTheme()
+        unifiedTheme: UnifiedTheme? = null
     ): ViewData {
-        localeProviderMock()
-
         val chatOperatorMessageLayoutBinding = ChatOperatorMessageLayoutBinding.inflate(layoutInflater)
         val gvaPersistentButtonsContentBinding = ChatGvaPersistentButtonsContentBinding.inflate(
             layoutInflater,
@@ -156,7 +131,7 @@ class GvaPersistentButtonsViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, 
             chatOperatorMessageLayoutBinding,
             gvaPersistentButtonsContentBinding,
             {},
-            uiTheme,
+            UiTheme(),
             unifiedTheme
         )
 

@@ -12,24 +12,13 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(
 
     // MARK: Init call
 
-    private fun initCallState() = callState()
-        .initCall(requestedMediaType = Engagement.MediaType.VIDEO)
+    private fun initCallState() = callState().initCall(requestedMediaType = Engagement.MediaType.VIDEO)
 
     @Test
     fun initCall() {
         snapshot(
             setupView(
                 callState = initCallState()
-            ).root
-        )
-    }
-
-    @Test
-    fun initCallWithUiTheme() {
-        snapshot(
-            setupView(
-                callState = initCallState(),
-                uiTheme = uiTheme()
             ).root
         )
     }
@@ -74,16 +63,6 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(
         snapshot(
             setupView(
                 callState = operatorConnectedState()
-            ).root
-        )
-    }
-
-    @Test
-    fun operatorConnectedWithUiTheme() {
-        snapshot(
-            setupView(
-                callState = operatorConnectedState(),
-                uiTheme = uiTheme()
             ).root
         )
     }
@@ -137,16 +116,6 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(
     }
 
     @Test
-    fun video1WayCallStartedWithUiTheme() {
-        snapshot(
-            setupView(
-                callState = video1WayCallStartedState(),
-                uiTheme = uiTheme()
-            ).root
-        )
-    }
-
-    @Test
     fun video1WayCallStartedWithGlobalColors() {
         snapshot(
             setupView(
@@ -190,16 +159,6 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(
         snapshot(
             setupView(
                 callState = video2WayCallStartedState()
-            ).root
-        )
-    }
-
-    @Test
-    fun video2WayCallStartedWithUiTheme() {
-        snapshot(
-            setupView(
-                callState = video2WayCallStartedState(),
-                uiTheme = uiTheme()
             ).root
         )
     }
@@ -255,16 +214,6 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(
     }
 
     @Test
-    fun video2WayWithFlipButtonWithUiTheme() {
-        snapshot(
-            setupView(
-                callState = video2WayWithFlipButtonState(),
-                uiTheme = uiTheme()
-            ).root
-        )
-    }
-
-    @Test
     fun video2WayWithFlipButtonWithGlobalColors() {
         snapshot(
             setupView(
@@ -304,16 +253,6 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(
         snapshot(
             setupView(
                 callState = onHoldState()
-            ).root
-        )
-    }
-
-    @Test
-    fun onHoldWithUiTheme() {
-        snapshot(
-            setupView(
-                callState = onHoldState(),
-                uiTheme = uiTheme()
             ).root
         )
     }

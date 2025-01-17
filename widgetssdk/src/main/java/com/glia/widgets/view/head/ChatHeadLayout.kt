@@ -8,11 +8,8 @@ import androidx.core.util.Pair
 import androidx.core.view.ViewCompat
 import com.glia.widgets.Constants
 import com.glia.widgets.R
-import com.glia.widgets.UiTheme
-import com.glia.widgets.core.configuration.EngagementConfiguration
 import com.glia.widgets.databinding.ChatHeadLayoutBinding
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.helper.Utils
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.wrapWithMaterialThemeOverlay
 import com.glia.widgets.view.ViewHelpers
@@ -33,11 +30,11 @@ internal class ChatHeadLayout @JvmOverloads constructor(
     private var chatHeadController: ChatHeadLayoutContract.Controller by Delegates.notNull()
 
     private var navigationCallback: NavigationCallback? = null
-    private var chatHeadClickedListener: OnChatHeadClickedListener? = null
-    private var uiTheme: UiTheme by Delegates.notNull()
 
-    private val chatHeadViewPosition: Pair<Int?, Int?>
+    private val _chatHeadViewPosition: Pair<Int?, Int?>
         get() = Pair(chatHeadView.x.roundToInt(), chatHeadView.y.roundToInt())
+
+    val position: Pair<Int?, Int?> get() = _chatHeadViewPosition
 
     private val chatHeadSize: Float by lazy { resources.getDimension(R.dimen.glia_chat_head_size) }
     private val chatHeadMargin: Float by lazy { resources.getDimension(R.dimen.glia_chat_head_content_padding) }
@@ -49,7 +46,7 @@ internal class ChatHeadLayout @JvmOverloads constructor(
     private val chatHeadView: ChatHeadView by lazy { binding.chatHeadView }
 
     init {
-        init(attrs, defStyleAttr, defStyleRes)
+        initialize()
     }
 
     override fun showOperatorImage(operatorImgUrl: String) {
@@ -134,16 +131,6 @@ internal class ChatHeadLayout @JvmOverloads constructor(
     }
 
     /**
-     * Method for the integrator to override if they want to do custom logic when the chat head is
-     * clicked.
-     *
-     * @param listener
-     */
-    fun setOnChatHeadClickedListener(listener: OnChatHeadClickedListener) {
-        chatHeadClickedListener = listener
-    }
-
-    /**
      * Method that allows integrator to override navigation on click with using own paths
      *
      *
@@ -155,11 +142,10 @@ internal class ChatHeadLayout @JvmOverloads constructor(
         navigationCallback = callback
     }
 
-    private fun init(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
+    private fun initialize() {
         visibility = GONE
         initConfigurations()
         setupViewActions()
-        readTypedArray(attrs, defStyleAttr, defStyleRes)
         setController(Dependencies.controllerFactory.chatHeadLayoutController)
         chatHeadController.setView(this)
     }
@@ -174,30 +160,10 @@ internal class ChatHeadLayout @JvmOverloads constructor(
     private fun setupViewActions() {
         chatHeadView.setOnTouchListener(
             ViewHelpers.OnTouchListener(
-                { chatHeadViewPosition },
+                { _chatHeadViewPosition },
                 ::onChatHeadDragged
             ) { onChatHeadClicked() }
         )
-    }
-
-    private fun readTypedArray(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
-        @SuppressLint("CustomViewStyleable")
-        val typedArray =
-            context.obtainStyledAttributes(attrs, R.styleable.GliaView, defStyleAttr, defStyleRes)
-        setBuildTimeTheme(Utils.getThemeFromTypedArray(typedArray, context))
-        typedArray.recycle()
-    }
-
-    private fun setBuildTimeTheme(theme: UiTheme) {
-        uiTheme = theme
-        updateChatHeadConfiguration(uiTheme)
-    }
-
-    private fun updateChatHeadConfiguration(
-        buildTimeTheme: UiTheme,
-        engagementConfiguration: EngagementConfiguration? = null
-    ) {
-        chatHeadView.updateConfiguration(buildTimeTheme, engagementConfiguration)
     }
 
     private fun onChatHeadDragged(x: Float, y: Float) {
@@ -206,22 +172,12 @@ internal class ChatHeadLayout @JvmOverloads constructor(
         chatHeadView.invalidate()
     }
 
-    private fun onChatHeadClicked() {
-        chatHeadClickedListener?.onClicked(null) ?: chatHeadController.onChatHeadClicked()
-    }
-
-    fun getPosition(): Pair<Int?, Int?> {
-        return chatHeadViewPosition
-    }
+    private fun onChatHeadClicked() = chatHeadController.onChatHeadClicked()
 
     fun setPosition(x: Float, y: Float) {
         chatHeadView.x = x
         chatHeadView.y = y
         chatHeadView.invalidate()
-    }
-
-    fun interface OnChatHeadClickedListener {
-        fun onClicked(engagementConfiguration: EngagementConfiguration?)
     }
 
     interface NavigationCallback {

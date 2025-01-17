@@ -3,7 +3,7 @@ package com.glia.widgets.helper
 import android.app.Activity
 import com.glia.widgets.call.CallActivity
 import com.glia.widgets.chat.ChatActivity
-import com.glia.widgets.filepreview.ui.FilePreviewActivity
+import com.glia.widgets.filepreview.ui.ImagePreviewActivity
 import io.mockk.MockKAnnotations
 import io.mockk.confirmVerified
 import io.mockk.impl.annotations.MockK
@@ -20,7 +20,7 @@ class GliaActivityManagerTest {
     private lateinit var callActivity: CallActivity
 
     @MockK(relaxUnitFun = true)
-    private lateinit var filePreviewActivity: FilePreviewActivity
+    private lateinit var imagePreviewActivity: ImagePreviewActivity
 
     @MockK(relaxUnitFun = true)
     private lateinit var anotherActivity: Activity
@@ -59,34 +59,34 @@ class GliaActivityManagerTest {
     fun `onActivityDestroyed() removes activity from the list`() {
         managerTest.onActivityCreated(chatActivity)
         managerTest.onActivityCreated(callActivity)
-        managerTest.onActivityCreated(filePreviewActivity)
+        managerTest.onActivityCreated(imagePreviewActivity)
 
-        managerTest.onActivityDestroyed(filePreviewActivity)
+        managerTest.onActivityDestroyed(imagePreviewActivity)
 
         managerTest.finishActivities()
 
         verify { chatActivity.finish() }
         verify { callActivity.finish() }
-        verify(exactly = 0) { filePreviewActivity.finish() }
+        verify(exactly = 0) { imagePreviewActivity.finish() }
 
-        confirmVerified(chatActivity, callActivity, filePreviewActivity)
+        confirmVerified(chatActivity, callActivity, imagePreviewActivity)
     }
 
     @Test
     fun `finishActivity finishes activity when it is present in list`() {
         managerTest.onActivityCreated(chatActivity)
         managerTest.onActivityCreated(callActivity)
-        managerTest.onActivityCreated(filePreviewActivity)
+        managerTest.onActivityCreated(imagePreviewActivity)
         managerTest.onActivityCreated(anotherActivity)
 
-        managerTest.finishActivity(FilePreviewActivity::class)
+        managerTest.finishActivity(ImagePreviewActivity::class)
 
         verify(exactly = 0) { chatActivity.finish() }
         verify(exactly = 0) { callActivity.finish() }
         verify(exactly = 0) { anotherActivity.finish() }
-        verify { filePreviewActivity.finish() }
+        verify { imagePreviewActivity.finish() }
 
-        confirmVerified(chatActivity, callActivity, filePreviewActivity, anotherActivity)
+        confirmVerified(chatActivity, callActivity, imagePreviewActivity, anotherActivity)
     }
 
 }

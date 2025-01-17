@@ -32,6 +32,9 @@ internal data class AlertRemoteConfig(
     @SerializedName("negativeButton")
     val negativeButtonRemoteConfig: ButtonRemoteConfig?,
 
+    @SerializedName("negativeNeutralButton")
+    val negativeNeutralButtonRemoteConfig: ButtonRemoteConfig?,
+
     @SerializedName("buttonAxis")
     val buttonAxisRemoteConfig: AxisRemoteConfig?
 ) {
@@ -44,6 +47,7 @@ internal data class AlertRemoteConfig(
         linkButton = linkButtonRemoteConfig?.toButtonTheme(),
         positiveButton = positiveButtonRemoteConfig?.toButtonTheme(),
         negativeButton = negativeButtonRemoteConfig?.toButtonTheme(),
+        negativeNeutralButton = negativeNeutralButtonRemoteConfig?.toButtonTheme(),
         isVerticalAxis = buttonAxisRemoteConfig?.isVertical
     )
 }

@@ -11,7 +11,7 @@
     <!-- Must be included for dialog styling -->
     <style name="Application.Glia.Activity.Style" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- example usage of compile time styling -->
-        <!-- <item name="gliaChatStyle">@style/Theme.GliaAndroidSdkWidgetsExample.Chat</item> -->
+        <!--        <item name="gliaChatStyle">@style/Theme.GliaAndroidSdkWidgetsExample.Chat</item>-->
     </style>
 
     <style name="Theme.GliaAndroidSdkWidgetsExample.Chat" parent="Application.Glia.Chat">
@@ -29,7 +29,7 @@
         <item name="gliaBrandPrimaryColor">@color/color_pure_yellow</item>
         <item name="gliaVisitorCodeStyle">@style/TextAppearance.AppCompat</item>
         <item name="gliaAlertDialogButtonUseVerticalAlignment">true</item>
-        <item name="whiteLabel">false</item>
+        <item name="whiteLabel">true</item>
         <item name="gliaNewMessagesDividerColor">@color/color_red</item>
         <item name="gliaNewMessagesDividerTextColor">@color/color_pure_yellow</item>
     </style>

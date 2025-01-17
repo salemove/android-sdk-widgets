@@ -23,26 +23,26 @@ internal fun ChatEngagementStatesTheme(
         composeIfAtLeastOneNotNull(
             operatorTheme,
             primaryColorTheme,
-            baseLightColorTheme,
-            baseDarkColorTheme
+            lightColorTheme,
+            darkColorTheme
         ) {
             EngagementStatesTheme(
                 operator = operatorTheme,
                 queue = EngagementStateTheme(
-                    title = baseDarkColorTheme,
-                    description = baseNormalColorTheme
+                    title = darkColorTheme,
+                    description = normalColorTheme
                 ),
                 connecting = EngagementStateTheme(
-                    title = baseDarkColorTheme,
+                    title = darkColorTheme,
                     description = primaryColorTheme
                 ),
                 connected = EngagementStateTheme(
-                    title = baseDarkColorTheme,
+                    title = darkColorTheme,
                     description = primaryColorTheme
                 ),
                 transferring = EngagementStateTheme(
-                    title = baseDarkColorTheme,
-                    description = baseDarkColorTheme
+                    title = darkColorTheme,
+                    description = darkColorTheme
                 )
             )
         }
@@ -58,9 +58,9 @@ internal fun CallEngagementStatesTheme(
     val operatorTheme = OperatorTheme(pallet)
 
     return pallet.run {
-        composeIfAtLeastOneNotNull(operatorTheme, baseLightColorTheme) {
+        composeIfAtLeastOneNotNull(operatorTheme, lightColorTheme) {
             val engagementState =
-                EngagementStateTheme(title = baseLightColorTheme, description = baseLightColorTheme)
+                EngagementStateTheme(title = lightColorTheme, description = lightColorTheme)
             EngagementStatesTheme(
                 operator = operatorTheme,
                 connecting = engagementState,
@@ -91,11 +91,11 @@ internal fun OperatorTheme(pallet: ColorPallet): OperatorTheme? {
     val userImage = UserImageTheme(pallet)
 
     return pallet.run {
-        composeIfAtLeastOneNotNull(userImage, primaryColorTheme, baseLightColorTheme) {
+        composeIfAtLeastOneNotNull(userImage, primaryColorTheme, lightColorTheme) {
             OperatorTheme(
                 image = userImage,
                 animationColor = primaryColorTheme,
-                onHoldOverlay = OnHoldOverlayTheme(tintColor = baseLightColorTheme)
+                onHoldOverlay = OnHoldOverlayTheme(tintColor = lightColorTheme)
             )
         }
     }

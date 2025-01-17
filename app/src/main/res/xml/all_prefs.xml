@@ -8,10 +8,6 @@
             android:title="SDK Basic Settings" />
 
         <Preference
-            android:key="@string/pref_glia_runtime_theme_settings"
-            android:title="Runtime Theme Settings" />
-
-        <Preference
             android:key="@string/pref_glia_remote_theme_settings"
             android:title="Remote Theme Settings" />
 

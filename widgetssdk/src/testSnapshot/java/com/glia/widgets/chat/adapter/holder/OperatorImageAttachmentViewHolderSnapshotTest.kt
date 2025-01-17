@@ -20,7 +20,7 @@ import com.glia.widgets.snapshotutils.SnapshotSchedulers
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import org.junit.Test
 
-class OperatorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen, SnapshotAttachment, SnapshotGetImageFile,
+internal class OperatorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen, SnapshotAttachment, SnapshotGetImageFile,
     SnapshotSchedulers, SnapshotProviders, SnapshotPicasso {
 
     // MARK: without header
@@ -30,16 +30,6 @@ class OperatorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotCh
         snapshot(
             setupView(
                 operatorAttachmentItemImage()
-            ).itemView
-        )
-    }
-
-    @Test
-    fun withoutHeaderWithUiTheme() {
-        snapshot(
-            setupView(
-                operatorAttachmentItemImage(),
-                uiTheme = uiTheme()
             ).itemView
         )
     }
@@ -81,16 +71,6 @@ class OperatorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotCh
         snapshot(
             setupView(
                 operatorAttachmentItemImage(showChatHead = true)
-            ).itemView
-        )
-    }
-
-    @Test
-    fun withHeaderWithUiTheme() {
-        snapshot(
-            setupView(
-                operatorAttachmentItemImage(showChatHead = true),
-                uiTheme = uiTheme()
             ).itemView
         )
     }
@@ -142,16 +122,6 @@ class OperatorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotCh
     }
 
     @Test
-    fun operatorImageHeaderWithUiTheme() {
-        snapshot(
-            setupView(
-                operatorImageHeaderItem(),
-                uiTheme = uiTheme()
-            ).itemView
-        )
-    }
-
-    @Test
     fun operatorImageHeaderWithGlobalColors() {
         snapshot(
             setupView(
@@ -183,23 +153,18 @@ class OperatorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotCh
 
     // MARK: utils for tests
 
-    private fun setupView(
-        item: OperatorAttachmentItem.Image,
-        unifiedTheme: UnifiedTheme? = null,
-        uiTheme: UiTheme = UiTheme()
-    ): OperatorImageAttachmentViewHolder {
+    private fun setupView(item: OperatorAttachmentItem.Image, unifiedTheme: UnifiedTheme? = null): OperatorImageAttachmentViewHolder {
         unifiedTheme?.let { Dependencies.gliaThemeManager.theme = it }
 
         picassoMock(listOf(R.drawable.test_launcher2))
         val imageFileMock = getImageFileMock(R.drawable.test_banner)
         val schedulersMock = schedulersMock()
-        localeProviderMock()
 
         val binding = ChatAttachmentOperatorImageLayoutBinding.inflate(layoutInflater)
 
         val viewHolder = OperatorImageAttachmentViewHolder(
             binding, imageFileMock.getImageFileFromCacheUseCaseMock, imageFileMock.getImageFileFromDownloadsUseCaseMock,
-            imageFileMock.getImageFileFromNetworkUseCaseMock, schedulersMock.schedulers, uiTheme, object : ChatAdapter.OnImageItemClickListener {
+            imageFileMock.getImageFileFromNetworkUseCaseMock, schedulersMock.schedulers, UiTheme(), object : ChatAdapter.OnImageItemClickListener {
                 override fun onImageItemClick(item: AttachmentFile, view: View) {}
                 override fun onLocalImageItemClick(attachment: LocalAttachment, view: View) {}
             }

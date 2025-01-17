@@ -6,6 +6,7 @@ import com.glia.widgets.view.unifiedui.config.base.LayerRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.TextRemoteConfig
 import com.glia.widgets.view.unifiedui.config.bubble.BubbleRemoteConfig
 import com.glia.widgets.view.unifiedui.config.gva.GvaRemoteConfig
+import com.glia.widgets.view.unifiedui.config.securemessaging.SecureMessagingRemoteConfig
 import com.glia.widgets.view.unifiedui.theme.chat.ChatTheme
 import com.google.gson.annotations.SerializedName
 
@@ -27,6 +28,9 @@ internal data class ChatRemoteConfig(
 
     @SerializedName("input")
     val inputRemoteConfig: InputRemoteConfig?,
+
+    @SerializedName("inputDisabled")
+    val inputDisabledRemoteConfig: InputRemoteConfig?,
 
     @SerializedName("responseCard")
     val responseCardRemoteConfig: ResponseCardRemoteConfig?,
@@ -56,7 +60,10 @@ internal data class ChatRemoteConfig(
     val newMessagesDividerTextRemoteConfig: TextRemoteConfig?,
 
     @SerializedName("gva")
-    val gvaRemoteConfig: GvaRemoteConfig?
+    val gvaRemoteConfig: GvaRemoteConfig?,
+
+    @SerializedName("secureMessaging")
+    val secureMessagingRemoteConfig: SecureMessagingRemoteConfig?
 ) {
     fun toChatTheme(): ChatTheme = ChatTheme(
         background = background?.toLayerTheme(),
@@ -65,6 +72,7 @@ internal data class ChatRemoteConfig(
         visitorMessage = visitorMessage?.toMessageBalloonTheme(),
         connect = connect?.toEngagementStatesTheme(),
         input = inputRemoteConfig?.toInputTheme(),
+        inputDisabled = inputDisabledRemoteConfig?.toInputTheme(),
         responseCard = responseCardRemoteConfig?.toResponseCardTheme(),
         audioUpgrade = audioUpgradeRemoteConfig?.toUpgradeTheme(),
         videoUpgrade = videoUpgradeRemoteConfig?.toUpgradeTheme(),
@@ -74,6 +82,7 @@ internal data class ChatRemoteConfig(
         typingIndicator = typingIndicator?.toColorTheme(),
         newMessagesDividerColorTheme = newMessagesDividerColorRemoteConfig?.toColorTheme(),
         newMessagesDividerTextTheme = newMessagesDividerTextRemoteConfig?.toTextTheme(),
-        gva = gvaRemoteConfig?.toGvaTheme()
+        gva = gvaRemoteConfig?.toGvaTheme(),
+        secureMessaging = secureMessagingRemoteConfig?.toSecureMessagingTheme()
     )
 }

@@ -30,10 +30,12 @@ import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.androidsdk.screensharing.ScreenSharingRequest
 import com.glia.androidsdk.screensharing.VisitorScreenSharingState
 import com.glia.widgets.core.engagement.GliaOperatorRepository
+import com.glia.widgets.core.queue.QueueRepository
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.Data
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.formattedName
+import com.glia.widgets.launcher.ConfigurationManager
 import io.mockk.CapturingSlot
 import io.mockk.MockKAnnotations
 import io.mockk.Runs
@@ -48,6 +50,7 @@ import io.mockk.slot
 import io.mockk.spyk
 import io.mockk.unmockkStatic
 import io.mockk.verify
+import io.reactivex.rxjava3.core.Single
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertNull
@@ -90,12 +93,17 @@ class EngagementRepositoryTest {
     private lateinit var engagementState: EngagementState
     private lateinit var cameraDevice: CameraDevice
 
+    private lateinit var queueRepository: QueueRepository
+
     private lateinit var repository: EngagementRepository
+    private lateinit var configurationManager: ConfigurationManager
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
         mockLogger()
+
+        queueRepository = mockk(relaxUnitFun = true)
 
         engagementRequestCallbackSlot = slot()
         omniCoreEngagementCallbackSlot = slot()
@@ -112,8 +120,11 @@ class EngagementRepositoryTest {
         screenSharingStateCallbackSlot = slot()
 
         every { core.callVisualizer } returns callVisualizer
+        configurationManager = mockk<ConfigurationManager> {
+            every { visitorContextAssetId } returns null
+        }
 
-        repository = EngagementRepositoryImpl(core, operatorRepository)
+        repository = EngagementRepositoryImpl(core, operatorRepository, queueRepository, configurationManager)
         initializeAndVerify()
     }
 
@@ -166,8 +177,8 @@ class EngagementRepositoryTest {
             assertNull(currentOperatorValue)
             assertNull(operatorCurrentMediaState)
             screenSharingStateTest.assertNotComplete().assertNoValues()
-            assertFalse(isQueueingOrEngagement)
-            assertFalse(hasOngoingEngagement)
+            assertFalse(isQueueingOrLiveEngagement)
+            assertFalse(hasOngoingLiveEngagement)
             assertFalse(isQueueing)
             assertFalse(isQueueingForMedia)
             assertFalse(isCallVisualizerEngagement)
@@ -189,29 +200,43 @@ class EngagementRepositoryTest {
         screenSharing = mockk(relaxUnitFun = true)
         cameraDevice = mockk(relaxUnitFun = true)
 
-        operator = mockk(relaxUnitFun = true)
+        operator = mockk(relaxUnitFun = true) {
+            every { id } returns "initial_id"
+            every { formattedName } returns "initial_operator_name"
+        }
         engagementState = mockk(relaxUnitFun = true)
         every { engagementState.operator } returns operator
         every { engagement.state } returns engagementState
+        every { engagementState.visitorStatus } returns EngagementState.VisitorStatus.ENGAGED
         every { engagement.media } returns media
         every { engagement.chat } returns chat
         every { engagement.screenSharing } returns screenSharing
         every { media.currentCameraDevice } returns cameraDevice
 
+        val stateTestSubscriber = repository.engagementState.test()
+
         if (callVisualizer) {
             callVisualizerEngagementCallbackSlot.captured.accept(engagement as OmnibrowseEngagement)
-            repository.engagementState.test().assertValue(State.StartedCallVisualizer).assertValueCount(1).assertNotComplete()
+            stateTestSubscriber.assertValues(
+                State.NoEngagement,
+                State.StartedCallVisualizer,
+                State.Update(engagementState, EngagementUpdateState.OperatorConnected(operator))
+            ).assertValueCount(3).assertNotComplete()
             verify(inverse = true) { chat.on(Chat.Events.OPERATOR_TYPING_STATUS, capture(operatorTypingCallbackSlot)) }
             assertTrue(repository.isCallVisualizerEngagement)
         } else {
             omniCoreEngagementCallbackSlot.captured.accept(engagement as OmnicoreEngagement)
-            repository.engagementState.test().assertValue(State.StartedOmniCore).assertValueCount(1).assertNotComplete()
+            stateTestSubscriber.assertValues(
+                State.NoEngagement,
+                State.StartedOmniCore,
+                State.Update(engagementState, EngagementUpdateState.OperatorConnected(operator))
+            ).assertValueCount(3).assertNotComplete()
             verify { chat.on(Chat.Events.OPERATOR_TYPING_STATUS, capture(operatorTypingCallbackSlot)) }
             assertFalse(repository.isCallVisualizerEngagement)
         }
 
-        assertTrue(repository.hasOngoingEngagement)
-        assertTrue(repository.isQueueingOrEngagement)
+        assertTrue(repository.hasOngoingLiveEngagement)
+        assertTrue(repository.isQueueingOrLiveEngagement)
 
         verify { Logger.i(any(), any()) }
         verify { operatorRepository.emit(operator) }
@@ -229,6 +254,7 @@ class EngagementRepositoryTest {
 
         verify { engagement.state }
         verify { engagementState.operator }
+        verify { engagementState.visitorStatus }
         verify { engagement.media }
         verify { engagement.screenSharing }
 
@@ -370,7 +396,7 @@ class EngagementRepositoryTest {
     }
 
     private fun confirmEngagementVerified() {
-        confirmVerified(engagement, engagementState, operator, chat, media, screenSharing)
+        confirmVerified(engagement, chat, media, screenSharing)
     }
 
     private fun requestScreenSharing(testBody: (ScreenSharingRequest) -> Unit) {
@@ -401,7 +427,7 @@ class EngagementRepositoryTest {
 
     @After
     fun tearDown() {
-        confirmVerified(core, operatorRepository, callVisualizer)
+        confirmVerified(core, operatorRepository, callVisualizer, queueRepository)
         unmockkStatic(LOGGER_PATH)
     }
 
@@ -514,6 +540,31 @@ class EngagementRepositoryTest {
     }
 
     @Test
+    fun `TransferredToSecureConversation state is emitted when visitorStatus is transferring and has text capabilities`() {
+        operator = mockk(relaxUnitFun = true)
+        engagementState = mockk(relaxUnitFun = true)
+        media = mockk(relaxUnitFun = true)
+        chat = mockk(relaxUnitFun = true)
+        screenSharing = mockk(relaxUnitFun = true)
+        cameraDevice = mockk(relaxUnitFun = true)
+        every { engagementState.visitorStatus } returns EngagementState.VisitorStatus.TRANSFERRING
+        every { engagementState.capabilities.isText } returns true
+        every { engagementState.operator } returns operator
+
+        every { media.currentCameraDevice } returns cameraDevice
+
+        engagement = mockk<OmnicoreEngagement>(relaxUnitFun = true)
+        every { engagement.state } returns engagementState
+        every { engagement.media } returns media
+        every { engagement.chat } returns chat
+        every { engagement.screenSharing } returns screenSharing
+
+        omniCoreEngagementCallbackSlot.captured.accept(engagement as OmnicoreEngagement)
+        repository.engagementState.test().assertValue(State.TransferredToSecureConversation).assertValueCount(1).assertNotComplete()
+        verify { operatorRepository.emit(any()) }
+    }
+
+    @Test
     fun `endEngagement() will do nothing when no ongoing engagement`() {
         repository.endEngagement(false)
         verifyEngagementEnd(ongoingEngagement = false)
@@ -615,35 +666,46 @@ class EngagementRepositoryTest {
         val engagementStateTestObserver = repository.engagementState.test()
         val operatorTypingStatusTestObserver = repository.operatorTypingStatus.test()
 
-        val operator1: Operator = mockk(relaxed = true) {
+        val operator1: Operator = mockk(relaxUnitFun = true) {
             every { id } returns "1"
         }
 
-        val operator2: Operator = mockk(relaxed = true) {
+        val operator2: Operator = mockk(relaxUnitFun = true) {
             every { id } returns "2"
         }
-        val state1: EngagementState = mockk(relaxed = true) {
+        val state1: EngagementState = mockk(relaxUnitFun = true) {
             every { operator } returns operator1
             every { visitorStatus } returns EngagementState.VisitorStatus.ENGAGED
             every { id } returns "s_1"
+            every { capabilities.isText } returns false
         }
 
-        val state2: EngagementState = mockk(relaxed = true) {
+        val state2: EngagementState = mockk(relaxUnitFun = true) {
             every { operator } returns operator1
             every { visitorStatus } returns EngagementState.VisitorStatus.TRANSFERRING
             every { id } returns "s_2"
+            every { capabilities.isText } returns false
         }
 
-        val state3: EngagementState = mockk(relaxed = true) {
+        val state3: EngagementState = mockk(relaxUnitFun = true) {
             every { operator } returns operator2
             every { visitorStatus } returns EngagementState.VisitorStatus.ENGAGED
             every { id } returns "s_3"
+            every { capabilities.isText } returns false
         }
 
-        val state4: EngagementState = mockk(relaxed = true) {
+        val state4: EngagementState = mockk(relaxUnitFun = true) {
             every { operator } returns operator2
             every { visitorStatus } returns EngagementState.VisitorStatus.ENGAGED
             every { id } returns "s_4"
+            every { capabilities.isText } returns false
+        }
+
+        val state5: EngagementState = mockk(relaxUnitFun = true) {
+            every { operator } returns operator2
+            every { visitorStatus } returns EngagementState.VisitorStatus.TRANSFERRING
+            every { id } returns "s_5"
+            every { capabilities.isText } returns true
         }
 
         mockEngagementAndStart()
@@ -657,6 +719,8 @@ class EngagementRepositoryTest {
         assertEquals(operator2, repository.currentOperatorValue)
         engagementStateCallbackSlot.captured.accept(state4)
         assertEquals(operator2, repository.currentOperatorValue)
+        engagementStateCallbackSlot.captured.accept(state5)
+        assertEquals(operator2, repository.currentOperatorValue)
 
         operatorTypingCallbackSlot.captured.apply {
             accept(OperatorTypingStatus { false })
@@ -665,7 +729,7 @@ class EngagementRepositoryTest {
         }
 
         verify(exactly = 2) { operatorRepository.emit(operator1) }
-        verify(exactly = 2) { operatorRepository.emit(operator2) }
+        verify(exactly = 3) { operatorRepository.emit(operator2) }
 
         operatorTypingStatusTestObserver
             .assertNotComplete()
@@ -678,26 +742,26 @@ class EngagementRepositoryTest {
 
         currentOperatorTestObserver
             .assertNotComplete()
-            .assertValueCount(5)
+            .assertValueCount(4)
             .assertValuesOnly(
                 Data.Empty,
+                Data.Value(operator),
                 Data.Value(operator1),
-                Data.Value(operator1),
-                Data.Value(operator2),
                 Data.Value(operator2)
             )
 
 
         engagementStateTestObserver
             .assertNotComplete()
-            .assertValueCount(6)
+            .assertValueCount(7)
             .assertValuesOnly(
                 State.NoEngagement,
                 State.StartedOmniCore,
-                State.Update(state1, EngagementUpdateState.OperatorConnected(operator1)),
+                State.Update(engagementState, EngagementUpdateState.OperatorConnected(operator)),
+                State.Update(state1, EngagementUpdateState.OperatorChanged(operator1)),
                 State.Update(state2, EngagementUpdateState.Transferring),
                 State.Update(state3, EngagementUpdateState.OperatorChanged(operator2)),
-                State.Update(state4, EngagementUpdateState.Ongoing(operator2))
+                State.TransferredToSecureConversation
             )
 
         repository.endEngagement(silently = true)
@@ -786,70 +850,87 @@ class EngagementRepositoryTest {
     }
 
     @Test
-    fun `queueForEngagement with TEXT type produces PreQueueing when queueing success`() {
+    fun `queueForEngagement produces PreQueueing`() {
         val queueId = "queue_id"
+        every { queueRepository.relevantQueueIds } returns Single.just(listOf(queueId))
         val queueForEngagementCallbackSlot = slot<Consumer<GliaException?>>()
-        repository.queueForEngagement(listOf(queueId), MediaType.TEXT,null)
 
-        verify(exactly = 1) { core.queueForEngagement(arrayOf(queueId), MediaType.TEXT, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
+        repository.queueForEngagement(MediaType.TEXT)
+
+        verify(exactly = 1) { core.queueForEngagement(listOf(queueId), MediaType.TEXT, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
         queueForEngagementCallbackSlot.captured.accept(null)
 
         assertTrue(repository.isQueueing)
         assertFalse(repository.isQueueingForMedia)
 
-        repository.engagementState.test().assertNotComplete().assertValue(State.PreQueuing(listOf(queueId), MediaType.TEXT))
+        repository.engagementState.test().assertNotComplete().assertValue(State.PreQueuing(MediaType.TEXT))
 
-        repository.queueForEngagement(listOf(queueId), MediaType.TEXT, "url")
+        repository.queueForEngagement(MediaType.TEXT)
 
-        verify(exactly = 0) { core.queueForEngagement(arrayOf(queueId), MediaType.TEXT, "url", any(), any(), capture(queueForEngagementCallbackSlot)) }
+        verify { queueRepository.relevantQueueIds }
+        verify(exactly = 0) { core.queueForEngagement(listOf(queueId), MediaType.TEXT, "url", any(), any(), capture(queueForEngagementCallbackSlot)) }
     }
 
     @Test
-    fun `queueForEngagement with AUDIO type produces PreQueueing when queueing success`() {
-        val queueId = "queue_id"
-        val mediaType = MediaType.AUDIO
-        val queueForEngagementCallbackSlot = slot<Consumer<GliaException?>>()
-        repository.queueForEngagement(listOf(queueId), mediaType, null)
+    fun `queueForEngagement produces Error when relevant queues are empty`() {
+        every { queueRepository.relevantQueueIds } returns Single.just(emptyList())
+        val testSubscriber = repository.engagementState.test()
 
-        verify { core.queueForEngagement(arrayOf(queueId), mediaType, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
-        queueForEngagementCallbackSlot.captured.accept(null)
+        repository.queueForEngagement(MediaType.TEXT)
 
-        repository.engagementState.test().assertNotComplete().assertValue(State.PreQueuing(listOf(queueId), mediaType))
+        verify { queueRepository.relevantQueueIds }
+        verify(exactly = 0) { core.queueForEngagement(any(), MediaType.TEXT, null, any(), any(), any()) }
+
+        assertFalse(repository.isQueueing)
+        assertFalse(repository.isQueueingForMedia)
+
+        testSubscriber.assertNotComplete().assertValuesOnly(
+            State.NoEngagement,
+            State.PreQueuing(MediaType.TEXT),
+            State.UnexpectedErrorHappened,
+            State.NoEngagement
+        )
     }
 
     @Test
-    fun `queueForEngagement produces PreQueueing when already queued`() {
+    fun `queueForEngagement will do nothing when already queued`() {
         val queueId = "queue_id"
         val mediaType = MediaType.AUDIO
+        every { queueRepository.relevantQueueIds } returns Single.just(listOf(queueId))
         val queueForEngagementCallbackSlot = slot<Consumer<GliaException?>>()
-        repository.queueForEngagement(listOf(queueId), mediaType, null)
+        repository.queueForEngagement(mediaType)
 
-        verify(exactly = 1) { core.queueForEngagement(arrayOf(queueId), mediaType, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
+        repository.engagementState.test().assertNotComplete().assertValue(State.PreQueuing(mediaType))
+        verify { queueRepository.relevantQueueIds }
+        verify(exactly = 1) { core.queueForEngagement(listOf(queueId), mediaType, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
         queueForEngagementCallbackSlot.captured.accept(GliaException("message", GliaException.Cause.ALREADY_QUEUED))
 
         assertTrue(repository.isQueueing)
         assertTrue(repository.isQueueingForMedia)
 
-        repository.engagementState.test().assertNotComplete().assertValue(State.PreQueuing(listOf(queueId), mediaType))
+        repository.engagementState.test().assertNotComplete().assertValue(State.PreQueuing(mediaType))
 
-        repository.queueForEngagement(listOf(queueId), MediaType.VIDEO, null)
+        repository.queueForEngagement(MediaType.VIDEO)
 
-        verify(exactly = 0) { core.queueForEngagement(arrayOf(queueId), MediaType.VIDEO, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
+        verify(exactly = 0) { core.queueForEngagement(listOf(queueId), MediaType.VIDEO, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
     }
 
     @Test
     fun `queueForEngagement produces QueueUnstaffed when queue is unavailable`() {
         val queueId = "queue_id"
         val mediaType = MediaType.AUDIO
+        every { queueRepository.relevantQueueIds } returns Single.just(listOf(queueId))
         val queueForEngagementCallbackSlot = slot<Consumer<GliaException?>>()
         val testSubscriber = repository.engagementState.test()
-        repository.queueForEngagement(listOf(queueId), mediaType, null)
+        repository.queueForEngagement(mediaType)
 
-        verify { core.queueForEngagement(arrayOf(queueId), mediaType, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
+        verify { queueRepository.relevantQueueIds }
+        verify { core.queueForEngagement(listOf(queueId), mediaType, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
         queueForEngagementCallbackSlot.captured.accept(GliaException("message", GliaException.Cause.QUEUE_CLOSED))
 
         testSubscriber.assertNotComplete().assertValuesOnly(
             State.NoEngagement,
+            State.PreQueuing(mediaType = mediaType),
             State.QueueUnstaffed,
             State.NoEngagement
         )
@@ -859,15 +940,18 @@ class EngagementRepositoryTest {
     fun `queueForEngagement produces UnexpectedError when queueing failed`() {
         val queueId = "queue_id"
         val mediaType = MediaType.AUDIO
+        every { queueRepository.relevantQueueIds } returns Single.just(listOf(queueId))
         val queueForEngagementCallbackSlot = slot<Consumer<GliaException?>>()
         val testSubscriber = repository.engagementState.test()
-        repository.queueForEngagement(listOf(queueId), mediaType, null)
+        repository.queueForEngagement(mediaType)
 
-        verify { core.queueForEngagement(arrayOf(queueId), mediaType, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
+        verify { queueRepository.relevantQueueIds }
+        verify { core.queueForEngagement(listOf(queueId), mediaType, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
         queueForEngagementCallbackSlot.captured.accept(GliaException("message", GliaException.Cause.NETWORK_TIMEOUT))
 
         testSubscriber.assertNotComplete().assertValuesOnly(
             State.NoEngagement,
+            State.PreQueuing(mediaType = mediaType),
             State.UnexpectedErrorHappened,
             State.NoEngagement
         )
@@ -877,21 +961,23 @@ class EngagementRepositoryTest {
     fun `enqueuing is canceling when unstaffed queue ticked is received`() {
         val queueId = "queue_id"
         val mediaType = MediaType.TEXT
+        every { queueRepository.relevantQueueIds } returns Single.just(listOf(queueId))
         val queueForEngagementCallbackSlot = slot<Consumer<GliaException?>>()
         val subscribeQueueTicketCallbackSlot = slot<RequestCallback<QueueTicket?>>()
         val ticketId = "ticket_id"
         val queueTicket: QueueTicket = mockk(relaxed = true) {
             every { id } returns ticketId
         }
-        repository.queueForEngagement(listOf(queueId), mediaType, null)
+        repository.queueForEngagement(mediaType)
 
-        verify(exactly = 1) { core.queueForEngagement(arrayOf(queueId), mediaType, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
+        verify { queueRepository.relevantQueueIds }
+        verify(exactly = 1) { core.queueForEngagement(listOf(queueId), mediaType, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
         queueForEngagementCallbackSlot.captured.accept(null)
 
         assertTrue(repository.isQueueing)
         assertFalse(repository.isQueueingForMedia)
 
-        repository.engagementState.test().assertNotComplete().assertValue(State.PreQueuing(listOf(queueId), mediaType))
+        repository.engagementState.test().assertNotComplete().assertValue(State.PreQueuing(mediaType))
 
         queueTicketCallbackSlot.captured.accept(queueTicket)
 
@@ -904,7 +990,7 @@ class EngagementRepositoryTest {
             subscribeQueueTicketCallbackSlot.captured.onResult(unstaffedTicket, null)
 
             assertNotComplete().assertValuesOnly(
-                State.Queuing(listOf(queueId), ticketId, mediaType),
+                State.Queuing(ticketId, mediaType),
                 State.QueueUnstaffed,
                 State.NoEngagement
             )
@@ -915,6 +1001,7 @@ class EngagementRepositoryTest {
     fun `cancelQueuing sends cancel queue request immediately when current state is Queueing`() {
         val queueId = "queue_id"
         val mediaType = MediaType.TEXT
+        every { queueRepository.relevantQueueIds } returns Single.just(listOf(queueId))
         val queueForEngagementCallbackSlot = slot<Consumer<GliaException?>>()
         val subscribeQueueTicketCallbackSlot = slot<RequestCallback<QueueTicket?>>()
         val cancelQueueTicketCallbackSlot = slot<Consumer<GliaException?>>()
@@ -922,15 +1009,16 @@ class EngagementRepositoryTest {
         val queueTicket: QueueTicket = mockk(relaxed = true) {
             every { id } returns ticketId
         }
-        repository.queueForEngagement(listOf(queueId), mediaType, null)
+        repository.queueForEngagement(mediaType)
 
-        verify(exactly = 1) { core.queueForEngagement(arrayOf(queueId), mediaType, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
+        verify { queueRepository.relevantQueueIds }
+        verify(exactly = 1) { core.queueForEngagement(listOf(queueId), mediaType, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
         queueForEngagementCallbackSlot.captured.accept(null)
 
         assertTrue(repository.isQueueing)
         assertFalse(repository.isQueueingForMedia)
 
-        repository.engagementState.test().assertNotComplete().assertValue(State.PreQueuing(listOf(queueId), mediaType))
+        repository.engagementState.test().assertNotComplete().assertValue(State.PreQueuing(mediaType))
 
         queueTicketCallbackSlot.captured.accept(queueTicket)
 
@@ -942,7 +1030,7 @@ class EngagementRepositoryTest {
             cancelQueueTicketCallbackSlot.captured.accept(null)
             assertNotComplete()
                 .assertValuesOnly(
-                    State.Queuing(listOf(queueId), ticketId, mediaType),
+                    State.Queuing(ticketId, mediaType),
                     State.QueueingCanceled,
                     State.NoEngagement
                 )
@@ -953,6 +1041,7 @@ class EngagementRepositoryTest {
     fun `cancelQueuing sends cancel queue request after queue ticket update when current state is PreQueueing`() {
         val queueId = "queue_id"
         val mediaType = MediaType.TEXT
+        every { queueRepository.relevantQueueIds } returns Single.just(listOf(queueId))
         val queueForEngagementCallbackSlot = slot<Consumer<GliaException?>>()
         val subscribeQueueTicketCallbackSlot = slot<RequestCallback<QueueTicket?>>()
         val cancelQueueTicketCallbackSlot = slot<Consumer<GliaException?>>()
@@ -960,15 +1049,16 @@ class EngagementRepositoryTest {
         val queueTicket: QueueTicket = mockk(relaxed = true) {
             every { id } returns ticketId
         }
-        repository.queueForEngagement(listOf(queueId), mediaType, null)
+        repository.queueForEngagement(mediaType)
 
-        verify(exactly = 1) { core.queueForEngagement(arrayOf(queueId), mediaType, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
+        verify { queueRepository.relevantQueueIds }
+        verify(exactly = 1) { core.queueForEngagement(listOf(queueId), mediaType, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
         queueForEngagementCallbackSlot.captured.accept(null)
 
         assertTrue(repository.isQueueing)
         assertFalse(repository.isQueueingForMedia)
 
-        repository.engagementState.test().assertNotComplete().assertValue(State.PreQueuing(listOf(queueId), mediaType))
+        repository.engagementState.test().assertNotComplete().assertValue(State.PreQueuing(mediaType))
         repository.cancelQueuing()
 
         queueTicketCallbackSlot.captured.accept(queueTicket)
@@ -990,7 +1080,12 @@ class EngagementRepositoryTest {
     fun `reset should call cancelQueuing when no ongoing engagement`() {
         val repositorySpy = spyk(repository)
 
+        assertFalse(repositorySpy.isSecureMessagingRequested)
+        repositorySpy.updateIsSecureMessagingRequested(true)
+        assertTrue(repositorySpy.isSecureMessagingRequested)
+
         repositorySpy.reset()
+        assertFalse(repositorySpy.isSecureMessagingRequested)
 
         verify { repositorySpy.cancelQueuing() }
         verify(inverse = true) { repositorySpy.endEngagement(true) }
@@ -1171,7 +1266,7 @@ class EngagementRepositoryTest {
         }
         engagementStateCallbackSlot.captured.accept(state1)
         repository.engagementState.test().assertNotComplete().assertValues(
-            State.Update(state1, EngagementUpdateState.OperatorConnected(operator1))
+            State.Update(state1, EngagementUpdateState.OperatorChanged(operator1))
         )
         verify { operatorRepository.emit(operator1) }
         //emit a new state end
@@ -1186,6 +1281,7 @@ class EngagementRepositoryTest {
         val newOperator: Operator = mockk(relaxUnitFun = true)
         val newEngagementState: EngagementState = mockk(relaxUnitFun = true)
         every { newEngagementState.operator } returns newOperator
+        every { newEngagementState.visitorStatus } returns EngagementState.VisitorStatus.ENGAGED
         every { newEngagement.state } returns newEngagementState
         every { newEngagement.media } returns newMedia
         every { newEngagement.chat } returns newChat
@@ -1193,8 +1289,9 @@ class EngagementRepositoryTest {
         every { newMedia.currentCameraDevice } returns null
 
         omniCoreEngagementCallbackSlot.captured.accept(newEngagement)
-        repository.engagementState.test().assertNotComplete().assertValue(State.Update(state1, EngagementUpdateState.OperatorConnected(operator1)))
-        assertTrue(repository.hasOngoingEngagement)
+        repository.engagementState.test().assertNotComplete()
+            .assertValue(State.Update(newEngagementState, EngagementUpdateState.OperatorConnected(newOperator)))
+        assertTrue(repository.hasOngoingLiveEngagement)
 
         verify { operatorRepository.emit(newOperator) }
 
@@ -1219,7 +1316,7 @@ class EngagementRepositoryTest {
         //emit new engagement end
 
         verifyUnsubscribedFromEngagement()
-        confirmVerified(newEngagement, newMedia, newChat, newScreenSharing, newOperator, newEngagementState)
+        confirmVerified(newEngagement, newMedia, newChat, newScreenSharing)
     }
 
 
@@ -1238,7 +1335,7 @@ class EngagementRepositoryTest {
         }
         engagementStateCallbackSlot.captured.accept(state1)
         repository.engagementState.test().assertNotComplete().assertValues(
-            State.Update(state1, EngagementUpdateState.OperatorConnected(operator1))
+            State.Update(state1, EngagementUpdateState.OperatorChanged(operator1))
         )
         verify { operatorRepository.emit(operator1) }
         //emit a new state end
@@ -1252,6 +1349,7 @@ class EngagementRepositoryTest {
 
         val newOperator: Operator = mockk(relaxUnitFun = true)
         val newEngagementState: EngagementState = mockk(relaxUnitFun = true)
+        every { newEngagementState.visitorStatus } returns EngagementState.VisitorStatus.ENGAGED
         every { newEngagementState.operator } returns newOperator
         every { newEngagement.state } returns newEngagementState
         every { newEngagement.media } returns newMedia
@@ -1260,8 +1358,9 @@ class EngagementRepositoryTest {
         every { newMedia.currentCameraDevice } returns mockk()
 
         callVisualizerEngagementCallbackSlot.captured.accept(newEngagement)
-        repository.engagementState.test().assertNotComplete().assertValue(State.Update(state1, EngagementUpdateState.OperatorConnected(operator1)))
-        assertTrue(repository.hasOngoingEngagement)
+        repository.engagementState.test().assertNotComplete()
+            .assertValue(State.Update(newEngagementState, EngagementUpdateState.OperatorConnected(newOperator)))
+        assertTrue(repository.hasOngoingLiveEngagement)
 
         verify { operatorRepository.emit(newOperator) }
 
@@ -1286,7 +1385,7 @@ class EngagementRepositoryTest {
         //emit new engagement end
 
         verifyUnsubscribedFromEngagement()
-        confirmVerified(newEngagement, newMedia, newChat, newScreenSharing, newOperator, newEngagementState)
+        confirmVerified(newEngagement, newMedia, newChat, newScreenSharing)
     }
 
     @Test
@@ -1309,4 +1408,63 @@ class EngagementRepositoryTest {
         assertEquals(VisitorCamera.Switching, repository.currentVisitorCamera)
     }
 
+    @Test
+    fun `queueForEngagement uses visitorContextAssetId from configurationManager`() {
+        val queueId = "queue_id"
+        val visitorContextAssetId = "visitor_context_asset_id"
+        every { queueRepository.relevantQueueIds } returns Single.just(listOf(queueId))
+        every { configurationManager.visitorContextAssetId } returns visitorContextAssetId
+        val queueForEngagementCallbackSlot = slot<Consumer<GliaException?>>()
+
+        repository.queueForEngagement(MediaType.TEXT)
+
+        verify(exactly = 1) {
+            core.queueForEngagement(
+                listOf(queueId),
+                MediaType.TEXT,
+                visitorContextAssetId,
+                any(),
+                any(),
+                capture(queueForEngagementCallbackSlot)
+            )
+        }
+        queueForEngagementCallbackSlot.captured.accept(null)
+
+        assertTrue(repository.isQueueing)
+        assertFalse(repository.isQueueingForMedia)
+
+        repository.queueForEngagement(MediaType.TEXT)
+
+        verify { queueRepository.relevantQueueIds }
+        verify(exactly = 1) {
+            core.queueForEngagement(
+                listOf(queueId),
+                MediaType.TEXT,
+                visitorContextAssetId,
+                any(),
+                any(),
+                capture(queueForEngagementCallbackSlot)
+            )
+        }
+    }
+
+    @Test
+    fun `queueForEngagement uses null visitorContextAssetId when configurationManager returns null`() {
+        val queueId = "queue_id"
+        every { queueRepository.relevantQueueIds } returns Single.just(listOf(queueId))
+        every { configurationManager.visitorContextAssetId } returns null
+        val queueForEngagementCallbackSlot = slot<Consumer<GliaException?>>()
+
+        repository.queueForEngagement(MediaType.TEXT)
+
+        verify(exactly = 1) { core.queueForEngagement(listOf(queueId), MediaType.TEXT, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
+        queueForEngagementCallbackSlot.captured.accept(null)
+
+        assertTrue(repository.isQueueing)
+        assertFalse(repository.isQueueingForMedia)
+        repository.queueForEngagement(MediaType.TEXT)
+
+        verify { queueRepository.relevantQueueIds }
+        verify(exactly = 1) { core.queueForEngagement(listOf(queueId), MediaType.TEXT, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
+    }
 }

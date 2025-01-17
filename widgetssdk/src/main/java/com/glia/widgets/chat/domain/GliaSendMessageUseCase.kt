@@ -9,20 +9,18 @@ import com.glia.widgets.chat.data.GliaChatRepository
 import com.glia.widgets.chat.model.VisitorAttachmentItem
 import com.glia.widgets.chat.model.VisitorChatItem
 import com.glia.widgets.chat.model.VisitorMessageItem
-import com.glia.widgets.core.engagement.GliaEngagementConfigRepository
 import com.glia.widgets.core.fileupload.FileAttachmentRepository
 import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
-import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
+import com.glia.widgets.core.secureconversations.domain.ManageSecureMessagingStatusUseCase
 import com.glia.widgets.engagement.domain.IsOperatorPresentUseCase
 
 internal class GliaSendMessageUseCase(
     private val chatRepository: GliaChatRepository,
     private val fileAttachmentRepository: FileAttachmentRepository,
     private val isOperatorPresentUseCase: IsOperatorPresentUseCase,
-    private val engagementConfigRepository: GliaEngagementConfigRepository,
     private val secureConversationsRepository: SecureConversationsRepository,
-    private val isSecureEngagementUseCase: IsSecureEngagementUseCase
+    private val shouldUseSecureMessagingApis: ManageSecureMessagingStatusUseCase
 ) {
     interface Listener {
         fun messageSent(message: VisitorMessage?)
@@ -34,11 +32,11 @@ internal class GliaSendMessageUseCase(
     }
 
     private val isSecureEngagement: Boolean
-        get() = isSecureEngagementUseCase()
+        get() = shouldUseSecureMessagingApis.shouldUseSecureMessagingEndpoints
 
     private fun sendMessage(payload: SendMessagePayload, listener: Listener) {
         if (isSecureEngagement) {
-            secureConversationsRepository.send(payload, engagementConfigRepository.queueIds, listener)
+            secureConversationsRepository.send(payload, listener)
         } else {
             chatRepository.sendMessage(payload, listener)
         }
@@ -46,7 +44,7 @@ internal class GliaSendMessageUseCase(
 
     fun execute(message: String, listener: Listener) {
         val localAttachments: List<LocalAttachment>? = fileAttachmentRepository
-            .readyToSendLocalAttachments
+            .getReadyToSendFileAttachments()
             .filter { it.engagementFile != null }
             .takeIf { it.isNotEmpty() }
 
@@ -82,7 +80,7 @@ internal class GliaSendMessageUseCase(
         val messageItem = VisitorMessageItem(payload.content, payload.messageId)
         listener.onMessagePrepared(messageItem, payload)
         when {
-            isSecureEngagement -> secureConversationsRepository.send(payload, engagementConfigRepository.queueIds, listener)
+            isSecureEngagement -> secureConversationsRepository.send(payload, listener)
 
             isOperatorOnline -> chatRepository.sendMessage(payload, listener)
 

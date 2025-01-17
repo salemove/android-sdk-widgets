@@ -35,7 +35,7 @@ private data class ViewDefaultProperties(
 /**
  * @hide
  */
-class CharCodeView @JvmOverloads constructor(
+internal class CharCodeView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0

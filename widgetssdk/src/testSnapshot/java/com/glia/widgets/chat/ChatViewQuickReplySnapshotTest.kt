@@ -25,16 +25,6 @@ internal class ChatViewQuickReplySnapshotTest : SnapshotTest(), SnapshotChatView
     }
 
     @Test
-    fun withUiTheme() {
-        snapshot(
-            setupView(
-                chatState = chatState(),
-                uiTheme = uiTheme()
-            ).root
-        )
-    }
-
-    @Test
     fun withGlobalColors() {
         snapshot(
             setupView(

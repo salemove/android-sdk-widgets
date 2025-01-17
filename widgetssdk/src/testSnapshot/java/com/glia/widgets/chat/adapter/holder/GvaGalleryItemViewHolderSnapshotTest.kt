@@ -14,7 +14,7 @@ import com.glia.widgets.snapshotutils.SnapshotPicasso
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import org.junit.Test
 
-class GvaGalleryItemViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, SnapshotPicasso {
+internal class GvaGalleryItemViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, SnapshotPicasso {
 
     // MARK: tests with all views
 
@@ -33,16 +33,6 @@ class GvaGalleryItemViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, Snapsh
         snapshot(
             setupView(
                 allViewsCard(),
-            ).viewHolder.itemView
-        )
-    }
-
-    @Test
-    fun allViewsWithUiTheme() {
-        snapshot(
-            setupView(
-                allViewsCard(),
-                uiTheme = uiTheme()
             ).viewHolder.itemView
         )
     }
@@ -93,16 +83,6 @@ class GvaGalleryItemViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, Snapsh
     }
 
     @Test
-    fun onlyMandatoryWithUiTheme() {
-        snapshot(
-            setupView(
-                onlyMandatoryCard(),
-                uiTheme = uiTheme()
-            ).viewHolder.itemView
-        )
-    }
-
-    @Test
     fun onlyMandatoryWithGlobalColors() {
         snapshot(
             setupView(
@@ -143,16 +123,6 @@ class GvaGalleryItemViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, Snapsh
         snapshot(
             setupView(
                 longTitleCard()
-            ).viewHolder.itemView
-        )
-    }
-
-    @Test
-    fun longTitleWithUiTheme() {
-        snapshot(
-            setupView(
-                longTitleCard(),
-                uiTheme = uiTheme()
             ).viewHolder.itemView
         )
     }
@@ -200,17 +170,6 @@ class GvaGalleryItemViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, Snapsh
             setupView(
                 longSubtitleCard(),
                 height = 700
-            ).viewHolder.itemView
-        )
-    }
-
-    @Test
-    fun longSubtitleWithUiTheme() {
-        snapshot(
-            setupView(
-                longSubtitleCard(),
-                uiTheme = uiTheme(),
-                height = 740
             ).viewHolder.itemView
         )
     }
@@ -266,18 +225,6 @@ class GvaGalleryItemViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, Snapsh
     }
 
     @Test
-    fun longButtonsTitleWithUiTheme() {
-        val itemView = setupView(
-            longButtonsTitleCard(),
-            uiTheme = uiTheme()
-
-        ).viewHolder.itemView
-        measureHeight(itemView)
-
-        snapshot(itemView)
-    }
-
-    @Test
     fun longButtonsTitleWithGlobalColors() {
         val itemView = setupView(
             longButtonsTitleCard(),
@@ -321,13 +268,12 @@ class GvaGalleryItemViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, Snapsh
         card: GvaGalleryCard,
         @DrawableRes imageRes: Int = R.drawable.test_banner,
         unifiedTheme: UnifiedTheme? = null,
-        uiTheme: UiTheme = UiTheme(),
         height: Int? = null
     ): ViewData {
         picassoMock(imageResources = listOf(imageRes))
 
         val binding = ChatGvaGalleryItemBinding.inflate(layoutInflater)
-        val viewHolder = GvaGalleryItemViewHolder(binding, {}, uiTheme, unifiedTheme)
+        val viewHolder = GvaGalleryItemViewHolder(binding, {}, UiTheme(), unifiedTheme)
 
         viewHolder.bind(card, 1, 4)
 

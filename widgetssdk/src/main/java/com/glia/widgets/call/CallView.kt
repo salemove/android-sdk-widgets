@@ -22,13 +22,11 @@ import androidx.transition.TransitionSet
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.comms.VideoView
-import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.widgets.Constants
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.UiTheme.UiThemeBuilder
 import com.glia.widgets.call.CallState.ViewState
-import com.glia.widgets.core.configuration.EngagementConfiguration
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.databinding.CallButtonsLayoutBinding
@@ -41,7 +39,6 @@ import com.glia.widgets.helper.Utils
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getColorStateListCompat
 import com.glia.widgets.helper.getFontCompat
-import com.glia.widgets.helper.getFullHybridTheme
 import com.glia.widgets.helper.hideKeyboard
 import com.glia.widgets.helper.insetsController
 import com.glia.widgets.helper.requireActivity
@@ -50,6 +47,7 @@ import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.setLocaleHint
 import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.helper.showToast
+import com.glia.widgets.launcher.ActivityLauncher
 import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.locale.StringKey
 import com.glia.widgets.locale.StringKeyPair
@@ -86,6 +84,7 @@ internal class CallView(
     defStyleAttr,
     defStyleRes
 ), CallContract.View, DialogDelegate by DialogDelegateImpl() {
+    private val activityLauncher: ActivityLauncher by lazy { Dependencies.activityLauncher }
 
     private val callTheme: CallTheme? by lazy {
         Dependencies.gliaThemeManager.theme?.callTheme
@@ -174,22 +173,8 @@ internal class CallView(
         }
     }
 
-    fun startCall(
-        companyName: String,
-        queueIds: List<String>?,
-        visitorContextAssetId: String?,
-        screenSharingMode: ScreenSharing.Mode,
-        isUpgradeToCall: Boolean,
-        mediaType: Engagement.MediaType?
-    ) {
-        callController?.startCall(
-            companyName,
-            queueIds,
-            visitorContextAssetId,
-            mediaType,
-            screenSharingMode,
-            isUpgradeToCall
-        )
+    fun startCall(isUpgradeToCall: Boolean, mediaType: Engagement.MediaType?) {
+        callController?.startCall(mediaType, isUpgradeToCall)
     }
 
     fun onDestroy() {
@@ -495,8 +480,8 @@ internal class CallView(
     private fun setAppBarTheme() {
         val builder = UiThemeBuilder()
         builder.setTheme(theme)
-        builder.setSystemNegativeColor(R.color.glia_system_negative_color)
-        builder.setBaseLightColor(R.color.glia_base_light_color)
+        builder.setSystemNegativeColor(R.color.glia_negative_color)
+        builder.setBaseLightColor(R.color.glia_light_color)
         builder.setBrandPrimaryColor(R.color.glia_call_view_background_color)
         builder.setGliaChatHeaderTitleTintColor(android.R.color.white)
         builder.setGliaChatHeaderHomeButtonTintColor(android.R.color.white)
@@ -521,12 +506,6 @@ internal class CallView(
 
     private fun setDefaultTheme(typedArray: TypedArray) {
         theme = Utils.getThemeFromTypedArray(typedArray, this.context)
-            .getFullHybridTheme(Dependencies.sdkConfigurationManager.uiTheme)
-    }
-
-    fun setUiTheme(uiTheme: UiTheme?) {
-        theme = theme.getFullHybridTheme(uiTheme ?: return)
-        setupViewAppearance()
     }
 
     fun setOnBackClickedListener(onBackClicked: OnBackClickedListener) {
@@ -617,8 +596,7 @@ internal class CallView(
             positiveButtonClickListener = {
                 resetDialogStateAndDismiss()
                 callController?.overlayPermissionsDialogDismissed()
-                val overlayIntent = Dependencies.intentConfigurationHelper.createForOverlayPermissionScreen(context)
-                this.context.startActivity(overlayIntent)
+                activityLauncher.launchOverlayPermission(context)
             },
             negativeButtonClickListener = {
                 resetDialogStateAndDismiss()
@@ -671,11 +649,6 @@ internal class CallView(
         callController?.onUserInteraction()
     }
 
-    fun setEngagementConfiguration(engagementConfiguration: EngagementConfiguration?) {
-        serviceChatHeadController?.setBuildTimeTheme(theme)
-        serviceChatHeadController?.setEngagementConfiguration(engagementConfiguration)
-    }
-
     override fun showToast(message: String) {
         post { context.showToast(message, Toast.LENGTH_SHORT) }
     }
@@ -702,12 +675,6 @@ internal class CallView(
 
     fun interface OnTitleUpdatedListener {
         fun onTitleUpdated(title: LocaleString?)
-    }
-
-    @Deprecated("", ReplaceWith("shouldShowMediaEngagementView(isUpgradeToCall)"))
-    fun shouldShowMediaEngagementView() {
-        Logger.logDeprecatedMethodUse(TAG, "shouldShowMediaEngagementView()")
-        shouldShowMediaEngagementView(false)
     }
 
     fun shouldShowMediaEngagementView(isUpgradeToCall: Boolean) =

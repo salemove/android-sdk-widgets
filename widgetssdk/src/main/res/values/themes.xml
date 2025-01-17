@@ -76,7 +76,7 @@
 
     </style>
 
-    <style name="Application.Glia.FilePreview.Activity" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Application.Glia.ImagePreview.Activity" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:windowBackground">@color/glia_black_color</item>
         <item name="gliaIconAppBarBack">@drawable/ic_baseline_arrow_back</item>
         <item name="colorPrimary">@color/glia_black_color</item>
@@ -93,15 +93,15 @@
     </style>
 
     <style name="ThemeOverlay.Glia.Chat" parent="">
-        <item name="gliaBrandPrimaryColor">@color/glia_brand_primary_color</item>
-        <item name="gliaBaseDarkColor">@color/glia_base_dark_color</item>
-        <item name="gliaBaseLightColor">@color/glia_base_light_color</item>
-        <item name="gliaBaseNormalColor">@color/glia_base_normal_color</item>
-        <item name="gliaBaseShadeColor">@color/glia_base_shade_color</item>
-        <item name="gliaSystemNegativeColor">@color/glia_system_negative_color</item>
-        <item name="gliaSystemAgentBubbleColor">@color/glia_system_agent_bubble_color</item>
+        <item name="gliaBrandPrimaryColor">@color/glia_primary_color</item>
+        <item name="gliaBaseDarkColor">@color/glia_dark_color</item>
+        <item name="gliaBaseLightColor">@color/glia_light_color</item>
+        <item name="gliaBaseNormalColor">@color/glia_normal_color</item>
+        <item name="gliaBaseShadeColor">@color/glia_shade_color</item>
+        <item name="gliaSystemNegativeColor">@color/glia_negative_color</item>
+        <item name="gliaSystemAgentBubbleColor">@color/glia_neutral_color</item>
         <item name="gliaChatBackgroundColor">@color/glia_chat_background_color</item>
-        <item name="gliaEndScreenShareTintColor">@color/glia_base_light_color</item>
+        <item name="gliaEndScreenShareTintColor">@color/glia_light_color</item>
         <item name="gliaIconAppBarBack">@drawable/ic_baseline_arrow_back</item>
         <item name="gliaIconLeaveQueue">@drawable/ic_baseline_close</item>
         <item name="gliaIconSendMessage">@drawable/ic_baseline_send</item>
@@ -181,6 +181,19 @@
     <style name="ThemeOverlay.Glia.Chat.AlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
         <item name="alertDialogStyle">@style/MaterialAlertDialog.App</item>
         <item name="android:backgroundTint">?attr/gliaBaseLightColor</item>
+
+        <!--        TODO remove this two lines during implementation of leave dialog. This was added to make text on the temp dialog visible-->
+        <item name="colorOnSurface">@color/glia_black_color</item>
+        <item name="colorPrimary">@color/glia_primary_color</item>
     </style>
+
+    <style name="ThemeOverlay.Glia.BottomSheetDialog" parent="ThemeOverlay.MaterialComponents.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/ThemeOverlay.Glia.BottomSheetModal</item>
+    </style>
+
+    <style name="ThemeOverlay.Glia.BottomSheetModal" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
 
 </resources>

@@ -11,14 +11,14 @@ import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
  * Default [SnackBarTheme] generated for [ColorPallet]
  */
 internal fun DefaultSnackBarTheme(pallet: ColorPallet?): SnackBarTheme? = pallet?.run {
-    SnackBarTheme(background = baseDarkColorTheme, text = baseLightColorTheme)
+    SnackBarTheme(background = darkColorTheme, text = lightColorTheme)
 }
 
 /**
  * [SnackBarTheme] generated for Call Screen
  */
 internal fun CallSnackBarTheme(pallet: ColorPallet?): SnackBarTheme? = pallet?.run {
-    SnackBarTheme(background = baseLightColorTheme, text = baseDarkColorTheme)
+    SnackBarTheme(background = lightColorTheme, text = darkColorTheme)
 }
 
 internal fun SnackBarTheme(background: ColorTheme?, text: ColorTheme?): SnackBarTheme? = composeIfAtLeastOneNotNull(background, text) {

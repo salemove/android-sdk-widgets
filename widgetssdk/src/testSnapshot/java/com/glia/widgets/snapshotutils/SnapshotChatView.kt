@@ -4,7 +4,6 @@ import android.view.View
 import android.widget.EditText
 import androidx.annotation.DrawableRes
 import com.glia.widgets.R
-import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.ChatContract
 import com.glia.widgets.chat.ChatView
 import com.glia.widgets.chat.controller.ChatController
@@ -14,6 +13,7 @@ import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.databinding.ChatActivityBinding
 import com.glia.widgets.di.ControllerFactory
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.entrywidget.EntryWidgetContract
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import org.mockito.kotlin.KArgumentCaptor
 import org.mockito.kotlin.argumentCaptor
@@ -23,7 +23,7 @@ import org.mockito.kotlin.whenever
 import java.util.concurrent.Executor
 
 internal interface SnapshotChatView : SnapshotContent, SnapshotTheme, SnapshotActivityWindow, SnapshotProviders,
-    SnapshotGetImageFile, SnapshotSchedulers, SnapshotAttachment, SnapshotPicasso, SnapshotLottie {
+    SnapshotGetImageFile, SnapshotSchedulers, SnapshotAttachment, SnapshotPicasso, SnapshotLottie, SnapshotThemeConfiguration {
 
     data class Mock(
         val activityMock: SnapshotActivityWindow.Mock,
@@ -39,12 +39,12 @@ internal interface SnapshotChatView : SnapshotContent, SnapshotTheme, SnapshotAc
         val schedulersMock = schedulersMock()
 
         lottieMock()
-        localeProviderMock()
-        resourceProviderMock()
 
         val controllerFactoryMock = mock<ControllerFactory>()
         val chatControllerMock = mock<ChatController>()
+        val entryWidgetControllerMock = mock<EntryWidgetContract.Controller>()
         whenever(controllerFactoryMock.chatController).thenReturn(chatControllerMock)
+        whenever(controllerFactoryMock.entryWidgetController).thenReturn(entryWidgetControllerMock)
         Dependencies.controllerFactory = controllerFactoryMock
 
         return Mock(activityMock, imageFileMock, schedulersMock, controllerFactoryMock, chatControllerMock)
@@ -63,21 +63,19 @@ internal interface SnapshotChatView : SnapshotContent, SnapshotTheme, SnapshotAc
         @DrawableRes imageResources: List<Int>? = null,
         message: String? = null,
         executor: Executor? = Executor(Runnable::run),
-        unifiedTheme: UnifiedTheme? = null,
-        uiTheme: UiTheme? = null
+        unifiedTheme: UnifiedTheme? = null
     ): ViewData {
+        setUnifiedTheme(unifiedTheme)
+
         val mock = chatViewMock()
 
         imageResources?.let { picassoMock(imageResources) }
-        unifiedTheme?.let { Dependencies.gliaThemeManager.theme = it }
 
         val chatViewCaptor: KArgumentCaptor<ChatContract.View> = argumentCaptor()
         val chatActivityBinding = ChatActivityBinding.inflate(layoutInflater)
         val root = chatActivityBinding.root
         val chatView = chatActivityBinding.chatView
         verify(mock.chatControllerMock).setView(chatViewCaptor.capture())
-
-        chatView.setUiTheme(uiTheme)
 
         chatView.executor = executor
 
@@ -86,10 +84,6 @@ internal interface SnapshotChatView : SnapshotContent, SnapshotTheme, SnapshotAc
         chatItems?.let { chatViewCallback.emitItems(it) }
         fileAttachments?.let { chatViewCallback.emitUploadAttachments(it) }
         message?.let { chatView.findViewById<EditText>(R.id.chat_edit_text).setText(it) }
-
-        setOnEndListener {
-            Dependencies.gliaThemeManager.theme = null
-        }
 
         return ViewData(root, chatView, mock)
     }

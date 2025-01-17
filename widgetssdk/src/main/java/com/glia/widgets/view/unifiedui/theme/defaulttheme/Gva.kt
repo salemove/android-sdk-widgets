@@ -21,11 +21,11 @@ internal fun GvaTheme(pallet: ColorPallet): GvaTheme = GvaTheme(
 private fun GvaPersistentButtonTheme(
     pallet: ColorPallet
 ): GvaPersistentButtonTheme? = pallet.run {
-    composeIfAtLeastOneNotNull(baseNeutralColorTheme, baseDarkColorTheme, baseLightColorTheme) {
+    composeIfAtLeastOneNotNull(neutralColorTheme, darkColorTheme, lightColorTheme) {
         GvaPersistentButtonTheme(
             title = BaseDarkColorTextTheme(this),
             background = LayerTheme(
-                fill = baseNeutralColorTheme
+                fill = neutralColorTheme
             ),
             button = GvaDefaultButtonTheme(this)
         )
@@ -35,12 +35,12 @@ private fun GvaPersistentButtonTheme(
 private fun GvaGalleryCardTheme(
     pallet: ColorPallet
 ): GvaGalleryCardTheme? = pallet.run {
-    composeIfAtLeastOneNotNull(baseNeutralColorTheme, baseDarkColorTheme, baseLightColorTheme) {
+    composeIfAtLeastOneNotNull(neutralColorTheme, darkColorTheme, lightColorTheme) {
         GvaGalleryCardTheme(
             title = BaseDarkColorTextTheme(this),
             subtitle = BaseDarkColorTextTheme(this),
             background = LayerTheme(
-                fill = baseNeutralColorTheme
+                fill = neutralColorTheme
             ),
             button = GvaDefaultButtonTheme(this)
         )

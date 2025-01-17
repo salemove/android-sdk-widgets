@@ -32,8 +32,9 @@ import com.glia.widgets.chat.model.VisitorChatItem
 import com.glia.widgets.chat.model.VisitorMessageItem
 import com.glia.widgets.core.engagement.domain.model.ChatHistoryResponse
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
+import com.glia.widgets.core.secureconversations.domain.HasOngoingSecureConversationUseCase
 import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDelayUseCase
-import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
+import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Observable
@@ -76,10 +77,12 @@ class ChatManagerTest {
     private lateinit var sendUnsentMessagesUseCase: SendUnsentMessagesUseCase
     private lateinit var handleCustomCardClickUseCase: HandleCustomCardClickUseCase
     private lateinit var isAuthenticatedUseCase: IsAuthenticatedUseCase
-    private lateinit var isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase
+    private lateinit var hasOngoingSecureConversationUseCase: HasOngoingSecureConversationUseCase
+    private lateinit var isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase
     private lateinit var subjectUnderTest: ChatManager
     private lateinit var state: ChatManager.State
     private lateinit var compositeDisposable: CompositeDisposable
+    private lateinit var markMessagesReadDisposable: CompositeDisposable
     private lateinit var stateProcessor: BehaviorProcessor<ChatManager.State>
     private lateinit var quickReplies: BehaviorProcessor<List<GvaButton>>
     private lateinit var action: BehaviorProcessor<ChatManager.Action>
@@ -98,8 +101,10 @@ class ChatManagerTest {
         sendUnsentMessagesUseCase = mock()
         handleCustomCardClickUseCase = mock()
         isAuthenticatedUseCase = mock()
-        isQueueingOrEngagementUseCase = mock()
+        hasOngoingSecureConversationUseCase = mock()
+        isQueueingOrLiveEngagementUseCase = mock()
         compositeDisposable = spy()
+        markMessagesReadDisposable = spy()
         stateProcessor = BehaviorProcessor.createDefault(state)
         quickReplies = BehaviorProcessor.create()
         action = BehaviorProcessor.create()
@@ -115,8 +120,10 @@ class ChatManagerTest {
             sendUnsentMessagesUseCase,
             handleCustomCardClickUseCase,
             isAuthenticatedUseCase,
-            isQueueingOrEngagementUseCase,
+            hasOngoingSecureConversationUseCase,
+            isQueueingOrLiveEngagementUseCase,
             compositeDisposable,
+            markMessagesReadDisposable,
             stateProcessor,
             quickReplies,
             action,
@@ -151,23 +158,20 @@ class ChatManagerTest {
         subjectUnderTestSpy.markMessagesReadWithDelay()
         verify(subjectUnderTestSpy).removeNewMessagesDivider(any())
         assertFalse(stateProcessorSpy.value!!.chatItems.contains(NewMessagesDividerItem))
-        verify(compositeDisposable).add(any())
+        verify(markMessagesReadDisposable).add(any())
         verify(stateProcessorSpy).onNext(any())
     }
 
     @Test
     fun `mapInQueue adds OperatorStatusItem_InQueue to chatItems and updates operatorStatusItem`() {
-        val companyName = "company Name"
-        val newState = subjectUnderTest.mapInQueue(companyName, state)
+        val newState = subjectUnderTest.mapInQueue(state)
         val lastItem = newState.chatItems.last() as OperatorStatusItem.InQueue
-        assertEquals(companyName, lastItem.companyName)
-        assertEquals(companyName, newState.operatorStatusItem!!.companyName)
         assertEquals(lastItem, newState.operatorStatusItem)
     }
 
     @Test
     fun `mapTransferring removes old OperatorStatusItem when it exists and adds new one`() {
-        subjectUnderTest.mapTransferring(subjectUnderTest.mapInQueue("name", state)).apply {
+        subjectUnderTest.mapTransferring(subjectUnderTest.mapInQueue(state)).apply {
             assertTrue(chatItems.count() == 1)
             assertTrue(chatItems.contains(OperatorStatusItem.Transferring))
         }
@@ -175,7 +179,7 @@ class ChatManagerTest {
 
     @Test
     fun `mapOperatorConnected adds OperatorStatusItem_Connected when the old is null`() {
-        val action = ChatManager.Action.OperatorConnected("c_name", "o_name", "o_image")
+        val action = ChatManager.Action.OperatorConnected("o_name", "o_image")
         val stateSpy = spy(state)
         val subjectUnderTestSpy = spy(subjectUnderTest)
         subjectUnderTestSpy.mapOperatorConnected(action, stateSpy)
@@ -183,13 +187,12 @@ class ChatManagerTest {
         verify(stateSpy).resetOperator()
         val newItem = stateSpy.chatItems.last() as OperatorStatusItem.Connected
         assertEquals(newItem.operatorName, action.operatorFormattedName)
-        assertEquals(newItem.companyName, action.companyName)
         assertEquals(newItem.profileImgUrl, action.operatorImageUrl)
     }
 
     @Test
     fun `mapOperatorConnected replaces old OperatorStatusItem when the old is exists`() {
-        val action = ChatManager.Action.OperatorConnected("c_name", "o_name", "o_image")
+        val action = ChatManager.Action.OperatorConnected("o_name", "o_image")
         state.apply {
             operatorStatusItem = OperatorStatusItem.Transferring
             chatItems.add(mock())
@@ -201,7 +204,6 @@ class ChatManagerTest {
         verify(subjectUnderTestSpy).checkUnsentMessages(any())
         val newItem = newState.chatItems.last() as OperatorStatusItem.Connected
         assertEquals(newItem.operatorName, action.operatorFormattedName)
-        assertEquals(newItem.companyName, action.companyName)
         assertEquals(newItem.profileImgUrl, action.operatorImageUrl)
         assertFalse(newState.chatItems.contains(OperatorStatusItem.Transferring))
     }
@@ -226,7 +228,7 @@ class ChatManagerTest {
         val payload = SendMessagePayload(content = "content")
         val item = VisitorMessageItem(payload.content, payload.messageId)
 
-        val inQueue = OperatorStatusItem.InQueue("company_name")
+        val inQueue = OperatorStatusItem.InQueue
 
         assertTrue(state.messagePreviews.isEmpty())
         assertTrue(state.chatItems.isEmpty())
@@ -272,7 +274,7 @@ class ChatManagerTest {
 
     @Test
     fun `mapOperatorJoined adds OperatorStatusItem_Joined to chatItems when called`() {
-        val action: ChatManager.Action.OperatorJoined = ChatManager.Action.OperatorJoined("", "", "")
+        val action: ChatManager.Action.OperatorJoined = ChatManager.Action.OperatorJoined("", "")
         subjectUnderTest.mapTransferring(state).apply {
             assertTrue(chatItems.contains(OperatorStatusItem.Transferring))
         }
@@ -355,19 +357,14 @@ class ChatManagerTest {
 
     @Test
     fun `mapAction calls mapInQueue when Action_QueuingStarted passed`() {
-        val action: ChatManager.Action.QueuingStarted = mock {
-            on { companyName } doReturn ""
-        }
-
         val subjectUnderTestSpy = spy(subjectUnderTest)
-        subjectUnderTestSpy.mapAction(action, state)
-        verify(subjectUnderTestSpy).mapInQueue(any(), any())
+        subjectUnderTestSpy.mapAction(ChatManager.Action.QueuingStarted, state)
+        verify(subjectUnderTestSpy).mapInQueue(any())
     }
 
     @Test
     fun `mapAction calls mapOperatorConnected when Action_OperatorConnected passed`() {
         val action: ChatManager.Action.OperatorConnected = mock {
-            on { companyName } doReturn ""
             on { operatorFormattedName } doReturn ""
         }
 
@@ -388,7 +385,6 @@ class ChatManagerTest {
     @Test
     fun `mapAction calls mapOperatorJoined when Action_OperatorJoined passed`() {
         val action: ChatManager.Action.OperatorJoined = mock {
-            on { companyName } doReturn ""
             on { operatorFormattedName } doReturn ""
         }
 
@@ -701,7 +697,7 @@ class ChatManagerTest {
     @Test
     fun `loadHistory loads history when authenticated`() {
         whenever(isAuthenticatedUseCase()) doReturn true
-        whenever(isQueueingOrEngagementUseCase.hasOngoingEngagement) doReturn false
+        whenever(isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement) doReturn false
 
         whenever(loadHistoryUseCase()) doReturn Single.just(mock())
 
@@ -721,7 +717,7 @@ class ChatManagerTest {
     @Test
     fun `loadHistory loads history when engagement is ongoing`() {
         whenever(isAuthenticatedUseCase()) doReturn false
-        whenever(isQueueingOrEngagementUseCase.hasOngoingEngagement) doReturn true
+        whenever(isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement) doReturn true
 
         whenever(loadHistoryUseCase()) doReturn Single.just(mock())
 
@@ -741,7 +737,7 @@ class ChatManagerTest {
     @Test
     fun `loadHistory skips history when there is no ongoing engagement and not authenticated`() {
         whenever(isAuthenticatedUseCase()) doReturn false
-        whenever(isQueueingOrEngagementUseCase.hasOngoingEngagement) doReturn false
+        whenever(isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement) doReturn false
 
         whenever(loadHistoryUseCase()) doReturn Single.just(mock())
 
@@ -792,6 +788,7 @@ class ChatManagerTest {
         subjectUnderTest.reset()
 
         verify(compositeDisposable).clear()
+        verify(markMessagesReadDisposable).clear()
         assertEquals(stateProcessor.value, ChatManager.State())
         assertEquals(quickReplies.value, emptyList<GvaButton>())
         assertEquals(historyLoaded.value, false)
@@ -826,6 +823,7 @@ class ChatManagerTest {
 
             initialize(onHistoryLoaded, onQuickReplyReceived, onOperatorMessageReceived).test().assertNoErrors().awaitCount(1)
 
+            verify(compositeDisposable).clear()
             verify(this).subscribe(onHistoryLoaded, onOperatorMessageReceived, onQuickReplyReceived)
             verify(this).subscribeToState(onHistoryLoaded, onOperatorMessageReceived)
             verify(this).subscribeToQuickReplies(onQuickReplyReceived)

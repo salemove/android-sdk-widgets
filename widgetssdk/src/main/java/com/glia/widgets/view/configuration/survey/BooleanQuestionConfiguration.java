@@ -78,34 +78,34 @@ public class BooleanQuestionConfiguration implements Parcelable {
 
         @SuppressLint("ResourceType")
         private OptionButtonConfiguration prepareDefaultButtonConfiguration(ResourceProvider resourceProvider) {
-            ColorStateList normalTextColor = resourceProvider.getColorStateList(R.color.glia_base_dark_color);
-            ColorStateList selectedTextColor = resourceProvider.getColorStateList(R.color.glia_base_light_color);
+            ColorStateList normalTextColor = resourceProvider.getColorStateList(R.color.glia_dark_color);
+            ColorStateList selectedTextColor = resourceProvider.getColorStateList(R.color.glia_light_color);
             TextConfiguration normalText = new TextConfiguration.Builder()
                     .textColor(normalTextColor)
                     .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
-                    .build();
+                    .build(resourceProvider);
             TextConfiguration selectedText = new TextConfiguration.Builder()
                     .textColor(selectedTextColor)
                     .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
-                    .build();
+                    .build(resourceProvider);
             TextConfiguration highlightedText = new TextConfiguration.Builder()
                     .textColor(normalTextColor)
                     .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
-                    .build();
+                    .build(resourceProvider);
 
             LayerConfiguration normalLayer = new LayerConfiguration.Builder()
-                    .backgroundColor(resourceProvider.getString(R.color.glia_base_light_color))
+                    .backgroundColor(resourceProvider.getString(R.color.glia_light_color))
                     .borderColor(resourceProvider.getString(R.color.glia_stroke_gray))
                     .cornerRadius(resourceProvider.getDimension(R.dimen.glia_survey_default_corner_radius))
                     .build();
             LayerConfiguration selectedLayer = new LayerConfiguration.Builder()
-                    .backgroundColor(resourceProvider.getString(R.color.glia_brand_primary_color))
-                    .borderColor(resourceProvider.getString(R.color.glia_brand_primary_color))
+                    .backgroundColor(resourceProvider.getString(R.color.glia_primary_color))
+                    .borderColor(resourceProvider.getString(R.color.glia_primary_color))
                     .cornerRadius(resourceProvider.getDimension(R.dimen.glia_survey_default_corner_radius))
                     .build();
             LayerConfiguration highlightedLayer = new LayerConfiguration.Builder()
-                    .backgroundColor(resourceProvider.getString(R.color.glia_base_light_color))
-                    .borderColor(resourceProvider.getString(R.color.glia_system_negative_color))
+                    .backgroundColor(resourceProvider.getString(R.color.glia_light_color))
+                    .borderColor(resourceProvider.getString(R.color.glia_negative_color))
                     .cornerRadius(resourceProvider.getDimension(R.dimen.glia_survey_default_corner_radius))
                     .build();
             return new OptionButtonConfiguration.Builder()
@@ -119,12 +119,12 @@ public class BooleanQuestionConfiguration implements Parcelable {
         }
 
         private TextConfiguration prepareDefaultTitleConfiguration(ResourceProvider resourceProvider) {
-            ColorStateList normalTextColor = resourceProvider.getColorStateList(R.color.glia_base_dark_color);
+            ColorStateList normalTextColor = resourceProvider.getColorStateList(R.color.glia_dark_color);
             return new TextConfiguration.Builder()
                     .textColor(normalTextColor)
                     .bold(true)
                     .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_title_text_size))
-                    .build();
+                    .build(resourceProvider);
         }
     }
 

@@ -8,7 +8,6 @@ import androidx.activity.result.ActivityResult
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.widgets.chat.ChatActivity
-import com.glia.widgets.core.configuration.GliaSdkConfigurationManager
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
 import com.glia.widgets.core.dialog.domain.SetOverlayPermissionRequestDialogShownUseCase
@@ -62,7 +61,6 @@ class OperatorRequestControllerTest {
     private lateinit var setOverlayPermissionRequestDialogShownUseCase: SetOverlayPermissionRequestDialogShownUseCase
     private lateinit var dialogController: DialogContract.Controller
     private lateinit var dialogCallbackSlot: CapturingSlot<DialogContract.Controller.Callback>
-    private lateinit var gliaSdkConfigurationManager: GliaSdkConfigurationManager
     private lateinit var withNotificationPermissionUseCase: WithNotificationPermissionUseCase
     private lateinit var prepareToScreenSharingUseCase: PrepareToScreenSharingUseCase
     private lateinit var releaseScreenSharingResourcesUseCase: ReleaseScreenSharingResourcesUseCase
@@ -93,8 +91,6 @@ class OperatorRequestControllerTest {
 
         dialogCallbackSlot = slot()
 
-        gliaSdkConfigurationManager = mockk(relaxed = true)
-
         controller = OperatorRequestController(
             operatorMediaUpgradeOfferUseCase,
             acceptMediaUpgradeOfferUseCase,
@@ -106,7 +102,6 @@ class OperatorRequestControllerTest {
             isCurrentEngagementCallVisualizerUseCase,
             setOverlayPermissionRequestDialogShownUseCase,
             dialogController,
-            gliaSdkConfigurationManager,
             withNotificationPermissionUseCase,
             prepareToScreenSharingUseCase,
             releaseScreenSharingResourcesUseCase
@@ -308,20 +303,17 @@ class OperatorRequestControllerTest {
 
         verify { withNotificationPermissionUseCase(capture(callbackSlot)) }
 
-        verify(exactly = 0) { gliaSdkConfigurationManager.screenSharingMode }
-        verify(exactly = 0) { screenSharingUseCase.acceptRequestWithAskedPermission(eq(activity), any()) }
+        verify(exactly = 0) { screenSharingUseCase.acceptRequestWithAskedPermission(eq(activity)) }
         state.assertNotComplete().assertNoValues()
 
         callbackSlot.captured.invoke()
 
-        verify { gliaSdkConfigurationManager.screenSharingMode }
-        verify { screenSharingUseCase.acceptRequestWithAskedPermission(eq(activity), any()) }
+        verify { screenSharingUseCase.acceptRequestWithAskedPermission(eq(activity)) }
         state.assertNotComplete().assertValue { it.value == OperatorRequestContract.State.AcquireMediaProjectionToken }
         confirmVerified(
             releaseScreenSharingResourcesUseCase,
             prepareToScreenSharingUseCase,
             screenSharingUseCase,
-            gliaSdkConfigurationManager,
             withNotificationPermissionUseCase
         )
     }

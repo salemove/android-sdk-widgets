@@ -26,22 +26,20 @@ import com.glia.androidsdk.Glia
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.fcm.GliaPushMessage
 import com.glia.androidsdk.omnibrowse.Omnibrowse
-import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.androidsdk.visitor.Authentication
 import com.glia.exampleapp.ExampleAppConfigManager.createDefaultConfig
 import com.glia.exampleapp.Utils.getAuthenticationBehaviorFromPrefs
 import com.glia.widgets.GliaWidgets
-import com.glia.widgets.UiTheme
-import com.glia.widgets.call.CallActivity
-import com.glia.widgets.chat.ChatActivity
-import com.glia.widgets.chat.ChatType
 import com.glia.widgets.core.notification.NotificationActionReceiver
-import com.glia.widgets.messagecenter.MessageCenterActivity
+import com.glia.widgets.entrywidget.EntryWidget
+import com.glia.widgets.launcher.EngagementLauncher
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.card.MaterialCardView
 import kotlin.concurrent.thread
 import kotlin.properties.Delegates
 
 class MainFragment : Fragment() {
+
     private var containerView: ConstraintLayout? = null
     private var authentication: Authentication? = null
 
@@ -53,10 +51,22 @@ class MainFragment : Fragment() {
 
     private val authToken: String
         get() {
-            val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
             val authTokenFromPrefs = getAuthTokenFromPrefs(sharedPreferences)
             return authTokenFromPrefs.ifEmpty { getString(R.string.glia_jwt) }
         }
+
+    private val sharedPreferences: SharedPreferences by lazy {
+        PreferenceManager.getDefaultSharedPreferences(requireContext())
+    }
+
+    private val engagementLauncher: EngagementLauncher by lazy {
+        ensureInitialized()
+        GliaWidgets.getEngagementLauncher(getQueueIdsFromPrefs(sharedPreferences))
+    }
+
+    private val entryWidget: EntryWidget by lazy {
+        GliaWidgets.getEntryWidget(getQueueIdsFromPrefs(sharedPreferences))
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -73,14 +83,35 @@ class MainFragment : Fragment() {
 
         view.findViewById<View>(R.id.settings_button)
             .setOnClickListener { navController.navigate(R.id.settings) }
+        view.findViewById<View>(R.id.entry_widget_button)
+            .setOnClickListener {
+                if ((view.findViewById<View>(R.id.entry_widget_switch) as SwitchCompat).isChecked) {
+                    showEntryWidgetInADedicatedView()
+                } else {
+                    entryWidget.show(requireActivity())
+                }
+            }
+        val visitorContextAssetId = getContextAssetIdFromPrefs(sharedPreferences)
         view.findViewById<View>(R.id.chat_activity_button)
-            .setOnClickListener { navigateToChat(ChatType.LIVE_CHAT) }
+            .setOnClickListener {
+                visitorContextAssetId?.run { engagementLauncher.startChat(requireActivity(), this) }
+                    ?: engagementLauncher.startChat(requireActivity())
+            }
         view.findViewById<View>(R.id.audio_call_button)
-            .setOnClickListener { navigateToCall(GliaWidgets.MEDIA_TYPE_AUDIO) }
+            .setOnClickListener {
+                visitorContextAssetId?.run { engagementLauncher.startAudioCall(requireActivity(), this) }
+                    ?: engagementLauncher.startAudioCall(requireActivity())
+            }
         view.findViewById<View>(R.id.video_call_button)
-            .setOnClickListener { navigateToCall(GliaWidgets.MEDIA_TYPE_VIDEO) }
+            .setOnClickListener {
+                visitorContextAssetId?.run { engagementLauncher.startVideoCall(requireActivity(), this) }
+                    ?: engagementLauncher.startVideoCall(requireActivity())
+            }
         view.findViewById<View>(R.id.message_center_activity_button)
-            .setOnClickListener { navigateToMessageCenter() }
+            .setOnClickListener {
+                visitorContextAssetId?.run { engagementLauncher.startSecureMessaging(requireActivity(), this) }
+                    ?: engagementLauncher.startSecureMessaging(requireActivity())
+            }
         view.findViewById<View>(R.id.end_engagement_button)
             .setOnClickListener { GliaWidgets.endEngagement() }
         view.findViewById<View>(R.id.visitor_info_button)
@@ -193,9 +224,9 @@ class MainFragment : Fragment() {
             .handleOnMainActivityCreate(requireActivity().intent.extras) ?: return
 
         if (push.type == GliaPushMessage.PushType.QUEUED_MESSAGE) {
-            authenticate { navigateToChat(ChatType.SECURE_MESSAGING) }
+            authenticate { engagementLauncher.startSecureMessaging(requireActivity()) }
         } else {
-            navigateToChat(ChatType.LIVE_CHAT)
+            engagementLauncher.startChat(requireActivity())
         }
     }
 
@@ -272,52 +303,6 @@ class MainFragment : Fragment() {
         }
     }
 
-    private fun navigateToChat(chatType: ChatType) {
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-        val intent = ChatActivity.getIntent(
-            requireContext(),
-            getContextAssetIdFromPrefs(sharedPreferences),
-            getQueueIdsFromPrefs(sharedPreferences),
-            chatType
-        )
-        startActivity(intent)
-    }
-
-    private fun navigateToMessageCenter() {
-        val intent = Intent(requireContext(), MessageCenterActivity::class.java)
-        setNavigationIntentData(intent)
-        startActivity(intent)
-    }
-
-    private fun navigateToCall(mediaType: String) {
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-        val intent = Intent(context, CallActivity::class.java)
-            .putExtra(GliaWidgets.QUEUE_IDS, ArrayList(getQueueIdsFromPrefs(sharedPreferences)))
-            .putExtra(GliaWidgets.CONTEXT_ASSET_ID, getContextAssetIdFromPrefs(sharedPreferences))
-            .putExtra(GliaWidgets.UI_THEME, getRuntimeThemeFromPrefs(sharedPreferences))
-//            .putExtra(GliaWidgets.USE_OVERLAY, true) // Use it to make sure this deprecated approach is still working
-            .putExtra(GliaWidgets.SCREEN_SHARING_MODE, getScreenSharingModeFromPrefs(sharedPreferences))
-            .putExtra(GliaWidgets.MEDIA_TYPE, Utils.toMediaType(mediaType))
-        startActivity(intent)
-    }
-
-    private fun setNavigationIntentData(intent: Intent) {
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-        intent.putExtra(GliaWidgets.QUEUE_IDS, ArrayList(getQueueIdsFromPrefs(sharedPreferences)))
-            .putExtra(GliaWidgets.CONTEXT_ASSET_ID, getContextAssetIdFromPrefs(sharedPreferences))
-            .putExtra(GliaWidgets.UI_THEME, getRuntimeThemeFromPrefs(sharedPreferences))
-//            .putExtra(GliaWidgets.USE_OVERLAY, true) // Use it to make sure this deprecated approach is still working
-            .putExtra(GliaWidgets.SCREEN_SHARING_MODE, getScreenSharingModeFromPrefs(sharedPreferences))
-    }
-
-    private fun getScreenSharingModeFromPrefs(sharedPreferences: SharedPreferences): ScreenSharing.Mode {
-        return Utils.getScreenSharingModeFromPrefs(sharedPreferences, resources)
-    }
-
-    private fun getRuntimeThemeFromPrefs(sharedPreferences: SharedPreferences): UiTheme? {
-        return Utils.getRunTimeThemeByPrefs(sharedPreferences, resources)
-    }
-
     private fun getQueueIdsFromPrefs(sharedPreferences: SharedPreferences): List<String> {
         val defaultQueues = sharedPreferences.getBoolean(resources.getString(R.string.pref_default_queues), false)
         if (defaultQueues) {
@@ -344,24 +329,13 @@ class MainFragment : Fragment() {
         )
     }
 
-    private fun getCompanyNameFromPrefs(sharedPreferences: SharedPreferences): String {
-        return Utils.getStringFromPrefs(
-            R.string.pref_company_name,
-            "",
-            sharedPreferences,
-            resources
-        )
-    }
-
     private fun saveAuthToken(jwt: String) {
         if (jwt != getString(R.string.glia_jwt)) {
-            val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
             putAuthTokenToPrefs(sharedPreferences, jwt)
         }
     }
 
     private fun clearAuthToken() {
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
         putAuthTokenToPrefs(sharedPreferences, null)
     }
 
@@ -436,8 +410,10 @@ class MainFragment : Fragment() {
         return container
     }
 
-    private fun prepareJwtInputViewEditText(builder: AlertDialog.Builder,
-                                            dialogTitle: Int): EditText {
+    private fun prepareJwtInputViewEditText(
+        builder: AlertDialog.Builder,
+        dialogTitle: Int
+    ): EditText {
         val input = EditText(context)
         input.setHint(R.string.authentication_dialog_jwt_input_hint)
         input.setSingleLine()
@@ -449,8 +425,10 @@ class MainFragment : Fragment() {
         return input
     }
 
-    private fun prepareExternalTokenInputViewEditText(builder: AlertDialog.Builder,
-                                                      dialogTitle: Int): EditText {
+    private fun prepareExternalTokenInputViewEditText(
+        builder: AlertDialog.Builder,
+        dialogTitle: Int
+    ): EditText {
         val input = EditText(context)
         input.setHint(R.string.authentication_dialog_external_token_input_hint)
         input.setSingleLine()
@@ -496,7 +474,7 @@ class MainFragment : Fragment() {
         if (externalToken!!.isEmpty()) externalToken = null
         authentication?.refresh(
             jwt, externalToken
-        ) { response, exception ->
+        ) { _, exception ->
             setupAuthButtonsVisibility()
             if (exception != null || !authentication!!.isAuthenticated) {
                 showToast("Error: $exception")
@@ -505,6 +483,12 @@ class MainFragment : Fragment() {
             }
         }
         saveAuthToken(jwt)
+    }
+
+    private fun ensureInitialized() {
+        if (!Glia.isInitialized()) {
+            initGliaWidgets()
+        }
     }
 
     private fun initGliaWidgets() {
@@ -517,8 +501,7 @@ class MainFragment : Fragment() {
         GliaWidgets.init(
             createDefaultConfig(
                 context = requireActivity().applicationContext,
-//                uiJsonRemoteConfig = UnifiedUiConfigurationLoader.fetchRemoteConfiguration(),
-//                runtimeConfig = createSampleRuntimeConfig(),
+//                uiJsonRemoteConfig = UnifiedUiConfigurationLoader.fetchLocalConfigSample(requireContext()),
 //                region = "us"
             )
         )
@@ -529,14 +512,9 @@ class MainFragment : Fragment() {
         view?.post { initMenu() }
     }
 
-    private fun createSampleRuntimeConfig(): UiTheme = UiTheme(
-        gvaQuickReplyTextColor = android.R.color.holo_green_dark,
-        gvaQuickReplyStrokeColor = android.R.color.holo_green_dark,
-        brandPrimaryColor = android.R.color.holo_green_dark
-    )
-
     private fun prepareAuthentication() {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        authentication = GliaWidgets.getAuthentication(getAuthenticationBehaviorFromPrefs(sharedPreferences, resources))
         authentication =
             GliaWidgets.getAuthentication(getAuthenticationBehaviorFromPrefs(sharedPreferences, resources))
     }
@@ -585,12 +563,20 @@ class MainFragment : Fragment() {
         setupAuthButtonsVisibility()
     }
 
+    // For testing the embedded Entry Widget
+    private fun showEntryWidgetInADedicatedView() {
+        val entryWidgetView = entryWidget.getView(requireContext())
+        val container = containerView!!.findViewById<MaterialCardView>(R.id.entry_widget_container)
+        container.removeAllViews()
+        container.addView(entryWidgetView)
+        container.visibility = View.VISIBLE
+    }
+
     private fun showVisitorCode() {
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-        val visitorContext = getContextAssetIdFromPrefs(sharedPreferences)
+        val visitorContextAssetId = getContextAssetIdFromPrefs(sharedPreferences)
         val cv = GliaWidgets.getCallVisualizer()
-        if (!visitorContext.isNullOrBlank()) {
-            cv.addVisitorContext(visitorContext)
+        if (!visitorContextAssetId.isNullOrBlank()) {
+            cv.addVisitorContext(visitorContextAssetId)
         }
         cv.showVisitorCodeDialog()
     }
@@ -598,14 +584,14 @@ class MainFragment : Fragment() {
     // For testing the integrated Visitor Code solution
     private fun showVisitorCodeInADedicatedView() {
         val visitorCodeView = GliaWidgets.getCallVisualizer().createVisitorCodeView(requireContext())
-        val cv = containerView!!.findViewById<CardView>(R.id.container)
+        val cv = containerView!!.findViewById<CardView>(R.id.visitor_code_container)
         cv.removeAllViews()
         cv.addView(visitorCodeView)
         cv.visibility = View.VISIBLE
     }
 
     private fun removeVisitorCodeFromDedicatedView() {
-        val cv = containerView!!.findViewById<CardView>(R.id.container)
+        val cv = containerView!!.findViewById<CardView>(R.id.visitor_code_container)
         cv.removeAllViews()
         cv.visibility = View.GONE
     }

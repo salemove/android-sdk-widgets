@@ -29,11 +29,7 @@ import kotlinx.parcelize.Parcelize
     "While this class can still be used for UI customization, we strongly encourage adopting remote configurations(GliaWidgetsConfig.Builder.setUiJsonRemoteConfig). " +
         "The remote configurations approach is more versatile and better suited for future development."
 )
-data class UiTheme(
-    /**
-     * Text to be shown on the top of the app bar in the chat
-     */
-    val appBarTitle: String? = null,
+internal data class UiTheme(
 
     /**
      * Primary color for your brand. Used for example to set the color of the appbar
@@ -372,7 +368,6 @@ data class UiTheme(
 ) : Parcelable, Mergeable<UiTheme> {
 
     private constructor(builder: UiThemeBuilder) : this(
-        appBarTitle = builder.appBarTitle,
         brandPrimaryColor = builder.brandPrimaryColor,
         baseLightColor = builder.baseLightColor,
         baseDarkColor = builder.baseDarkColor,
@@ -439,7 +434,6 @@ data class UiTheme(
     )
 
     override fun merge(other: UiTheme): UiTheme = UiTheme(
-        appBarTitle = appBarTitle merge other.appBarTitle,
         brandPrimaryColor = brandPrimaryColor merge other.brandPrimaryColor,
         baseLightColor = baseLightColor merge other.baseLightColor,
         baseDarkColor = baseDarkColor merge other.baseDarkColor,
@@ -506,14 +500,14 @@ data class UiTheme(
 
     private fun toColorPallet(context: Context): ColorPallet = context.run {
         ColorPallet(
-            baseDarkColorTheme = ColorTheme(context.getColor(baseDarkColor ?: R.color.glia_base_dark_color)),
-            baseLightColorTheme = ColorTheme(context.getColor(baseLightColor ?: R.color.glia_base_light_color)),
-            baseNeutralColorTheme = ColorTheme(context.getColor(R.color.glia_system_agent_bubble_color)),
-            baseNormalColorTheme = ColorTheme(context.getColor(baseNormalColor ?: R.color.glia_base_normal_color)),
-            baseShadeColorTheme = ColorTheme(context.getColor(baseShadeColor ?: R.color.glia_base_shade_color)),
-            primaryColorTheme = ColorTheme(context.getColor(brandPrimaryColor ?: R.color.glia_brand_primary_color)),
+            darkColorTheme = ColorTheme(context.getColor(baseDarkColor ?: R.color.glia_dark_color)),
+            lightColorTheme = ColorTheme(context.getColor(baseLightColor ?: R.color.glia_light_color)),
+            neutralColorTheme = ColorTheme(context.getColor(R.color.glia_neutral_color)),
+            normalColorTheme = ColorTheme(context.getColor(baseNormalColor ?: R.color.glia_normal_color)),
+            shadeColorTheme = ColorTheme(context.getColor(baseShadeColor ?: R.color.glia_shade_color)),
+            primaryColorTheme = ColorTheme(context.getColor(brandPrimaryColor ?: R.color.glia_primary_color)),
             secondaryColorTheme = null,
-            systemNegativeColorTheme = ColorTheme(context.getColor(systemNegativeColor ?: R.color.glia_system_negative_color))
+            negativeColorTheme = ColorTheme(context.getColor(systemNegativeColor ?: R.color.glia_negative_color))
         )
     }
 
@@ -544,11 +538,6 @@ data class UiTheme(
             "The remote configurations approach is more versatile and better suited for future development."
     )
     class UiThemeBuilder {
-        /**
-         * Text to be shown on the top of the app bar in the chat
-         */
-        var appBarTitle: String? = null
-            private set
 
         /**
          * Primary color for your brand. Used for example to set the color of the appbar
@@ -932,10 +921,6 @@ data class UiTheme(
         var gvaQuickReplyTextColor: Int? = null
             private set
 
-        fun setAppBarTitle(appBarTitle: String?) {
-            this.appBarTitle = appBarTitle
-        }
-
         fun setFontRes(@FontRes fontRes: Int?) {
             this.fontRes = fontRes?.takeIf { it != 0 }
         }
@@ -1185,7 +1170,6 @@ data class UiTheme(
         }
 
         fun setTheme(theme: UiTheme) {
-            appBarTitle = theme.appBarTitle
             brandPrimaryColor = theme.brandPrimaryColor
             baseLightColor = theme.baseLightColor
             baseDarkColor = theme.baseDarkColor

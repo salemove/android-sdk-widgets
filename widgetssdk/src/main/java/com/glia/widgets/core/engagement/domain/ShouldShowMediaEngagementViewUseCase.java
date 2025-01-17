@@ -1,19 +1,19 @@
 package com.glia.widgets.core.engagement.domain;
 
 import com.glia.widgets.engagement.domain.EngagementTypeUseCase;
-import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase;
+import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase;
 
 /**
  * @hide
  */
 public class ShouldShowMediaEngagementViewUseCase {
-    private final IsQueueingOrEngagementUseCase isQueueingOrEngagementUseCase;
+    private final IsQueueingOrLiveEngagementUseCase isQueueingOrLiveEngagementUseCase;
     private final EngagementTypeUseCase engagementTypeUseCase;
 
     public ShouldShowMediaEngagementViewUseCase(
-        IsQueueingOrEngagementUseCase isQueueingOrEngagementUseCase,
+        IsQueueingOrLiveEngagementUseCase isQueueingOrLiveEngagementUseCase,
         EngagementTypeUseCase engagementTypeUseCase) {
-        this.isQueueingOrEngagementUseCase = isQueueingOrEngagementUseCase;
+        this.isQueueingOrLiveEngagementUseCase = isQueueingOrLiveEngagementUseCase;
         this.engagementTypeUseCase = engagementTypeUseCase;
     }
 
@@ -25,11 +25,11 @@ public class ShouldShowMediaEngagementViewUseCase {
     }
 
     private boolean hasNoQueueingAndEngagementOngoing() {
-        return !isQueueingOrEngagementUseCase.invoke();
+        return !isQueueingOrLiveEngagementUseCase.invoke();
     }
 
     private boolean hasMediaQueueingOngoing() {
-        return isQueueingOrEngagementUseCase.isQueueingForMedia();
+        return isQueueingOrLiveEngagementUseCase.isQueueingForMedia();
     }
 
     private boolean hasOngoingMediaEngagement() {

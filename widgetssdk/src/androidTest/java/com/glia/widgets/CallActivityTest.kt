@@ -15,12 +15,10 @@ import com.glia.widgets.call.CallActivity
 import com.glia.widgets.call.CallContract
 import com.glia.widgets.call.CallStateHelper
 import com.glia.widgets.call.CallStatus
-import com.glia.widgets.core.configuration.GliaSdkConfigurationManager
 import com.glia.widgets.di.ControllerFactory
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.ResourceProvider
 import com.glia.widgets.locale.LocaleProvider
-import com.glia.widgets.locale.StringKeyPair
 import com.glia.widgets.view.head.ChatHeadContract
 import io.mockk.CapturingSlot
 import io.mockk.every
@@ -28,6 +26,7 @@ import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import org.hamcrest.Matchers
+import org.junit.After
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
@@ -41,7 +40,6 @@ class CallActivityTest {
     private lateinit var callController: CallContract.Controller
     private lateinit var callView: CallContract.View
     private lateinit var serviceChatHeadController: ChatHeadContract.Controller
-    private lateinit var sdkConfigurationManager: GliaSdkConfigurationManager
     private lateinit var resourceProvider: ResourceProvider
     private lateinit var callStatus: CallStatus
     private lateinit var callViewSlot: CapturingSlot<CallContract.View>
@@ -67,11 +65,7 @@ class CallActivityTest {
         every { controllerFactory.chatHeadController } answers { serviceChatHeadController }
         Dependencies.controllerFactory = controllerFactory
 
-        // set up SdkConfigurationManager
-        sdkConfigurationManager = mockk(relaxed = true)
-        every { sdkConfigurationManager.uiTheme } answers { UiTheme() }
-        every { sdkConfigurationManager.companyName } answers { "Test Company" }
-        Dependencies.sdkConfigurationManager = sdkConfigurationManager
+        Dependencies.repositoryFactory = mockk(relaxed = true)
 
         // set up ResourceProvider
         resourceProvider = ResourceProvider(appContext)
@@ -85,6 +79,11 @@ class CallActivityTest {
         every { callStatus.formattedOperatorName } answers { "FormattedOperatorName" }
 
         launchActivity()
+    }
+
+    @After
+    fun tearDown() {
+        activityScenario.close()
     }
 
     private fun launchActivity() {
@@ -279,6 +278,7 @@ class CallActivityTest {
         callView.emitState(callState.makeCallState())
         Thread.sleep(1000)
         Espresso.onView(ViewMatchers.withContentDescription(R.string.android_app_bar_nav_up_accessibility)).perform(ViewActions.click())
+        Thread.sleep(1000)
         Assert.assertEquals(Lifecycle.State.DESTROYED, activityScenario.state)
     }
 

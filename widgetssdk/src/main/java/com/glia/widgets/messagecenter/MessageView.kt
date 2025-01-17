@@ -37,7 +37,7 @@ import com.glia.widgets.helper.wrapWithMaterialThemeOverlay
 import com.glia.widgets.view.unifiedui.applyColorTheme
 import com.glia.widgets.view.unifiedui.applyImageColorTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
-import com.glia.widgets.view.unifiedui.theme.secureconversations.SecureConversationsWelcomeScreenTheme
+import com.glia.widgets.view.unifiedui.theme.securemessaging.SecureMessagingWelcomeScreenTheme
 import com.google.android.material.button.MaterialButton
 import java.util.concurrent.Executor
 import kotlin.properties.Delegates
@@ -70,14 +70,12 @@ internal class MessageView(
     private val sendMessageGroup: Group get() = binding.sendMessageGroup
     private val bottomSpace: Space get() = binding.bottomSpace
 
-    private val unifiedTheme: SecureConversationsWelcomeScreenTheme? by lazy {
-        Dependencies.gliaThemeManager.theme?.secureConversationsWelcomeScreenTheme
+    private val unifiedTheme: SecureMessagingWelcomeScreenTheme? by lazy {
+        Dependencies.gliaThemeManager.theme?.secureMessagingWelcomeScreenTheme
     }
 
-    private var theme: UiTheme by Delegates.notNull()
-
     private val attachmentPopup by lazy {
-        AttachmentPopup(addAttachmentButton, unifiedTheme?.pickMediaTheme)
+        AttachmentPopup(context, unifiedTheme?.pickMediaTheme)
     }
 
     val messageTitleTop: Int get() = messageTitle.top
@@ -116,12 +114,12 @@ internal class MessageView(
     }
 
     private fun setDefaultTheme(typedArray: TypedArray) {
-        theme = Utils.getThemeFromTypedArray(typedArray, this.context)
-        setupAttachmentIconTheme()
-        setupMessageErrorTextTheme()
+        val theme = Utils.getThemeFromTypedArray(typedArray, this.context)
+        setupAttachmentIconTheme(theme)
+        setupMessageErrorTextTheme(theme)
     }
 
-    private fun setupMessageErrorTextTheme() {
+    private fun setupMessageErrorTextTheme(theme: UiTheme) {
         val systemNegativeColorId = theme.systemNegativeColor ?: return
 
         TextViewCompat.setCompoundDrawableTintList(
@@ -185,7 +183,7 @@ internal class MessageView(
         attachmentRecyclerView.adapter = uploadAttachmentAdapter
     }
 
-    private fun setupAttachmentIconTheme() {
+    private fun setupAttachmentIconTheme(theme: UiTheme) {
         val normalColor = unifiedTheme?.filePickerButtonTheme?.primaryColor
             ?: theme.baseNormalColor?.let { getColorCompat(it) }
         val disabledColor = unifiedTheme?.filePickerButtonDisabledTheme?.primaryColor

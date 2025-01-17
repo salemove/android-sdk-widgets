@@ -4,7 +4,6 @@ import android.CONTEXT_EXTENSIONS_CLASS_PATH
 import android.LOGGER_PATH
 import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import com.glia.widgets.UiTheme
@@ -17,6 +16,7 @@ import com.glia.widgets.helper.GliaActivityManager
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.OneTimeEvent
 import com.glia.widgets.helper.withRuntimeTheme
+import com.glia.widgets.launcher.ActivityLauncher
 import com.glia.widgets.locale.LocaleProvider
 import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.view.Dialogs
@@ -50,6 +50,7 @@ class CallVisualizerActivityWatcherTest {
 
     private lateinit var watcher: CallVisualizerActivityWatcher
     private lateinit var mockLocale: LocaleString
+    private lateinit var activityLauncher: ActivityLauncher
 
     @Before
     fun setUp() {
@@ -66,8 +67,9 @@ class CallVisualizerActivityWatcherTest {
         localeProvider = mockk(relaxed = true)
         themeManager = mockk(relaxed = true)
         mockLocale = mockk(relaxed = true)
+        activityLauncher = mockk(relaxed = true)
 
-        watcher = CallVisualizerActivityWatcher(controller, gliaActivityManager, localeProvider, themeManager)
+        watcher = CallVisualizerActivityWatcher(controller, gliaActivityManager, localeProvider, themeManager, activityLauncher)
         verify { controller.state }
     }
 
@@ -321,10 +323,6 @@ class CallVisualizerActivityWatcherTest {
     fun `WebBrowserActivity should be shown when current state is OpenWebBrowserScreen`() {
         val title = mockLocale
         val url = "url"
-        val intent: Intent = mockk(relaxed = true)
-        mockkObject(WebBrowserActivity)
-
-        every { WebBrowserActivity.intent(any(), any(), any()) } returns intent
 
         val activity = emitActivity<DialogHolderActivity>()
         val event = createMockEvent(CallVisualizerContract.State.OpenWebBrowserScreen(title, url))
@@ -335,10 +333,9 @@ class CallVisualizerActivityWatcherTest {
         verify { event.value }
         verify(exactly = 0) { event.consume(any()) }
         verify(exactly = 0) { event.markConsumed() }
-        verify { activity.startActivity(eq(intent)) }
+        verify { activityLauncher.launchWebBrowser(activity, title, url) }
 
         confirmVerified(activity, event)
-        unmockkObject(WebBrowserActivity)
     }
 
     private fun createMockEvent(state: CallVisualizerContract.State, isConsumed: Boolean = false): OneTimeEvent<CallVisualizerContract.State> {

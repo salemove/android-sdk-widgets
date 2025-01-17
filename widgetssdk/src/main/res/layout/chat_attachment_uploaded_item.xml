@@ -14,7 +14,7 @@
         android:layout_marginStart="@dimen/glia_medium"
         android:layout_marginTop="@dimen/glia_medium"
         android:layout_marginBottom="@dimen/glia_medium"
-        app:cardBackgroundColor="@color/glia_brand_primary_color"
+        app:cardBackgroundColor="?attr/gliaBrandPrimaryColor"
         app:cardCornerRadius="@dimen/glia_chat_attachment_corner_radius"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -33,7 +33,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:textColor="@color/glia_base_light_color"
+            android:textColor="?attr/gliaBaseLightColor"
             android:textSize="14sp"
             android:textStyle="bold"
             tools:text="PDF" />
@@ -53,7 +53,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0"
-        app:tint="@color/glia_base_normal_color" />
+        app:tint="?attr/gliaBaseNormalColor" />
 
     <TextView
         android:id="@+id/item_title"
@@ -63,7 +63,7 @@
         android:layout_marginTop="8dp"
         android:ellipsize="end"
         android:singleLine="true"
-        android:textColor="@color/glia_base_normal_color"
+        android:textColor="?attr/gliaBaseNormalColor"
         android:textSize="12sp"
         app:layout_constraintEnd_toStartOf="@id/remove_item_button"
         app:layout_constraintHorizontal_bias="0"
@@ -77,7 +77,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
         android:layout_marginTop="4dp"
-        android:textColor="@color/glia_base_dark_color"
+        android:textColor="?attr/gliaBaseDarkColor"
         android:textSize="14sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toStartOf="@id/remove_item_button"
@@ -94,14 +94,14 @@
         android:indeterminate="true"
         android:max="100"
         app:trackThickness="@dimen/glia_chat_attachment_progressbar_height"
-        app:indicatorColor="@color/glia_brand_primary_color"
+        app:indicatorColor="?attr/gliaBrandPrimaryColor"
         app:layout_constraintBottom_toBottomOf="@id/type_indicator_view"
         app:layout_constraintEnd_toStartOf="@id/remove_item_button"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toEndOf="@id/type_indicator_view"
         app:layout_constraintTop_toBottomOf="@id/status_indicator"
         app:layout_constraintWidth_percent="0.5"
-        app:trackColor="@color/glia_system_agent_bubble_color"
+        app:trackColor="?attr/gliaSystemAgentBubbleColor"
         app:trackCornerRadius="4dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

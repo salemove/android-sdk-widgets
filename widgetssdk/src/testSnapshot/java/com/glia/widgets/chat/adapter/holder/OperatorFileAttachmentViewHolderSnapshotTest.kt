@@ -17,7 +17,7 @@ import com.glia.widgets.snapshotutils.SnapshotProviders
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import org.junit.Test
 
-class OperatorFileAttachmentViewHolderSnapshotTest : SnapshotTest(
+internal class OperatorFileAttachmentViewHolderSnapshotTest : SnapshotTest(
     renderingMode = fullWidthRenderMode
 ), SnapshotChatScreen, SnapshotAttachment, SnapshotProviders, SnapshotPicasso {
 
@@ -28,16 +28,6 @@ class OperatorFileAttachmentViewHolderSnapshotTest : SnapshotTest(
         snapshot(
             setupView(
                 operatorAttachmentItemFile()
-            ).itemView
-        )
-    }
-
-    @Test
-    fun withoutHeaderWithUiTheme() {
-        snapshot(
-            setupView(
-                operatorAttachmentItemFile(),
-                uiTheme = uiTheme()
             ).itemView
         )
     }
@@ -79,16 +69,6 @@ class OperatorFileAttachmentViewHolderSnapshotTest : SnapshotTest(
         snapshot(
             setupView(
                 operatorAttachmentItemFile(showChatHead = true)
-            ).itemView
-        )
-    }
-
-    @Test
-    fun withHeaderWithUiTheme() {
-        snapshot(
-            setupView(
-                operatorAttachmentItemFile(showChatHead = true),
-                uiTheme = uiTheme()
             ).itemView
         )
     }
@@ -140,16 +120,6 @@ class OperatorFileAttachmentViewHolderSnapshotTest : SnapshotTest(
     }
 
     @Test
-    fun operatorImageHeaderWithUiTheme() {
-        snapshot(
-            setupView(
-                operatorImageHeaderItem(),
-                uiTheme = uiTheme()
-            ).itemView
-        )
-    }
-
-    @Test
     fun operatorImageHeaderWithGlobalColors() {
         snapshot(
             setupView(
@@ -181,12 +151,7 @@ class OperatorFileAttachmentViewHolderSnapshotTest : SnapshotTest(
 
     // MARK: utils for tests
 
-    private fun setupView(
-        item: OperatorAttachmentItem.File,
-        unifiedTheme: UnifiedTheme? = null,
-        uiTheme: UiTheme = UiTheme()
-    ): OperatorFileAttachmentViewHolder {
-        localeProviderMock()
+    private fun setupView(item: OperatorAttachmentItem.File, unifiedTheme: UnifiedTheme? = null): OperatorFileAttachmentViewHolder {
         picassoMock(listOf(R.drawable.test_launcher2))
         unifiedTheme?.let { Dependencies.gliaThemeManager.theme = it }
 
@@ -196,7 +161,7 @@ class OperatorFileAttachmentViewHolderSnapshotTest : SnapshotTest(
 
         return OperatorFileAttachmentViewHolder(
             ChatAttachmentOperatorFileLayoutBinding.inflate(layoutInflater),
-            uiTheme,
+            UiTheme(),
             object : ChatAdapter.OnFileItemClickListener {
                 override fun onFileOpenClick(file: AttachmentFile) {}
                 override fun onFileDownloadClick(file: AttachmentFile) {}

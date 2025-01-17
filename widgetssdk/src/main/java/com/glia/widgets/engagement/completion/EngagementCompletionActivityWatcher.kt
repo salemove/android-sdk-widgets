@@ -1,24 +1,22 @@
 package com.glia.widgets.engagement.completion
 
 import android.app.Activity
-import android.content.Intent
-import android.os.Parcelable
 import com.glia.androidsdk.engagement.Survey
-import com.glia.widgets.GliaWidgets
-import com.glia.widgets.R
 import com.glia.widgets.base.BaseSingleActivityWatcher
 import com.glia.widgets.helper.GliaActivityManager
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.OneTimeEvent
 import com.glia.widgets.helper.TAG
-import com.glia.widgets.helper.withRuntimeTheme
-import com.glia.widgets.survey.SurveyActivity
+import com.glia.widgets.launcher.ActivityLauncher
 import com.glia.widgets.view.Dialogs
 import io.reactivex.rxjava3.core.Flowable
 import java.lang.ref.WeakReference
 
-internal class EngagementCompletionActivityWatcher(controller: EngagementCompletionContract.Controller, gliaActivityManager: GliaActivityManager) :
-    BaseSingleActivityWatcher(gliaActivityManager) {
+internal class EngagementCompletionActivityWatcher(
+    controller: EngagementCompletionContract.Controller,
+    gliaActivityManager: GliaActivityManager,
+    private val activityLauncher: ActivityLauncher
+) : BaseSingleActivityWatcher(gliaActivityManager) {
 
     init {
         Flowable.combineLatest(resumedActivity, controller.state, ::handleState).subscribe()
@@ -44,16 +42,7 @@ internal class EngagementCompletionActivityWatcher(controller: EngagementComplet
         }
     }
 
-    private fun showSurvey(activity: Activity, survey: Survey) {
-        activity.withRuntimeTheme { _, uiTheme ->
-            val newIntent: Intent = Intent(activity, SurveyActivity::class.java)
-                .putExtra(GliaWidgets.UI_THEME, uiTheme)
-                .putExtra(GliaWidgets.SURVEY, survey as Parcelable)
-
-            activity.overridePendingTransition(R.anim.slide_up, 0)
-            activity.startActivity(newIntent)
-        }
-    }
+    private fun showSurvey(activity: Activity, survey: Survey) = activityLauncher.launchSurvey(activity, survey)
 
     private fun showOperatorEndedEngagementDialog(activity: Activity, consumeCallback: () -> Unit) {
         showAlertDialogWithStyledContext(activity) { context, theme ->

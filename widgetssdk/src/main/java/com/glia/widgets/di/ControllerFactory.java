@@ -12,13 +12,15 @@ import com.glia.widgets.callvisualizer.controller.CallVisualizerController;
 import com.glia.widgets.callvisualizer.controller.VisitorCodeController;
 import com.glia.widgets.chat.ChatContract;
 import com.glia.widgets.chat.controller.ChatController;
-import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
 import com.glia.widgets.core.dialog.DialogContract;
 import com.glia.widgets.core.dialog.DialogController;
 import com.glia.widgets.engagement.completion.EngagementCompletionContract;
 import com.glia.widgets.engagement.completion.EngagementCompletionController;
-import com.glia.widgets.filepreview.ui.FilePreviewContract;
-import com.glia.widgets.filepreview.ui.FilePreviewController;
+import com.glia.widgets.entrywidget.EntryWidgetContract;
+import com.glia.widgets.entrywidget.EntryWidgetController;
+import com.glia.widgets.entrywidget.EntryWidgetHideController;
+import com.glia.widgets.filepreview.ui.ImagePreviewContract;
+import com.glia.widgets.filepreview.ui.ImagePreviewController;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
 import com.glia.widgets.messagecenter.MessageCenterContract;
@@ -55,9 +57,9 @@ public class ControllerFactory {
     private final DialogContract.Controller dialogController;
     private final MessagesNotSeenHandler messagesNotSeenHandler;
     private final UseCaseFactory useCaseFactory;
-    private final GliaSdkConfigurationManager sdkConfigurationManager;
-    private final FilePreviewContract.Controller filePreviewController;
+    private final ImagePreviewContract.Controller filePreviewController;
     private final ManagerFactory managerFactory;
+    private final GliaCore core;
     private EngagementCompletionContract.Controller engagementCompletionController;
     private ChatContract.Controller retainedChatController;
     private CallContract.Controller retainedCallController;
@@ -65,12 +67,13 @@ public class ControllerFactory {
     private CallVisualizerContract.Controller callVisualizerController;
     private ActivityWatcherForChatHeadController activityWatcherForChatHeadController;
     private ActivityWatcherForLiveObservationController activityWatcherForLiveObservationController;
+    private EntryWidgetHideController entryWidgetHideController;
 
     public ControllerFactory(
         RepositoryFactory repositoryFactory,
         UseCaseFactory useCaseFactory,
-        GliaSdkConfigurationManager sdkConfigurationManager,
-        ManagerFactory managerFactory
+        ManagerFactory managerFactory,
+        GliaCore core
     ) {
         this.repositoryFactory = repositoryFactory;
         messagesNotSeenHandler = new MessagesNotSeenHandler(
@@ -78,13 +81,13 @@ public class ControllerFactory {
         );
 
         this.useCaseFactory = useCaseFactory;
+        this.core = core;
         this.dialogController = new DialogController();
-        this.filePreviewController = new FilePreviewController(
+        this.filePreviewController = new ImagePreviewController(
             useCaseFactory.createGetImageFileFromDownloadsUseCase(),
             useCaseFactory.createGetImageFileFromCacheUseCase(),
             useCaseFactory.createPutImageFileToDownloadsUseCase()
         );
-        this.sdkConfigurationManager = sdkConfigurationManager;
         this.managerFactory = managerFactory;
     }
 
@@ -103,7 +106,6 @@ public class ControllerFactory {
                 useCaseFactory.getEndEngagementUseCase(),
                 useCaseFactory.createAddFileToAttachmentAndUploadUseCase(),
                 useCaseFactory.createAddFileAttachmentsObserverUseCase(),
-                useCaseFactory.createRemoveFileAttachmentObserverUseCase(),
                 useCaseFactory.createGetFileAttachmentsUseCase(),
                 useCaseFactory.createRemoveFileAttachmentUseCase(),
                 useCaseFactory.createSupportedFileCountCheckUseCase(),
@@ -113,9 +115,7 @@ public class ControllerFactory {
                 useCaseFactory.createSiteInfoUseCase(),
                 useCaseFactory.createIsFromCallScreenUseCase(),
                 useCaseFactory.createUpdateFromCallScreenUseCase(),
-                useCaseFactory.createIsSecureEngagementUseCase(),
-                useCaseFactory.createSetEngagementConfigUseCase(),
-                useCaseFactory.createSecureMessagingAvailableQueueIdsUseCase(),
+                useCaseFactory.createManageSecureMessagingStatusUseCase(),
                 useCaseFactory.getIsCurrentEngagementCallVisualizer(),
                 useCaseFactory.createIsFileReadyForPreviewUseCase(),
                 useCaseFactory.createDetermineGvaButtonTypeUseCase(),
@@ -137,7 +137,11 @@ public class ControllerFactory {
                 useCaseFactory.getWithReadWritePermissionsUseCase(),
                 useCaseFactory.getRequestNotificationPermissionIfPushNotificationsSetUpUseCase(),
                 useCaseFactory.getReleaseResourcesUseCase(getDialogController()),
-                useCaseFactory.createGetUrlFromLinkUseCase()
+                useCaseFactory.createGetUrlFromLinkUseCase(),
+                useCaseFactory.createIsMessagingAvailableUseCase(),
+                useCaseFactory.createSecureConversationTopBannerVisibilityUseCase(),
+                useCaseFactory.createSetLeaveSecureConversationDialogVisibleUseCase(),
+                useCaseFactory.getSetChatScreenOpenUseCase()
             );
         }
 
@@ -148,7 +152,6 @@ public class ControllerFactory {
         if (retainedCallController == null) {
             Logger.d(TAG, "new call controller");
             retainedCallController = new CallController(
-                sdkConfigurationManager,
                 sharedTimer,
                 new TimeCounter(),
                 new TimeCounter(),
@@ -227,7 +230,7 @@ public class ControllerFactory {
         getActivityWatcherForChatHeadController().init();
     }
 
-    public FilePreviewContract.Controller getImagePreviewController() {
+    public ImagePreviewContract.Controller getImagePreviewController() {
         return filePreviewController;
     }
 
@@ -242,7 +245,8 @@ public class ControllerFactory {
                 useCaseFactory.getEngagementStateUseCase(),
                 useCaseFactory.getCurrentOperatorUseCase(),
                 useCaseFactory.getVisitorMediaUseCase(),
-                useCaseFactory.getScreenSharingUseCase()
+                useCaseFactory.getScreenSharingUseCase(),
+                useCaseFactory.getEngagementTypeUseCase()
             );
         }
         return serviceChatHeadController;
@@ -258,7 +262,8 @@ public class ControllerFactory {
                 useCaseFactory.getEngagementStateUseCase(),
                 useCaseFactory.getCurrentOperatorUseCase(),
                 useCaseFactory.getVisitorMediaUseCase(),
-                useCaseFactory.getScreenSharingUseCase()
+                useCaseFactory.getScreenSharingUseCase(),
+                useCaseFactory.getEngagementTypeUseCase()
             );
         }
         return applicationChatHeadController;
@@ -290,14 +295,11 @@ public class ControllerFactory {
 
     public MessageCenterContract.Controller getMessageCenterController() {
         return new MessageCenterController(
-            serviceChatHeadController,
-            useCaseFactory.createSetEngagementConfigUseCase(),
             useCaseFactory.createSendSecureMessageUseCase(),
-            useCaseFactory.createSecureMessagingAvailableQueueIdsUseCase(),
-            useCaseFactory.createAddSecureFileAttachmentsObserverUseCase(),
+            useCaseFactory.createAddFileAttachmentsObserverUseCase(),
             useCaseFactory.createAddSecureFileToAttachmentAndUploadUseCase(),
-            useCaseFactory.createGetSecureFileAttachmentsUseCase(),
-            useCaseFactory.createRemoveSecureFileAttachmentUseCase(),
+            useCaseFactory.createGetFileAttachmentsUseCase(),
+            useCaseFactory.createRemoveFileAttachmentUseCase(),
             useCaseFactory.createIsAuthenticatedUseCase(),
             useCaseFactory.createSiteInfoUseCase(),
             useCaseFactory.createOnNextMessageUseCase(),
@@ -307,7 +309,9 @@ public class ControllerFactory {
             createDialogController(),
             useCaseFactory.getTakePictureUseCase(),
             useCaseFactory.getUriToFileAttachmentUseCase(),
-            useCaseFactory.getRequestNotificationPermissionIfPushNotificationsSetUpUseCase()
+            useCaseFactory.getRequestNotificationPermissionIfPushNotificationsSetUpUseCase(),
+            useCaseFactory.createIsMessagingAvailableUseCase(),
+            useCaseFactory.getIsQueueingOrEngagementUseCase()
         );
     }
 
@@ -379,10 +383,30 @@ public class ControllerFactory {
             useCaseFactory.getIsCurrentEngagementCallVisualizer(),
             useCaseFactory.createSetOverlayPermissionRequestDialogShownUseCase(),
             dialogController,
-            sdkConfigurationManager,
             useCaseFactory.getWithNotificationPermissionUseCase(),
             useCaseFactory.getPrepareToScreenSharingUseCase(),
             useCaseFactory.getReleaseScreenSharingResourcesUseCase()
         );
+    }
+
+    public EntryWidgetContract.Controller getEntryWidgetController() {
+        return new EntryWidgetController(
+            repositoryFactory.getQueueRepository(),
+            useCaseFactory.createIsAuthenticatedUseCase(),
+            repositoryFactory.getSecureConversationsRepository(),
+            useCaseFactory.getHasPendingSecureConversationsWithTimeoutUseCase(),
+            useCaseFactory.getEngagementStateUseCase(),
+            useCaseFactory.getEngagementTypeUseCase(),
+            core,
+            Dependencies.getEngagementLauncher(),
+            Dependencies.getActivityLauncher()
+        );
+    }
+
+    public EntryWidgetHideController getEntryWidgetHideController() {
+        if (entryWidgetHideController == null) {
+            entryWidgetHideController = new EntryWidgetHideController();
+        }
+        return entryWidgetHideController;
     }
 }

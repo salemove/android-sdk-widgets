@@ -5,7 +5,7 @@ import com.glia.widgets.callvisualizer.VisitorCodeContract
 import com.glia.widgets.core.callvisualizer.domain.VisitorCodeRepository
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
-import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
+import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -14,7 +14,7 @@ internal class VisitorCodeController(
     private val callVisualizerController: CallVisualizerContract.Controller,
     private val visitorCodeRepository: VisitorCodeRepository,
     private val engagementStateUseCase: EngagementStateUseCase,
-    private val isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase
+    private val isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase
 ) : VisitorCodeContract.Controller {
 
     private var disposable: Disposable? = null
@@ -63,7 +63,7 @@ internal class VisitorCodeController(
     }
 
     private fun autoCloseOnEngagement() {
-        if (isQueueingOrEngagementUseCase.hasOngoingEngagement) {
+        if (isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement) {
             // Normally, there is no need for visitor code if there is already ongoing engagement.
             // But it also doesn't seem right to just close it if right away when it was open
             return

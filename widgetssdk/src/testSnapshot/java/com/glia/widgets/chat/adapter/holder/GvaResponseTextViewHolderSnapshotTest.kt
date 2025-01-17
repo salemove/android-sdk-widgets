@@ -10,7 +10,7 @@ import com.glia.widgets.snapshotutils.SnapshotProviders
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import org.junit.Test
 
-class GvaResponseTextViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, SnapshotProviders {
+internal class GvaResponseTextViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, SnapshotProviders {
 
     private fun gvaResponseText(showChatHead: Boolean = false) = GvaResponseText(
         content = gvaLongSubtitle(),
@@ -24,16 +24,6 @@ class GvaResponseTextViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, Snaps
         snapshot(
             setupView(
                 gvaResponseText()
-            ).viewHolder.itemView
-        )
-    }
-
-    @Test
-    fun withoutChatHeadWithUiTheme() {
-        snapshot(
-            setupView(
-                gvaResponseText(),
-                uiTheme = uiTheme()
             ).viewHolder.itemView
         )
     }
@@ -72,18 +62,6 @@ class GvaResponseTextViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, Snaps
     }
 
     @Test
-    fun withChatHeadWithUiTheme() {
-        snapshot(
-            setupView(
-                gvaResponseText(
-                    showChatHead = true
-                ),
-                uiTheme = uiTheme()
-            ).viewHolder.itemView
-        )
-    }
-
-    @Test
     fun withChatHeadWithGlobalColors() {
         snapshot(
             setupView(
@@ -115,13 +93,7 @@ class GvaResponseTextViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, Snaps
         val viewHolder: GvaResponseTextViewHolder
     )
 
-    private fun setupView(
-        card: GvaResponseText,
-        unifiedTheme: UnifiedTheme? = null,
-        uiTheme: UiTheme = UiTheme()
-    ): ViewData {
-        localeProviderMock()
-
+    private fun setupView(card: GvaResponseText, unifiedTheme: UnifiedTheme? = null): ViewData {
         val chatOperatorMessageLayoutBinding = ChatOperatorMessageLayoutBinding.inflate(layoutInflater)
         val gvaPersistentButtonsContentBinding = ChatReceiveMessageContentBinding.inflate(
             layoutInflater,
@@ -131,7 +103,7 @@ class GvaResponseTextViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, Snaps
         val viewHolder = GvaResponseTextViewHolder(
             chatOperatorMessageLayoutBinding,
             gvaPersistentButtonsContentBinding,
-            uiTheme,
+            UiTheme(),
             unifiedTheme
         )
 

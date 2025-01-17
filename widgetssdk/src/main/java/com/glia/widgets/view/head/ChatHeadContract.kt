@@ -1,9 +1,7 @@
 package com.glia.widgets.view.head
 
-import com.glia.widgets.UiTheme
 import com.glia.widgets.base.BaseController
 import com.glia.widgets.base.BaseView
-import com.glia.widgets.core.configuration.EngagementConfiguration
 
 internal interface ChatHeadContract {
     interface Controller : BaseController {
@@ -12,8 +10,6 @@ internal interface ChatHeadContract {
         fun onResume(view: android.view.View?)
         fun onApplicationStop()
         fun onChatHeadPositionChanged(x: Int, y: Int)
-        fun setBuildTimeTheme(uiTheme: UiTheme?)
-        fun setEngagementConfiguration(configuration: EngagementConfiguration?)
         fun onPause(gliaOrRootView: android.view.View?)
         fun updateChatHeadView()
         fun onSetChatHeadView(view: View)
@@ -30,6 +26,5 @@ internal interface ChatHeadContract {
         fun navigateToChat()
         fun navigateToCall()
         fun navigateToEndScreenSharing()
-        fun updateConfiguration(buildTimeTheme: UiTheme, engagementConfiguration: EngagementConfiguration?)
     }
 }

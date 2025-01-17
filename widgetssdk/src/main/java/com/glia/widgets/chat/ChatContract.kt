@@ -2,6 +2,7 @@ package com.glia.widgets.chat
 
 import android.net.Uri
 import android.widget.Toast
+import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.androidsdk.chat.SingleChoiceOption
 import com.glia.widgets.base.BaseController
@@ -12,8 +13,10 @@ import com.glia.widgets.chat.model.CustomCardChatItem
 import com.glia.widgets.chat.model.GvaButton
 import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.core.dialog.model.ConfirmationDialogLinks
+import com.glia.widgets.core.dialog.model.LeaveDialogAction
 import com.glia.widgets.core.dialog.model.Link
 import com.glia.widgets.core.fileupload.model.LocalAttachment
+import com.glia.widgets.entrywidget.EntryWidgetContract
 import com.glia.widgets.locale.LocaleString
 
 internal interface ChatContract {
@@ -49,7 +52,8 @@ internal interface ChatContract {
         fun onLinkClicked(link: Link)
         fun getConfirmationDialogLinks(): ConfirmationDialogLinks
         fun onEngagementConfirmationDialogRequested()
-        fun initChat(companyName: String?, queueIds: List<String>?, visitorContextAssetId: String?, chatType: ChatType)
+        fun initChat(intention: Intention)
+        fun restoreChat()
         fun show()
         fun onPause()
         fun onResume()
@@ -58,13 +62,15 @@ internal interface ChatContract {
         fun onImageCaptured(result: Boolean)
         fun onContentChosen(uri: Uri)
         fun onLocalImageItemClick(attachment: LocalAttachment, view: android.view.View)
+        fun leaveCurrentConversationDialogLeaveClicked(action: LeaveDialogAction)
+        fun leaveCurrentConversationDialogStayClicked()
+        fun onScTopBannerItemClicked(itemType: EntryWidgetContract.ItemType)
     }
 
     interface View : BaseView<Controller> {
         fun emitUploadAttachments(attachments: List<LocalAttachment>)
         fun emitState(chatState: ChatState)
         fun emitItems(items: List<ChatItem>)
-        fun navigateToCall(mediaType: String)
         fun backToCall()
         fun minimizeView()
         fun smoothScrollToBottom()
@@ -83,5 +89,6 @@ internal interface ChatContract {
         fun dispatchImageCapture(uri: Uri)
         fun navigateToImagePreview(attachmentFile: AttachmentFile, view: android.view.View)
         fun navigateToImagePreview(attachmentFile: LocalAttachment, view: android.view.View)
+        fun launchCall(mediaType: Engagement.MediaType)
     }
 }

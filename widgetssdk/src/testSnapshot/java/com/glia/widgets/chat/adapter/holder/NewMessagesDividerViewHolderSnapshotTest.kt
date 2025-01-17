@@ -10,7 +10,7 @@ import com.glia.widgets.snapshotutils.SnapshotProviders
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import org.junit.Test
 
-class NewMessagesDividerViewHolderSnapshotTest : SnapshotTest(
+internal class NewMessagesDividerViewHolderSnapshotTest : SnapshotTest(
     renderingMode = fullWidthRenderMode
 ), SnapshotChatScreen, SnapshotChatView, SnapshotProviders {
 
@@ -20,15 +20,6 @@ class NewMessagesDividerViewHolderSnapshotTest : SnapshotTest(
     fun defaultTheme() {
         snapshot(
             setupView().itemView
-        )
-    }
-
-    @Test
-    fun withUiTheme() {
-        snapshot(
-            setupView(
-                uiTheme = uiTheme()
-            ).itemView
         )
     }
 
@@ -61,11 +52,7 @@ class NewMessagesDividerViewHolderSnapshotTest : SnapshotTest(
 
     // MARK: utils for tests
 
-    private fun setupView(
-        unifiedTheme: UnifiedTheme? = null,
-        uiTheme: UiTheme = UiTheme()
-    ): NewMessagesDividerViewHolder {
-        localeProviderMock()
+    private fun setupView(unifiedTheme: UnifiedTheme? = null): NewMessagesDividerViewHolder {
         unifiedTheme?.let { Dependencies.gliaThemeManager.theme = it }
 
         setOnEndListener {
@@ -74,7 +61,7 @@ class NewMessagesDividerViewHolderSnapshotTest : SnapshotTest(
 
         return NewMessagesDividerViewHolder(
             ChatNewMessagesDividerLayoutBinding.inflate(layoutInflater),
-            uiTheme
+            UiTheme()
         )
     }
 }

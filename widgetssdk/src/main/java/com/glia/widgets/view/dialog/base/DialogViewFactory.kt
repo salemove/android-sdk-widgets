@@ -9,8 +9,10 @@ import com.glia.widgets.view.dialog.confirmation.ConfirmationDialogViewInflater
 import com.glia.widgets.view.dialog.confirmation.VerticalConfirmationDialogViewInflater
 import com.glia.widgets.view.dialog.operatorendedengagement.OperatorEndedEngagementDialogViewInflater
 import com.glia.widgets.view.dialog.option.OptionDialogViewInflater
+import com.glia.widgets.view.dialog.option.OptionWithNegativeNeutralDialogViewInflater
 import com.glia.widgets.view.dialog.option.ReversedOptionDialogViewInflater
 import com.glia.widgets.view.dialog.option.VerticalOptionDialogViewInflater
+import com.glia.widgets.view.dialog.option.VerticalOptionWithNegativeNeutralDialogViewInflater
 import com.glia.widgets.view.dialog.option.VerticalReversedOptionDialogViewInflater
 import com.glia.widgets.view.dialog.screensharing.ScreenSharingDialogViewInflater
 import com.glia.widgets.view.dialog.screensharing.VerticalScreenSharingDialogViewInflater
@@ -35,6 +37,8 @@ internal class DialogViewFactory(context: Context, uiTheme: UiTheme, unifiedThem
         type is DialogType.Option -> OptionDialogViewInflater(layoutInflater, configuration, type.payload)
         type is DialogType.ReversedOption && isVerticalAxis -> VerticalReversedOptionDialogViewInflater(layoutInflater, configuration, type.payload)
         type is DialogType.ReversedOption -> ReversedOptionDialogViewInflater(layoutInflater, configuration, type.payload)
+        type is DialogType.OptionWithNegativeNeutral && isVerticalAxis -> VerticalOptionWithNegativeNeutralDialogViewInflater(layoutInflater, configuration, type.payload)
+        type is DialogType.OptionWithNegativeNeutral -> OptionWithNegativeNeutralDialogViewInflater(layoutInflater, configuration, type.payload)
         type is DialogType.Confirmation && isVerticalAxis -> VerticalConfirmationDialogViewInflater(layoutInflater, configuration, type.payload)
         type is DialogType.Confirmation -> ConfirmationDialogViewInflater(layoutInflater, configuration, type.payload)
         type is DialogType.Upgrade && isVerticalAxis -> VerticalUpgradeDialogViewInflater(layoutInflater, configuration, type.payload)

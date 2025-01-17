@@ -44,7 +44,7 @@ internal abstract class SurveyViewHolder(
         val questionText = question.text
         if (question.isRequired) {
             val context = title.context
-            val color = ContextCompat.getColor(context, R.color.glia_system_negative_color)
+            val color = ContextCompat.getColor(context, R.color.glia_negative_color)
             val colorString = String.format("%X", color).substring(2)
             val source = context.getString(
                 R.string.glia_survey_require_label,

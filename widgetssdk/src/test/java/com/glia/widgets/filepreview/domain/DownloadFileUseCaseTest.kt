@@ -1,6 +1,7 @@
 package com.glia.widgets.filepreview.domain
 
 import com.glia.androidsdk.chat.AttachmentFile
+import com.glia.widgets.core.secureconversations.domain.ManageSecureMessagingStatusUseCase
 import com.glia.widgets.filepreview.data.GliaFileRepository
 import com.glia.widgets.filepreview.domain.exception.FileNameMissingException
 import com.glia.widgets.filepreview.domain.exception.RemoteFileIsDeletedException
@@ -20,37 +21,34 @@ class DownloadFileUseCaseTest {
     private lateinit var fileRepository: GliaFileRepository
     private lateinit var attachmentFile: AttachmentFile
     private lateinit var useCase: DownloadFileUseCase
+    private lateinit var manageSecureMessagingStatusUseCase: ManageSecureMessagingStatusUseCase
 
     @Before
     fun setUp() {
         fileRepository = mock()
         attachmentFile = mock()
-        useCase = DownloadFileUseCase(fileRepository)
+        manageSecureMessagingStatusUseCase = mock()
+        useCase = DownloadFileUseCase(fileRepository, manageSecureMessagingStatusUseCase)
     }
 
     @Test
     fun execute_emitsFileNameMissingException_whenFileNameIsEmpty() {
         whenever(attachmentFile.name) doReturn NAME_EMPTY
-        useCase(attachmentFile).test()
-            .assertError(FileNameMissingException::class.java)
+        useCase(attachmentFile).test().assertError(FileNameMissingException::class.java)
     }
 
     @Test
     fun execute_emitsRemoteFileIsDeletedException_whenFileIsDeleted() {
         whenever(attachmentFile.name) doReturn NAME
         whenever(attachmentFile.isDeleted) doReturn true
-        useCase(attachmentFile)
-            .test()
-            .assertError(RemoteFileIsDeletedException::class.java)
+        useCase(attachmentFile).test().assertError(RemoteFileIsDeletedException::class.java)
     }
 
     @Test
     fun execute_successfullyCompletes_whenValidArgument() {
-        whenever(fileRepository.downloadFileFromNetwork(any())) doReturn Completable.complete()
+        whenever(fileRepository.downloadFileFromNetwork(any(), any())) doReturn Completable.complete()
         whenever(attachmentFile.name) doReturn NAME
         whenever(attachmentFile.isDeleted) doReturn false
-        useCase(attachmentFile)
-            .test()
-            .assertComplete()
+        useCase(attachmentFile).test().assertComplete()
     }
 }

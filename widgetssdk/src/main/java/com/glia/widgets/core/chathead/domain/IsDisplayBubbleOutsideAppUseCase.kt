@@ -1,14 +1,14 @@
 package com.glia.widgets.core.chathead.domain
 
 import com.glia.widgets.core.chathead.ChatHeadManager
-import com.glia.widgets.core.configuration.GliaSdkConfigurationManager
 import com.glia.widgets.core.permissions.PermissionManager
 import com.glia.widgets.engagement.domain.EngagementTypeUseCase
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
-import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
+import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 import com.glia.widgets.engagement.domain.ScreenSharingUseCase
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
+import com.glia.widgets.launcher.ConfigurationManager
 
 /**
  * This use case:
@@ -16,15 +16,15 @@ import com.glia.widgets.helper.TAG
  * 2) starts or stops the chat head service (bubble outside the app)
  */
 internal class IsDisplayBubbleOutsideAppUseCase(
-    isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase,
+    isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase,
     isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase,
     screenSharingUseCase: ScreenSharingUseCase,
     private val chatHeadManager: ChatHeadManager,
     permissionManager: PermissionManager,
-    configurationManager: GliaSdkConfigurationManager,
+    configurationManager: ConfigurationManager,
     engagementTypeUseCase: EngagementTypeUseCase
 ) : IsDisplayBubbleUseCase(
-    isQueueingOrEngagementUseCase,
+    isQueueingOrLiveEngagementUseCase,
     isCurrentEngagementCallVisualizerUseCase,
     screenSharingUseCase,
     permissionManager,
@@ -50,13 +50,13 @@ internal class IsDisplayBubbleOutsideAppUseCase(
         // global device bubble is NOT turned off by integrator (turned ON by default)
         // AND
         // global device bubble is allowed by visitor (overlay permission).
-        return configurationManager.isEnableBubbleOutsideApp && permissionManager.hasOverlayPermission()
+        return configurationManager.enableBubbleOutsideApp && permissionManager.hasOverlayPermission()
     }
 
     override fun isShowBasedOnForegroundBackground(viewName: String?): Boolean {
         return viewName == null || // true when app is in background
             // Use only ChatHeadService instead of ChatHeadService + app bubble if bubble is enabled outside and inside
-            (configurationManager.isEnableBubbleOutsideApp && configurationManager.isEnableBubbleInsideApp && permissionManager.hasOverlayPermission())
+            (configurationManager.enableBubbleOutsideApp && configurationManager.enableBubbleInsideApp && permissionManager.hasOverlayPermission())
     }
 
     fun onDestroy() {

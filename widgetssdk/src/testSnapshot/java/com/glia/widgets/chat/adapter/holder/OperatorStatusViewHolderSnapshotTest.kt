@@ -13,14 +13,13 @@ import com.glia.widgets.snapshotutils.SnapshotProviders
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import org.junit.Test
 
-class OperatorStatusViewHolderSnapshotTest : SnapshotTest(
+internal class OperatorStatusViewHolderSnapshotTest : SnapshotTest(
     renderingMode = fullWidthRenderMode
 ), SnapshotChatScreen, SnapshotChatView, SnapshotProviders, SnapshotPicasso, SnapshotLottie {
 
     // MARK: Connected
 
     private fun connectedItem() = OperatorStatusItem.Connected(
-        "Snapshot Company",
         "Screen Shot",
         "https://test.url"
     )
@@ -30,16 +29,6 @@ class OperatorStatusViewHolderSnapshotTest : SnapshotTest(
         snapshot(
             setupView(
                 connectedItem()
-            ).viewHolder.itemView
-        )
-    }
-
-    @Test
-    fun connectedWithUiTheme() {
-        snapshot(
-            setupView(
-                connectedItem(),
-                uiTheme = uiTheme()
             ).viewHolder.itemView
         )
     }
@@ -88,25 +77,13 @@ class OperatorStatusViewHolderSnapshotTest : SnapshotTest(
 
     // MARK: In Queue
 
-    private fun inQueueItem() = OperatorStatusItem.InQueue(
-        "Snapshot Company"
-    )
+    private fun inQueueItem() = OperatorStatusItem.InQueue
 
     @Test
     fun inQueue() {
         snapshot(
             setupView(
                 inQueueItem()
-            ).viewHolder.itemView
-        )
-    }
-
-    @Test
-    fun inQueueWithUiTheme() {
-        snapshot(
-            setupView(
-                inQueueItem(),
-                uiTheme = uiTheme()
             ).viewHolder.itemView
         )
     }
@@ -144,7 +121,6 @@ class OperatorStatusViewHolderSnapshotTest : SnapshotTest(
     // MARK: In Queue
 
     private fun joinedItem() = OperatorStatusItem.Joined(
-        "Snapshot Company",
         "Screen Shot",
         null
     )
@@ -154,16 +130,6 @@ class OperatorStatusViewHolderSnapshotTest : SnapshotTest(
         snapshot(
             setupView(
                 joinedItem()
-            ).viewHolder.itemView
-        )
-    }
-
-    @Test
-    fun joinedWithUiTheme() {
-        snapshot(
-            setupView(
-                joinedItem(),
-                uiTheme = uiTheme()
             ).viewHolder.itemView
         )
     }
@@ -210,16 +176,6 @@ class OperatorStatusViewHolderSnapshotTest : SnapshotTest(
     }
 
     @Test
-    fun transferringWithUiTheme() {
-        snapshot(
-            setupView(
-                OperatorStatusItem.Transferring,
-                uiTheme = uiTheme()
-            ).viewHolder.itemView
-        )
-    }
-
-    @Test
     fun transferringWithGlobalColors() {
         snapshot(
             setupView(
@@ -256,17 +212,15 @@ class OperatorStatusViewHolderSnapshotTest : SnapshotTest(
     private fun setupView(
         item: OperatorStatusItem,
         imageLoadError: Boolean = false,
-        unifiedTheme: UnifiedTheme? = null,
-        uiTheme: UiTheme = UiTheme()
+        unifiedTheme: UnifiedTheme? = null
     ): ViewData {
         lottieMock()
-        localeProviderMock()
         picassoMock(imageLoadError = imageLoadError)
 
         unifiedTheme?.let { Dependencies.gliaThemeManager.theme = it }
 
         val binding = ChatOperatorStatusLayoutBinding.inflate(layoutInflater)
-        val viewHolder = OperatorStatusViewHolder(binding, uiTheme)
+        val viewHolder = OperatorStatusViewHolder(binding, UiTheme())
 
         viewHolder.bind(item)
 

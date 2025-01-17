@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:foreground="?attr/selectableItemBackground"
+    android:paddingTop="@dimen/glia_large"
+    android:paddingBottom="@dimen/glia_large">
+
+    <ImageView
+        android:id="@+id/icon"
+        android:layout_width="@dimen/glia_large_x_large"
+        android:layout_height="@dimen/glia_large_x_large"
+        android:layout_marginStart="@dimen/glia_large"
+        android:layout_marginEnd="@dimen/glia_large"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="?attr/gliaBrandPrimaryColor"
+        tools:src="@drawable/ic_audio" />
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/glia_x_large"
+        android:letterSpacing="0.03125"
+        android:textColor="?attr/gliaBaseDarkColor"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@id/description"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/icon"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="@string/entry_widget_audio_button_label" />
+
+    <TextView
+        android:id="@+id/description"
+        style="@style/Application.Glia.Subtitle2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:letterSpacing="0.017857"
+        android:textColor="?attr/gliaBaseNormalColor"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/title"
+        app:layout_constraintTop_toBottomOf="@id/title"
+        tools:text="@string/entry_widget_audio_button_description" />
+
+    <View
+        android:id="@+id/icon_loading"
+        android:layout_width="@dimen/glia_large_x_large"
+        android:layout_height="@dimen/glia_large_x_large"
+        android:background="@drawable/bg_circle"
+        android:backgroundTint="?attr/gliaBaseShadeColor"
+        app:layout_constraintBottom_toBottomOf="@id/icon"
+        app:layout_constraintEnd_toEndOf="@id/icon"
+        app:layout_constraintStart_toStartOf="@id/icon"
+        app:layout_constraintTop_toTopOf="@id/icon" />
+
+    <View
+        android:id="@+id/title_loading"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="@dimen/glia_medium"
+        android:background="@drawable/bg_entry_widget_loading"
+        android:backgroundTint="?attr/gliaBaseShadeColor"
+        app:layout_constraintBottom_toTopOf="@id/description_loading"
+        app:layout_constraintEnd_toEndOf="@+id/title"
+        app:layout_constraintStart_toStartOf="@+id/title"
+        app:layout_constraintTop_toTopOf="@+id/title"
+        app:layout_constraintVertical_weight="7" />
+
+    <View
+        android:id="@+id/description_loading"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/bg_entry_widget_loading"
+        android:backgroundTint="?attr/gliaBaseShadeColor"
+        app:layout_constraintBottom_toBottomOf="@+id/description"
+        app:layout_constraintEnd_toEndOf="@+id/description"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toStartOf="@+id/description"
+        app:layout_constraintTop_toBottomOf="@+id/title_loading"
+        app:layout_constraintVertical_weight="6"
+        app:layout_constraintWidth_percent="0.43" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/loading_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="icon_loading, title_loading, description_loading" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

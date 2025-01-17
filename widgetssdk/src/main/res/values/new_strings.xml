@@ -65,7 +65,7 @@
 
     <!-- Chat -->
     <string name="engagement_chat_title">@string/glia_chat_title</string>
-    <string name="message_center_header">@string/glia_messaging_title</string>
+    <string name="message_center_header">@string/glia_message_center_title</string>
     <string name="chat_input_placeholder">@string/glia_chat_enter_message</string>
     <string name="chat_message_start_engagement_placeholder">@string/glia_chat_not_started_hint</string>
     <string name="android_file_not_ready_for_preview">@string/glia_view_file_not_ready_for_preview</string>
@@ -167,6 +167,13 @@
     <string name="general_sending">@string/message_center_progress_bar_content_description</string>
     <string name="general_send">@string/message_center_send_message_btn</string>
     <string name="message_center_welcome_file_picker_accessibility_label">File picker</string>
+    <string name="secure_messaging_chat_banner_bottom">@string/message_center_bottom_banner</string>
+    <string name="secure_messaging_chat_unavailable_message">@string/message_center_error_unavailable_message</string>
+    <string name="secure_messaging_chat_banner_top">@string/need_live_support_label</string>
+    <string name="secure_messaging_chat_leave_current_conversation_title">@string/message_center_leaving_conversation_title</string>
+    <string name="secure_messaging_chat_leave_current_conversation_message">@string/message_center_leaving_conversation_message</string>
+    <string name="secure_messaging_chat_leave_current_conversation_button_positive">@string/message_center_leaving_conversation_positive_button</string>
+    <string name="secure_messaging_chat_leave_current_conversation_button_negative">@string/message_center_leaving_conversation_negative_button</string>
 
     <!-- General -->
     <string name="general_refresh">@string/glia_visitor_code_refresh_button</string>
@@ -213,5 +220,29 @@
     <!--    GVA -->
     <string name="gva_unsupported_action_error">This action is not currently supported on mobile.</string>
     <string name="gva_gallery_card_message_accessibility">%1$s \n Card: %2$d of %3$d.</string><!--does not synchronized yet-->
+
+    <!--    Entry Widget -->
+    <string name="entry_widget_live_chat_button_label">Chat</string>
+    <string name="entry_widget_live_chat_button_description">For the texter in all of us</string>
+    <string name="entry_widget_live_chat_button_accessibility_hint">Starts a chat</string>
+    <string name="entry_widget_audio_button_label">Audio</string>
+    <string name="entry_widget_audio_button_description">Speak through your device</string>
+    <string name="entry_widget_audio_button_accessibility_hint">Starts a call</string>
+    <string name="entry_widget_video_button_label">Video</string>
+    <string name="entry_widget_video_button_description">Face-to-face, just like in person</string>
+    <string name="entry_widget_video_button_accessibility_hint">Starts a video call</string>
+    <string name="entry_widget_secure_messaging_button_label">Secure Messaging</string>
+    <string name="entry_widget_secure_messaging_button_description">Start a conversation, we’ll get back to you</string>
+    <string name="entry_widget_secure_messaging_button_accessibility_hint">Starts messaging with us</string>
+    <string name="entry_widget_empty_state_title">Support team is currently offline</string>
+    <string name="entry_widget_empty_state_description">We are here to assist you during our business hours.</string>
+    <string name="entry_widget_error_state_title">Oops! Contacts Couldn\'t Be Loaded</string>
+    <string name="entry_widget_error_state_description">We couldn\'t load the contacts at this time. This may be due to a temporary syncing issue or network problem.</string>
+    <string name="entry_widget_error_state_try_again_button_label">Try again</string>
+    <string name="entry_widget_loading_accessibility_label">Loading indicator. Waiting for available options.</string>
+    <string name="entry_widget_ongoing_engagement_description">Ongoing • Tap to return</string>
+    <string name="entry_widget_ongoing_engagement_button_accessibility_hint">Returns to ongoing engagement</string>
+    <string name="entry_widget_call_visualizer_button_label">Call Visualizer</string>
+    <string name="entry_widget_call_visualizer_description">You are already in contact with the support team</string>
 
 </resources>

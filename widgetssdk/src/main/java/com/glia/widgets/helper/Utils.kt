@@ -7,26 +7,14 @@ import android.util.TypedValue
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleableRes
 import androidx.core.content.res.ResourcesCompat
-import com.glia.androidsdk.Engagement
-import com.glia.widgets.GliaWidgets
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.UiTheme.UiThemeBuilder
-import java.security.InvalidParameterException
 
 internal object Utils {
-    @JvmStatic
-    fun toMediaType(mediaType: String): Engagement.MediaType {
-        return when (mediaType) {
-            GliaWidgets.MEDIA_TYPE_VIDEO -> Engagement.MediaType.VIDEO
-            GliaWidgets.MEDIA_TYPE_AUDIO -> Engagement.MediaType.AUDIO
-            else -> throw InvalidParameterException("Invalid Media Type")
-        }
-    }
 
     fun getThemeFromTypedArray(typedArray: TypedArray, context: Context): UiTheme {
         val defaultThemeBuilder = UiThemeBuilder().apply {
-            setAppBarTitle(getAppBarTitleValue(typedArray))
             setBrandPrimaryColor(
                 getTypedArrayIntegerValue(
                     typedArray,
@@ -422,14 +410,6 @@ internal object Utils {
 
     private fun getTypedArrayBooleanValue(typedArray: TypedArray, index: Int): Boolean {
         return typedArray.hasValue(index) && typedArray.getBoolean(index, false)
-    }
-
-    private fun getAppBarTitleValue(typedArray: TypedArray): String? {
-        return if (typedArray.hasValue(R.styleable.GliaView_appBarTitle)) {
-            typedArray.getString(R.styleable.GliaView_appBarTitle)
-        } else {
-            null
-        }
     }
 
     fun getTypedArrayStringValue(

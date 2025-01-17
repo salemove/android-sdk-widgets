@@ -208,6 +208,7 @@ class EngagementRepositoryTest {
         every { engagementState.operator } returns operator
         every { engagement.state } returns engagementState
         every { engagementState.visitorStatus } returns EngagementState.VisitorStatus.ENGAGED
+        every { engagementState.isLiveEngagementTransferredToSecureConversation } returns false
         every { engagement.media } returns media
         every { engagement.chat } returns chat
         every { engagement.screenSharing } returns screenSharing
@@ -548,7 +549,7 @@ class EngagementRepositoryTest {
         screenSharing = mockk(relaxUnitFun = true)
         cameraDevice = mockk(relaxUnitFun = true)
         every { engagementState.visitorStatus } returns EngagementState.VisitorStatus.TRANSFERRING
-        every { engagementState.capabilities.isText } returns true
+        every { engagementState.isLiveEngagementTransferredToSecureConversation } returns true
         every { engagementState.operator } returns operator
 
         every { media.currentCameraDevice } returns cameraDevice
@@ -677,35 +678,35 @@ class EngagementRepositoryTest {
             every { operator } returns operator1
             every { visitorStatus } returns EngagementState.VisitorStatus.ENGAGED
             every { id } returns "s_1"
-            every { capabilities.isText } returns false
+            every { isLiveEngagementTransferredToSecureConversation } returns false
         }
 
         val state2: EngagementState = mockk(relaxUnitFun = true) {
             every { operator } returns operator1
             every { visitorStatus } returns EngagementState.VisitorStatus.TRANSFERRING
             every { id } returns "s_2"
-            every { capabilities.isText } returns false
+            every { isLiveEngagementTransferredToSecureConversation } returns false
         }
 
         val state3: EngagementState = mockk(relaxUnitFun = true) {
             every { operator } returns operator2
             every { visitorStatus } returns EngagementState.VisitorStatus.ENGAGED
             every { id } returns "s_3"
-            every { capabilities.isText } returns false
+            every { isLiveEngagementTransferredToSecureConversation } returns false
         }
 
         val state4: EngagementState = mockk(relaxUnitFun = true) {
             every { operator } returns operator2
             every { visitorStatus } returns EngagementState.VisitorStatus.ENGAGED
             every { id } returns "s_4"
-            every { capabilities.isText } returns false
+            every { isLiveEngagementTransferredToSecureConversation } returns false
         }
 
         val state5: EngagementState = mockk(relaxUnitFun = true) {
             every { operator } returns operator2
             every { visitorStatus } returns EngagementState.VisitorStatus.TRANSFERRING
             every { id } returns "s_5"
-            every { capabilities.isText } returns true
+            every { isLiveEngagementTransferredToSecureConversation } returns true
         }
 
         mockEngagementAndStart()
@@ -765,8 +766,8 @@ class EngagementRepositoryTest {
             )
 
         repository.endEngagement(silently = true)
-        verifyEngagementEnd()
-
+        verify { state5.isLiveEngagementTransferredToSecureConversation }
+        verify(exactly = 0) { engagement.end(any()) }
     }
 
     @Test
@@ -1262,6 +1263,7 @@ class EngagementRepositoryTest {
         val state1: EngagementState = mockk(relaxed = true) {
             every { operator } returns operator1
             every { visitorStatus } returns EngagementState.VisitorStatus.ENGAGED
+            every { isLiveEngagementTransferredToSecureConversation } returns false
             every { id } returns "s_1"
         }
         engagementStateCallbackSlot.captured.accept(state1)
@@ -1282,6 +1284,7 @@ class EngagementRepositoryTest {
         val newEngagementState: EngagementState = mockk(relaxUnitFun = true)
         every { newEngagementState.operator } returns newOperator
         every { newEngagementState.visitorStatus } returns EngagementState.VisitorStatus.ENGAGED
+        every { newEngagementState.isLiveEngagementTransferredToSecureConversation } returns false
         every { newEngagement.state } returns newEngagementState
         every { newEngagement.media } returns newMedia
         every { newEngagement.chat } returns newChat
@@ -1331,6 +1334,7 @@ class EngagementRepositoryTest {
         val state1: EngagementState = mockk(relaxed = true) {
             every { operator } returns operator1
             every { visitorStatus } returns EngagementState.VisitorStatus.ENGAGED
+            every { isLiveEngagementTransferredToSecureConversation } returns false
             every { id } returns "s_1"
         }
         engagementStateCallbackSlot.captured.accept(state1)
@@ -1350,6 +1354,7 @@ class EngagementRepositoryTest {
         val newOperator: Operator = mockk(relaxUnitFun = true)
         val newEngagementState: EngagementState = mockk(relaxUnitFun = true)
         every { newEngagementState.visitorStatus } returns EngagementState.VisitorStatus.ENGAGED
+        every { newEngagementState.isLiveEngagementTransferredToSecureConversation } returns false
         every { newEngagementState.operator } returns newOperator
         every { newEngagement.state } returns newEngagementState
         every { newEngagement.media } returns newMedia

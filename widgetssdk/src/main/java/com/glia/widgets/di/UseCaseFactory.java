@@ -113,6 +113,7 @@ import com.glia.widgets.core.secureconversations.domain.SendMessageButtonStateUs
 import com.glia.widgets.core.secureconversations.domain.SendSecureMessageUseCase;
 import com.glia.widgets.core.secureconversations.domain.SetLeaveSecureConversationDialogVisibleUseCase;
 import com.glia.widgets.core.secureconversations.domain.SetLeaveSecureConversationDialogVisibleUseCaseImpl;
+import com.glia.widgets.core.secureconversations.domain.ShouldMarkMessagesReadUseCase;
 import com.glia.widgets.core.secureconversations.domain.ShowMessageLimitErrorUseCase;
 import com.glia.widgets.core.survey.domain.GliaSurveyAnswerUseCase;
 import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCase;
@@ -577,6 +578,13 @@ public class UseCaseFactory {
     @NonNull
     public SecureConversationTopBannerVisibilityUseCase createSecureConversationTopBannerVisibilityUseCase() {
         return new SecureConversationTopBannerVisibilityUseCase(repositoryFactory.getQueueRepository(), createManageSecureMessagingStatusUseCase());
+    }
+
+    @NonNull
+    public ShouldMarkMessagesReadUseCase createShouldMarkMessagesReadUseCase() {
+        return new ShouldMarkMessagesReadUseCase(
+            repositoryFactory.getEngagementRepository()
+        );
     }
 
     @NonNull

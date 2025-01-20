@@ -2,6 +2,7 @@ package com.glia.widgets.engagement
 
 import android.app.Activity
 import android.content.Intent
+import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.Engagement.MediaType
 import com.glia.androidsdk.EngagementRequest.Outcome
 import com.glia.androidsdk.IncomingEngagementRequest
@@ -42,6 +43,7 @@ internal interface EngagementRepository {
     val isOperatorPresent: Boolean
     val isSharingScreen: Boolean
     val isSecureMessagingRequested: Boolean
+    val isRetainAfterEnd: Boolean
     val cameras: List<CameraDevice>?
     val currentVisitorCamera: VisitorCamera
 

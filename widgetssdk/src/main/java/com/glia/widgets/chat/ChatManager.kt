@@ -32,6 +32,7 @@ import com.glia.widgets.core.engagement.domain.model.ChatHistoryResponse
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 import com.glia.widgets.core.secureconversations.domain.HasOngoingSecureConversationUseCase
 import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDelayUseCase
+import com.glia.widgets.core.secureconversations.domain.ShouldMarkMessagesReadUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
@@ -48,6 +49,7 @@ internal class ChatManager(
     private val onMessageUseCase: GliaOnMessageUseCase,
     private val loadHistoryUseCase: GliaLoadHistoryUseCase,
     private val addNewMessagesDividerUseCase: AddNewMessagesDividerUseCase,
+    private val shouldMarkMessagesReadUseCase: ShouldMarkMessagesReadUseCase,
     private val markMessagesReadWithDelayUseCase: MarkMessagesReadWithDelayUseCase,
     private val appendHistoryChatMessageUseCase: AppendHistoryChatMessageUseCase,
     private val appendNewChatMessageUseCase: AppendNewChatMessageUseCase,
@@ -199,10 +201,8 @@ internal class ChatManager(
             appendNewChatMessageUseCase(messagesState, chatMessage)
             if (chatMessage.chatMessage is VisitorMessage) {
                 checkUnsentMessages(messagesState)
-            } else {
-                hasOngoingSecureConversationUseCase(onHasOngoingSecureConversation = {
-                    markMessagesRead()
-                })
+            } else if (shouldMarkMessagesReadUseCase()) {
+                markMessagesReadWithDelay()
             }
         }
 
@@ -438,16 +438,8 @@ internal class ChatManager(
     }
 
     @VisibleForTesting
-    fun markMessagesRead() {
-        val disposable = markMessagesReadWithDelayUseCase(delay = 0)
-            .andThen(state.firstOrError())
-            .map(::removeNewMessagesDivider)
-            .subscribe(state::onNext, Throwable::printStackTrace)
-        markMessagesReadDisposable.add(disposable)
-    }
-
-    @VisibleForTesting
     fun markMessagesReadWithDelay() {
+        markMessagesReadDisposable.clear()
         val disposable = markMessagesReadWithDelayUseCase()
             .andThen(state.firstOrError())
             .map(::removeNewMessagesDivider)

@@ -1475,4 +1475,28 @@ class EngagementRepositoryTest {
         verify { queueRepository.relevantQueueIds }
         verify(exactly = 1) { core.queueForEngagement(listOf(queueId), MediaType.TEXT, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
     }
+
+    @Test
+    fun `isRetainAfterEnd is true when actionOnEnd is RETAIN`() {
+        mockEngagementAndStart()
+
+        every { engagementState.actionOnEnd } returns Engagement.ActionOnEnd.RETAIN
+
+        assertTrue(repository.isRetainAfterEnd)
+    }
+
+    @Test
+    fun `isRetainAfterEnd is false when actionOnEnd is not RETAIN`() {
+        mockEngagementAndStart()
+
+        every { engagementState.actionOnEnd } returnsMany listOf(
+            Engagement.ActionOnEnd.SHOW_SURVEY,
+            Engagement.ActionOnEnd.END_NOTIFICATION,
+            Engagement.ActionOnEnd.UNKNOWN
+        )
+
+        assertFalse(repository.isRetainAfterEnd)
+        assertFalse(repository.isRetainAfterEnd)
+        assertFalse(repository.isRetainAfterEnd)
+    }
 }

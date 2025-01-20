@@ -13,6 +13,10 @@ private const val TAG = "MarkMessagesReadUseCase"
 @VisibleForTesting
 const val DELAY_SEC = 6L
 
+/**
+ * This use case is responsible for marking the messages as read with a delay.
+ * The messages should be marked as read if the chat screen is open and the leave dialog is not visible.
+ */
 internal class MarkMessagesReadWithDelayUseCase(
     private val secureConversationsRepository: SecureConversationsRepository,
     private val chatScreenRepository: ChatScreenRepository

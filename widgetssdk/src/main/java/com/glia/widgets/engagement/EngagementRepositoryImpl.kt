@@ -171,6 +171,9 @@ internal class EngagementRepositoryImpl(
     override val isSecureMessagingRequested: Boolean
         get() = _isSecureMessagingRequested
 
+    override val isRetainAfterEnd: Boolean
+        get() = currentEngagement?.state?.actionOnEnd == Engagement.ActionOnEnd.RETAIN
+
     override val cameras: List<CameraDevice>?
         get() = currentEngagement?.media?.cameraDevices
 

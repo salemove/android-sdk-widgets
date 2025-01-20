@@ -9,6 +9,7 @@ internal class ManagerFactory(private val useCaseFactory: UseCaseFactory) {
                 onMessageUseCase = createGliaOnMessageUseCase(),
                 loadHistoryUseCase = createGliaLoadHistoryUseCase(),
                 addNewMessagesDividerUseCase = createAddNewMessagesDividerUseCase(),
+                shouldMarkMessagesReadUseCase = createShouldMarkMessagesReadUseCase(),
                 markMessagesReadWithDelayUseCase = createMarkMessagesReadUseCase(),
                 appendHistoryChatMessageUseCase = createAppendHistoryChatMessageUseCase(),
                 appendNewChatMessageUseCase = createAppendNewChatMessageUseCase(),

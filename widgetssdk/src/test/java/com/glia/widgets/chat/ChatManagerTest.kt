@@ -34,6 +34,7 @@ import com.glia.widgets.core.engagement.domain.model.ChatHistoryResponse
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 import com.glia.widgets.core.secureconversations.domain.HasOngoingSecureConversationUseCase
 import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDelayUseCase
+import com.glia.widgets.core.secureconversations.domain.ShouldMarkMessagesReadUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
 import io.reactivex.rxjava3.core.Completable
@@ -71,6 +72,7 @@ class ChatManagerTest {
     private lateinit var onMessageUseCase: GliaOnMessageUseCase
     private lateinit var loadHistoryUseCase: GliaLoadHistoryUseCase
     private lateinit var addNewMessagesDividerUseCase: AddNewMessagesDividerUseCase
+    private lateinit var shouldMarkMessagesReadUseCase: ShouldMarkMessagesReadUseCase
     private lateinit var markMessagesReadWithDelayUseCase: MarkMessagesReadWithDelayUseCase
     private lateinit var appendHistoryChatMessageUseCase: AppendHistoryChatMessageUseCase
     private lateinit var appendNewChatMessageUseCase: AppendNewChatMessageUseCase
@@ -95,6 +97,7 @@ class ChatManagerTest {
         onMessageUseCase = mock()
         loadHistoryUseCase = mock()
         addNewMessagesDividerUseCase = mock()
+        shouldMarkMessagesReadUseCase = mock()
         markMessagesReadWithDelayUseCase = mock()
         appendHistoryChatMessageUseCase = mock()
         appendNewChatMessageUseCase = mock()
@@ -114,6 +117,7 @@ class ChatManagerTest {
             onMessageUseCase,
             loadHistoryUseCase,
             addNewMessagesDividerUseCase,
+            shouldMarkMessagesReadUseCase,
             markMessagesReadWithDelayUseCase,
             appendHistoryChatMessageUseCase,
             appendNewChatMessageUseCase,

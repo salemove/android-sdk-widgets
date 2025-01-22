@@ -14,7 +14,7 @@ internal class ActivityWatcherForLiveObservationController(
 
     init {
         engagementStateUseCase()
-            .filter { it is State.StartedOmniCore || it is State.StartedCallVisualizer }
+            .filter { it is State.EngagementStarted }
             .switchMapSingle { liveObservationPopupUseCase() }
             .filter { it }
             .subscribe({ liveObservationWatcher.showSnackBar() }) {}

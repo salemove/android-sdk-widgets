@@ -7,6 +7,7 @@ import android.content.Context
 import android.os.Parcelable
 import android.view.View
 import androidx.appcompat.app.AlertDialog
+import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.engagement.Survey
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.ChatActivity
@@ -85,7 +86,7 @@ class EngagementCompletionActivityWatcherTest {
         Logger.setIsDebug(false)
         every { Logger.d(any(), any()) } just Runs
 
-        val event = createMockEvent(EngagementCompletionState.QueuingOrEngagementEnded)
+        val event = createMockEvent(EngagementCompletionState.EngagementEnded(true, Engagement.ActionOnEnd.END_NOTIFICATION))
         every { event.consumed } returns true
 
         val activity = mockkActivity<Activity>()
@@ -111,8 +112,8 @@ class EngagementCompletionActivityWatcherTest {
     }
 
     @Test
-    fun `handleState will finish activities when state is QueuingOrEngagementEnded even if activity is null or finishing`() {
-        val event = createMockEvent(EngagementCompletionState.QueuingOrEngagementEnded)
+    fun `handleState will finish activities when state is EngagementEnded even if activity is null or finishing`() {
+        val event = createMockEvent(EngagementCompletionState.EngagementEnded(true, Engagement.ActionOnEnd.END_NOTIFICATION))
         val activity = mockkActivity<Activity>()
 
         every { activity.isFinishing } returns true
@@ -242,8 +243,8 @@ class EngagementCompletionActivityWatcherTest {
     }
 
     @Test
-    fun `handleState will show operator ended engagement dialog when event is OperatorEndedEngagement`() {
-        val event = createMockEvent(EngagementCompletionState.OperatorEndedEngagement)
+    fun `handleState will show operator ended engagement dialog when event is ActionOnEnd is END_NOTIFICATION`() {
+        val event = createMockEvent(EngagementCompletionState.EngagementEnded(false, Engagement.ActionOnEnd.END_NOTIFICATION))
 
         val activity = mockkActivity<ChatActivity>()
 

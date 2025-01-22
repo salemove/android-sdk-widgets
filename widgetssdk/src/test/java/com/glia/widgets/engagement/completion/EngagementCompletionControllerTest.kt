@@ -2,6 +2,7 @@ package com.glia.widgets.engagement.completion
 
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.engagement.Survey
+import com.glia.widgets.engagement.EngagementType
 import com.glia.widgets.engagement.EngagementUpdateState
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.SurveyState
@@ -55,23 +56,23 @@ class EngagementCompletionControllerTest {
     }
 
     @Test
-    fun `State FinishedCallVisualizer should release resources and emit QueuingOrEngagementEnded`() {
-        engagementStateProcessor.onNext(State.FinishedCallVisualizer)
+    fun `State EngagementEnded(CallVisualizer) should release resources and emit completion event EngagementEnded`() {
+        engagementStateProcessor.onNext(State.EngagementEnded(EngagementType.CallVisualizer, true, Engagement.ActionOnEnd.UNKNOWN))
 
         verify { releaseResourcesUseCase() }
-        assertEquals(EngagementCompletionState.QueuingOrEngagementEnded, controller.state.blockingFirst().value)
+        assertEquals(EngagementCompletionState.EngagementEnded(true, Engagement.ActionOnEnd.UNKNOWN), controller.state.blockingFirst().value)
     }
 
     @Test
-    fun `State FinishedOmniCore should release resources and emit QueuingOrEngagementEnded`() {
-        engagementStateProcessor.onNext(State.FinishedOmniCore)
+    fun `State EngagementEnded(OmniCore) should release resources and emit completion event EngagementEnded`() {
+        engagementStateProcessor.onNext(State.EngagementEnded(EngagementType.OmniCore, true, Engagement.ActionOnEnd.UNKNOWN))
 
         verify { releaseResourcesUseCase() }
-        assertEquals(EngagementCompletionState.QueuingOrEngagementEnded, controller.state.blockingFirst().value)
+        assertEquals(EngagementCompletionState.EngagementEnded(true, Engagement.ActionOnEnd.UNKNOWN), controller.state.blockingFirst().value)
     }
 
     @Test
-    fun `State QueueUnstaffed should release resources and emit QueuingOrEngagementEnded and QueueUnstaffed`() {
+    fun `State QueueUnstaffed should release resources and emit QueueUnstaffed`() {
         val testState = controller.state.map { it.value }.test()
 
         engagementStateProcessor.onNext(State.QueueUnstaffed)
@@ -79,13 +80,12 @@ class EngagementCompletionControllerTest {
         verify { releaseResourcesUseCase() }
 
         testState.assertValues(
-            EngagementCompletionState.QueuingOrEngagementEnded,
             EngagementCompletionState.QueueUnstaffed
         )
     }
 
     @Test
-    fun `State UnexpectedErrorHappened should release resources and emit QueuingOrEngagementEnded and UnexpectedErrorHappened`() {
+    fun `State UnexpectedErrorHappened should release resources and emit UnexpectedErrorHappened`() {
         val testState = controller.state.map { it.value }.test()
 
         engagementStateProcessor.onNext(State.UnexpectedErrorHappened)
@@ -93,21 +93,20 @@ class EngagementCompletionControllerTest {
         verify { releaseResourcesUseCase() }
 
         testState.assertValues(
-            EngagementCompletionState.QueuingOrEngagementEnded,
             EngagementCompletionState.UnexpectedErrorHappened
         )
     }
 
     @Test
-    fun `State other than FinishedCallVisualizer, FinishedOmniCore, QueueUnstaffed, UnexpectedErrorHappened should not release resources`() {
+    fun `State other than EngagementEnded, QueueUnstaffed, UnexpectedErrorHappened should not release resources`() {
         val testState = controller.state.test()
 
         engagementStateProcessor.onNext(State.NoEngagement)
         engagementStateProcessor.onNext(State.PreQueuing(Engagement.MediaType.TEXT))
         engagementStateProcessor.onNext(State.Queuing("queueTicketId", Engagement.MediaType.TEXT))
         engagementStateProcessor.onNext(State.QueueingCanceled)
-        engagementStateProcessor.onNext(State.StartedOmniCore)
-        engagementStateProcessor.onNext(State.StartedCallVisualizer)
+        engagementStateProcessor.onNext(State.EngagementStarted(EngagementType.CallVisualizer))
+        engagementStateProcessor.onNext(State.EngagementStarted(EngagementType.OmniCore))
         engagementStateProcessor.onNext(State.Update(mockk(), EngagementUpdateState.Transferring))
 
         verify(exactly = 0) { releaseResourcesUseCase() }
@@ -115,12 +114,14 @@ class EngagementCompletionControllerTest {
     }
 
     @Test
-    fun `SurveyState EmptyFromOperatorRequest should produce OperatorEndedEngagement`() {
+    fun `Engagement State EngagementEnded() should produce completion EngagementEnded event with same properties`() {
         val testState = controller.state.map { it.value }.test()
 
-        surveyStateProcessor.onNext(SurveyState.EmptyFromOperatorRequest)
+        engagementStateProcessor.onNext(State.EngagementEnded(EngagementType.OmniCore, false, Engagement.ActionOnEnd.UNKNOWN))
 
-        testState.assertValues(EngagementCompletionState.OperatorEndedEngagement)
+        verify { releaseResourcesUseCase() }
+
+        testState.assertValues(EngagementCompletionState.EngagementEnded(false, Engagement.ActionOnEnd.UNKNOWN))
     }
 
     @Test

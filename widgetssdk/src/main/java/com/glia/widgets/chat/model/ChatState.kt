@@ -54,7 +54,10 @@ internal data class ChatState(
     fun setSecureMessagingState(): ChatState = copy(
         isSecureMessaging = true,
         chatInputMode = ChatInputMode.ENABLED,
-        isAttachmentButtonNeeded = true
+        isAttachmentButtonNeeded = true,
+        engagementRequested = false,
+        operatorProfileImgUrl = null,
+        formattedOperatorName = null
     )
 
     fun setLiveChatState(): ChatState = copy(

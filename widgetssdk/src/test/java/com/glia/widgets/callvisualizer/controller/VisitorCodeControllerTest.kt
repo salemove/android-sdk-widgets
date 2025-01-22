@@ -3,6 +3,7 @@ package com.glia.widgets.callvisualizer.controller
 import com.glia.androidsdk.omnibrowse.VisitorCode
 import com.glia.widgets.callvisualizer.VisitorCodeContract
 import com.glia.widgets.core.callvisualizer.domain.VisitorCodeRepository
+import com.glia.widgets.engagement.EngagementType
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
@@ -85,7 +86,7 @@ internal class VisitorCodeControllerTest {
 
     @Test
     fun `auto close is triggered when engagement starts`() {
-        engagementState.onNext(State.StartedCallVisualizer)
+        engagementState.onNext(State.EngagementStarted(EngagementType.CallVisualizer))
 
         verify(view).destroyTimer()
         verifyNoInteractions(callVisualizerController)

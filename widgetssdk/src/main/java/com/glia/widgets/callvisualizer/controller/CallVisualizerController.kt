@@ -60,8 +60,8 @@ internal class CallVisualizerController(
 
     private val _state: PublishProcessor<CallVisualizerContract.State> = PublishProcessor.create()
     override val state: Flowable<OneTimeEvent<CallVisualizerContract.State>> = _state.asOneTimeStateFlowable()
-    override val engagementStartFlow: Flowable<EngagementState> get() = engagementStateUseCase().filter { it is EngagementState.StartedCallVisualizer }
-    override val engagementEndFlow: Flowable<EngagementState> get() = engagementStateUseCase().filter { it is EngagementState.FinishedCallVisualizer }
+    override val engagementStartFlow: Flowable<EngagementState> get() = engagementStateUseCase().filter { it is EngagementState.EngagementStarted && it.isCallVisualizer }
+    override val engagementEndFlow: Flowable<EngagementState> get() = engagementStateUseCase().filter { it is EngagementState.EngagementEnded && it.isCallVisualizer }
 
     private var visitorContextAssetId: String? = null
 

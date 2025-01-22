@@ -101,15 +101,13 @@ internal class ServiceChatHeadController(
 
     private fun handleEngagementState(state: com.glia.widgets.engagement.State) {
         when (state) {
-            is EngagementState.StartedOmniCore,
-            is EngagementState.StartedCallVisualizer -> {
+            is EngagementState.EngagementStarted -> {
                 newEngagementLoaded()
             }
 
             is EngagementState.Update -> toggleChatHead()
 
-            is EngagementState.FinishedCallVisualizer,
-            is EngagementState.FinishedOmniCore,
+            is EngagementState.EngagementEnded,
             is EngagementState.QueueUnstaffed,
             is EngagementState.UnexpectedErrorHappened,
             is EngagementState.QueueingCanceled -> {

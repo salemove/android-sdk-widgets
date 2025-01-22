@@ -26,8 +26,6 @@ import com.glia.widgets.core.notification.domain.CallNotificationUseCase
 import com.glia.widgets.engagement.EngagementUpdateState
 import com.glia.widgets.engagement.ScreenSharingState
 import com.glia.widgets.engagement.State
-import com.glia.widgets.engagement.State.StartedCallVisualizer
-import com.glia.widgets.engagement.State.StartedOmniCore
 import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCase
 import com.glia.widgets.engagement.domain.EndEngagementUseCase
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
@@ -547,7 +545,7 @@ internal class CallController(
 
     private fun onEngagementStateChanged(state: State) {
         when (state) {
-            StartedCallVisualizer, StartedOmniCore -> newEngagementLoaded()
+            is State.EngagementStarted -> newEngagementLoaded()
             is State.Update -> handleEngagementStateUpdate(state.updateState)
             is State.QueueUnstaffed, is State.UnexpectedErrorHappened -> {
                 emitViewState(callState.changeVisibility(false))

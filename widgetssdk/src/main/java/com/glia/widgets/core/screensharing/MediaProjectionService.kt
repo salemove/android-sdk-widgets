@@ -60,7 +60,7 @@ class MediaProjectionService : Service() {
             informThatReadyToShareScreenUseCase()
 
             engagementStateUseCase()
-                .filter { it is State.FinishedCallVisualizer || it is State.FinishedOmniCore }
+                .filter { it is State.EngagementEnded }
                 .subscribe { stopSelf() }
                 .also(compositeDisposable::add)
         }

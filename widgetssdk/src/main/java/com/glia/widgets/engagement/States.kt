@@ -1,5 +1,6 @@
 package com.glia.widgets.engagement
 
+import com.glia.androidsdk.Engagement.ActionOnEnd
 import com.glia.androidsdk.Engagement.MediaType
 import com.glia.androidsdk.Operator
 import com.glia.androidsdk.engagement.EngagementState
@@ -12,10 +13,8 @@ internal sealed interface State {
     data object QueueUnstaffed : State
     data object UnexpectedErrorHappened : State
     data object QueueingCanceled : State
-    data object StartedOmniCore : State
-    data object StartedCallVisualizer : State
-    data object FinishedOmniCore : State
-    data object FinishedCallVisualizer : State
+    data class EngagementStarted(val type: EngagementType) : StateWithType(type)
+    data class EngagementEnded(val type: EngagementType, val isEndedByVisitor: Boolean, val onEnd: ActionOnEnd) : StateWithType(type)
     data object TransferredToSecureConversation : State
     data class Update(val state: EngagementState, val updateState: EngagementUpdateState) : State
 
@@ -24,7 +23,7 @@ internal sealed interface State {
 
     val isLiveEngagement: Boolean
         get() = when (this) {
-            is Update, StartedOmniCore, StartedCallVisualizer -> true
+            is Update, is EngagementStarted -> true
             else -> false
         }
 
@@ -34,6 +33,10 @@ internal sealed interface State {
             is Queuing -> mediaType
             else -> null
         }
+
+    open class StateWithType(engagementType: EngagementType): State {
+        val isCallVisualizer = engagementType == EngagementType.CallVisualizer
+    }
 }
 
 internal sealed interface EngagementUpdateState {
@@ -45,7 +48,6 @@ internal sealed interface EngagementUpdateState {
 
 internal sealed interface SurveyState {
     data object Empty : SurveyState
-    data object EmptyFromOperatorRequest : SurveyState
     data class Value(val survey: Survey) : SurveyState
 }
 
@@ -56,4 +58,9 @@ internal sealed interface ScreenSharingState {
     data object RequestDeclined : ScreenSharingState
     data class FailedToAcceptRequest(val message: String) : ScreenSharingState
     data object Ended : ScreenSharingState
+}
+
+internal sealed interface EngagementType {
+    data object OmniCore: EngagementType
+    data object CallVisualizer: EngagementType
 }

@@ -51,14 +51,12 @@ internal class ApplicationChatHeadLayoutController(
         messagesNotSeenHandler.addListener(::onUnreadMessageCountChange)
         engagementStateUseCase().unSafeSubscribe {
             when (it) {
-                is EngagementState.FinishedCallVisualizer,
-                is EngagementState.FinishedOmniCore,
+                is EngagementState.EngagementEnded,
                 is EngagementState.QueueUnstaffed,
                 is EngagementState.UnexpectedErrorHappened,
                 is EngagementState.QueueingCanceled -> engagementEnded()
 
-                EngagementState.StartedCallVisualizer,
-                EngagementState.StartedOmniCore -> onNewEngagementLoaded()
+                is EngagementState.EngagementStarted -> onNewEngagementLoaded()
 
                 is EngagementState.Queuing,
                 is EngagementState.PreQueuing -> onQueuingStarted()

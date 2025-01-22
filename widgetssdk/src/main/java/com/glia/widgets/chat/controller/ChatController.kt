@@ -572,13 +572,16 @@ internal class ChatController(
 
     private fun onEngagementStateChanged(state: State) {
         when (state) {
-            State.FinishedCallVisualizer, State.FinishedOmniCore -> {
+            is State.EngagementEnded -> {
                 if (!isQueueingOrOngoingEngagement) {
                     dialogController.dismissDialogs()
                 }
+                if (state.onEnd == Engagement.ActionOnEnd.RETAIN) {
+                    onTransferredToSecureConversation()
+                }
             }
 
-            State.StartedOmniCore -> newEngagementLoaded()
+            is State.EngagementStarted -> if(!state.isCallVisualizer) newEngagementLoaded()
             is State.Update -> handleEngagementStateUpdate(state.updateState)
             is State.PreQueuing, is State.Queuing -> queueForEngagementStarted()
             is State.QueueUnstaffed, is State.UnexpectedErrorHappened, is State.QueueingCanceled -> emitViewState { chatState.chatUnavailableState() }

@@ -1,9 +1,7 @@
 package com.glia.widgets.engagement.completion
 
+import com.glia.androidsdk.Engagement
 import com.glia.widgets.engagement.State
-import com.glia.widgets.engagement.State.StartedCallVisualizer
-import com.glia.widgets.engagement.State.StartedOmniCore
-import com.glia.widgets.engagement.State.Update
 import com.glia.widgets.engagement.SurveyState
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import com.glia.widgets.engagement.domain.ReleaseResourcesUseCase
@@ -37,20 +35,21 @@ internal class EngagementCompletionController(
 
     private fun handleEngagementState(state: State) {
         when (state) {
-            State.FinishedCallVisualizer, State.FinishedOmniCore -> {
-                releaseResourcesUseCase()
-                _state.onNext(EngagementCompletionState.QueuingOrEngagementEnded)
+            is State.EngagementEnded -> {
+                if (state.onEnd != Engagement.ActionOnEnd.RETAIN) {
+                    // Even though we need to retain the chat screen we still need to reset view states and controllers and later setup them again
+                    releaseResourcesUseCase()
+                }
+                _state.onNext(EngagementCompletionState.EngagementEnded(state.isEndedByVisitor, state.onEnd))
             }
 
             State.QueueUnstaffed -> {
                 releaseResourcesUseCase()
-                _state.onNext(EngagementCompletionState.QueuingOrEngagementEnded)
                 _state.onNext(EngagementCompletionState.QueueUnstaffed)
             }
 
             State.UnexpectedErrorHappened -> {
                 releaseResourcesUseCase()
-                _state.onNext(EngagementCompletionState.QueuingOrEngagementEnded)
                 _state.onNext(EngagementCompletionState.UnexpectedErrorHappened)
             }
 
@@ -62,7 +61,6 @@ internal class EngagementCompletionController(
 
     private fun handleSurveyState(surveyState: SurveyState) {
         when (surveyState) {
-            SurveyState.EmptyFromOperatorRequest -> _state.onNext(EngagementCompletionState.OperatorEndedEngagement)
             is SurveyState.Value -> _state.onNext(EngagementCompletionState.SurveyLoaded(surveyState.survey))
             SurveyState.Empty -> {
                 // no op

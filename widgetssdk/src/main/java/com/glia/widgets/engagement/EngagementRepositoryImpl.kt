@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Intent
 import androidx.annotation.VisibleForTesting
 import com.glia.androidsdk.Engagement
+import com.glia.androidsdk.Engagement.ActionOnEnd
 import com.glia.androidsdk.Engagement.MediaType
 import com.glia.androidsdk.EngagementRequest
 import com.glia.androidsdk.EngagementRequest.Outcome
@@ -196,8 +197,8 @@ internal class EngagementRepositoryImpl(
         cancelQueuing()
     }
 
-    private fun resetState() {
-        _isSecureMessagingRequested = false
+    private fun resetState(retainSecureMessagingState: Boolean = false) {
+        _isSecureMessagingRequested = retainSecureMessagingState
         _operatorMediaState.onNext(Data.Empty)
         _visitorMediaState.onNext(Data.Empty)
         _currentOperator.onNext(Data.Empty)
@@ -213,12 +214,12 @@ internal class EngagementRepositoryImpl(
             currentEngagement = null
             Logger.i(TAG, "Engagement ended locally, silently:$silently")
             unsubscribeFromEvents(it)
-            notifyEngagementEnded(it)
+            notifyEngagementEnded(it, false)
             it.end { ex -> ex?.also { Logger.d(TAG, "Ending engagement failed") } }
             if (silently || it is OmnibrowseEngagement) {
                 _survey.onNext(SurveyState.Empty)
             } else {
-                fetchSurvey(it, false)
+                fetchSurvey(it)
             }
             resetState()
         }
@@ -331,15 +332,13 @@ internal class EngagementRepositoryImpl(
         }
     }
 
-    private fun fetchSurvey(engagement: Engagement, isOperator: Boolean) {
+    private fun fetchSurvey(engagement: Engagement) {
         engagement.getSurvey { survey, _ ->
             when {
                 survey != null -> {
                     Logger.i(TAG, "Survey loaded")
                     _survey.onNext(SurveyState.Value(survey))
                 }
-
-                isOperator -> _survey.onNext(SurveyState.EmptyFromOperatorRequest)
                 else -> _survey.onNext(SurveyState.Empty)
             }
         }
@@ -408,7 +407,7 @@ internal class EngagementRepositoryImpl(
 
             engagement.state.isLiveEngagementTransferredToSecureConversation -> _engagementState.onNext(State.TransferredToSecureConversation)
 
-            else -> _engagementState.onNext(State.StartedOmniCore)
+            else -> _engagementState.onNext(State.EngagementStarted(EngagementType.OmniCore))
         }
 
         currentEngagement = engagement
@@ -428,7 +427,7 @@ internal class EngagementRepositoryImpl(
             unsubscribeFromEvents(it)
             currentEngagement = null
             resetState()
-        } ?: _engagementState.onNext(State.StartedCallVisualizer)
+        } ?: _engagementState.onNext(State.EngagementStarted(EngagementType.CallVisualizer))
 
         currentEngagement = engagement
         handleEngagementState(engagement.state)
@@ -531,23 +530,25 @@ internal class EngagementRepositoryImpl(
         currentEngagement?.also {
             currentEngagement = null
             unsubscribeFromEvents(it)
-            notifyEngagementEnded(it)
-            resetState()
+            notifyEngagementEnded(it, true)
 
-            if (it is OmnicoreEngagement) {
-                fetchSurvey(it, true)
+            resetState(it.state.actionOnEnd == ActionOnEnd.RETAIN)
+
+            if (it is OmnicoreEngagement && it.state.actionOnEnd == ActionOnEnd.SHOW_SURVEY) {
+                fetchSurvey(it)
             } else {
                 _survey.onNext(SurveyState.Empty)
             }
         }
     }
 
-    private fun notifyEngagementEnded(engagement: Engagement) {
-        val state = if (engagement is OmnibrowseEngagement)
-            State.FinishedCallVisualizer
+    private fun notifyEngagementEnded(engagement: Engagement, isEndedByOperator: Boolean) {
+        val engagementType = if (engagement is OmnibrowseEngagement)
+            EngagementType.CallVisualizer
         else
-            State.FinishedOmniCore
+            EngagementType.OmniCore
 
+        val state = State.EngagementEnded(engagementType, !isEndedByOperator, engagement.state.actionOnEnd)
         _engagementState.onNext(state)
     }
 

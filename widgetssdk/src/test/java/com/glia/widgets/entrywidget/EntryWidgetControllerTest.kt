@@ -2,6 +2,7 @@ package com.glia.widgets.entrywidget
 
 import android.COMMON_EXTENSIONS_CLASS_PATH
 import android.app.Activity
+import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.Engagement.MediaType
 import com.glia.androidsdk.engagement.EngagementState
 import com.glia.androidsdk.queuing.Queue
@@ -11,6 +12,7 @@ import com.glia.widgets.core.queue.QueuesState
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.core.secureconversations.domain.HasOngoingSecureConversationUseCase
 import com.glia.widgets.di.GliaCore
+import com.glia.widgets.engagement.EngagementType
 import com.glia.widgets.engagement.EngagementUpdateState
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
@@ -662,10 +664,10 @@ class EntryWidgetControllerTest {
         testPrepareItemsBasedOnQueuesCalledForEngagementState(State.QueueUnstaffed)
         testPrepareItemsBasedOnQueuesCalledForEngagementState(State.UnexpectedErrorHappened)
         testPrepareItemsBasedOnQueuesCalledForEngagementState(State.QueueingCanceled)
-        testPrepareItemsBasedOnQueuesCalledForEngagementState(State.StartedOmniCore)
-        testPrepareItemsBasedOnQueuesCalledForEngagementState(State.StartedCallVisualizer)
-        testPrepareItemsBasedOnQueuesCalledForEngagementState(State.FinishedOmniCore)
-        testPrepareItemsBasedOnQueuesCalledForEngagementState(State.FinishedCallVisualizer)
+        testPrepareItemsBasedOnQueuesCalledForEngagementState(State.EngagementStarted(EngagementType.OmniCore))
+        testPrepareItemsBasedOnQueuesCalledForEngagementState(State.EngagementStarted(EngagementType.CallVisualizer))
+        testPrepareItemsBasedOnQueuesCalledForEngagementState(State.EngagementEnded(EngagementType.OmniCore, false, Engagement.ActionOnEnd.UNKNOWN))
+        testPrepareItemsBasedOnQueuesCalledForEngagementState(State.EngagementEnded(EngagementType.CallVisualizer, false, Engagement.ActionOnEnd.UNKNOWN))
         testPrepareItemsBasedOnQueuesCalledForEngagementState(State.TransferredToSecureConversation)
     }
 

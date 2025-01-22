@@ -69,7 +69,7 @@ internal class VisitorCodeController(
             return
         }
         engagementStateDisposable?.dispose()
-        engagementStateDisposable = engagementStateUseCase().filter { it is State.StartedCallVisualizer }.subscribe {
+        engagementStateDisposable = engagementStateUseCase().filter { it is State.EngagementStarted && it.isCallVisualizer }.subscribe {
             view.destroyTimer()
         }
     }

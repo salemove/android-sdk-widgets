@@ -3,6 +3,7 @@ package com.glia.widgets.engagement
 import android.LOGGER_PATH
 import android.app.Activity
 import com.glia.androidsdk.Engagement
+import com.glia.androidsdk.Engagement.ActionOnEnd
 import com.glia.androidsdk.Engagement.MediaType
 import com.glia.androidsdk.EngagementRequest
 import com.glia.androidsdk.Glia
@@ -188,7 +189,7 @@ class EngagementRepositoryTest {
         }
     }
 
-    private fun mockEngagementAndStart(callVisualizer: Boolean = false) {
+    private fun mockEngagementAndStart(callVisualizer: Boolean = false, actionOnEnd: ActionOnEnd = ActionOnEnd.END_NOTIFICATION) {
         engagement = if (callVisualizer) {
             mockk<OmnibrowseEngagement>(relaxUnitFun = true)
         } else {
@@ -206,6 +207,7 @@ class EngagementRepositoryTest {
         }
         engagementState = mockk(relaxUnitFun = true)
         every { engagementState.operator } returns operator
+        every { engagementState.actionOnEnd } returns actionOnEnd
         every { engagement.state } returns engagementState
         every { engagementState.visitorStatus } returns EngagementState.VisitorStatus.ENGAGED
         every { engagementState.isLiveEngagementTransferredToSecureConversation } returns false
@@ -220,7 +222,7 @@ class EngagementRepositoryTest {
             callVisualizerEngagementCallbackSlot.captured.accept(engagement as OmnibrowseEngagement)
             stateTestSubscriber.assertValues(
                 State.NoEngagement,
-                State.StartedCallVisualizer,
+                State.EngagementStarted(EngagementType.CallVisualizer),
                 State.Update(engagementState, EngagementUpdateState.OperatorConnected(operator))
             ).assertValueCount(3).assertNotComplete()
             verify(inverse = true) { chat.on(Chat.Events.OPERATOR_TYPING_STATUS, capture(operatorTypingCallbackSlot)) }
@@ -229,7 +231,7 @@ class EngagementRepositoryTest {
             omniCoreEngagementCallbackSlot.captured.accept(engagement as OmnicoreEngagement)
             stateTestSubscriber.assertValues(
                 State.NoEngagement,
-                State.StartedOmniCore,
+                State.EngagementStarted(EngagementType.OmniCore),
                 State.Update(engagementState, EngagementUpdateState.OperatorConnected(operator))
             ).assertValueCount(3).assertNotComplete()
             verify { chat.on(Chat.Events.OPERATOR_TYPING_STATUS, capture(operatorTypingCallbackSlot)) }
@@ -349,7 +351,7 @@ class EngagementRepositoryTest {
         confirmVerified(mockAudio, mockVideo, visitorMediaState)
     }
 
-    private fun verifyEngagementEnd(ongoingEngagement: Boolean = true, endedLocally: Boolean = true) {
+    private fun verifyEngagementEnd(ongoingEngagement: Boolean = true, endedLocally: Boolean = true, actionOnEnd: ActionOnEnd = ActionOnEnd.END_NOTIFICATION) {
         repository.apply {
             currentOperator.test().assertNotComplete().assertValue(Data.Empty)
             visitorMediaState.test().assertNotComplete().assertValue(Data.Empty)
@@ -369,7 +371,8 @@ class EngagementRepositoryTest {
 
             verifyUnsubscribedFromEngagement()
 
-            val state = if (engagement is OmnicoreEngagement) State.FinishedOmniCore else State.FinishedCallVisualizer
+            val engagementType = if (engagement is OmnicoreEngagement) EngagementType.OmniCore else EngagementType.CallVisualizer
+            val state = State.EngagementEnded(engagementType, endedLocally, actionOnEnd)
             repository.engagementState.test().assertNotComplete().assertValue(state)
         }
     }
@@ -636,12 +639,12 @@ class EngagementRepositoryTest {
         val survey: Survey = mockk()
         val surveyCallbackSlot = slot<RequestCallback<Survey>>()
         val surveyStateTestSubscriber = repository.survey.test()
-        mockEngagementAndStart()
+        mockEngagementAndStart(actionOnEnd = ActionOnEnd.SHOW_SURVEY)
         fillStates()
         engagementEndCallbackSlot.captured.run()
         verify { engagement.getSurvey(capture(surveyCallbackSlot)) }
 
-        verifyEngagementEnd(endedLocally = false)
+        verifyEngagementEnd(endedLocally = false, actionOnEnd = ActionOnEnd.SHOW_SURVEY)
         surveyCallbackSlot.captured.onResult(survey, null)
         surveyStateTestSubscriber.assertNotComplete().assertValueCount(1).assertValue(SurveyState.Value(survey))
     }
@@ -651,14 +654,14 @@ class EngagementRepositoryTest {
         val exception: GliaException = mockk()
         val surveyCallbackSlot = slot<RequestCallback<Survey>>()
         val surveyStateTestSubscriber = repository.survey.test()
-        mockEngagementAndStart()
+        mockEngagementAndStart(actionOnEnd = ActionOnEnd.SHOW_SURVEY)
         fillStates()
         engagementEndCallbackSlot.captured.run()
         verify { engagement.getSurvey(capture(surveyCallbackSlot)) }
 
-        verifyEngagementEnd(endedLocally = false)
+        verifyEngagementEnd(endedLocally = false, actionOnEnd = ActionOnEnd.SHOW_SURVEY)
         surveyCallbackSlot.captured.onResult(null, exception)
-        surveyStateTestSubscriber.assertNotComplete().assertValueCount(1).assertValue(SurveyState.EmptyFromOperatorRequest)
+        surveyStateTestSubscriber.assertNotComplete().assertValueCount(1).assertValue(SurveyState.Empty)
     }
 
     @Test
@@ -757,7 +760,7 @@ class EngagementRepositoryTest {
             .assertValueCount(7)
             .assertValuesOnly(
                 State.NoEngagement,
-                State.StartedOmniCore,
+                State.EngagementStarted(EngagementType.OmniCore),
                 State.Update(engagementState, EngagementUpdateState.OperatorConnected(operator)),
                 State.Update(state1, EngagementUpdateState.OperatorChanged(operator1)),
                 State.Update(state2, EngagementUpdateState.Transferring),

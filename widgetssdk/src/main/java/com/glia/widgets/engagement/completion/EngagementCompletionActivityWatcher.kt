@@ -1,6 +1,7 @@
 package com.glia.widgets.engagement.completion
 
 import android.app.Activity
+import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.engagement.Survey
 import com.glia.widgets.base.BaseSingleActivityWatcher
 import com.glia.widgets.helper.GliaActivityManager
@@ -28,16 +29,13 @@ internal class EngagementCompletionActivityWatcher(
 
         when {
             event.consumed -> Logger.d(TAG, "skipping.. event: ${event.value} is already consumed")
-
-            /*
-            * This state finishes all SDK activities even if the application is in the background(activity == null),
-            * to be sure that everything related to the queueing or engagement is released.
-            * */
-            state is EngagementCompletionState.QueuingOrEngagementEnded -> event.consume { finishActivities() }
-            activity == null || activity.isFinishing -> Logger.d(TAG, "skipping.. activity is null or finishing")
+            activity == null || activity.isFinishing -> {
+                Logger.d(TAG, "skipping.. activity is null or finishing")
+                if (state is EngagementCompletionState.EngagementEnded) event.consume { finishActivities() }
+            }
             state is EngagementCompletionState.QueueUnstaffed -> showQueueUnstaffedDialog(activity, event::markConsumed)
             state is EngagementCompletionState.UnexpectedErrorHappened -> showUnexpectedErrorDialog(activity, event::markConsumed)
-            state is EngagementCompletionState.OperatorEndedEngagement -> showOperatorEndedEngagementDialog(activity, event::markConsumed)
+            state is EngagementCompletionState.EngagementEnded -> state.handleEngagementEndedEvent(activity, event::markConsumed)
             state is EngagementCompletionState.SurveyLoaded -> event.consume { showSurvey(activity, state.survey) }
         }
     }
@@ -71,6 +69,14 @@ internal class EngagementCompletionActivityWatcher(
                 finishActivities()
                 consumeCallback()
             }
+        }
+    }
+
+    private fun EngagementCompletionState.EngagementEnded.handleEngagementEndedEvent(activity: Activity, onEventHandled: () -> Unit) {
+        if (isEndedByVisitor || actionOnEnd == Engagement.ActionOnEnd.RETAIN || actionOnEnd == Engagement.ActionOnEnd.SHOW_SURVEY) {
+            onEventHandled()
+        } else if (actionOnEnd == Engagement.ActionOnEnd.END_NOTIFICATION || actionOnEnd == Engagement.ActionOnEnd.UNKNOWN) {
+            showOperatorEndedEngagementDialog(activity, onEventHandled)
         }
     }
 }

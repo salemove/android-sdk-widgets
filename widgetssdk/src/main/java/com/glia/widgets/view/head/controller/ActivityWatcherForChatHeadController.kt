@@ -38,15 +38,13 @@ internal class ActivityWatcherForChatHeadController(
 
     private fun handleEngagementState(state: State) {
         when (state) {
-            is State.StartedOmniCore,
-            is State.StartedCallVisualizer,
+            is State.EngagementStarted,
             is State.Queuing,
             is State.PreQueuing -> onEngagementOrQueueingStarted()
 
             is State.Update -> updateBubble()
 
-            is State.FinishedCallVisualizer,
-            is State.FinishedOmniCore,
+            is State.EngagementEnded,
             is State.QueueUnstaffed,
             is State.UnexpectedErrorHappened,
             is State.QueueingCanceled -> onEngagementOrQueueingEnded()

@@ -7,6 +7,7 @@ import com.glia.androidsdk.Engagement
 import com.glia.widgets.chat.ChatView
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
+import com.glia.widgets.engagement.EngagementType
 import com.glia.widgets.engagement.ScreenSharingState
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
@@ -112,8 +113,8 @@ internal class ActivityWatcherForChatHeadTest {
 
     @Test
     fun `bubble will be removed when engagement or queueing ended`() {
-        engagementStateFlowable.onNext(State.FinishedCallVisualizer)
-        engagementStateFlowable.onNext(State.FinishedOmniCore)
+        engagementStateFlowable.onNext(State.EngagementEnded(EngagementType.CallVisualizer, false, Engagement.ActionOnEnd.UNKNOWN))
+        engagementStateFlowable.onNext(State.EngagementEnded(EngagementType.OmniCore, false, Engagement.ActionOnEnd.UNKNOWN))
         engagementStateFlowable.onNext(State.QueueUnstaffed)
         engagementStateFlowable.onNext(State.UnexpectedErrorHappened)
         engagementStateFlowable.onNext(State.QueueingCanceled)
@@ -126,7 +127,7 @@ internal class ActivityWatcherForChatHeadTest {
     fun `bubble will be updated when OmniCoreEngagement is started`() {
         mockShouldShowChatHead()
 
-        engagementStateFlowable.onNext(State.StartedOmniCore)
+        engagementStateFlowable.onNext(State.EngagementStarted(EngagementType.OmniCore))
         verifyBubbleIsShowed(times = 2)
     }
 
@@ -134,7 +135,7 @@ internal class ActivityWatcherForChatHeadTest {
     fun `bubble will be updated when OmniBrowseEngagement is started`() {
         mockShouldShowChatHead()
 
-        engagementStateFlowable.onNext(State.StartedCallVisualizer)
+        engagementStateFlowable.onNext(State.EngagementStarted(EngagementType.CallVisualizer))
         verifyBubbleIsShowed(times = 2)
     }
 

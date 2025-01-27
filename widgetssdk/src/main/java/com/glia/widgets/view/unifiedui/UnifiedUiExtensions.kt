@@ -51,58 +51,40 @@ internal fun createBackgroundFromTheme(color: ColorTheme): Drawable = color.run 
     }
 }
 
+internal val View.backgroundGradientDrawable: GradientDrawable
+    get() = when {
+        // The part below is needed to preserve GradientDrawable/background properties that are `null`.
+        // For example without this implementation if `cornerRadius = null` but `stroke = Color.RED` then
+        // whatever corner radios is in the default UI implementation it would automatically become 0 instead
+        background is StateListDrawable && background.current is StateListDrawable -> background.current as GradientDrawable
+        background is GradientDrawable -> background as GradientDrawable
+        else -> GradientDrawable()
+    }
+
 /**
  * will update whole background without keeping an old background or stroke
  * in case when the old background differs from [GradientDrawable]
  */
-internal fun View.applyLayerTheme(defTheme: LayerTheme?, disabledTheme: LayerTheme? = null) {
-    if (defTheme?.fill == null && defTheme?.stroke == null) return
+internal fun View.applyLayerTheme(layerTheme: LayerTheme?) {
+    if (layerTheme?.fill == null && layerTheme?.stroke == null) return
 
-    var drawable: GradientDrawable? = null
-    // The part below is needed to preserve GradientDrawable/background properties that are `null`.
-    // For example without this implementation if `cornerRadius = null` but `stroke = Color.RED` then
-    // whatever corner radios is in the default UI implementation it would automatically become 0 instead
-    if (background is StateListDrawable) {
-        drawable = background.current as? GradientDrawable
-    } else if (background is GradientDrawable) {
-        drawable = background as GradientDrawable
-    }
-    if (drawable == null) {
-        drawable = GradientDrawable()
-    }
+    val drawable = backgroundGradientDrawable
 
     if (backgroundTintList != null) {
         drawable.color = backgroundTintList
         backgroundTintList = null
     }
 
-    applyLayerTheme(drawable, defTheme, disabledTheme)
+    background = drawable.mutateWithSettings(theme = layerTheme, context)
 }
-
-private fun View.applyLayerTheme(originalDrawable: GradientDrawable?, defTheme: LayerTheme?, disabledTheme: LayerTheme?) {
-    if (originalDrawable == null || defTheme == null) return
-    val newBackground = StateListDrawable()
-    newBackground.addState(
-        StateSet.WILD_CARD,
-        originalDrawable.mutateWithSettings(defTheme, context)
-    )
-    if (disabledTheme != null) {
-        newBackground.addState(
-            intArrayOf(-android.R.attr.state_enabled),
-            originalDrawable.mutateWithSettings(disabledTheme, context)
-        )
-    }
-
-    background = newBackground
-}
-
 
 private fun GradientDrawable.mutateWithSettings(theme: LayerTheme?, context: Context): GradientDrawable {
     return mutateWithSettings(theme, context.resources.getDimensionPixelSize(R.dimen.glia_px))
 }
 
 private fun GradientDrawable.mutateWithSettings(theme: LayerTheme?, fallbackStrokeWidth: Int): GradientDrawable {
-    val clone = (mutate() as? GradientDrawable) ?: GradientDrawable()
+    //It is important to use 'constantState?.newDrawable()' instead of 'mutate*()', because it represents the immutable state of original drawable
+    val clone = (constantState?.newDrawable() as? GradientDrawable) ?: GradientDrawable()
 
     if (theme == null) return clone
     theme.fill?.let {
@@ -211,7 +193,7 @@ internal fun TextView.applyTextTheme(
             if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
                 typeface = Typeface.SANS_SERIF
             }
-    }
+        }
 
     if (withAlignment) {
         textTheme?.textAlignment?.let { textAlignment = it }
@@ -274,7 +256,8 @@ private fun createColorStateList(defaultColor: Int?, disabledColor: Int?): Color
     // For future -> default state list can be found here:
     // https://developer.android.com/guide/topics/resources/color-list-resource
     return ColorStateList(
-        arrayOf( // Reminder: order maters
+        arrayOf(
+            // Reminder: order maters
             intArrayOf(-android.R.attr.state_enabled),
             intArrayOf(), // empty array -> default fallback
         ),

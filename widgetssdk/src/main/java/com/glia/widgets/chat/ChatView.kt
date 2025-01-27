@@ -514,8 +514,9 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             else -> binding.chatEditText.setLocaleHint(R.string.chat_input_placeholder)
         }
         binding.chatEditText.isEnabled = chatState.chatInputMode.isEnabled
+        binding.messageInputBackground.isEnabled = chatState.chatInputMode.isEnabled
         Dependencies.gliaThemeManager.theme?.chatTheme?.let {
-            binding.chatEditText.apply{
+            binding.chatEditText.apply {
                 val inputTheme = if (isEnabled) it.input else it.inputDisabled
                 applyTextTheme(inputTheme?.text, withAlignment = false)
             }
@@ -655,10 +656,10 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             ?.also(binding.scBottomBannerDivider::setBackgroundColor)
 
         theme.baseDarkColor?.let(::getColorCompat)
-            ?.also{ binding.chatEditText.applyTextColor(it, disabledInputColor) }
+            ?.also { binding.chatEditText.applyTextColor(it, disabledInputColor) }
         theme.baseNormalColor?.let(::getColorCompat)
-            ?.also{ binding.chatEditText.applyHintColor(it, disabledInputColor) }
-            ?.also{ binding.addAttachmentButton.applyImageColor(it, disabledInputColor) }
+            ?.also { binding.chatEditText.applyHintColor(it, disabledInputColor) }
+            ?.also { binding.addAttachmentButton.applyImageColor(it, disabledInputColor) }
             ?.also(binding.scBottomBannerLabel::setTextColor)
         theme.systemAgentBubbleColor?.let(::getColorCompat)?.also(binding.scBottomBannerLabel::setBackgroundColor)
 
@@ -842,7 +843,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
 
         chatTheme.header?.also(::applyHeaderTheme)
 
-        chatTheme.input?.also{ applyInputTheme(it, chatTheme.inputDisabled) }
+        applyInputTheme(chatTheme.input, chatTheme.inputDisabled)
 
         chatTheme.typingIndicator?.primaryColor?.also(binding.operatorTypingAnimationView::addColorFilter)
 
@@ -855,15 +856,15 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         binding.appBarView.applyHeaderTheme(headerTheme)
     }
 
-    private fun applyInputTheme(defaultTheme: InputTheme, disabledTheme: InputTheme?) {
-        binding.sendButton.applyButtonTheme(defaultTheme.sendButton, disabledTheme?.sendButton)
-        binding.addAttachmentButton.applyButtonTheme(defaultTheme.mediaButton, disabledTheme?.mediaButton)
-        binding.chatDivider.applyColorTheme(defaultTheme.divider, disabledTheme?.divider)
-        binding.messageInputBackground.applyLayerTheme(defaultTheme.background, disabledTheme?.background)
+    private fun applyInputTheme(defaultTheme: InputTheme?, disabledTheme: InputTheme?) {
+        binding.sendButton.applyButtonTheme(defaultTheme?.sendButton, disabledTheme?.sendButton)
+        binding.addAttachmentButton.applyButtonTheme(defaultTheme?.mediaButton, disabledTheme?.mediaButton)
+        binding.chatDivider.applyColorTheme(defaultTheme?.divider, disabledTheme?.divider)
+        binding.messageInputBackground.applyThemes(defaultTheme?.background, disabledTheme?.background)
         // It is impossible to support all possible change to text view related to disabled state
         // So it is achived manually in [updateChatEditText] method
-        binding.chatEditText.applyTextTheme(textTheme = defaultTheme.text, withAlignment = false)
-        binding.chatEditText.applyHintTheme(defaultTheme.placeholder, disabledTheme?.placeholder)
+        binding.chatEditText.applyTextTheme(textTheme = defaultTheme?.text, withAlignment = false)
+        binding.chatEditText.applyHintTheme(defaultTheme?.placeholder, disabledTheme?.placeholder)
     }
 
     private fun applyUnreadMessagesTheme(unreadIndicatorTheme: UnreadIndicatorTheme) {
@@ -886,12 +887,13 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     }
 
     private fun updateSecureMessagingState(state: ChatState) {
-        TransitionManager.beginDelayedTransition(rootConstraintLayout, AutoTransition()
-            .addTarget(binding.scErrorLabel)
-            .addTarget(binding.scTopBannerTitle)
-            .addTarget(binding.scTopBannerIcon)
-            .addTarget(binding.scTopBannerBackground)
-            .addTarget(binding.scTopBannerDivider)
+        TransitionManager.beginDelayedTransition(
+            rootConstraintLayout, AutoTransition()
+                .addTarget(binding.scErrorLabel)
+                .addTarget(binding.scTopBannerTitle)
+                .addTarget(binding.scTopBannerIcon)
+                .addTarget(binding.scTopBannerBackground)
+                .addTarget(binding.scTopBannerDivider)
         )
         binding.scErrorLabel.isVisible = state.isSecureConversationsUnavailableLabelVisible
         if (state.isSecureConversationsTopBannerVisible.not() && isNeedSupportDropDownShown()) {

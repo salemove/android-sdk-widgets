@@ -1,4 +1,4 @@
-package com.glia.widgets.view.snackbar
+package com.glia.widgets.view.snackbar.liveobservation
 
 import android.annotation.SuppressLint
 import com.glia.widgets.engagement.State

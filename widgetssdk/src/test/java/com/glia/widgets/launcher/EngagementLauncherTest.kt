@@ -5,15 +5,14 @@ import com.glia.androidsdk.Engagement
 import com.glia.widgets.callvisualizer.controller.CallVisualizerContract
 import com.glia.widgets.chat.Intention
 import com.glia.widgets.core.secureconversations.domain.HasOngoingSecureConversationUseCase
-import com.glia.widgets.engagement.domain.EndEngagementUseCase
 import com.glia.widgets.engagement.domain.EngagementTypeUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 import com.glia.widgets.helper.Logger
+import com.glia.widgets.view.snackbar.SnackbarContract
 import io.mockk.MockKAnnotations
 import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import io.mockk.verify
 import org.junit.After
 import org.junit.Before
@@ -31,22 +30,16 @@ class EngagementLauncherImplTest {
     private lateinit var isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase
 
     @MockK(relaxUnitFun = true)
-    private lateinit var endEngagementUseCase: EndEngagementUseCase
-
-    @MockK(relaxUnitFun = true)
     private lateinit var engagementTypeUseCase: EngagementTypeUseCase
 
     @MockK(relaxUnitFun = true)
-    private lateinit var callVisualizerController: CallVisualizerContract.Controller
+    private lateinit var snackbarController: SnackbarContract.Controller
 
     @MockK
     private lateinit var activity: Activity
 
     @MockK(relaxUnitFun = true)
     private lateinit var configurationManager: ConfigurationManager
-
-    private lateinit var destroyChatControllerCallback: () -> Unit
-    private lateinit var destroyCallControllerCallback: () -> Unit
 
     private lateinit var engagementLauncher: EngagementLauncherImpl
 
@@ -56,18 +49,13 @@ class EngagementLauncherImplTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-        destroyChatControllerCallback = mockk(relaxed = true)
-        destroyCallControllerCallback = mockk(relaxed = true)
         engagementLauncher = EngagementLauncherImpl(
             activityLauncher,
+            configurationManager,
+            snackbarController,
             hasOngoingSecureConversationUseCase,
             isQueueingOrLiveEngagementUseCase,
-            endEngagementUseCase,
-            configurationManager,
             engagementTypeUseCase,
-            callVisualizerController,
-            destroyChatControllerCallback,
-            destroyCallControllerCallback
         )
         Logger.setIsDebug(false)
     }
@@ -78,9 +66,7 @@ class EngagementLauncherImplTest {
             activityLauncher,
             hasOngoingSecureConversationUseCase,
             isQueueingOrLiveEngagementUseCase,
-            endEngagementUseCase,
             engagementTypeUseCase,
-            callVisualizerController,
             configurationManager
         )
     }
@@ -89,22 +75,21 @@ class EngagementLauncherImplTest {
 
     @Test
     fun `startChat shows already in call snackBar when CV is ongoing`() {
-        mockConditions(isQueueingForMedia = true, isCallVisualizer = true, hasOngoingLiveEngagement = true)
+        mockConditions(isCallVisualizer = true)
 
         engagementLauncher.startChat(activity, visitorContextAssetId)
 
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
-
-        verify { endEngagementUseCase() }
-        verify { destroyChatControllerCallback() }
-
         verify { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
-
         verify { engagementTypeUseCase.isCallVisualizer }
-        verify { callVisualizerController.showAlreadyInCvSnackBar() }
+        verify(exactly = 1) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { engagementTypeUseCase.isMediaEngagement }
+        verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
+        verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.isQueueing }
         verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement }
-        verify(exactly = 0) { activityLauncher.launchChat(any(), any()) }
+        verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.RETURN_TO_CHAT) }
         verify(exactly = 0) { hasOngoingSecureConversationUseCase(any(), any()) }
+        verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.SC_DIALOG_ENQUEUE_FOR_TEXT) }
+        verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.LIVE_CHAT) }
     }
 
     @Test
@@ -113,39 +98,38 @@ class EngagementLauncherImplTest {
 
         engagementLauncher.startChat(activity)
 
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
-
-        verify(exactly = 0) { endEngagementUseCase() }
-        verify(exactly = 0) { destroyChatControllerCallback() }
-
         verify(exactly = 0) { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
-
         verify { engagementTypeUseCase.isCallVisualizer }
-        verify(exactly = 0) { callVisualizerController.showAlreadyInCvSnackBar() }
+        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify { engagementTypeUseCase.isMediaEngagement }
+        verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
+        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify { isQueueingOrLiveEngagementUseCase.isQueueing }
         verify { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement }
-        verify { activityLauncher.launchChat(eq(activity), eq(Intention.RETURN_TO_CHAT)) }
+        verify { activityLauncher.launchChat(any(), Intention.RETURN_TO_CHAT) }
         verify(exactly = 0) { hasOngoingSecureConversationUseCase(any(), any()) }
+        verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.SC_DIALOG_ENQUEUE_FOR_TEXT) }
+        verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.LIVE_CHAT) }
     }
 
     @Test
     fun `startChat restores chat screen when has queueing for Live chat`() {
-        mockConditions(isQueueingForLiveChat = true, hasOngoingLiveEngagement = false)
+        mockConditions(isQueueing = true)
 
         engagementLauncher.startChat(activity)
 
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
-
-        verify(exactly = 0) { endEngagementUseCase() }
-        verify(exactly = 0) { destroyChatControllerCallback() }
-
         verify(exactly = 0) { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
-
         verify { engagementTypeUseCase.isCallVisualizer }
-        verify(exactly = 0) { callVisualizerController.showAlreadyInCvSnackBar() }
-        verify { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement }
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
-        verify { activityLauncher.launchChat(eq(activity), eq(Intention.RETURN_TO_CHAT)) }
+        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify { engagementTypeUseCase.isMediaEngagement }
+        verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
+        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify { isQueueingOrLiveEngagementUseCase.isQueueing }
+        verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement }
+        verify { activityLauncher.launchChat(any(), Intention.RETURN_TO_CHAT) }
         verify(exactly = 0) { hasOngoingSecureConversationUseCase(any(), any()) }
+        verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.SC_DIALOG_ENQUEUE_FOR_TEXT) }
+        verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.LIVE_CHAT) }
     }
 
     @Test
@@ -154,19 +138,18 @@ class EngagementLauncherImplTest {
 
         engagementLauncher.startChat(activity)
 
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
-
-        verify(exactly = 0) { endEngagementUseCase() }
-        verify(exactly = 0) { destroyChatControllerCallback() }
-
         verify(exactly = 0) { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
-
         verify { engagementTypeUseCase.isCallVisualizer }
-        verify(exactly = 0) { callVisualizerController.showAlreadyInCvSnackBar() }
+        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify { engagementTypeUseCase.isMediaEngagement }
+        verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
+        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify { isQueueingOrLiveEngagementUseCase.isQueueing }
         verify { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement }
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
+        verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.RETURN_TO_CHAT) }
         verify { hasOngoingSecureConversationUseCase(any(), any()) }
-        verify { activityLauncher.launchChat(eq(activity), eq(Intention.SC_DIALOG_ENQUEUE_FOR_TEXT)) }
+        verify { activityLauncher.launchChat(any(), Intention.SC_DIALOG_ENQUEUE_FOR_TEXT) }
+        verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.LIVE_CHAT) }
     }
 
     @Test
@@ -175,109 +158,116 @@ class EngagementLauncherImplTest {
 
         engagementLauncher.startChat(activity)
 
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
-
-        verify(exactly = 0) { endEngagementUseCase() }
-        verify(exactly = 0) { destroyChatControllerCallback() }
-
         verify(exactly = 0) { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
-
         verify { engagementTypeUseCase.isCallVisualizer }
-        verify(exactly = 0) { callVisualizerController.showAlreadyInCvSnackBar() }
+        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify { engagementTypeUseCase.isMediaEngagement }
+        verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
+        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify { isQueueingOrLiveEngagementUseCase.isQueueing }
         verify { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement }
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
+        verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.RETURN_TO_CHAT) }
         verify { hasOngoingSecureConversationUseCase(any(), any()) }
-        verify { activityLauncher.launchChat(eq(activity), eq(Intention.LIVE_CHAT)) }
+        verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.SC_DIALOG_ENQUEUE_FOR_TEXT) }
+        verify { activityLauncher.launchChat(any(), Intention.LIVE_CHAT) }
     }
 
     //Start Audio Call
     @Test
     fun `startAudioCall shows already in call snackBar when CV is ongoing`() {
-        mockConditions(isQueueingForLiveChat = true, isCallVisualizer = true, hasOngoingLiveEngagement = true)
+        mockConditions(isCallVisualizer = true)
 
         engagementLauncher.startAudioCall(activity, visitorContextAssetId)
 
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
-
-        verify { endEngagementUseCase() }
-        verify { destroyCallControllerCallback() }
-
         verify { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
-
         verify { engagementTypeUseCase.isCallVisualizer }
-        verify { callVisualizerController.showAlreadyInCvSnackBar() }
+        verify(exactly = 1) { snackbarController.showSnackBar(any()) }
         verify(exactly = 0) { engagementTypeUseCase.isMediaEngagement }
-        verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement }
-        verify(exactly = 0) { activityLauncher.launchCall(any(), any(), any()) }
+        verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
+        verify(exactly = 0) { activityLauncher.launchCall(any(), null, false) }
+        verify(exactly = 0) { engagementTypeUseCase.isChatEngagement }
+        verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
         verify(exactly = 0) { hasOngoingSecureConversationUseCase(any(), any()) }
+        verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.SC_DIALOG_START_AUDIO) }
+        verify(exactly = 0) { activityLauncher.launchCall(any(), Engagement.MediaType.AUDIO, false) }
     }
 
     @Test
     fun `startAudioCall restores call screen when has ongoing Media engagement`() {
-        mockConditions(isQueueingForVideo = true, isMediaEngagement = true)
+        mockConditions(isMediaEngagement = true)
 
         engagementLauncher.startAudioCall(activity)
 
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForVideo }
-
-        verify { endEngagementUseCase() }
-        verify { destroyCallControllerCallback() }
-
         verify(exactly = 0) { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
-
         verify { engagementTypeUseCase.isCallVisualizer }
-        verify(exactly = 0) { callVisualizerController.showAlreadyInCvSnackBar() }
+        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
         verify { engagementTypeUseCase.isMediaEngagement }
-        verify { activityLauncher.launchCall(eq(activity), isNull(), eq(false)) }
-        verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement }
+        verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
+        verify { activityLauncher.launchCall(any(), null, false) }
+        verify(exactly = 0) { engagementTypeUseCase.isChatEngagement }
+        verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
+        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
         verify(exactly = 0) { hasOngoingSecureConversationUseCase(any(), any()) }
+        verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.SC_DIALOG_START_AUDIO) }
+        verify(exactly = 0) { activityLauncher.launchCall(any(), Engagement.MediaType.AUDIO, false) }
     }
 
     @Test
     fun `startAudioCall restores call screen when queueing for audio`() {
-        mockConditions(isQueueingForAudio = true, isMediaEngagement = false)
+        mockConditions(isQueueingForMedia = true)
 
         engagementLauncher.startAudioCall(activity)
 
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForVideo }
-
-        verify(exactly = 0) { endEngagementUseCase() }
-        verify(exactly = 0) { destroyCallControllerCallback() }
-
         verify(exactly = 0) { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
-
         verify { engagementTypeUseCase.isCallVisualizer }
-        verify(exactly = 0) { callVisualizerController.showAlreadyInCvSnackBar() }
+        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
         verify { engagementTypeUseCase.isMediaEngagement }
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForAudio }
-        verify { activityLauncher.launchCall(eq(activity), isNull(), eq(false)) }
-        verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement }
+        verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
+        verify { activityLauncher.launchCall(any(), null, false) }
+        verify(exactly = 0) { engagementTypeUseCase.isChatEngagement }
+        verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
+        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
         verify(exactly = 0) { hasOngoingSecureConversationUseCase(any(), any()) }
+        verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.SC_DIALOG_START_AUDIO) }
+        verify(exactly = 0) { activityLauncher.launchCall(any(), Engagement.MediaType.AUDIO, false) }
     }
 
     @Test
-    fun `startAudioCall restores chat screen when has ongoing Live engagement`() {
-        mockConditions(hasOngoingLiveEngagement = true)
+    fun `startAudioCall shows already in CV SnackBar when has ongoing Live engagement`() {
+        mockConditions(isChatEngagement = true)
 
         engagementLauncher.startAudioCall(activity)
 
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForVideo }
+        verify(exactly = 0) { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
+        verify { engagementTypeUseCase.isCallVisualizer }
+        verify { engagementTypeUseCase.isMediaEngagement }
+        verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
+        verify(exactly = 0) { activityLauncher.launchCall(any(), null, false) }
+        verify { engagementTypeUseCase.isChatEngagement }
+        verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
+        verify(exactly = 1) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { hasOngoingSecureConversationUseCase(any(), any()) }
+        verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.SC_DIALOG_START_AUDIO) }
+        verify(exactly = 0) { activityLauncher.launchCall(any(), Engagement.MediaType.AUDIO, false) }
+    }
 
-        verify(exactly = 0) { endEngagementUseCase() }
-        verify(exactly = 0) { destroyChatControllerCallback() }
+    @Test
+    fun `startAudioCall shows already in CV SnackBar when queueing for a live engagement`() {
+        mockConditions(isQueueingForLiveChat = true)
+
+        engagementLauncher.startAudioCall(activity)
 
         verify(exactly = 0) { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
-
         verify { engagementTypeUseCase.isCallVisualizer }
-        verify(exactly = 0) { callVisualizerController.showAlreadyInCvSnackBar() }
         verify { engagementTypeUseCase.isMediaEngagement }
-        verify { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement }
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForAudio }
-        verify { activityLauncher.launchChat(eq(activity), eq(Intention.RETURN_TO_CHAT)) }
+        verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
+        verify(exactly = 0) { activityLauncher.launchCall(any(), null, false) }
+        verify { engagementTypeUseCase.isChatEngagement }
+        verify { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
+        verify(exactly = 1) { snackbarController.showSnackBar(any()) }
         verify(exactly = 0) { hasOngoingSecureConversationUseCase(any(), any()) }
+        verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.SC_DIALOG_START_AUDIO) }
+        verify(exactly = 0) { activityLauncher.launchCall(any(), Engagement.MediaType.AUDIO, false) }
     }
 
     @Test
@@ -286,21 +276,18 @@ class EngagementLauncherImplTest {
 
         engagementLauncher.startAudioCall(activity)
 
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForVideo }
-
-        verify(exactly = 0) { endEngagementUseCase() }
-        verify(exactly = 0) { destroyChatControllerCallback() }
-
         verify(exactly = 0) { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
-
         verify { engagementTypeUseCase.isCallVisualizer }
-        verify(exactly = 0) { callVisualizerController.showAlreadyInCvSnackBar() }
+        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
         verify { engagementTypeUseCase.isMediaEngagement }
-        verify { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement }
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForAudio }
+        verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
+        verify(exactly = 0) { activityLauncher.launchCall(any(), null, false) }
+        verify { engagementTypeUseCase.isChatEngagement }
+        verify { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
+        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
         verify { hasOngoingSecureConversationUseCase(any(), any()) }
-        verify { activityLauncher.launchChat(eq(activity), eq(Intention.SC_DIALOG_START_AUDIO)) }
+        verify { activityLauncher.launchChat(any(), Intention.SC_DIALOG_START_AUDIO) }
+        verify(exactly = 0) { activityLauncher.launchCall(any(), Engagement.MediaType.AUDIO, false) }
     }
 
     @Test
@@ -309,114 +296,142 @@ class EngagementLauncherImplTest {
 
         engagementLauncher.startAudioCall(activity)
 
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForVideo }
-
-        verify(exactly = 0) { endEngagementUseCase() }
-        verify(exactly = 0) { destroyChatControllerCallback() }
-
         verify(exactly = 0) { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
-
         verify { engagementTypeUseCase.isCallVisualizer }
-        verify(exactly = 0) { callVisualizerController.showAlreadyInCvSnackBar() }
+        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
         verify { engagementTypeUseCase.isMediaEngagement }
-        verify { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement }
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForAudio }
+        verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
+        verify(exactly = 0) { activityLauncher.launchCall(any(), null, false) }
+        verify { engagementTypeUseCase.isChatEngagement }
+        verify { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
+        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
         verify { hasOngoingSecureConversationUseCase(any(), any()) }
-        verify { activityLauncher.launchCall(eq(activity), eq(Engagement.MediaType.AUDIO), eq(false)) }
+        verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.SC_DIALOG_START_AUDIO) }
+        verify { activityLauncher.launchCall(any(), Engagement.MediaType.AUDIO, false) }
     }
 
     //Start Video Call
     @Test
     fun `startVideoCall shows already in call snackBar when CV is ongoing`() {
-        mockConditions(isQueueingForLiveChat = true, isCallVisualizer = true, hasOngoingLiveEngagement = true)
+        mockConditions(isCallVisualizer = true)
 
         engagementLauncher.startVideoCall(activity, visitorContextAssetId)
 
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
+        verify { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
+        verify { engagementTypeUseCase.isCallVisualizer }
+        verify { engagementTypeUseCase.hasVideo }
+        verify(exactly = 1) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { engagementTypeUseCase.isMediaEngagement }
+        verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
+        verify(exactly = 0) { activityLauncher.launchCall(any(), null, false) }
+        verify(exactly = 0) { engagementTypeUseCase.isChatEngagement }
+        verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
+        verify(exactly = 0) { hasOngoingSecureConversationUseCase(any(), any()) }
+        verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.SC_DIALOG_START_VIDEO) }
+        verify(exactly = 0) { activityLauncher.launchCall(any(), Engagement.MediaType.VIDEO, false) }
+    }
 
-        verify { endEngagementUseCase() }
-        verify { destroyCallControllerCallback() }
+    @Test
+    fun `startVideoCall opens Call screen when CV with video is ongoing`() {
+        mockConditions(isCallVisualizer = true, hasVideo = true, hasOngoingInteraction = false)
+
+        engagementLauncher.startVideoCall(activity, visitorContextAssetId)
 
         verify { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
-
         verify { engagementTypeUseCase.isCallVisualizer }
         verify { engagementTypeUseCase.hasVideo }
-        verify { callVisualizerController.showAlreadyInCvSnackBar() }
-        verify(exactly = 0) { engagementTypeUseCase.isMediaEngagement }
-        verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement }
-        verify(exactly = 0) { activityLauncher.launchCall(any(), any(), any()) }
-        verify(exactly = 0) { hasOngoingSecureConversationUseCase(any(), any()) }
+        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify { engagementTypeUseCase.isMediaEngagement }
+        verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
+        verify(exactly = 0) { activityLauncher.launchCall(any(), null, false) }
+        verify { engagementTypeUseCase.isChatEngagement }
+        verify { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
+        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify { hasOngoingSecureConversationUseCase(any(), any()) }
+        verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.SC_DIALOG_START_VIDEO) }
+        verify { activityLauncher.launchCall(any(), Engagement.MediaType.VIDEO, false) }
     }
 
     @Test
-    fun `startVideoCall restores call screen when has ongoing Media engagement`() {
-        mockConditions(isQueueingForAudio = true, isMediaEngagement = true, isCallVisualizer = true, hasVideo = true)
+    fun `startVideoCall opens call screen when has ongoing Media engagement`() {
+        mockConditions(isMediaEngagement = true)
 
         engagementLauncher.startVideoCall(activity)
 
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForAudio }
-
-        verify { endEngagementUseCase() }
-        verify { destroyCallControllerCallback() }
-
         verify(exactly = 0) { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
-
         verify { engagementTypeUseCase.isCallVisualizer }
-        verify { engagementTypeUseCase.hasVideo }
-        verify(exactly = 0) { callVisualizerController.showAlreadyInCvSnackBar() }
+        verify(exactly = 0) { engagementTypeUseCase.hasVideo }
+        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
         verify { engagementTypeUseCase.isMediaEngagement }
-        verify { activityLauncher.launchCall(eq(activity), isNull(), eq(false)) }
-        verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement }
+        verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
+        verify { activityLauncher.launchCall(any(), null, false) }
+        verify(exactly = 0) { engagementTypeUseCase.isChatEngagement }
+        verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
+        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
         verify(exactly = 0) { hasOngoingSecureConversationUseCase(any(), any()) }
+        verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.SC_DIALOG_START_VIDEO) }
+        verify(exactly = 0) { activityLauncher.launchCall(any(), Engagement.MediaType.VIDEO, false) }
     }
 
     @Test
-    fun `startVideoCall restores call screen when queueing for video`() {
-        mockConditions(isQueueingForVideo = true, isCallVisualizer = true, hasVideo = true)
+    fun `startVideoCall opens call screen when queueing for video`() {
+        mockConditions(isQueueingForMedia = true)
 
         engagementLauncher.startVideoCall(activity)
 
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForAudio }
-
-        verify(exactly = 0) { endEngagementUseCase() }
-        verify(exactly = 0) { destroyCallControllerCallback() }
-
         verify(exactly = 0) { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
-
         verify { engagementTypeUseCase.isCallVisualizer }
-        verify { engagementTypeUseCase.hasVideo }
-        verify(exactly = 0) { callVisualizerController.showAlreadyInCvSnackBar() }
+        verify(exactly = 0) { engagementTypeUseCase.hasVideo }
+        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
         verify { engagementTypeUseCase.isMediaEngagement }
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForVideo }
-        verify { activityLauncher.launchCall(eq(activity), isNull(), eq(false)) }
-        verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement }
+        verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
+        verify { activityLauncher.launchCall(any(), null, false) }
+        verify(exactly = 0) { engagementTypeUseCase.isChatEngagement }
+        verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
+        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
         verify(exactly = 0) { hasOngoingSecureConversationUseCase(any(), any()) }
+        verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.SC_DIALOG_START_VIDEO) }
+        verify(exactly = 0) { activityLauncher.launchCall(any(), Engagement.MediaType.VIDEO, false) }
     }
 
     @Test
     fun `startVideoCall restores chat screen when has ongoing Live engagement`() {
-        mockConditions(hasOngoingLiveEngagement = true)
+        mockConditions(isChatEngagement = true)
 
         engagementLauncher.startVideoCall(activity)
 
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForAudio }
+        verify(exactly = 0) { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
+        verify { engagementTypeUseCase.isCallVisualizer }
+        verify(exactly = 0) { engagementTypeUseCase.hasVideo }
+        verify { engagementTypeUseCase.isMediaEngagement }
+        verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
+        verify(exactly = 0) { activityLauncher.launchCall(any(), null, false) }
+        verify { engagementTypeUseCase.isChatEngagement }
+        verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
+        verify(exactly = 1) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { hasOngoingSecureConversationUseCase(any(), any()) }
+        verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.SC_DIALOG_START_VIDEO) }
+        verify(exactly = 0) { activityLauncher.launchCall(any(), Engagement.MediaType.VIDEO, false) }
+    }
 
-        verify(exactly = 0) { endEngagementUseCase() }
-        verify(exactly = 0) { destroyChatControllerCallback() }
+    @Test
+    fun `startVideoCall restores chat screen when queueing for chat`() {
+        mockConditions(isQueueingForLiveChat = true)
+
+        engagementLauncher.startVideoCall(activity)
 
         verify(exactly = 0) { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
-
         verify { engagementTypeUseCase.isCallVisualizer }
-        verify(exactly = 0) { callVisualizerController.showAlreadyInCvSnackBar() }
+        verify(exactly = 0) { engagementTypeUseCase.hasVideo }
         verify { engagementTypeUseCase.isMediaEngagement }
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForVideo }
-        verify { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement }
-        verify { activityLauncher.launchChat(eq(activity), eq(Intention.RETURN_TO_CHAT)) }
+        verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
+        verify(exactly = 0) { activityLauncher.launchCall(any(), null, false) }
+        verify { engagementTypeUseCase.isChatEngagement }
+        verify { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
+        verify(exactly = 1) { snackbarController.showSnackBar(any()) }
         verify(exactly = 0) { hasOngoingSecureConversationUseCase(any(), any()) }
+        verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.SC_DIALOG_START_VIDEO) }
+        verify(exactly = 0) { activityLauncher.launchCall(any(), Engagement.MediaType.VIDEO, false) }
     }
 
     @Test
@@ -425,21 +440,19 @@ class EngagementLauncherImplTest {
 
         engagementLauncher.startVideoCall(activity)
 
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForAudio }
-
-        verify(exactly = 0) { endEngagementUseCase() }
-        verify(exactly = 0) { destroyChatControllerCallback() }
-
         verify(exactly = 0) { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
-
         verify { engagementTypeUseCase.isCallVisualizer }
-        verify(exactly = 0) { callVisualizerController.showAlreadyInCvSnackBar() }
+        verify(exactly = 0) { engagementTypeUseCase.hasVideo }
+        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
         verify { engagementTypeUseCase.isMediaEngagement }
-        verify { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement }
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForVideo }
+        verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
+        verify(exactly = 0) { activityLauncher.launchCall(any(), null, false) }
+        verify { engagementTypeUseCase.isChatEngagement }
+        verify { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
+        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
         verify { hasOngoingSecureConversationUseCase(any(), any()) }
-        verify { activityLauncher.launchChat(eq(activity), eq(Intention.SC_DIALOG_START_VIDEO)) }
+        verify { activityLauncher.launchChat(any(), Intention.SC_DIALOG_START_VIDEO) }
+        verify(exactly = 0) { activityLauncher.launchCall(any(), Engagement.MediaType.VIDEO, false) }
     }
 
     @Test
@@ -448,64 +461,59 @@ class EngagementLauncherImplTest {
 
         engagementLauncher.startVideoCall(activity)
 
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForAudio }
-
-        verify(exactly = 0) { endEngagementUseCase() }
-        verify(exactly = 0) { destroyChatControllerCallback() }
-
         verify(exactly = 0) { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
-
         verify { engagementTypeUseCase.isCallVisualizer }
-        verify(exactly = 0) { callVisualizerController.showAlreadyInCvSnackBar() }
+        verify(exactly = 0) { engagementTypeUseCase.hasVideo }
+        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
         verify { engagementTypeUseCase.isMediaEngagement }
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForVideo }
-        verify { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement }
+        verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
+        verify(exactly = 0) { activityLauncher.launchCall(any(), null, false) }
+        verify { engagementTypeUseCase.isChatEngagement }
+        verify { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
+        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
         verify { hasOngoingSecureConversationUseCase(any(), any()) }
-        verify { activityLauncher.launchCall(eq(activity), eq(Engagement.MediaType.VIDEO), eq(false)) }
+        verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.SC_DIALOG_START_VIDEO) }
+        verify { activityLauncher.launchCall(any(), Engagement.MediaType.VIDEO, false) }
     }
 
     //Start Secure Messaging
     @Test
     fun `startSecureMessaging shows already in call snackBar when CV is ongoing`() {
-        mockConditions(isQueueingForMedia = true, isCallVisualizer = true, hasOngoingLiveEngagement = true)
+        mockConditions(isCallVisualizer = true)
 
         engagementLauncher.startSecureMessaging(activity, visitorContextAssetId)
 
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
-
-        verify { endEngagementUseCase() }
-        verify { destroyChatControllerCallback() }
-
         verify { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
-
         verify { engagementTypeUseCase.isCallVisualizer }
-        verify { callVisualizerController.showAlreadyInCvSnackBar() }
-        verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement }
-        verify(exactly = 0) { activityLauncher.launchChat(any(), any()) }
-        verify(exactly = 0) { activityLauncher.launchSecureMessagingWelcomeScreen(any()) }
+        verify(exactly = 1) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { engagementTypeUseCase.isChatEngagement }
+        verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
+        verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.RETURN_TO_CHAT) }
+        verify(exactly = 0) { engagementTypeUseCase.isMediaEngagement }
+        verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
         verify(exactly = 0) { hasOngoingSecureConversationUseCase(any(), any()) }
+        verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.SC_CHAT) }
+        verify(exactly = 0) { activityLauncher.launchSecureMessagingWelcomeScreen(any()) }
     }
 
     @Test
     fun `startSecureMessaging restores chat screen when has ongoing Live engagement`() {
-        mockConditions(hasOngoingLiveEngagement = true)
+        mockConditions(isChatEngagement = true)
 
         engagementLauncher.startSecureMessaging(activity)
 
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
-
-        verify(exactly = 0) { endEngagementUseCase() }
-        verify(exactly = 0) { destroyChatControllerCallback() }
-
         verify(exactly = 0) { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
-
         verify { engagementTypeUseCase.isCallVisualizer }
-        verify(exactly = 0) { callVisualizerController.showAlreadyInCvSnackBar() }
-        verify { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement }
-        verify { activityLauncher.launchChat(eq(activity), eq(Intention.RETURN_TO_CHAT)) }
-        verify(exactly = 0) { activityLauncher.launchSecureMessagingWelcomeScreen(any()) }
+        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify { engagementTypeUseCase.isChatEngagement }
+        verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
+        verify { activityLauncher.launchChat(any(), Intention.RETURN_TO_CHAT) }
+        verify(exactly = 0) { engagementTypeUseCase.isMediaEngagement }
+        verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
+        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
         verify(exactly = 0) { hasOngoingSecureConversationUseCase(any(), any()) }
+        verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.SC_CHAT) }
+        verify(exactly = 0) { activityLauncher.launchSecureMessagingWelcomeScreen(any()) }
     }
 
     @Test
@@ -514,20 +522,56 @@ class EngagementLauncherImplTest {
 
         engagementLauncher.startSecureMessaging(activity)
 
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
+        verify(exactly = 0) { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
+        verify { engagementTypeUseCase.isCallVisualizer }
+        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify { engagementTypeUseCase.isChatEngagement }
+        verify { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
+        verify { activityLauncher.launchChat(any(), Intention.RETURN_TO_CHAT) }
+        verify(exactly = 0) { engagementTypeUseCase.isMediaEngagement }
+        verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
+        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { hasOngoingSecureConversationUseCase(any(), any()) }
+        verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.SC_CHAT) }
+        verify(exactly = 0) { activityLauncher.launchSecureMessagingWelcomeScreen(any()) }
+    }
 
-        verify(exactly = 0) { endEngagementUseCase() }
-        verify(exactly = 0) { destroyChatControllerCallback() }
+    @Test
+    fun `startSecureMessaging shows snackbar when queueing for media engagement`() {
+        mockConditions(isQueueingForMedia = true)
+
+        engagementLauncher.startSecureMessaging(activity)
 
         verify(exactly = 0) { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
-
         verify { engagementTypeUseCase.isCallVisualizer }
-        verify(exactly = 0) { callVisualizerController.showAlreadyInCvSnackBar() }
-        verify { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement }
+        verify { engagementTypeUseCase.isChatEngagement }
         verify { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
-        verify { activityLauncher.launchChat(eq(activity), eq(Intention.RETURN_TO_CHAT)) }
-        verify(exactly = 0) { activityLauncher.launchSecureMessagingWelcomeScreen(any()) }
+        verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.RETURN_TO_CHAT) }
+        verify { engagementTypeUseCase.isMediaEngagement }
+        verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
+        verify(exactly = 1) { snackbarController.showSnackBar(any()) }
         verify(exactly = 0) { hasOngoingSecureConversationUseCase(any(), any()) }
+        verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.SC_CHAT) }
+        verify(exactly = 0) { activityLauncher.launchSecureMessagingWelcomeScreen(any()) }
+    }
+
+    @Test
+    fun `startSecureMessaging shows snackbar when has media engagement`() {
+        mockConditions(isMediaEngagement = true)
+
+        engagementLauncher.startSecureMessaging(activity)
+
+        verify(exactly = 0) { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
+        verify { engagementTypeUseCase.isCallVisualizer }
+        verify { engagementTypeUseCase.isChatEngagement }
+        verify { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
+        verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.RETURN_TO_CHAT) }
+        verify { engagementTypeUseCase.isMediaEngagement }
+        verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
+        verify(exactly = 1) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { hasOngoingSecureConversationUseCase(any(), any()) }
+        verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.SC_CHAT) }
+        verify(exactly = 0) { activityLauncher.launchSecureMessagingWelcomeScreen(any()) }
     }
 
     @Test
@@ -536,19 +580,17 @@ class EngagementLauncherImplTest {
 
         engagementLauncher.startSecureMessaging(activity)
 
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
-
-        verify(exactly = 0) { endEngagementUseCase() }
-        verify(exactly = 0) { destroyChatControllerCallback() }
-
         verify(exactly = 0) { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
-
         verify { engagementTypeUseCase.isCallVisualizer }
-        verify(exactly = 0) { callVisualizerController.showAlreadyInCvSnackBar() }
-        verify { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement }
+        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify { engagementTypeUseCase.isChatEngagement }
         verify { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
+        verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.RETURN_TO_CHAT) }
+        verify { engagementTypeUseCase.isMediaEngagement }
+        verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
+        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
         verify { hasOngoingSecureConversationUseCase(any(), any()) }
-        verify { activityLauncher.launchChat(eq(activity), eq(Intention.SC_CHAT)) }
+        verify { activityLauncher.launchChat(any(), Intention.SC_CHAT) }
         verify(exactly = 0) { activityLauncher.launchSecureMessagingWelcomeScreen(any()) }
     }
 
@@ -558,41 +600,38 @@ class EngagementLauncherImplTest {
 
         engagementLauncher.startSecureMessaging(activity)
 
-        verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
-
-        verify(exactly = 0) { endEngagementUseCase() }
-        verify(exactly = 0) { destroyChatControllerCallback() }
-
         verify(exactly = 0) { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
-
         verify { engagementTypeUseCase.isCallVisualizer }
-        verify(exactly = 0) { callVisualizerController.showAlreadyInCvSnackBar() }
-        verify { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement }
+        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify { engagementTypeUseCase.isChatEngagement }
         verify { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
+        verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.RETURN_TO_CHAT) }
+        verify { engagementTypeUseCase.isMediaEngagement }
+        verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
+        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
         verify { hasOngoingSecureConversationUseCase(any(), any()) }
-        verify(exactly = 0) { activityLauncher.launchChat(eq(activity), eq(Intention.SC_CHAT)) }
-        verify { activityLauncher.launchSecureMessagingWelcomeScreen(eq(activity)) }
+        verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.SC_CHAT) }
+        verify { activityLauncher.launchSecureMessagingWelcomeScreen(any()) }
     }
 
     private fun mockConditions(
         isQueueingForLiveChat: Boolean = false,
-        isQueueingForAudio: Boolean = false,
-        isQueueingForVideo: Boolean = false,
         isQueueingForMedia: Boolean = false,
+        isQueueing: Boolean = false,
         hasOngoingLiveEngagement: Boolean = false,
-        isCallVisualizer: Boolean = false,
+        isChatEngagement: Boolean = false,
         isMediaEngagement: Boolean = false,
+        hasOngoingInteraction: Boolean? = null,
+        isCallVisualizer: Boolean = false,
         hasVideo: Boolean = false,
-        hasOngoingInteraction: Boolean? = null
     ) {
         every { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat } returns isQueueingForLiveChat
-        every { isQueueingOrLiveEngagementUseCase.isQueueingForAudio } returns isQueueingForAudio
-        every { isQueueingOrLiveEngagementUseCase.isQueueingForVideo } returns isQueueingForVideo
         every { isQueueingOrLiveEngagementUseCase.isQueueingForMedia } returns isQueueingForMedia
-
+        every { isQueueingOrLiveEngagementUseCase.isQueueing } returns isQueueing
         every { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement } returns hasOngoingLiveEngagement
         every { engagementTypeUseCase.isCallVisualizer } returns isCallVisualizer
         every { engagementTypeUseCase.isMediaEngagement } returns isMediaEngagement
+        every { engagementTypeUseCase.isChatEngagement } returns isChatEngagement
         every { engagementTypeUseCase.hasVideo } returns hasVideo
 
         if (hasOngoingInteraction ?: return) {

@@ -210,15 +210,6 @@ class CallVisualizerControllerTest {
     }
 
     @Test
-    fun `showAlreadyInCallSnackBar will show snackBar`() {
-        val testState = controller.state.test()
-
-        controller.showAlreadyInCvSnackBar()
-
-        testState.assertNotComplete().assertValue { it.value is CallVisualizerContract.State.ShowAlreadyInCvSnackBar }
-    }
-
-    @Test
     fun `onWebBrowserOpened will request to show CV Confirmation Dialog`() {
         controller.onWebBrowserOpened()
 

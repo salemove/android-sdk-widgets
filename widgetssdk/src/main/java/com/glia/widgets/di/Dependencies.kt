@@ -40,7 +40,8 @@ import com.glia.widgets.operator.OperatorRequestActivityWatcher
 import com.glia.widgets.permissions.ActivityWatcherForPermissionsRequest
 import com.glia.widgets.view.head.ActivityWatcherForChatHead
 import com.glia.widgets.view.head.ChatHeadContract
-import com.glia.widgets.view.snackbar.ActivityWatcherForLiveObservation
+import com.glia.widgets.view.snackbar.liveobservation.ActivityWatcherForLiveObservation
+import com.glia.widgets.view.snackbar.ActivityWatcherForSnackbar
 import com.glia.widgets.view.unifiedui.theme.UnifiedThemeManager
 
 
@@ -85,14 +86,11 @@ internal object Dependencies {
     val engagementLauncher: EngagementLauncher by lazy {
         EngagementLauncherImpl(
             activityLauncher = activityLauncher,
+            configurationManager = configurationManager,
+            snackbarController = controllerFactory.snackbarController,
             hasOngoingSecureConversationUseCase = useCaseFactory.hasPendingSecureConversationsWithTimeoutUseCase,
             isQueueingOrLiveEngagementUseCase = useCaseFactory.isQueueingOrEngagementUseCase,
-            endEngagementUseCase = useCaseFactory.endEngagementUseCase,
-            configurationManager = configurationManager,
-            engagementTypeUseCase = useCaseFactory.engagementTypeUseCase,
-            callVisualizerController = controllerFactory.callVisualizerController,
-            destroyChatController = controllerFactory::destroyChatController,
-            destroyCallController = controllerFactory::destroyCallController
+            engagementTypeUseCase = useCaseFactory.engagementTypeUseCase
         )
     }
 
@@ -199,6 +197,14 @@ internal object Dependencies {
             GliaActivityManagerImpl()
         )
         application.registerActivityLifecycleCallbacks(operatorRequestActivityWatcher)
+
+        val activityWatcherForSnackbar = ActivityWatcherForSnackbar(
+            controllerFactory.snackbarController,
+            GliaActivityManagerImpl(),
+            localeProvider,
+            gliaThemeManager
+        )
+        application.registerActivityLifecycleCallbacks(activityWatcherForSnackbar)
     }
 
     @JvmStatic

@@ -1,4 +1,4 @@
-package com.glia.widgets.view.snackbar
+package com.glia.widgets.view.snackbar.liveobservation
 
 import com.glia.widgets.chat.domain.SiteInfoUseCase
 import io.reactivex.rxjava3.core.Single

@@ -187,7 +187,7 @@ import com.glia.widgets.launcher.ConfigurationManager;
 import com.glia.widgets.locale.LocaleProvider;
 import com.glia.widgets.push.notifications.IsPushNotificationsSetUpUseCase;
 import com.glia.widgets.push.notifications.IsPushNotificationsSetUpUseCaseImpl;
-import com.glia.widgets.view.snackbar.LiveObservationPopupUseCase;
+import com.glia.widgets.view.snackbar.liveobservation.LiveObservationPopupUseCase;
 import com.glia.widgets.webbrowser.domain.GetUrlFromLinkUseCase;
 import com.glia.widgets.webbrowser.domain.GetUrlFromLinkUseCaseImpl;
 import com.google.gson.Gson;

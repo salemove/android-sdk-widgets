@@ -1,4 +1,4 @@
-package com.glia.widgets.view.snackbar
+package com.glia.widgets.view.snackbar.liveobservation
 
 internal interface ActivityWatcherForLiveObservationContract {
     interface Controller {

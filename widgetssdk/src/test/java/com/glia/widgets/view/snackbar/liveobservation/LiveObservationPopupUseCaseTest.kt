@@ -1,4 +1,4 @@
-package com.glia.widgets.view.snackbar
+package com.glia.widgets.view.snackbar.liveobservation
 
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback

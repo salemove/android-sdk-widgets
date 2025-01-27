@@ -46,7 +46,6 @@ internal class CallVisualizerActivityWatcher(
             activity is WebBrowserActivity && state is ControllerState.DisplayConfirmationDialog -> Logger.d(TAG, "skipping.. WebBrowser is open")
             activity is WebBrowserActivity && state is ControllerState.OpenWebBrowserScreen -> event.consume { controller.onWebBrowserOpened() }
             state is ControllerState.ShowTimeoutSnackBar -> event.consume { showTimedOutSnackBar(activity) }
-            state is ControllerState.ShowAlreadyInCvSnackBar -> event.consume { showAlreadyInCvSnackBar(activity) }
             //Ensure this state remains unconsumed until the opening of the WebBrowserActivity.
             state is ControllerState.OpenWebBrowserScreen -> openWebBrowser(activity, state.title, state.url)
             state is ControllerState.DisplayVisitorCodeDialog -> displayVisitorCodeDialog(activity)
@@ -96,8 +95,6 @@ internal class CallVisualizerActivityWatcher(
     }
 
     private fun showTimedOutSnackBar(activity: Activity) = showSnackBar(activity, R.string.engagement_incoming_request_timed_out_message)
-
-    private fun showAlreadyInCvSnackBar(activity: Activity) = showSnackBar(activity, R.string.entry_widget_call_visualizer_description)
 
     private fun showSnackBar(activity: Activity, @StringRes messageRes: Int) = SnackBarDelegateFactory(
         activity,

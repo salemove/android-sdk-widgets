@@ -40,8 +40,10 @@ import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadContract;
 import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadController;
 import com.glia.widgets.view.head.controller.ApplicationChatHeadLayoutController;
 import com.glia.widgets.view.head.controller.ServiceChatHeadController;
-import com.glia.widgets.view.snackbar.ActivityWatcherForLiveObservationContract;
-import com.glia.widgets.view.snackbar.ActivityWatcherForLiveObservationController;
+import com.glia.widgets.view.snackbar.liveobservation.ActivityWatcherForLiveObservationContract;
+import com.glia.widgets.view.snackbar.liveobservation.ActivityWatcherForLiveObservationController;
+import com.glia.widgets.view.snackbar.SnackbarContract;
+import com.glia.widgets.view.snackbar.SnackbarController;
 
 /**
  * @hide
@@ -68,6 +70,7 @@ public class ControllerFactory {
     private ActivityWatcherForChatHeadController activityWatcherForChatHeadController;
     private ActivityWatcherForLiveObservationController activityWatcherForLiveObservationController;
     private EntryWidgetHideController entryWidgetHideController;
+    private SnackbarController snackbarController;
 
     public ControllerFactory(
         RepositoryFactory repositoryFactory,
@@ -408,5 +411,12 @@ public class ControllerFactory {
             entryWidgetHideController = new EntryWidgetHideController();
         }
         return entryWidgetHideController;
+    }
+
+    public SnackbarContract.Controller getSnackbarController() {
+        if (snackbarController == null) {
+            snackbarController = new SnackbarController();
+        }
+        return snackbarController;
     }
 }

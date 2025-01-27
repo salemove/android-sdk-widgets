@@ -2,14 +2,12 @@ package com.glia.widgets.launcher
 
 import android.content.Context
 import com.glia.androidsdk.Engagement
-import com.glia.widgets.callvisualizer.controller.CallVisualizerContract
+import com.glia.widgets.R
 import com.glia.widgets.chat.Intention
 import com.glia.widgets.core.secureconversations.domain.HasOngoingSecureConversationUseCase
-import com.glia.widgets.engagement.domain.EndEngagementUseCase
 import com.glia.widgets.engagement.domain.EngagementTypeUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
-import com.glia.widgets.helper.Logger
-import com.glia.widgets.helper.TAG
+import com.glia.widgets.view.snackbar.SnackbarContract
 
 /**
  * An interface for launching different types of engagements, such as chat,
@@ -80,115 +78,141 @@ interface EngagementLauncher {
 
 internal class EngagementLauncherImpl(
     private val activityLauncher: ActivityLauncher,
+    private val configurationManager: ConfigurationManager,
+    private val snackbarController: SnackbarContract.Controller,
     private val hasOngoingSecureConversationUseCase: HasOngoingSecureConversationUseCase,
     private val isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase,
-    private val endEngagementUseCase: EndEngagementUseCase,
-    private val configurationManager: ConfigurationManager,
     private val engagementTypeUseCase: EngagementTypeUseCase,
-    private val callVisualizerController: CallVisualizerContract.Controller,
-    private val destroyChatController: () -> Unit,
-    private val destroyCallController: () -> Unit
 ) : EngagementLauncher {
 
+    /**
+     * @return true if there is an ongoing engagement or enqueueing for any media type
+     */
+    private val isEngagementOrQueueing: Boolean
+        get() = isQueueingOrLiveEngagementUseCase.isQueueing || isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement
+
+    /**
+     * @return true if there is an ongoing engagement or enqueueing for audio or video media type
+     */
+    private val isMediaEngagementOrMediaQueueing: Boolean
+        get() = engagementTypeUseCase.isMediaEngagement || isQueueingOrLiveEngagementUseCase.isQueueingForMedia
+
+    /**
+     * @return true if there is an ongoing engagement or enqueueing for live chat
+     */
+    private val isChatEngagementOrChatQueueing: Boolean
+        get() = engagementTypeUseCase.isChatEngagement || isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat
+
     override fun startChat(context: Context) {
-        if (isQueueingOrLiveEngagementUseCase.isQueueingForMedia) {
-            Logger.i(TAG, "Canceling ongoing queue ticket to create a new one")
-            endEngagementUseCase()
-            destroyChatController()
-        }
-
         when {
-            engagementTypeUseCase.isCallVisualizer -> callVisualizerController.showAlreadyInCvSnackBar()
-            isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement || isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat ->
-                activityLauncher.launchChat(context, Intention.RETURN_TO_CHAT)
-
+            engagementTypeUseCase.isCallVisualizer -> snackbarController.showSnackBar(R.string.entry_widget_call_visualizer_description)
+            isMediaEngagementOrMediaQueueing -> snackbarController.showSnackBar(R.string.entry_widget_call_visualizer_description)
+            isEngagementOrQueueing -> activityLauncher.launchChat(context, Intention.RETURN_TO_CHAT)
             else -> hasOngoingSecureConversationUseCase(
-                onHasOngoingSecureConversation = { activityLauncher.launchChat(context, Intention.SC_DIALOG_ENQUEUE_FOR_TEXT) },
-                onNoOngoingSecureConversation = { activityLauncher.launchChat(context, Intention.LIVE_CHAT) }
+                onHasOngoingSecureConversation = {
+                    activityLauncher.launchChat(
+                        context,
+                        Intention.SC_DIALOG_ENQUEUE_FOR_TEXT
+                    )
+                },
+                onNoOngoingSecureConversation = {
+                    activityLauncher.launchChat(
+                        context,
+                        Intention.LIVE_CHAT
+                    )
+                }
             )
         }
     }
 
     override fun startChat(context: Context, visitorContextAssetId: String) {
         configurationManager.setVisitorContextAssetId(visitorContextAssetId)
-
         startChat(context)
     }
 
     override fun startAudioCall(context: Context) {
-        if (isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat || isQueueingOrLiveEngagementUseCase.isQueueingForVideo) {
-            Logger.i(TAG, "Canceling ongoing queue ticket to create a new one")
-            endEngagementUseCase()
-            destroyCallController()
-        }
-
         when {
-            engagementTypeUseCase.isCallVisualizer -> callVisualizerController.showAlreadyInCvSnackBar()
-            engagementTypeUseCase.isMediaEngagement || isQueueingOrLiveEngagementUseCase.isQueueingForAudio ->
-                activityLauncher.launchCall(context, null, false)
-
-            isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement -> activityLauncher.launchChat(context, Intention.RETURN_TO_CHAT)
+            engagementTypeUseCase.isCallVisualizer -> snackbarController.showSnackBar(R.string.entry_widget_call_visualizer_description)
+            isMediaEngagementOrMediaQueueing -> activityLauncher.launchCall(context, null, false)
+            isChatEngagementOrChatQueueing -> snackbarController.showSnackBar(R.string.entry_widget_call_visualizer_description)
             else -> hasOngoingSecureConversationUseCase(
-                onHasOngoingSecureConversation = { activityLauncher.launchChat(context, Intention.SC_DIALOG_START_AUDIO) },
-                onNoOngoingSecureConversation = { activityLauncher.launchCall(context, Engagement.MediaType.AUDIO, false) }
+                onHasOngoingSecureConversation = {
+                    activityLauncher.launchChat(
+                        context,
+                        Intention.SC_DIALOG_START_AUDIO
+                    )
+                },
+                onNoOngoingSecureConversation = {
+                    activityLauncher.launchCall(
+                        context,
+                        Engagement.MediaType.AUDIO,
+                        false
+                    )
+                }
             )
         }
     }
 
     override fun startAudioCall(context: Context, visitorContextAssetId: String) {
         configurationManager.setVisitorContextAssetId(visitorContextAssetId)
-
         startAudioCall(context)
     }
 
     override fun startVideoCall(context: Context) {
-        if (isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat || isQueueingOrLiveEngagementUseCase.isQueueingForAudio) {
-            Logger.i(TAG, "Canceling ongoing queue ticket to create a new one")
-            endEngagementUseCase()
-            destroyCallController()
-        }
-
         when {
-            engagementTypeUseCase.isCallVisualizer && !engagementTypeUseCase.hasVideo -> callVisualizerController.showAlreadyInCvSnackBar()
-            engagementTypeUseCase.isMediaEngagement || isQueueingOrLiveEngagementUseCase.isQueueingForVideo ->
-                activityLauncher.launchCall(context, null, false)
-
-            isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement -> activityLauncher.launchChat(context, Intention.RETURN_TO_CHAT)
+            engagementTypeUseCase.isCallVisualizer && !engagementTypeUseCase.hasVideo -> snackbarController.showSnackBar(R.string.entry_widget_call_visualizer_description)
+            isMediaEngagementOrMediaQueueing -> activityLauncher.launchCall(context, null, false)
+            isChatEngagementOrChatQueueing -> snackbarController.showSnackBar(R.string.entry_widget_call_visualizer_description)
             else -> hasOngoingSecureConversationUseCase(
-                onHasOngoingSecureConversation = { activityLauncher.launchChat(context, Intention.SC_DIALOG_START_VIDEO) },
-                onNoOngoingSecureConversation = { activityLauncher.launchCall(context, Engagement.MediaType.VIDEO, false) }
+                onHasOngoingSecureConversation = {
+                    activityLauncher.launchChat(
+                        context,
+                        Intention.SC_DIALOG_START_VIDEO
+                    )
+                },
+                onNoOngoingSecureConversation = {
+                    activityLauncher.launchCall(
+                        context,
+                        Engagement.MediaType.VIDEO,
+                        false
+                    )
+                }
             )
         }
     }
 
     override fun startVideoCall(context: Context, visitorContextAssetId: String) {
         configurationManager.setVisitorContextAssetId(visitorContextAssetId)
-
         startVideoCall(context)
     }
 
     override fun startSecureMessaging(context: Context) {
-        if (isQueueingOrLiveEngagementUseCase.isQueueingForMedia) {
-            Logger.i(TAG, "Canceling ongoing queue ticket to create a new one")
-            endEngagementUseCase()
-            destroyChatController()
-        }
-
         when {
-            engagementTypeUseCase.isCallVisualizer -> callVisualizerController.showAlreadyInCvSnackBar()
-            isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement || isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat ->
-                activityLauncher.launchChat(context, Intention.RETURN_TO_CHAT)
+            engagementTypeUseCase.isCallVisualizer -> snackbarController.showSnackBar(R.string.entry_widget_call_visualizer_description)
+            isChatEngagementOrChatQueueing -> activityLauncher.launchChat(
+                context,
+                Intention.RETURN_TO_CHAT
+            )
 
+            isMediaEngagementOrMediaQueueing -> snackbarController.showSnackBar(R.string.entry_widget_call_visualizer_description)
             else -> hasOngoingSecureConversationUseCase(
-                onHasOngoingSecureConversation = { activityLauncher.launchChat(context, Intention.SC_CHAT) },
-                onNoOngoingSecureConversation = { activityLauncher.launchSecureMessagingWelcomeScreen(context) }
+                onHasOngoingSecureConversation = {
+                    activityLauncher.launchChat(
+                        context,
+                        Intention.SC_CHAT
+                    )
+                },
+                onNoOngoingSecureConversation = {
+                    activityLauncher.launchSecureMessagingWelcomeScreen(
+                        context
+                    )
+                }
             )
         }
     }
 
     override fun startSecureMessaging(context: Context, visitorContextAssetId: String) {
         configurationManager.setVisitorContextAssetId(visitorContextAssetId)
-
         startSecureMessaging(context)
     }
 }

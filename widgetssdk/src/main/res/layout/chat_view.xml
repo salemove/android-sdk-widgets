@@ -215,7 +215,7 @@
         tools:itemCount="6"
         tools:listitem="@layout/chat_attachment_uploaded_item" />
 
-    <View
+    <com.glia.widgets.chat.StatefulChatInputBackground
         android:id="@+id/message_input_background"
         android:layout_height="0dp"
         android:layout_width="0dp"
@@ -237,8 +237,8 @@
         android:maxLines="4"
         android:minHeight="@dimen/glia_chat_edit_text_min_height"
         android:paddingStart="@dimen/glia_large"
-        android:textColor="@color/input_dark_color_state_list"
-        android:textColorHint="@color/input_normal_color_state_list"
+        android:textColor="@color/chat_input_text_color_state_list"
+        android:textColorHint="@color/chat_input_hint_and_attachment_button_color_state_list"
         android:textCursorDrawable="@null"
         tools:text="@string/chat_input_placeholder" />
 
@@ -250,7 +250,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/chat_edit_text"
         app:layout_constraintStart_toEndOf="@+id/chat_edit_text"
         app:layout_constraintEnd_toStartOf="@+id/send_button"
-        app:tint="@color/input_normal_color_state_list"
+        app:tint="@color/chat_input_hint_and_attachment_button_color_state_list"
         android:background="?attr/selectableItemBackground"
         android:padding="@dimen/glia_large"
         android:src="@drawable/ic_add_attachment" />
@@ -266,7 +266,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:background="?attr/selectableItemBackground"
         android:src="?attr/gliaIconSendMessage"
-        app:tint="@color/input_primary_color_state_list"
+        app:tint="@color/chat_send_button_color_state_list"
         tools:src="@drawable/ic_baseline_send" />
 
     <View

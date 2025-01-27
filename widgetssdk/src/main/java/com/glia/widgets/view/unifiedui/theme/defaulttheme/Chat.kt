@@ -120,9 +120,11 @@ private fun ChatInputTheme(pallet: ColorPallet): InputTheme? = pallet.run {
         normalColorTheme,
         primaryColorTheme,
         shadeColorTheme,
-        negativeColorTheme
+        negativeColorTheme,
+        lightColorTheme
     ) {
         InputTheme(
+            background = LayerTheme(fill = lightColorTheme),
             text = BaseDarkColorTextTheme(this),
             placeholder = BaseNormalColorTextTheme(this),
             divider = shadeColorTheme,
@@ -155,9 +157,11 @@ private fun ChatInputDisabledTheme(pallet: ColorPallet): InputTheme? = pallet.ru
         normalColorTheme,
         primaryColorTheme,
         shadeColorTheme,
-        negativeColorTheme
+        negativeColorTheme,
+        neutralColorTheme
     ) {
         InputTheme(
+            background = LayerTheme(fill = neutralColorTheme),
             text = BaseShaderColorTextTheme(this),
             placeholder = BaseShaderColorTextTheme(this),
             divider = shadeColorTheme,

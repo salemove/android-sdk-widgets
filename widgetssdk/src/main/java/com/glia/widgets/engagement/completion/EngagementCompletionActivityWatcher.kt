@@ -73,6 +73,9 @@ internal class EngagementCompletionActivityWatcher(
     }
 
     private fun EngagementCompletionState.EngagementEnded.handleEngagementEndedEvent(activity: Activity, onEventHandled: () -> Unit) {
+        if (actionOnEnd == Engagement.ActionOnEnd.UNKNOWN) {
+            Logger.w(TAG, "Engagement ended with unknown case.")
+        }
         if (isEndedByVisitor || actionOnEnd == Engagement.ActionOnEnd.RETAIN || actionOnEnd == Engagement.ActionOnEnd.SHOW_SURVEY) {
             onEventHandled()
         } else if (actionOnEnd == Engagement.ActionOnEnd.END_NOTIFICATION || actionOnEnd == Engagement.ActionOnEnd.UNKNOWN) {

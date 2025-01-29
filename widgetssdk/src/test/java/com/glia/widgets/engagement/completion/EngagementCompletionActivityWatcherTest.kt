@@ -86,7 +86,7 @@ class EngagementCompletionActivityWatcherTest {
         Logger.setIsDebug(false)
         every { Logger.d(any(), any()) } just Runs
 
-        val event = createMockEvent(EngagementCompletionState.EngagementEnded(true, Engagement.ActionOnEnd.END_NOTIFICATION))
+        val event = createMockEvent(EngagementCompletionState.EngagementEnded(true, false, Engagement.ActionOnEnd.END_NOTIFICATION))
         every { event.consumed } returns true
 
         val activity = mockkActivity<Activity>()
@@ -113,7 +113,7 @@ class EngagementCompletionActivityWatcherTest {
 
     @Test
     fun `handleState will finish activities when state is EngagementEnded even if activity is null or finishing`() {
-        val event = createMockEvent(EngagementCompletionState.EngagementEnded(true, Engagement.ActionOnEnd.END_NOTIFICATION))
+        val event = createMockEvent(EngagementCompletionState.EngagementEnded(true, false, Engagement.ActionOnEnd.END_NOTIFICATION))
         val activity = mockkActivity<Activity>()
 
         every { activity.isFinishing } returns true
@@ -244,7 +244,7 @@ class EngagementCompletionActivityWatcherTest {
 
     @Test
     fun `handleState will show operator ended engagement dialog when event is ActionOnEnd is END_NOTIFICATION`() {
-        val event = createMockEvent(EngagementCompletionState.EngagementEnded(false, Engagement.ActionOnEnd.END_NOTIFICATION))
+        val event = createMockEvent(EngagementCompletionState.EngagementEnded(false, false, Engagement.ActionOnEnd.END_NOTIFICATION))
 
         val activity = mockkActivity<ChatActivity>()
 

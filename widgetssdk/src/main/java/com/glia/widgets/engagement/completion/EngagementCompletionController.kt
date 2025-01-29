@@ -40,7 +40,7 @@ internal class EngagementCompletionController(
                     // Even though we need to retain the chat screen we still need to reset view states and controllers and later setup them again
                     releaseResourcesUseCase()
                 }
-                _state.onNext(EngagementCompletionState.EngagementEnded(state.isEndedByVisitor, state.onEnd))
+                _state.onNext(EngagementCompletionState.EngagementEnded(state.isEndedByVisitor, state.isCallVisualizer, state.onEnd))
             }
 
             State.QueueUnstaffed -> {

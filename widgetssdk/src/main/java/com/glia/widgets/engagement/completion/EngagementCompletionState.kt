@@ -6,6 +6,6 @@ import com.glia.androidsdk.engagement.Survey
 internal sealed interface EngagementCompletionState {
     data object QueueUnstaffed : EngagementCompletionState
     data object UnexpectedErrorHappened : EngagementCompletionState
-    data class EngagementEnded(val isEndedByVisitor: Boolean, val actionOnEnd: ActionOnEnd) : EngagementCompletionState
+    data class EngagementEnded(val isEndedByVisitor: Boolean, val isCallVisualizer: Boolean, val actionOnEnd: ActionOnEnd) : EngagementCompletionState
     data class SurveyLoaded(val survey: Survey) : EngagementCompletionState
 }

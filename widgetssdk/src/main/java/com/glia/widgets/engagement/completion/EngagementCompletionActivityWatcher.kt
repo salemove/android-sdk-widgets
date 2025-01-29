@@ -76,13 +76,17 @@ internal class EngagementCompletionActivityWatcher(
         if (actionOnEnd == Engagement.ActionOnEnd.UNKNOWN) {
             Logger.w(TAG, "Engagement ended with unknown case.")
         }
-        if (isEndedByVisitor) {
-            finishActivities()
-            onEventHandled()
-        } else if (actionOnEnd == Engagement.ActionOnEnd.RETAIN || actionOnEnd == Engagement.ActionOnEnd.SHOW_SURVEY) {
-            onEventHandled()
-        } else if (actionOnEnd == Engagement.ActionOnEnd.END_NOTIFICATION || actionOnEnd == Engagement.ActionOnEnd.UNKNOWN) {
-            showOperatorEndedEngagementDialog(activity, onEventHandled)
+        when {
+            isEndedByVisitor || isCallVisualizer -> {
+                finishActivities()
+                onEventHandled()
+            }
+            actionOnEnd == Engagement.ActionOnEnd.RETAIN || actionOnEnd == Engagement.ActionOnEnd.SHOW_SURVEY -> {
+                onEventHandled()
+            }
+            actionOnEnd == Engagement.ActionOnEnd.END_NOTIFICATION || actionOnEnd == Engagement.ActionOnEnd.UNKNOWN -> {
+                showOperatorEndedEngagementDialog(activity, onEventHandled)
+            }
         }
     }
 }

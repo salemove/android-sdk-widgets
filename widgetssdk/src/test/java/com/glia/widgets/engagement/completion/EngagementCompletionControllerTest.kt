@@ -60,7 +60,7 @@ class EngagementCompletionControllerTest {
         engagementStateProcessor.onNext(State.EngagementEnded(EngagementType.CallVisualizer, true, Engagement.ActionOnEnd.UNKNOWN))
 
         verify { releaseResourcesUseCase() }
-        assertEquals(EngagementCompletionState.EngagementEnded(true, Engagement.ActionOnEnd.UNKNOWN), controller.state.blockingFirst().value)
+        assertEquals(EngagementCompletionState.EngagementEnded(true, true, Engagement.ActionOnEnd.UNKNOWN), controller.state.blockingFirst().value)
     }
 
     @Test
@@ -68,7 +68,7 @@ class EngagementCompletionControllerTest {
         engagementStateProcessor.onNext(State.EngagementEnded(EngagementType.OmniCore, true, Engagement.ActionOnEnd.UNKNOWN))
 
         verify { releaseResourcesUseCase() }
-        assertEquals(EngagementCompletionState.EngagementEnded(true, Engagement.ActionOnEnd.UNKNOWN), controller.state.blockingFirst().value)
+        assertEquals(EngagementCompletionState.EngagementEnded(true, false, Engagement.ActionOnEnd.UNKNOWN), controller.state.blockingFirst().value)
     }
 
     @Test
@@ -121,7 +121,7 @@ class EngagementCompletionControllerTest {
 
         verify { releaseResourcesUseCase() }
 
-        testState.assertValues(EngagementCompletionState.EngagementEnded(false, Engagement.ActionOnEnd.UNKNOWN))
+        testState.assertValues(EngagementCompletionState.EngagementEnded(false, false, Engagement.ActionOnEnd.UNKNOWN))
     }
 
     @Test

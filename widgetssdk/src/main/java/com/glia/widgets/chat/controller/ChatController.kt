@@ -60,6 +60,7 @@ import com.glia.widgets.core.secureconversations.domain.ManageSecureMessagingSta
 import com.glia.widgets.core.secureconversations.domain.SecureConversationTopBannerVisibilityUseCase
 import com.glia.widgets.core.secureconversations.domain.SetLeaveSecureConversationDialogVisibleUseCase
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.engagement.EndedBy
 import com.glia.widgets.engagement.EngagementUpdateState
 import com.glia.widgets.engagement.ScreenSharingState
 import com.glia.widgets.engagement.State
@@ -83,6 +84,7 @@ import com.glia.widgets.helper.TimeCounter.FormattedTimerStatusListener
 import com.glia.widgets.helper.exists
 import com.glia.widgets.helper.formattedName
 import com.glia.widgets.helper.imageUrl
+import com.glia.widgets.helper.isRetain
 import com.glia.widgets.helper.isValid
 import com.glia.widgets.helper.unSafeSubscribe
 import com.glia.widgets.view.MessagesNotSeenHandler
@@ -576,7 +578,7 @@ internal class ChatController(
                 if (!isQueueingOrOngoingEngagement) {
                     dialogController.dismissDialogs()
                 }
-                if (state.onEnd == Engagement.ActionOnEnd.RETAIN) {
+                if (state.action.isRetain) {
                     onTransferredToSecureConversation()
                 }
             }
@@ -694,7 +696,7 @@ internal class ChatController(
 
     private fun endChat() {
         Logger.d(TAG, "Stop, engagement ended")
-        endEngagementUseCase()
+        endEngagementUseCase(EndedBy.VISITOR)
         chatManager.reset()
         mediaUpgradeDisposable.clear()
         emitViewState { chatState.chatUnavailableState() }

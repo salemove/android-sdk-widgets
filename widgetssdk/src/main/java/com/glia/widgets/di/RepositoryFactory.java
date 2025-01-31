@@ -53,7 +53,6 @@ public class RepositoryFactory {
     public void initialize() {
         getEngagementRepository().initialize();
         getQueueRepository().initialize();
-        getSecureConversationsRepository().initialize();
     }
 
     public GliaChatRepository getGliaMessageRepository() {

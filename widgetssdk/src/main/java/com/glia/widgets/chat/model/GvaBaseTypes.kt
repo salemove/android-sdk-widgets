@@ -36,7 +36,7 @@ internal object Gva {
     }
 
     sealed interface ButtonType {
-        object BroadcastEvent : ButtonType
+        data object BroadcastEvent : ButtonType
         data class PostBack(val singleChoiceAttachment: SingleChoiceAttachment) : ButtonType
         data class Phone(val uri: Uri) : ButtonType
         data class Email(val uri: Uri) : ButtonType

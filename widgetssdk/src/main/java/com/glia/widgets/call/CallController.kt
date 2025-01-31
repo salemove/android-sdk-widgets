@@ -23,6 +23,7 @@ import com.glia.widgets.core.dialog.model.Link
 import com.glia.widgets.core.engagement.domain.ConfirmationDialogUseCase
 import com.glia.widgets.core.engagement.domain.ShouldShowMediaEngagementViewUseCase
 import com.glia.widgets.core.notification.domain.CallNotificationUseCase
+import com.glia.widgets.engagement.EndedBy
 import com.glia.widgets.engagement.EngagementUpdateState
 import com.glia.widgets.engagement.ScreenSharingState
 import com.glia.widgets.engagement.State
@@ -509,7 +510,7 @@ internal class CallController(
 
     private fun stop() {
         d(TAG, "Stop, engagement ended")
-        endEngagementUseCase()
+        endEngagementUseCase(EndedBy.VISITOR)
         mediaUpgradeDisposable.clear()
         emitViewState(callState.stop())
     }

@@ -11,6 +11,8 @@ import android.text.Spanned
 import android.text.format.DateUtils
 import androidx.annotation.ColorInt
 import androidx.core.graphics.drawable.DrawableCompat
+import com.glia.androidsdk.Engagement
+import com.glia.androidsdk.Engagement.ActionOnEnd
 import com.glia.androidsdk.Engagement.MediaType
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.Operator
@@ -21,6 +23,7 @@ import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.androidsdk.comms.MediaDirection
 import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.comms.MediaUpgradeOffer
+import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement
 import com.glia.androidsdk.queuing.Queue
 import com.glia.androidsdk.queuing.QueueState
 import com.glia.widgets.UiTheme
@@ -91,6 +94,13 @@ internal val MediaUpgradeOffer.isOneWayVideo: Boolean get() = video == MediaDire
 
 internal val GliaException.isQueueUnavailable: Boolean
     get() = cause == GliaException.Cause.QUEUE_CLOSED || cause == GliaException.Cause.QUEUE_FULL
+
+internal val ActionOnEnd?.isRetain: Boolean get() = this == ActionOnEnd.RETAIN
+internal val ActionOnEnd?.isSurvey: Boolean get() = this == ActionOnEnd.SHOW_SURVEY
+internal val ActionOnEnd?.isShowEndDialog: Boolean get() = this == ActionOnEnd.END_NOTIFICATION
+internal val ActionOnEnd?.isUnknown: Boolean get() = this == ActionOnEnd.UNKNOWN
+
+internal val Engagement.isCallVisualizer: Boolean get() = this is OmnibrowseEngagement
 
 @SuppressLint("CheckResult")
 internal fun <T : Any> Flowable<out T>.unSafeSubscribe(onNextCallback: (T) -> Unit) {

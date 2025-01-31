@@ -3,6 +3,7 @@ package com.glia.widgets.core.authentication
 import com.glia.androidsdk.RequestCallback
 import com.glia.androidsdk.visitor.Authentication
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.di.Dependencies.repositoryFactory
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 
@@ -23,19 +24,29 @@ internal class AuthenticationManager(
         externalAccessToken: String?,
         requestCallback: RequestCallback<Void>
     ) {
-        cleanup()
+        Dependencies.destroyControllersAndResetQueueing()
+
         Logger.i(TAG, "Authenticate. Is external access token used: ${externalAccessToken != null}")
-        authentication.authenticate(jwtToken, externalAccessToken, requestCallback)
+        authentication.authenticate(jwtToken, externalAccessToken) { void, gliaException ->
+            if (gliaException == null) {
+                //Here we need to subscribe to secure conversations repository to get the data for authenticated visitors
+                repositoryFactory.secureConversationsRepository.subscribe()
+            }
+
+            requestCallback.onResult(void, gliaException)
+        }
     }
 
     override fun deauthenticate(requestCallback: RequestCallback<Void>) {
         Logger.i(TAG, "Unauthenticate")
-        cleanup()
-        authentication.deauthenticate(requestCallback)
-    }
+        //Need to end engagement before it's done on the core side to prevent unexpected behavior
+        Dependencies.destroyControllersAndResetEngagementData()
 
-    private fun cleanup() {
-        Dependencies.destroyControllersAndResetQueueing()
+        //Here we reset the secure conversations repository to clear the data, because the visitor is de-authenticated
+        //and we don't need secure conversations data for un-authenticated visitors.
+        repositoryFactory.secureConversationsRepository.unsubscribeAndResetData()
+
+        authentication.deauthenticate(requestCallback)
     }
 
     override fun isAuthenticated(): Boolean = authentication.isAuthenticated

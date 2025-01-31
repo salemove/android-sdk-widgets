@@ -7,7 +7,7 @@ import com.glia.widgets.core.dialog.domain.ConfirmationDialogLinksUseCase
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.dialog.model.Link
 import com.glia.widgets.core.engagement.domain.ConfirmationDialogUseCase
-import com.glia.widgets.engagement.EngagementType
+import com.glia.widgets.engagement.EndedBy
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementRequestUseCase
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
@@ -91,7 +91,7 @@ class CallVisualizerControllerTest {
 
     @Test
     fun `CV engagement start will trigger will dismiss visitor code dialog`() {
-        engagementStateProcessor.onNext(State.EngagementStarted(EngagementType.CallVisualizer))
+        engagementStateProcessor.onNext(State.EngagementStarted(true))
         verify { dialogController.dismissVisitorCodeDialog() }
     }
 
@@ -101,7 +101,7 @@ class CallVisualizerControllerTest {
 
         verify { engagementStateUseCase() }
 
-        engagementStateProcessor.onNext(State.EngagementEnded(EngagementType.CallVisualizer, false, Engagement.ActionOnEnd.RETAIN))
+        engagementStateProcessor.onNext(State.EngagementEnded(true, EndedBy.OPERATOR, Engagement.ActionOnEnd.END_NOTIFICATION, mockk()))
 
         engagementEnd.assertNotComplete().assertValueCount(1)
     }

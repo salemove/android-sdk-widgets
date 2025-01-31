@@ -7,7 +7,6 @@ import android.content.Context
 import android.os.Parcelable
 import android.view.View
 import androidx.appcompat.app.AlertDialog
-import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.engagement.Survey
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.ChatActivity
@@ -86,7 +85,7 @@ class EngagementCompletionActivityWatcherTest {
         Logger.setIsDebug(false)
         every { Logger.d(any(), any()) } just Runs
 
-        val event = createMockEvent(EngagementCompletionState.EngagementEnded(true, false, Engagement.ActionOnEnd.END_NOTIFICATION))
+        val event = createMockEvent(EngagementCompletionState.ShowEngagementEndedDialog)
         every { event.consumed } returns true
 
         val activity = mockkActivity<Activity>()
@@ -112,8 +111,8 @@ class EngagementCompletionActivityWatcherTest {
     }
 
     @Test
-    fun `handleState will finish activities when state is EngagementEnded even if activity is null or finishing`() {
-        val event = createMockEvent(EngagementCompletionState.EngagementEnded(true, false, Engagement.ActionOnEnd.END_NOTIFICATION))
+    fun `handleState will finish activities when state is FinishActivities even if activity is null or finishing`() {
+        val event = createMockEvent(EngagementCompletionState.FinishActivities)
         val activity = mockkActivity<Activity>()
 
         every { activity.isFinishing } returns true
@@ -137,12 +136,12 @@ class EngagementCompletionActivityWatcherTest {
     }
 
     @Test
-    fun `handleState will do nothing when event is not QueuingOrEngagementEnded and Activity is null or finishing`() {
+    fun `handleState will do nothing when event is not FinishActivities and Activity is null or finishing`() {
         mockkStatic(LOGGER_PATH)
         Logger.setIsDebug(false)
         every { Logger.d(any(), any()) } just Runs
 
-        val event = createMockEvent(EngagementCompletionState.QueueUnstaffed)
+        val event = createMockEvent(EngagementCompletionState.ShowNoOperatorsAvailableDialog)
 
         val activity = mockkActivity<Activity>()
         every { activity.isFinishing } returns true
@@ -169,8 +168,8 @@ class EngagementCompletionActivityWatcherTest {
     }
 
     @Test
-    fun `handleState will show unstaffed dialog when event is QueueUnstaffed`() {
-        val event = createMockEvent(EngagementCompletionState.QueueUnstaffed)
+    fun `handleState will show noMoreOperatorsAvailableDialog dialog when event is ShowNoOperatorsAvailableDialog`() {
+        val event = createMockEvent(EngagementCompletionState.ShowNoOperatorsAvailableDialog)
 
         val activity = mockkActivity<ChatActivity>()
 
@@ -206,8 +205,8 @@ class EngagementCompletionActivityWatcherTest {
     }
 
     @Test
-    fun `handleState will show unexpected error dialog when event is UnexpectedErrorHappened`() {
-        val event = createMockEvent(EngagementCompletionState.UnexpectedErrorHappened)
+    fun `handleState will show unexpected error dialog when event is ShowUnexpectedErrorDialog`() {
+        val event = createMockEvent(EngagementCompletionState.ShowUnexpectedErrorDialog)
 
         val activity = mockkActivity<ChatActivity>()
 
@@ -243,8 +242,8 @@ class EngagementCompletionActivityWatcherTest {
     }
 
     @Test
-    fun `handleState will show operator ended engagement dialog when event is ActionOnEnd is END_NOTIFICATION`() {
-        val event = createMockEvent(EngagementCompletionState.EngagementEnded(false, false, Engagement.ActionOnEnd.END_NOTIFICATION))
+    fun `handleState will show operator ended engagement dialog when event is ShowEngagementEndedDialog`() {
+        val event = createMockEvent(EngagementCompletionState.ShowEngagementEndedDialog)
 
         val activity = mockkActivity<ChatActivity>()
 
@@ -280,9 +279,9 @@ class EngagementCompletionActivityWatcherTest {
     }
 
     @Test
-    fun `handleState will start Survey when event is SurveyLoaded`() {
+    fun `handleState will start Survey when event is ShowSurvey`() {
         val survey = mockk<Survey>(moreInterfaces = arrayOf(Parcelable::class))
-        val event = createMockEvent(EngagementCompletionState.SurveyLoaded(survey))
+        val event = createMockEvent(EngagementCompletionState.ShowSurvey(survey))
 
         val activity = mockkActivity<ChatActivity>()
 

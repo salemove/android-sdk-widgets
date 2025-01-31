@@ -12,7 +12,7 @@ import com.glia.widgets.core.queue.QueuesState
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.core.secureconversations.domain.HasOngoingSecureConversationUseCase
 import com.glia.widgets.di.GliaCore
-import com.glia.widgets.engagement.EngagementType
+import com.glia.widgets.engagement.EndedBy
 import com.glia.widgets.engagement.EngagementUpdateState
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
@@ -664,10 +664,10 @@ class EntryWidgetControllerTest {
         testPrepareItemsBasedOnQueuesCalledForEngagementState(State.QueueUnstaffed)
         testPrepareItemsBasedOnQueuesCalledForEngagementState(State.UnexpectedErrorHappened)
         testPrepareItemsBasedOnQueuesCalledForEngagementState(State.QueueingCanceled)
-        testPrepareItemsBasedOnQueuesCalledForEngagementState(State.EngagementStarted(EngagementType.OmniCore))
-        testPrepareItemsBasedOnQueuesCalledForEngagementState(State.EngagementStarted(EngagementType.CallVisualizer))
-        testPrepareItemsBasedOnQueuesCalledForEngagementState(State.EngagementEnded(EngagementType.OmniCore, false, Engagement.ActionOnEnd.UNKNOWN))
-        testPrepareItemsBasedOnQueuesCalledForEngagementState(State.EngagementEnded(EngagementType.CallVisualizer, false, Engagement.ActionOnEnd.UNKNOWN))
+        testPrepareItemsBasedOnQueuesCalledForEngagementState(State.EngagementStarted(false))
+        testPrepareItemsBasedOnQueuesCalledForEngagementState(State.EngagementStarted(true))
+        testPrepareItemsBasedOnQueuesCalledForEngagementState(State.EngagementEnded(false, EndedBy.VISITOR, Engagement.ActionOnEnd.UNKNOWN, mockk()))
+        testPrepareItemsBasedOnQueuesCalledForEngagementState(State.EngagementEnded(true, EndedBy.OPERATOR, Engagement.ActionOnEnd.UNKNOWN, mockk()))
         testPrepareItemsBasedOnQueuesCalledForEngagementState(State.TransferredToSecureConversation)
     }
 

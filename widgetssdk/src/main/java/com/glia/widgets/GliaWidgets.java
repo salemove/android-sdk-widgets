@@ -16,6 +16,7 @@ import com.glia.widgets.chat.adapter.WebViewCardAdapter;
 import com.glia.widgets.core.authentication.AuthenticationManager;
 import com.glia.widgets.core.callvisualizer.domain.CallVisualizer;
 import com.glia.widgets.di.Dependencies;
+import com.glia.widgets.engagement.EndedBy;
 import com.glia.widgets.entrywidget.EntryWidget;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.launcher.EngagementLauncher;
@@ -113,6 +114,7 @@ public class GliaWidgets {
      * Your activity in turn must call this method to pass the results of the request to Glia SDK.</p>
      *
      * <p>This method is no-op for other non-Glia triggered results.</p>
+     *
      * @deprecated This method is no longer required, as all the required permissions are now managed internally.
      */
     @Deprecated(forRemoval = true)
@@ -133,6 +135,7 @@ public class GliaWidgets {
      * Your activity in turn must call this method to pass the results of the request to Glia SDK.</p>
      *
      * <p>This method is no-op for other non-Glia triggered results.</p>
+     *
      * @deprecated This method is no longer required, as required activity results are now managed internally.
      */
     @Deprecated(forRemoval = true)
@@ -147,6 +150,11 @@ public class GliaWidgets {
     public static void clearVisitorSession() {
         Logger.i(TAG, "Clear visitor session");
         Dependencies.destroyControllersAndResetEngagementData();
+
+        //Here we reset the secure conversations repository to clear the data, because the visitor session is cleared(de-authenticated)
+        //and we don't need secure conversations data for un-authenticated visitors.
+        Dependencies.getRepositoryFactory().getSecureConversationsRepository().unsubscribeAndResetData();
+
         Dependencies.glia().clearVisitorSession();
     }
 
@@ -157,7 +165,7 @@ public class GliaWidgets {
      */
     public static void endEngagement() {
         Logger.i(TAG, "End engagement by integrator");
-        Dependencies.getUseCaseFactory().getEndEngagementUseCase().invoke(true);
+        Dependencies.getUseCaseFactory().getEndEngagementUseCase().invoke(EndedBy.CLEAR_STATE);
     }
 
     /**

@@ -40,8 +40,8 @@ import com.glia.widgets.operator.OperatorRequestActivityWatcher
 import com.glia.widgets.permissions.ActivityWatcherForPermissionsRequest
 import com.glia.widgets.view.head.ActivityWatcherForChatHead
 import com.glia.widgets.view.head.ChatHeadContract
-import com.glia.widgets.view.snackbar.liveobservation.ActivityWatcherForLiveObservation
 import com.glia.widgets.view.snackbar.ActivityWatcherForSnackbar
+import com.glia.widgets.view.snackbar.liveobservation.ActivityWatcherForLiveObservation
 import com.glia.widgets.view.unifiedui.theme.UnifiedThemeManager
 
 
@@ -274,8 +274,9 @@ internal object Dependencies {
 
     @JvmStatic
     fun destroyControllersAndResetEngagementData() {
-        destroyControllers()
         repositoryFactory.engagementRepository.reset()
+
+        destroyControllers()
     }
 
     fun destroyControllersAndResetQueueing() {

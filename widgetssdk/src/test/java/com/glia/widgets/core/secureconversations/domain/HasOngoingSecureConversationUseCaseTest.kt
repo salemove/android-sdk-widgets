@@ -2,7 +2,6 @@ package com.glia.widgets.core.secureconversations.domain
 
 import com.glia.androidsdk.Engagement
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
-import com.glia.widgets.engagement.EngagementType
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import io.mockk.every
@@ -94,7 +93,7 @@ class HasOngoingSecureConversationUseCaseTest {
 
     @Test
     fun `invoke returns false when ongoing engagement`() {
-        mockInitialState(engagementState = State.EngagementStarted(EngagementType.OmniCore), pendingSC = true)
+        mockInitialState(engagementState = State.EngagementStarted(false), pendingSC = true)
 
         val result = useCase().blockingLast()
         assertEquals(false, result)

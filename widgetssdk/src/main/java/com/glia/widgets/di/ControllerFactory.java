@@ -40,10 +40,10 @@ import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadContract;
 import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadController;
 import com.glia.widgets.view.head.controller.ApplicationChatHeadLayoutController;
 import com.glia.widgets.view.head.controller.ServiceChatHeadController;
-import com.glia.widgets.view.snackbar.liveobservation.ActivityWatcherForLiveObservationContract;
-import com.glia.widgets.view.snackbar.liveobservation.ActivityWatcherForLiveObservationController;
 import com.glia.widgets.view.snackbar.SnackbarContract;
 import com.glia.widgets.view.snackbar.SnackbarController;
+import com.glia.widgets.view.snackbar.liveobservation.ActivityWatcherForLiveObservationContract;
+import com.glia.widgets.view.snackbar.liveobservation.ActivityWatcherForLiveObservationController;
 
 /**
  * @hide
@@ -366,8 +366,7 @@ public class ControllerFactory {
         if (engagementCompletionController == null) {
             engagementCompletionController = new EngagementCompletionController(
                 useCaseFactory.getReleaseResourcesUseCase(dialogController),
-                useCaseFactory.getEngagementStateUseCase(),
-                useCaseFactory.getSurveyUseCase()
+                useCaseFactory.getEngagementStateUseCase()
             );
         }
         return engagementCompletionController;

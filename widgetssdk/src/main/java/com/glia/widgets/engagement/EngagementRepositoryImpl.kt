@@ -5,7 +5,6 @@ import android.app.Activity
 import android.content.Intent
 import androidx.annotation.VisibleForTesting
 import com.glia.androidsdk.Engagement
-import com.glia.androidsdk.Engagement.ActionOnEnd
 import com.glia.androidsdk.Engagement.MediaType
 import com.glia.androidsdk.EngagementRequest
 import com.glia.androidsdk.EngagementRequest.Outcome
@@ -22,6 +21,7 @@ import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.androidsdk.comms.OperatorMediaState
 import com.glia.androidsdk.comms.VisitorMediaState
 import com.glia.androidsdk.engagement.EngagementState
+import com.glia.androidsdk.engagement.Survey
 import com.glia.androidsdk.omnibrowse.Omnibrowse
 import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement
 import com.glia.androidsdk.omnicore.OmnicoreEngagement
@@ -35,8 +35,12 @@ import com.glia.widgets.core.queue.QueueRepository
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.Data
 import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.isAudioOrVideo
+import com.glia.widgets.helper.isCallVisualizer
 import com.glia.widgets.helper.isQueueUnavailable
+import com.glia.widgets.helper.isRetain
+import com.glia.widgets.helper.isUnknown
 import com.glia.widgets.helper.unSafeSubscribe
 import com.glia.widgets.launcher.ConfigurationManager
 import io.reactivex.rxjava3.core.Completable
@@ -80,9 +84,6 @@ internal class EngagementRepositoryImpl(
 
     private val _engagementState: BehaviorProcessor<State> = BehaviorProcessor.createDefault(State.NoEngagement)
     override val engagementState: Flowable<State> = _engagementState.onBackpressureBuffer().distinctUntilChanged()
-
-    private val _survey: PublishProcessor<SurveyState> = PublishProcessor.create()
-    override val survey: Flowable<SurveyState> = _survey
 
     private val _currentOperator: BehaviorProcessor<Data<Operator>> = BehaviorProcessor.createDefault(Data.Empty)
     override val currentOperator: Flowable<Data<Operator>> = _currentOperator.onBackpressureLatest().distinctUntilChanged()
@@ -172,7 +173,7 @@ internal class EngagementRepositoryImpl(
         get() = _isSecureMessagingRequested
 
     override val isRetainAfterEnd: Boolean
-        get() = currentEngagement?.state?.actionOnEnd == Engagement.ActionOnEnd.RETAIN
+        get() = currentEngagement?.state?.actionOnEnd.isRetain
 
     override val cameras: List<CameraDevice>?
         get() = currentEngagement?.media?.cameraDevices
@@ -193,7 +194,7 @@ internal class EngagementRepositoryImpl(
 
     override fun reset() {
         _isSecureMessagingRequested = false
-        currentEngagement?.let { endEngagement(true) } ?: cancelQueuing()
+        currentEngagement?.let { endEngagement(EndedBy.CLEAR_STATE) } ?: cancelQueuing()
     }
 
     override fun resetQueueing() {
@@ -209,22 +210,29 @@ internal class EngagementRepositoryImpl(
         markScreenSharingEnded()
     }
 
-    override fun endEngagement(silently: Boolean) {
+    override fun endEngagement(endedBy: EndedBy) {
         //This is required to not end the transferred engagement
         if (isTransferredSecureConversation) return
 
         currentEngagement?.also {
             currentEngagement = null
-            Logger.i(TAG, "Engagement ended locally, silently:$silently")
+            Logger.i(TAG, "Engagement ended locally, ended by:$endedBy")
             unsubscribeFromEvents(it)
-            notifyEngagementEnded(it, false)
-            it.end { ex -> ex?.also { Logger.d(TAG, "Ending engagement failed") } }
-            if (silently || it is OmnibrowseEngagement) {
-                _survey.onNext(SurveyState.Empty)
-            } else {
-                fetchSurvey(it)
-            }
             resetState()
+
+            it.end { ex -> ex?.also { Logger.d(TAG, "Ending engagement failed") } }
+
+            val state = State.EngagementEnded(
+                it.isCallVisualizer,
+                endedBy,
+                it.state.actionOnEnd
+            ) { onSuccess, onError -> fetchSurvey(it, onError, onSuccess) }
+
+            _engagementState.onNext(state)
+
+            if (state.action.isUnknown) {
+                Logger.w(TAG, "Engagement ended with unknown case.")
+            }
         }
     }
 
@@ -335,14 +343,15 @@ internal class EngagementRepositoryImpl(
         }
     }
 
-    private fun fetchSurvey(engagement: Engagement) {
+    private fun fetchSurvey(engagement: Engagement, onError: () -> Unit = {}, onSuccess: (Survey) -> Unit) {
         engagement.getSurvey { survey, _ ->
             when {
                 survey != null -> {
                     Logger.i(TAG, "Survey loaded")
-                    _survey.onNext(SurveyState.Value(survey))
+                    onSuccess(survey)
                 }
-                else -> _survey.onNext(SurveyState.Empty)
+
+                else -> onError()
             }
         }
     }
@@ -410,7 +419,7 @@ internal class EngagementRepositoryImpl(
 
             engagement.state.isLiveEngagementTransferredToSecureConversation -> _engagementState.onNext(State.TransferredToSecureConversation)
 
-            else -> _engagementState.onNext(State.EngagementStarted(EngagementType.OmniCore))
+            else -> _engagementState.onNext(State.EngagementStarted(false))
         }
 
         currentEngagement = engagement
@@ -430,7 +439,7 @@ internal class EngagementRepositoryImpl(
             unsubscribeFromEvents(it)
             currentEngagement = null
             resetState()
-        } ?: _engagementState.onNext(State.EngagementStarted(EngagementType.CallVisualizer))
+        } ?: _engagementState.onNext(State.EngagementStarted(true))
 
         currentEngagement = engagement
         handleEngagementState(engagement.state)
@@ -533,26 +542,21 @@ internal class EngagementRepositoryImpl(
         currentEngagement?.also {
             currentEngagement = null
             unsubscribeFromEvents(it)
-            notifyEngagementEnded(it, true)
 
-            resetState(it.state.actionOnEnd == ActionOnEnd.RETAIN)
+            resetState(it.state.actionOnEnd.isRetain)
 
-            if (it is OmnicoreEngagement && it.state.actionOnEnd == ActionOnEnd.SHOW_SURVEY) {
-                fetchSurvey(it)
-            } else {
-                _survey.onNext(SurveyState.Empty)
+            val state = State.EngagementEnded(
+                it.isCallVisualizer,
+                EndedBy.OPERATOR,
+                it.state.actionOnEnd
+            ) { onSuccess, onError -> fetchSurvey(it, onError, onSuccess) }
+
+            _engagementState.onNext(state)
+
+            if (state.action.isUnknown) {
+                Logger.w(TAG, "Engagement ended with unknown case.")
             }
         }
-    }
-
-    private fun notifyEngagementEnded(engagement: Engagement, isEndedByOperator: Boolean) {
-        val engagementType = if (engagement is OmnibrowseEngagement)
-            EngagementType.CallVisualizer
-        else
-            EngagementType.OmniCore
-
-        val state = State.EngagementEnded(engagementType, !isEndedByOperator, engagement.state.actionOnEnd)
-        _engagementState.onNext(state)
     }
 
     //--Media

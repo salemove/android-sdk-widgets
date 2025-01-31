@@ -7,7 +7,7 @@ import com.glia.androidsdk.Engagement
 import com.glia.widgets.chat.ChatView
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
-import com.glia.widgets.engagement.EngagementType
+import com.glia.widgets.engagement.EndedBy
 import com.glia.widgets.engagement.ScreenSharingState
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
@@ -113,8 +113,8 @@ internal class ActivityWatcherForChatHeadTest {
 
     @Test
     fun `bubble will be removed when engagement or queueing ended`() {
-        engagementStateFlowable.onNext(State.EngagementEnded(EngagementType.CallVisualizer, false, Engagement.ActionOnEnd.UNKNOWN))
-        engagementStateFlowable.onNext(State.EngagementEnded(EngagementType.OmniCore, false, Engagement.ActionOnEnd.UNKNOWN))
+        engagementStateFlowable.onNext(State.EngagementEnded(true, EndedBy.OPERATOR, Engagement.ActionOnEnd.UNKNOWN, mock()))
+        engagementStateFlowable.onNext(State.EngagementEnded(false, EndedBy.CLEAR_STATE, Engagement.ActionOnEnd.UNKNOWN, mock()))
         engagementStateFlowable.onNext(State.QueueUnstaffed)
         engagementStateFlowable.onNext(State.UnexpectedErrorHappened)
         engagementStateFlowable.onNext(State.QueueingCanceled)
@@ -127,7 +127,7 @@ internal class ActivityWatcherForChatHeadTest {
     fun `bubble will be updated when OmniCoreEngagement is started`() {
         mockShouldShowChatHead()
 
-        engagementStateFlowable.onNext(State.EngagementStarted(EngagementType.OmniCore))
+        engagementStateFlowable.onNext(State.EngagementStarted(false))
         verifyBubbleIsShowed(times = 2)
     }
 
@@ -135,7 +135,7 @@ internal class ActivityWatcherForChatHeadTest {
     fun `bubble will be updated when OmniBrowseEngagement is started`() {
         mockShouldShowChatHead()
 
-        engagementStateFlowable.onNext(State.EngagementStarted(EngagementType.CallVisualizer))
+        engagementStateFlowable.onNext(State.EngagementStarted(true))
         verifyBubbleIsShowed(times = 2)
     }
 

@@ -63,6 +63,7 @@ import com.glia.widgets.chat.domain.gva.ParseGvaGalleryCardsUseCase;
 import com.glia.widgets.core.audio.AudioControlManager;
 import com.glia.widgets.core.audio.domain.OnAudioStartedUseCase;
 import com.glia.widgets.core.audio.domain.TurnSpeakerphoneUseCase;
+import com.glia.widgets.core.authentication.AuthenticationManager;
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase;
 import com.glia.widgets.core.callvisualizer.domain.VisitorCodeViewBuilderUseCase;
 import com.glia.widgets.core.chathead.ChatHeadManager;
@@ -168,8 +169,6 @@ import com.glia.widgets.engagement.domain.StartMediaProjectionServiceUseCase;
 import com.glia.widgets.engagement.domain.StartMediaProjectionServiceUseCaseImpl;
 import com.glia.widgets.engagement.domain.StopMediaProjectionServiceUseCase;
 import com.glia.widgets.engagement.domain.StopMediaProjectionServiceUseCaseImpl;
-import com.glia.widgets.engagement.domain.SurveyUseCase;
-import com.glia.widgets.engagement.domain.SurveyUseCaseImpl;
 import com.glia.widgets.engagement.domain.ToggleVisitorAudioMediaStateUseCase;
 import com.glia.widgets.engagement.domain.ToggleVisitorAudioMediaStateUseCaseImpl;
 import com.glia.widgets.engagement.domain.ToggleVisitorVideoMediaStateUseCase;
@@ -192,6 +191,8 @@ import com.glia.widgets.webbrowser.domain.GetUrlFromLinkUseCase;
 import com.glia.widgets.webbrowser.domain.GetUrlFromLinkUseCaseImpl;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import java.util.Optional;
 
 /**
  * @hide
@@ -567,7 +568,9 @@ public class UseCaseFactory {
 
     @NonNull
     public IsAuthenticatedUseCase createIsAuthenticatedUseCase() {
-        return new IsAuthenticatedUseCase(authenticationManagerProvider.authenticationManager);
+        return () -> Optional.ofNullable(authenticationManagerProvider.authenticationManager)
+            .map(AuthenticationManager::isAuthenticated)
+            .orElse(false);
     }
 
     @NonNull
@@ -848,11 +851,6 @@ public class UseCaseFactory {
     @NonNull
     public IsCurrentEngagementCallVisualizerUseCase getIsCurrentEngagementCallVisualizer() {
         return new IsCurrentEngagementCallVisualizerUseCaseImpl(repositoryFactory.getEngagementRepository());
-    }
-
-    @NonNull
-    public SurveyUseCase getSurveyUseCase() {
-        return new SurveyUseCaseImpl(repositoryFactory.getEngagementRepository());
     }
 
     @NonNull

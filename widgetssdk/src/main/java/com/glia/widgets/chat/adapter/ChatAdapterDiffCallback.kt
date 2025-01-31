@@ -26,5 +26,5 @@ internal sealed interface ChatAdapterPayload {
     data class Time(val time: String) : ChatAdapterPayload
     data class ErrorStateChanged(val isError: Boolean) : ChatAdapterPayload
     data class MessageUpdated(val isError: Boolean, val message: String) : ChatAdapterPayload
-    object RemoteAttachmentStatusChanged : ChatAdapterPayload
+    data object RemoteAttachmentStatusChanged : ChatAdapterPayload
 }

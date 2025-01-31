@@ -19,6 +19,7 @@ import com.glia.widgets.core.notification.domain.CallNotificationUseCase
 import com.glia.widgets.core.permissions.PermissionManager
 import com.glia.widgets.core.screensharing.MEDIA_PROJECTION_SERVICE_ACTION_START
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.engagement.EndedBy
 import com.glia.widgets.engagement.EngagementRepository
 import com.glia.widgets.engagement.ScreenSharingState
 import com.glia.widgets.helper.Data
@@ -187,7 +188,7 @@ class EngagementDomainTest {
 
         val useCase: EndEngagementUseCase = EndEngagementUseCaseImpl(engagementRepository = repository)
 
-        useCase(silently = false)
+        useCase(EndedBy.OPERATOR)
 
         verify { repository.isQueueing }
         verify { repository.cancelQueuing() }
@@ -204,10 +205,10 @@ class EngagementDomainTest {
 
         val useCase: EndEngagementUseCase = EndEngagementUseCaseImpl(engagementRepository = repository)
 
-        useCase(silently = false)
+        useCase(EndedBy.OPERATOR)
 
         verify { repository.isQueueing }
-        verify { repository.endEngagement(false) }
+        verify { repository.endEngagement(eq(EndedBy.OPERATOR)) }
         verify(exactly = 0) { repository.cancelQueuing() }
 
         confirmVerified(repository)

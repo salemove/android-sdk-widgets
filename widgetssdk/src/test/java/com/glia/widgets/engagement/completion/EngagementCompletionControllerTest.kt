@@ -2,32 +2,30 @@ package com.glia.widgets.engagement.completion
 
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.engagement.Survey
-import com.glia.widgets.engagement.EngagementType
-import com.glia.widgets.engagement.EngagementUpdateState
+import com.glia.widgets.engagement.EndedBy
+import com.glia.widgets.engagement.FetchSurveyCallback
 import com.glia.widgets.engagement.State
-import com.glia.widgets.engagement.SurveyState
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import com.glia.widgets.engagement.domain.ReleaseResourcesUseCase
-import com.glia.widgets.engagement.domain.SurveyUseCase
 import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.slot
 import io.mockk.verify
 import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
 import io.reactivex.rxjava3.processors.PublishProcessor
 import io.reactivex.rxjava3.schedulers.Schedulers
-import junit.framework.TestCase.assertEquals
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
 class EngagementCompletionControllerTest {
-    private val surveyStateProcessor = PublishProcessor.create<SurveyState>()
     private val engagementStateProcessor = PublishProcessor.create<State>()
 
     private lateinit var releaseResourcesUseCase: ReleaseResourcesUseCase
     private lateinit var engagementStateUseCase: EngagementStateUseCase
-    private lateinit var surveyUseCase: SurveyUseCase
+    private lateinit var fetchSurveyCallback: FetchSurveyCallback
 
     private lateinit var controller: EngagementCompletionContract.Controller
 
@@ -37,109 +35,163 @@ class EngagementCompletionControllerTest {
 
         releaseResourcesUseCase = mockk(relaxUnitFun = true)
         engagementStateUseCase = mockk(relaxUnitFun = true)
-        surveyUseCase = mockk(relaxUnitFun = true)
+        fetchSurveyCallback = mockk<FetchSurveyCallback>(relaxed = true)
 
         every { engagementStateUseCase() } returns engagementStateProcessor
-        every { surveyUseCase() } returns surveyStateProcessor
 
-        controller = EngagementCompletionController(releaseResourcesUseCase, engagementStateUseCase, surveyUseCase)
+        controller = EngagementCompletionController(releaseResourcesUseCase, engagementStateUseCase)
 
-        verify { surveyUseCase() }
         verify { engagementStateUseCase() }
     }
 
     @After
     fun tearDown() {
-        confirmVerified(releaseResourcesUseCase, engagementStateUseCase, surveyUseCase)
+        confirmVerified(releaseResourcesUseCase, engagementStateUseCase)
 
         RxAndroidPlugins.reset()
     }
 
     @Test
-    fun `State EngagementEnded(CallVisualizer) should release resources and emit completion event EngagementEnded`() {
-        engagementStateProcessor.onNext(State.EngagementEnded(EngagementType.CallVisualizer, true, Engagement.ActionOnEnd.UNKNOWN))
+    fun `State EngagementEnded should release resources and emit FinishActivities when engagement is CV`() {
+        engagementStateProcessor.onNext(
+            State.EngagementEnded(
+                true,
+                EndedBy.CLEAR_STATE,
+                Engagement.ActionOnEnd.END_NOTIFICATION,
+                fetchSurveyCallback
+            )
+        )
 
         verify { releaseResourcesUseCase() }
-        assertEquals(EngagementCompletionState.EngagementEnded(true, true, Engagement.ActionOnEnd.UNKNOWN), controller.state.blockingFirst().value)
+        verify(exactly = 0) { fetchSurveyCallback.invoke(any(), any()) }
+        assertEquals(EngagementCompletionState.FinishActivities, controller.state.blockingFirst().value)
     }
 
     @Test
-    fun `State EngagementEnded(OmniCore) should release resources and emit completion event EngagementEnded`() {
-        engagementStateProcessor.onNext(State.EngagementEnded(EngagementType.OmniCore, true, Engagement.ActionOnEnd.UNKNOWN))
+    fun `State EngagementEnded should release resources and emit FinishActivities when omnicore engagement is ended by integrator`() {
+        engagementStateProcessor.onNext(
+            State.EngagementEnded(
+                false,
+                EndedBy.CLEAR_STATE,
+                Engagement.ActionOnEnd.END_NOTIFICATION,
+                fetchSurveyCallback
+            )
+        )
 
         verify { releaseResourcesUseCase() }
-        assertEquals(EngagementCompletionState.EngagementEnded(true, false, Engagement.ActionOnEnd.UNKNOWN), controller.state.blockingFirst().value)
+        verify(exactly = 0) { fetchSurveyCallback.invoke(any(), any()) }
+        assertEquals(EngagementCompletionState.FinishActivities, controller.state.blockingFirst().value)
     }
 
     @Test
-    fun `State QueueUnstaffed should release resources and emit QueueUnstaffed`() {
+    fun `State EngagementEnded should release resources and emit FinishActivities when omnicore engagement is ended by visitor and no survey`() {
+        engagementStateProcessor.onNext(State.EngagementEnded(false, EndedBy.VISITOR, Engagement.ActionOnEnd.END_NOTIFICATION, fetchSurveyCallback))
+
+        verify { releaseResourcesUseCase() }
+        verify(exactly = 0) { fetchSurveyCallback.invoke(any(), any()) }
+        assertEquals(EngagementCompletionState.FinishActivities, controller.state.blockingFirst().value)
+    }
+
+    @Test
+    fun `State EngagementEnded should do nothing when omnicore enngagement end action is RETAIN`() {
+        engagementStateProcessor.onNext(State.EngagementEnded(false, EndedBy.OPERATOR, Engagement.ActionOnEnd.RETAIN, fetchSurveyCallback))
+
+        verify(exactly = 0) { releaseResourcesUseCase() }
+        verify(exactly = 0) { fetchSurveyCallback.invoke(any(), any()) }
+        controller.state.test().assertNotComplete().assertNoValues()
+    }
+
+    @Test
+    fun `State EngagementEnded should fetchSurvey when omnicore enngagement end action is SURVEY`() {
+        val state = controller.state.map { it.value }
+        engagementStateProcessor.onNext(State.EngagementEnded(false, EndedBy.VISITOR, Engagement.ActionOnEnd.SHOW_SURVEY, fetchSurveyCallback))
+
+        val onSuccessCallbackSlot = slot<(Survey) -> Unit>()
+
+        verify { releaseResourcesUseCase() }
+        verify { fetchSurveyCallback.invoke(capture(onSuccessCallbackSlot), any()) }
+
+        state.test().assertNotComplete().assertValues(EngagementCompletionState.FinishActivities)
+
+        val survey = mockk<Survey>()
+
+        onSuccessCallbackSlot.captured.invoke(survey)
+        state.test().assertNotComplete().assertValues(EngagementCompletionState.ShowSurvey(survey))
+    }
+
+    @Test
+    fun `State EngagementEnded should emit EngagementEndedDialog when fetching survey is failed and engagement ended by operator`() {
+        val state = controller.state.map { it.value }
+        engagementStateProcessor.onNext(State.EngagementEnded(false, EndedBy.OPERATOR, Engagement.ActionOnEnd.SHOW_SURVEY, fetchSurveyCallback))
+
+        val onFailureCallback = slot<() -> Unit>()
+
+        verify { releaseResourcesUseCase() }
+        verify { fetchSurveyCallback.invoke(any(), capture(onFailureCallback)) }
+
+        state.test().assertNotComplete().assertValues(EngagementCompletionState.FinishActivities)
+
+        onFailureCallback.captured.invoke()
+        state.test().assertNotComplete().assertValues(EngagementCompletionState.ShowEngagementEndedDialog)
+    }
+
+    @Test
+    fun `State EngagementEnded should not emit EngagementEndedDialog when fetching survey is failed and engagement ended by visitor`() {
+        val state = controller.state.map { it.value }
+        engagementStateProcessor.onNext(State.EngagementEnded(false, EndedBy.VISITOR, Engagement.ActionOnEnd.SHOW_SURVEY, fetchSurveyCallback))
+
+        val onFailureCallback = slot<() -> Unit>()
+
+        verify { releaseResourcesUseCase() }
+        verify { fetchSurveyCallback.invoke(any(), capture(onFailureCallback)) }
+
+        state.test().assertNotComplete().assertValues(EngagementCompletionState.FinishActivities)
+
+        onFailureCallback.captured.invoke()
+        state.test().assertNotComplete().assertValues(EngagementCompletionState.FinishActivities)
+    }
+
+    @Test
+    fun `State EngagementEnded should emit EngagementEndedDialog when engagement ended by Operator and no action is END_NOTIFICATION`() {
+        val state = controller.state.map { it.value }.test()
+        engagementStateProcessor.onNext(State.EngagementEnded(false, EndedBy.OPERATOR, Engagement.ActionOnEnd.END_NOTIFICATION, fetchSurveyCallback))
+
+        verify { releaseResourcesUseCase() }
+        verify(exactly = 0) { fetchSurveyCallback.invoke(any(), any()) }
+
+        state.assertNotComplete().assertValues(EngagementCompletionState.FinishActivities, EngagementCompletionState.ShowEngagementEndedDialog)
+    }
+
+    @Test
+    fun `State EngagementEnded should emit EngagementEndedDialog when engagement ended by Operator and no action is UNKNOWN`() {
+        val state = controller.state.map { it.value }.test()
+        engagementStateProcessor.onNext(State.EngagementEnded(false, EndedBy.OPERATOR, Engagement.ActionOnEnd.UNKNOWN, fetchSurveyCallback))
+
+        verify { releaseResourcesUseCase() }
+        verify(exactly = 0) { fetchSurveyCallback.invoke(any(), any()) }
+
+        state.assertNotComplete().assertValues(EngagementCompletionState.FinishActivities, EngagementCompletionState.ShowEngagementEndedDialog)
+    }
+
+    @Test
+    fun `State QueueUnstaffed should release resources and emit ShowNoOperatorsAvailableDialog`() {
         val testState = controller.state.map { it.value }.test()
 
         engagementStateProcessor.onNext(State.QueueUnstaffed)
 
         verify { releaseResourcesUseCase() }
 
-        testState.assertValues(
-            EngagementCompletionState.QueueUnstaffed
-        )
+        testState.assertValues(EngagementCompletionState.FinishActivities, EngagementCompletionState.ShowNoOperatorsAvailableDialog)
     }
 
     @Test
-    fun `State UnexpectedErrorHappened should release resources and emit UnexpectedErrorHappened`() {
+    fun `State UnexpectedErrorHappened should release resources and emit ShowUnexpectedErrorDialog`() {
         val testState = controller.state.map { it.value }.test()
 
         engagementStateProcessor.onNext(State.UnexpectedErrorHappened)
 
         verify { releaseResourcesUseCase() }
 
-        testState.assertValues(
-            EngagementCompletionState.UnexpectedErrorHappened
-        )
-    }
-
-    @Test
-    fun `State other than EngagementEnded, QueueUnstaffed, UnexpectedErrorHappened should not release resources`() {
-        val testState = controller.state.test()
-
-        engagementStateProcessor.onNext(State.NoEngagement)
-        engagementStateProcessor.onNext(State.PreQueuing(Engagement.MediaType.TEXT))
-        engagementStateProcessor.onNext(State.Queuing("queueTicketId", Engagement.MediaType.TEXT))
-        engagementStateProcessor.onNext(State.QueueingCanceled)
-        engagementStateProcessor.onNext(State.EngagementStarted(EngagementType.CallVisualizer))
-        engagementStateProcessor.onNext(State.EngagementStarted(EngagementType.OmniCore))
-        engagementStateProcessor.onNext(State.Update(mockk(), EngagementUpdateState.Transferring))
-
-        verify(exactly = 0) { releaseResourcesUseCase() }
-        testState.assertNoValues()
-    }
-
-    @Test
-    fun `Engagement State EngagementEnded() should produce completion EngagementEnded event with same properties`() {
-        val testState = controller.state.map { it.value }.test()
-
-        engagementStateProcessor.onNext(State.EngagementEnded(EngagementType.OmniCore, false, Engagement.ActionOnEnd.UNKNOWN))
-
-        verify { releaseResourcesUseCase() }
-
-        testState.assertValues(EngagementCompletionState.EngagementEnded(false, false, Engagement.ActionOnEnd.UNKNOWN))
-    }
-
-    @Test
-    fun `SurveyState Value should produce SurveyLoaded`() {
-        val survey = mockk<Survey>()
-        val testState = controller.state.map { it.value }.test()
-
-        surveyStateProcessor.onNext(SurveyState.Value(survey))
-
-        testState.assertValues(EngagementCompletionState.SurveyLoaded(survey))
-    }
-
-    @Test
-    fun `SurveyState Empty should not produce any state`() {
-        val testState = controller.state.test()
-
-        surveyStateProcessor.onNext(SurveyState.Empty)
-
-        testState.assertNoValues()
+        testState.assertValues(EngagementCompletionState.FinishActivities, EngagementCompletionState.ShowUnexpectedErrorDialog)
     }
 }

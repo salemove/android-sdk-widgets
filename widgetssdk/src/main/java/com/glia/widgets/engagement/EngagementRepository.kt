@@ -2,7 +2,6 @@ package com.glia.widgets.engagement
 
 import android.app.Activity
 import android.content.Intent
-import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.Engagement.MediaType
 import com.glia.androidsdk.EngagementRequest.Outcome
 import com.glia.androidsdk.IncomingEngagementRequest
@@ -18,7 +17,6 @@ internal interface EngagementRepository {
     val engagementRequest: Flowable<IncomingEngagementRequest>
     val engagementOutcome: Flowable<Outcome>
     val engagementState: Flowable<State>
-    val survey: Flowable<SurveyState>
     val currentOperator: Flowable<Data<Operator>>
     val operatorTypingStatus: Flowable<Boolean>
     val mediaUpgradeOffer: Flowable<MediaUpgradeOffer>
@@ -50,7 +48,7 @@ internal interface EngagementRepository {
     fun initialize()
     fun reset()
     fun resetQueueing()
-    fun endEngagement(silently: Boolean)
+    fun endEngagement(endedBy: EndedBy)
     fun queueForEngagement(mediaType: MediaType)
     fun cancelQueuing()
     fun acceptCurrentEngagementRequest(visitorContextAssetId: String)

@@ -1,7 +1,6 @@
 package com.glia.widgets.engagement.completion
 
 import android.app.Activity
-import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.engagement.Survey
 import com.glia.widgets.base.BaseSingleActivityWatcher
 import com.glia.widgets.helper.GliaActivityManager
@@ -29,14 +28,16 @@ internal class EngagementCompletionActivityWatcher(
 
         when {
             event.consumed -> Logger.d(TAG, "skipping.. event: ${event.value} is already consumed")
-            activity == null || activity.isFinishing -> {
-                Logger.d(TAG, "skipping.. activity is null or finishing")
-                if (state is EngagementCompletionState.EngagementEnded) event.consume { finishActivities() }
-            }
-            state is EngagementCompletionState.QueueUnstaffed -> showQueueUnstaffedDialog(activity, event::markConsumed)
-            state is EngagementCompletionState.UnexpectedErrorHappened -> showUnexpectedErrorDialog(activity, event::markConsumed)
-            state is EngagementCompletionState.EngagementEnded -> state.handleEngagementEndedEvent(activity, event::markConsumed)
-            state is EngagementCompletionState.SurveyLoaded -> event.consume { showSurvey(activity, state.survey) }
+            /*
+            * This state finishes all SDK activities even if the application is in the background(activity == null),
+            * to be sure that everything related to the queueing or engagement is released.
+            * */
+            state is EngagementCompletionState.FinishActivities -> event.consume { finishActivities() }
+            activity == null || activity.isFinishing -> Logger.d(TAG, "skipping.. activity is null or finishing")
+            state is EngagementCompletionState.ShowNoOperatorsAvailableDialog -> showNoOperatorsAvailableDialog(activity, event::markConsumed)
+            state is EngagementCompletionState.ShowUnexpectedErrorDialog -> showUnexpectedErrorDialog(activity, event::markConsumed)
+            state is EngagementCompletionState.ShowEngagementEndedDialog -> showOperatorEndedEngagementDialog(activity, event::markConsumed)
+            state is EngagementCompletionState.ShowSurvey -> event.consume { showSurvey(activity, state.survey) }
         }
     }
 
@@ -52,7 +53,7 @@ internal class EngagementCompletionActivityWatcher(
         }
     }
 
-    private fun showQueueUnstaffedDialog(activity: Activity, consumeCallback: () -> Unit) {
+    private fun showNoOperatorsAvailableDialog(activity: Activity, consumeCallback: () -> Unit) {
         showAlertDialogWithStyledContext(activity) { context, theme ->
             Dialogs.showNoMoreOperatorsAvailableDialog(context = context, uiTheme = theme) {
                 dismissAlertDialogSilently()
@@ -68,24 +69,6 @@ internal class EngagementCompletionActivityWatcher(
                 dismissAlertDialogSilently()
                 finishActivities()
                 consumeCallback()
-            }
-        }
-    }
-
-    private fun EngagementCompletionState.EngagementEnded.handleEngagementEndedEvent(activity: Activity, onEventHandled: () -> Unit) {
-        if (actionOnEnd == Engagement.ActionOnEnd.UNKNOWN) {
-            Logger.w(TAG, "Engagement ended with unknown case.")
-        }
-        when {
-            isEndedByVisitor || isCallVisualizer -> {
-                finishActivities()
-                onEventHandled()
-            }
-            actionOnEnd == Engagement.ActionOnEnd.RETAIN || actionOnEnd == Engagement.ActionOnEnd.SHOW_SURVEY -> {
-                onEventHandled()
-            }
-            actionOnEnd == Engagement.ActionOnEnd.END_NOTIFICATION || actionOnEnd == Engagement.ActionOnEnd.UNKNOWN -> {
-                showOperatorEndedEngagementDialog(activity, onEventHandled)
             }
         }
     }

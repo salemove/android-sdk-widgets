@@ -145,7 +145,6 @@ class EngagementRepositoryTest {
     private fun initializeAndVerify() {
         val engagementRequestTest = repository.engagementRequest.test()
         val engagementStateTest = repository.engagementState.test()
-        val surveyTest = repository.survey.test()
         val currentOperatorTest = repository.currentOperator.test()
         val operatorTypingStatusTest = repository.operatorTypingStatus.test()
         val mediaUpgradeOfferTest = repository.mediaUpgradeOffer.test()
@@ -166,7 +165,6 @@ class EngagementRepositoryTest {
         repository.apply {
             engagementRequestTest.assertNotComplete().assertNoValues()
             engagementStateTest.assertNotComplete().assertValue(State.NoEngagement).assertValueCount(1)
-            surveyTest.assertNotComplete().assertNoValues()
             currentOperatorTest.assertNotComplete().assertValue(Data.Empty).assertValueCount(1)
             operatorTypingStatusTest.assertNotComplete().assertNoValues()
             mediaUpgradeOfferTest.assertNotComplete().assertNoValues()
@@ -222,7 +220,7 @@ class EngagementRepositoryTest {
             callVisualizerEngagementCallbackSlot.captured.accept(engagement as OmnibrowseEngagement)
             stateTestSubscriber.assertValues(
                 State.NoEngagement,
-                State.EngagementStarted(EngagementType.CallVisualizer),
+                State.EngagementStarted(true),
                 State.Update(engagementState, EngagementUpdateState.OperatorConnected(operator))
             ).assertValueCount(3).assertNotComplete()
             verify(inverse = true) { chat.on(Chat.Events.OPERATOR_TYPING_STATUS, capture(operatorTypingCallbackSlot)) }
@@ -231,7 +229,7 @@ class EngagementRepositoryTest {
             omniCoreEngagementCallbackSlot.captured.accept(engagement as OmnicoreEngagement)
             stateTestSubscriber.assertValues(
                 State.NoEngagement,
-                State.EngagementStarted(EngagementType.OmniCore),
+                State.EngagementStarted(false),
                 State.Update(engagementState, EngagementUpdateState.OperatorConnected(operator))
             ).assertValueCount(3).assertNotComplete()
             verify { chat.on(Chat.Events.OPERATOR_TYPING_STATUS, capture(operatorTypingCallbackSlot)) }
@@ -351,7 +349,11 @@ class EngagementRepositoryTest {
         confirmVerified(mockAudio, mockVideo, visitorMediaState)
     }
 
-    private fun verifyEngagementEnd(ongoingEngagement: Boolean = true, endedLocally: Boolean = true, actionOnEnd: ActionOnEnd = ActionOnEnd.END_NOTIFICATION) {
+    private fun verifyEngagementEnd(
+        ongoingEngagement: Boolean = true,
+        endedBy: EndedBy = EndedBy.CLEAR_STATE,
+        actionOnEnd: ActionOnEnd = ActionOnEnd.END_NOTIFICATION
+    ) {
         repository.apply {
             currentOperator.test().assertNotComplete().assertValue(Data.Empty)
             visitorMediaState.test().assertNotComplete().assertValue(Data.Empty)
@@ -365,15 +367,23 @@ class EngagementRepositoryTest {
         }
 
         if (ongoingEngagement) {
-            if (endedLocally) {
+            if (endedBy != EndedBy.OPERATOR) {
                 verify { engagement.end(any()) }
             }
 
             verifyUnsubscribedFromEngagement()
 
-            val engagementType = if (engagement is OmnicoreEngagement) EngagementType.OmniCore else EngagementType.CallVisualizer
-            val state = State.EngagementEnded(engagementType, endedLocally, actionOnEnd)
-            repository.engagementState.test().assertNotComplete().assertValue(state)
+            repository.engagementState
+                .test()
+                .assertNotComplete()
+                .values()
+                .last()
+                .let { it as State.EngagementEnded }
+                .also {
+                    assertEquals(engagement is Omnibrowse, it.isCallVisualizer)
+                    assertEquals(endedBy, it.endedBy)
+                    assertEquals(actionOnEnd, it.action)
+                }
         }
     }
 
@@ -569,99 +579,151 @@ class EngagementRepositoryTest {
     }
 
     @Test
+    fun `endEngagement will return when ongoing engagement is transferred SC`() {
+        operator = mockk(relaxUnitFun = true)
+        engagementState = mockk(relaxUnitFun = true)
+        media = mockk(relaxUnitFun = true)
+        chat = mockk(relaxUnitFun = true)
+        screenSharing = mockk(relaxUnitFun = true)
+        cameraDevice = mockk(relaxUnitFun = true)
+        every { engagementState.visitorStatus } returns EngagementState.VisitorStatus.TRANSFERRING
+        every { engagementState.isLiveEngagementTransferredToSecureConversation } returns true
+        every { engagementState.operator } returns operator
+
+        every { media.currentCameraDevice } returns cameraDevice
+
+        engagement = mockk<OmnicoreEngagement>(relaxUnitFun = true)
+        every { engagement.state } returns engagementState
+        every { engagement.media } returns media
+        every { engagement.chat } returns chat
+        every { engagement.screenSharing } returns screenSharing
+
+        omniCoreEngagementCallbackSlot.captured.accept(engagement as OmnicoreEngagement)
+        repository.engagementState.test().assertValue(State.TransferredToSecureConversation).assertValueCount(1).assertNotComplete()
+        verify { operatorRepository.emit(any()) }
+
+        repository.endEngagement(EndedBy.VISITOR)
+        repository.engagementState.test().assertValue(State.TransferredToSecureConversation).assertValueCount(1).assertNotComplete()
+    }
+
+    @Test
     fun `endEngagement() will do nothing when no ongoing engagement`() {
-        repository.endEngagement(false)
+        repository.endEngagement(EndedBy.VISITOR)
         verifyEngagementEnd(ongoingEngagement = false)
     }
 
     @Test
-    fun `endEngagement() will not fetch survey when silently = true`() {
-        val surveyStateTestSubscriber = repository.survey.test()
+    fun `endEngagement() will emit EngagementEnded state`() {
         mockEngagementAndStart()
         fillStates()
-        repository.endEngagement(silently = true)
+        repository.endEngagement(EndedBy.CLEAR_STATE)
         verifyEngagementEnd()
-        surveyStateTestSubscriber.assertNotComplete().assertValueCount(1).assertValue(SurveyState.Empty)
     }
 
     @Test
-    fun `endEngagement() will not fetch survey when CallVisualizer`() {
-        val surveyStateTestSubscriber = repository.survey.test()
-        mockEngagementAndStart(callVisualizer = true)
+    fun `endEngagement() will fetch survey when EngagementEnded fetchSurveyCallback is invoked`() {
+        mockEngagementAndStart(actionOnEnd = ActionOnEnd.SHOW_SURVEY)
+        repository.updateIsSecureMessagingRequested(true)
         fillStates()
-        repository.endEngagement(silently = true)
-        verifyEngagementEnd()
-        surveyStateTestSubscriber.assertNotComplete().assertValueCount(1).assertValue(SurveyState.Empty)
-    }
+        repository.endEngagement(EndedBy.VISITOR)
+        verifyEngagementEnd(endedBy = EndedBy.VISITOR, actionOnEnd = ActionOnEnd.SHOW_SURVEY)
 
-    @Test
-    fun `endEngagement() will update survey when it present`() {
-        val survey: Survey = mockk()
+        val onSuccessCallback = mockk<(Survey) -> Unit>(relaxed = true)
+        val onErrorCallback = mockk<() -> Unit>(relaxed = true)
+
+        (repository.engagementState.test().values().last() as State.EngagementEnded).fetchSurveyCallback(onSuccessCallback, onErrorCallback)
+
         val surveyCallbackSlot = slot<RequestCallback<Survey>>()
-        val surveyStateTestSubscriber = repository.survey.test()
-        mockEngagementAndStart()
-        fillStates()
-        repository.endEngagement(silently = false)
+
         verify { engagement.getSurvey(capture(surveyCallbackSlot)) }
 
-        verifyEngagementEnd()
+        val survey = mockk<Survey>()
         surveyCallbackSlot.captured.onResult(survey, null)
-        surveyStateTestSubscriber.assertNotComplete().assertValueCount(1).assertValue(SurveyState.Value(survey))
+
+        verify { onSuccessCallback(eq(survey)) }
+        verify(exactly = 0) { onErrorCallback() }
+        assertFalse(repository.isSecureMessagingRequested)
     }
 
     @Test
-    fun `endEngagement() will not update survey when it is not present`() {
-        val exception: GliaException = mockk()
-        val surveyCallbackSlot = slot<RequestCallback<Survey>>()
-        val surveyStateTestSubscriber = repository.survey.test()
-        mockEngagementAndStart()
-        fillStates()
-        repository.endEngagement(silently = false)
-        verify { engagement.getSurvey(capture(surveyCallbackSlot)) }
-
-        verifyEngagementEnd()
-        surveyCallbackSlot.captured.onResult(null, exception)
-        surveyStateTestSubscriber.assertNotComplete().assertValueCount(1).assertValue(SurveyState.Empty)
-    }
-
-    @Test
-    fun `end engagement event will not fetch survey when CallVisualizer`() {
-        val surveyStateTestSubscriber = repository.survey.test()
-        mockEngagementAndStart(callVisualizer = true)
+    fun `endEngagement event will fetch survey when EngagementEnded fetchSurveyCallback is invoked`() {
+        mockEngagementAndStart(actionOnEnd = ActionOnEnd.SHOW_SURVEY)
+        repository.updateIsSecureMessagingRequested(true)
         fillStates()
         engagementEndCallbackSlot.captured.run()
-        verifyEngagementEnd(endedLocally = false)
-        surveyStateTestSubscriber.assertNotComplete().assertValueCount(1).assertValue(SurveyState.Empty)
+        verifyEngagementEnd(endedBy = EndedBy.OPERATOR, actionOnEnd = ActionOnEnd.SHOW_SURVEY)
+
+        val onSuccessCallback = mockk<(Survey) -> Unit>(relaxed = true)
+        val onErrorCallback = mockk<() -> Unit>(relaxed = true)
+
+        (repository.engagementState.test().values().last() as State.EngagementEnded).fetchSurveyCallback(onSuccessCallback, onErrorCallback)
+
+        val surveyCallbackSlot = slot<RequestCallback<Survey>>()
+
+        verify { engagement.getSurvey(capture(surveyCallbackSlot)) }
+
+        val survey = mockk<Survey>()
+        surveyCallbackSlot.captured.onResult(survey, null)
+
+        verify { onSuccessCallback(eq(survey)) }
+        verify(exactly = 0) { onErrorCallback() }
+        assertFalse(repository.isSecureMessagingRequested)
     }
 
     @Test
-    fun `end engagement event will update survey when it present`() {
-        val survey: Survey = mockk()
+    fun `endEngagement() will trigger onFailure callback when fetching survey fails`() {
+        mockEngagementAndStart(actionOnEnd = ActionOnEnd.SHOW_SURVEY)
+        fillStates()
+        repository.endEngagement(EndedBy.VISITOR)
+        verifyEngagementEnd(endedBy = EndedBy.VISITOR, actionOnEnd = ActionOnEnd.SHOW_SURVEY)
+
+        val onSuccessCallback = mockk<(Survey) -> Unit>(relaxed = true)
+        val onErrorCallback = mockk<() -> Unit>(relaxed = true)
+
+        (repository.engagementState.test().values().last() as State.EngagementEnded).fetchSurveyCallback(onSuccessCallback, onErrorCallback)
+
         val surveyCallbackSlot = slot<RequestCallback<Survey>>()
-        val surveyStateTestSubscriber = repository.survey.test()
+
+        verify { engagement.getSurvey(capture(surveyCallbackSlot)) }
+
+        val ex = mockk<GliaException>()
+        surveyCallbackSlot.captured.onResult(null, ex)
+
+        verify(exactly = 0) { onSuccessCallback(any()) }
+        verify { onErrorCallback() }
+    }
+
+    @Test
+    fun `endEngagement event will trigger onFailure callback when fetching survey fails`() {
         mockEngagementAndStart(actionOnEnd = ActionOnEnd.SHOW_SURVEY)
         fillStates()
         engagementEndCallbackSlot.captured.run()
+        verifyEngagementEnd(endedBy = EndedBy.OPERATOR, actionOnEnd = ActionOnEnd.SHOW_SURVEY)
+
+        val onSuccessCallback = mockk<(Survey) -> Unit>(relaxed = true)
+        val onErrorCallback = mockk<() -> Unit>(relaxed = true)
+
+        (repository.engagementState.test().values().last() as State.EngagementEnded).fetchSurveyCallback(onSuccessCallback, onErrorCallback)
+
+        val surveyCallbackSlot = slot<RequestCallback<Survey>>()
+
         verify { engagement.getSurvey(capture(surveyCallbackSlot)) }
 
-        verifyEngagementEnd(endedLocally = false, actionOnEnd = ActionOnEnd.SHOW_SURVEY)
-        surveyCallbackSlot.captured.onResult(survey, null)
-        surveyStateTestSubscriber.assertNotComplete().assertValueCount(1).assertValue(SurveyState.Value(survey))
+        val ex = mockk<GliaException>()
+        surveyCallbackSlot.captured.onResult(null, ex)
+
+        verify(exactly = 0) { onSuccessCallback(any()) }
+        verify { onErrorCallback() }
     }
 
     @Test
-    fun `end engagement event will not update survey when it is not present`() {
-        val exception: GliaException = mockk()
-        val surveyCallbackSlot = slot<RequestCallback<Survey>>()
-        val surveyStateTestSubscriber = repository.survey.test()
-        mockEngagementAndStart(actionOnEnd = ActionOnEnd.SHOW_SURVEY)
+    fun `endEngagement event will keep SC requested state when action is retain`() {
+        mockEngagementAndStart(actionOnEnd = ActionOnEnd.RETAIN)
+        repository.updateIsSecureMessagingRequested(true)
         fillStates()
         engagementEndCallbackSlot.captured.run()
-        verify { engagement.getSurvey(capture(surveyCallbackSlot)) }
-
-        verifyEngagementEnd(endedLocally = false, actionOnEnd = ActionOnEnd.SHOW_SURVEY)
-        surveyCallbackSlot.captured.onResult(null, exception)
-        surveyStateTestSubscriber.assertNotComplete().assertValueCount(1).assertValue(SurveyState.Empty)
+        verifyEngagementEnd(endedBy = EndedBy.OPERATOR, actionOnEnd = ActionOnEnd.RETAIN)
+        assertTrue(repository.isSecureMessagingRequested)
     }
 
     @Test
@@ -760,7 +822,7 @@ class EngagementRepositoryTest {
             .assertValueCount(7)
             .assertValuesOnly(
                 State.NoEngagement,
-                State.EngagementStarted(EngagementType.OmniCore),
+                State.EngagementStarted(false),
                 State.Update(engagementState, EngagementUpdateState.OperatorConnected(operator)),
                 State.Update(state1, EngagementUpdateState.OperatorChanged(operator1)),
                 State.Update(state2, EngagementUpdateState.Transferring),
@@ -768,7 +830,7 @@ class EngagementRepositoryTest {
                 State.TransferredToSecureConversation
             )
 
-        repository.endEngagement(silently = true)
+        repository.endEngagement(EndedBy.CLEAR_STATE)
         verify { state5.isLiveEngagementTransferredToSecureConversation }
         verify(exactly = 0) { engagement.end(any()) }
     }
@@ -1092,7 +1154,7 @@ class EngagementRepositoryTest {
         assertFalse(repositorySpy.isSecureMessagingRequested)
 
         verify { repositorySpy.cancelQueuing() }
-        verify(inverse = true) { repositorySpy.endEngagement(true) }
+        verify(inverse = true) { repositorySpy.endEngagement(eq(EndedBy.CLEAR_STATE)) }
     }
 
     @Test
@@ -1102,7 +1164,7 @@ class EngagementRepositoryTest {
 
         repositorySpy.reset()
 
-        verify { repositorySpy.endEngagement(true) }
+        verify { repositorySpy.endEngagement(eq(EndedBy.CLEAR_STATE)) }
         verify(inverse = true) { repositorySpy.cancelQueuing() }
     }
 
@@ -1480,7 +1542,7 @@ class EngagementRepositoryTest {
     fun `isRetainAfterEnd is true when actionOnEnd is RETAIN`() {
         mockEngagementAndStart()
 
-        every { engagementState.actionOnEnd } returns Engagement.ActionOnEnd.RETAIN
+        every { engagementState.actionOnEnd } returns ActionOnEnd.RETAIN
 
         assertTrue(repository.isRetainAfterEnd)
     }
@@ -1490,9 +1552,9 @@ class EngagementRepositoryTest {
         mockEngagementAndStart()
 
         every { engagementState.actionOnEnd } returnsMany listOf(
-            Engagement.ActionOnEnd.SHOW_SURVEY,
-            Engagement.ActionOnEnd.END_NOTIFICATION,
-            Engagement.ActionOnEnd.UNKNOWN
+            ActionOnEnd.SHOW_SURVEY,
+            ActionOnEnd.END_NOTIFICATION,
+            ActionOnEnd.UNKNOWN
         )
 
         assertFalse(repository.isRetainAfterEnd)

@@ -47,7 +47,7 @@ class SecureConversationsRepositoryTest {
             .assertNotComplete()
             .assertValue(false)
 
-        repository.initialize()
+        repository.subscribe()
         verify { core.secureConversations }
         verify { secureConversations.subscribeToUnreadMessageCount(capture(unreadMessagesSlot)) }
         verify { secureConversations.subscribeToPendingSecureConversationStatus(capture(pendingSCSlot)) }
@@ -111,6 +111,24 @@ class SecureConversationsRepositoryTest {
         repository.pendingSecureConversationsStatusObservable.test()
             .assertNotComplete()
             .assertValue(false)
+    }
+
+    @Test
+    fun `unsubscribeAndResetData() unsubscribes and emits default values`() {
+        `pendingSecureConversationsStatusObservable emits value when new value is received`() // to make sure that the values are not default
+        `unreadMessagesCountObservable emits value when new value is received`() // to make sure that the values are not default
+
+        repository.unsubscribeAndResetData()
+        verify { secureConversations.unSubscribeFromUnreadMessageCount(any()) }
+        verify { secureConversations.unSubscribeFromPendingSecureConversationStatus(any()) }
+
+        repository.pendingSecureConversationsStatusObservable.test()
+            .assertNotComplete()
+            .assertValue(false)
+
+        repository.unreadMessagesCountObservable.test()
+            .assertNotComplete()
+            .assertValue(0)
     }
 
     @Test

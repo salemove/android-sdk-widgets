@@ -3,6 +3,7 @@ package com.glia.widgets.view.head
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.util.Pair
 import androidx.core.view.ViewCompat
@@ -178,6 +179,10 @@ internal class ChatHeadLayout @JvmOverloads constructor(
         chatHeadView.x = x
         chatHeadView.y = y
         chatHeadView.invalidate()
+    }
+
+    fun removeSelf() {
+        (parent as? ViewGroup)?.removeView(this)
     }
 
     interface NavigationCallback {

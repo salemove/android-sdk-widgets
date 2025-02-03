@@ -167,7 +167,6 @@ internal class EntryWidgetController @JvmOverloads constructor(
         val messaging = EntryWidgetContract.ItemType.Messaging(unreadMessagesCount)
 
         val items = queues.mediaTypes.mapNotNull {
-            println("*********************** authenticated: ${isAuthenticatedUseCase()}")
             when {
                 it == MediaType.VIDEO -> EntryWidgetContract.ItemType.VideoCall
                 it == MediaType.AUDIO -> EntryWidgetContract.ItemType.AudioCall

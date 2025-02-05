@@ -92,9 +92,18 @@ internal class GliaCoreImpl : GliaCore {
         visitorContextAssetId: String?,
         engagementOptions: EngagementOptions?,
         mediaPermissionRequestCode: Int,
+        replaceExisting: Boolean,
         callback: Consumer<GliaException?>
     ) {
-        Glia.queueForEngagement(queueIds.toTypedArray(), mediaType, visitorContextAssetId, engagementOptions, mediaPermissionRequestCode, callback)
+        Glia.queueForEngagement(
+            queueIds.toTypedArray(),
+            mediaType,
+            visitorContextAssetId,
+            engagementOptions,
+            mediaPermissionRequestCode,
+            replaceExisting,
+            callback
+        )
     }
 
     override fun cancelQueueTicket(queueTicketId: String, callback: Consumer<GliaException?>) {

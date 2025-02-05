@@ -236,7 +236,7 @@ internal class EngagementRepositoryImpl(
         }
     }
 
-    override fun queueForEngagement(mediaType: MediaType) {
+    override fun queueForEngagement(mediaType: MediaType, replaceExisting: Boolean) {
         if (isQueueingOrLiveEngagement) return
 
         _engagementState.onNext(State.PreQueuing(mediaType))
@@ -247,11 +247,12 @@ internal class EngagementRepositoryImpl(
             queueRepository.relevantQueueIds.subscribe { ids ->
                 if (ids.isNotEmpty()) {
                     core.queueForEngagement(
-                        ids,
-                        mediaType,
-                        configurationManager.visitorContextAssetId,
-                        null,
-                        MEDIA_PERMISSION_REQUEST_CODE
+                        queueIds = ids,
+                        mediaType = mediaType,
+                        visitorContextAssetId = configurationManager.visitorContextAssetId,
+                        engagementOptions = null,
+                        mediaPermissionRequestCode = MEDIA_PERMISSION_REQUEST_CODE,
+                        replaceExisting = replaceExisting
                     ) {
                         handleQueueingResponse(it)
                     }

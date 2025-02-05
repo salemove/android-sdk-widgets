@@ -18,6 +18,7 @@ import com.glia.widgets.core.fileupload.FileAttachmentRepository
 import com.glia.widgets.core.notification.domain.CallNotificationUseCase
 import com.glia.widgets.core.permissions.PermissionManager
 import com.glia.widgets.core.screensharing.MEDIA_PROJECTION_SERVICE_ACTION_START
+import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.EndedBy
 import com.glia.widgets.engagement.EngagementRepository
@@ -321,13 +322,68 @@ class EngagementDomainTest {
 
     @Test
     fun `EnqueueForEngagementUseCase invoke enqueues with selected type engagement when media type is present`() {
-        val repository: EngagementRepository = mockk(relaxUnitFun = true)
+        val engagementRepository: EngagementRepository = mockk(relaxUnitFun = true) {
+            every { isTransferredSecureConversation } returns false
+        }
+        val secureConversationsRepository: SecureConversationsRepository = mockk(relaxUnitFun = true) {
+            every { hasPendingSecureConversations } returns false
+        }
         val mediaType: Engagement.MediaType = mockk(relaxUnitFun = true)
 
-        val useCase: EnqueueForEngagementUseCase = EnqueueForEngagementUseCaseImpl(engagementRepository = repository)
+        val useCase: EnqueueForEngagementUseCase = EnqueueForEngagementUseCaseImpl(
+            engagementRepository = engagementRepository,
+            secureConversationsRepository = secureConversationsRepository
+        )
+
         useCase(mediaType)
 
-        verify { repository.queueForEngagement(mediaType) }
+        verify { secureConversationsRepository.hasPendingSecureConversations }
+        verify { engagementRepository.isTransferredSecureConversation }
+        verify { engagementRepository.queueForEngagement(mediaType, eq(false)) }
+    }
+
+    @Test
+    fun `EnqueueForEngagementUseCase invoke enqueues with replaceExisting = true when is transferred SC`() {
+        val engagementRepository: EngagementRepository = mockk(relaxUnitFun = true) {
+            every { isTransferredSecureConversation } returns true
+        }
+        val secureConversationsRepository: SecureConversationsRepository = mockk(relaxUnitFun = true) {
+            every { hasPendingSecureConversations } returns false
+        }
+        val mediaType: Engagement.MediaType = mockk(relaxUnitFun = true)
+
+        val useCase: EnqueueForEngagementUseCase = EnqueueForEngagementUseCaseImpl(
+            engagementRepository = engagementRepository,
+            secureConversationsRepository = secureConversationsRepository
+        )
+
+        useCase(mediaType)
+
+        verify { secureConversationsRepository.hasPendingSecureConversations }
+        verify { engagementRepository.isTransferredSecureConversation }
+        verify { engagementRepository.queueForEngagement(mediaType, eq(true)) }
+    }
+
+    @Test
+    fun `EnqueueForEngagementUseCase invoke enqueues with replaceExisting = true when has pending SC`() {
+        val engagementRepository: EngagementRepository = mockk(relaxUnitFun = true) {
+            every { isTransferredSecureConversation } returns false
+        }
+        val secureConversationsRepository: SecureConversationsRepository = mockk(relaxUnitFun = true) {
+            every { hasPendingSecureConversations } returns true
+        }
+        val mediaType: Engagement.MediaType = mockk(relaxUnitFun = true)
+
+        val useCase: EnqueueForEngagementUseCase = EnqueueForEngagementUseCaseImpl(
+            engagementRepository = engagementRepository,
+            secureConversationsRepository = secureConversationsRepository
+        )
+
+        useCase(mediaType)
+
+        verify { secureConversationsRepository.hasPendingSecureConversations }
+        verify(inverse = true) { engagementRepository.isTransferredSecureConversation }
+        verify { engagementRepository.queueForEngagement(mediaType, eq(true)) }
     }
 
     @Test

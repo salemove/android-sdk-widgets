@@ -921,9 +921,19 @@ class EngagementRepositoryTest {
         every { queueRepository.relevantQueueIds } returns Single.just(listOf(queueId))
         val queueForEngagementCallbackSlot = slot<Consumer<GliaException?>>()
 
-        repository.queueForEngagement(MediaType.TEXT)
+        repository.queueForEngagement(MediaType.TEXT, true)
 
-        verify(exactly = 1) { core.queueForEngagement(listOf(queueId), MediaType.TEXT, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
+        verify(exactly = 1) {
+            core.queueForEngagement(
+                listOf(queueId),
+                MediaType.TEXT,
+                null,
+                any(),
+                any(),
+                eq(true),
+                capture(queueForEngagementCallbackSlot)
+            )
+        }
         queueForEngagementCallbackSlot.captured.accept(null)
 
         assertTrue(repository.isQueueing)
@@ -931,10 +941,20 @@ class EngagementRepositoryTest {
 
         repository.engagementState.test().assertNotComplete().assertValue(State.PreQueuing(MediaType.TEXT))
 
-        repository.queueForEngagement(MediaType.TEXT)
+        repository.queueForEngagement(MediaType.TEXT, false)
 
         verify { queueRepository.relevantQueueIds }
-        verify(exactly = 0) { core.queueForEngagement(listOf(queueId), MediaType.TEXT, "url", any(), any(), capture(queueForEngagementCallbackSlot)) }
+        verify(exactly = 0) {
+            core.queueForEngagement(
+                listOf(queueId),
+                MediaType.TEXT,
+                "url",
+                any(),
+                any(),
+                eq(false),
+                capture(queueForEngagementCallbackSlot)
+            )
+        }
     }
 
     @Test
@@ -942,10 +962,10 @@ class EngagementRepositoryTest {
         every { queueRepository.relevantQueueIds } returns Single.just(emptyList())
         val testSubscriber = repository.engagementState.test()
 
-        repository.queueForEngagement(MediaType.TEXT)
+        repository.queueForEngagement(MediaType.TEXT, true)
 
         verify { queueRepository.relevantQueueIds }
-        verify(exactly = 0) { core.queueForEngagement(any(), MediaType.TEXT, null, any(), any(), any()) }
+        verify(exactly = 0) { core.queueForEngagement(any(), MediaType.TEXT, null, any(), any(), eq(true), any()) }
 
         assertFalse(repository.isQueueing)
         assertFalse(repository.isQueueingForMedia)
@@ -964,11 +984,21 @@ class EngagementRepositoryTest {
         val mediaType = MediaType.AUDIO
         every { queueRepository.relevantQueueIds } returns Single.just(listOf(queueId))
         val queueForEngagementCallbackSlot = slot<Consumer<GliaException?>>()
-        repository.queueForEngagement(mediaType)
+        repository.queueForEngagement(mediaType, false)
 
         repository.engagementState.test().assertNotComplete().assertValue(State.PreQueuing(mediaType))
         verify { queueRepository.relevantQueueIds }
-        verify(exactly = 1) { core.queueForEngagement(listOf(queueId), mediaType, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
+        verify(exactly = 1) {
+            core.queueForEngagement(
+                listOf(queueId),
+                mediaType,
+                null,
+                any(),
+                any(),
+                eq(false),
+                capture(queueForEngagementCallbackSlot)
+            )
+        }
         queueForEngagementCallbackSlot.captured.accept(GliaException("message", GliaException.Cause.ALREADY_QUEUED))
 
         assertTrue(repository.isQueueing)
@@ -976,9 +1006,19 @@ class EngagementRepositoryTest {
 
         repository.engagementState.test().assertNotComplete().assertValue(State.PreQueuing(mediaType))
 
-        repository.queueForEngagement(MediaType.VIDEO)
+        repository.queueForEngagement(MediaType.VIDEO, false)
 
-        verify(exactly = 0) { core.queueForEngagement(listOf(queueId), MediaType.VIDEO, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
+        verify(exactly = 0) {
+            core.queueForEngagement(
+                listOf(queueId),
+                MediaType.VIDEO,
+                null,
+                any(),
+                any(),
+                eq(false),
+                capture(queueForEngagementCallbackSlot)
+            )
+        }
     }
 
     @Test
@@ -988,10 +1028,10 @@ class EngagementRepositoryTest {
         every { queueRepository.relevantQueueIds } returns Single.just(listOf(queueId))
         val queueForEngagementCallbackSlot = slot<Consumer<GliaException?>>()
         val testSubscriber = repository.engagementState.test()
-        repository.queueForEngagement(mediaType)
+        repository.queueForEngagement(mediaType, true)
 
         verify { queueRepository.relevantQueueIds }
-        verify { core.queueForEngagement(listOf(queueId), mediaType, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
+        verify { core.queueForEngagement(listOf(queueId), mediaType, null, any(), any(), eq(true), capture(queueForEngagementCallbackSlot)) }
         queueForEngagementCallbackSlot.captured.accept(GliaException("message", GliaException.Cause.QUEUE_CLOSED))
 
         testSubscriber.assertNotComplete().assertValuesOnly(
@@ -1009,10 +1049,10 @@ class EngagementRepositoryTest {
         every { queueRepository.relevantQueueIds } returns Single.just(listOf(queueId))
         val queueForEngagementCallbackSlot = slot<Consumer<GliaException?>>()
         val testSubscriber = repository.engagementState.test()
-        repository.queueForEngagement(mediaType)
+        repository.queueForEngagement(mediaType, true)
 
         verify { queueRepository.relevantQueueIds }
-        verify { core.queueForEngagement(listOf(queueId), mediaType, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
+        verify { core.queueForEngagement(listOf(queueId), mediaType, null, any(), any(), eq(true), capture(queueForEngagementCallbackSlot)) }
         queueForEngagementCallbackSlot.captured.accept(GliaException("message", GliaException.Cause.NETWORK_TIMEOUT))
 
         testSubscriber.assertNotComplete().assertValuesOnly(
@@ -1034,10 +1074,20 @@ class EngagementRepositoryTest {
         val queueTicket: QueueTicket = mockk(relaxed = true) {
             every { id } returns ticketId
         }
-        repository.queueForEngagement(mediaType)
+        repository.queueForEngagement(mediaType, true)
 
         verify { queueRepository.relevantQueueIds }
-        verify(exactly = 1) { core.queueForEngagement(listOf(queueId), mediaType, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
+        verify(exactly = 1) {
+            core.queueForEngagement(
+                listOf(queueId),
+                mediaType,
+                null,
+                any(),
+                any(),
+                eq(true),
+                capture(queueForEngagementCallbackSlot)
+            )
+        }
         queueForEngagementCallbackSlot.captured.accept(null)
 
         assertTrue(repository.isQueueing)
@@ -1075,10 +1125,20 @@ class EngagementRepositoryTest {
         val queueTicket: QueueTicket = mockk(relaxed = true) {
             every { id } returns ticketId
         }
-        repository.queueForEngagement(mediaType)
+        repository.queueForEngagement(mediaType, true)
 
         verify { queueRepository.relevantQueueIds }
-        verify(exactly = 1) { core.queueForEngagement(listOf(queueId), mediaType, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
+        verify(exactly = 1) {
+            core.queueForEngagement(
+                listOf(queueId),
+                mediaType,
+                null,
+                any(),
+                any(),
+                eq(true),
+                capture(queueForEngagementCallbackSlot)
+            )
+        }
         queueForEngagementCallbackSlot.captured.accept(null)
 
         assertTrue(repository.isQueueing)
@@ -1115,10 +1175,20 @@ class EngagementRepositoryTest {
         val queueTicket: QueueTicket = mockk(relaxed = true) {
             every { id } returns ticketId
         }
-        repository.queueForEngagement(mediaType)
+        repository.queueForEngagement(mediaType, true)
 
         verify { queueRepository.relevantQueueIds }
-        verify(exactly = 1) { core.queueForEngagement(listOf(queueId), mediaType, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
+        verify(exactly = 1) {
+            core.queueForEngagement(
+                listOf(queueId),
+                mediaType,
+                null,
+                any(),
+                any(),
+                eq(true),
+                capture(queueForEngagementCallbackSlot)
+            )
+        }
         queueForEngagementCallbackSlot.captured.accept(null)
 
         assertTrue(repository.isQueueing)
@@ -1486,7 +1556,7 @@ class EngagementRepositoryTest {
         every { configurationManager.visitorContextAssetId } returns visitorContextAssetId
         val queueForEngagementCallbackSlot = slot<Consumer<GliaException?>>()
 
-        repository.queueForEngagement(MediaType.TEXT)
+        repository.queueForEngagement(MediaType.TEXT, false)
 
         verify(exactly = 1) {
             core.queueForEngagement(
@@ -1495,6 +1565,7 @@ class EngagementRepositoryTest {
                 visitorContextAssetId,
                 any(),
                 any(),
+                eq(false),
                 capture(queueForEngagementCallbackSlot)
             )
         }
@@ -1503,7 +1574,7 @@ class EngagementRepositoryTest {
         assertTrue(repository.isQueueing)
         assertFalse(repository.isQueueingForMedia)
 
-        repository.queueForEngagement(MediaType.TEXT)
+        repository.queueForEngagement(MediaType.TEXT, false)
 
         verify { queueRepository.relevantQueueIds }
         verify(exactly = 1) {
@@ -1513,6 +1584,7 @@ class EngagementRepositoryTest {
                 visitorContextAssetId,
                 any(),
                 any(),
+                eq(false),
                 capture(queueForEngagementCallbackSlot)
             )
         }
@@ -1525,17 +1597,37 @@ class EngagementRepositoryTest {
         every { configurationManager.visitorContextAssetId } returns null
         val queueForEngagementCallbackSlot = slot<Consumer<GliaException?>>()
 
-        repository.queueForEngagement(MediaType.TEXT)
+        repository.queueForEngagement(MediaType.TEXT, false)
 
-        verify(exactly = 1) { core.queueForEngagement(listOf(queueId), MediaType.TEXT, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
+        verify(exactly = 1) {
+            core.queueForEngagement(
+                listOf(queueId),
+                MediaType.TEXT,
+                null,
+                any(),
+                any(),
+                eq(false),
+                capture(queueForEngagementCallbackSlot)
+            )
+        }
         queueForEngagementCallbackSlot.captured.accept(null)
 
         assertTrue(repository.isQueueing)
         assertFalse(repository.isQueueingForMedia)
-        repository.queueForEngagement(MediaType.TEXT)
+        repository.queueForEngagement(MediaType.TEXT, false)
 
         verify { queueRepository.relevantQueueIds }
-        verify(exactly = 1) { core.queueForEngagement(listOf(queueId), MediaType.TEXT, null, any(), any(), capture(queueForEngagementCallbackSlot)) }
+        verify(exactly = 1) {
+            core.queueForEngagement(
+                listOf(queueId),
+                MediaType.TEXT,
+                null,
+                any(),
+                any(),
+                eq(false),
+                capture(queueForEngagementCallbackSlot)
+            )
+        }
     }
 
     @Test

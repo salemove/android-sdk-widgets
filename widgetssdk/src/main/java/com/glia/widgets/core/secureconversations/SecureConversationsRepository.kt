@@ -25,10 +25,14 @@ internal class SecureConversationsRepository(private val core: GliaCore, private
 
     private val _unreadMessagesCountObservable: BehaviorProcessor<Int> = BehaviorProcessor.createDefault(0)
     val unreadMessagesCountObservable: Flowable<Int> get() = _unreadMessagesCountObservable.asStateFlowable()
+
     private val unreadMessagesCountCallback: RequestCallback<Int> = RequestCallback { count, _ -> count?.let(_unreadMessagesCountObservable::onNext) }
 
     private val _pendingSecureConversationsStatusObservable: BehaviorProcessor<Boolean> = BehaviorProcessor.createDefault(false)
     val pendingSecureConversationsStatusObservable: Flowable<Boolean> get() = _pendingSecureConversationsStatusObservable.asStateFlowable()
+
+    val hasPendingSecureConversations: Boolean get() = _pendingSecureConversationsStatusObservable.value ?: false
+
     private val pendingSecureConversationsCallback: RequestCallback<Boolean> = RequestCallback { hasPendingSecureConversations, _ ->
         hasPendingSecureConversations?.let(_pendingSecureConversationsStatusObservable::onNext)
     }

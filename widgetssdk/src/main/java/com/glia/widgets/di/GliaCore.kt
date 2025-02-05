@@ -50,7 +50,9 @@ internal interface GliaCore {
         visitorContextAssetId: String?,
         engagementOptions: EngagementOptions?,
         mediaPermissionRequestCode: Int,
-        callback: Consumer<GliaException?>)
+        replaceExisting: Boolean,
+        callback: Consumer<GliaException?>
+    )
 
     fun cancelQueueTicket(queueTicketId: String, callback: Consumer<GliaException?>)
 

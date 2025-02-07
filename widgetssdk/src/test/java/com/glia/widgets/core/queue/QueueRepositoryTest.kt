@@ -2,8 +2,7 @@ package com.glia.widgets.core.queue
 
 import android.assertCurrentValue
 import com.glia.androidsdk.GliaException
-import com.glia.androidsdk.RequestCallback
-import com.glia.androidsdk.queuing.Queue
+import com.glia.androidsdk.queuing.QueueState
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.launcher.ConfigurationManager
@@ -17,6 +16,7 @@ import io.reactivex.rxjava3.processors.PublishProcessor
 import org.junit.Before
 import org.junit.Test
 import java.util.function.Consumer
+import com.glia.androidsdk.queuing.Queue as CoreSdkQueue
 
 class QueueRepositoryTest {
 
@@ -24,11 +24,11 @@ class QueueRepositoryTest {
     private lateinit var configurationManager: ConfigurationManager
     private lateinit var queueRepository: QueueRepository
 
-    private lateinit var getQueuesCallbackSlot: MutableList<RequestCallback<List<Queue>?>>
-    private lateinit var subscribeToQueueUpdatesCallbackSlot: CapturingSlot<Consumer<Queue>>
+    private lateinit var getQueuesSuccessCallbackSlot: MutableList<(Array<out CoreSdkQueue>) -> Unit>
+    private lateinit var getQueuesErrorCallbackSlot: MutableList<(GliaException?) -> Unit>
+    private lateinit var subscribeToQueueUpdatesCallbackSlot: CapturingSlot<Consumer<CoreSdkQueue>>
 
-    private val configurationQueuesProcessor: PublishProcessor<List<String>> =
-        PublishProcessor.create()
+    private val configurationQueuesProcessor: PublishProcessor<List<String>> = PublishProcessor.create()
 
     @Before
     fun setUp() {
@@ -37,13 +37,14 @@ class QueueRepositoryTest {
         configurationManager = mockk {
             every { queueIdsObservable } returns configurationQueuesProcessor.hide()
         }
-        getQueuesCallbackSlot = mutableListOf()
+        getQueuesSuccessCallbackSlot = mutableListOf()
+        getQueuesErrorCallbackSlot = mutableListOf()
         subscribeToQueueUpdatesCallbackSlot = slot()
 
         queueRepository = QueueRepositoryImpl(gliaCore, configurationManager)
 
         verify(exactly = 0) { configurationManager.queueIdsObservable }
-        verify(exactly = 0) { gliaCore.getQueues(any()) }
+        verify(exactly = 0) { gliaCore.getQueues(any(), any()) }
         verify(exactly = 0) { gliaCore.isInitialized }
     }
 
@@ -51,11 +52,22 @@ class QueueRepositoryTest {
         configurationQueuesProcessor.onNext(queues)
     }
 
-    private fun createQueue(id: String, isDefault: Boolean, name: String = "defaultName"): Queue {
-        val queue = mockk<Queue>()
+    private fun createQueue(
+        id: String,
+        isDefault: Boolean?,
+        name: String = "defaultName",
+        lastUpdatedMillis: Long = System.currentTimeMillis()
+    ): CoreSdkQueue {
+        val state = mockk<QueueState> {
+            every { status } returns QueueState.Status.OPEN
+            every { medias } returns emptyArray()
+        }
+        val queue = mockk<CoreSdkQueue>()
         every { queue.id } returns id
         every { queue.isDefault } returns isDefault
         every { queue.name } returns name
+        every { queue.lastUpdatedMillis } returns lastUpdatedMillis
+        every { queue.state } returns state
         return queue
     }
 
@@ -65,13 +77,13 @@ class QueueRepositoryTest {
         queueRepository.initialize()
 
         verify { gliaCore.isInitialized }
-        verify { gliaCore.getQueues(capture(getQueuesCallbackSlot)) }
+        verify { gliaCore.getQueues(capture(getQueuesSuccessCallbackSlot), capture(getQueuesErrorCallbackSlot)) }
 
         verify(exactly = 0) { configurationManager.queueIdsObservable }
     }
 
-    private fun pushSiteQueues(vararg queues: Queue) {
-        getQueuesCallbackSlot.last().onResult(listOf(*queues), null)
+    private fun pushSiteQueues(vararg queues: CoreSdkQueue) {
+        getQueuesSuccessCallbackSlot.last().invoke(queues)
     }
 
     @Test
@@ -81,7 +93,7 @@ class QueueRepositoryTest {
         queueRepository.initialize()
 
         verify(exactly = 0) { configurationManager.queueIdsObservable }
-        verify(exactly = 0) { gliaCore.getQueues(any()) }
+        verify(exactly = 0) { gliaCore.getQueues(any(), any()) }
         verify { gliaCore.isInitialized }
     }
 
@@ -91,7 +103,7 @@ class QueueRepositoryTest {
 
         queueRepository.relevantQueueIds.test().assertNotComplete()
         verify { gliaCore.isInitialized }
-        verify { gliaCore.getQueues(any()) }
+        verify { gliaCore.getQueues(any(), any()) }
 
         verify(exactly = 0) { configurationManager.queueIdsObservable }
     }
@@ -109,11 +121,11 @@ class QueueRepositoryTest {
 
         val subscriber = queueRepository.queuesState.test()
 
-        verify { gliaCore.getQueues(capture(getQueuesCallbackSlot)) }
+        verify { gliaCore.getQueues(capture(getQueuesSuccessCallbackSlot), capture(getQueuesErrorCallbackSlot)) }
         verify(exactly = 0) { configurationManager.queueIdsObservable }
         subscriber.assertCurrentValue(QueuesState.Loading)
 
-        getQueuesCallbackSlot.last().onResult(null, exception)
+        getQueuesErrorCallbackSlot.last().invoke(exception)
         subscriber.assertCurrentValue(QueuesState.Error(exception))
     }
 
@@ -123,11 +135,11 @@ class QueueRepositoryTest {
 
         val subscriber = queueRepository.queuesState.test()
 
-        verify { gliaCore.getQueues(capture(getQueuesCallbackSlot)) }
+        verify { gliaCore.getQueues(capture(getQueuesSuccessCallbackSlot), capture(getQueuesErrorCallbackSlot)) }
         verify(exactly = 0) { configurationManager.queueIdsObservable }
         subscriber.assertCurrentValue(QueuesState.Loading)
 
-        getQueuesCallbackSlot.last().onResult(null, null)
+        getQueuesErrorCallbackSlot.last().invoke(null)
         subscriber.assertCurrentValue(Predicate { it is QueuesState.Error })
     }
 
@@ -164,7 +176,7 @@ class QueueRepositoryTest {
         verify { configurationManager.queueIdsObservable }
 
         queueRepository.queuesState.test()
-            .assertCurrentValue(QueuesState.Queues(listOf(defaultQueue)))
+            .assertCurrentValue(QueuesState.Queues(listOf(defaultQueue.asLocalQueue())))
 
         queueRepository.relevantQueueIds.test().assertValue(listOf(defaultQueue.id))
         verify { gliaCore.subscribeToQueueStateUpdates(eq(listOf(defaultQueueId)), any(), any()) }
@@ -198,7 +210,7 @@ class QueueRepositoryTest {
         verify { configurationManager.queueIdsObservable }
 
         queueRepository.queuesState.test()
-            .assertCurrentValue(QueuesState.Queues(listOf(defaultQueue)))
+            .assertCurrentValue(QueuesState.Queues(listOf(defaultQueue.asLocalQueue())))
         queueRepository.relevantQueueIds.test().assertValue(listOf(defaultQueue.id))
         verify { gliaCore.subscribeToQueueStateUpdates(eq(listOf(defaultQueueId)), any(), any()) }
     }
@@ -232,7 +244,7 @@ class QueueRepositoryTest {
         verify { configurationManager.queueIdsObservable }
 
         queueRepository.queuesState.test()
-            .assertCurrentValue(QueuesState.Queues(listOf(defaultQueue, nonDefaultQueue)))
+            .assertCurrentValue(QueuesState.Queues(listOf(defaultQueue.asLocalQueue(), nonDefaultQueue.asLocalQueue())))
         queueRepository.relevantQueueIds.test()
             .assertValue(listOf(defaultQueue.id, nonDefaultQueue.id))
         verify {
@@ -261,7 +273,7 @@ class QueueRepositoryTest {
         verify { configurationManager.queueIdsObservable }
 
         queueRepository.queuesState.test()
-            .assertCurrentValue(QueuesState.Queues(listOf(defaultQueue, nonDefaultQueue)))
+            .assertCurrentValue(QueuesState.Queues(listOf(defaultQueue.asLocalQueue(), nonDefaultQueue.asLocalQueue())))
         queueRepository.relevantQueueIds.test()
             .assertValue(listOf(defaultQueue.id, nonDefaultQueue.id))
 
@@ -273,10 +285,8 @@ class QueueRepositoryTest {
             )
         }
 
-        val updatedQueueName = "updatedDefaultQueueName"
-        val updatedDefaultQueue = createQueue(defaultQueue.id, true, updatedQueueName)
-
-        subscribeToQueueUpdatesCallbackSlot.captured.accept(updatedDefaultQueue)
+        val outDatedQueue = createQueue(nonDefaultQueue.id, null, "outdatedQueue", System.currentTimeMillis() - 10000)
+        subscribeToQueueUpdatesCallbackSlot.captured.accept(outDatedQueue)
 
         verify(atMost = 1) {
             gliaCore.subscribeToQueueStateUpdates(
@@ -285,10 +295,19 @@ class QueueRepositoryTest {
         }
 
         queueRepository.queuesState.test()
-            .assertCurrentValue(QueuesState.Queues(listOf(updatedDefaultQueue, nonDefaultQueue)))
+            .assertCurrentValue(QueuesState.Queues(listOf(defaultQueue.asLocalQueue(), nonDefaultQueue.asLocalQueue())))
+        queueRepository.relevantQueueIds.test()
+            .assertValue(listOf(defaultQueue.id, nonDefaultQueue.id))
+
+        val updatedQueueName = "updatedDefaultQueueName"
+        val updatedDefaultQueue = createQueue(defaultQueue.id, null, updatedQueueName)
+
+        subscribeToQueueUpdatesCallbackSlot.captured.accept(updatedDefaultQueue)
+
+        queueRepository.queuesState.test()
+            .assertCurrentValue(QueuesState.Queues(listOf(updatedDefaultQueue.asLocalQueue().copy(isDefault = true), nonDefaultQueue.asLocalQueue())))
         queueRepository.relevantQueueIds.test()
             .assertValue(listOf(defaultQueue.id, nonDefaultQueue.id))
     }
-
 
 }

@@ -2,8 +2,8 @@ package com.glia.widgets.core.secureconversations.domain
 
 import android.assertCurrentValue
 import com.glia.androidsdk.Engagement
-import com.glia.androidsdk.queuing.Queue
 import com.glia.androidsdk.queuing.QueueState
+import com.glia.widgets.core.queue.Queue
 import com.glia.widgets.core.queue.QueueRepository
 import com.glia.widgets.core.queue.QueuesState
 import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
@@ -72,11 +72,11 @@ class SecureConversationTopBannerVisibilityUseCaseTest {
         scheduleIncomingQueues(
             newQueue(
                 status = QueueState.Status.OPEN,
-                media = arrayOf(Engagement.MediaType.MESSAGING)
+                media = listOf(Engagement.MediaType.MESSAGING)
             ),
             newQueue(
                 status = QueueState.Status.OPEN,
-                media = arrayOf(Engagement.MediaType.UNKNOWN)
+                media = listOf(Engagement.MediaType.UNKNOWN)
             )
         )
 
@@ -91,15 +91,15 @@ class SecureConversationTopBannerVisibilityUseCaseTest {
         scheduleIncomingQueues(
             newQueue(
                 status = QueueState.Status.UNSTAFFED,
-                media = arrayOf(Engagement.MediaType.TEXT)
+                media = listOf(Engagement.MediaType.TEXT)
             ),
             newQueue(
                 status = QueueState.Status.CLOSED,
-                media = arrayOf(Engagement.MediaType.TEXT)
+                media = listOf(Engagement.MediaType.TEXT)
             ),
             newQueue(
                 status = QueueState.Status.FULL,
-                media = arrayOf(Engagement.MediaType.TEXT)
+                media = listOf(Engagement.MediaType.TEXT)
             )
         )
 
@@ -114,7 +114,7 @@ class SecureConversationTopBannerVisibilityUseCaseTest {
         scheduleIncomingQueues(
             newQueue(
                 status = QueueState.Status.OPEN,
-                media = arrayOf(Engagement.MediaType.TEXT)
+                media = listOf(Engagement.MediaType.TEXT)
             )
         )
 
@@ -129,7 +129,7 @@ class SecureConversationTopBannerVisibilityUseCaseTest {
         scheduleIncomingQueues(
             newQueue(
                 status = QueueState.Status.OPEN,
-                media = arrayOf(Engagement.MediaType.AUDIO)
+                media = listOf(Engagement.MediaType.AUDIO)
             )
         )
 
@@ -144,7 +144,7 @@ class SecureConversationTopBannerVisibilityUseCaseTest {
         scheduleIncomingQueues(
             newQueue(
                 status = QueueState.Status.OPEN,
-                media = arrayOf(Engagement.MediaType.VIDEO)
+                media = listOf(Engagement.MediaType.VIDEO)
             )
         )
 
@@ -159,7 +159,7 @@ class SecureConversationTopBannerVisibilityUseCaseTest {
         whenever(queueRepository.queuesState) doReturn Flowable.just(QueuesState.Queues(queueList.toList()))
     }
 
-    private fun newQueue(status: QueueState.Status, media: Array<Engagement.MediaType>): Queue {
-        return Queue("id", "name", status, media, false)
+    private fun newQueue(status: QueueState.Status, media: List<Engagement.MediaType>): Queue {
+        return Queue("id", "name", false, System.currentTimeMillis(), media, status)
     }
 }

@@ -1,13 +1,13 @@
 package com.glia.widgets.core.secureconversations.domain
 
 import android.COMMON_EXTENSIONS_CLASS_PATH
-import com.glia.androidsdk.queuing.Queue
+import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.queuing.QueueState
+import com.glia.widgets.core.queue.Queue
 import com.glia.widgets.core.queue.QueueRepository
 import com.glia.widgets.core.queue.QueuesState
 import com.glia.widgets.engagement.EngagementRepository
 import com.glia.widgets.engagement.State
-import com.glia.widgets.helper.supportMessaging
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
@@ -116,8 +116,11 @@ class IsMessagingAvailableUseCaseTest {
 
     private fun createQueueWithStatus(status: QueueState.Status, supportsMessaging: Boolean): Queue {
         val queue = mockk<Queue>()
-        every { queue.state.status } returns status
-        every { any<Queue>().supportMessaging() } returns supportsMessaging
+        every { queue.status } returns status
+        every { queue.medias } returns if (supportsMessaging) listOf(Engagement.MediaType.MESSAGING) else listOf(
+            Engagement.MediaType.TEXT,
+            Engagement.MediaType.AUDIO
+        )
         return queue
     }
 }

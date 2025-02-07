@@ -1,7 +1,6 @@
 package com.glia.widgets.core.queue
 
 import com.glia.androidsdk.GliaException
-import com.glia.androidsdk.queuing.Queue
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
@@ -11,6 +10,7 @@ import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.processors.BehaviorProcessor
 import java.util.function.Consumer
+import com.glia.androidsdk.queuing.Queue as CoreSdkQueue
 
 internal sealed interface QueuesState {
     fun queuesOrEmpty(): List<Queue> = when (this) {
@@ -33,7 +33,7 @@ internal interface QueueRepository {
 
 internal class QueueRepositoryImpl(private val gliaCore: GliaCore, private val configurationManager: ConfigurationManager) : QueueRepository {
 
-    private val queueUpdateCallback: Consumer<Queue> = Consumer { updateQueues(it) }
+    private val queueUpdateCallback: Consumer<CoreSdkQueue> = Consumer { updateQueues(it) }
     private val siteQueues: BehaviorProcessor<List<Queue>> = BehaviorProcessor.create()
 
     private val _queuesState: BehaviorProcessor<QueuesState> = BehaviorProcessor.create()
@@ -58,14 +58,12 @@ internal class QueueRepositoryImpl(private val gliaCore: GliaCore, private val c
         if (gliaCore.isInitialized && siteQueues.value == null) {
             _queuesState.onNext(QueuesState.Loading)
 
-            gliaCore.getQueues { queues, exception ->
-                queues?.let { siteQueuesReceived(it) } ?: reportGetSiteQueuesError(exception)
-            }
+            gliaCore.getQueues(::siteQueuesReceived, ::reportGetSiteQueuesError)
         }
     }
 
-    private fun siteQueuesReceived(queues: List<Queue>) {
-        siteQueues.onNext(queues)
+    private fun siteQueuesReceived(queues: Array<CoreSdkQueue>) {
+        siteQueues.onNext(queues.map { it.asLocalQueue() })
         subscribeToQueues()
         subscribeToQueueUpdates()
     }
@@ -121,15 +119,22 @@ internal class QueueRepositoryImpl(private val gliaCore: GliaCore, private val c
         }
     }
 
-    private fun updateQueues(queue: Queue) {
+    private fun updateQueues(coreSdkQueue: CoreSdkQueue) {
         val currentQueues = _queuesState.value
             ?.let { it as? QueuesState.Queues }
             ?.queues
             ?.toMutableList() ?: return
 
-        val index = currentQueues.indexOfFirst { it.id == queue.id }.takeIf { it != -1 } ?: return
+        val index = currentQueues.indexOfFirst { it.id == coreSdkQueue.id }.takeIf { it != -1 } ?: return
 
-        currentQueues[index] = queue
+        val currentQueue = currentQueues[index]
+
+        if (currentQueue.lastUpdatedMillis > coreSdkQueue.lastUpdatedMillis) {
+            // Skip if the current queue is newer then the received one
+            return
+        }
+
+        currentQueues[index] = currentQueue merge coreSdkQueue.asLocalQueue()
 
         _queuesState.onNext(QueuesState.Queues(currentQueues.toList()))
     }

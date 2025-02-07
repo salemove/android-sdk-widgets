@@ -5,8 +5,8 @@ import android.app.Activity
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.Engagement.MediaType
 import com.glia.androidsdk.engagement.EngagementState
-import com.glia.androidsdk.queuing.Queue
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
+import com.glia.widgets.core.queue.Queue
 import com.glia.widgets.core.queue.QueueRepository
 import com.glia.widgets.core.queue.QueuesState
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository

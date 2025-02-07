@@ -24,9 +24,9 @@ import com.glia.androidsdk.comms.MediaDirection
 import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement
-import com.glia.androidsdk.queuing.Queue
 import com.glia.androidsdk.queuing.QueueState
 import com.glia.widgets.UiTheme
+import com.glia.widgets.core.queue.Queue
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
@@ -45,15 +45,11 @@ internal fun ColorStateList?.colorForState(state: IntArray): Int? = this?.getCol
 // Common
 internal fun String.separateStringWithSymbol(symbol: String): String = asSequence().joinToString(symbol)
 
-internal fun Queue.supportMessaging() = state.medias.contains(MediaType.MESSAGING)
-
-internal fun Queue.supportedMediaTypes(): List<MediaType>? = state.run {
-    when {
-        status == QueueState.Status.OPEN -> medias.filterNot { it == MediaType.PHONE || it == MediaType.UNKNOWN }.takeIf { it.isNotEmpty() }
-        status == QueueState.Status.FULL && medias.contains(MediaType.MESSAGING) -> listOf(MediaType.MESSAGING)
-        status == QueueState.Status.UNSTAFFED && medias.contains(MediaType.MESSAGING) -> listOf(MediaType.MESSAGING)
-        else -> null
-    }
+internal fun Queue.supportedMediaTypes(): List<MediaType>? = when {
+    status == QueueState.Status.OPEN -> medias.filterNot { it == MediaType.PHONE || it == MediaType.UNKNOWN }.takeIf { it.isNotEmpty() }
+    status == QueueState.Status.FULL && medias.contains(MediaType.MESSAGING) -> listOf(MediaType.MESSAGING)
+    status == QueueState.Status.UNSTAFFED && medias.contains(MediaType.MESSAGING) -> listOf(MediaType.MESSAGING)
+    else -> null
 }
 
 internal val List<Queue>.mediaTypes: List<MediaType>

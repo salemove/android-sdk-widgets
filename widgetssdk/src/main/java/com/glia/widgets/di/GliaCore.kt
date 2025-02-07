@@ -42,7 +42,7 @@ internal interface GliaCore {
     fun <T> off(event: OmnicoreEvent<T>)
     fun fetchFile(attachmentFile: AttachmentFile, callback: RequestCallback<InputStream?>)
     fun getChatHistory(callback: RequestCallback<List<ChatMessage>?>)
-    fun getQueues(requestCallback: RequestCallback<List<Queue>?>)
+    fun getQueues(onSuccess: (Array<Queue>) -> Unit, onError: (GliaException?) -> Unit)
 
     fun queueForEngagement(
         queueIds: List<String>,

@@ -12,7 +12,6 @@ import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.DeliveredItem
 import com.glia.widgets.chat.model.LocalAttachmentItem
 import com.glia.widgets.chat.model.OperatorChatItem
-import com.glia.widgets.chat.model.ServerChatItem
 import com.glia.widgets.chat.model.VisitorChatItem
 import com.glia.widgets.chat.model.VisitorMessageItem
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
@@ -20,6 +19,11 @@ import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.asSingleChoice
 
+/**
+ * Use case for appending a new chat message to the chat state.
+ * Handles different types of messages including visitor messages, operator messages, and system messages.
+ * Updates the state with the new message and manages the visibility of the operator's chat head.
+ */
 internal class AppendNewChatMessageUseCase(
     private val appendNewOperatorMessageUseCase: AppendNewOperatorMessageUseCase,
     private val appendNewVisitorMessageUseCase: AppendNewVisitorMessageUseCase,
@@ -37,6 +41,7 @@ internal class AppendNewChatMessageUseCase(
             is SystemMessage -> {
                 appendSystemMessageItemUseCase(state.chatItems, message)
                 state.resetOperator()
+                state.addedMessagesCount = 1
             }
 
             else -> Logger.d(TAG, "Unexpected type of message received -> $message")
@@ -44,6 +49,11 @@ internal class AppendNewChatMessageUseCase(
     }
 }
 
+/**
+ * Use case for appending a new operator message to the chat state.
+ * Handles different types of operator messages including GVA messages, custom card messages, and response card or text messages.
+ * Updates the state with the new message and manages the visibility of the operator's chat head.
+ */
 internal class AppendNewOperatorMessageUseCase(
     private val isGvaUseCase: IsGvaUseCase,
     private val customCardAdapterTypeUseCase: CustomCardAdapterTypeUseCase,
@@ -52,7 +62,7 @@ internal class AppendNewOperatorMessageUseCase(
     private val appendNewResponseCardOrTextItemUseCase: AppendNewResponseCardOrTextItemUseCase
 ) {
     operator fun invoke(state: ChatManager.State, chatMessageInternal: ChatMessageInternal) {
-        val itemsCount = state.chatItems.count()
+        val initialItemCount = state.chatItems.count()
         val message: OperatorMessage = chatMessageInternal.chatMessage as OperatorMessage
         when {
             isGvaUseCase(message) -> appendGvaMessageItemUseCase(
@@ -69,7 +79,7 @@ internal class AppendNewOperatorMessageUseCase(
             else -> appendNewResponseCardOrTextItemUseCase(state.chatItems, chatMessageInternal)
         }
 
-        state.apply { addedMessagesCount = chatItems.count { it is ServerChatItem || it is VisitorChatItem } - itemsCount }
+        state.apply { addedMessagesCount = chatItems.count() - initialItemCount }
 
         val lastMessageWithVisibleOperatorImage = state.lastMessageWithVisibleOperatorImage
         val lastItem = state.chatItems.lastOrNull()
@@ -89,6 +99,11 @@ internal class AppendNewOperatorMessageUseCase(
     }
 }
 
+/**
+ * Use case for appending a new response card or plain text item to the chat state.
+ * Handles the addition of response cards, plain text messages, and attachments.
+ * Updates the state with the new message.
+ */
 internal class AppendNewResponseCardOrTextItemUseCase(
     private val mapOperatorAttachmentUseCase: MapOperatorAttachmentUseCase,
     private val mapOperatorPlainTextUseCase: MapOperatorPlainTextUseCase,
@@ -126,6 +141,11 @@ internal class AppendNewResponseCardOrTextItemUseCase(
     }
 }
 
+/**
+ * Use case for appending a new visitor message to the chat state.
+ * Handles the addition of visitor messages and attachments.
+ * Updates the state with the new message.
+ */
 internal class AppendNewVisitorMessageUseCase(private val mapVisitorAttachmentUseCase: MapVisitorAttachmentUseCase) {
     private var lastDeliveredItem: DeliveredItem? = null
 

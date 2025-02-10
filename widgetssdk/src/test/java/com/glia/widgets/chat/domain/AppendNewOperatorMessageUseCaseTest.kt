@@ -3,10 +3,8 @@ package com.glia.widgets.chat.domain
 import com.glia.androidsdk.chat.OperatorMessage
 import com.glia.widgets.chat.ChatManager
 import com.glia.widgets.chat.domain.gva.IsGvaUseCase
-import com.glia.widgets.chat.model.MediaUpgradeStartedTimerItem
 import com.glia.widgets.chat.model.OperatorChatItem
 import com.glia.widgets.chat.model.OperatorMessageItem
-import com.glia.widgets.chat.model.ServerChatItem
 import com.glia.widgets.chat.model.VisitorMessageItem
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 import org.junit.Assert.assertEquals
@@ -90,13 +88,11 @@ class AppendNewOperatorMessageUseCaseTest {
         whenever(customCardAdapterTypeUseCase(any())) doReturn null
         whenever(isGvaUseCase(any())) doReturn false
         doAnswer {
-            state.chatItems.add(mock<ServerChatItem>())
-            state.chatItems.add(mock<VisitorMessageItem>())
-            state.chatItems.add(mock<MediaUpgradeStartedTimerItem.Audio>())
+            state.chatItems.add(mock<OperatorMessageItem.PlainText>())
         }.whenever(appendNewResponseCardOrTextItemUseCase).invoke(any(), any())
 
         useCase(state, chatMessageInternal)
-        assertEquals(state.addedMessagesCount, 2)
+        assertEquals(1, state.addedMessagesCount)
     }
 
     @Test

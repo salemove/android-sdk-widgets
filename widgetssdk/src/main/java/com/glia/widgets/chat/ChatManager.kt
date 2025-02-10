@@ -30,7 +30,6 @@ import com.glia.widgets.chat.model.VisitorAttachmentItem
 import com.glia.widgets.chat.model.VisitorChatItem
 import com.glia.widgets.core.engagement.domain.model.ChatHistoryResponse
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
-import com.glia.widgets.core.secureconversations.domain.HasOngoingSecureConversationUseCase
 import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDelayUseCase
 import com.glia.widgets.core.secureconversations.domain.ShouldMarkMessagesReadUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
@@ -56,7 +55,6 @@ internal class ChatManager(
     private val sendUnsentMessagesUseCase: SendUnsentMessagesUseCase,
     private val handleCustomCardClickUseCase: HandleCustomCardClickUseCase,
     private val isAuthenticatedUseCase: IsAuthenticatedUseCase,
-    private val hasOngoingSecureConversationUseCase: HasOngoingSecureConversationUseCase,
     private val isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase,
     private val compositeDisposable: CompositeDisposable = CompositeDisposable(),
     private val markMessagesReadDisposable: CompositeDisposable = CompositeDisposable(),

@@ -57,6 +57,7 @@ internal class TimeCounter {
         timerTask = object : TimerTask() {
             var value = timerDelayMs
 
+            @Synchronized
             override fun run() {
                 Logger.d(TAG, "Timer value: $value")
                 for (listener in rawListeners) {
@@ -73,6 +74,7 @@ internal class TimeCounter {
                 value += timerIntervalMs
             }
 
+            @Synchronized
             override fun cancel(): Boolean {
                 for (listener in rawListeners) {
                     listener.onRawTimerCancelled()

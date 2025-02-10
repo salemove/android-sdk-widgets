@@ -32,7 +32,6 @@ import com.glia.widgets.chat.model.VisitorChatItem
 import com.glia.widgets.chat.model.VisitorMessageItem
 import com.glia.widgets.core.engagement.domain.model.ChatHistoryResponse
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
-import com.glia.widgets.core.secureconversations.domain.HasOngoingSecureConversationUseCase
 import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDelayUseCase
 import com.glia.widgets.core.secureconversations.domain.ShouldMarkMessagesReadUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
@@ -79,7 +78,6 @@ class ChatManagerTest {
     private lateinit var sendUnsentMessagesUseCase: SendUnsentMessagesUseCase
     private lateinit var handleCustomCardClickUseCase: HandleCustomCardClickUseCase
     private lateinit var isAuthenticatedUseCase: IsAuthenticatedUseCase
-    private lateinit var hasOngoingSecureConversationUseCase: HasOngoingSecureConversationUseCase
     private lateinit var isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase
     private lateinit var subjectUnderTest: ChatManager
     private lateinit var state: ChatManager.State
@@ -104,7 +102,6 @@ class ChatManagerTest {
         sendUnsentMessagesUseCase = mock()
         handleCustomCardClickUseCase = mock()
         isAuthenticatedUseCase = mock()
-        hasOngoingSecureConversationUseCase = mock()
         isQueueingOrLiveEngagementUseCase = mock()
         compositeDisposable = spy()
         markMessagesReadDisposable = spy()
@@ -124,7 +121,6 @@ class ChatManagerTest {
             sendUnsentMessagesUseCase,
             handleCustomCardClickUseCase,
             isAuthenticatedUseCase,
-            hasOngoingSecureConversationUseCase,
             isQueueingOrLiveEngagementUseCase,
             compositeDisposable,
             markMessagesReadDisposable,

@@ -38,13 +38,13 @@ internal class MarkMessagesReadWithDelayUseCase(
         .doOnComplete { Logger.d(TAG, "Messages successfully marked as read") }
 
     private fun chatScreenOpen(delay: Long) = chatScreenRepository.isChatScreenOpenObservable
-        .flatMap { isChatScreenOpen ->
-            return@flatMap delayIf(isChatScreenOpen, delay) { isChatScreenOpen && delay > 0 }
+        .switchMap { isChatScreenOpen ->
+            return@switchMap delayIf(isChatScreenOpen, delay) { isChatScreenOpen && delay > 0 }
         }
 
     private fun leaveDialogVisible(delay: Long) = secureConversationsRepository.isLeaveSecureConversationDialogVisibleObservable
-        .flatMap { isLeaveDialogVisible ->
-            return@flatMap delayIf(isLeaveDialogVisible, delay) { !isLeaveDialogVisible && delay > 0 }
+        .switchMap { isLeaveDialogVisible ->
+            return@switchMap delayIf(isLeaveDialogVisible, delay) { !isLeaveDialogVisible && delay > 0 }
         }
 
     private fun<T: Any> delayIf(value: T, delay: Long, condition: () -> Boolean): Flowable<T> {

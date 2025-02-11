@@ -252,33 +252,9 @@ internal class MessageCenterControllerTest {
     }
 
     @Test
-    fun ensureMessageCenterAvailability_showsUnexpectedErrorDialog_onException() {
-        messageCenterController.setView(viewContract)
-        whenever(isMessagingAvailableUseCase.invoke()) doReturn Flowable.just(
-            Result.failure(
-                GliaException(
-                    "Error",
-                    GliaException.Cause.INTERNAL_ERROR
-                )
-            )
-        )
-        messageCenterController.ensureMessageCenterAvailability()
-
-        val messageCenterStateArgumentCaptor = argumentCaptor<MessageCenterState>()
-        verify(viewContract, times(1)).onStateUpdated(messageCenterStateArgumentCaptor.capture())
-
-        messageCenterStateArgumentCaptor.firstValue.apply {
-            assert(!showSendMessageGroup)
-        }
-
-        verify(dialogController, never()).showMessageCenterUnavailableDialog()
-        verify(dialogController, times(1)).showUnexpectedErrorDialog()
-    }
-
-    @Test
     fun ensureMessageCenterAvailability_showsMessageCenterUnavailableDialog_whenMessagingIsUnavailable() {
         messageCenterController.setView(viewContract)
-        whenever(isMessagingAvailableUseCase.invoke()) doReturn Flowable.just(Result.success(false))
+        whenever(isMessagingAvailableUseCase.invoke()) doReturn Flowable.just(false)
         messageCenterController.ensureMessageCenterAvailability()
 
         val messageCenterStateArgumentCaptor = argumentCaptor<MessageCenterState>()
@@ -295,7 +271,7 @@ internal class MessageCenterControllerTest {
     @Test
     fun ensureMessageCenterAvailability_showSendMessageGroup_whenMessageCenterAvailable() {
         messageCenterController.setView(viewContract)
-        whenever(isMessagingAvailableUseCase.invoke()) doReturn Flowable.just(Result.success(true))
+        whenever(isMessagingAvailableUseCase.invoke()) doReturn Flowable.just(true)
 
         messageCenterController.ensureMessageCenterAvailability()
 

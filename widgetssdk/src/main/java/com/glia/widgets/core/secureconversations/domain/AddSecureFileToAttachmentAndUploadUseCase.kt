@@ -3,7 +3,7 @@ package com.glia.widgets.core.secureconversations.domain
 import com.glia.widgets.core.fileupload.FileAttachmentRepository
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase.Listener
-import com.glia.widgets.core.fileupload.domain.SupportedFileCountCheckUseCase
+import com.glia.widgets.core.fileupload.domain.FileUploadLimitNotExceededObservableUseCase
 import com.glia.widgets.core.fileupload.exception.RemoveBeforeReUploadingException
 import com.glia.widgets.core.fileupload.exception.SupportedFileCountExceededException
 import com.glia.widgets.core.fileupload.exception.SupportedFileSizeExceededException
@@ -21,7 +21,7 @@ internal class AddSecureFileToAttachmentAndUploadUseCase(private val fileAttachm
 
     private fun onFileNotAttached(
         file: LocalAttachment,
-        listener: AddFileToAttachmentAndUploadUseCase.Listener
+        listener: Listener
     ) {
         fileAttachmentRepository.attachFile(file)
         if (isSupportedFileCountExceeded()) {
@@ -40,6 +40,6 @@ internal class AddSecureFileToAttachmentAndUploadUseCase(private val fileAttachm
         return file.size >= AddFileToAttachmentAndUploadUseCase.SUPPORTED_FILE_SIZE
     }
     private fun isSupportedFileCountExceeded(): Boolean {
-        return fileAttachmentRepository.getAttachedFilesCount() > SupportedFileCountCheckUseCase.SUPPORTED_FILE_COUNT
+        return fileAttachmentRepository.getAttachedFilesCount() > FileUploadLimitNotExceededObservableUseCase.FILE_UPLOAD_LIMIT
     }
 }

@@ -47,9 +47,9 @@ import com.glia.widgets.core.engagement.domain.ConfirmationDialogUseCase
 import com.glia.widgets.core.engagement.domain.UpdateOperatorDefaultImageUrlUseCase
 import com.glia.widgets.core.fileupload.domain.AddFileAttachmentsObserverUseCase
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase
+import com.glia.widgets.core.fileupload.domain.FileUploadLimitNotExceededObservableUseCase
 import com.glia.widgets.core.fileupload.domain.GetFileAttachmentsUseCase
 import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentUseCase
-import com.glia.widgets.core.fileupload.domain.SupportedFileCountCheckUseCase
 import com.glia.widgets.core.fileupload.model.LocalAttachment
 import com.glia.widgets.core.notification.domain.CallNotificationUseCase
 import com.glia.widgets.core.permissions.domain.RequestNotificationPermissionIfPushNotificationsSetUpUseCase
@@ -91,6 +91,7 @@ import com.glia.widgets.view.MessagesNotSeenHandler
 import com.glia.widgets.view.MinimizeHandler
 import com.glia.widgets.webbrowser.domain.GetUrlFromLinkUseCase
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -109,7 +110,7 @@ internal class ChatController(
     private val addFileAttachmentsObserverUseCase: AddFileAttachmentsObserverUseCase,
     private val getFileAttachmentsUseCase: GetFileAttachmentsUseCase,
     private val removeFileAttachmentUseCase: RemoveFileAttachmentUseCase,
-    private val supportedFileCountCheckUseCase: SupportedFileCountCheckUseCase,
+    private val fileUploadLimitNotExceededObservableUseCase: FileUploadLimitNotExceededObservableUseCase,
     private val isShowSendButtonUseCase: IsShowSendButtonUseCase,
     private val isShowOverlayPermissionRequestDialogUseCase: IsShowOverlayPermissionRequestDialogUseCase,
     private val downloadFileUseCase: DownloadFileUseCase,
@@ -192,10 +193,13 @@ internal class ChatController(
             emitViewState {
                 emitUploadAttachments(attachments)
                 chatState.setShowSendButton(isShowSendButtonUseCase(chatState.lastTypedText))
-                    .setIsAttachmentButtonEnabled(supportedFileCountCheckUseCase())
             }
         }
     }
+
+    private val attachmentButtonState: Observable<Pair<Boolean, Boolean>>
+        get() = Observable.combineLatest(fileUploadLimitNotExceededObservableUseCase(), isMessagingAvailableUseCase().toObservable(), ::Pair)
+            .observeOn(AndroidSchedulers.mainThread())
 
     @Volatile
     private var chatState: ChatState
@@ -258,8 +262,9 @@ internal class ChatController(
     }
 
     private fun initSecureMessaging() {
-        initChatManager()
         emitViewState { chatState.initChat().setSecureMessagingState() }
+        initChatManager()
+        initFileAttachmentState()
         ensureSecureMessagingAvailable()
         observeTopBannerUseCase()
     }
@@ -273,8 +278,9 @@ internal class ChatController(
     }
 
     private fun initLiveChat() {
-        initChatManager()
         emitViewState { chatState.initChat().setLiveChatState() }
+        initChatManager()
+        initFileAttachmentState()
     }
 
     override fun restoreChat() {
@@ -288,36 +294,36 @@ internal class ChatController(
     }
 
     private fun ensureSecureMessagingAvailable() {
-        disposable.add(isMessagingAvailableUseCase().subscribe(::handleMessagingAvailableResult))
+        disposable.add(isMessagingAvailableUseCase().observeOn(AndroidSchedulers.mainThread()).subscribe(::handleMessagingAvailableResult))
     }
 
-    private fun handleMessagingAvailableResult(result: Result<Boolean>) {
-        result.onFailure { error ->
-            Logger.e(TAG, "Checking for Messaging availability failed", error)
-            dialogController.showUnexpectedErrorDialog()
+    private fun handleMessagingAvailableResult(isAvailable: Boolean) {
+        if (!isAvailable && manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging && !isQueueingOrOngoingEngagement) {
+            Logger.d(TAG, "Messaging is unavailable")
+            emitViewState { chatState.setSecureMessagingUnavailable() }
+        } else {
+            Logger.d(TAG, "Messaging is available")
+            emitViewState { chatState.setSecureMessagingAvailable() }
         }
+    }
 
-        result.onSuccess { isMessagingAvailable ->
-            if (!isMessagingAvailable && manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging && !isQueueingOrOngoingEngagement) {
-                Logger.d(TAG, "Messaging is unavailable")
-                emitViewState { chatState.setSecureMessagingUnavailable() }
-            } else {
-                Logger.d(TAG, "Messaging is available")
-                emitViewState { chatState.setSecureMessagingAvailable() }
+    private fun trackAttachmentButtonState() {
+        attachmentButtonState.subscribe { (limitNotExceeded, isMessagingAvailable) ->
+            val isEnabled = when {
+                manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging -> isMessagingAvailable && limitNotExceeded
+                else -> limitNotExceeded
             }
-        }
+            emitViewState { chatState.setIsAttachmentButtonEnabled(isEnabled) }
+        }.also(disposable::add)
     }
 
     private fun prepareChatComponents() {
-        disposable.add(
-            addFileAttachmentsObserverUseCase().subscribe(fileAttachmentCallback)
-        )
+        disposable.add(addFileAttachmentsObserverUseCase().subscribe(fileAttachmentCallback))
         minimizeHandler.addListener { minimizeView() }
         timerStatusListener?.also { callTimer.removeFormattedValueListener(it) }
         val newTimerListener = createNewTimerCallback()
         callTimer.addFormattedValueListener(newTimerListener)
         timerStatusListener = newTimerListener
-        updateAllowFileSendState()
     }
 
     override fun onEngagementConfirmationDialogRequested() {
@@ -583,7 +589,7 @@ internal class ChatController(
                 }
             }
 
-            is State.EngagementStarted -> if(!state.isCallVisualizer) newEngagementLoaded()
+            is State.EngagementStarted -> if (!state.isCallVisualizer) newEngagementLoaded()
             is State.Update -> handleEngagementStateUpdate(state.updateState)
             is State.PreQueuing, is State.Queuing -> queueForEngagementStarted()
             is State.QueueUnstaffed, is State.UnexpectedErrorHappened, is State.QueueingCanceled -> emitViewState { chatState.chatUnavailableState() }
@@ -782,6 +788,11 @@ internal class ChatController(
         chatManager.initialize(::onHistoryLoaded, ::addQuickReplyButtons, ::updateUnSeenMessagesCount)
             .subscribe(::emitItems, ::error)
             .also(disposable::add)
+    }
+
+    private fun initFileAttachmentState() {
+        updateAllowFileSendState()
+        trackAttachmentButtonState()
     }
 
     private fun updateUnSeenMessagesCount(count: Int) {

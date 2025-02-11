@@ -33,7 +33,8 @@ internal class ChatViewSnapshotTest : SnapshotTest(), SnapshotChatView, Snapshot
             .changeVisibility(true)
             .engagementStarted()
             .operatorConnected("Snap Test", null)
-            .setShowSendButton(true),
+            .setShowSendButton(true)
+            .setIsAttachmentButtonEnabled(true),
         fileAttachments = listOf(
             fileAttachment(
                 displayName = "test.doc",
@@ -172,6 +173,7 @@ internal class ChatViewSnapshotTest : SnapshotTest(), SnapshotChatView, Snapshot
             .initChat()
             .setSecureMessagingState()
             .setSecureConversationsTopBannerVisibility(showTopBanner)
+            .setIsAttachmentButtonEnabled(!isUnavailable)
             .let { if (isUnavailable) it.setSecureMessagingUnavailable() else it },
         message = mediumLengthTexts()[2],
         unifiedTheme = unifiedTheme

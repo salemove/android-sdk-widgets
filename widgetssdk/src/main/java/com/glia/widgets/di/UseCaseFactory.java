@@ -84,9 +84,9 @@ import com.glia.widgets.core.engagement.domain.ShouldShowMediaEngagementViewUseC
 import com.glia.widgets.core.engagement.domain.UpdateOperatorDefaultImageUrlUseCase;
 import com.glia.widgets.core.fileupload.domain.AddFileAttachmentsObserverUseCase;
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase;
+import com.glia.widgets.core.fileupload.domain.FileUploadLimitNotExceededObservableUseCase;
 import com.glia.widgets.core.fileupload.domain.GetFileAttachmentsUseCase;
 import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentUseCase;
-import com.glia.widgets.core.fileupload.domain.SupportedFileCountCheckUseCase;
 import com.glia.widgets.core.notification.device.INotificationManager;
 import com.glia.widgets.core.notification.domain.CallNotificationUseCase;
 import com.glia.widgets.core.notification.domain.RemoveScreenSharingNotificationUseCase;
@@ -416,8 +416,8 @@ public class UseCaseFactory {
     }
 
     @NonNull
-    public SupportedFileCountCheckUseCase createSupportedFileCountCheckUseCase() {
-        return new SupportedFileCountCheckUseCase(repositoryFactory.getGliaFileAttachmentRepository());
+    public FileUploadLimitNotExceededObservableUseCase createSupportedFileCountCheckUseCase() {
+        return new FileUploadLimitNotExceededObservableUseCase(repositoryFactory.getGliaFileAttachmentRepository());
     }
 
     @NonNull

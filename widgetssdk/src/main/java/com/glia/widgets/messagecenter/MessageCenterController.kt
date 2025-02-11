@@ -28,6 +28,7 @@ import com.glia.widgets.core.secureconversations.domain.ShowMessageLimitErrorUse
 import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 internal class MessageCenterController(
@@ -188,21 +189,18 @@ internal class MessageCenterController(
     }
 
     override fun ensureMessageCenterAvailability() {
-        disposables.add(isMessagingAvailableUseCase().subscribe(::handleMessagingAvailableResult))
+        disposables.add(isMessagingAvailableUseCase().observeOn(AndroidSchedulers.mainThread()).subscribe(::handleMessagingAvailableResult))
     }
 
-    private fun handleMessagingAvailableResult(result: Result<Boolean>) {
-        result.onFailure {
-            dialogController.showUnexpectedErrorDialog()
-            setState(state.copy(showSendMessageGroup = false))
+    private fun handleMessagingAvailableResult(isAvailable: Boolean) {
+        if (isAvailable) {
+            dialogController.dismissMessageCenterUnavailableDialog()
+        } else {
+            dialogController.showMessageCenterUnavailableDialog()
         }
 
-        result.onSuccess {
-            setState(state.copy(showSendMessageGroup = it))
-            if (!it) {
-                dialogController.showMessageCenterUnavailableDialog()
-            }
-        }
+        setState(state.copy(showSendMessageGroup = isAvailable))
+
     }
 
     fun onAttachmentReceived(file: LocalAttachment) {

@@ -63,7 +63,7 @@ class AddFileToAttachmentAndUploadUseCaseTest {
         every { localAttachment.size } returns AddFileToAttachmentAndUploadUseCase.SUPPORTED_FILE_SIZE - 1
         val listener = mockk<AddFileToAttachmentAndUploadUseCase.Listener>(relaxed = true)
         every { fileAttachmentRepository.isFileAttached(localAttachment.uri) } returns false
-        every { fileAttachmentRepository.getAttachedFilesCount() } returns SupportedFileCountCheckUseCase.SUPPORTED_FILE_COUNT + 1
+        every { fileAttachmentRepository.getAttachedFilesCount() } returns FileUploadLimitNotExceededObservableUseCase.FILE_UPLOAD_LIMIT + 1
         every { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement } returns true
         every { manageSecureMessagingStatusUseCase.shouldUseSecureMessagingEndpoints } returns false
 

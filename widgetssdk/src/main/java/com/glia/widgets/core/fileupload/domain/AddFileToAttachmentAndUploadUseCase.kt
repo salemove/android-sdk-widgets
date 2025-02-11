@@ -16,7 +16,7 @@ internal class AddFileToAttachmentAndUploadUseCase(
     private val manageSecureMessagingStatusUseCase: ManageSecureMessagingStatusUseCase
 ) {
     private val isSupportedFileCountExceeded: Boolean
-        get() = fileAttachmentRepository.getAttachedFilesCount() > SupportedFileCountCheckUseCase.SUPPORTED_FILE_COUNT
+        get() = fileAttachmentRepository.getAttachedFilesCount() > FileUploadLimitNotExceededObservableUseCase.FILE_UPLOAD_LIMIT
 
     operator fun invoke(file: LocalAttachment, listener: Listener) {
         if (fileAttachmentRepository.isFileAttached(file.uri)) {

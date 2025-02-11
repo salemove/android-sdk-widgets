@@ -40,7 +40,6 @@ internal data class ChatState(
         isSendButtonVisible = false,
         isSendButtonEnabled = true,
         isAttachmentAllowed = true,
-        isAttachmentButtonEnabled = true,
         isInitialized = true
     )
 
@@ -116,7 +115,6 @@ internal data class ChatState(
     fun setSecureMessagingUnavailable(): ChatState = copy(
         isSecureConversationsUnavailableLabelVisible = true,
         isAttachmentButtonNeeded = true,
-        isAttachmentButtonEnabled = false,
         isSendButtonVisible = true,
         isSendButtonEnabled = false,
         chatInputMode = ChatInputMode.DISABLED
@@ -125,7 +123,6 @@ internal data class ChatState(
     fun setSecureMessagingAvailable(): ChatState = copy(
         isSecureConversationsUnavailableLabelVisible = false,
         isAttachmentButtonNeeded = true,
-        isAttachmentButtonEnabled = true,
         isSendButtonVisible = true,
         isSendButtonEnabled = true,
         chatInputMode = ChatInputMode.ENABLED

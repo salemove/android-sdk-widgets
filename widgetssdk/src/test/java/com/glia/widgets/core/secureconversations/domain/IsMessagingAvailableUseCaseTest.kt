@@ -44,10 +44,10 @@ class IsMessagingAvailableUseCaseTest {
         every { queueRepository.queuesState } returns Flowable.just(queuesState)
         every { engagementRepository.engagementState } returns Flowable.just(State.TransferredToSecureConversation)
 
-        val testSubscriber = TestSubscriber<Result<Boolean>>()
+        val testSubscriber = TestSubscriber<Boolean>()
         isMessagingAvailableUseCase().subscribe(testSubscriber)
 
-        testSubscriber.assertValue(Result.success(true))
+        testSubscriber.assertValue(true)
     }
 
     @Test
@@ -57,10 +57,10 @@ class IsMessagingAvailableUseCaseTest {
         every { queueRepository.queuesState } returns Flowable.just(queuesState)
         every { engagementRepository.engagementState } returns Flowable.just(State.NoEngagement)
 
-        val testSubscriber = TestSubscriber<Result<Boolean>>()
+        val testSubscriber = TestSubscriber<Boolean>()
         isMessagingAvailableUseCase().subscribe(testSubscriber)
 
-        testSubscriber.assertValue(Result.success(true))
+        testSubscriber.assertValue(true)
     }
 
     @Test
@@ -70,10 +70,10 @@ class IsMessagingAvailableUseCaseTest {
         every { queueRepository.queuesState } returns Flowable.just(queuesState)
         every { engagementRepository.engagementState } returns Flowable.just(State.NoEngagement)
 
-        val testSubscriber = TestSubscriber<Result<Boolean>>()
+        val testSubscriber = TestSubscriber<Boolean>()
         isMessagingAvailableUseCase().subscribe(testSubscriber)
 
-        testSubscriber.assertValue(Result.success(false))
+        testSubscriber.assertValue(false)
     }
 
     @Test
@@ -83,10 +83,10 @@ class IsMessagingAvailableUseCaseTest {
         every { queueRepository.queuesState } returns Flowable.just(queuesState)
         every { engagementRepository.engagementState } returns Flowable.just(State.NoEngagement)
 
-        val testSubscriber = TestSubscriber<Result<Boolean>>()
+        val testSubscriber = TestSubscriber<Boolean>()
         isMessagingAvailableUseCase().subscribe(testSubscriber)
 
-        testSubscriber.assertValue(Result.success(false))
+        testSubscriber.assertValue(false)
     }
 
     @Test
@@ -96,22 +96,22 @@ class IsMessagingAvailableUseCaseTest {
         every { queueRepository.queuesState } returns Flowable.just(queuesState)
         every { engagementRepository.engagementState } returns Flowable.just(State.NoEngagement)
 
-        val testSubscriber = TestSubscriber<Result<Boolean>>()
+        val testSubscriber = TestSubscriber<Boolean>()
         isMessagingAvailableUseCase().subscribe(testSubscriber)
 
-        testSubscriber.assertValue(Result.success(false))
+        testSubscriber.assertValue(false)
     }
 
     @Test
-    fun `invoke returns error when queue state is error`() {
+    fun `invoke returns false when queue state is error`() {
         val errorState = QueuesState.Error(Throwable("Error"))
         every { queueRepository.queuesState } returns Flowable.just(errorState)
         every { engagementRepository.engagementState } returns Flowable.just(State.NoEngagement)
 
-        val testSubscriber = TestSubscriber<Result<Boolean>>()
+        val testSubscriber = TestSubscriber<Boolean>()
         isMessagingAvailableUseCase().subscribe(testSubscriber)
 
-        testSubscriber.assertValue { it.isFailure }
+        testSubscriber.assertValue { !it }
     }
 
     private fun createQueueWithStatus(status: QueueState.Status, supportsMessaging: Boolean): Queue {

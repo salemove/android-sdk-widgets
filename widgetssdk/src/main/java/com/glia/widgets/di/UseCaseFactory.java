@@ -453,8 +453,7 @@ public class UseCaseFactory {
     public GetImageFileFromNetworkUseCase createGetImageFileFromNetworkUseCase() {
         return new GetImageFileFromNetworkUseCase(
             repositoryFactory.getGliaFileRepository(),
-            createDecodeSampledBitmapFromInputStreamUseCase(),
-            createManageSecureMessagingStatusUseCase()
+            createDecodeSampledBitmapFromInputStreamUseCase()
         );
     }
 
@@ -465,7 +464,7 @@ public class UseCaseFactory {
 
     @NonNull
     public DownloadFileUseCase createDownloadFileUseCase() {
-        return new DownloadFileUseCase(repositoryFactory.getGliaFileRepository(), createManageSecureMessagingStatusUseCase());
+        return new DownloadFileUseCase(repositoryFactory.getGliaFileRepository());
     }
 
     @NonNull

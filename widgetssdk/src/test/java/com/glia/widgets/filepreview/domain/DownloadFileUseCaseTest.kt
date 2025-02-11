@@ -1,7 +1,6 @@
 package com.glia.widgets.filepreview.domain
 
 import com.glia.androidsdk.chat.AttachmentFile
-import com.glia.widgets.core.secureconversations.domain.ManageSecureMessagingStatusUseCase
 import com.glia.widgets.filepreview.data.GliaFileRepository
 import com.glia.widgets.filepreview.domain.exception.FileNameMissingException
 import com.glia.widgets.filepreview.domain.exception.RemoteFileIsDeletedException
@@ -21,14 +20,12 @@ class DownloadFileUseCaseTest {
     private lateinit var fileRepository: GliaFileRepository
     private lateinit var attachmentFile: AttachmentFile
     private lateinit var useCase: DownloadFileUseCase
-    private lateinit var manageSecureMessagingStatusUseCase: ManageSecureMessagingStatusUseCase
 
     @Before
     fun setUp() {
         fileRepository = mock()
         attachmentFile = mock()
-        manageSecureMessagingStatusUseCase = mock()
-        useCase = DownloadFileUseCase(fileRepository, manageSecureMessagingStatusUseCase)
+        useCase = DownloadFileUseCase(fileRepository)
     }
 
     @Test
@@ -46,7 +43,7 @@ class DownloadFileUseCaseTest {
 
     @Test
     fun execute_successfullyCompletes_whenValidArgument() {
-        whenever(fileRepository.downloadFileFromNetwork(any(), any())) doReturn Completable.complete()
+        whenever(fileRepository.downloadFileFromNetwork(any())) doReturn Completable.complete()
         whenever(attachmentFile.name) doReturn NAME
         whenever(attachmentFile.isDeleted) doReturn false
         useCase(attachmentFile).test().assertComplete()

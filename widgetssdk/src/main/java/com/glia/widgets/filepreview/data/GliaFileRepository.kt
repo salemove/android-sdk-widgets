@@ -12,6 +12,6 @@ internal interface GliaFileRepository {
     fun putImageToCache(fileName: String, bitmap: Bitmap)
     fun loadImageFromDownloads(fileName: String): Maybe<Bitmap>
     fun putImageToDownloads(fileName: String, bitmap: Bitmap): Completable
-    fun loadImageFileFromNetwork(shouldUseSecureMessagingEndpoints: Boolean, attachmentFile: AttachmentFile): Maybe<InputStream>
-    fun downloadFileFromNetwork(shouldUseSecureMessagingEndpoints: Boolean, attachmentFile: AttachmentFile): Completable
+    fun loadImageFileFromNetwork(attachmentFile: AttachmentFile): Maybe<InputStream>
+    fun downloadFileFromNetwork(attachmentFile: AttachmentFile): Completable
 }

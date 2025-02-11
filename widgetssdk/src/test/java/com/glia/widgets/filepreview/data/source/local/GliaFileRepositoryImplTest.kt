@@ -132,14 +132,13 @@ class GliaFileRepositoryTest {
 
     @Test
     fun `loadImageFileFromNetwork fetches file from network`() {
-        val requestCallbackSlot = slot<RequestCallback<InputStream>>()
+        val requestCallbackSlot = slot<RequestCallback<InputStream?>>()
         val attachmentFile = mockk<AttachmentFile>()
-        every { attachmentFile.id } returns "id"
         val inputStream = mockk<InputStream>()
 
-        val testObserver = repository.loadImageFileFromNetwork(true, attachmentFile).test()
+        val testObserver = repository.loadImageFileFromNetwork(attachmentFile).test()
 
-        verify { secureConversations.fetchFile("id", capture(requestCallbackSlot)) }
+        verify { gliaCore.fetchFile(attachmentFile, capture(requestCallbackSlot)) }
         requestCallbackSlot.captured.onResult(inputStream, null)
 
         testObserver.awaitCount(1).assertValue(inputStream).assertComplete()
@@ -147,12 +146,11 @@ class GliaFileRepositoryTest {
 
     @Test
     fun `loadImageFileFromNetwork returns error when failure`() {
-        val requestCallbackSlot = slot<RequestCallback<InputStream>>()
+        val requestCallbackSlot = slot<RequestCallback<InputStream?>>()
         val attachmentFile = mockk<AttachmentFile>()
-        every { attachmentFile.id } returns "id"
-        val testObserver = repository.loadImageFileFromNetwork(true, attachmentFile).test()
+        val testObserver = repository.loadImageFileFromNetwork(attachmentFile).test()
 
-        verify { secureConversations.fetchFile("id", capture(requestCallbackSlot)) }
+        verify { gliaCore.fetchFile(attachmentFile, capture(requestCallbackSlot)) }
         val exception = GliaException("error", GliaException.Cause.AUTHENTICATION_ERROR)
         requestCallbackSlot.captured.onResult(null, exception)
 
@@ -161,12 +159,11 @@ class GliaFileRepositoryTest {
 
     @Test
     fun `loadImageFileFromNetwork returns error when response and exception are null`() {
-        val requestCallbackSlot = slot<RequestCallback<InputStream>>()
+        val requestCallbackSlot = slot<RequestCallback<InputStream?>>()
         val attachmentFile = mockk<AttachmentFile>()
-        every { attachmentFile.id } returns "id"
-        val testObserver = repository.loadImageFileFromNetwork(true, attachmentFile).test()
+        val testObserver = repository.loadImageFileFromNetwork(attachmentFile).test()
 
-        verify { secureConversations.fetchFile("id", capture(requestCallbackSlot)) }
+        verify { gliaCore.fetchFile(attachmentFile, capture(requestCallbackSlot)) }
         requestCallbackSlot.captured.onResult(null, null)
 
         testObserver.awaitCount(1).assertError { it is RuntimeException }
@@ -184,7 +181,7 @@ class GliaFileRepositoryTest {
         val inputStream = mockk<InputStream>()
         every { downloadsFolderDataSource.downloadFileToDownloads(any(), any(), any()) } returns Completable.complete()
 
-        val testObserver = repository.downloadFileFromNetwork(false, attachmentFile).test()
+        val testObserver = repository.downloadFileFromNetwork(attachmentFile).test()
         verify { gliaCore.fetchFile(attachmentFile, capture(requestCallbackSlot)) }
         requestCallbackSlot.captured.onResult(inputStream, null)
 

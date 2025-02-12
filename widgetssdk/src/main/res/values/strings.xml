@@ -85,7 +85,7 @@
     <string name="glia_survey_require_label_content_description">Required.</string>
     <string name="message_center_message_limit_error_message">The message cannot exceed 10,000 characters.</string>
     <string name="message_center_title">Welcome to Secure Messaging</string>
-    <string name="message_center_check_messages_btn">Check messages</string>
+    <string name="message_center_check_messages_btn">Check Messages</string>
     <string name="message_center_message_title">Your message</string>
     <string name="message_center_message_edit_text_hint">Enter message</string>
     <string name="glia_message_center_title">Secure Messaging</string>
@@ -96,7 +96,7 @@
     <string name="message_center_leaving_conversation_message">You already have a conversation in progress. Starting a new one may lead to our agents overlooking your current conversation.</string>
     <string name="message_center_leaving_conversation_positive_button">Stay</string>
     <string name="message_center_leaving_conversation_negative_button">Leave</string>
-    <string name="need_live_support_label">Need live support?</string>
+    <string name="need_live_support_label">Need Live Support?</string>
     <string name="call_visualizer_screen_sharing_title">Screen Sharing</string>
     <string name="call_visualizer_label">Your Screen is Being Shared</string>
     <string name="glia_chat_file_download_success_message">The file has been downloaded.</string>

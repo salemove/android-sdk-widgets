@@ -30,6 +30,7 @@ public class MessagesNotSeenHandler {
     public void init() {
         Logger.d(TAG, "init");
         gliaOnMessageUseCase.invoke().doOnNext(this::onMessage).subscribe();
+        isCounting = true;
     }
 
     public void chatOnBackClicked() {

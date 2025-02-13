@@ -4,14 +4,19 @@ import android.assertCurrentValue
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.queuing.QueueState
 import com.glia.widgets.di.GliaCore
+import com.glia.widgets.helper.DeviceMonitor
+import com.glia.widgets.helper.DeviceState
 import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.NetworkState
 import com.glia.widgets.launcher.ConfigurationManager
 import io.mockk.CapturingSlot
+import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import io.reactivex.rxjava3.functions.Predicate
+import io.reactivex.rxjava3.processors.BehaviorProcessor
 import io.reactivex.rxjava3.processors.PublishProcessor
 import org.junit.Before
 import org.junit.Test
@@ -27,6 +32,10 @@ class QueueRepositoryTest {
     private lateinit var getQueuesSuccessCallbackSlot: MutableList<(Array<out CoreSdkQueue>) -> Unit>
     private lateinit var getQueuesErrorCallbackSlot: MutableList<(GliaException?) -> Unit>
     private lateinit var subscribeToQueueUpdatesCallbackSlot: CapturingSlot<Consumer<CoreSdkQueue>>
+    private lateinit var deviceMonitor: DeviceMonitor
+
+    private lateinit var networkStateProcessor: BehaviorProcessor<NetworkState>
+    private lateinit var deviceStateProcessor: BehaviorProcessor<DeviceState>
 
     private val configurationQueuesProcessor: PublishProcessor<List<String>> = PublishProcessor.create()
 
@@ -41,7 +50,16 @@ class QueueRepositoryTest {
         getQueuesErrorCallbackSlot = mutableListOf()
         subscribeToQueueUpdatesCallbackSlot = slot()
 
-        queueRepository = QueueRepositoryImpl(gliaCore, configurationManager)
+        // Default values to check if the skip works
+        networkStateProcessor = BehaviorProcessor.createDefault(NetworkState.CONNECTED)
+        deviceStateProcessor = BehaviorProcessor.createDefault(DeviceState.USER_PRESENT)
+
+        deviceMonitor = mockk(relaxUnitFun = true) {
+            every { networkState } returns networkStateProcessor.hide()
+            every { deviceState } returns deviceStateProcessor.hide()
+        }
+
+        queueRepository = QueueRepositoryImpl(gliaCore, configurationManager, deviceMonitor)
 
         verify(exactly = 0) { configurationManager.queueIdsObservable }
         verify(exactly = 0) { gliaCore.getQueues(any(), any()) }
@@ -147,8 +165,51 @@ class QueueRepositoryTest {
     fun `fetchQueues will subscribe to queues when response is not error`() {
         initialize()
 
+        val exception = GliaException("Fetching queues failed", GliaException.Cause.NETWORK_TIMEOUT)
+
+        val subscriber = queueRepository.queuesState.test()
+
+        verify { gliaCore.getQueues(capture(getQueuesSuccessCallbackSlot), capture(getQueuesErrorCallbackSlot)) }
+        verify(exactly = 0) { configurationManager.queueIdsObservable }
+        subscriber.assertCurrentValue(QueuesState.Loading)
+
+        getQueuesErrorCallbackSlot.last().invoke(exception)
+        subscriber.assertCurrentValue(QueuesState.Error(exception))
+
+        queueRepository.fetchQueues()
+
         pushSiteQueues(createQueue("1", false))
         verify { configurationManager.queueIdsObservable }
+    }
+
+    @Test
+    fun `fetchQueues will be triggered when the app is unlocked and connected to the network`() {
+        initialize()
+
+        pushSiteQueues(createQueue("1", false))
+        verify { configurationManager.queueIdsObservable }
+
+        clearMocks(
+            gliaCore,
+            answers = false,
+            recordedCalls = true,
+            childMocks = false,
+            verificationMarks = true,
+            exclusionRules = false
+        ) //clear invocations to check if the first value is skipped
+
+        networkStateProcessor.onNext(NetworkState.DISCONNECTED)
+        verify(exactly = 0) { gliaCore.getQueues(any(), any()) }
+
+        deviceStateProcessor.onNext(DeviceState.INTERACTIVE)
+        verify(exactly = 0) { gliaCore.getQueues(any(), any()) }
+
+        //Check for debounce
+        (0..5).forEach { _ ->
+            networkStateProcessor.onNext(NetworkState.CONNECTED)
+            deviceStateProcessor.onNext(DeviceState.USER_PRESENT)
+        }
+        verify(timeout = 1000, exactly = 1) { gliaCore.getQueues(any(), any()) }
     }
 
     @Test

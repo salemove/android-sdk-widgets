@@ -24,6 +24,7 @@ import com.glia.widgets.entrywidget.EntryWidget
 import com.glia.widgets.entrywidget.EntryWidgetImpl
 import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource
 import com.glia.widgets.helper.ApplicationLifecycleManager
+import com.glia.widgets.helper.DeviceMonitor
 import com.glia.widgets.helper.GliaActivityManagerImpl
 import com.glia.widgets.helper.IntentHelperImpl
 import com.glia.widgets.helper.ResourceProvider
@@ -113,7 +114,8 @@ internal object Dependencies {
         localeProvider = LocaleProvider(resourceProvider)
         notificationManager = NotificationManager(application)
         val downloadsFolderDataSource = DownloadsFolderDataSource(application)
-        repositoryFactory = RepositoryFactory(gliaCore, downloadsFolderDataSource, configurationManager)
+        val deviceMonitor = DeviceMonitor(application)
+        repositoryFactory = RepositoryFactory(gliaCore, downloadsFolderDataSource, configurationManager, deviceMonitor)
 
         val permissionManager = PermissionManager(
             application,

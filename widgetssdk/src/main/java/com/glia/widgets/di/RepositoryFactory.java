@@ -19,6 +19,7 @@ import com.glia.widgets.filepreview.data.GliaFileRepository;
 import com.glia.widgets.filepreview.data.GliaFileRepositoryImpl;
 import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource;
 import com.glia.widgets.filepreview.data.source.local.InAppBitmapCache;
+import com.glia.widgets.helper.DeviceMonitor;
 import com.glia.widgets.launcher.ConfigurationManager;
 import com.glia.widgets.permissions.PermissionsRequestRepository;
 
@@ -37,17 +38,20 @@ public class RepositoryFactory {
     private final GliaCore gliaCore;
     private final DownloadsFolderDataSource downloadsFolderDataSource;
     private final ConfigurationManager configurationManager;
+    private final DeviceMonitor deviceMonitor;
     private ChatScreenRepository chatScreenRepository;
     private EngagementRepository engagementRepository;
 
     public RepositoryFactory(
         GliaCore gliaCore,
         DownloadsFolderDataSource downloadsFolderDataSource,
-        ConfigurationManager configurationManager
+        ConfigurationManager configurationManager,
+        DeviceMonitor deviceMonitor
     ) {
         this.downloadsFolderDataSource = downloadsFolderDataSource;
         this.gliaCore = gliaCore;
         this.configurationManager = configurationManager;
+        this.deviceMonitor = deviceMonitor;
     }
 
     public void initialize() {
@@ -61,7 +65,7 @@ public class RepositoryFactory {
 
     public QueueRepository getQueueRepository() {
         if (queueRepository == null) {
-            queueRepository = new QueueRepositoryImpl(gliaCore, configurationManager);
+            queueRepository = new QueueRepositoryImpl(gliaCore, configurationManager, deviceMonitor);
         }
         return queueRepository;
     }

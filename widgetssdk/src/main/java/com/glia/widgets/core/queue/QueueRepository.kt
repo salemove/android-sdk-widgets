@@ -2,13 +2,17 @@ package com.glia.widgets.core.queue
 
 import com.glia.androidsdk.GliaException
 import com.glia.widgets.di.GliaCore
+import com.glia.widgets.helper.DeviceMonitor
+import com.glia.widgets.helper.DeviceState
 import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.NetworkState
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.unSafeSubscribe
 import com.glia.widgets.launcher.ConfigurationManager
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.processors.BehaviorProcessor
+import java.util.concurrent.TimeUnit
 import java.util.function.Consumer
 import com.glia.androidsdk.queuing.Queue as CoreSdkQueue
 
@@ -31,20 +35,32 @@ internal interface QueueRepository {
     fun fetchQueues()
 }
 
-internal class QueueRepositoryImpl(private val gliaCore: GliaCore, private val configurationManager: ConfigurationManager) : QueueRepository {
+internal class QueueRepositoryImpl(
+    private val gliaCore: GliaCore,
+    private val configurationManager: ConfigurationManager,
+    deviceMonitor: DeviceMonitor
+) : QueueRepository {
+
+    private val isDeviceUnlockedAndConnected = Flowable.combineLatest(
+        deviceMonitor.networkState,
+        deviceMonitor.deviceState
+    ) { networkState, deviceState ->
+        // Check if the device is unlocked and connected to the internet
+        networkState == NetworkState.CONNECTED && deviceState == DeviceState.USER_PRESENT
+    }
 
     private val queueUpdateCallback: Consumer<CoreSdkQueue> = Consumer { updateQueues(it) }
     private val siteQueues: BehaviorProcessor<List<Queue>> = BehaviorProcessor.create()
 
     private val _queuesState: BehaviorProcessor<QueuesState> = BehaviorProcessor.create()
     override val queuesState = _queuesState.hide()
-        .doOnSubscribe { fetchQueues() }
+        .doOnSubscribe { fetchQueues() } // Try to fetch queues when the Entry Widget is requested
         .distinctUntilChanged()
 
     private val _relevantQueueIds: Flowable<List<String>>
         get() = queuesState
             .filter { it !is QueuesState.Loading }
-            .map { it.queuesOrEmpty() }
+            .map(QueuesState::queuesOrEmpty)
             .map { queues -> queues.map { it.id } }
 
     override val relevantQueueIds: Single<List<String>>
@@ -52,10 +68,28 @@ internal class QueueRepositoryImpl(private val gliaCore: GliaCore, private val c
 
     override fun initialize() {
         fetchQueues()
+
+        // Fetch queues when the device is unlocked or connection is restored
+        isDeviceUnlockedAndConnected
+            .skip(1) // Skip the initial value
+            .debounce(500, TimeUnit.MILLISECONDS) // Sometimes the `Connected` event is fired right after device is unlocked
+            .filter { it }
+            .unSafeSubscribe {
+                // We're forcing this update, because when there is no internet connection,
+                // or the device is locked for a while, the queues won't update by the socket
+                forceFetchQueues()
+            }
     }
 
     override fun fetchQueues() {
-        if (gliaCore.isInitialized && siteQueues.value == null) {
+        // Fetch queues only if they are not already fetched or there was an error
+        if (siteQueues.value == null || _queuesState.value is Error) {
+            forceFetchQueues()
+        }
+    }
+
+    private fun forceFetchQueues() {
+        if (gliaCore.isInitialized) {
             _queuesState.onNext(QueuesState.Loading)
 
             gliaCore.getQueues(::siteQueuesReceived, ::reportGetSiteQueuesError)

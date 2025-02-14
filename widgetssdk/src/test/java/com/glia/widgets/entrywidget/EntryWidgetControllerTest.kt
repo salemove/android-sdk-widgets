@@ -53,7 +53,7 @@ class EntryWidgetControllerTest {
     }
 
     private val errorState by lazy {
-        listOf(EntryWidgetContract.ItemType.EmptyState)
+        listOf(EntryWidgetContract.ItemType.ErrorState)
     }
 
     private val sdkNotInitializedState by lazy {
@@ -412,7 +412,7 @@ class EntryWidgetControllerTest {
 
         controller.setView(view, EntryWidgetContract.ViewType.EMBEDDED_VIEW)
 
-        verify { view.showItems(emptyState) }
+        verify { view.showItems(errorState) }
         verify { queueRepository.queuesState }
         verify { secureConversationsRepository.unreadMessagesCountObservable }
         verify { hasOngoingSecureConversationUseCase.invoke() }
@@ -430,7 +430,7 @@ class EntryWidgetControllerTest {
 
         controller.setView(view, EntryWidgetContract.ViewType.EMBEDDED_VIEW)
 
-        verify { view.showItems(emptyState + poweredByItem) }
+        verify { view.showItems(errorState + poweredByItem) }
         verify { queueRepository.queuesState }
         verify { secureConversationsRepository.unreadMessagesCountObservable }
         verify { hasOngoingSecureConversationUseCase.invoke() }

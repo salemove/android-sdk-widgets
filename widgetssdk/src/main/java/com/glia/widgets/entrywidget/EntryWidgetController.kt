@@ -54,8 +54,8 @@ internal class EntryWidgetController @JvmOverloads constructor(
         listOf(EntryWidgetContract.ItemType.EmptyState)
     }
 
-    private val errorState: List<EntryWidgetContract.ItemType.EmptyState> by lazy {
-        listOf(EntryWidgetContract.ItemType.EmptyState)
+    private val errorState: List<EntryWidgetContract.ItemType.ErrorState> by lazy {
+        listOf(EntryWidgetContract.ItemType.ErrorState)
     }
 
     private val messagingChatObservableItemType: Flowable<List<EntryWidgetContract.ItemType>>

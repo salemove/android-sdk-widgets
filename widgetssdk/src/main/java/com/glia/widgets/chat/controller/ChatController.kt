@@ -690,14 +690,22 @@ internal class ChatController(
         chatManager.onChatAction(
             ChatManager.Action.OperatorConnected(formattedOperatorName, profileImgUrl)
         )
-        emitViewState { chatState.operatorConnected(formattedOperatorName, profileImgUrl).setLiveChatState() }
+        emitViewState {
+            //Need to call setLiveChatState() first, to keep the input state ENABLED when operator is connected
+            //Ticket - https://glia.atlassian.net/browse/MOB-4061
+            chatState.setLiveChatState().operatorConnected(formattedOperatorName, profileImgUrl)
+        }
     }
 
     private fun operatorChanged(formattedOperatorName: String, profileImgUrl: String?) {
         chatManager.onChatAction(
             ChatManager.Action.OperatorJoined(formattedOperatorName, profileImgUrl)
         )
-        emitViewState { chatState.operatorConnected(formattedOperatorName, profileImgUrl).setLiveChatState() }
+        emitViewState {
+            //Need to call setLiveChatState() first, to keep the input state ENABLED when operator is connected
+            //Ticket - https://glia.atlassian.net/browse/MOB-4061
+            chatState.setLiveChatState().operatorConnected(formattedOperatorName, profileImgUrl)
+        }
     }
 
     private fun endChat() {

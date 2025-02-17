@@ -207,6 +207,7 @@ internal class EngagementRepositoryImpl(
         _visitorMediaState.onNext(Data.Empty)
         _currentOperator.onNext(Data.Empty)
         _onHoldState.onNext(false)
+        _operatorTypingStatus.onNext(false)
         markScreenSharingEnded()
     }
 

@@ -614,9 +614,13 @@ class EngagementRepositoryTest {
 
     @Test
     fun `endEngagement() will emit EngagementEnded state`() {
+        val operatorTypingStatusTestObserver = repository.operatorTypingStatus.test()
         mockEngagementAndStart()
         fillStates()
+        operatorTypingCallbackSlot.captured.accept(OperatorTypingStatus { true })
         repository.endEngagement(EndedBy.CLEAR_STATE)
+        operatorTypingStatusTestObserver.assertNotComplete().assertValues(true, false)
+
         verifyEngagementEnd()
     }
 

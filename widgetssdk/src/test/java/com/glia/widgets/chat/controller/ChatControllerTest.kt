@@ -37,6 +37,7 @@ import com.glia.widgets.core.notification.domain.CallNotificationUseCase
 import com.glia.widgets.core.permissions.domain.RequestNotificationPermissionIfPushNotificationsSetUpUseCase
 import com.glia.widgets.core.permissions.domain.WithCameraPermissionUseCase
 import com.glia.widgets.core.permissions.domain.WithReadWritePermissionsUseCase
+import com.glia.widgets.core.secureconversations.domain.HasOngoingSecureConversationUseCase
 import com.glia.widgets.core.secureconversations.domain.IsMessagingAvailableUseCase
 import com.glia.widgets.core.secureconversations.domain.ManageSecureMessagingStatusUseCase
 import com.glia.widgets.core.secureconversations.domain.SecureConversationTopBannerVisibilityUseCase
@@ -139,6 +140,7 @@ class ChatControllerTest {
     private lateinit var shouldShowTopBannerVisibilityUseCase: SecureConversationTopBannerVisibilityUseCase
     private lateinit var setLeaveSecureConversationDialogVisibleUseCase: SetLeaveSecureConversationDialogVisibleUseCase
     private lateinit var setChatScreenOpenUseCase: SetChatScreenOpenUseCase
+    private lateinit var hasOngoingSecureConversationUseCase: HasOngoingSecureConversationUseCase
 
     @Before
     fun setUp() {
@@ -208,6 +210,7 @@ class ChatControllerTest {
         }
         setLeaveSecureConversationDialogVisibleUseCase = mock()
         setChatScreenOpenUseCase = mock()
+        hasOngoingSecureConversationUseCase = mock()
 
         chatController = ChatController(
             callTimer = callTimer,
@@ -256,7 +259,8 @@ class ChatControllerTest {
             manageSecureMessagingStatusUseCase = manageSecureMessagingStatusUseCase,
             shouldShowTopBannerUseCase = shouldShowTopBannerVisibilityUseCase,
             setLeaveSecureConversationDialogVisibleUseCase = setLeaveSecureConversationDialogVisibleUseCase,
-            setChatScreenOpenUseCase = setChatScreenOpenUseCase
+            setChatScreenOpenUseCase = setChatScreenOpenUseCase,
+            hasOngoingSecureConversationUseCase = hasOngoingSecureConversationUseCase
         )
         chatController.setView(chatView)
         Mockito.clearInvocations(chatView)
@@ -648,26 +652,112 @@ class ChatControllerTest {
     }
 
     @Test
+    fun `onScTopBannerItemClicked will show leave current conversation dialog when item type is AudioCall and no ongoing SC`() {
+        chatController.onScTopBannerItemClicked(itemType = EntryWidgetContract.ItemType.AudioCall)
+        val onHasOngoingSecureConversationCaptor = argumentCaptor<() -> Unit>()
+        val onNoOngoingSecureConversationCaptor = argumentCaptor<() -> Unit>()
+        verify(hasOngoingSecureConversationUseCase).invoke(
+            onHasOngoingSecureConversationCaptor.capture(),
+            onNoOngoingSecureConversationCaptor.capture()
+        )
+        onNoOngoingSecureConversationCaptor.lastValue.invoke()
+        verify(chatView).launchCall(Engagement.MediaType.AUDIO)
+    }
+
+    @Test
+    fun `onScTopBannerItemClicked will show leave current conversation dialog when item type is Chat and no ongoing SC`() {
+        val stateKArgumentCaptor = argumentCaptor<ChatState>()
+        chatController.onScTopBannerItemClicked(itemType = EntryWidgetContract.ItemType.Chat)
+        val onHasOngoingSecureConversationCaptor = argumentCaptor<() -> Unit>()
+        val onNoOngoingSecureConversationCaptor = argumentCaptor<() -> Unit>()
+        verify(hasOngoingSecureConversationUseCase).invoke(
+            onHasOngoingSecureConversationCaptor.capture(),
+            onNoOngoingSecureConversationCaptor.capture()
+        )
+        onNoOngoingSecureConversationCaptor.lastValue.invoke()
+        verify(chatView, atLeastOnce()).emitState(stateKArgumentCaptor.capture())
+        assertLiveChatState(stateKArgumentCaptor.lastValue)
+
+        verify(chatManager).onChatAction(eq(ChatManager.Action.QueuingStarted))
+    }
+
+    @Test
+    fun `onScTopBannerItemClicked will show leave current conversation dialog when item type is VideoCall and no ongoing SC`() {
+        chatController.onScTopBannerItemClicked(itemType = EntryWidgetContract.ItemType.VideoCall)
+        val onHasOngoingSecureConversationCaptor = argumentCaptor<() -> Unit>()
+        val onNoOngoingSecureConversationCaptor = argumentCaptor<() -> Unit>()
+        verify(hasOngoingSecureConversationUseCase).invoke(
+            onHasOngoingSecureConversationCaptor.capture(),
+            onNoOngoingSecureConversationCaptor.capture()
+        )
+        onNoOngoingSecureConversationCaptor.lastValue.invoke()
+        verify(chatView).launchCall(Engagement.MediaType.VIDEO)
+    }
+
+    @Test
+    fun `onScTopBannerItemClicked will not show leave current conversation dialog when item type is different and no ongoing SC`() {
+        chatController.onScTopBannerItemClicked(itemType = EntryWidgetContract.ItemType.ErrorState)
+        val onHasOngoingSecureConversationCaptor = argumentCaptor<() -> Unit>()
+        val onNoOngoingSecureConversationCaptor = argumentCaptor<() -> Unit>()
+        verify(hasOngoingSecureConversationUseCase).invoke(
+            onHasOngoingSecureConversationCaptor.capture(),
+            onNoOngoingSecureConversationCaptor.capture()
+        )
+        onNoOngoingSecureConversationCaptor.lastValue.invoke()
+        verify(chatView, never()).launchCall(Engagement.MediaType.VIDEO)
+        verify(chatView, never()).launchCall(Engagement.MediaType.AUDIO)
+        verify(chatManager, never()).onChatAction(eq(ChatManager.Action.QueuingStarted))
+    }
+
+    @Test
     fun `onScTopBannerItemClicked will show leave current conversation dialog when item type is AudioCall`() {
         chatController.onScTopBannerItemClicked(itemType = EntryWidgetContract.ItemType.AudioCall)
+        val onHasOngoingSecureConversationCaptor = argumentCaptor<() -> Unit>()
+        val onNoOngoingSecureConversationCaptor = argumentCaptor<() -> Unit>()
+        verify(hasOngoingSecureConversationUseCase).invoke(
+            onHasOngoingSecureConversationCaptor.capture(),
+            onNoOngoingSecureConversationCaptor.capture()
+        )
+        onHasOngoingSecureConversationCaptor.lastValue.invoke()
         verify(dialogController).showLeaveCurrentConversationDialog(eq(LeaveDialogAction.AUDIO))
     }
 
     @Test
     fun `onScTopBannerItemClicked will show leave current conversation dialog when item type is Chat`() {
         chatController.onScTopBannerItemClicked(itemType = EntryWidgetContract.ItemType.Chat)
+        val onHasOngoingSecureConversationCaptor = argumentCaptor<() -> Unit>()
+        val onNoOngoingSecureConversationCaptor = argumentCaptor<() -> Unit>()
+        verify(hasOngoingSecureConversationUseCase).invoke(
+            onHasOngoingSecureConversationCaptor.capture(),
+            onNoOngoingSecureConversationCaptor.capture()
+        )
+        onHasOngoingSecureConversationCaptor.lastValue.invoke()
         verify(dialogController).showLeaveCurrentConversationDialog(eq(LeaveDialogAction.LIVE_CHAT))
     }
 
     @Test
     fun `onScTopBannerItemClicked will show leave current conversation dialog when item type is VideoCall`() {
         chatController.onScTopBannerItemClicked(itemType = EntryWidgetContract.ItemType.VideoCall)
+        val onHasOngoingSecureConversationCaptor = argumentCaptor<() -> Unit>()
+        val onNoOngoingSecureConversationCaptor = argumentCaptor<() -> Unit>()
+        verify(hasOngoingSecureConversationUseCase).invoke(
+            onHasOngoingSecureConversationCaptor.capture(),
+            onNoOngoingSecureConversationCaptor.capture()
+        )
+        onHasOngoingSecureConversationCaptor.lastValue.invoke()
         verify(dialogController).showLeaveCurrentConversationDialog(eq(LeaveDialogAction.VIDEO))
     }
 
     @Test
     fun `onScTopBannerItemClicked will not show leave current conversation dialog when item type is different`() {
         chatController.onScTopBannerItemClicked(itemType = EntryWidgetContract.ItemType.ErrorState)
+        val onHasOngoingSecureConversationCaptor = argumentCaptor<() -> Unit>()
+        val onNoOngoingSecureConversationCaptor = argumentCaptor<() -> Unit>()
+        verify(hasOngoingSecureConversationUseCase).invoke(
+            onHasOngoingSecureConversationCaptor.capture(),
+            onNoOngoingSecureConversationCaptor.capture()
+        )
+        onHasOngoingSecureConversationCaptor.lastValue.invoke()
         verify(dialogController, never()).showLeaveCurrentConversationDialog(eq(LeaveDialogAction.AUDIO))
         verify(dialogController, never()).showLeaveCurrentConversationDialog(eq(LeaveDialogAction.LIVE_CHAT))
         verify(dialogController, never()).showLeaveCurrentConversationDialog(eq(LeaveDialogAction.AUDIO))

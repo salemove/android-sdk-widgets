@@ -144,7 +144,8 @@ public class ControllerFactory {
                 useCaseFactory.createIsMessagingAvailableUseCase(),
                 useCaseFactory.createSecureConversationTopBannerVisibilityUseCase(),
                 useCaseFactory.createSetLeaveSecureConversationDialogVisibleUseCase(),
-                useCaseFactory.getSetChatScreenOpenUseCase()
+                useCaseFactory.getSetChatScreenOpenUseCase(),
+                useCaseFactory.getHasOngoingSecureConversationUseCase()
             );
         }
 
@@ -396,7 +397,7 @@ public class ControllerFactory {
             repositoryFactory.getQueueRepository(),
             useCaseFactory.createIsAuthenticatedUseCase(),
             repositoryFactory.getSecureConversationsRepository(),
-            useCaseFactory.getHasPendingSecureConversationsWithTimeoutUseCase(),
+            useCaseFactory.getHasOngoingSecureConversationUseCase(),
             useCaseFactory.getEngagementStateUseCase(),
             useCaseFactory.getEngagementTypeUseCase(),
             core,

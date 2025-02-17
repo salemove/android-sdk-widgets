@@ -89,7 +89,7 @@ internal object Dependencies {
             activityLauncher = activityLauncher,
             configurationManager = configurationManager,
             snackbarController = controllerFactory.snackbarController,
-            hasOngoingSecureConversationUseCase = useCaseFactory.hasPendingSecureConversationsWithTimeoutUseCase,
+            hasOngoingSecureConversationUseCase = useCaseFactory.hasOngoingSecureConversationUseCase,
             isQueueingOrLiveEngagementUseCase = useCaseFactory.isQueueingOrEngagementUseCase,
             engagementTypeUseCase = useCaseFactory.engagementTypeUseCase
         )
@@ -101,7 +101,7 @@ internal object Dependencies {
             activityLauncher,
             gliaThemeManager,
             controllerFactory.entryWidgetHideController,
-            useCaseFactory.hasPendingSecureConversationsWithTimeoutUseCase
+            useCaseFactory.hasOngoingSecureConversationUseCase
         )
 
     @JvmStatic

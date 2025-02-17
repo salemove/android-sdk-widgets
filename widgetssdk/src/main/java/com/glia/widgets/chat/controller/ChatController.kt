@@ -55,6 +55,7 @@ import com.glia.widgets.core.notification.domain.CallNotificationUseCase
 import com.glia.widgets.core.permissions.domain.RequestNotificationPermissionIfPushNotificationsSetUpUseCase
 import com.glia.widgets.core.permissions.domain.WithCameraPermissionUseCase
 import com.glia.widgets.core.permissions.domain.WithReadWritePermissionsUseCase
+import com.glia.widgets.core.secureconversations.domain.HasOngoingSecureConversationUseCase
 import com.glia.widgets.core.secureconversations.domain.IsMessagingAvailableUseCase
 import com.glia.widgets.core.secureconversations.domain.ManageSecureMessagingStatusUseCase
 import com.glia.widgets.core.secureconversations.domain.SecureConversationTopBannerVisibilityUseCase
@@ -143,7 +144,8 @@ internal class ChatController(
     private val isMessagingAvailableUseCase: IsMessagingAvailableUseCase,
     private val shouldShowTopBannerUseCase: SecureConversationTopBannerVisibilityUseCase,
     private val setLeaveSecureConversationDialogVisibleUseCase: SetLeaveSecureConversationDialogVisibleUseCase,
-    private val setChatScreenOpenUseCase: SetChatScreenOpenUseCase
+    private val setChatScreenOpenUseCase: SetChatScreenOpenUseCase,
+    private val hasOngoingSecureConversationUseCase: HasOngoingSecureConversationUseCase
 ) : ChatContract.Controller {
     private var backClickedListener: ChatView.OnBackClickedListener? = null
     private var view: ChatContract.View? = null
@@ -990,6 +992,24 @@ internal class ChatController(
     }
 
     override fun onScTopBannerItemClicked(itemType: EntryWidgetContract.ItemType) {
+        hasOngoingSecureConversationUseCase(
+            onHasOngoingSecureConversation = { onScTopBannerItemClickedHasOngoingSC(itemType) },
+            onNoOngoingSecureConversation = { onScTopBannerClickedNoOngoingSC(itemType) }
+        )
+    }
+
+    private fun onScTopBannerClickedNoOngoingSC(itemType: EntryWidgetContract.ItemType) {
+        when (itemType) {
+            EntryWidgetContract.ItemType.Chat -> leaveCurrentConversationAndStartEnqueueing()
+            EntryWidgetContract.ItemType.VideoCall -> view?.launchCall(Engagement.MediaType.VIDEO)
+            EntryWidgetContract.ItemType.AudioCall -> view?.launchCall(Engagement.MediaType.AUDIO)
+            else -> {
+                /*no op*/
+            }
+        }
+    }
+
+    private fun onScTopBannerItemClickedHasOngoingSC(itemType: EntryWidgetContract.ItemType) {
         when (itemType) {
             EntryWidgetContract.ItemType.AudioCall -> dialogController.showLeaveCurrentConversationDialog(LeaveDialogAction.AUDIO)
             EntryWidgetContract.ItemType.Chat -> dialogController.showLeaveCurrentConversationDialog(LeaveDialogAction.LIVE_CHAT)

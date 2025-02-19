@@ -790,7 +790,7 @@ class EngagementRepositoryTest {
         engagementStateCallbackSlot.captured.accept(state4)
         assertEquals(operator2, repository.currentOperatorValue)
         engagementStateCallbackSlot.captured.accept(state5)
-        assertEquals(operator2, repository.currentOperatorValue)
+        assertNull(repository.currentOperatorValue)
 
         operatorTypingCallbackSlot.captured.apply {
             accept(OperatorTypingStatus { false })
@@ -812,12 +812,13 @@ class EngagementRepositoryTest {
 
         currentOperatorTestObserver
             .assertNotComplete()
-            .assertValueCount(4)
+            .assertValueCount(5)
             .assertValuesOnly(
                 Data.Empty,
                 Data.Value(operator),
                 Data.Value(operator1),
-                Data.Value(operator2)
+                Data.Value(operator2),
+                Data.Empty
             )
 
 

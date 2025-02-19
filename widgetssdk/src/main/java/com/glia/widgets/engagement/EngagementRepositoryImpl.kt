@@ -512,30 +512,41 @@ internal class EngagementRepositoryImpl(
         val currentOperator: Operator? = currentOperatorValue
 
         operatorRepository.emit(state.operator)
-        _currentOperator.onNext(Data.Value(state.operator))
+        //since there is no need to update operator data in case of transferred SC, we postpone it to do inside the when branches
+        val updateCurrentOperator = { _currentOperator.onNext(Data.Value(state.operator)) }
 
         when {
             state.isLiveEngagementTransferredToSecureConversation -> {
+                resetState() // reset state to avoid any side effects like operator typing during SC etc.
                 Logger.i(TAG, "Transfer to Secure Conversation")
                 _engagementState.onNext(State.TransferredToSecureConversation)
             }
 
             state.visitorStatus == EngagementState.VisitorStatus.TRANSFERRING -> {
+                updateCurrentOperator()
+
                 Logger.i(TAG, "Transfer engagement")
                 _engagementState.onNext(State.Update(state, EngagementUpdateState.Transferring))
             }
 
             currentOperator == null -> {
+                updateCurrentOperator()
+
                 Logger.i(TAG, "Operator connected")
                 _engagementState.onNext(State.Update(state, EngagementUpdateState.OperatorConnected(state.operator)))
             }
 
             currentOperator.id != state.operator.id -> {
+                updateCurrentOperator()
+
                 Logger.i(TAG, "Operator changed")
                 _engagementState.onNext(State.Update(state, EngagementUpdateState.OperatorChanged(state.operator)))
             }
 
-            currentOperator != state.operator -> _engagementState.onNext(State.Update(state, EngagementUpdateState.Ongoing(state.operator)))
+            currentOperator != state.operator -> {
+                updateCurrentOperator()
+                _engagementState.onNext(State.Update(state, EngagementUpdateState.Ongoing(state.operator)))
+            }
         }
     }
 
@@ -555,7 +566,7 @@ internal class EngagementRepositoryImpl(
 
             _engagementState.onNext(state)
 
-            if (state.action.isUnknown) {
+            if (it.state.actionOnEnd.isUnknown) {
                 Logger.w(TAG, "Engagement ended with unknown case.")
             }
         }

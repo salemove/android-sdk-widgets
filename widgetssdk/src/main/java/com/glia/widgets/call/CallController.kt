@@ -113,7 +113,7 @@ internal class CallController(
         }
 
         subscribeToEngagement()
-        decideOnQueueingUseCase().unSafeSubscribe(::enqueueForEngagement)
+        decideOnQueueingUseCase().unSafeSubscribe { enqueueForEngagement() }
         screenSharingUseCase().unSafeSubscribe { handleScreenSharingState(it) }
     }
 

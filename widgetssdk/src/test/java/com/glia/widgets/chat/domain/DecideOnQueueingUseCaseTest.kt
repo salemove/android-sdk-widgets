@@ -23,17 +23,17 @@ class DecideOnQueueingUseCaseTest {
     }
 
     @Test
-    fun `invoke completes when both completable are completed`() {
+    fun `invoke emits when both steps are completed`() {
         useCase = DecideOnQueueingUseCaseImpl(setOverlayPermissionRequestDialogShownUseCase)
 
         val testCompletable = useCase().test()
-        testCompletable.assertNotComplete()
+        testCompletable.assertNoValues()
 
         useCase.markOverlayStepCompleted()
-        testCompletable.assertNotComplete()
+        testCompletable.assertNoValues()
 
         useCase.onQueueingRequested()
-        testCompletable.assertComplete()
+        testCompletable.assertNotComplete().assertValue(Unit)
     }
 
     @Test
@@ -44,11 +44,29 @@ class DecideOnQueueingUseCaseTest {
         testCompletable.assertNotComplete()
 
         useCase.onQueueingRequested()
-        testCompletable.assertNotComplete()
+        testCompletable.assertNoValues()
 
         useCase.onOverlayDialogShown()
         verify { setOverlayPermissionRequestDialogShownUseCase() }
-        testCompletable.assertComplete()
+        testCompletable.assertNotComplete().assertValue(Unit)
+    }
+
+
+    @Test
+    fun `invoke resets the queueingRequested step after each emission`() {
+        useCase = DecideOnQueueingUseCaseImpl(setOverlayPermissionRequestDialogShownUseCase)
+
+        val testCompletable = useCase().test()
+        testCompletable.assertNoValues()
+
+        useCase.markOverlayStepCompleted()
+        testCompletable.assertNoValues()
+
+        useCase.onQueueingRequested()
+        testCompletable.assertNotComplete().assertValue(Unit)
+
+        useCase.onQueueingRequested()
+        testCompletable.assertNotComplete().assertValues(Unit, Unit)
     }
 
 }

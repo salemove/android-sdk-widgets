@@ -215,7 +215,7 @@ internal class ChatController(
         Logger.d(TAG, "constructor")
         chatState = ChatState()
         subscribeToEngagement()
-        decideOnQueueingUseCase().unSafeSubscribe(::enqueueForEngagement)
+        decideOnQueueingUseCase().unSafeSubscribe { enqueueForEngagement() }
         screenSharingUseCase().unSafeSubscribe(::handleScreenSharingState)
     }
 

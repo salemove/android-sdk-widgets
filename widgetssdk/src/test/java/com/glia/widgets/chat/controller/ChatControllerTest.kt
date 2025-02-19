@@ -62,7 +62,6 @@ import com.glia.widgets.view.MessagesNotSeenHandler
 import com.glia.widgets.view.MinimizeHandler
 import com.glia.widgets.webbrowser.domain.GetUrlFromLinkUseCase
 import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
-import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -189,7 +188,7 @@ class ChatControllerTest {
         enqueueForEngagementUseCase = mock()
         chatView = mock()
         decideOnQueueingUseCase = mock {
-            on { invoke() } doReturn Completable.complete()
+            on { invoke() } doReturn Flowable.just(Unit)
         }
 
         screenSharingUseCase = mock {

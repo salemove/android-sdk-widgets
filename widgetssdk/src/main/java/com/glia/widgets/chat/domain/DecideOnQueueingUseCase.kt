@@ -1,11 +1,11 @@
 package com.glia.widgets.chat.domain
 
 import com.glia.widgets.core.dialog.domain.SetOverlayPermissionRequestDialogShownUseCase
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.subjects.CompletableSubject
+import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.processors.BehaviorProcessor
 
 internal interface DecideOnQueueingUseCase {
-    operator fun invoke(): Completable
+    operator fun invoke(): Flowable<Unit>
     fun onOverlayDialogShown()
     fun onQueueingRequested()
     fun markOverlayStepCompleted()
@@ -15,10 +15,19 @@ internal class DecideOnQueueingUseCaseImpl(
     private val setOverlayPermissionRequestDialogShownUseCase: SetOverlayPermissionRequestDialogShownUseCase
 ) : DecideOnQueueingUseCase {
 
-    private val overlayStep: CompletableSubject = CompletableSubject.create()
-    private val queueingStep: CompletableSubject = CompletableSubject.create()
+    private val overlayStep: BehaviorProcessor<Boolean> = BehaviorProcessor.createDefault(false)
+    private val queueingStep: BehaviorProcessor<Boolean> = BehaviorProcessor.createDefault(false)
 
-    override fun invoke(): Completable = Completable.concat(listOf(overlayStep, queueingStep))
+    override fun invoke(): Flowable<Unit> = Flowable.combineLatest(overlayStep, queueingStep) { overlay, queueing ->
+        //make sure that we have completed both steps
+        overlay && queueing
+    }
+        .filter { it } //filter out until both steps are completed
+        .map { }// map to unit
+        .doOnNext {
+            //reset only the queueing step, because the overlay step is checked once per session
+            queueingStep.onNext(false)
+        }
 
     override fun onOverlayDialogShown() {
         markOverlayStepCompleted()
@@ -27,11 +36,11 @@ internal class DecideOnQueueingUseCaseImpl(
     }
 
     override fun onQueueingRequested() {
-        queueingStep.onComplete()
+        queueingStep.onNext(true)
     }
 
     override fun markOverlayStepCompleted() {
-        overlayStep.onComplete()
+        overlayStep.onNext(true)
     }
 
 }

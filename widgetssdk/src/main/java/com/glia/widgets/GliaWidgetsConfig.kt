@@ -206,19 +206,6 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
         }
 
         /**
-         * @param useOverlay - is it allowed to overlay the application
-         * @return Builder instance
-         * @deprecated Use [GliaWidgetsConfig.enableBubbleOutsideApp] and [GliaWidgetsConfig.enableBubbleInsideApp]
-         */
-        @Deprecated("Please use GliaWidgetsConfig.enableBubbleOutsideApp and GliaWidgetsConfig.enableBubbleInsideApp")
-        fun setUseOverlay(useOverlay: Boolean): Builder {
-            Logger.logDeprecatedMethodUse(TAG, "GliaWidgetsConfig.setUseOverlay()")
-            this.enableBubbleOutsideApp = useOverlay
-            this.enableBubbleInsideApp = useOverlay
-            return this
-        }
-
-        /**
          * @param enableBubbleOutsideApp - is bubble enabled outside the app
          * @return Builder instance
          */

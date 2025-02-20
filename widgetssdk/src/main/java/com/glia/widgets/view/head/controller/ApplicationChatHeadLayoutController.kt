@@ -58,6 +58,8 @@ internal class ApplicationChatHeadLayoutController(
 
                 is EngagementState.EngagementStarted -> onNewEngagementLoaded()
 
+                is EngagementState.Update -> onEngagementUpdated()
+
                 is EngagementState.Queuing,
                 is EngagementState.PreQueuing -> onQueuingStarted()
 
@@ -77,6 +79,12 @@ internal class ApplicationChatHeadLayoutController(
                 else -> updateChatHeadView()
             }
         }
+    }
+
+    private fun onEngagementUpdated() {
+        state = State.ENGAGEMENT
+        chatHeadLayout?.show()
+        updateChatHeadView()
     }
 
     override fun onChatHeadClicked() {

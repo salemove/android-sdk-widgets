@@ -126,7 +126,9 @@ internal class ServiceChatHeadController(
     }
 
     private fun toggleChatHead() {
+        state = State.ENGAGEMENT
         isDisplayBubbleOutsideAppUseCase(resumedViewName)
+        updateChatHeadView()
     }
 
     override fun updateChatHeadView() {

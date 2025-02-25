@@ -25,7 +25,10 @@ internal class GliaOperatorRepositoryImpl(private val gliaCore: GliaCore) : Glia
     var isAlwaysUseDefaultOperatorPicture: Boolean = false
 
     override fun getOperatorById(operatorId: String, callback: Consumer<LocalOperator?>) {
-        val cachedOperator = cachedOperators[operatorId]
+        val cachedOperator: LocalOperator?
+        synchronized(cachedOperators) {
+            cachedOperator = cachedOperators[operatorId]
+        }
         if (cachedOperator != null) {
             callback.accept(cachedOperator)
             return
@@ -49,7 +52,9 @@ internal class GliaOperatorRepositoryImpl(private val gliaCore: GliaCore) : Glia
 
     @VisibleForTesting
     fun putOperator(operator: LocalOperator) {
-        operator.apply { cachedOperators.put(id, this) }
+        synchronized(cachedOperators) {
+            operator.apply { cachedOperators.put(id, this) }
+        }
     }
 
     override fun updateOperatorDefaultImageUrl(imageUrl: String?) {

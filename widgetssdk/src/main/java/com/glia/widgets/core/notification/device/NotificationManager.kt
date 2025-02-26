@@ -10,6 +10,8 @@ import com.glia.widgets.R
 import com.glia.widgets.core.notification.NotificationFactory
 import com.glia.widgets.core.notification.NotificationRemovalService
 import com.glia.widgets.core.notification.areNotificationsEnabledForChannel
+import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.TAG
 
 internal class NotificationManager(private val applicationContext: Application) : INotificationManager {
     private val notificationManager: NotificationManager by lazy {
@@ -88,7 +90,12 @@ internal class NotificationManager(private val applicationContext: Application) 
     override fun startNotificationRemovalService() {
         // If this service is not already running, it will be instantiated and started (creating a process for it if needed);
         // if it is running then it remains running.
-        applicationContext.startService(Intent(applicationContext, NotificationRemovalService::class.java))
+        try {
+            applicationContext.startService(Intent(applicationContext, NotificationRemovalService::class.java))
+        } catch (error: Throwable) {
+            // Above code is known to throw an error if app is in background
+            Logger.e(TAG, "Failed to launch 'NotificationRemovalService'", error)
+        }
     }
 
     override fun removeCallNotification() {

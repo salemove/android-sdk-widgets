@@ -252,13 +252,17 @@ internal object Dependencies {
         chatBubbleController: ChatHeadContract.Controller
     ) {
         lifecycleManager.addObserver { _, event: Lifecycle.Event ->
-            if (event == Lifecycle.Event.ON_STOP) {
-                chatBubbleController.onApplicationStop()
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S && Glia.isInitialized()) {
-                    notificationManager.startNotificationRemovalService()
+            when(event) {
+                Lifecycle.Event.ON_PAUSE -> {
+                    // Moved to on pause due to "IllegalStateException: Not allowed to start service app is in background"
+                    // Related bug ticket MOB-4011
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S && Glia.isInitialized()) {
+                        notificationManager.startNotificationRemovalService()
+                    }
                 }
-            } else if (event == Lifecycle.Event.ON_DESTROY) {
-                chatBubbleController.onDestroy()
+                Lifecycle.Event.ON_STOP -> chatBubbleController.onApplicationStop()
+                Lifecycle.Event.ON_DESTROY -> chatBubbleController.onDestroy()
+                else -> { /* no-op */ }
             }
         }
     }

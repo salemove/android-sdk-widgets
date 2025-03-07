@@ -5,6 +5,7 @@ workflows:
   _increment_project_version:
     steps:
       - script@1:
+          title: Read GitHub argument, if exists
           inputs:
             - content: |-
                 #!/usr/bin/env bash
@@ -18,7 +19,7 @@ workflows:
                 if [ ! -z "$GITHUB_VERSION_INCREMENT_TYPE" ] ; then
                   envman add --key VERSION_INCREMENT_TYPE --value "$GITHUB_VERSION_INCREMENT_TYPE"
                 fi
-      - gradle-runner@2:
+      - gradle-runner@3:
           title: Increment project version
           inputs:
             - gradle_file: $PROJECT_LOCATION/build.gradle
@@ -66,7 +67,7 @@ workflows:
       - opts:
           is_expand: false
         VERSION_INCREMENT_TYPE: patch
-  authenticated_increment_project_version:
+  increment_project_version:
     description: Task builds an SDK and uploads it to Nexus.
     steps:
       - activate-ssh-key@4: { }
@@ -172,6 +173,7 @@ workflows:
   post_release:
     steps:
       - trigger-bitrise-workflow@0:
+          title: Update dependency in Cortex Financial
           inputs:
             - api_token: $ANDROID_CORTEX_BANKING_APP_BUILD_TRIGGER_TOKEN
             - workflow_id: upgrade_dependencies
@@ -207,7 +209,7 @@ workflows:
             - module: $EXAMPLE_APP_MODULE
             - variant: $DEBUG_VARIANT
             - project_location: $PROJECT_LOCATION
-      - gradle-runner@2:
+      - gradle-runner@3:
           title: Generate JavaDoc
           inputs:
             - gradle_task: $WIDGET_SDK_MODULE:dokkaJavadoc
@@ -232,6 +234,7 @@ workflows:
                 # this will run Gradle script to deploy library and related artifacts to Maven Central
                 ./gradlew clean widgetssdk:publishReleasePublicationToSonatypeRepository
       - git-tag@1:
+          title: Create Git tag
           inputs:
             - tag: $NEW_VERSION
       - script@1:
@@ -323,7 +326,7 @@ workflows:
             - project_location: $PROJECT_LOCATION
             - module: $EXAMPLE_APP_MODULE
             - variant: $DEBUG_VARIANT
-      - gradle-runner@2:
+      - gradle-runner@3:
           title: Assemble SDK for instrumentation tests
           inputs:
             - gradlew_path: ./gradlew
@@ -347,7 +350,7 @@ workflows:
       - install-missing-android-tools@3:
           inputs:
             - gradlew_path: $PROJECT_LOCATION/gradlew
-      - gradle-runner@2:
+      - gradle-runner@3:
           title: Upgrade Core SDK version
           inputs:
             - gradlew_path: $PROJECT_LOCATION/gradlew

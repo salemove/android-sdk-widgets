@@ -284,6 +284,17 @@ workflows:
     - install-missing-android-tools@3:
         inputs:
         - gradlew_path: $PROJECT_LOCATION/gradlew
+    - share-pipeline-variable@1:
+        inputs:
+          - variables: |-
+              PROJECT_LOCATION
+              GRADLE_BUILD_FILE_PATH
+              GRADLEW_PATH
+              EXAMPLE_APP_MODULE
+              WIDGET_SDK_MODULE
+              TEST_APP_MODULE
+              SDK_VARIANT
+              DEBUG_VARIANT
   snapshot_tests:
     steps:
     - gradle-unit-test@1:

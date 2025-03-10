@@ -330,7 +330,7 @@ workflows:
     - android-lint@0:
         title: Run Lint for SDK
         inputs:
-        - project_location: $PROJECT_LOCATION
+        - project_location: $BITRISE_SOURCE_DIR
         - module: $WIDGET_SDK_MODULE
         - variant: $SDK_VARIANT
     - android-lint@0:

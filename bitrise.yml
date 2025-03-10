@@ -47,24 +47,49 @@ meta:
     machine_type_id: standard
     stack: linux-docker-android-22.04
 pipelines:
-  publish:
+  browserstack_upload:
     workflows:
-      setup_project: { }
-      unit_tests:
+      setup_project: {}
+      upload_to_browserstack:
         depends_on:
         - setup_project
+  merged_to_dev:
+    triggers:
+      push:
+      - branch: development
+    workflows:
       instrumented_tests:
         depends_on:
         - setup_project
+      setup_project: {}
+      share_build_in_slack:
+        depends_on:
+        - upload_to_browserstack
       snapshot_tests:
         depends_on:
         - setup_project
-      publish_javadoc:
+      unit_tests:
+        depends_on:
+        - setup_project
+      upload_to_browserstack:
         depends_on:
         - unit_tests
         - instrumented_tests
         - snapshot_tests
+  publish:
+    workflows:
       create_git_release:
+        depends_on:
+        - unit_tests
+        - instrumented_tests
+        - snapshot_tests
+      increment_project_version:
+        depends_on:
+        - publish_to_nexus
+      instrumented_tests:
+        depends_on:
+        - setup_project
+      publish_javadoc:
         depends_on:
         - unit_tests
         - instrumented_tests
@@ -73,57 +98,60 @@ pipelines:
         depends_on:
         - create_git_release
         - publish_javadoc
-      increment_project_version:
+      setup_project: {}
+      snapshot_tests:
         depends_on:
-        - publish_to_nexus
+        - setup_project
+      unit_tests:
+        depends_on:
+        - setup_project
   pull_request:
     triggers:
       pull_request:
-        - target_branch: '*'
+      - target_branch: '*'
     workflows:
-      setup_project: { }
+      instrumented_tests:
+        depends_on:
+        - setup_project
       lint_checks:
         depends_on:
         - setup_project
-      unit_tests:
-        depends_on:
-        - setup_project
-      instrumented_tests:
-        depends_on:
-        - setup_project
+      setup_project: {}
       snapshot_tests:
         depends_on:
         - setup_project
-  browserstack_upload:
-    workflows:
-      setup_project: { }
-      upload_to_browserstack:
-        depends_on:
-        - setup_project
-  merged_to_dev:
-    triggers:
-      push:
-        - branch: development
-    workflows:
-      setup_project: { }
       unit_tests:
         depends_on:
         - setup_project
-      instrumented_tests:
-        depends_on:
-        - setup_project
-      snapshot_tests:
-        depends_on:
-        - setup_project
-      upload_to_browserstack:
-        depends_on:
-        - unit_tests
-        - instrumented_tests
-        - snapshot_tests
-      share_build_in_slack:
-        depends_on:
-        - upload_to_browserstack
 workflows:
+  create_git_release:
+    before_run:
+    - pipeline_load_files
+    steps:
+    - git-tag@1:
+        inputs:
+        - tag: $NEW_VERSION
+    - script@1:
+        title: Generate changelog
+        inputs:
+        - content: |-
+            #!/usr/bin/env bash
+            # fail if any commands fails
+            set -e
+            # debug log
+            set -x
+
+            # run the local bash script
+            bash ./scripts/generate-changelog.sh
+    - github-release@0:
+        inputs:
+        - username: kkk
+        - tag: $NEW_VERSION
+        - commit: $GIT_CLONE_COMMIT_HASH
+        - name: Glia Android Widgets $NEW_VERSION
+        - body: $BITRISE_CHANGELOG
+        - draft: "no"
+        - api_token: $GITHUB_API_TOKEN
   increment_project_version:
     envs:
     - VERSION_INCREMENT_TYPE: patch
@@ -189,82 +217,64 @@ workflows:
               -H "Authorization: Bearer $GITHUB_API_TOKEN" \
               https://api.github.com/repos/salemove/android-sdk-widgets/pulls/$PULL_REQUEST_NUMBER/requested_reviewers \
               -d "{\"team_reviewers\":[\"tm-mobile-android\"]}"
-  upload_to_browserstack:
-    before_run:
-      - pipeline_load_files
-    steps:
-    - android-build@1.0:
-        inputs:
-        - variant: $INTEGRATOR_VARIANT
-        - module: $EXAMPLE_APP_MODULE
-    - browserstack-upload@0:
-        title: Upload APP to BrowserStack
-        inputs:
-        - custom_id: $BROWSERSTACK_APP_ID
-  create_git_release:
-    before_run:
-      - pipeline_load_files
-    steps:
-    - git-tag@1:
-        inputs:
-        - tag: $NEW_VERSION
-    - script@1:
-        title: Generate changelog
-        inputs:
-        - content: |-
-            #!/usr/bin/env bash
-            # fail if any commands fails
-            set -e
-            # debug log
-            set -x
-
-            # run the local bash script
-            bash ./scripts/generate-changelog.sh
-    - github-release@0:
-        inputs:
-        - username: kkk
-        - tag: $NEW_VERSION
-        - commit: $GIT_CLONE_COMMIT_HASH
-        - name: Glia Android Widgets $NEW_VERSION
-        - body: $BITRISE_CHANGELOG
-        - draft: "no"
-        - api_token: $GITHUB_API_TOKEN
   instrumented_tests:
     before_run:
-      - pipeline_load_files
+    - pipeline_load_files
     steps:
     - gradle-runner@3:
         title: Assemble SDK for instrumentation tests
         inputs:
         - gradle_file: $PROJECT_LOCATION/build.gradle
         - gradlew_path: $PROJECT_LOCATION/gradlew
-        - gradle_task: :$WIDGET_SDK_MODULE:assembleDebugAndroidTest
+        - gradle_task: :$WIDGET_SDK_MODULE:assembleDebug :$WIDGET_SDK_MODULE:assembleDebugAndroidTest
+        - app_file_include_filter: $PROJECT_LOCATION/**/*.apk
+        - test_apk_file_include_filter: $PROJECT_LOCATION/**/*.apk
+
     - script@1:
-        title: TEMP
-        is_always_run: true
+        title: Create PR
         inputs:
           - content: |-
               #!/usr/bin/env bash
               # fail if any commands fails
               set -e
+              # make pipelines' return status equal the last command to exit with a non-zero status, or zero if all commands exit successfully
+              set -o pipefail
               # debug log
               set -x
-              
-              echo $PROJECT_LOCATION/$WIDGET_SDK_MODULE/build/outputs/apk/androidTest/debug/widgetssdk-debug-androidTest.apk
-              
-              if [ ! -f $PROJECT_LOCATION/$WIDGET_SDK_MODULE/build/outputs/apk/androidTest/debug/widgetssdk-debug-androidTest.apk ]; then
-                echo "File not found!"
-              fi
+              echo $PROJECT_LOCATION
+              # Just to confirm the final name & location
+              ls -alh $PROJECT_LOCATION/$WIDGET_SDK_MODULE/build/outputs/apk/androidTest/debug
     - virtual-device-testing-for-android@1:
         title: UI Test for APP
         inputs:
-        - app_path: $PROJECT_LOCATION/$WIDGET_SDK_MODULE/build/outputs/apk/androidTest/debug/widgetssdk-debug-androidTest.apk
         - test_type: instrumentation
         - use_verbose_log: true
-    - deploy-to-bitrise-io@2: { }
+        - app_path: $PROJECT_LOCATION/$WIDGET_SDK_MODULE/build/outputs/apk/androidTest/debug/widgetssdk-debug-androidTest.apk
+        - test_apk_path: $PROJECT_LOCATION/$WIDGET_SDK_MODULE/build/outputs/apk/androidTest/debug/widgetssdk-debug-androidTest.apk
+    - deploy-to-bitrise-io@2: {}
+  lint_checks:
+    before_run:
+    - pipeline_load_files
+    steps:
+    - android-lint@0:
+        title: Run Lint for SDK
+        inputs:
+        - project_location: $PROJECT_LOCATION
+        - module: $WIDGET_SDK_MODULE
+        - variant: $SDK_VARIANT
+    - android-lint@0:
+        title: Run Lint for APP
+        inputs:
+        - project_location: $PROJECT_LOCATION
+        - module: $EXAMPLE_APP_MODULE
+        - variant: $DEBUG_VARIANT
+    - deploy-to-bitrise-io@2: {}
+  pipeline_load_files:
+    steps:
+    - pull-intermediate-files@1: {}
   publish_javadoc:
     before_run:
-      - pipeline_load_files
+    - pipeline_load_files
     steps:
     - gradle-runner@3:
         title: Generate JavaDoc
@@ -280,7 +290,7 @@ workflows:
         - access_key_id: $AMAZON_AWS_KEY
   publish_to_nexus:
     before_run:
-      - pipeline_load_files
+    - pipeline_load_files
     steps:
     - gradle-runner@3:
         title: Publish SDK to Sonatype
@@ -299,20 +309,29 @@ workflows:
     - install-missing-android-tools@3:
         inputs:
         - gradlew_path: $PROJECT_LOCATION/gradlew
-    - android-build@1:
-        inputs:
-          - project_location: $PROJECT_LOCATION
-          - module: $EXAMPLE_APP_MODULE
-          - variant: $DEBUG_VARIANT
     - deploy-to-bitrise-io@2:
         inputs:
-          - pipeline_intermediate_files: $PROJECT_LOCATION:PROJECT_LOCATION
-  pipeline_load_files:
+        - pipeline_intermediate_files: $PROJECT_LOCATION:PROJECT_LOCATION
+  share_build_in_slack:
+    before_run:
+    - pipeline_load_files
     steps:
-    - pull-intermediate-files@1: { }
+    - slack@4:
+        title: Send build result message
+        inputs:
+        - channel: '#tm-mobile-builds'
+        - text: Android Build Succeeded!
+        - webhook_url_on_error: $SLACK_ANDROID_WEBHOOK
+        - channel_on_error: '#tm-mobile'
+        - text_on_error: '@mobile-caretaker Android Build Failed! (development-build)'
+        - emoji_on_error: "\U0001F4A5"
+        - color_on_error: '#d9482b'
+        - from_username_on_error: Bitrise
+        - pretext: ""
+        - webhook_url: $SLACK_ANDROID_WEBHOOK
   snapshot_tests:
     before_run:
-      - pipeline_load_files
+    - pipeline_load_files
     steps:
     - gradle-unit-test@1:
         title: Snapshot Test for SDK
@@ -344,10 +363,10 @@ workflows:
               cd $SNAPSHOT_DIR
               zip -r $BITRISE_DEPLOY_DIR/widgetssdk-snapshots.zip *
             fi
-    - deploy-to-bitrise-io@2: { }
+    - deploy-to-bitrise-io@2: {}
   unit_tests:
     before_run:
-      - pipeline_load_files
+    - pipeline_load_files
     steps:
     - android-unit-test@1:
         title: Unit Test for SDK
@@ -361,38 +380,16 @@ workflows:
         - project_location: $PROJECT_LOCATION
         - module: $EXAMPLE_APP_MODULE
         - variant: $DEBUG_VARIANT
-    - deploy-to-bitrise-io@2: { }
-  lint_checks:
+    - deploy-to-bitrise-io@2: {}
+  upload_to_browserstack:
     before_run:
-      - pipeline_load_files
+    - pipeline_load_files
     steps:
-    - android-lint@0:
-        title: Run Lint for SDK
+    - android-build@1.0:
         inputs:
-          - project_location: $PROJECT_LOCATION
-          - module: $WIDGET_SDK_MODULE
-          - variant: $SDK_VARIANT
-    - android-lint@0:
-        title: Run Lint for APP
+        - variant: $INTEGRATOR_VARIANT
+        - module: $EXAMPLE_APP_MODULE
+    - browserstack-upload@0:
+        title: Upload APP to BrowserStack
         inputs:
-          - project_location: $PROJECT_LOCATION
-          - module: $EXAMPLE_APP_MODULE
-          - variant: $DEBUG_VARIANT
-    - deploy-to-bitrise-io@2: { }
-  share_build_in_slack:
-    before_run:
-      - pipeline_load_files
-    steps:
-    - slack@4:
-        title: Send build result message
-        inputs:
-        - channel: '#tm-mobile-builds'
-        - text: Android Build Succeeded!
-        - webhook_url_on_error: $SLACK_ANDROID_WEBHOOK
-        - channel_on_error: '#tm-mobile'
-        - text_on_error: '@mobile-caretaker Android Build Failed! (development-build)'
-        - emoji_on_error: "\U0001F4A5"
-        - color_on_error: '#d9482b'
-        - from_username_on_error: Bitrise
-        - pretext: ""
-        - webhook_url: $SLACK_ANDROID_WEBHOOK
+        - custom_id: $BROWSERSTACK_APP_ID

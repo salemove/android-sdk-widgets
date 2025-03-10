@@ -233,20 +233,19 @@ workflows:
     before_run:
       - pipeline_load_files
     steps:
-    - android-build-for-ui-testing@0:
+    - gradle-runner@3:
+        title: Assemble SDK for instrumentation tests
         inputs:
-          - module: $WIDGET_SDK_MODULE
-          - variant: debug
-          - project_location: $PROJECT_LOCATION
-          - apk_path_pattern: $PROJECT_LOCATION/$WIDGET_SDK_MODULE/build/outputs/apk/*/*.apk
+        - gradle_file: $PROJECT_LOCATION/build.gradle
+        - gradlew_path: $PROJECT_LOCATION/gradlew
+        - gradle_task: :$WIDGET_SDK_MODULE:assembleDebugAndroidTest
     - virtual-device-testing-for-android@1:
         title: UI Test for APP
         inputs:
-        - app_path: $BITRISE_APK_PATH
+        - app_path: $PROJECT_LOCATION/$WIDGET_SDK_MODULE/build/outputs/apk/androidTest/debug/widgetssdk-debug-androidTest.apk
         - test_type: instrumentation
         - use_verbose_log: true
-    after_run:
-      - pipeline_save_files
+    - deploy-to-bitrise-io@2: { }
   publish_javadoc:
     before_run:
       - pipeline_load_files
@@ -284,10 +283,6 @@ workflows:
     - install-missing-android-tools@3:
         inputs:
         - gradlew_path: $PROJECT_LOCATION/gradlew
-    after_run:
-    - pipeline_save_files
-  pipeline_save_files:
-    steps:
     - deploy-to-bitrise-io@2:
         inputs:
           - pipeline_intermediate_files: $PROJECT_LOCATION:PROJECT_LOCATION
@@ -328,8 +323,7 @@ workflows:
               cd $SNAPSHOT_DIR
               zip -r $BITRISE_DEPLOY_DIR/widgetssdk-snapshots.zip *
             fi
-    after_run:
-      - pipeline_save_files
+    - deploy-to-bitrise-io@2: { }
   unit_tests:
     before_run:
       - pipeline_load_files
@@ -346,8 +340,7 @@ workflows:
         - project_location: $PROJECT_LOCATION
         - module: $EXAMPLE_APP_MODULE
         - variant: $DEBUG_VARIANT
-    after_run:
-      - pipeline_save_files
+    - deploy-to-bitrise-io@2: { }
   lint_checks:
     before_run:
       - pipeline_load_files
@@ -364,8 +357,7 @@ workflows:
           - project_location: $PROJECT_LOCATION
           - module: $EXAMPLE_APP_MODULE
           - variant: $DEBUG_VARIANT
-    after_run:
-      - pipeline_save_files
+    - deploy-to-bitrise-io@2: { }
   share_build_in_slack:
     before_run:
       - pipeline_load_files

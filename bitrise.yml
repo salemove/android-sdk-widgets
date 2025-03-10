@@ -73,10 +73,6 @@ pipelines:
         depends_on:
         - create_git_release
         - publish_javadoc
-      post_build:
-        depends_on:
-        - publish_to_nexus
-        should_always_run: workflow
       increment_project_version:
         depends_on:
         - publish_to_nexus
@@ -98,22 +94,12 @@ pipelines:
       snapshot_tests:
         depends_on:
         - setup_project
-      post_build:
-        depends_on:
-        - lint_checks
-        - unit_tests
-        - instrumented_tests
-        - snapshot_tests
-        should_always_run: workflow
   browserstack_upload:
     workflows:
       setup_project: { }
       upload_to_browserstack:
         depends_on:
         - setup_project
-      post_build:
-        depends_on:
-        - upload_to_browserstack
   merged_to_dev:
     triggers:
       push:
@@ -204,8 +190,9 @@ workflows:
               https://api.github.com/repos/salemove/android-sdk-widgets/pulls/$PULL_REQUEST_NUMBER/requested_reviewers \
               -d "{\"team_reviewers\":[\"tm-mobile-android\"]}"
   upload_to_browserstack:
+    before_run:
+      - pipeline_load_files
     steps:
-    - pull-intermediate-files@1: { }
     - android-build@1.0:
         inputs:
         - variant: $INTEGRATOR_VARIANT
@@ -215,8 +202,9 @@ workflows:
         inputs:
         - custom_id: $BROWSERSTACK_APP_ID
   create_git_release:
+    before_run:
+      - pipeline_load_files
     steps:
-    - pull-intermediate-files@1: { }
     - git-tag@1:
         inputs:
         - tag: $NEW_VERSION
@@ -242,8 +230,9 @@ workflows:
         - draft: "no"
         - api_token: $GITHUB_API_TOKEN
   instrumented_tests:
+    before_run:
+      - pipeline_load_files
     steps:
-    - pull-intermediate-files@1: { }
     - android-build-for-ui-testing@0:
         inputs:
           - module: $WIDGET_SDK_MODULE
@@ -256,14 +245,12 @@ workflows:
         - app_path: $BITRISE_APK_PATH
         - test_type: instrumentation
         - use_verbose_log: true
-  post_build:
-    steps:
-    - pull-intermediate-files@1: { }
-    - cache-push@2: {}
-    - deploy-to-bitrise-io@2: {}
+    after_run:
+      - pipeline_save_files
   publish_javadoc:
+    before_run:
+      - pipeline_load_files
     steps:
-    - pull-intermediate-files@1: { }
     - gradle-runner@3:
         title: Generate JavaDoc
         inputs:
@@ -277,8 +264,9 @@ workflows:
         - upload_local_path: $PROJECT_LOCATION/$WIDGET_SDK_MODULE/build/dokka
         - access_key_id: $AMAZON_AWS_KEY
   publish_to_nexus:
+    before_run:
+      - pipeline_load_files
     steps:
-    - pull-intermediate-files@1: { }
     - gradle-runner@3:
         title: Publish SDK to Sonatype
         inputs:
@@ -296,12 +284,20 @@ workflows:
     - install-missing-android-tools@3:
         inputs:
         - gradlew_path: $PROJECT_LOCATION/gradlew
+    after_run:
+    - pipeline_save_files
+  pipeline_save_files:
+    steps:
     - deploy-to-bitrise-io@2:
         inputs:
           - pipeline_intermediate_files: $PROJECT_LOCATION:PROJECT_LOCATION
-  snapshot_tests:
+  pipeline_load_files:
     steps:
     - pull-intermediate-files@1: { }
+  snapshot_tests:
+    before_run:
+      - pipeline_load_files
+    steps:
     - gradle-unit-test@1:
         title: Snapshot Test for SDK
         is_always_run: true
@@ -332,9 +328,12 @@ workflows:
               cd $SNAPSHOT_DIR
               zip -r $BITRISE_DEPLOY_DIR/widgetssdk-snapshots.zip *
             fi
+    after_run:
+      - pipeline_save_files
   unit_tests:
+    before_run:
+      - pipeline_load_files
     steps:
-    - pull-intermediate-files@1: { }
     - android-unit-test@1:
         title: Unit Test for SDK
         inputs:
@@ -347,9 +346,12 @@ workflows:
         - project_location: $PROJECT_LOCATION
         - module: $EXAMPLE_APP_MODULE
         - variant: $DEBUG_VARIANT
+    after_run:
+      - pipeline_save_files
   lint_checks:
+    before_run:
+      - pipeline_load_files
     steps:
-    - pull-intermediate-files@1: { }
     - android-lint@0:
         title: Run Lint for SDK
         inputs:
@@ -362,9 +364,12 @@ workflows:
           - project_location: $PROJECT_LOCATION
           - module: $EXAMPLE_APP_MODULE
           - variant: $DEBUG_VARIANT
+    after_run:
+      - pipeline_save_files
   share_build_in_slack:
+    before_run:
+      - pipeline_load_files
     steps:
-    - pull-intermediate-files@1: { }
     - slack@4:
         title: Send build result message
         inputs:

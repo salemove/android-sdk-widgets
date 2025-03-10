@@ -86,6 +86,9 @@ pipelines:
         - target_branch: '*'
     workflows:
       setup_project: { }
+      lint_checks:
+        depends_on:
+        - setup_project
       unit_tests:
         depends_on:
         - setup_project
@@ -97,6 +100,7 @@ pipelines:
         - setup_project
       post_build:
         depends_on:
+        - lint_checks
         - unit_tests
         - instrumented_tests
         - snapshot_tests
@@ -240,12 +244,11 @@ workflows:
   instrumented_tests:
     steps:
     - pull-intermediate-files@1: { }
-    - gradle-runner@3:
-        title: Assemble SDK for instrumentation tests
+    - android-build-for-ui-testing@0:
         inputs:
-        - gradle_file: $PROJECT_LOCATION/build.gradle
-        - gradlew_path: $PROJECT_LOCATION/gradlew
-        - gradle_task: :$WIDGET_SDK_MODULE:assembleDebugAndroidTest
+          - module: $WIDGET_SDK_MODULE
+          - variant: debug
+          - project_location: $PROJECT_LOCATION
     - virtual-device-testing-for-android@1:
         title: UI Test for APP
         inputs:
@@ -331,18 +334,6 @@ workflows:
   unit_tests:
     steps:
     - pull-intermediate-files@1: { }
-    - android-lint@0:
-        title: Run Lint for SDK
-        inputs:
-        - project_location: $PROJECT_LOCATION
-        - module: $WIDGET_SDK_MODULE
-        - variant: $SDK_VARIANT
-    - android-lint@0:
-        title: Run Lint for APP
-        inputs:
-        - project_location: $PROJECT_LOCATION
-        - module: $EXAMPLE_APP_MODULE
-        - variant: $DEBUG_VARIANT
     - android-unit-test@1:
         title: Unit Test for SDK
         inputs:
@@ -355,6 +346,21 @@ workflows:
         - project_location: $PROJECT_LOCATION
         - module: $EXAMPLE_APP_MODULE
         - variant: $DEBUG_VARIANT
+  lint_checks:
+    steps:
+    - pull-intermediate-files@1: { }
+    - android-lint@0:
+        title: Run Lint for SDK
+        inputs:
+          - project_location: $PROJECT_LOCATION
+          - module: $WIDGET_SDK_MODULE
+          - variant: $SDK_VARIANT
+    - android-lint@0:
+        title: Run Lint for APP
+        inputs:
+          - project_location: $PROJECT_LOCATION
+          - module: $EXAMPLE_APP_MODULE
+          - variant: $DEBUG_VARIANT
   share_build_in_slack:
     steps:
     - pull-intermediate-files@1: { }

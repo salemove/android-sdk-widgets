@@ -222,7 +222,7 @@ workflows:
             bash ./scripts/generate-changelog.sh
     - github-release@0:
         inputs:
-        - username: $GITHUB_USERNAME
+        - username: kkk
         - tag: $NEW_VERSION
         - commit: $GIT_CLONE_COMMIT_HASH
         - name: Glia Android Widgets $NEW_VERSION
@@ -239,6 +239,22 @@ workflows:
         - gradle_file: $PROJECT_LOCATION/build.gradle
         - gradlew_path: $PROJECT_LOCATION/gradlew
         - gradle_task: :$WIDGET_SDK_MODULE:assembleDebugAndroidTest
+    - script@1:
+        title: TEMP
+        is_always_run: true
+        inputs:
+          - content: |-
+              #!/usr/bin/env bash
+              # fail if any commands fails
+              set -e
+              # debug log
+              set -x
+              
+              echo $PROJECT_LOCATION/$WIDGET_SDK_MODULE/build/outputs/apk/androidTest/debug/widgetssdk-debug-androidTest.apk
+              
+              if [ ! -f $PROJECT_LOCATION/$WIDGET_SDK_MODULE/build/outputs/apk/androidTest/debug/widgetssdk-debug-androidTest.apk ]; then
+                echo "File not found!"
+              fi
     - virtual-device-testing-for-android@1:
         title: UI Test for APP
         inputs:
@@ -283,6 +299,11 @@ workflows:
     - install-missing-android-tools@3:
         inputs:
         - gradlew_path: $PROJECT_LOCATION/gradlew
+    - android-build@1:
+        inputs:
+          - project_location: $PROJECT_LOCATION
+          - module: $EXAMPLE_APP_MODULE
+          - variant: $DEBUG_VARIANT
     - deploy-to-bitrise-io@2:
         inputs:
           - pipeline_intermediate_files: $PROJECT_LOCATION:PROJECT_LOCATION

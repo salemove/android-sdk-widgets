@@ -201,6 +201,7 @@ workflows:
               -d "{\"team_reviewers\":[\"tm-mobile-android\"]}"
   upload_to_browserstack:
     steps:
+    - pull-intermediate-files@1: { }
     - android-build@1.0:
         inputs:
         - variant: $INTEGRATOR_VARIANT
@@ -211,6 +212,7 @@ workflows:
         - custom_id: $BROWSERSTACK_APP_ID
   create_git_release:
     steps:
+    - pull-intermediate-files@1: { }
     - git-tag@1:
         inputs:
         - tag: $NEW_VERSION
@@ -237,6 +239,7 @@ workflows:
         - api_token: $GITHUB_API_TOKEN
   instrumented_tests:
     steps:
+    - pull-intermediate-files@1: { }
     - gradle-runner@3:
         title: Assemble SDK for instrumentation tests
         inputs:
@@ -249,10 +252,12 @@ workflows:
         - use_verbose_log: true
   post_build:
     steps:
+    - pull-intermediate-files@1: { }
     - cache-push@2: {}
     - deploy-to-bitrise-io@2: {}
   publish_javadoc:
     steps:
+    - pull-intermediate-files@1: { }
     - gradle-runner@3:
         title: Generate JavaDoc
         inputs:
@@ -267,6 +272,7 @@ workflows:
         - access_key_id: $AMAZON_AWS_KEY
   publish_to_nexus:
     steps:
+    - pull-intermediate-files@1: { }
     - gradle-runner@3:
         title: Publish SDK to Sonatype
         inputs:
@@ -284,19 +290,12 @@ workflows:
     - install-missing-android-tools@3:
         inputs:
         - gradlew_path: $PROJECT_LOCATION/gradlew
-    - share-pipeline-variable@1:
+    - deploy-to-bitrise-io@2:
         inputs:
-          - variables: |-
-              PROJECT_LOCATION
-              GRADLE_BUILD_FILE_PATH
-              GRADLEW_PATH
-              EXAMPLE_APP_MODULE
-              WIDGET_SDK_MODULE
-              TEST_APP_MODULE
-              SDK_VARIANT
-              DEBUG_VARIANT
+          - pipeline_intermediate_files: $PROJECT_LOCATION:PROJECT_LOCATION
   snapshot_tests:
     steps:
+    - pull-intermediate-files@1: { }
     - gradle-unit-test@1:
         title: Snapshot Test for SDK
         is_always_run: true
@@ -327,10 +326,11 @@ workflows:
             fi
   unit_tests:
     steps:
+    - pull-intermediate-files@1: { }
     - android-lint@0:
         title: Run Lint for SDK
         inputs:
-        - project_location: $BITRISE_SOURCE_DIR
+        - project_location: $PROJECT_LOCATION
         - module: $WIDGET_SDK_MODULE
         - variant: $SDK_VARIANT
     - android-lint@0:
@@ -353,6 +353,7 @@ workflows:
         - variant: $DEBUG_VARIANT
   share_build_in_slack:
     steps:
+    - pull-intermediate-files@1: { }
     - slack@4:
         title: Send build result message
         inputs:

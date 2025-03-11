@@ -80,6 +80,17 @@ tasks.register('publishToLocalMaven') {
   dependsOn ':widgetssdk:publishSnapshotPublicationToMavenLocal'
 }
 
+tasks.register("publishCoreSdkToLocalMaven") {
+  if (gliaCoreSdkUseDirect) {
+    dependsOn gradle.includedBuild("gliaCore").task(":androidSdk:publishToLocalMaven")
+  } else {
+    println("Cannot publish Core SDK to local maven repository!")
+    println("Core SDK is not configured to be used directly.")
+  }
+}
+
+apply from: "${rootProject.projectDir}/scripts/direct-core.gradle"
+
 dependencies {
   implementation libs.java.appcompat
   implementation libs.java.material
@@ -91,7 +102,11 @@ dependencies {
   implementation libs.java.rxandroid
   implementation libs.java.rxjava
 
-  api "com.glia:android-sdk:$gliaSdkVersion"
+  releaseApi "com.glia:android-sdk:$gliaSdkVersion"
+  debugApi "com.glia:android-sdk:${coreSdkDebugVersion(gliaSdkVersion)}"
+
+  // includeBuild doesn't work with custom build types, use local maven version instead
+  snapshotApi "com.glia:android-sdk:${coreSdkSnapshotVersion(gliaSdkVersion)}"
 
   implementation libs.media.audioswitch
   implementation libs.media.lottie

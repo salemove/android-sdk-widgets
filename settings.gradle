@@ -2,3 +2,14 @@ rootProject.name = "Glia Android SDK Widgets"
 include ':widgetssdk'
 include ':app'
 include ':lint_checker'
+
+apply from: "${rootProject.projectDir}/scripts/direct-core.gradle"
+
+if (gliaCoreSdkUseDirect) {
+  includeBuild(coreSdkPath) {
+    name = 'gliaCore'
+    dependencySubstitution {
+      substitute module("com.glia:android-sdk:$gliaCoreSdkDirectPathVersion") using project(':androidSdk')
+    }
+  }
+}

@@ -1,0 +1,141 @@
+/**
+ * README!
+ *
+ * Using the Core SDK directly allows you to build the Widgets SDK testing application
+ * with the Core SDK sources instead of the released version.
+ *
+ * If you want to use the Core SDK directly, you need to set
+ * the `dependency.coreSdk.useDirect` to `true` in the `local.properties`.
+ * It will use the Default Core SDK path ("../android-sdk") if it is not set.
+ * If you want to use a custom path, you can set it in the `local.properties`
+ * by adding the `dependency.coreSdk.path` property.
+ * Or you can provide the path via the `$CORE_SDK_PATH` environment variable.
+ *
+ * Pay attention: only default build types (debug, release) are supported for direct Core SDK usage.
+ * If you want to build custom build types (like the snapshot), you need to publish the Core SDK
+ * to the local maven repository.
+ * You can do it by running the `:widgetssdk:publishCoreSdkToLocalMaven` task.
+ */
+
+ext {
+  localPropertiesFilePath = "${rootProject.projectDir}/local.properties"
+  gliaCoreSdkUseDirectTag = 'gliaCoreSdkUseDirect'
+  gliaCoreSdkUseDirectTagInProperties = 'dependency.coreSdk.useDirect'
+  gliaCoreSdkPathTag = 'coreSdkPath'
+  gliaCoreSdkPathTagInProperties = 'dependency.coreSdk.path'
+  gliaCoreSdkPathTagInEnv = 'CORE_SDK_PATH'
+  gliaCoreSdkDefaultPath = "${rootProject.projectDir}/../android-sdk"
+
+  gliaCoreSdkDirectVersionPropertiesFileRelatedPath = 'androidSdk/version.properties'
+  gliaCoreSdkDirectVersionTag = 'gliaCoreSdkDirectVersion'
+  gliaCoreSdkDirectVersionTagInProperties = 'version.name'
+
+  gliaCoreSdkDirectPathVersion = 'direct_localPath'
+
+  coreSdkDebugVersion = {String defaultVersion ->
+    if (gliaCoreSdkUseDirect) {
+      return gliaCoreSdkDirectPathVersion
+    } else {
+      return defaultVersion
+    }
+  }
+
+  coreSdkSnapshotVersion = {String defaultVersion ->
+    if (gliaCoreSdkUseDirect) {
+      return "${gliaCoreSdkDirectVersion}_snapshot"
+    } else {
+      return defaultVersion
+    }
+  }
+}
+
+exposeCoreSdkPath()
+exposeDirectCoreSdkVersion()
+
+def exposeCoreSdkPath() {
+  Boolean gliaCoreSdkUseDirect = false
+  String coreSdkPath = null
+  String coreSdkPathEnv = System.getenv(gliaCoreSdkPathTagInEnv) as String
+  String coreSdkDefaultPath = null
+
+  File propertiesFile = file(localPropertiesFilePath)
+  if (propertiesFile.exists()) {
+    Properties properties = new Properties()
+    new FileInputStream(propertiesFile).withCloseable { is -> properties.load(is) }
+    if (properties.containsKey(gliaCoreSdkUseDirectTagInProperties)) {
+      gliaCoreSdkUseDirect = Boolean.parseBoolean(properties[gliaCoreSdkUseDirectTagInProperties])
+    }
+    if (properties.containsKey(gliaCoreSdkPathTagInProperties)) {
+      coreSdkPath = properties[gliaCoreSdkPathTagInProperties]
+    }
+  }
+
+  if (coreSdkPath) {
+    coreSdkPath = absolutePath(coreSdkPath)
+  } else if (coreSdkPathEnv) {
+    coreSdkPathEnv = absolutePath(coreSdkPathEnv)
+  } else if (file(gliaCoreSdkDefaultPath).exists()) {
+    coreSdkDefaultPath = gliaCoreSdkDefaultPath
+  }
+
+  printDirectCoreSdkInfo(gliaCoreSdkUseDirect, coreSdkPath, coreSdkPathEnv, coreSdkDefaultPath)
+
+  ext[gliaCoreSdkUseDirectTag] = gliaCoreSdkUseDirect
+  ext[gliaCoreSdkPathTag] = coreSdkPath ?: coreSdkPathEnv ?: coreSdkDefaultPath
+}
+
+def exposeDirectCoreSdkVersion() {
+  String coreSdkVersion = null
+
+  if (coreSdkPath) {
+    String versionPropertiesPath = "$coreSdkPath/$gliaCoreSdkDirectVersionPropertiesFileRelatedPath"
+    File propertiesFile = file(versionPropertiesPath)
+    if (propertiesFile.exists()) {
+      Properties properties = new Properties()
+      new FileInputStream(propertiesFile).withCloseable { is -> properties.load(is) }
+      if (properties.containsKey(gliaCoreSdkDirectVersionTagInProperties)) {
+        coreSdkVersion = properties[gliaCoreSdkDirectVersionTagInProperties]
+      }
+    }
+  }
+
+  ext[gliaCoreSdkDirectVersionTag] = coreSdkVersion
+}
+
+def absolutePath(String path) {
+  if (path.startsWith('/')) {
+    return path
+  }
+  return new File(rootProject.projectDir, path).absolutePath
+}
+
+def printDirectCoreSdkInfo(Boolean gliaCoreSdkUseDirect, String coreSdkPath, String coreSdkPathEnv, String coreSdkDefaultPath) {
+  println("\n----------------------Direct Core SDK-----------------------")
+  if (gliaCoreSdkUseDirect) {
+    if (coreSdkPath || coreSdkPathEnv) {
+      println("The project configured to use the Core SDK directly!")
+    }
+    if (coreSdkPath) {
+      println("Core SDK path: $coreSdkPath (set by \"dependency.coreSdk.path\" from the local.properties)")
+    } else if (coreSdkPathEnv) {
+      println("Core SDK path: $coreSdkPathEnv (set from \$CORE_SDK_PATH environment variable)")
+    } else if (coreSdkDefaultPath) {
+      println("Core SDK path: $coreSdkDefaultPath (default path is used)")
+    } else {
+      println(
+        "No Core SDK path is set!\n" +
+        "You can set it in the local.properties using the \"dependency.coreSdk.path\" " +
+        "or provide it via the \$CORE_SDK_PATH environment variable.\n" +
+        "\nIf you don't want to use the Core SDK directly, " +
+        "set the \"dependency.coreSdk.useDirect\" in the local.properties to false."
+      )
+    }
+  } else {
+    println(
+      "The project is not configured to use the Core SDK from the direct path!\n" +
+      "If you want to use the Core SDK directly, " +
+      "add the \"dependency.coreSdk.useDirect=true\" to the local.properties."
+    )
+  }
+  println("----------------------Direct Core SDK-----------------------\n")
+}

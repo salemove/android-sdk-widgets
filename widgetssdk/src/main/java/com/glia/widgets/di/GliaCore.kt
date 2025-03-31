@@ -33,8 +33,6 @@ internal interface GliaCore {
     val secureConversations: SecureConversations
     @Throws(GliaException::class)
     fun init(config: GliaConfig)
-    @Throws(GliaException::class)
-    fun onAppCreate(application: Application)
     fun getVisitorInfo(visitorCallback: RequestCallback<VisitorInfo?>)
     fun updateVisitorInfo(visitorInfoUpdateRequest: VisitorInfoUpdateRequest, visitorCallback: Consumer<GliaException?>)
     fun <T> on(event: OmnicoreEvent<T>, listener: Consumer<T>)

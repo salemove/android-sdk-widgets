@@ -44,7 +44,6 @@ public class GliaWidgets {
      * @param application the application where it is initialized
      */
     public synchronized static void onAppCreate(Application application) {
-        Dependencies.glia().onAppCreate(application);
         Dependencies.onAppCreate(application);
         setupRxErrorHandler();
         Logger.d(TAG, "onAppCreate");

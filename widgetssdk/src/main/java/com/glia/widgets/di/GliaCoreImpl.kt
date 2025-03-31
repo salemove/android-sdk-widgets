@@ -48,12 +48,6 @@ internal class GliaCoreImpl : GliaCore {
         Glia.init(config)
     }
 
-    @Synchronized
-    @Throws(GliaException::class)
-    override fun onAppCreate(application: Application) {
-        Glia.onAppCreate(application)
-    }
-
     override fun getVisitorInfo(visitorCallback: RequestCallback<VisitorInfo?>) {
         Glia.getVisitorInfo(visitorCallback)
     }

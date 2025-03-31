@@ -41,9 +41,14 @@ public class GliaWidgets {
      * Should be called when the application is starting in {@link Application}.onCreate()
      *
      * @param application the application where it is initialized
+     * @throws GliaWidgetsException with {@link GliaWidgetsException.Cause}
      */
     public synchronized static void onAppCreate(Application application) {
-        Dependencies.onAppCreate(application);
+        try {
+            Dependencies.onAppCreate(application);
+        } catch (GliaException gliaException) {
+            throw mapCoreExceptionToWidgets(gliaException);
+        }
         setupRxErrorHandler();
         Logger.d(TAG, "onAppCreate");
     }
@@ -52,12 +57,18 @@ public class GliaWidgets {
      * Initializes the Glia core SDK using {@link GliaWidgetsConfig}.
      *
      * @param gliaWidgetsConfig Glia configuration
+     * @throws GliaWidgetsException with {@link GliaWidgetsException.Cause}
      */
     public synchronized static void init(GliaWidgetsConfig gliaWidgetsConfig) {
-        Dependencies.onSdkInit(gliaWidgetsConfig);
-        setupLoggingMetadata(gliaWidgetsConfig);
         Logger.i(TAG, "Initialize Glia Widgets SDK");
-        Dependencies.getGliaThemeManager().applyJsonConfig(gliaWidgetsConfig.uiJsonRemoteConfig);
+        try {
+            Dependencies.onSdkInit(gliaWidgetsConfig);
+            setupLoggingMetadata(gliaWidgetsConfig);
+            Dependencies.getGliaThemeManager().applyJsonConfig(gliaWidgetsConfig.uiJsonRemoteConfig);
+        } catch (GliaException gliaException) {
+            throw mapCoreExceptionToWidgets(gliaException);
+        }
+
     }
 
     /**
@@ -66,14 +77,18 @@ public class GliaWidgets {
      * @param queueIds A list of queue IDs to be used for the engagement launcher.
      *                 When empty or invalid, the default queues will be used.
      * @return An instance of {@link EngagementLauncher}.
-     * @throws GliaException with the {@link GliaException.Cause#INVALID_INPUT} if the SDK is not initialized.
+     * @throws GliaWidgetsException with the {@link GliaWidgetsException.Cause#INVALID_INPUT} if the SDK is not initialized.
      */
     @NonNull
     public synchronized static EngagementLauncher getEngagementLauncher(@NonNull List<String> queueIds) {
         Logger.i(TAG, "Returning an Engagement Launcher");
-        setupQueueIds(queueIds);
+        try {
+            setupQueueIds(queueIds);
 
-        return Dependencies.getEngagementLauncher();
+            return Dependencies.getEngagementLauncher();
+        } catch (GliaException gliaException) {
+            throw mapCoreExceptionToWidgets(gliaException);
+        }
     }
 
     /**
@@ -82,7 +97,7 @@ public class GliaWidgets {
      * @param queueIds A list of queue IDs to be used for the entry widget.
      *                 When empty or invalid, the default queues will be used.
      * @return An instance of {@link EntryWidget}.
-     * @throws GliaException with the {@link GliaException.Cause#INVALID_INPUT} if the SDK is not initialized.
+     * @throws GliaWidgetsException with the {@link GliaWidgetsException.Cause#INVALID_INPUT} if the SDK is not initialized.
      */
     @NonNull
     public synchronized static EntryWidget getEntryWidget(@NonNull List<String> queueIds) {
@@ -90,8 +105,12 @@ public class GliaWidgets {
             Logger.e(TAG, "Attempt to get EntryWidget before SDK initialization");
         }
 
-        Dependencies.getConfigurationManager().setQueueIds(queueIds);
-        return Dependencies.getEntryWidget();
+        try {
+            Dependencies.getConfigurationManager().setQueueIds(queueIds);
+            return Dependencies.getEntryWidget();
+        } catch (GliaException gliaException) {
+            throw mapCoreExceptionToWidgets(gliaException);
+        }
     }
 
     private static void setupQueueIds(@NonNull List<String> queueIds) {
@@ -118,7 +137,11 @@ public class GliaWidgets {
     @Deprecated(forRemoval = true)
     public static void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         Logger.d(TAG, "onRequestPermissionsResult");
-        Dependencies.glia().onRequestPermissionsResult(requestCode, permissions, grantResults);
+        try {
+            Dependencies.glia().onRequestPermissionsResult(requestCode, permissions, grantResults);
+        } catch (GliaException gliaException) {
+            throw mapCoreExceptionToWidgets(gliaException);
+        }
     }
 
     /**
@@ -139,31 +162,45 @@ public class GliaWidgets {
     @Deprecated(forRemoval = true)
     public static void onActivityResult(int requestCode, int resultCode, Intent data) {
         Logger.d(TAG, "onActivityResult");
-        Dependencies.getRepositoryFactory().getEngagementRepository().onActivityResult(requestCode, resultCode, data);
+        try {
+            Dependencies.getRepositoryFactory().getEngagementRepository().onActivityResult(requestCode, resultCode, data);
+        } catch (GliaException gliaException) {
+            throw mapCoreExceptionToWidgets(gliaException);
+        }
     }
 
     /**
      * Clears visitor session
+     * @throws GliaWidgetsException with {@link GliaWidgetsException.Cause}
      */
     public static void clearVisitorSession() {
         Logger.i(TAG, "Clear visitor session");
-        Dependencies.destroyControllersAndResetEngagementData();
+        try {
+            Dependencies.destroyControllersAndResetEngagementData();
 
-        //Here we reset the secure conversations repository to clear the data, because the visitor session is cleared(de-authenticated)
-        //and we don't need secure conversations data for un-authenticated visitors.
-        Dependencies.getRepositoryFactory().getSecureConversationsRepository().unsubscribeAndResetData();
+            //Here we reset the secure conversations repository to clear the data, because the visitor session is cleared(de-authenticated)
+            //and we don't need secure conversations data for un-authenticated visitors.
+            Dependencies.getRepositoryFactory().getSecureConversationsRepository().unsubscribeAndResetData();
 
-        Dependencies.glia().clearVisitorSession();
+            Dependencies.glia().clearVisitorSession();
+        } catch (GliaException gliaException) {
+            throw mapCoreExceptionToWidgets(gliaException);
+        }
     }
 
     /**
      * Ends active engagement
      * <p>
      * Ends active engagement if existing and closes Widgets SDK UI (includes bubble).
+     * @throws GliaWidgetsException with {@link GliaWidgetsException.Cause}
      */
     public static void endEngagement() {
         Logger.i(TAG, "End engagement by integrator");
-        Dependencies.getUseCaseFactory().getEndEngagementUseCase().invoke(EndedBy.CLEAR_STATE);
+        try {
+            Dependencies.getUseCaseFactory().getEndEngagementUseCase().invoke(EndedBy.CLEAR_STATE);
+        } catch (GliaException gliaException) {
+            throw mapCoreExceptionToWidgets(gliaException);
+        }
     }
 
     /**
@@ -193,12 +230,16 @@ public class GliaWidgets {
      * Creates `Authentication` instance for a given JWT token.
      *
      * @param behavior authentication behavior
-     * @return {@code Authentication} object or throws {@link GliaException} if error happened.
+     * @return {@code Authentication} object or throws {@link GliaWidgetsException} if error happened.
      * Exception may have the following cause:
-     * {@link GliaException.Cause#INVALID_INPUT} - when SDK is not initialized
+     * {@link GliaWidgetsException.Cause#INVALID_INPUT} - when SDK is not initialized
      */
     public static Authentication getAuthentication(@NonNull Authentication.Behavior behavior) {
-        return Dependencies.getAuthenticationManager(behavior);
+        try {
+            return Dependencies.getAuthenticationManager(behavior);
+        } catch (GliaException gliaException) {
+            throw mapCoreExceptionToWidgets(gliaException);
+        }
     }
 
     /**
@@ -258,6 +299,11 @@ public class GliaWidgets {
 
             logUndeliverableException(e);
         });
+    }
+
+    private static RuntimeException mapCoreExceptionToWidgets(GliaException gliaException) {
+        GliaWidgetsException widgetsException = GliaWidgetsException.from(gliaException);
+        return widgetsException != null ? widgetsException : gliaException;
     }
 
     private static void throwUncaughtException(Throwable e) {

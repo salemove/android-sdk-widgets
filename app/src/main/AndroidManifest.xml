@@ -54,5 +54,10 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/ic_notification" />
+
+        <provider
+            android:name=".InitializationProvider"
+            android:authorities="${applicationId}.InitializationProvider"
+            android:exported="false"/>
     </application>
 </manifest>

@@ -14,7 +14,6 @@ public class Application extends android.app.Application {
         super.onCreate();
         initFirebase();
 
-        GliaWidgets.onAppCreate(this);
         GliaWidgets.setCustomCardAdapter(new ExampleCustomCardAdapter());
     }
 

@@ -7,6 +7,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import com.glia.androidsdk.Glia
 import com.glia.androidsdk.GliaConfig
+import com.glia.androidsdk.GliaException
 import com.glia.widgets.GliaWidgetsConfig
 import com.glia.widgets.StringProvider
 import com.glia.widgets.callvisualizer.CallVisualizerActivityWatcher
@@ -108,8 +109,13 @@ internal object Dependencies {
     lateinit var repositoryFactory: RepositoryFactory
         @VisibleForTesting set
 
+    @Synchronized
     @JvmStatic
     fun onAppCreate(application: Application) {
+        if (this::resourceProvider.isInitialized) {
+            return
+        }
+
         resourceProvider = ResourceProvider(application.baseContext)
         localeProvider = LocaleProvider(resourceProvider)
         notificationManager = NotificationManager(application)

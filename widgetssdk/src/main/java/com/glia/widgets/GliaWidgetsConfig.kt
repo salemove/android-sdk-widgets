@@ -47,9 +47,14 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
     val manualLocaleOverride: String?
 
     init {
+        // The Context can be an Activity that has its life cycle.
+        // To prevent storing the link to an Activity that can be destroyed, we need to take the Application Context.
+        // An Application object lives all the time when the application is active, so it is safe to store it.
+        val applicationContext = builder.context?.applicationContext
+
         siteApiKey = builder.siteApiKey
         siteId = builder.siteId
-        context = builder.context
+        context = applicationContext
         region = builder.region
         baseDomain = builder.baseDomain
         requestCode = builder.requestCode

@@ -21,11 +21,9 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.RuntimeEnvironment
 
 @get:ClassRule
 val rule: TestRule = InstantTaskExecutorRule()
@@ -49,18 +47,14 @@ class GliaWidgetsTest {
     }
 
     @Test
-    fun onAppCreate_setApplicationToGliaCore_whenCalled() {
-        val application = RuntimeEnvironment.getApplication()
-        GliaWidgets.onAppCreate(application)
-        verify(gliaCore).onAppCreate(eq(application))
-    }
-
-    @Test
     fun onSdkInit_setConfigToGliaCore_whenCalled() {
         val siteApiKey = SiteApiKey("SiteApiId", "SiteApiSecret")
         val siteId = "SiteId"
         val region = "Region"
+        val applicationContext = mock<Context>()
+        whenever(applicationContext.applicationContext).thenReturn(applicationContext)
         val context = mock<Context>()
+        whenever(context.applicationContext).thenReturn(applicationContext)
         val widgetsConfig = GliaWidgetsConfig.Builder()
             .setSiteApiKey(siteApiKey)
             .setSiteId(siteId)
@@ -83,7 +77,7 @@ class GliaWidgetsTest {
         Assert.assertEquals(siteApiKey, gliaConfig.siteApiKey)
         Assert.assertEquals(siteId, gliaConfig.siteId)
         Assert.assertEquals(region, gliaConfig.region)
-        Assert.assertEquals(context, gliaConfig.context)
+        Assert.assertEquals(applicationContext, gliaConfig.context)
     }
 
 }

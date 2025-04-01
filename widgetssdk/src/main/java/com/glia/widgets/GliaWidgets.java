@@ -10,11 +10,17 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.glia.androidsdk.GliaException;
+import com.glia.androidsdk.RequestCallback;
 import com.glia.androidsdk.visitor.Authentication;
+import com.glia.widgets.callbacks.OnError;
+import com.glia.widgets.callbacks.OnSuccess;
+import com.glia.widgets.callbacks.OnComplete;
 import com.glia.widgets.chat.adapter.CustomCardAdapter;
 import com.glia.widgets.chat.adapter.WebViewCardAdapter;
 import com.glia.widgets.core.authentication.AuthenticationManager;
 import com.glia.widgets.core.callvisualizer.domain.CallVisualizer;
+import com.glia.widgets.core.visitor.VisitorInfo;
+import com.glia.widgets.core.visitor.VisitorInfoUpdateRequest;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.engagement.EndedBy;
 import com.glia.widgets.entrywidget.EntryWidget;
@@ -23,6 +29,7 @@ import com.glia.widgets.launcher.EngagementLauncher;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.function.Consumer;
 
 import io.reactivex.rxjava3.exceptions.UndeliverableException;
 import io.reactivex.rxjava3.plugins.RxJavaPlugins;
@@ -169,6 +176,37 @@ public class GliaWidgets {
         } catch (GliaException gliaException) {
             throw mapCoreExceptionToWidgets(gliaException);
         }
+    }
+
+    /**
+     * Fetches the visitor's information
+     */
+    public static void getVisitorInfo(OnSuccess<VisitorInfo> onSuccess,
+                                      OnError onError) {
+        RequestCallback<com.glia.androidsdk.visitor.VisitorInfo> callback = (visitorInfo, e) -> {
+            if (e != null || visitorInfo == null) {
+                onError.onError(GliaWidgetsException.Companion.from(e));
+            } else {
+                onSuccess.onSuccess(new VisitorInfo(visitorInfo));
+            }
+        };
+        Dependencies.glia().getVisitorInfo(callback);
+    }
+
+    /**
+     * Updates the visitor's information
+     */
+    public static void updateVisitorInfo(VisitorInfoUpdateRequest visitorInfoUpdateRequest,
+                                         OnComplete onComplete,
+                                         OnError onError) {
+        Consumer<GliaException> updateCallback = error -> {
+            if (error == null) {
+                onComplete.onComplete();
+            } else {
+                onError.onError(GliaWidgetsException.Companion.from(error));
+            }
+        };
+        Dependencies.glia().updateVisitorInfo(visitorInfoUpdateRequest.toCoreType(), updateCallback);
     }
 
     /**

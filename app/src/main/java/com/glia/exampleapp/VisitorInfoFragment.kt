@@ -13,10 +13,13 @@ import android.widget.Toast
 import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
-import com.glia.androidsdk.Glia
-import com.glia.androidsdk.GliaException
-import com.glia.androidsdk.visitor.VisitorInfo
-import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest
+import com.glia.widgets.GliaWidgets
+import com.glia.widgets.GliaWidgetsException
+import com.glia.widgets.callbacks.OnError
+import com.glia.widgets.callbacks.OnSuccess
+import com.glia.widgets.callbacks.OnComplete
+import com.glia.widgets.core.visitor.VisitorInfo
+import com.glia.widgets.core.visitor.VisitorInfoUpdateRequest
 import java.util.UUID
 
 class VisitorInfoFragment : Fragment() {
@@ -77,20 +80,20 @@ class VisitorInfoFragment : Fragment() {
         customAttributesAdapter.setAttributes(visitorInfo.customAttributesMap)
     }
 
-    private fun showError(exception: GliaException) {
+    private fun showError(exception: GliaWidgetsException) {
         Toast.makeText(context, exception.message ?: exception.debugMessage, Toast.LENGTH_LONG).show()
     }
 
     private fun obtainVisitorInfoUpdateRequest(): VisitorInfoUpdateRequest {
-        return VisitorInfoUpdateRequest.Builder()
-            .setName(nameEditText.text.toString())
-            .setEmail(emailEditText.text.toString())
-            .setPhone(phoneEditText.text.toString())
-            .setNote(noteEditText.text.toString())
-            .setCustomAttributes(obtainCustomAttributes())
-            .setCustomAttrsUpdateMethod(obtainCustomAttributesUpdateMethod())
-            .setNoteUpdateMethod(obtainNoteUpdateMethod())
-            .build()
+        return VisitorInfoUpdateRequest(
+            name = nameEditText.text.toString(),
+            email = emailEditText.text.toString(),
+            phone = phoneEditText.text.toString(),
+            note = noteEditText.text.toString(),
+            customAttributes = obtainCustomAttributes(),
+            customAttrsUpdateMethod = obtainCustomAttributesUpdateMethod(),
+            noteUpdateMethod = obtainNoteUpdateMethod(),
+        )
     }
 
     private fun obtainNoteUpdateMethod() = if (noteModeSwitch.isChecked) {
@@ -111,24 +114,33 @@ class VisitorInfoFragment : Fragment() {
 
     private fun getVisitorInfo() {
         saveButton.text = getString(R.string.visitor_info_loading)
-        Glia.getVisitorInfo { visitorInfo, error ->
+        val onSuccess: OnSuccess<VisitorInfo> = OnSuccess { result ->
             view?.post {
                 saveButton.text = getString(R.string.visitor_info_save)
-                visitorInfo?.let { showVisitorInfo(it) }
-                error?.let { showError(it) }
+                result?.let { showVisitorInfo(it) }
             }
         }
+
+        val onError = OnError { exception -> exception?.let { showError(it) } }
+
+        GliaWidgets.getVisitorInfo(onSuccess, onError)
     }
 
     private fun saveVisitorInfo(visitorInfo: VisitorInfoUpdateRequest) {
         saveButton.text = getString(R.string.visitor_info_saving)
-        Glia.updateVisitorInfo(visitorInfo) { error ->
+
+        val onComplete = OnComplete {
             view?.post {
                 saveButton.text = getString(R.string.visitor_info_save)
-                error?.let { showError(it) }
                 getVisitorInfo()
             }
         }
+
+        val onError = OnError { exception ->
+            saveButton.text = getString(R.string.visitor_info_save)
+            exception?.let { showError(it) }
+        }
+        GliaWidgets.updateVisitorInfo(visitorInfo, onComplete, onError)
     }
 }
 

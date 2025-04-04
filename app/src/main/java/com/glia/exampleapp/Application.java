@@ -3,6 +3,7 @@ package com.glia.exampleapp;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.glia.androidsdk.Glia;
 import com.glia.widgets.GliaWidgets;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
@@ -13,6 +14,8 @@ public class Application extends android.app.Application {
     public void onCreate() {
         super.onCreate();
         initFirebase();
+
+        Glia.onAppCreate(this); // TODO: remove this line when Core SDK is updated
 
         GliaWidgets.setCustomCardAdapter(new ExampleCustomCardAdapter());
     }

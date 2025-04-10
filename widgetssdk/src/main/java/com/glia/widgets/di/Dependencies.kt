@@ -7,7 +7,6 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import com.glia.androidsdk.Glia
 import com.glia.androidsdk.GliaConfig
-import com.glia.androidsdk.GliaException
 import com.glia.widgets.GliaWidgetsConfig
 import com.glia.widgets.StringProvider
 import com.glia.widgets.callvisualizer.CallVisualizerActivityWatcher
@@ -20,6 +19,7 @@ import com.glia.widgets.core.dialog.PermissionDialogManager
 import com.glia.widgets.core.notification.device.INotificationManager
 import com.glia.widgets.core.notification.device.NotificationManager
 import com.glia.widgets.core.permissions.PermissionManager
+import com.glia.widgets.core.visitor.Authentication
 import com.glia.widgets.engagement.completion.EngagementCompletionActivityWatcher
 import com.glia.widgets.entrywidget.EntryWidget
 import com.glia.widgets.entrywidget.EntryWidgetImpl
@@ -298,6 +298,6 @@ internal object Dependencies {
 
     internal class AuthenticationManagerProvider {
         @JvmField
-        var authenticationManager: AuthenticationManager? = null
+        var authenticationManager: Authentication? = null
     }
 }

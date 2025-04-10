@@ -6,7 +6,7 @@ import android.content.res.Resources;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 
-import com.glia.androidsdk.visitor.Authentication;
+import com.glia.widgets.core.visitor.Authentication;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -114,7 +114,7 @@ class Utils {
             allowedDuringEngagementValue
         );
 
-        if (valueFromPrefs != null && valueFromPrefs.equals(allowedDuringEngagementValue)) {
+        if (valueFromPrefs.equals(allowedDuringEngagementValue)) {
             return Authentication.Behavior.ALLOWED_DURING_ENGAGEMENT;
         } else {
             return Authentication.Behavior.FORBIDDEN_DURING_ENGAGEMENT;

@@ -7,18 +7,19 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import com.glia.androidsdk.Glia
 import com.glia.androidsdk.GliaConfig
-import com.glia.androidsdk.visitor.Authentication
 import com.glia.widgets.GliaWidgetsConfig
 import com.glia.widgets.callvisualizer.CallVisualizerActivityWatcher
 import com.glia.widgets.core.audio.AudioControlManager
 import com.glia.widgets.core.audio.domain.OnAudioStartedUseCase
 import com.glia.widgets.core.authentication.AuthenticationManager
+import com.glia.widgets.core.authentication.toCoreType
 import com.glia.widgets.core.callvisualizer.CallVisualizerManager
 import com.glia.widgets.core.chathead.ChatHeadManager
 import com.glia.widgets.core.dialog.PermissionDialogManager
 import com.glia.widgets.core.notification.device.INotificationManager
 import com.glia.widgets.core.notification.device.NotificationManager
 import com.glia.widgets.core.permissions.PermissionManager
+import com.glia.widgets.core.visitor.Authentication
 import com.glia.widgets.engagement.completion.EngagementCompletionActivityWatcher
 import com.glia.widgets.entrywidget.EntryWidget
 import com.glia.widgets.entrywidget.EntryWidgetImpl
@@ -257,7 +258,7 @@ internal object Dependencies {
 
     @JvmStatic
     fun getAuthenticationManager(behavior: Authentication.Behavior): AuthenticationManager =
-        AuthenticationManager(gliaCore.getAuthentication(behavior), authenticationCallback).apply {
+        AuthenticationManager(gliaCore.getAuthentication(behavior.toCoreType()), authenticationCallback).apply {
             authenticationManagerProvider.authenticationManager = this
         }
 
@@ -311,6 +312,6 @@ internal object Dependencies {
 
     internal class AuthenticationManagerProvider {
         @JvmField
-        var authenticationManager: AuthenticationManager? = null
+        var authenticationManager: Authentication? = null
     }
 }

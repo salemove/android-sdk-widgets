@@ -63,7 +63,6 @@ import com.glia.widgets.chat.domain.gva.ParseGvaGalleryCardsUseCase;
 import com.glia.widgets.core.audio.AudioControlManager;
 import com.glia.widgets.core.audio.domain.OnAudioStartedUseCase;
 import com.glia.widgets.core.audio.domain.TurnSpeakerphoneUseCase;
-import com.glia.widgets.core.authentication.AuthenticationManager;
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase;
 import com.glia.widgets.core.callvisualizer.domain.VisitorCodeViewBuilderUseCase;
 import com.glia.widgets.core.chathead.ChatHeadManager;
@@ -117,6 +116,7 @@ import com.glia.widgets.core.secureconversations.domain.SetLeaveSecureConversati
 import com.glia.widgets.core.secureconversations.domain.ShouldMarkMessagesReadUseCase;
 import com.glia.widgets.core.secureconversations.domain.ShowMessageLimitErrorUseCase;
 import com.glia.widgets.core.survey.domain.GliaSurveyAnswerUseCase;
+import com.glia.widgets.core.visitor.Authentication;
 import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCase;
 import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCaseImpl;
 import com.glia.widgets.engagement.domain.CheckMediaUpgradePermissionsUseCase;
@@ -571,7 +571,7 @@ public class UseCaseFactory {
     @NonNull
     public IsAuthenticatedUseCase createIsAuthenticatedUseCase() {
         return () -> Optional.ofNullable(authenticationManagerProvider.authenticationManager)
-            .map(AuthenticationManager::isAuthenticated)
+            .map(Authentication::isAuthenticated)
             .orElse(false);
     }
 

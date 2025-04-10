@@ -18,6 +18,7 @@ class GliaWidgetsExceptionTest {
         val allWidgetsCauses: List<GliaWidgetsException.Cause> = GliaWidgetsException.Cause.entries
         val gliaWidgetsExceptions = allWidgetsCauses.map { GliaWidgetsException("Test message", it) }
 
+        assertEquals(allCoreCauses.size, allWidgetsCauses.size)
         gliaCoreExceptions.forEachIndexed { index, item ->
             val widgetsException = GliaWidgetsException.from(item)
 

@@ -1,7 +1,7 @@
 package com.glia.widgets.core.authentication
 
 import com.glia.androidsdk.RequestCallback
-import com.glia.androidsdk.visitor.Authentication
+import com.glia.widgets.core.visitor.Authentication
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.di.Dependencies.repositoryFactory
 import com.glia.widgets.helper.Logger
@@ -13,9 +13,9 @@ import com.glia.widgets.helper.TAG
  *
  */
 internal class AuthenticationManager(
-    private val authentication: Authentication
+    private val authentication: com.glia.androidsdk.visitor.Authentication
 ) : Authentication {
-    override fun setBehavior(behavior: Authentication.Behavior) {
+    override fun setBehavior(behavior: com.glia.androidsdk.visitor.Authentication.Behavior) {
         authentication.setBehavior(behavior)
     }
 
@@ -55,4 +55,9 @@ internal class AuthenticationManager(
         Logger.i(TAG, "Refresh authentication")
         authentication.refresh(jwtToken, externalAccessToken, authCallback)
     }
+}
+
+internal fun Authentication.Behavior.toCoreType(): com.glia.androidsdk.visitor.Authentication.Behavior? {
+    return com.glia.androidsdk.visitor.Authentication.Behavior
+        .entries.firstOrNull { it.name == name }
 }

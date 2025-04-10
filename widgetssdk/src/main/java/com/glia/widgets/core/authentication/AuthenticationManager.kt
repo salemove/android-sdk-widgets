@@ -1,7 +1,8 @@
 package com.glia.widgets.core.authentication
 
+import com.glia.androidsdk.visitor.Authentication as CoreAuthentication
 import com.glia.androidsdk.RequestCallback
-import com.glia.androidsdk.visitor.Authentication
+import com.glia.widgets.core.visitor.Authentication
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.di.Dependencies.repositoryFactory
 import com.glia.widgets.helper.Logger
@@ -13,10 +14,10 @@ import com.glia.widgets.helper.TAG
  *
  */
 internal class AuthenticationManager(
-    private val authentication: Authentication,
+    private val authentication: CoreAuthentication,
     private val onAuthenticationRequestedCallback: () -> Unit
 ) : Authentication {
-    override fun setBehavior(behavior: Authentication.Behavior) {
+    override fun setBehavior(behavior: CoreAuthentication.Behavior) {
         authentication.setBehavior(behavior)
     }
 
@@ -58,3 +59,15 @@ internal class AuthenticationManager(
         authentication.refresh(jwtToken, externalAccessToken, authCallback)
     }
 }
+
+internal fun Authentication.Behavior.toCoreType(): CoreAuthentication.Behavior =
+    when (this) {
+        Authentication.Behavior.FORBIDDEN_DURING_ENGAGEMENT -> CoreAuthentication.Behavior.FORBIDDEN_DURING_ENGAGEMENT
+        Authentication.Behavior.ALLOWED_DURING_ENGAGEMENT -> CoreAuthentication.Behavior.ALLOWED_DURING_ENGAGEMENT
+    }
+
+internal fun CoreAuthentication.Behavior.toWidgetsType(): Authentication.Behavior =
+    when (this) {
+        CoreAuthentication.Behavior.FORBIDDEN_DURING_ENGAGEMENT -> Authentication.Behavior.FORBIDDEN_DURING_ENGAGEMENT
+        CoreAuthentication.Behavior.ALLOWED_DURING_ENGAGEMENT -> Authentication.Behavior.ALLOWED_DURING_ENGAGEMENT
+    }

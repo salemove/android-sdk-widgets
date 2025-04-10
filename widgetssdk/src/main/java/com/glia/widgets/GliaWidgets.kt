@@ -4,14 +4,15 @@ import android.app.Application
 import android.content.Intent
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
-import com.glia.androidsdk.visitor.Authentication
 import com.glia.widgets.GliaWidgetsException.Companion.from
 import com.glia.widgets.callbacks.OnComplete
 import com.glia.widgets.callbacks.OnError
 import com.glia.widgets.callbacks.OnSuccess
 import com.glia.widgets.chat.adapter.CustomCardAdapter
 import com.glia.widgets.chat.adapter.WebViewCardAdapter
+import com.glia.widgets.core.authentication.toCoreType
 import com.glia.widgets.core.callvisualizer.domain.CallVisualizer
+import com.glia.widgets.core.visitor.Authentication
 import com.glia.widgets.core.visitor.VisitorInfo
 import com.glia.widgets.core.visitor.VisitorInfoUpdateRequest
 import com.glia.widgets.di.Dependencies
@@ -323,9 +324,29 @@ object GliaWidgets {
      * Exception may have the following cause:
      * [GliaWidgetsException.Cause.INVALID_INPUT] - when SDK is not initialized
      */
-    fun getAuthentication(behavior: Authentication.Behavior): Authentication {
+    @Deprecated("Please use getAuthentication(behavior: com.glia.widgets.core.visitor.Authentication.Behavior)")
+    fun getAuthentication(behavior: com.glia.androidsdk.visitor.Authentication.Behavior): Authentication {
         try {
             val authentication = glia().getAuthenticationManager(behavior)
+            setAuthenticationManager(authentication)
+            return authentication
+        } catch (gliaException: GliaException) {
+            throw mapCoreExceptionToWidgets(gliaException)
+        }
+    }
+
+    /**
+     * Creates `Authentication` instance for a given JWT token.
+     *
+     * @param behavior authentication behavior
+     * @return `Authentication` object or throws [GliaWidgetsException] if error happened.
+     * Exception may have the following cause:
+     * [GliaWidgetsException.Cause.INVALID_INPUT] - when SDK is not initialized
+     */
+    fun getAuthentication(behavior: Authentication.Behavior): Authentication {
+        val widgetsBehavior = behavior.toCoreType() ?: throw GliaWidgetsException("Behavior value is not supported", GliaWidgetsException.Cause.INVALID_INPUT)
+        try {
+            val authentication = glia().getAuthenticationManager(widgetsBehavior)
             setAuthenticationManager(authentication)
             return authentication
         } catch (gliaException: GliaException) {

@@ -110,6 +110,10 @@ def absolutePath(String path) {
 }
 
 def printDirectCoreSdkInfo(Boolean gliaCoreSdkUseDirect, String coreSdkPath, String coreSdkPathEnv, String coreSdkDefaultPath) {
+  if (gradle.startParameter.logLevel == LogLevel.QUIET) {
+    return
+  }
+
   println("\n----------------------Direct Core SDK-----------------------")
   if (gliaCoreSdkUseDirect) {
     if (coreSdkPath || coreSdkPathEnv) {

@@ -38,7 +38,8 @@ internal class ChatHeadLayout @JvmOverloads constructor(
     val position: Pair<Int?, Int?> get() = _chatHeadViewPosition
 
     private val chatHeadSize: Float by lazy { resources.getDimension(R.dimen.glia_chat_head_size) }
-    private val chatHeadMargin: Float by lazy { resources.getDimension(R.dimen.glia_chat_head_content_padding) }
+    private val chatHeadBottomRightMargin: Float by lazy { resources.getDimension(R.dimen.glia_chat_head_content_padding) }
+    private val chatHeadTopLeftMargin: Float by lazy { resources.getDimension(R.dimen.glia_small) }
 
     private val binding: ChatHeadLayoutBinding by lazy {
         ChatHeadLayoutBinding.inflate(layoutInflater, this)
@@ -116,9 +117,14 @@ internal class ChatHeadLayout @JvmOverloads constructor(
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         val isPositioned = chatHeadView.x != 0f && chatHeadView.y != 0f
-        if (isPositioned) return
 
-        val floatingViewX = w - chatHeadSize - chatHeadMargin
+        // isPositioned==true when the chat head already has valid coordinates
+        // (oldw == 0 && oldh == 0) occurs when view just added to the view hierarchy
+        // This way we will reset the position during the configuration change,
+        // but will keep it for the new activities with the same orientation
+        if (isPositioned && oldw == 0 && oldh == 0) return
+
+        val floatingViewX = w - chatHeadSize - chatHeadBottomRightMargin
         val floatingViewY = h / 10f * 8f
         chatHeadView.x = floatingViewX
         chatHeadView.y = floatingViewY
@@ -168,8 +174,10 @@ internal class ChatHeadLayout @JvmOverloads constructor(
     }
 
     private fun onChatHeadDragged(x: Float, y: Float) {
-        chatHeadView.x = x
-        chatHeadView.y = y
+        // Make sure the chat head doesn't go off the screen
+        chatHeadView.x = x.coerceIn(chatHeadTopLeftMargin, width - chatHeadSize - chatHeadBottomRightMargin)
+        // Make sure the chat head doesn't go off the screen
+        chatHeadView.y = y.coerceIn(chatHeadTopLeftMargin, height - chatHeadSize - chatHeadBottomRightMargin)
         chatHeadView.invalidate()
     }
 

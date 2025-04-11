@@ -7,9 +7,9 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:networkSecurityConfig="@xml/network_security_config"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:networkSecurityConfig="@xml/network_security_config"
         android:theme="@style/Theme.GliaAndroidSDKWidgetsExample">
 
         <activity
@@ -41,7 +41,9 @@
             </intent-filter>
         </activity-alias>
 
-        <activity android:name=".LegacyActivity" />
+        <activity
+            android:name=".LegacyActivity"
+            android:configChanges="orientation|screenSize" />
 
         <service
             android:name="com.glia.androidsdk.fcm.GliaFcmService"
@@ -58,6 +60,6 @@
         <provider
             android:name=".InitializationProvider"
             android:authorities="${applicationId}.InitializationProvider"
-            android:exported="false"/>
+            android:exported="false" />
     </application>
 </manifest>

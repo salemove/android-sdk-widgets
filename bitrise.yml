@@ -336,6 +336,7 @@ workflows:
           inputs:
             - test_type: instrumentation
             - use_verbose_log: true
+            - test_devices: MediumPhone.arm,26,en,portrait
       - deploy-to-bitrise-io@2: { }
       - cache-push@2: { }
   upgrade_dependencies:

@@ -1,6 +1,5 @@
 package com.glia.widgets.di
 
-import android.app.Application
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.Glia.OmnicoreEvent
 import com.glia.androidsdk.GliaConfig
@@ -26,13 +25,14 @@ import java.util.Optional
 import java.util.function.Consumer
 
 internal interface GliaCore {
-    val isInitialized: Boolean
+    var isInitialized: Boolean
     val pushNotifications: PushNotifications
     val currentEngagement: Optional<Engagement>
     val callVisualizer: Omnibrowse
     val secureConversations: SecureConversations
     @Throws(GliaException::class)
     fun init(config: GliaConfig)
+    fun init(config: GliaConfig, callback: RequestCallback<Boolean?>)
     fun getVisitorInfo(visitorCallback: RequestCallback<VisitorInfo?>)
     fun updateVisitorInfo(visitorInfoUpdateRequest: VisitorInfoUpdateRequest, visitorCallback: Consumer<GliaException?>)
     fun <T> on(event: OmnicoreEvent<T>, listener: Consumer<T>)

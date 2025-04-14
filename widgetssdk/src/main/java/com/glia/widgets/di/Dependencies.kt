@@ -7,6 +7,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import com.glia.androidsdk.Glia
 import com.glia.androidsdk.GliaConfig
+import com.glia.androidsdk.RequestCallback
 import com.glia.widgets.GliaWidgetsConfig
 import com.glia.widgets.StringProvider
 import com.glia.widgets.callvisualizer.CallVisualizerActivityWatcher
@@ -223,6 +224,20 @@ internal object Dependencies {
         repositoryFactory.initialize()
         configurationManager.applyConfiguration(gliaWidgetsConfig)
         localeProvider.setCompanyName(gliaWidgetsConfig.companyName)
+    }
+
+    @JvmStatic
+    fun onSdkInit(gliaWidgetsConfig: GliaWidgetsConfig, callback: RequestCallback<Boolean?>? = null) {
+        val gliaConfig = createGliaConfig(gliaWidgetsConfig)
+        gliaCore.init(gliaConfig) { success, error ->
+            if (error == null) {
+                controllerFactory.init()
+                repositoryFactory.initialize()
+                configurationManager.applyConfiguration(gliaWidgetsConfig)
+                localeProvider.setCompanyName(gliaWidgetsConfig.companyName)
+            }
+            callback?.onResult(success, error)
+        }
     }
 
     private fun createGliaConfig(gliaWidgetsConfig: GliaWidgetsConfig): GliaConfig {

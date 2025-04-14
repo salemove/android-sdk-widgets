@@ -1,6 +1,5 @@
 package com.glia.widgets.di
 
-import android.app.Application
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.Glia
 import com.glia.androidsdk.Glia.OmnicoreEvent
@@ -27,8 +26,7 @@ import java.util.Optional
 import java.util.function.Consumer
 
 internal class GliaCoreImpl : GliaCore {
-    override val isInitialized: Boolean
-        get() = Glia.isInitialized()
+    override var isInitialized: Boolean = false
 
     override val pushNotifications: PushNotifications
         get() = Glia.getPushNotifications()
@@ -46,6 +44,12 @@ internal class GliaCoreImpl : GliaCore {
     @Throws(GliaException::class)
     override fun init(config: GliaConfig) {
         Glia.init(config)
+    }
+
+    @Synchronized
+    @Throws(GliaException::class)
+    override fun init(config: GliaConfig, callback: RequestCallback<Boolean?>) {
+        Glia.init(config, callback)
     }
 
     override fun getVisitorInfo(visitorCallback: RequestCallback<VisitorInfo?>) {

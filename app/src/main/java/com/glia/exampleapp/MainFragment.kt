@@ -492,7 +492,7 @@ class MainFragment : Fragment() {
     }
 
     private fun initGliaWidgets() {
-        if (Glia.isInitialized()) {
+        if (GliaWidgets.isInitialized()) {
             setupAuthButtonsVisibility()
             listenForCallVisualizerEngagements()
             return
@@ -503,13 +503,18 @@ class MainFragment : Fragment() {
                 context = requireActivity().applicationContext,
 //                uiJsonRemoteConfig = UnifiedUiConfigurationLoader.fetchLocalConfigSample(requireContext()),
 //                region = "us"
-            )
-        )
-        prepareAuthentication()
-        setupAuthButtonsVisibility()
-        listenForCallVisualizerEngagements()
+            ),
+            onComplete = {
+                prepareAuthentication()
+                setupAuthButtonsVisibility()
+                listenForCallVisualizerEngagements()
 
-        view?.post { initMenu() }
+                view?.post { initMenu() }
+            },
+            onError = { error ->
+                error?.let { showToast(it.message.toString()) }
+            }
+        )
     }
 
     private fun prepareAuthentication() {

@@ -119,6 +119,7 @@ object GliaWidgets {
 
     /**
      * Initializes the Glia Core SDK using [GliaWidgetsConfig].
+     * [GliaWidgets.isInitialized] will return `true` regardless of the initialization result.
      *
      * @param gliaWidgetsConfig Glia configuration
      * @throws GliaWidgetsException with [GliaWidgetsException.Cause]
@@ -131,9 +132,73 @@ object GliaWidgets {
             onSdkInit(gliaWidgetsConfig)
             setupLoggingMetadata(gliaWidgetsConfig)
             gliaThemeManager.applyJsonConfig(gliaWidgetsConfig.uiJsonRemoteConfig)
+            glia().isInitialized = true
         } catch (gliaException: GliaException) {
-            throw mapCoreExceptionToWidgets(gliaException)
+            val gliaWidgetsException = mapCoreExceptionToWidgets(gliaException)
+            throw gliaWidgetsException
         }
+    }
+
+    /**
+     * Initializes the Glia Core SDK using [GliaWidgetsConfig].
+     * [GliaWidgets.isInitialized] will return `true` after initialization succeeds.
+     *
+     * @param gliaWidgetsConfig Glia configuration
+     * @throws GliaWidgetsException with [GliaWidgetsException.Cause]
+     */
+    @JvmStatic
+    @Synchronized
+    fun init(gliaWidgetsConfig: GliaWidgetsConfig,
+             onComplete: OnComplete? = null,
+             onError: OnError? = null) {
+        Logger.i(TAG, "Initialize Glia Widgets SDK")
+        try {
+            val callback: RequestCallback<Boolean?> =
+                RequestCallback { _, exception ->
+                    if (exception == null) {
+                        glia().isInitialized = true
+                        onComplete?.onComplete()
+                    } else {
+                        Logger.i(TAG, "Glia Widgets SDK initialization failed")
+                        val invalidInputError = GliaWidgetsException(
+                            "Failed to initialise Glia Widgets SDK. Please check credentials.",
+                            GliaWidgetsException.Cause.INVALID_INPUT
+                        )
+                        onError?.onError(invalidInputError)
+                    }
+                }
+
+            onSdkInit(gliaWidgetsConfig, callback)
+            setupLoggingMetadata(gliaWidgetsConfig)
+            gliaThemeManager.applyJsonConfig(gliaWidgetsConfig.uiJsonRemoteConfig)
+        } catch (exception: Exception) {
+            if (exception is GliaException) {
+                val mappedException = mapCoreExceptionToWidgets(exception)
+                if (mappedException is GliaWidgetsException) {
+                    onError?.onError(mappedException)
+                    return
+                }
+            }
+
+            Logger.e(TAG, "Glia Widgets SDK initialization failed")
+            val internalError = GliaWidgetsException(
+                "Internal SDK error",
+                GliaWidgetsException.Cause.INTERNAL_ERROR
+            )
+            onError?.onError(internalError)
+        }
+    }
+
+    /**
+     * Checks result of Glia Widgets SDK initialization
+     *
+     * @return `true` if [GliaWidgets.init] is called without exceptions.
+     *
+     *  Please note, that `true` doesn't mean that credentials are valid/correct.
+     * @see [GliaWidgets.init]
+     */
+    fun isInitialized(): Boolean {
+        return glia().isInitialized
     }
 
     /**

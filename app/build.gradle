@@ -9,11 +9,11 @@ java {
 }
 
 android {
-  compileSdk 35
+  compileSdk 36
   defaultConfig {
     applicationId "com.glia.exampleapp"
     minSdkVersion 24
-    targetSdkVersion 35
+    targetSdkVersion 36
     versionCode 1
     versionName "1.0"
 

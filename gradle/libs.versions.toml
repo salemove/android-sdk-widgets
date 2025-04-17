@@ -10,7 +10,7 @@ ktlintVersion = "12.2.0"
 # be carefully with updating this plugin, it may upgrade kotlin version for the entire project
 # check the release notes and set the version similar with the project kotlin version
 # https://github.com/cashapp/paparazzi/releases
-paparazziVersion = "1.3.3"
+paparazziVersion = "1.3.5"
 
 javaAppCompatVersion = "1.7.0"
 javaConstraintLayoutVersion = "2.2.1"

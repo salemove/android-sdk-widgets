@@ -6,7 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.glia.androidsdk.chat.ChatMessage;
+import com.glia.androidsdk.chat.Chat;
 import com.glia.widgets.chat.adapter.CustomCardAdapter;
 
 import org.json.JSONException;
@@ -30,7 +30,7 @@ public class CustomCardAdapterTypeUseCaseTest {
     @Test
     public void execute_returnsNull_whenAdapterIsNull() {
         CustomCardAdapterTypeUseCase useCase = new CustomCardAdapterTypeUseCase(null);
-        ChatMessage message = mock(ChatMessage.class);
+        com.glia.androidsdk.chat.ChatMessage message = mock(com.glia.androidsdk.chat.ChatMessage.class);
 
         Integer result = useCase.invoke(message);
 
@@ -39,7 +39,7 @@ public class CustomCardAdapterTypeUseCaseTest {
 
     @Test
     public void execute_returnsNull_whenMetadataIsNull() {
-        ChatMessage message = mock(ChatMessage.class);
+        com.glia.androidsdk.chat.ChatMessage message = mock(com.glia.androidsdk.chat.ChatMessage.class);
 
         Integer result = useCase.invoke(message);
 
@@ -48,7 +48,7 @@ public class CustomCardAdapterTypeUseCaseTest {
 
     @Test
     public void execute_returnsNull_whenAdapterReturnsNull() {
-        ChatMessage message = mock(ChatMessage.class);
+        com.glia.androidsdk.chat.ChatMessage message = mock(com.glia.androidsdk.chat.ChatMessage.class);
         JSONObject metadata = new JSONObject();
         when(message.getMetadata()).thenReturn(metadata);
 
@@ -59,10 +59,14 @@ public class CustomCardAdapterTypeUseCaseTest {
 
     @Test
     public void execute_returnsViewType_whenAdapterReturnsViewType() throws JSONException {
-        ChatMessage message = mock(ChatMessage.class);
+        com.glia.androidsdk.chat.ChatMessage message = mock(com.glia.androidsdk.chat.ChatMessage.class);
         JSONObject metadata = new JSONObject().put("someKey", "someValue");
         when(message.getMetadata()).thenReturn(metadata);
-        when(customCardAdapter.getChatAdapterViewType(message)).thenReturn(VIEW_TYPE);
+        when(message.getId()).thenReturn("id");
+        when(message.getContent()).thenReturn("");
+        when(message.getSenderType()).thenReturn(Chat.Participant.OPERATOR);
+//        when(message.getTimestamp()).thenReturn(-1L);
+        when(customCardAdapter.getChatAdapterViewType(any())).thenReturn(VIEW_TYPE);
 
         Integer result = useCase.invoke(message);
 

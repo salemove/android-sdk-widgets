@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 
 import com.glia.androidsdk.chat.ChatMessage;
 import com.glia.widgets.R;
+import com.glia.widgets.chat.adapter.CustomCardMessage;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -83,10 +84,10 @@ public class WebViewViewHolder extends CustomCardViewHolder {
     }
 
     /**
-     * @see CustomCardViewHolder#bind(ChatMessage, ResponseCallback)
+     * @see CustomCardViewHolder#bind(CustomCardMessage, ResponseCallback)
      */
     @Override
-    public void bind(@NonNull ChatMessage message, @NonNull ResponseCallback callback) {
+    public void bind(@NonNull CustomCardMessage message, @NonNull ResponseCallback callback) {
         responseCallback = callback;
 
         JSONObject metadata = message.getMetadata();
@@ -106,6 +107,19 @@ public class WebViewViewHolder extends CustomCardViewHolder {
      * @return true if the message metadata has the <code>html</code> key.
      */
     public static boolean isWebViewType(@NonNull ChatMessage message) {
+        JSONObject metadata = message.getMetadata();
+        if (metadata == null || metadata.length() == 0) {
+            return false;
+        }
+        return metadata.has(METADATA_KEY);
+    }
+
+    /**
+     * Allows checking if the message can be displayed using {@link WebViewViewHolder}.
+     * @param message the chat message with metadata.
+     * @return true if the message metadata has the <code>html</code> key.
+     */
+    public static boolean isWebViewType(@NonNull CustomCardMessage message) {
         JSONObject metadata = message.getMetadata();
         if (metadata == null || metadata.length() == 0) {
             return false;

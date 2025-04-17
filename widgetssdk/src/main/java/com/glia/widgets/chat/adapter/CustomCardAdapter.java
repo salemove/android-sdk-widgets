@@ -11,7 +11,6 @@ import androidx.annotation.VisibleForTesting;
 import androidx.collection.SparseArrayCompat;
 
 import com.glia.androidsdk.chat.ChatMessage;
-import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.adapter.holder.CustomCardViewHolder;
 
 /**
@@ -48,9 +47,38 @@ public abstract class CustomCardAdapter {
      * @param message a chat message with metadata.
      * @return an integer value that specifies the type of view needed to represent the
      *         current message. Or {@code null} for the default Glia message implementation.
+     * @deprecated Use {@link #getItemViewType(CustomCardMessage message)}
+     */
+    @Deprecated
+    @Nullable
+    public Integer getItemViewType(ChatMessage message) {
+        return null;
+    }
+
+    /**
+     * Returns the view type of the chat message item.
+     * <p>
+     * Consider using a resource id to uniquely identify item view types.
+     * <p>
+     * <b>Usage example:</b>
+     * <pre>{@code
+     *     @Nullable
+     *     @Override
+     *     public Integer getItemViewType(CustomCardMessage message) {
+     *         if (message.getMetadata().has("insurance")) {
+     *             return INSURANCE_TYPE;
+     *         }
+     *         return null;
+     *     }
+     * }<pre/>
+     * @param message a chat message with metadata.
+     * @return an integer value that specifies the type of view needed to represent the
+     *         current message. Or {@code null} for the default Glia message implementation.
      */
     @Nullable
-    abstract public Integer getItemViewType(ChatMessage message);
+    public Integer getItemViewType(CustomCardMessage message) {
+        return null;
+    }
 
     /**
      * Called when chat needs a new {@link CustomCardViewHolder}
@@ -61,7 +89,7 @@ public abstract class CustomCardAdapter {
      * XML layout file.
      * <p>
      * The new ViewHolder will be used to display items of the adapter using
-     * {@link CustomCardViewHolder#bind(ChatMessage, CustomCardViewHolder.ResponseCallback)}.
+     * {@link CustomCardViewHolder#bind(CustomCardMessage, CustomCardViewHolder.ResponseCallback)}.
      * <p>
      * <b>Usage example:</b>
      * <pre>{@code
@@ -69,7 +97,6 @@ public abstract class CustomCardAdapter {
      *     @Override
      *     public CustomCardViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
      *                                                    @NonNull LayoutInflater inflater,
-     *                                                    @NonNull UiTheme uiTheme,
      *                                                    int viewType) {
      *         if (viewType == INSURANCE_TYPE) {
      *             return new InsuranceViewHolder(parent);
@@ -81,17 +108,15 @@ public abstract class CustomCardAdapter {
      * @param parent the ViewGroup to which the new view will be added after it has been bound to
      *               the adapter position.
      * @param inflater an instance of LayoutInflater. It can be used to inflate an XML layout file.
-     * @param uiTheme contains the current theme attributes.
      * @param viewType the view type of the new view.
-     *                 The type is provided by {@link #getItemViewType(ChatMessage)}.
+     *                 The type is provided by {@link #getItemViewType(CustomCardMessage)}.
      * @return a new {@link CustomCardViewHolder} that holds a view of the given view type.
-     * @see #getItemViewType(ChatMessage)
-     * @see CustomCardViewHolder#bind(ChatMessage, CustomCardViewHolder.ResponseCallback)
+     * @see #getItemViewType(CustomCardMessage)
+     * @see CustomCardViewHolder#bind(CustomCardMessage, CustomCardViewHolder.ResponseCallback)
      */
     @NonNull
     abstract public CustomCardViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
                                                             @NonNull LayoutInflater inflater,
-                                                            @NonNull UiTheme uiTheme,
                                                             int viewType);
 
     /**
@@ -102,14 +127,32 @@ public abstract class CustomCardAdapter {
      * @return a boolean indicating if the custom card view should be shown when
      *         the card is interactable and an option is selected.
      *         The default implementation returns {@code false}.
+     * @deprecated Use {@link #shouldShowCard(CustomCardMessage message, int viewType)}
      */
+    @Deprecated
     public boolean shouldShowCard(ChatMessage message, int viewType) {
         return false;
     }
 
+    /**
+     *
+     * @param message a chat message with metadata.
+     * @param viewType the view type of the new view.
+     *                 The type is provided by {@link #getItemViewType(CustomCardMessage)}.
+     * @return a boolean indicating if the custom card view should be shown when
+     *         the card is interactable and an option is selected.
+     *         The default implementation returns {@code false}.
+     */
+    public boolean shouldShowCard(CustomCardMessage message, int viewType) {
+        return false;
+    }
+
     @Nullable
-    public final Integer getChatAdapterViewType(ChatMessage chatMessage) {
-        Integer customCardViewType = getItemViewType(chatMessage);
+    public final Integer getChatAdapterViewType(ChatMessage message) {
+        Integer customCardViewType = getItemViewType(new CustomCardMessage(message));
+        if (customCardViewType == null) {
+            customCardViewType = getItemViewType(message);
+        }
         if (customCardViewType != null) {
             Integer chatAdapterViewType = viewTypeMap.get(customCardViewType);
             if (chatAdapterViewType == null) {
@@ -136,11 +179,10 @@ public abstract class CustomCardAdapter {
     @Nullable
     final CustomCardViewHolder getCustomCardViewHolder(@NonNull ViewGroup parent,
                                                        @NonNull LayoutInflater inflater,
-                                                       @NonNull UiTheme uiTheme,
                                                        int chatAdapterViewType) {
         Integer customCardViewTypeMap = getCustomCardViewType(chatAdapterViewType);
         if (customCardViewTypeMap != null) {
-            return onCreateViewHolder(parent, inflater, uiTheme, customCardViewTypeMap);
+            return onCreateViewHolder(parent, inflater, customCardViewTypeMap);
         }
         return null;
     }

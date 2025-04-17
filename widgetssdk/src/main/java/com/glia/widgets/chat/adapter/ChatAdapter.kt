@@ -182,7 +182,7 @@ internal class ChatAdapter(
             else -> {
                 var customCardViewHolder: CustomCardViewHolder? = null
                 if (customCardAdapter != null) {
-                    customCardViewHolder = customCardAdapter.getCustomCardViewHolder(parent, inflater, uiTheme, viewType)
+                    customCardViewHolder = customCardAdapter.getCustomCardViewHolder(parent, inflater, viewType)
                 }
                 customCardViewHolder ?: throw IllegalArgumentException("Unknown view type: $viewType")
             }
@@ -288,7 +288,7 @@ internal class ChatAdapter(
             is GvaPersistentButtons -> (holder as GvaPersistentButtonsViewHolder).bind(chatItem)
             is GvaGalleryCards -> (holder as GvaGalleryViewHolder).bind(chatItem, chatItemHeightManager.getMeasuredHeight(chatItem))
             is CustomCardChatItem -> {
-                (holder as CustomCardViewHolder).bind(chatItem.message) { text: String, value: String ->
+                (holder as CustomCardViewHolder).bind(CustomCardMessage(chatItem.message)) { text: String, value: String ->
                     onCustomCardResponse.onCustomCardResponse(chatItem, text, value)
                 }
             }

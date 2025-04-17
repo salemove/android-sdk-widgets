@@ -116,22 +116,30 @@ class MainFragment : Fragment() {
         val visitorContextAssetId = getContextAssetIdFromPrefs(sharedPreferences)
         view.findViewById<View>(R.id.chat_activity_button)
             .setOnClickListener {
-                visitorContextAssetId?.run { engagementLauncher.startChat(requireActivity(), this) }
+                visitorContextAssetId?.runCatching {
+                    engagementLauncher.startChat(requireActivity(), this)
+                }?.onFailure { error -> showToast("Error: ${error.message}") }
                     ?: engagementLauncher.startChat(requireActivity())
             }
         view.findViewById<View>(R.id.audio_call_button)
             .setOnClickListener {
-                visitorContextAssetId?.run { engagementLauncher.startAudioCall(requireActivity(), this) }
+                visitorContextAssetId?.runCatching {
+                    engagementLauncher.startAudioCall(requireActivity(), this)
+                }?.onFailure { error -> showToast("Error: ${error.message}") }
                     ?: engagementLauncher.startAudioCall(requireActivity())
             }
         view.findViewById<View>(R.id.video_call_button)
             .setOnClickListener {
-                visitorContextAssetId?.run { engagementLauncher.startVideoCall(requireActivity(), this) }
+                visitorContextAssetId?.runCatching {
+                    engagementLauncher.startVideoCall(requireActivity(), this)
+                }?.onFailure { error -> showToast("Error: ${error.message}") }
                     ?: engagementLauncher.startVideoCall(requireActivity())
             }
         view.findViewById<View>(R.id.message_center_activity_button)
             .setOnClickListener {
-                visitorContextAssetId?.run { engagementLauncher.startSecureMessaging(requireActivity(), this) }
+                visitorContextAssetId?.runCatching {
+                    engagementLauncher.startSecureMessaging(requireActivity(), this)
+                }?.onFailure { error -> showToast("Error: ${error.message}") }
                     ?: engagementLauncher.startSecureMessaging(requireActivity())
             }
         view.findViewById<View>(R.id.end_engagement_button)

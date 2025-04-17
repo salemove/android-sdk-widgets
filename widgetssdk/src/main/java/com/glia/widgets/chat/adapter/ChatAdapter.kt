@@ -182,7 +182,7 @@ internal class ChatAdapter(
             else -> {
                 var customCardViewHolder: CustomCardViewHolder? = null
                 if (customCardAdapter != null) {
-                    customCardViewHolder = customCardAdapter.getCustomCardViewHolder(parent, inflater, uiTheme, viewType)
+                    customCardViewHolder = customCardAdapter.getCustomCardViewHolder(parent, inflater, viewType)
                 }
                 customCardViewHolder ?: throw IllegalArgumentException("Unknown view type: $viewType")
             }

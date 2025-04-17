@@ -68,26 +68,6 @@ subprojects {
     dokkaPlugin(libs.java.dokka)
   }
 }
-// This is known bug in paparazzi 1.3.3 version.
-subprojects {
-  plugins.withId("app.cash.paparazzi") {
-    // Defer until afterEvaluate so that testImplementation is created by Android plugin.
-    afterEvaluate {
-      dependencies.constraints {
-        add("testImplementation", "com.google.guava:guava") {
-          attributes {
-            attribute(
-              TargetJvmEnvironment.TARGET_JVM_ENVIRONMENT_ATTRIBUTE,
-              objects.named(TargetJvmEnvironment, TargetJvmEnvironment.STANDARD_JVM)
-            )
-          }
-          because("LayoutLib and sdk-common depend on Guava's -jre published variant." +
-            "See https://github.com/cashapp/paparazzi/issues/906.")
-        }
-      }
-    }
-  }
-}
 
 tasks.register('clean', Delete) {
   delete rootProject.layout.buildDirectory

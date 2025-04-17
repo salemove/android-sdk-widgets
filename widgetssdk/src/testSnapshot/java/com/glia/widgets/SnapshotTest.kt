@@ -82,9 +82,9 @@ internal open class SnapshotTest(
 
     @After
     open fun tearDown() {
+        _paparazzi.close()
         onEndListeners.forEach { it() }
         onEndListeners.clear()
-        _paparazzi.close()
     }
 
     private val onEndListeners: MutableList<OnTestEnded> = mutableListOf()

@@ -4,12 +4,13 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.glia.androidsdk.chat.Chat;
 import com.glia.androidsdk.chat.ChatMessage;
-import com.glia.androidsdk.chat.MessageAttachment;
 import com.glia.androidsdk.chat.SingleChoiceAttachment;
 import com.glia.widgets.chat.adapter.CustomCardAdapter;
 
@@ -33,7 +34,7 @@ public class CustomCardShouldShowUseCaseTest {
     @Test
     public void execute_returnsTrue_whenIsNotSingleChoiceAttachment() {
         ChatMessage message = mock(ChatMessage.class);
-        MessageAttachment attachment = mock(MessageAttachment.class);
+        com.glia.androidsdk.chat.MessageAttachment attachment = mock(com.glia.androidsdk.chat.MessageAttachment.class);
         when(message.getAttachment()).thenReturn(attachment);
         CustomCardShouldShowUseCase useCase = new CustomCardShouldShowUseCase(null);
 
@@ -45,7 +46,7 @@ public class CustomCardShouldShowUseCaseTest {
     @Test
     public void execute_returnsTrue_whenAttachmentIsNull() {
         ChatMessage message = mock(ChatMessage.class);
-        MessageAttachment attachment = mock(MessageAttachment.class);
+        com.glia.androidsdk.chat.MessageAttachment attachment = mock(com.glia.androidsdk.chat.MessageAttachment.class);
         when(message.getAttachment()).thenReturn(attachment);
         CustomCardShouldShowUseCase useCase = new CustomCardShouldShowUseCase(null);
 
@@ -118,6 +119,9 @@ public class CustomCardShouldShowUseCaseTest {
     @Test
     public void execute_returnsFalse_whenCustomCardAdapterReturnsFalse() {
         ChatMessage message = mock(ChatMessage.class);
+        when(message.getId()).thenReturn("id");
+        when(message.getContent()).thenReturn("");
+        when(message.getSenderType()).thenReturn(Chat.Participant.OPERATOR);
         when(message.getMetadata()).thenReturn(new JSONObject());
         when(customCardAdapter.shouldShowCard(any(ChatMessage.class), anyInt())).thenReturn(false);
 
@@ -130,6 +134,9 @@ public class CustomCardShouldShowUseCaseTest {
     public void execute_returnsTrue_whenCustomCardAdapterReturnsTrue() {
         ChatMessage message = mock(ChatMessage.class);
         when(message.getMetadata()).thenReturn(new JSONObject());
+        when(message.getId()).thenReturn("id");
+        when(message.getContent()).thenReturn("");
+        when(message.getSenderType()).thenReturn(Chat.Participant.OPERATOR);
         when(customCardAdapter.shouldShowCard(any(ChatMessage.class), anyInt())).thenReturn(true);
 
         boolean result = useCase.execute(message, VIEW_TYPE, false);
@@ -140,11 +147,15 @@ public class CustomCardShouldShowUseCaseTest {
     @Test
     public void execute_callAdapter_whenAdapterNotNull() {
         ChatMessage message = mock(ChatMessage.class);
+        when(message.getId()).thenReturn("id");
+        when(message.getContent()).thenReturn("");
+        when(message.getSenderType()).thenReturn(Chat.Participant.OPERATOR);
         when(message.getMetadata()).thenReturn(new JSONObject());
         when(customCardAdapter.shouldShowCard(any(ChatMessage.class), anyInt())).thenReturn(true);
 
         useCase.execute(message, VIEW_TYPE, false);
 
-        verify(customCardAdapter).shouldShowCard(message, VIEW_TYPE);
+        verify(customCardAdapter).shouldShowCard(any(ChatMessage.class), eq(VIEW_TYPE));
     }
+
 }

@@ -14,7 +14,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.glia.androidsdk.chat.ChatMessage;
-import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.adapter.holder.CustomCardViewHolder;
 
 import org.junit.Before;
@@ -38,7 +37,7 @@ public class CustomCardAdapterTest {
 
     @Test
     public void getChatAdapterViewType_returnsNull_whenViewTypeIsNull() {
-        ChatMessage message = mock(ChatMessage.class);
+        ChatMessage message = new ChatMessage("1", "text", 1L, mock(), null, null, null);
 
         adapter.customViewType = null;
         Integer result = adapter.getChatAdapterViewType(message);
@@ -50,7 +49,7 @@ public class CustomCardAdapterTest {
     public void getChatAdapterViewType_returnsValueFromMap_ifExists() {
         adapter.viewTypeMap.put(CUSTOM_VIEW_TYPE_1, ADAPTER_VIEW_TYPE_1);
         adapter.viewTypeMap.put(CUSTOM_VIEW_TYPE_2, ADAPTER_VIEW_TYPE_2);
-        ChatMessage message = mock(ChatMessage.class);
+        ChatMessage message = new ChatMessage("1", "text", 1L, mock(), null, null, null);
 
         adapter.customViewType = CUSTOM_VIEW_TYPE_1;
         Integer result = adapter.getChatAdapterViewType(message);
@@ -65,7 +64,7 @@ public class CustomCardAdapterTest {
 
     @Test
     public void getChatAdapterViewType_returnsNewValue_ifItIsNewCustomType() {
-        ChatMessage message = mock(ChatMessage.class);
+        ChatMessage message = new ChatMessage("1", "text", 1L, mock(), null, null, null);
 
         adapter.customViewType = CUSTOM_VIEW_TYPE_3;
         Integer result = adapter.getChatAdapterViewType(message);
@@ -75,7 +74,7 @@ public class CustomCardAdapterTest {
 
     @Test
     public void getChatAdapterViewType_returnsNewValue_forNewCustomType() {
-        ChatMessage message = mock(ChatMessage.class);
+        ChatMessage message = new ChatMessage("1", "text", 1L, mock(), null, null, null);
 
         adapter.customViewType = CUSTOM_VIEW_TYPE_3;
         Integer ignore = adapter.getChatAdapterViewType(message);
@@ -113,9 +112,8 @@ public class CustomCardAdapterTest {
 
         ViewGroup parent = mock(ViewGroup.class);
         LayoutInflater inflater = mock(LayoutInflater.class);
-        UiTheme uiTheme = mock(UiTheme.class);
 
-        adapter.getCustomCardViewHolder(parent, inflater, uiTheme, ADAPTER_VIEW_TYPE_1);
+        adapter.getCustomCardViewHolder(parent, inflater, ADAPTER_VIEW_TYPE_1);
 
         assertTrue(adapter.isOnCreateViewHolderIsCalled);
     }
@@ -126,9 +124,8 @@ public class CustomCardAdapterTest {
 
         ViewGroup parent = mock(ViewGroup.class);
         LayoutInflater inflater = mock(LayoutInflater.class);
-        UiTheme uiTheme = mock(UiTheme.class);
 
-        adapter.getCustomCardViewHolder(parent, inflater, uiTheme, ADAPTER_VIEW_TYPE_2);
+        adapter.getCustomCardViewHolder(parent, inflater, ADAPTER_VIEW_TYPE_2);
 
         assertFalse(adapter.isOnCreateViewHolderIsCalled);
     }
@@ -139,18 +136,16 @@ public class CustomCardAdapterTest {
 
         ViewGroup parent = mock(ViewGroup.class);
         LayoutInflater inflater = mock(LayoutInflater.class);
-        UiTheme uiTheme = mock(UiTheme.class);
         CustomCardViewHolder viewHolder = mock(CustomCardViewHolder.class);
 
-        adapter.viewHolderCallback = (receivedParent, receivedInflater, receivedUiTheme, receivedViewType) -> {
+        adapter.viewHolderCallback = (receivedParent, receivedInflater, receivedViewType) -> {
             assertEquals(parent, receivedParent);
             assertEquals(inflater, receivedInflater);
-            assertEquals(uiTheme, receivedUiTheme);
             assertEquals(CUSTOM_VIEW_TYPE_1.intValue(), receivedViewType);
             return viewHolder;
         };
 
-        CustomCardViewHolder value = adapter.getCustomCardViewHolder(parent, inflater, uiTheme, ADAPTER_VIEW_TYPE_1);
+        CustomCardViewHolder value = adapter.getCustomCardViewHolder(parent, inflater, ADAPTER_VIEW_TYPE_1);
 
         assertEquals(viewHolder, value);
     }
@@ -162,7 +157,7 @@ public class CustomCardAdapterTest {
 
         @Nullable
         @Override
-        public Integer getItemViewType(ChatMessage message) {
+        public Integer getItemViewType(CustomCardMessage message) {
             return customViewType;
         }
 
@@ -170,17 +165,15 @@ public class CustomCardAdapterTest {
         @Override
         public CustomCardViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
                                                        @NonNull LayoutInflater inflater,
-                                                       @NonNull UiTheme uiTheme,
                                                        int viewType) {
             isOnCreateViewHolderIsCalled = true;
             if (viewHolderCallback == null) return null;
-            return viewHolderCallback.onCreateViewHolder(parent, inflater, uiTheme, viewType);
+            return viewHolderCallback.onCreateViewHolder(parent, inflater, viewType);
         }
 
         interface ViewHolderCallback {
             CustomCardViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
                                                     @NonNull LayoutInflater inflater,
-                                                    @NonNull UiTheme uiTheme,
                                                     int viewType);
         }
     }

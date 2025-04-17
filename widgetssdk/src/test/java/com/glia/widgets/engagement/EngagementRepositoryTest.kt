@@ -285,6 +285,7 @@ class EngagementRepositoryTest {
         assertEquals(visitorMediaState, repository.visitorCurrentMediaState)
         verify { visitorMediaState.video }
         verify { visitorMediaState.audio }
+        verify { media.currentCameraDevice }
 
         val videoOnHoldSlot = slot<Consumer<Boolean>>()
         val audioOnHoldSlot = slot<Consumer<Boolean>>()
@@ -394,13 +395,10 @@ class EngagementRepositoryTest {
         verify { media.off(Media.Events.MEDIA_UPGRADE_OFFER, any()) }
         verify { media.off(Media.Events.OPERATOR_STATE_UPDATE, any()) }
         verify { media.off(Media.Events.VISITOR_STATE_UPDATE, any()) }
-        verify { media.currentCameraDevice }
 
         verify { screenSharing.off(ScreenSharing.Events.SCREEN_SHARING_REQUEST, any()) }
         verify { screenSharing.off(ScreenSharing.Events.VISITOR_STATE, any()) }
 
-        verify { engagement.state }
-        verify { engagementState.operator }
         verify { engagement.media }
         verify { engagement.screenSharing }
         verify { chat.off(Chat.Events.OPERATOR_TYPING_STATUS, any()) }
@@ -619,6 +617,7 @@ class EngagementRepositoryTest {
         fillStates()
         operatorTypingCallbackSlot.captured.accept(OperatorTypingStatus { true })
         repository.endEngagement(EndedBy.CLEAR_STATE)
+        verify { engagement.state }
         operatorTypingStatusTestObserver.assertNotComplete().assertValues(true, false)
 
         verifyEngagementEnd()
@@ -630,6 +629,7 @@ class EngagementRepositoryTest {
         repository.updateIsSecureMessagingRequested(true)
         fillStates()
         repository.endEngagement(EndedBy.VISITOR)
+        verify { engagement.state }
         verifyEngagementEnd(endedBy = EndedBy.VISITOR, actionOnEnd = ActionOnEnd.SHOW_SURVEY)
 
         val onSuccessCallback = mockk<(Survey) -> Unit>(relaxed = true)
@@ -655,6 +655,7 @@ class EngagementRepositoryTest {
         repository.updateIsSecureMessagingRequested(true)
         fillStates()
         engagementEndCallbackSlot.captured.run()
+        verify { engagement.state }
         verifyEngagementEnd(endedBy = EndedBy.OPERATOR, actionOnEnd = ActionOnEnd.SHOW_SURVEY)
 
         val onSuccessCallback = mockk<(Survey) -> Unit>(relaxed = true)
@@ -679,6 +680,7 @@ class EngagementRepositoryTest {
         mockEngagementAndStart(actionOnEnd = ActionOnEnd.SHOW_SURVEY)
         fillStates()
         repository.endEngagement(EndedBy.VISITOR)
+        verify { engagement.state }
         verifyEngagementEnd(endedBy = EndedBy.VISITOR, actionOnEnd = ActionOnEnd.SHOW_SURVEY)
 
         val onSuccessCallback = mockk<(Survey) -> Unit>(relaxed = true)
@@ -702,6 +704,7 @@ class EngagementRepositoryTest {
         mockEngagementAndStart(actionOnEnd = ActionOnEnd.SHOW_SURVEY)
         fillStates()
         engagementEndCallbackSlot.captured.run()
+        verify { engagement.state }
         verifyEngagementEnd(endedBy = EndedBy.OPERATOR, actionOnEnd = ActionOnEnd.SHOW_SURVEY)
 
         val onSuccessCallback = mockk<(Survey) -> Unit>(relaxed = true)
@@ -726,6 +729,7 @@ class EngagementRepositoryTest {
         repository.updateIsSecureMessagingRequested(true)
         fillStates()
         engagementEndCallbackSlot.captured.run()
+        verify { engagement.state }
         verifyEngagementEnd(endedBy = EndedBy.OPERATOR, actionOnEnd = ActionOnEnd.RETAIN)
         assertTrue(repository.isSecureMessagingRequested)
     }

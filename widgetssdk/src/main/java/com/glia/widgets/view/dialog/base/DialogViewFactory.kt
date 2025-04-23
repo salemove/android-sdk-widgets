@@ -28,7 +28,7 @@ internal class DialogViewFactory(context: Context, uiTheme: UiTheme, unifiedThem
     }
 
     private val layoutInflater: LayoutInflater = LayoutInflater.from(context)
-    private val isVerticalAxis: Boolean = configuration.theme.isVerticalAxis ?: false
+    private val isVerticalAxis: Boolean = configuration.theme.isVerticalAxis == true
 
     fun createView(type: DialogType): View = getInflater(type).view
 

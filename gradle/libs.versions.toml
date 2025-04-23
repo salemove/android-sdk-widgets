@@ -3,7 +3,7 @@ javaVersion = "17"
 
 kotlinVersion = "2.0.21" # Kotlin and Dokka versions should have the same minor version to support the same kotlin version
 dokkaVersion = "2.0.0" # Kotlin and Dokka versions should have the same minor version to support the same kotlin version
-agpVersion = "8.9.1"
+agpVersion = "8.9.2"
 nexusPublishVersion = "2.0.0"
 ktlintVersion = "12.2.0"
 
@@ -19,7 +19,7 @@ javaKtorVersion = "3.1.2"
 javaCoroutinesVersion = "1.10.2" # newer versions require kotlin 2.0.0 or above
 javaDokkaVersion = "2.0.0"
 javaLifecycleProcessVersion = "2.8.7"
-javaLintVersion = "31.9.1"
+javaLintVersion = "31.9.2"
 javaMaterialVersion = "1.12.0"
 javaPreferenceVersion = "1.2.1"
 javaRxAndroid3Version = "3.0.2"

@@ -245,4 +245,8 @@
     <string name="entry_widget_call_visualizer_button_label">Call Visualizer</string>
     <string name="entry_widget_call_visualizer_description">You are already in contact with the support team</string>
 
+<!--    Push Notifications-->
+    <string name="push_notifications_alert_title">Allow Push Notifications</string>
+    <string name="push_notifications_alert_message">Please allow push notifications to receive new messages alerts.</string>
+
 </resources>

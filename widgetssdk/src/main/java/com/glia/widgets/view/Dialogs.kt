@@ -285,6 +285,25 @@ internal object Dialogs {
         return dialogService.showDialog(context, theme, DialogType.OptionWithNegativeNeutral(payload))
     }
 
+    fun showPushNotificationsPermissionDialog(
+        context: Context,
+        uiTheme: UiTheme,
+        positiveButtonClickListener: View.OnClickListener,
+        negativeButtonClickListener: View.OnClickListener
+    ): AlertDialog {
+        val payload = DialogPayload.Option(
+            title = LocaleString(R.string.push_notifications_alert_title),
+            message = LocaleString(R.string.push_notifications_alert_message),
+            positiveButtonText = allow,
+            negativeButtonText = cancel,
+            poweredByText = poweredByText,
+            positiveButtonClickListener = positiveButtonClickListener,
+            negativeButtonClickListener = negativeButtonClickListener
+        )
+
+        return dialogService.showDialog(context, uiTheme, DialogType.Option(payload))
+    }
+
     private fun Window.allowOutsideTouch() {
         setFlags(
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,

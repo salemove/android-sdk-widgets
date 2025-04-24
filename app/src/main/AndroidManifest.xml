@@ -46,7 +46,7 @@
             android:configChanges="orientation|screenSize" />
 
         <service
-            android:name="com.glia.androidsdk.fcm.GliaFcmService"
+            android:name="com.glia.widgets.fcm.GliaFcmService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

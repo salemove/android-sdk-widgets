@@ -34,6 +34,22 @@ def setupFilesForPublishing(publication) {
         }
     }
 
+    // Remove optional dependencies from the Widgets SDK
+    // to avoid requiring integrators to include them in their applications.
+    publication.pom.withXml {
+        final pomNode = asNode()
+        pomNode.dependencyManagement.dependencies.'*'.findAll() {
+            it.artifactId.text() == 'firebase-bom'
+        }.each() {
+            it.parent().remove(it)
+        }
+        pomNode.dependencies.'*'.findAll() {
+            it.artifactId.text() == 'firebase-messaging'
+        }.each() {
+            it.parent().remove(it)
+        }
+    }
+
     publication.pom {
         name = PUBLISH_ARTIFACT_ID
         description = PUBLISH_MODULE_DESCRIPTION

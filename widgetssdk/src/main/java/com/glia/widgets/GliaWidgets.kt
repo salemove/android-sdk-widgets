@@ -451,6 +451,12 @@ object GliaWidgets {
         }
     }
 
+    /**
+     * Handles FCM tokens and push messages.
+     *
+     * @return [PushNotifications]
+     */
+    @JvmStatic
     fun getPushNotifications(): PushNotifications {
         return pushNotifications
     }

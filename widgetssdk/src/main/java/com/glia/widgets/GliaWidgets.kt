@@ -197,6 +197,7 @@ object GliaWidgets {
      *  Please note, that `true` doesn't mean that credentials are valid/correct.
      * @see [GliaWidgets.init]
      */
+    @JvmStatic
     fun isInitialized(): Boolean {
         return glia().isInitialized
     }
@@ -210,6 +211,7 @@ object GliaWidgets {
      * @throws GliaWidgetsException with the [GliaWidgetsException.Cause.INVALID_INPUT] if the SDK is not initialized.
      */
     @Synchronized
+    @JvmStatic
     fun getEngagementLauncher(queueIds: List<String>): EngagementLauncher {
         Logger.i(TAG, "Returning an Engagement Launcher")
         try {
@@ -229,6 +231,7 @@ object GliaWidgets {
      * @throws GliaWidgetsException with the [GliaWidgetsException.Cause.INVALID_INPUT] if the SDK is not initialized.
      */
     @Synchronized
+    @JvmStatic
     fun getEntryWidget(queueIds: List<String>): EntryWidget {
         if (!glia().isInitialized) {
             Logger.e(TAG, "Attempt to get EntryWidget before SDK initialization")
@@ -259,6 +262,7 @@ object GliaWidgets {
      *
      */
     @Deprecated("This method is no longer required, as all the required permissions are now managed internally.")
+    @JvmStatic
     fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
@@ -289,6 +293,7 @@ object GliaWidgets {
      *
      */
     @Deprecated("This method is no longer required, as required activity results are now managed internally.")
+    @JvmStatic
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         Logger.d(TAG, "onActivityResult")
         try {
@@ -306,6 +311,7 @@ object GliaWidgets {
      * @param onError Callback invoked when an error occurs during the retrieval process.
      *                Provides a [GliaWidgetsException] describing the error.
      */
+    @JvmStatic
     fun getVisitorInfo(
         onSuccess: OnSuccess<VisitorInfo?>,
         onError: OnError
@@ -330,6 +336,7 @@ object GliaWidgets {
      * @param onError Callback invoked when an error occurs during the update operation.
      *                Provides a [GliaWidgetsException] describing the error.
      */
+    @JvmStatic
     fun updateVisitorInfo(
         visitorInfoUpdateRequest: VisitorInfoUpdateRequest,
         onComplete: OnComplete,
@@ -350,6 +357,7 @@ object GliaWidgets {
      * Clears visitor session
      * @throws GliaWidgetsException with [GliaWidgetsException.Cause]
      */
+    @JvmStatic
     fun clearVisitorSession() {
         Logger.i(TAG, "Clear visitor session")
         try {
@@ -373,6 +381,7 @@ object GliaWidgets {
      * Ends active engagement if existing and closes Widgets SDK UI (includes bubble).
      * @throws GliaWidgetsException with [GliaWidgetsException.Cause]
      */
+    @JvmStatic
     fun endEngagement() {
         Logger.i(TAG, "End engagement by integrator")
         try {
@@ -391,6 +400,7 @@ object GliaWidgets {
      * [GliaWidgetsException.Cause.INVALID_INPUT] - when SDK is not initialized
      */
     @Deprecated("Please use getAuthentication(behavior: com.glia.widgets.core.visitor.Authentication.Behavior)")
+    @JvmStatic
     fun getAuthentication(behavior: com.glia.androidsdk.visitor.Authentication.Behavior): Authentication {
         try {
             return Dependencies.getAuthenticationManager(behavior.toWidgetsType())
@@ -407,6 +417,7 @@ object GliaWidgets {
      * Exception may have the following cause:
      * [GliaWidgetsException.Cause.INVALID_INPUT] - when SDK is not initialized
      */
+    @JvmStatic
     fun getAuthentication(behavior: Authentication.Behavior): Authentication {
         try {
             return getAuthenticationManager(behavior)

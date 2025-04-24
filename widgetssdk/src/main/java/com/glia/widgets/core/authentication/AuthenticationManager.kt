@@ -24,6 +24,8 @@ internal class AuthenticationManager(
         externalAccessToken: String?,
         requestCallback: RequestCallback<Void>
     ) {
+        //TODO The business logic will be added on the next step
+//        Dependencies.controllerFactory.globalDialogController.showNotificationPermissionDialog(onAllow = {}, onCancel = {})
         Dependencies.destroyControllersAndResetQueueing()
 
         Logger.i(TAG, "Authenticate. Is external access token used: ${externalAccessToken != null}")

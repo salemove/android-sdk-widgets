@@ -7,7 +7,6 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import com.glia.androidsdk.Glia
 import com.glia.androidsdk.GliaConfig
-import com.glia.androidsdk.GliaException
 import com.glia.widgets.GliaWidgetsConfig
 import com.glia.widgets.StringProvider
 import com.glia.widgets.callvisualizer.CallVisualizerActivityWatcher
@@ -40,6 +39,7 @@ import com.glia.widgets.launcher.EngagementLauncherImpl
 import com.glia.widgets.locale.LocaleProvider
 import com.glia.widgets.operator.OperatorRequestActivityWatcher
 import com.glia.widgets.permissions.ActivityWatcherForPermissionsRequest
+import com.glia.widgets.view.dialog.ActivityWatcherForDialog
 import com.glia.widgets.view.head.ActivityWatcherForChatHead
 import com.glia.widgets.view.head.ChatHeadContract
 import com.glia.widgets.view.snackbar.ActivityWatcherForSnackbar
@@ -213,6 +213,13 @@ internal object Dependencies {
             gliaThemeManager
         )
         application.registerActivityLifecycleCallbacks(activityWatcherForSnackbar)
+
+        application.registerActivityLifecycleCallbacks(
+            ActivityWatcherForDialog(
+                GliaActivityManagerImpl(),
+                controllerFactory.globalDialogController
+            )
+        )
     }
 
     @JvmStatic
@@ -258,7 +265,7 @@ internal object Dependencies {
         chatBubbleController: ChatHeadContract.Controller
     ) {
         lifecycleManager.addObserver { _, event: Lifecycle.Event ->
-            when(event) {
+            when (event) {
                 Lifecycle.Event.ON_PAUSE -> {
                     // Moved to on pause due to "IllegalStateException: Not allowed to start service app is in background"
                     // Related bug ticket MOB-4011
@@ -266,6 +273,7 @@ internal object Dependencies {
                         notificationManager.startNotificationRemovalService()
                     }
                 }
+
                 Lifecycle.Event.ON_STOP -> chatBubbleController.onApplicationStop()
                 Lifecycle.Event.ON_DESTROY -> chatBubbleController.onDestroy()
                 else -> { /* no-op */ }

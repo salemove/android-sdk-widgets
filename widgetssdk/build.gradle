@@ -117,6 +117,9 @@ dependencies {
   implementation libs.java.core.ktx
   implementation libs.media.exif.interface
 
+  implementation platform(libs.firebase.bom)
+  implementation libs.firebase.messaging
+
   testImplementation libs.test.junit
   testImplementation libs.test.mockito.kotlin
   testImplementation libs.test.core.testing

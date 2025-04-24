@@ -24,6 +24,8 @@ import com.glia.widgets.core.visitor.Authentication
 import com.glia.widgets.engagement.completion.EngagementCompletionActivityWatcher
 import com.glia.widgets.entrywidget.EntryWidget
 import com.glia.widgets.entrywidget.EntryWidgetImpl
+import com.glia.widgets.fcm.PushNotifications
+import com.glia.widgets.fcm.PushNotificationsImpl
 import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource
 import com.glia.widgets.helper.ApplicationLifecycleManager
 import com.glia.widgets.helper.DeviceMonitor
@@ -110,6 +112,11 @@ internal object Dependencies {
             controllerFactory.entryWidgetHideController,
             useCaseFactory.hasOngoingSecureConversationUseCase
         )
+
+    @JvmStatic
+    val pushNotifications: PushNotifications by lazy {
+        PushNotificationsImpl(gliaCore.pushNotifications)
+    }
 
     @JvmStatic
     lateinit var repositoryFactory: RepositoryFactory

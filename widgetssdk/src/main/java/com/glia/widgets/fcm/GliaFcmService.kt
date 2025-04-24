@@ -1,6 +1,6 @@
 package com.glia.widgets.fcm
 
-import com.glia.androidsdk.Glia
+import com.glia.widgets.GliaWidgets
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
@@ -28,13 +28,13 @@ import com.google.firebase.messaging.RemoteMessage
 class GliaFcmService : FirebaseMessagingService() {
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        Glia.getPushNotifications()
+        GliaWidgets.getPushNotifications()
             .updateFcmToken(token)
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
-        Glia.getPushNotifications()
+        GliaWidgets.getPushNotifications()
             .onNewMessage(remoteMessage)
     }
 }

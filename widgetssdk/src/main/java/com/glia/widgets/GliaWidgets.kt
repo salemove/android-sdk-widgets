@@ -24,11 +24,13 @@ import com.glia.widgets.di.Dependencies.entryWidget
 import com.glia.widgets.di.Dependencies.glia
 import com.glia.widgets.di.Dependencies.gliaThemeManager
 import com.glia.widgets.di.Dependencies.onSdkInit
+import com.glia.widgets.di.Dependencies.pushNotifications
 import com.glia.widgets.di.Dependencies.repositoryFactory
 import com.glia.widgets.di.Dependencies.setAuthenticationManager
 import com.glia.widgets.di.Dependencies.useCaseFactory
 import com.glia.widgets.engagement.EndedBy
 import com.glia.widgets.entrywidget.EntryWidget
+import com.glia.widgets.fcm.PushNotifications
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.Logger.SITE_ID_KEY
 import com.glia.widgets.helper.Logger.addGlobalMetadata
@@ -428,6 +430,10 @@ object GliaWidgets {
         } catch (gliaException: GliaException) {
             throw mapCoreExceptionToWidgets(gliaException)
         }
+    }
+
+    fun getPushNotifications(): PushNotifications {
+        return pushNotifications
     }
 
     private fun setupQueueIds(queueIds: List<String>) {

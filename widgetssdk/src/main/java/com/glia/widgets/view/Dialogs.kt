@@ -160,8 +160,8 @@ internal object Dialogs {
             poweredByText = poweredByText,
             positiveButtonClickListener = positiveButtonClickListener,
             negativeButtonClickListener = negativeButtonClickListener,
-            link1ClickListener = { links.link1.let { linkClickListener(it) } },
-            link2ClickListener = { links.link2.let { linkClickListener(it) } }
+            link1ClickListener = { linkClickListener(links.link1) },
+            link2ClickListener = { linkClickListener(links.link2) }
         )
 
         return dialogService.showDialog(context, theme, DialogType.Confirmation(payload))

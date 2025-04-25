@@ -12,6 +12,7 @@ import com.glia.widgets.chat.adapter.CustomCardAdapter
 import com.glia.widgets.chat.adapter.WebViewCardAdapter
 import com.glia.widgets.core.authentication.toCoreType
 import com.glia.widgets.core.callvisualizer.domain.CallVisualizer
+import com.glia.widgets.core.secureconversations.SecureConversations
 import com.glia.widgets.core.visitor.Authentication
 import com.glia.widgets.core.visitor.VisitorInfo
 import com.glia.widgets.core.visitor.VisitorInfoUpdateRequest
@@ -26,6 +27,7 @@ import com.glia.widgets.di.Dependencies.gliaThemeManager
 import com.glia.widgets.di.Dependencies.onSdkInit
 import com.glia.widgets.di.Dependencies.pushNotifications
 import com.glia.widgets.di.Dependencies.repositoryFactory
+import com.glia.widgets.di.Dependencies.secureConversations
 import com.glia.widgets.di.Dependencies.setAuthenticationManager
 import com.glia.widgets.di.Dependencies.useCaseFactory
 import com.glia.widgets.engagement.EndedBy
@@ -427,6 +429,23 @@ object GliaWidgets {
             val authentication = glia().getAuthenticationManager(widgetsBehavior)
             setAuthenticationManager(authentication)
             return authentication
+        } catch (gliaException: GliaException) {
+            throw mapCoreExceptionToWidgets(gliaException)
+        }
+    }
+
+    /**
+     * Creates `SecureConversations` instance for secure conversations.
+     *
+     * @return {@code SecureConversations} object or throws [GliaWidgetsException] if error happened.
+     * Exception may have the following cause:
+     * [GliaWidgetsException.Cause.INVALID_INPUT] - when SDK is not initialized
+     */
+    @Suppress("unused")
+    @JvmStatic
+    fun getSecureConversations(): SecureConversations {
+        try {
+            return secureConversations
         } catch (gliaException: GliaException) {
             throw mapCoreExceptionToWidgets(gliaException)
         }

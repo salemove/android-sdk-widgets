@@ -20,6 +20,8 @@ import com.glia.widgets.core.dialog.PermissionDialogManager
 import com.glia.widgets.core.notification.device.INotificationManager
 import com.glia.widgets.core.notification.device.NotificationManager
 import com.glia.widgets.core.permissions.PermissionManager
+import com.glia.widgets.core.secureconversations.SecureConversations
+import com.glia.widgets.core.secureconversations.SecureConversationsImpl
 import com.glia.widgets.core.visitor.Authentication
 import com.glia.widgets.engagement.completion.EngagementCompletionActivityWatcher
 import com.glia.widgets.entrywidget.EntryWidget
@@ -116,6 +118,11 @@ internal object Dependencies {
     @JvmStatic
     lateinit var repositoryFactory: RepositoryFactory
         @VisibleForTesting set
+
+    @JvmStatic
+    val secureConversations: SecureConversations by lazy {
+        SecureConversationsImpl(gliaCore.secureConversations)
+    }
 
     @Synchronized
     @JvmStatic

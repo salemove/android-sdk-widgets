@@ -131,7 +131,7 @@ public abstract class CustomCardAdapter {
      */
     @Deprecated
     public boolean shouldShowCard(ChatMessage message, int viewType) {
-        return false;
+        return shouldShowCard(new CustomCardMessage(message), viewType);
     }
 
     /**

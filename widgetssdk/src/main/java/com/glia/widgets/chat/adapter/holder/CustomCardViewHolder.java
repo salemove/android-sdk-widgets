@@ -5,6 +5,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.glia.androidsdk.chat.ChatMessage;
 import com.glia.widgets.chat.adapter.CustomCardMessage;
 
 /**
@@ -49,12 +50,24 @@ public abstract class CustomCardViewHolder extends RecyclerView.ViewHolder {
     }
 
     /**
+     * Called to display the data for the specified {@link ChatMessage}. This method should
+     * update the content of {@link #itemView} to reflect the item for the given message.
+     * @param message a chat message with metadata.
+     * @param callback can be used to send the selected card option.
+     * @deprecated Use {@link #bind(CustomCardMessage, ResponseCallback)}
+     */
+    @Deprecated
+    public void bind(@NonNull ChatMessage message, @NonNull ResponseCallback callback) {
+        bind(new CustomCardMessage(message), callback);
+    }
+
+    /**
      * Called to display the data for the specified {@link CustomCardMessage}. This method should
      * update the content of {@link #itemView} to reflect the item for the given message.
      * @param message a chat message with metadata.
      * @param callback can be used to send the selected card option.
      */
-    public abstract void bind(@NonNull CustomCardMessage message, @NonNull ResponseCallback callback);
+    public void bind(@NonNull CustomCardMessage message, @NonNull ResponseCallback callback) {}
 
     /**
      * Allows returning the selected card.

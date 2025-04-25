@@ -3,7 +3,6 @@ package com.glia.widgets.chat.domain
 import com.glia.androidsdk.chat.ChatMessage
 import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.widgets.chat.adapter.CustomCardAdapter
-import com.glia.widgets.chat.adapter.CustomCardMessage
 
 internal class CustomCardShouldShowUseCase(private val adapter: CustomCardAdapter?) {
     fun execute(message: ChatMessage, viewType: Int, shouldApplySelectedOption: Boolean): Boolean {
@@ -13,7 +12,7 @@ internal class CustomCardShouldShowUseCase(private val adapter: CustomCardAdapte
         if (adapter == null || message.metadata == null) {
             return false
         }
-        return adapter.shouldShowCard(CustomCardMessage(message), viewType)
+        return adapter.shouldShowCard(message, viewType)
     }
 
     private fun hasSelectedOption(message: ChatMessage): Boolean {

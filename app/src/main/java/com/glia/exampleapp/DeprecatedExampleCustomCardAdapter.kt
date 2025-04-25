@@ -7,8 +7,8 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import com.glia.androidsdk.chat.ChatMessage
+import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.widgets.chat.adapter.CustomCardAdapter
-import com.glia.widgets.chat.adapter.CustomCardMessage
 import com.glia.widgets.chat.adapter.holder.CustomCardViewHolder
 import com.glia.widgets.chat.adapter.holder.WebViewViewHolder
 import org.json.JSONException
@@ -62,13 +62,13 @@ class DeprecatedExampleCustomCardAdapter : CustomCardAdapter() {
         private val okButton: Button =
             itemView.findViewById(R.id.ok_button)
 
-        override fun bind(message: CustomCardMessage, callback: ResponseCallback) {
+        override fun bind(message: ChatMessage, callback: ResponseCallback) {
             try {
                 val metadata = message.metadata?.toString(2)
                 metadataTextView.text = String.format("\"metadata\": %s", metadata)
 
                 if (message.metadata?.optBoolean(SHOW_BUTTON_KEY, false) == true) {
-                    if ("ok_value" == message.selectedOption) {
+                    if ("ok_value" == (message.attachment as? SingleChoiceAttachment)?.selectedOption) {
                         okButton.setOnClickListener(null)
                         okButton.isSelected = true
                         okButton.isClickable = false

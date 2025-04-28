@@ -12,6 +12,7 @@ import androidx.collection.SparseArrayCompat;
 
 import com.glia.androidsdk.chat.ChatMessage;
 import com.glia.widgets.chat.adapter.holder.CustomCardViewHolder;
+import com.glia.widgets.helper.Logger;
 
 /**
  * The base class of CustomCardAdapter.
@@ -21,6 +22,8 @@ import com.glia.widgets.chat.adapter.holder.CustomCardViewHolder;
  * @see WebViewCardAdapter
  */
 public abstract class CustomCardAdapter {
+
+    private static final String TAG = CustomCardAdapter.class.getSimpleName();
 
     @VisibleForTesting
     // Map of relations between custom card view types and adapter view types.
@@ -151,6 +154,7 @@ public abstract class CustomCardAdapter {
     public final Integer getChatAdapterViewType(ChatMessage message) {
         Integer customCardViewType = getItemViewType(new CustomCardMessage(message));
         if (customCardViewType == null) {
+            Logger.i(TAG, "Get item view type for CustomCardMessage returned null");
             customCardViewType = getItemViewType(message);
         }
         if (customCardViewType != null) {
@@ -163,6 +167,8 @@ public abstract class CustomCardAdapter {
                 viewTypeMap.put(customCardViewType, chatAdapterViewType);
             }
             return chatAdapterViewType;
+        } else {
+            Logger.i(TAG, "Get item view type for ChatMessage returned null");
         }
         return null;
     }

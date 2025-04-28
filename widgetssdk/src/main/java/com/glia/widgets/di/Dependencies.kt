@@ -17,6 +17,8 @@ import com.glia.widgets.core.authentication.AuthenticationManager
 import com.glia.widgets.core.callvisualizer.CallVisualizerManager
 import com.glia.widgets.core.chathead.ChatHeadManager
 import com.glia.widgets.core.dialog.PermissionDialogManager
+import com.glia.widgets.core.liveobservation.LiveObservation
+import com.glia.widgets.core.liveobservation.LiveObservationImpl
 import com.glia.widgets.core.notification.device.INotificationManager
 import com.glia.widgets.core.notification.device.NotificationManager
 import com.glia.widgets.core.permissions.PermissionManager
@@ -122,6 +124,11 @@ internal object Dependencies {
     @JvmStatic
     val secureConversations: SecureConversations by lazy {
         SecureConversationsImpl(gliaCore.secureConversations)
+    }
+
+    @JvmStatic
+    val liveObservation: LiveObservation by lazy {
+        LiveObservationImpl(gliaCore.liveObservation)
     }
 
     @Synchronized

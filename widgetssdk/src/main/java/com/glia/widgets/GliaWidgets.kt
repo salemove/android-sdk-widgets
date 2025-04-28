@@ -13,6 +13,7 @@ import com.glia.widgets.chat.adapter.WebViewCardAdapter
 import com.glia.widgets.core.authentication.toCoreType
 import com.glia.widgets.core.authentication.toWidgetsType
 import com.glia.widgets.core.callvisualizer.domain.CallVisualizer
+import com.glia.widgets.core.liveobservation.LiveObservation
 import com.glia.widgets.core.secureconversations.SecureConversations
 import com.glia.widgets.core.visitor.Authentication
 import com.glia.widgets.core.visitor.VisitorInfo
@@ -26,6 +27,7 @@ import com.glia.widgets.di.Dependencies.entryWidget
 import com.glia.widgets.di.Dependencies.getAuthenticationManager
 import com.glia.widgets.di.Dependencies.glia
 import com.glia.widgets.di.Dependencies.gliaThemeManager
+import com.glia.widgets.di.Dependencies.liveObservation
 import com.glia.widgets.di.Dependencies.onSdkInit
 import com.glia.widgets.di.Dependencies.pushNotifications
 import com.glia.widgets.di.Dependencies.repositoryFactory
@@ -442,6 +444,23 @@ object GliaWidgets {
     fun getSecureConversations(): SecureConversations {
         try {
             return secureConversations
+        } catch (gliaException: GliaException) {
+            throw mapCoreExceptionToWidgets(gliaException)
+        }
+    }
+
+    /**
+     * Handles Live Observation
+     *
+     * @return {@code LiveObservation} object or throws [GliaWidgetsException] if error happened.
+     * Exception may have the following cause:
+     * [GliaWidgetsException.Cause.INVALID_INPUT] - when SDK is not initialized or initialization failed.
+     */
+    @Suppress("unused")
+    @JvmStatic
+    fun getLiveObservation(): LiveObservation {
+        try {
+            return liveObservation
         } catch (gliaException: GliaException) {
             throw mapCoreExceptionToWidgets(gliaException)
         }

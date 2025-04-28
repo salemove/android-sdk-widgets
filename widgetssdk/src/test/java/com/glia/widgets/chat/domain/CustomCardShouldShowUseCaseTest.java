@@ -13,7 +13,6 @@ import com.glia.androidsdk.chat.Chat;
 import com.glia.androidsdk.chat.ChatMessage;
 import com.glia.androidsdk.chat.SingleChoiceAttachment;
 import com.glia.widgets.chat.adapter.CustomCardAdapter;
-import com.glia.widgets.chat.adapter.CustomCardMessage;
 
 import org.json.JSONObject;
 import org.junit.Before;
@@ -138,7 +137,7 @@ public class CustomCardShouldShowUseCaseTest {
         when(message.getId()).thenReturn("id");
         when(message.getContent()).thenReturn("");
         when(message.getSenderType()).thenReturn(Chat.Participant.OPERATOR);
-        when(customCardAdapter.shouldShowCard(any(CustomCardMessage.class), anyInt())).thenReturn(true);
+        when(customCardAdapter.shouldShowCard(any(ChatMessage.class), anyInt())).thenReturn(true);
 
         boolean result = useCase.execute(message, VIEW_TYPE, false);
 
@@ -156,6 +155,7 @@ public class CustomCardShouldShowUseCaseTest {
 
         useCase.execute(message, VIEW_TYPE, false);
 
-        verify(customCardAdapter).shouldShowCard(any(CustomCardMessage.class), eq(VIEW_TYPE));
+        verify(customCardAdapter).shouldShowCard(any(ChatMessage.class), eq(VIEW_TYPE));
     }
+
 }

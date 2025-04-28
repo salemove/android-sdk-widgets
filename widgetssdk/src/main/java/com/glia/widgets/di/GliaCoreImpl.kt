@@ -12,6 +12,7 @@ import com.glia.androidsdk.chat.ChatMessage
 import com.glia.androidsdk.comms.EngagementOptions
 import com.glia.androidsdk.engagement.Survey
 import com.glia.androidsdk.fcm.PushNotifications
+import com.glia.androidsdk.liveobservation.LiveObservation
 import com.glia.androidsdk.omnibrowse.Omnibrowse
 import com.glia.androidsdk.queuing.Queue
 import com.glia.androidsdk.queuing.QueueTicket
@@ -39,6 +40,9 @@ internal class GliaCoreImpl : GliaCore {
 
     override val secureConversations: SecureConversations
         get() = Glia.getSecureConversations()
+
+    override val liveObservation: LiveObservation
+        get() = Glia.getLiveObservation()
 
     @Synchronized
     @Throws(GliaException::class)

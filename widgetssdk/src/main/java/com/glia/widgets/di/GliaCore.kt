@@ -11,6 +11,7 @@ import com.glia.androidsdk.chat.ChatMessage
 import com.glia.androidsdk.comms.EngagementOptions
 import com.glia.androidsdk.engagement.Survey
 import com.glia.androidsdk.fcm.PushNotifications
+import com.glia.androidsdk.liveobservation.LiveObservation
 import com.glia.androidsdk.omnibrowse.Omnibrowse
 import com.glia.androidsdk.queuing.Queue
 import com.glia.androidsdk.queuing.QueueTicket
@@ -30,6 +31,7 @@ internal interface GliaCore {
     val currentEngagement: Optional<Engagement>
     val callVisualizer: Omnibrowse
     val secureConversations: SecureConversations
+    val liveObservation: LiveObservation
     @Throws(GliaException::class)
     fun init(config: GliaConfig)
     fun init(config: GliaConfig, callback: RequestCallback<Boolean?>)

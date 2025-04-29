@@ -7,8 +7,8 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import com.glia.androidsdk.Glia
 import com.glia.androidsdk.GliaConfig
+import com.glia.androidsdk.visitor.Authentication
 import com.glia.widgets.GliaWidgetsConfig
-import com.glia.widgets.StringProvider
 import com.glia.widgets.callvisualizer.CallVisualizerActivityWatcher
 import com.glia.widgets.core.audio.AudioControlManager
 import com.glia.widgets.core.audio.domain.OnAudioStartedUseCase
@@ -40,6 +40,8 @@ import com.glia.widgets.locale.LocaleProvider
 import com.glia.widgets.operator.OperatorRequestActivityWatcher
 import com.glia.widgets.permissions.ActivityWatcherForPermissionsRequest
 import com.glia.widgets.view.dialog.ActivityWatcherForDialog
+import com.glia.widgets.view.dialog.DialogDispatcher
+import com.glia.widgets.view.dialog.DialogDispatcherImpl
 import com.glia.widgets.view.head.ActivityWatcherForChatHead
 import com.glia.widgets.view.head.ChatHeadContract
 import com.glia.widgets.view.snackbar.ActivityWatcherForSnackbar
@@ -64,7 +66,9 @@ internal object Dependencies {
     @JvmStatic
     lateinit var useCaseFactory: UseCaseFactory
         @VisibleForTesting set
+
     private lateinit var managerFactory: ManagerFactory
+
     var gliaCore: GliaCore = GliaCoreImpl()
         @VisibleForTesting set
 
@@ -108,6 +112,11 @@ internal object Dependencies {
     @JvmStatic
     lateinit var repositoryFactory: RepositoryFactory
         @VisibleForTesting set
+
+    private val dialogDispatcher: DialogDispatcher by lazy { DialogDispatcherImpl() }
+
+    private val authenticationCallback: () -> Unit
+        get() = useCaseFactory.getRequestPushNotificationDuringAuthenticationUseCase(dialogDispatcher)::invoke
 
     @Synchronized
     @JvmStatic
@@ -214,12 +223,7 @@ internal object Dependencies {
         )
         application.registerActivityLifecycleCallbacks(activityWatcherForSnackbar)
 
-        application.registerActivityLifecycleCallbacks(
-            ActivityWatcherForDialog(
-                GliaActivityManagerImpl(),
-                controllerFactory.globalDialogController
-            )
-        )
+        application.registerActivityLifecycleCallbacks(ActivityWatcherForDialog(GliaActivityManagerImpl(), dialogDispatcher))
     }
 
     @JvmStatic
@@ -246,19 +250,16 @@ internal object Dependencies {
             .build()
     }
 
-    @Deprecated(" This feature is not public anymore")
-    val stringProvider: StringProvider
-        get() = localeProvider
-
     @JvmStatic
     fun glia(): GliaCore {
         return gliaCore
     }
 
     @JvmStatic
-    fun setAuthenticationManager(authenticationManager: AuthenticationManager) {
-        authenticationManagerProvider.authenticationManager = authenticationManager
-    }
+    fun getAuthenticationManager(behavior: Authentication.Behavior): AuthenticationManager =
+        AuthenticationManager(gliaCore.getAuthentication(behavior), authenticationCallback).apply {
+            authenticationManagerProvider.authenticationManager = this
+        }
 
     private fun initApplicationLifecycleObserver(
         lifecycleManager: ApplicationLifecycleManager,
@@ -276,7 +277,8 @@ internal object Dependencies {
 
                 Lifecycle.Event.ON_STOP -> chatBubbleController.onApplicationStop()
                 Lifecycle.Event.ON_DESTROY -> chatBubbleController.onDestroy()
-                else -> { /* no-op */ }
+                else -> { /* no-op */
+                }
             }
         }
     }
@@ -297,6 +299,9 @@ internal object Dependencies {
         repositoryFactory.engagementRepository.reset()
 
         destroyControllers()
+        //This function is called when the clear visitor session or de-authenticate is called
+        //so these are the cases, where potentially the dialog can be shown
+        dialogDispatcher.dismissDialog()
     }
 
     fun destroyControllersAndResetQueueing() {

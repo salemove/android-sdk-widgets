@@ -30,6 +30,8 @@ internal class PermissionManager(
 
     fun hasPermission(permission: String) = checkSelfPermission(applicationContext, permission) == PackageManager.PERMISSION_GRANTED
 
+    fun shouldShowPermissionRationale(permission: String): Boolean = permissionsRequestRepository.shouldShowPermissionRationale(permission)
+
     @SuppressLint("InlinedApi")
     fun getPermissionsForMediaUpgradeOffer(offer: MediaUpgradeOffer): Permissions {
         Logger.i(TAG, "Request permissions for media upgrade offer")
@@ -114,7 +116,9 @@ internal class PermissionManager(
         callback: PermissionsRequestResult? = null
     ) {
         Logger.i(TAG, "Request permissions")
-        val allPermissions = (necessaryPermissions ?: emptyList()) + (additionalPermissions ?: emptyList())
+        val necessaryPermissionsSafe = necessaryPermissions.orEmpty()
+        val additionalPermissionsSafe = additionalPermissions.orEmpty()
+        val allPermissions = necessaryPermissionsSafe + additionalPermissionsSafe
 
         if (allPermissions.isEmpty()) {
             necessaryPermissionsGrantedCallback?.invoke(true)
@@ -125,10 +129,8 @@ internal class PermissionManager(
 
         requestPermissions(allPermissions) { result, exception ->
             if (result != null) {
-                necessaryPermissionsGrantedCallback
-                    ?.invoke(necessaryPermissions?.any { result[it] == false }?.not() ?: true)
-                additionalPermissionsGrantedCallback
-                    ?.invoke(additionalPermissions?.any { result[it] == false }?.not() ?: true)
+                necessaryPermissionsGrantedCallback?.invoke(necessaryPermissionsSafe.none { result[it] == false })
+                additionalPermissionsGrantedCallback?.invoke(additionalPermissionsSafe.none { result[it] == false })
             } else {
                 necessaryPermissionsGrantedCallback?.invoke(false)
                 additionalPermissionsGrantedCallback?.invoke(false)

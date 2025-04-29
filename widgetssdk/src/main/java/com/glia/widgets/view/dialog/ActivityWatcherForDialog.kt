@@ -11,23 +11,23 @@ import com.glia.widgets.view.Dialogs
 import io.reactivex.rxjava3.core.Flowable
 import java.lang.ref.WeakReference
 
-internal class ActivityWatcherForDialog(gliaActivityManager: GliaActivityManager, controller: GlobalDialogController) :
+internal class ActivityWatcherForDialog(gliaActivityManager: GliaActivityManager, dialogDispatcher: DialogDispatcher) :
     BaseSingleActivityWatcher(gliaActivityManager) {
 
     init {
-        Flowable.combineLatest(resumedActivity, controller.state, ::handleState).subscribe()
+        Flowable.combineLatest(resumedActivity, dialogDispatcher.state, ::handleState).subscribe()
     }
 
-    private fun handleState(activityReference: WeakReference<Activity>, event: OneTimeEvent<GlobalDialogController.State>) {
+    private fun handleState(activityReference: WeakReference<Activity>, event: OneTimeEvent<DialogDispatcher.State>) {
         val activity = activityReference.get()
         val state = event.value
 
         when {
             event.consumed -> Logger.d(TAG, "skipping.., event is already consumed")
             activity == null -> Logger.d(TAG, "skipping.. activity is null")
-            state is GlobalDialogController.State.DismissDialog -> event.consume { dismissDialogAndFinishHolderActivity() }
+            state is DialogDispatcher.State.DismissDialog -> event.consume { dismissDialogAndFinishHolderActivity() }
             activity.isFinishing -> Logger.d(TAG, "skipping.. activity is finishing")
-            state is GlobalDialogController.State.NotificationPermissionDialog -> showPermissionsDialog(
+            state is DialogDispatcher.State.NotificationPermissionDialog -> showPermissionsDialog(
                 activity,
                 event::markConsumed,
                 state.onAllow,

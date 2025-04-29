@@ -26,12 +26,14 @@ internal class PermissionsRequestController(
     }
 
     override fun request(permissions: Array<String>) {
-        if (watcher.hasCurrentActivity()) {
+        if (watcher.hasValidActivity()) {
             launch(permissions)
         } else {
             permissionsRequest = permissions
         }
     }
+
+    override fun shouldShowPermissionRationale(permission: String): Boolean = watcher.shouldShowPermissionRationale(permission)
 
     private fun launch(permissions: Array<String>) {
         if (watcher.currentActivityIsComponentActivity()) {

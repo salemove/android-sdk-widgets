@@ -32,9 +32,9 @@ import org.junit.Test
 
 internal class ActivityWatcherForDialogTest {
     lateinit var activityManager: GliaActivityManager
-    lateinit var controller: GlobalDialogController
+    lateinit var controller: DialogDispatcher
     lateinit var watcher: ActivityWatcherForDialog
-    lateinit var stateFlowable: PublishProcessor<OneTimeEvent<GlobalDialogController.State>>
+    lateinit var stateFlowable: PublishProcessor<OneTimeEvent<DialogDispatcher.State>>
 
     @Before
     fun setUp() {
@@ -68,7 +68,7 @@ internal class ActivityWatcherForDialogTest {
     @Test
     fun `handleState will skip when event is already consumed`() {
         val activity = mockkActivity()
-        val event = mockkOneTimeEvent(GlobalDialogController.State.DismissDialog, isConsumed = true)
+        val event = mockkOneTimeEvent(DialogDispatcher.State.DismissDialog, isConsumed = true)
         stateFlowable.onNext(event)
         watcher.onActivityResumed(activity)
 
@@ -80,7 +80,7 @@ internal class ActivityWatcherForDialogTest {
     fun `handleState will skip when activity is finishing`() {
         val activity = mockkActivity(isFinishing = true)
         watcher.onActivityResumed(activity)
-        val event = mockkOneTimeEvent(GlobalDialogController.State.NotificationPermissionDialog({ }, {}))
+        val event = mockkOneTimeEvent(DialogDispatcher.State.NotificationPermissionDialog({ }, {}))
         stateFlowable.onNext(event)
 
         verify { event.consumed }
@@ -95,7 +95,7 @@ internal class ActivityWatcherForDialogTest {
         watcher.onActivityResumed(activity)
         resumedActivity.values().forEach { it.clear() }
 
-        val event = mockkOneTimeEvent(GlobalDialogController.State.NotificationPermissionDialog({ }, {}))
+        val event = mockkOneTimeEvent(DialogDispatcher.State.NotificationPermissionDialog({ }, {}))
         stateFlowable.onNext(event)
 
         verify { event.consumed }
@@ -114,7 +114,7 @@ internal class ActivityWatcherForDialogTest {
         watcher.onActivityResumed(activity)
         val onAllow = mockk<() -> Unit>(relaxed = true)
         val onCancel = mockk<() -> Unit>(relaxed = true)
-        val event = mockkOneTimeEvent(GlobalDialogController.State.NotificationPermissionDialog(onAllow, onCancel))
+        val event = mockkOneTimeEvent(DialogDispatcher.State.NotificationPermissionDialog(onAllow, onCancel))
         stateFlowable.onNext(event)
 
         verify(exactly = 0) { Logger.d(any(), match(skippingMatcher)) }
@@ -140,15 +140,15 @@ internal class ActivityWatcherForDialogTest {
         watcher.onActivityResumed(activity)
         val onAllow = mockk<() -> Unit>(relaxed = true)
         val onCancel = mockk<() -> Unit>(relaxed = true)
-        val event = mockkOneTimeEvent(GlobalDialogController.State.NotificationPermissionDialog(onAllow, onCancel))
+        val event = mockkOneTimeEvent(DialogDispatcher.State.NotificationPermissionDialog(onAllow, onCancel))
         stateFlowable.onNext(event)
 
         verify(exactly = 0) { Logger.d(any(), match(skippingMatcher)) }
         verify { Dialogs.showPushNotificationsPermissionDialog(any(), any(), any(), any()) }
 
-        val dismissEvent = mockkOneTimeEvent(GlobalDialogController.State.DismissDialog)
+        val dismissEvent = mockkOneTimeEvent(DialogDispatcher.State.DismissDialog)
         every { dismissEvent.consume(captureLambda()) } answers {
-            firstArg<GlobalDialogController.State.DismissDialog.() -> Unit>().invoke(GlobalDialogController.State.DismissDialog)
+            firstArg<DialogDispatcher.State.DismissDialog.() -> Unit>().invoke(DialogDispatcher.State.DismissDialog)
         }
         stateFlowable.onNext(dismissEvent)
         verify { dialog.dismiss() }

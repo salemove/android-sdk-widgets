@@ -1,5 +1,6 @@
 package com.glia.widgets.permissions
 
+import android.Manifest
 import com.glia.androidsdk.GliaException
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -125,4 +126,12 @@ internal class PermissionsRequestRepositoryTest {
     fun `hasPermissionRequest returns false if requests is empty`() {
         assertFalse(repository.hasPermissionRequest())
     }
+
+    @Test
+    fun `shouldShowPermissionRationale calls launcher shouldShowPermissionRationale`() {
+        val permission = Manifest.permission.POST_NOTIFICATIONS
+        repository.shouldShowPermissionRationale(permission)
+        verify(launcher).shouldShowPermissionRationale(permission)
+    }
+
 }

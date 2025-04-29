@@ -9,10 +9,11 @@ internal class PermissionsRequestContract {
     }
 
     interface Watcher {
-        fun hasCurrentActivity(): Boolean
+        fun hasValidActivity(): Boolean
         fun currentActivityIsComponentActivity(): Boolean
         fun requestPermissions(permissions: Array<String>): Int?
         fun openSupportActivity()
         fun destroySupportActivityIfExists()
+        fun shouldShowPermissionRationale(permission: String): Boolean
     }
 }

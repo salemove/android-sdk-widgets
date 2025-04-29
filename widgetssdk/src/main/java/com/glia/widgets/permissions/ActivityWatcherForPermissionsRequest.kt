@@ -21,7 +21,7 @@ internal class ActivityWatcherForPermissionsRequest(
 
     private val permissionsLaunchers = mutableMapOf<Int, ActivityResultLauncher<Array<String>>>()
 
-    override fun hasCurrentActivity(): Boolean = currentActivity != null
+    override fun hasValidActivity(): Boolean = currentActivity?.run { !isFinishing && !isDestroyed } == true
 
     override fun currentActivityIsComponentActivity(): Boolean = currentActivity is ComponentActivity
 
@@ -80,6 +80,9 @@ internal class ActivityWatcherForPermissionsRequest(
     override fun destroySupportActivityIfExists() {
         currentActivity?.let { destroySupportActivityIfExists(it) }
     }
+
+    override fun shouldShowPermissionRationale(permission: String): Boolean =
+        currentActivity?.shouldShowRequestPermissionRationale(permission) == true
 
     private fun destroySupportActivityIfExists(activity: Activity) {
         if (activity is DialogHolderActivity) {

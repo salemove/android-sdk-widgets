@@ -34,7 +34,10 @@ internal class PermissionsRequestRepository {
         launcher?.request(permissions.toTypedArray())
     }
 
-    fun interface Launcher {
+    fun shouldShowPermissionRationale(permission: String): Boolean = launcher?.shouldShowPermissionRationale(permission) == true
+
+    interface Launcher {
         fun request(permissions: Array<String>)
+        fun shouldShowPermissionRationale(permission: String): Boolean
     }
 }

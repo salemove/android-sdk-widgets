@@ -4,7 +4,6 @@ import android.graphics.Color
 import android.view.Gravity
 import android.view.View
 import android.widget.TextView
-import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.comms.Audio
 import com.glia.androidsdk.comms.Media
 import com.glia.androidsdk.comms.OperatorMediaState
@@ -12,6 +11,7 @@ import com.glia.androidsdk.comms.Video
 import com.glia.androidsdk.comms.VideoView
 import com.glia.androidsdk.comms.VisitorMediaState
 import com.glia.widgets.R
+import com.glia.widgets.core.engagement.MediaType
 import com.glia.widgets.databinding.CallActivityBinding
 import com.glia.widgets.di.ControllerFactory
 import com.glia.widgets.di.Dependencies
@@ -186,7 +186,7 @@ internal interface SnapshotCallView : SnapshotContent, SnapshotTheme, SnapshotAc
 
     fun CallState.initCall(
         companyName: String = "Snapshot tests",
-        requestedMediaType: Engagement.MediaType = Engagement.MediaType.AUDIO,
+        requestedMediaType: MediaType = MediaType.AUDIO,
         visitorMediaState: VisitorMediaState? = null,
         showFlipVisitorCameraButton: Boolean = false,
         isOnHold: Boolean = false

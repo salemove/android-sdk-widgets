@@ -7,9 +7,9 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.provider.Settings
 import androidx.annotation.VisibleForTesting
-import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.comms.MediaDirection
 import com.glia.androidsdk.comms.MediaUpgradeOffer
+import com.glia.widgets.core.engagement.MediaType
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.permissions.Permissions
@@ -58,14 +58,14 @@ internal class PermissionManager(
     }
 
     @SuppressLint("InlinedApi")
-    fun getPermissionsForEngagementMediaType(mediaType: Engagement.MediaType, isCallVisualizer: Boolean): Permissions {
+    fun getPermissionsForEngagementMediaType(mediaType: MediaType, isCallVisualizer: Boolean): Permissions {
         val requiredPermissions = mutableListOf<String>()
         val additionalPermissions = mutableListOf<String>()
-        if (mediaType == Engagement.MediaType.VIDEO) {
+        if (mediaType == MediaType.VIDEO) {
             requiredPermissions.add(Manifest.permission.CAMERA)
         }
         if (!isCallVisualizer) {
-            if (mediaType == Engagement.MediaType.AUDIO || mediaType == Engagement.MediaType.VIDEO) {
+            if (mediaType == MediaType.AUDIO || mediaType == MediaType.VIDEO) {
                 requiredPermissions.add(Manifest.permission.RECORD_AUDIO)
             }
             if (sdkInt > Build.VERSION_CODES.R) {

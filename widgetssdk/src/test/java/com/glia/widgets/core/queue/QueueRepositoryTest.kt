@@ -237,7 +237,7 @@ class QueueRepositoryTest {
         verify { configurationManager.queueIdsObservable }
 
         queueRepository.queuesState.test()
-            .assertCurrentValue(QueuesState.Queues(listOf(defaultQueue.asLocalQueue())))
+            .assertCurrentValue(QueuesState.Queues(listOf(defaultQueue.toWidgetsType())))
 
         queueRepository.relevantQueueIds.test().assertValue(listOf(defaultQueue.id))
         verify { gliaCore.subscribeToQueueStateUpdates(eq(listOf(defaultQueueId)), any(), any()) }
@@ -271,7 +271,7 @@ class QueueRepositoryTest {
         verify { configurationManager.queueIdsObservable }
 
         queueRepository.queuesState.test()
-            .assertCurrentValue(QueuesState.Queues(listOf(defaultQueue.asLocalQueue())))
+            .assertCurrentValue(QueuesState.Queues(listOf(defaultQueue.toWidgetsType())))
         queueRepository.relevantQueueIds.test().assertValue(listOf(defaultQueue.id))
         verify { gliaCore.subscribeToQueueStateUpdates(eq(listOf(defaultQueueId)), any(), any()) }
     }
@@ -305,7 +305,7 @@ class QueueRepositoryTest {
         verify { configurationManager.queueIdsObservable }
 
         queueRepository.queuesState.test()
-            .assertCurrentValue(QueuesState.Queues(listOf(defaultQueue.asLocalQueue(), nonDefaultQueue.asLocalQueue())))
+            .assertCurrentValue(QueuesState.Queues(listOf(defaultQueue.toWidgetsType(), nonDefaultQueue.toWidgetsType())))
         queueRepository.relevantQueueIds.test()
             .assertValue(listOf(defaultQueue.id, nonDefaultQueue.id))
         verify {
@@ -334,7 +334,7 @@ class QueueRepositoryTest {
         verify { configurationManager.queueIdsObservable }
 
         queueRepository.queuesState.test()
-            .assertCurrentValue(QueuesState.Queues(listOf(defaultQueue.asLocalQueue(), nonDefaultQueue.asLocalQueue())))
+            .assertCurrentValue(QueuesState.Queues(listOf(defaultQueue.toWidgetsType(), nonDefaultQueue.toWidgetsType())))
         queueRepository.relevantQueueIds.test()
             .assertValue(listOf(defaultQueue.id, nonDefaultQueue.id))
 
@@ -356,7 +356,7 @@ class QueueRepositoryTest {
         }
 
         queueRepository.queuesState.test()
-            .assertCurrentValue(QueuesState.Queues(listOf(defaultQueue.asLocalQueue(), nonDefaultQueue.asLocalQueue())))
+            .assertCurrentValue(QueuesState.Queues(listOf(defaultQueue.toWidgetsType(), nonDefaultQueue.toWidgetsType())))
         queueRepository.relevantQueueIds.test()
             .assertValue(listOf(defaultQueue.id, nonDefaultQueue.id))
 
@@ -366,7 +366,7 @@ class QueueRepositoryTest {
         subscribeToQueueUpdatesCallbackSlot.captured.accept(updatedDefaultQueue)
 
         queueRepository.queuesState.test()
-            .assertCurrentValue(QueuesState.Queues(listOf(updatedDefaultQueue.asLocalQueue().copy(isDefault = true), nonDefaultQueue.asLocalQueue())))
+            .assertCurrentValue(QueuesState.Queues(listOf(updatedDefaultQueue.toWidgetsType().copy(isDefault = true), nonDefaultQueue.toWidgetsType())))
         queueRepository.relevantQueueIds.test()
             .assertValue(listOf(defaultQueue.id, nonDefaultQueue.id))
     }

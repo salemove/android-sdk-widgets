@@ -1,12 +1,12 @@
 package com.glia.widgets.call
 
 import android.os.Bundle
-import com.glia.androidsdk.Engagement.MediaType
 import com.glia.widgets.R
 import com.glia.widgets.base.FadeTransitionActivity
 import com.glia.widgets.call.CallView.OnNavigateToChatListener
 import com.glia.widgets.call.CallView.OnNavigateToWebBrowserListener
 import com.glia.widgets.chat.Intention
+import com.glia.widgets.core.engagement.MediaType
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.ExtraKeys
 import com.glia.widgets.helper.Logger

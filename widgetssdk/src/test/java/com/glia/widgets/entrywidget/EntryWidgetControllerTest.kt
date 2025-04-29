@@ -3,9 +3,9 @@ package com.glia.widgets.entrywidget
 import android.COMMON_EXTENSIONS_CLASS_PATH
 import android.app.Activity
 import com.glia.androidsdk.Engagement
-import com.glia.androidsdk.Engagement.MediaType
 import com.glia.androidsdk.engagement.EngagementState
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
+import com.glia.widgets.core.engagement.MediaType
 import com.glia.widgets.core.queue.Queue
 import com.glia.widgets.core.queue.QueueRepository
 import com.glia.widgets.core.queue.QueuesState

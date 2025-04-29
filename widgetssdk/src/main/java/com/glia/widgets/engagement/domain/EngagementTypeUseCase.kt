@@ -1,6 +1,6 @@
 package com.glia.widgets.engagement.domain
 
-import com.glia.androidsdk.Engagement.MediaType
+import com.glia.widgets.core.engagement.MediaType
 import com.glia.widgets.helper.hasAudio
 import com.glia.widgets.helper.hasVideo
 import io.reactivex.rxjava3.core.Flowable

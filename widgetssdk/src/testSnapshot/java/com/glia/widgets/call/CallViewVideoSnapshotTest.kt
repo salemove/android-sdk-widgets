@@ -2,7 +2,7 @@ package com.glia.widgets.call
 
 import android.graphics.Color
 import com.android.ide.common.rendering.api.SessionParams
-import com.glia.androidsdk.Engagement
+import com.glia.widgets.core.engagement.MediaType
 import com.glia.widgets.SnapshotTest
 import org.junit.Test
 
@@ -12,7 +12,7 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(
 
     // MARK: Init call
 
-    private fun initCallState() = callState().initCall(requestedMediaType = Engagement.MediaType.VIDEO)
+    private fun initCallState() = callState().initCall(requestedMediaType = MediaType.VIDEO)
 
     @Test
     fun initCall() {

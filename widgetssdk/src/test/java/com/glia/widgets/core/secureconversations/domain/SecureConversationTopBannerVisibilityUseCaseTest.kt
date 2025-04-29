@@ -1,8 +1,7 @@
 package com.glia.widgets.core.secureconversations.domain
 
 import android.assertCurrentValue
-import com.glia.androidsdk.Engagement
-import com.glia.androidsdk.queuing.QueueState
+import com.glia.widgets.core.engagement.MediaType
 import com.glia.widgets.core.queue.Queue
 import com.glia.widgets.core.queue.QueueRepository
 import com.glia.widgets.core.queue.QueuesState
@@ -71,12 +70,12 @@ class SecureConversationTopBannerVisibilityUseCaseTest {
     fun `returns false when queue list has no live media in open queue`() {
         scheduleIncomingQueues(
             newQueue(
-                status = QueueState.Status.OPEN,
-                media = listOf(Engagement.MediaType.MESSAGING)
+                status = Queue.Status.OPEN,
+                media = listOf(MediaType.MESSAGING)
             ),
             newQueue(
-                status = QueueState.Status.OPEN,
-                media = listOf(Engagement.MediaType.UNKNOWN)
+                status = Queue.Status.OPEN,
+                media = listOf(MediaType.UNKNOWN)
             )
         )
 
@@ -90,16 +89,16 @@ class SecureConversationTopBannerVisibilityUseCaseTest {
     fun `returns false when queue list has no open queue`() {
         scheduleIncomingQueues(
             newQueue(
-                status = QueueState.Status.UNSTAFFED,
-                media = listOf(Engagement.MediaType.TEXT)
+                status = Queue.Status.UNSTAFFED,
+                media = listOf(MediaType.TEXT)
             ),
             newQueue(
-                status = QueueState.Status.CLOSED,
-                media = listOf(Engagement.MediaType.TEXT)
+                status = Queue.Status.CLOSED,
+                media = listOf(MediaType.TEXT)
             ),
             newQueue(
-                status = QueueState.Status.FULL,
-                media = listOf(Engagement.MediaType.TEXT)
+                status = Queue.Status.FULL,
+                media = listOf(MediaType.TEXT)
             )
         )
 
@@ -113,8 +112,8 @@ class SecureConversationTopBannerVisibilityUseCaseTest {
     fun `returns true when queue has open queue with text media`() {
         scheduleIncomingQueues(
             newQueue(
-                status = QueueState.Status.OPEN,
-                media = listOf(Engagement.MediaType.TEXT)
+                status = Queue.Status.OPEN,
+                media = listOf(MediaType.TEXT)
             )
         )
 
@@ -128,8 +127,8 @@ class SecureConversationTopBannerVisibilityUseCaseTest {
     fun `returns true when queue has open queue with audio media`() {
         scheduleIncomingQueues(
             newQueue(
-                status = QueueState.Status.OPEN,
-                media = listOf(Engagement.MediaType.AUDIO)
+                status = Queue.Status.OPEN,
+                media = listOf(MediaType.AUDIO)
             )
         )
 
@@ -143,8 +142,8 @@ class SecureConversationTopBannerVisibilityUseCaseTest {
     fun `returns true when queue has open queue with video media`() {
         scheduleIncomingQueues(
             newQueue(
-                status = QueueState.Status.OPEN,
-                media = listOf(Engagement.MediaType.VIDEO)
+                status = Queue.Status.OPEN,
+                media = listOf(MediaType.VIDEO)
             )
         )
 
@@ -159,7 +158,7 @@ class SecureConversationTopBannerVisibilityUseCaseTest {
         whenever(queueRepository.queuesState) doReturn Flowable.just(QueuesState.Queues(queueList.toList()))
     }
 
-    private fun newQueue(status: QueueState.Status, media: List<Engagement.MediaType>): Queue {
+    private fun newQueue(status: Queue.Status, media: List<MediaType>): Queue {
         return Queue("id", "name", false, System.currentTimeMillis(), media, status)
     }
 }

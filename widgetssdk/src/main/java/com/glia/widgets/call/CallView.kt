@@ -19,7 +19,6 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.transition.TransitionManager
 import androidx.transition.TransitionSet
-import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.comms.VideoView
 import com.glia.widgets.Constants
@@ -29,6 +28,7 @@ import com.glia.widgets.UiTheme.UiThemeBuilder
 import com.glia.widgets.call.CallState.ViewState
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.dialog.model.DialogState
+import com.glia.widgets.core.engagement.MediaType
 import com.glia.widgets.databinding.CallButtonsLayoutBinding
 import com.glia.widgets.databinding.CallViewBinding
 import com.glia.widgets.di.Dependencies
@@ -173,7 +173,7 @@ internal class CallView(
         }
     }
 
-    fun startCall(isUpgradeToCall: Boolean, mediaType: Engagement.MediaType?) {
+    fun startCall(isUpgradeToCall: Boolean, mediaType: MediaType?) {
         callController?.startCall(mediaType, isUpgradeToCall)
     }
 

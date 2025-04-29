@@ -7,6 +7,7 @@ import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.comms.Media;
 import com.glia.androidsdk.comms.MediaState;
 import com.glia.androidsdk.comms.Video;
+import com.glia.widgets.core.engagement.MediaType;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContract.FlipButtonState;
 
@@ -23,7 +24,7 @@ class CallState {
     public final boolean isMuted;
     public final boolean hasVideo;
     @Nullable
-    public final Engagement.MediaType requestedMediaType;
+    public final MediaType requestedMediaType;
     public final boolean isSpeakerOn;
     public final boolean isOnHold;
     //    Need this to not update all views when only time is changed.
@@ -141,7 +142,7 @@ class CallState {
     public Boolean isCurrentCallVideo() {
         if (requestedMediaType == null && callStatus.getOperatorMediaState() == null) return null;
 
-        return callStatus.getOperatorMediaState() == null ? requestedMediaType == Engagement.MediaType.VIDEO : callStatus.getOperatorMediaState().getVideo() != null;
+        return callStatus.getOperatorMediaState() == null ? requestedMediaType == MediaType.VIDEO : callStatus.getOperatorMediaState().getVideo() != null;
     }
 
     @NonNull
@@ -181,7 +182,7 @@ class CallState {
             .createCallState();
     }
 
-    public CallState changeRequestedMediaType(Engagement.MediaType requestedMediaType) {
+    public CallState changeRequestedMediaType(MediaType requestedMediaType) {
         return new Builder()
             .copyFrom(this)
             .setRequestedMediaType(requestedMediaType)
@@ -472,7 +473,7 @@ class CallState {
             visitorMediaState.getAudio().getStatus() != Media.Status.PLAYING;
     }
 
-    public CallState initCall(@Nullable Engagement.MediaType requestedMediaType) {
+    public CallState initCall(@Nullable MediaType requestedMediaType) {
         return new Builder()
             .copyFrom(this)
             .setIntegratorCallStarted(true)
@@ -494,7 +495,7 @@ class CallState {
         private boolean landscapeLayoutControlsVisible;
         private boolean isMuted;
         private boolean hasVideo;
-        private Engagement.MediaType requestedMediaType;
+        private MediaType requestedMediaType;
         private boolean isSpeakerOn;
         private boolean isOnHold;
         //Maybe helpful when converting to Kotlin, as an android studio makes fields nullable.
@@ -538,7 +539,7 @@ class CallState {
             return this;
         }
 
-        public Builder setRequestedMediaType(Engagement.MediaType requestedMediaType) {
+        public Builder setRequestedMediaType(MediaType requestedMediaType) {
             this.requestedMediaType = requestedMediaType;
             return this;
         }

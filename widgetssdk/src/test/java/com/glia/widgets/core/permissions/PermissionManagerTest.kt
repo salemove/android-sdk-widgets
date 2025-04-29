@@ -5,10 +5,10 @@ import android.content.Context
 import android.content.pm.PackageManager.PERMISSION_DENIED
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Build
-import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.comms.MediaDirection
 import com.glia.androidsdk.comms.MediaUpgradeOffer
+import com.glia.widgets.core.engagement.MediaType
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.permissions.Permissions
 import com.glia.widgets.permissions.PermissionsGrantedCallback
@@ -63,7 +63,7 @@ class PermissionManagerTest {
 
     @Test
     fun `getPermissionsForEngagementMediaType returns empty lists of permissions when mediaType is TEXT`() {
-        val result = permissionManager.getPermissionsForEngagementMediaType(Engagement.MediaType.TEXT, false)
+        val result = permissionManager.getPermissionsForEngagementMediaType(MediaType.TEXT, false)
 
         assertEquals(
             Permissions(
@@ -76,7 +76,7 @@ class PermissionManagerTest {
 
     @Test
     fun `getPermissionsForEngagementMediaType returns empty lists of permissions when mediaType is AUDIO`() {
-        val result = permissionManager.getPermissionsForEngagementMediaType(Engagement.MediaType.AUDIO, false)
+        val result = permissionManager.getPermissionsForEngagementMediaType(MediaType.AUDIO, false)
 
         assertEquals(
             Permissions(
@@ -89,7 +89,7 @@ class PermissionManagerTest {
 
     @Test
     fun `getPermissionsForEngagementMediaType returns empty lists of permissions when mediaType is VIDEO`() {
-        val result = permissionManager.getPermissionsForEngagementMediaType(Engagement.MediaType.VIDEO, false)
+        val result = permissionManager.getPermissionsForEngagementMediaType(MediaType.VIDEO, false)
 
         assertEquals(
             Permissions(
@@ -102,7 +102,7 @@ class PermissionManagerTest {
 
     @Test
     fun `getPermissionsForEngagementMediaType returns empty lists of permissions when mediaType is AUDIO, isCallVisualizer`() {
-        val result = permissionManager.getPermissionsForEngagementMediaType(Engagement.MediaType.AUDIO, true)
+        val result = permissionManager.getPermissionsForEngagementMediaType(MediaType.AUDIO, true)
 
         assertEquals(
             Permissions(
@@ -115,7 +115,7 @@ class PermissionManagerTest {
 
     @Test
     fun `getPermissionsForEngagementMediaType returns empty lists of permissions when mediaType is VIDEO, isCallVisualizer`() {
-        val result = permissionManager.getPermissionsForEngagementMediaType(Engagement.MediaType.VIDEO, true)
+        val result = permissionManager.getPermissionsForEngagementMediaType(MediaType.VIDEO, true)
 
         assertEquals(
             Permissions(
@@ -134,7 +134,7 @@ class PermissionManagerTest {
             permissionsRequestRepository,
             Build.VERSION_CODES.S
         )
-        val result = permissionManager.getPermissionsForEngagementMediaType(Engagement.MediaType.TEXT, false)
+        val result = permissionManager.getPermissionsForEngagementMediaType(MediaType.TEXT, false)
         assertEquals(
             Permissions(
                 emptyList(),
@@ -153,7 +153,7 @@ class PermissionManagerTest {
             Build.VERSION_CODES.S
         )
 
-        val result = permissionManager.getPermissionsForEngagementMediaType(Engagement.MediaType.AUDIO, false)
+        val result = permissionManager.getPermissionsForEngagementMediaType(MediaType.AUDIO, false)
 
         assertEquals(
             Permissions(
@@ -173,7 +173,7 @@ class PermissionManagerTest {
             Build.VERSION_CODES.S
         )
 
-        val result = permissionManager.getPermissionsForEngagementMediaType(Engagement.MediaType.VIDEO, false)
+        val result = permissionManager.getPermissionsForEngagementMediaType(MediaType.VIDEO, false)
 
         assertEquals(
             Permissions(
@@ -193,7 +193,7 @@ class PermissionManagerTest {
             Build.VERSION_CODES.S
         )
 
-        val result = permissionManager.getPermissionsForEngagementMediaType(Engagement.MediaType.AUDIO, true)
+        val result = permissionManager.getPermissionsForEngagementMediaType(MediaType.AUDIO, true)
 
         assertEquals(
             Permissions(
@@ -213,7 +213,7 @@ class PermissionManagerTest {
             Build.VERSION_CODES.S
         )
 
-        val result = permissionManager.getPermissionsForEngagementMediaType(Engagement.MediaType.VIDEO, true)
+        val result = permissionManager.getPermissionsForEngagementMediaType(MediaType.VIDEO, true)
 
         assertEquals(
             Permissions(
@@ -735,7 +735,7 @@ class PermissionManagerTest {
             Build.VERSION_CODES.TIRAMISU
         )
 
-        val result = permissionManager.getPermissionsForEngagementMediaType(Engagement.MediaType.AUDIO, true)
+        val result = permissionManager.getPermissionsForEngagementMediaType(MediaType.AUDIO, true)
 
         assertTrue(result.additionalPermissions.contains(Manifest.permission.POST_NOTIFICATIONS))
     }
@@ -749,7 +749,7 @@ class PermissionManagerTest {
             Build.VERSION_CODES.S_V2
         )
 
-        val result = permissionManager.getPermissionsForEngagementMediaType(Engagement.MediaType.VIDEO, false)
+        val result = permissionManager.getPermissionsForEngagementMediaType(MediaType.VIDEO, false)
 
         assertFalse(result.additionalPermissions.contains(Manifest.permission.POST_NOTIFICATIONS))
     }

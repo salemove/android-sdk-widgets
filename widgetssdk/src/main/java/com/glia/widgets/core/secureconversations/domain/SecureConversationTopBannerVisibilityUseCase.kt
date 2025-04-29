@@ -1,6 +1,6 @@
 package com.glia.widgets.core.secureconversations.domain
 
-import com.glia.androidsdk.Engagement.MediaType
+import com.glia.widgets.core.engagement.MediaType
 import com.glia.widgets.core.queue.Queue
 import com.glia.widgets.core.queue.QueueRepository
 import com.glia.widgets.core.queue.QueuesState

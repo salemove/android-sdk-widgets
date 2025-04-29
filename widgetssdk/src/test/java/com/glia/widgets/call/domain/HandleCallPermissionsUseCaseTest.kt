@@ -1,6 +1,6 @@
 package com.glia.widgets.call.domain
 
-import com.glia.androidsdk.Engagement
+import com.glia.widgets.core.engagement.MediaType
 import com.glia.widgets.core.permissions.PermissionManager
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
 import com.glia.widgets.permissions.Permissions
@@ -28,7 +28,7 @@ class HandleCallPermissionsUseCaseTest {
 
     @Test
     fun `invoke gets permissions from permission manager with MediaType VIDEO, and is call visualizer`() {
-        val mediaType = Engagement.MediaType.VIDEO
+        val mediaType = MediaType.VIDEO
         val isCallVisualizer = true
         whenever(isCurrentEngagementCallVisualizer.invoke()).thenReturn(isCallVisualizer)
         whenever(permissionManager.getPermissionsForEngagementMediaType(any(), any())).thenReturn(mock())
@@ -40,7 +40,7 @@ class HandleCallPermissionsUseCaseTest {
 
     @Test
     fun `invoke gets permissions from permission manager with MediaType AUDIO, and is not call visualizer`() {
-        val mediaType = Engagement.MediaType.AUDIO
+        val mediaType = MediaType.AUDIO
         val isCallVisualizer = false
         whenever(isCurrentEngagementCallVisualizer.invoke()).thenReturn(isCallVisualizer)
         whenever(permissionManager.getPermissionsForEngagementMediaType(any(), any())).thenReturn(mock())
@@ -59,7 +59,7 @@ class HandleCallPermissionsUseCaseTest {
         whenever(permissionManager.getPermissionsForEngagementMediaType(any(), any())).thenReturn(permissions)
         val callback = mock<PermissionsGrantedCallback>()
 
-        useCase.invoke(Engagement.MediaType.TEXT, callback)
+        useCase.invoke(MediaType.TEXT, callback)
 
         verify(permissionManager).handlePermissions(
             necessaryPermissions,

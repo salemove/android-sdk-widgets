@@ -20,6 +20,7 @@ import com.glia.androidsdk.site.SiteInfo
 import com.glia.androidsdk.visitor.Authentication
 import com.glia.androidsdk.visitor.VisitorInfo
 import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest
+import com.glia.widgets.core.engagement.MediaType
 import java.io.InputStream
 import java.util.Optional
 import java.util.function.Consumer
@@ -45,7 +46,7 @@ internal interface GliaCore {
 
     fun queueForEngagement(
         queueIds: List<String>,
-        mediaType: Engagement.MediaType,
+        mediaType: MediaType,
         visitorContextAssetId: String?,
         engagementOptions: EngagementOptions?,
         mediaPermissionRequestCode: Int,

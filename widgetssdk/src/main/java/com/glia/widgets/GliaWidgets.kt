@@ -14,6 +14,8 @@ import com.glia.widgets.core.authentication.toCoreType
 import com.glia.widgets.core.authentication.toWidgetsType
 import com.glia.widgets.core.callvisualizer.domain.CallVisualizer
 import com.glia.widgets.core.liveobservation.LiveObservation
+import com.glia.widgets.core.queue.Queue
+import com.glia.widgets.core.queue.toWidgetsType
 import com.glia.widgets.core.secureconversations.SecureConversations
 import com.glia.widgets.core.visitor.Authentication
 import com.glia.widgets.core.visitor.VisitorInfo
@@ -206,6 +208,29 @@ object GliaWidgets {
     @JvmStatic
     fun isInitialized(): Boolean {
         return glia().isInitialized
+    }
+
+    /**
+     * Fetches all queues and their information for the current site.
+     *
+     * @param onSuccess Callback invoked when the queues are successfully retrieved.
+     *                  Provides a collection of [Queue] objects or `null` if no queues are available.
+     * @param onError Callback invoked when an error occurs during the retrieval process.
+     *                Provides a [GliaWidgetsException] describing the error.
+     */
+    @JvmStatic
+    fun getQueues(
+        onSuccess: OnSuccess<Collection<Queue>?>,
+        onError: OnError
+    ) {
+        glia().getQueues(
+            onSuccess = { queues ->
+                onSuccess.onSuccess(queues.toWidgetsType())
+            },
+            onError = {
+                onError.onError(from(it))
+            }
+        )
     }
 
     /**

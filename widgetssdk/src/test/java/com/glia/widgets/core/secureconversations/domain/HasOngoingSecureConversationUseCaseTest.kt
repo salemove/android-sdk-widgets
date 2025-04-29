@@ -1,6 +1,6 @@
 package com.glia.widgets.core.secureconversations.domain
 
-import com.glia.androidsdk.Engagement
+import com.glia.widgets.core.engagement.MediaType
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
@@ -105,7 +105,7 @@ class HasOngoingSecureConversationUseCaseTest {
 
     @Test
     fun `invoke returns false when enqueueing`() {
-        mockInitialState(engagementState = State.PreQueuing(Engagement.MediaType.AUDIO), unreadMessagesCount = 10)
+        mockInitialState(engagementState = State.PreQueuing(MediaType.AUDIO), unreadMessagesCount = 10)
 
         val result = useCase().blockingLast()
         assertEquals(false, result)

@@ -754,6 +754,18 @@ class PermissionManagerTest {
         assertFalse(result.additionalPermissions.contains(Manifest.permission.POST_NOTIFICATIONS))
     }
 
+    @Test
+    fun `shouldShowPermissionRationale calls the similar function from the permissionsRequestRepository`() {
+        val permission = Manifest.permission.POST_NOTIFICATIONS
+        val shouldShowRationale = true
+        whenever(permissionsRequestRepository.shouldShowPermissionRationale(permission)).thenReturn(shouldShowRationale)
+
+        val result = permissionManager.shouldShowPermissionRationale(permission)
+        verify(permissionsRequestRepository).shouldShowPermissionRationale(permission)
+
+        assertEquals(shouldShowRationale, result)
+    }
+
     private fun mockMediaUpgradeOffer(audio: MediaDirection? = null, video: MediaDirection? = null): MediaUpgradeOffer =
         TestMediaUpgradeOffer(audio, video)
 

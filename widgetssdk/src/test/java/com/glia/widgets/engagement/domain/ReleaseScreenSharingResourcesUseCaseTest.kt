@@ -10,7 +10,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.util.ReflectionHelpers
+import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 class ReleaseScreenSharingResourcesUseCaseTest {
@@ -32,9 +32,8 @@ class ReleaseScreenSharingResourcesUseCaseTest {
     }
 
     @Test
+    @Config(sdk = [Build.VERSION_CODES.N_MR1])
     fun `invoke will call removeScreenSharingNotificationUseCase when Build_VERSION_SDK_INT is less than O`() {
-        ReflectionHelpers.setStaticField(Build.VERSION::class.java, "SDK_INT", 25)
-
         useCase()
 
         verify { removeScreenSharingNotificationUseCase() }
@@ -42,9 +41,8 @@ class ReleaseScreenSharingResourcesUseCaseTest {
     }
 
     @Test
+    @Config(sdk = [Build.VERSION_CODES.O])
     fun `invoke will call stopMediaProjectionServiceUseCase when Build_VERSION_SDK_INT is greater than or equal to O`() {
-        ReflectionHelpers.setStaticField(Build.VERSION::class.java, "SDK_INT", 26)
-
         useCase()
 
         verify { stopMediaProjectionServiceUseCase() }

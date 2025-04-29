@@ -33,8 +33,6 @@ import com.glia.widgets.survey.SurveyContract;
 import com.glia.widgets.survey.SurveyController;
 import com.glia.widgets.view.MessagesNotSeenHandler;
 import com.glia.widgets.view.MinimizeHandler;
-import com.glia.widgets.view.dialog.GlobalDialogController;
-import com.glia.widgets.view.dialog.GlobalDialogControllerImpl;
 import com.glia.widgets.view.head.ChatHeadContract;
 import com.glia.widgets.view.head.ChatHeadLayoutContract;
 import com.glia.widgets.view.head.ChatHeadPosition;
@@ -73,7 +71,6 @@ public class ControllerFactory {
     private ActivityWatcherForLiveObservationController activityWatcherForLiveObservationController;
     private EntryWidgetHideController entryWidgetHideController;
     private SnackbarController snackbarController;
-    private GlobalDialogController globalDialogController;
 
     public ControllerFactory(
         RepositoryFactory repositoryFactory,
@@ -421,12 +418,5 @@ public class ControllerFactory {
             snackbarController = new SnackbarController();
         }
         return snackbarController;
-    }
-
-    public GlobalDialogController getGlobalDialogController() {
-        if (globalDialogController == null) {
-            globalDialogController = new GlobalDialogControllerImpl();
-        }
-        return globalDialogController;
     }
 }

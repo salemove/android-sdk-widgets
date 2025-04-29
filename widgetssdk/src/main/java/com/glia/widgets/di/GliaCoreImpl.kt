@@ -1,6 +1,5 @@
 package com.glia.widgets.di
 
-import android.app.Application
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.Glia
 import com.glia.androidsdk.Glia.OmnicoreEvent
@@ -21,7 +20,6 @@ import com.glia.androidsdk.site.SiteInfo
 import com.glia.androidsdk.visitor.Authentication
 import com.glia.androidsdk.visitor.VisitorInfo
 import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest
-import com.glia.widgets.core.authentication.AuthenticationManager
 import java.io.InputStream
 import java.util.Optional
 import java.util.function.Consumer
@@ -130,9 +128,7 @@ internal class GliaCoreImpl : GliaCore {
         Glia.getOperator(operatorId, callback)
     }
 
-    override fun getAuthenticationManager(behavior: Authentication.Behavior): AuthenticationManager {
-        return AuthenticationManager(Glia.getAuthentication(behavior))
-    }
+    override fun getAuthentication(behavior: Authentication.Behavior): Authentication = Glia.getAuthentication(behavior)
 
     override fun subscribeToQueueStateUpdates(queueIds: List<String>, onError: Consumer<GliaException>, callback: Consumer<Queue>) {
         Glia.subscribeToQueueStateUpdates(queueIds.toTypedArray(), onError, callback)

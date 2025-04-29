@@ -17,13 +17,13 @@ internal class RequestPushNotificationDuringAuthenticationUseCaseImpl(
 ) : RequestPushNotificationDuringAuthenticationUseCase {
     override fun invoke() {
         when {
-            !isPushNotificationsSetUpUseCase() -> {
-                // Push Notifications are not set up, no need to request permission
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU -> {
+                // No need to request permission on Android versions below Tiramisu
                 return
             }
 
-            Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU -> {
-                // No need to request permission on Android versions below Tiramisu
+            !isPushNotificationsSetUpUseCase() -> {
+                // Push Notifications are not set up, no need to request permission
                 return
             }
 

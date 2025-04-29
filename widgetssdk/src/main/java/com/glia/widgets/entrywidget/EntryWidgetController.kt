@@ -2,9 +2,9 @@ package com.glia.widgets.entrywidget
 
 import android.app.Activity
 import androidx.annotation.VisibleForTesting
-import com.glia.androidsdk.Engagement.MediaType
 import com.glia.widgets.chat.Intention
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
+import com.glia.widgets.core.engagement.MediaType
 import com.glia.widgets.core.queue.Queue
 import com.glia.widgets.core.queue.QueueRepository
 import com.glia.widgets.core.queue.QueuesState

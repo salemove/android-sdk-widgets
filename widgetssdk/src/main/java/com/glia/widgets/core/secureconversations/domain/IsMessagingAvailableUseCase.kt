@@ -1,7 +1,6 @@
 package com.glia.widgets.core.secureconversations.domain
 
-import com.glia.androidsdk.Engagement.MediaType
-import com.glia.androidsdk.queuing.QueueState
+import com.glia.widgets.core.engagement.MediaType
 import com.glia.widgets.core.queue.Queue
 import com.glia.widgets.core.queue.QueueRepository
 import com.glia.widgets.core.queue.QueuesState
@@ -23,7 +22,7 @@ internal class IsMessagingAvailableUseCase(private val queueRepository: QueueRep
     }
 
     private fun isMessagingAvailable(queues: List<Queue>): Boolean = queues.asSequence()
-        .filterNot { it.status == QueueState.Status.CLOSED }
-        .filterNot { it.status == QueueState.Status.UNKNOWN }
+        .filterNot { it.status == Queue.Status.CLOSED }
+        .filterNot { it.status == Queue.Status.UNKNOWN }
         .any { it.medias.contains(MediaType.MESSAGING) } // Support messaging
 }

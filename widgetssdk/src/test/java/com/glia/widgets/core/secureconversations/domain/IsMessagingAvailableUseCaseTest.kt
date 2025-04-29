@@ -1,8 +1,7 @@
 package com.glia.widgets.core.secureconversations.domain
 
 import android.COMMON_EXTENSIONS_CLASS_PATH
-import com.glia.androidsdk.Engagement
-import com.glia.androidsdk.queuing.QueueState
+import com.glia.widgets.core.engagement.MediaType
 import com.glia.widgets.core.queue.Queue
 import com.glia.widgets.core.queue.QueueRepository
 import com.glia.widgets.core.queue.QueuesState
@@ -39,7 +38,7 @@ class IsMessagingAvailableUseCaseTest {
 
     @Test
     fun `invoke returns true when transferred SC`() {
-        val nonMessagingQueue = createQueueWithStatus(QueueState.Status.OPEN, false)
+        val nonMessagingQueue = createQueueWithStatus(Queue.Status.OPEN, false)
         val queuesState = QueuesState.Queues(listOf(nonMessagingQueue))
         every { queueRepository.queuesState } returns Flowable.just(queuesState)
         every { engagementRepository.engagementState } returns Flowable.just(State.TransferredToSecureConversation)
@@ -52,7 +51,7 @@ class IsMessagingAvailableUseCaseTest {
 
     @Test
     fun `invoke returns true when queue with messaging exists`() {
-        val messagingQueue = createQueueWithStatus(QueueState.Status.OPEN, true)
+        val messagingQueue = createQueueWithStatus(Queue.Status.OPEN, true)
         val queuesState = QueuesState.Queues(listOf(messagingQueue))
         every { queueRepository.queuesState } returns Flowable.just(queuesState)
         every { engagementRepository.engagementState } returns Flowable.just(State.NoEngagement)
@@ -65,7 +64,7 @@ class IsMessagingAvailableUseCaseTest {
 
     @Test
     fun `invoke returns false when no queue with messaging exists`() {
-        val nonMessagingQueue = createQueueWithStatus(QueueState.Status.OPEN, false)
+        val nonMessagingQueue = createQueueWithStatus(Queue.Status.OPEN, false)
         val queuesState = QueuesState.Queues(listOf(nonMessagingQueue))
         every { queueRepository.queuesState } returns Flowable.just(queuesState)
         every { engagementRepository.engagementState } returns Flowable.just(State.NoEngagement)
@@ -78,7 +77,7 @@ class IsMessagingAvailableUseCaseTest {
 
     @Test
     fun `invoke returns false when queue state is closed`() {
-        val closedQueue = createQueueWithStatus(QueueState.Status.CLOSED, true)
+        val closedQueue = createQueueWithStatus(Queue.Status.CLOSED, true)
         val queuesState = QueuesState.Queues(listOf(closedQueue))
         every { queueRepository.queuesState } returns Flowable.just(queuesState)
         every { engagementRepository.engagementState } returns Flowable.just(State.NoEngagement)
@@ -91,7 +90,7 @@ class IsMessagingAvailableUseCaseTest {
 
     @Test
     fun `invoke returns false when queue state is unknown`() {
-        val unknownQueue = createQueueWithStatus(QueueState.Status.UNKNOWN, true)
+        val unknownQueue = createQueueWithStatus(Queue.Status.UNKNOWN, true)
         val queuesState = QueuesState.Queues(listOf(unknownQueue))
         every { queueRepository.queuesState } returns Flowable.just(queuesState)
         every { engagementRepository.engagementState } returns Flowable.just(State.NoEngagement)
@@ -114,12 +113,12 @@ class IsMessagingAvailableUseCaseTest {
         testSubscriber.assertValue { !it }
     }
 
-    private fun createQueueWithStatus(status: QueueState.Status, supportsMessaging: Boolean): Queue {
+    private fun createQueueWithStatus(status: Queue.Status, supportsMessaging: Boolean): Queue {
         val queue = mockk<Queue>()
         every { queue.status } returns status
-        every { queue.medias } returns if (supportsMessaging) listOf(Engagement.MediaType.MESSAGING) else listOf(
-            Engagement.MediaType.TEXT,
-            Engagement.MediaType.AUDIO
+        every { queue.medias } returns if (supportsMessaging) listOf(MediaType.MESSAGING) else listOf(
+            MediaType.TEXT,
+            MediaType.AUDIO
         )
         return queue
     }

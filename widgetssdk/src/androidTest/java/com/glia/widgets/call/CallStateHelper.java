@@ -1,6 +1,6 @@
 package com.glia.widgets.call;
 
-import com.glia.androidsdk.Engagement;
+import com.glia.widgets.core.engagement.MediaType;
 
 public class CallStateHelper {
     public final boolean integratorCallStarted;
@@ -11,7 +11,7 @@ public class CallStateHelper {
     public final boolean isMuted;
     public final boolean hasVideo;
     public final String companyName;
-    public final Engagement.MediaType requestedMediaType;
+    public final MediaType requestedMediaType;
     public final boolean isSpeakerOn;
 
     public CallStateHelper(boolean integratorCallStarted,
@@ -23,7 +23,7 @@ public class CallStateHelper {
                            boolean hasVideo,
                            String queueTicketId,
                            String companyName,
-                           Engagement.MediaType requestedMediaType,
+                           MediaType requestedMediaType,
                            boolean isSpeakerOn) {
         this.integratorCallStarted = integratorCallStarted;
         this.isVisible = isVisible;
@@ -47,7 +47,7 @@ public class CallStateHelper {
         private boolean hasVideo;
         private String queueTicketId;
         private String companyName;
-        private Engagement.MediaType requestedMediaType;
+        private MediaType requestedMediaType;
         private boolean isSpeakerOn;
 
         public CallStateHelper.Builder setIntegratorCallStarted(boolean integratorCallStarted) {
@@ -95,7 +95,7 @@ public class CallStateHelper {
             return this;
         }
 
-        public CallStateHelper.Builder setRequestedMediaType(Engagement.MediaType requestedMediaType) {
+        public CallStateHelper.Builder setRequestedMediaType(MediaType requestedMediaType) {
             this.requestedMediaType = requestedMediaType;
             return this;
         }

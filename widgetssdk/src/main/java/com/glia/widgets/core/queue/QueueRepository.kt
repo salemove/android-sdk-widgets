@@ -97,7 +97,7 @@ internal class QueueRepositoryImpl(
     }
 
     private fun siteQueuesReceived(queues: Array<CoreSdkQueue>) {
-        siteQueues.onNext(queues.map { it.asLocalQueue() })
+        siteQueues.onNext(queues.map { it.toWidgetsType() })
         subscribeToQueues()
         subscribeToQueueUpdates()
     }
@@ -168,7 +168,7 @@ internal class QueueRepositoryImpl(
             return
         }
 
-        currentQueues[index] = currentQueue merge coreSdkQueue.asLocalQueue()
+        currentQueues[index] = currentQueue merge coreSdkQueue.toWidgetsType()
 
         _queuesState.onNext(QueuesState.Queues(currentQueues.toList()))
     }

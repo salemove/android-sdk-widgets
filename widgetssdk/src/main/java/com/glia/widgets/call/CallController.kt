@@ -1,7 +1,6 @@
 package com.glia.widgets.call
 
 import android.text.format.DateUtils
-import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.Operator
 import com.glia.androidsdk.comms.Audio
 import com.glia.androidsdk.comms.MediaDirection
@@ -20,6 +19,7 @@ import com.glia.widgets.core.dialog.domain.ConfirmationDialogLinksUseCase
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
 import com.glia.widgets.core.dialog.model.ConfirmationDialogLinks
 import com.glia.widgets.core.dialog.model.Link
+import com.glia.widgets.core.engagement.MediaType
 import com.glia.widgets.core.engagement.domain.ConfirmationDialogUseCase
 import com.glia.widgets.core.engagement.domain.ShouldShowMediaEngagementViewUseCase
 import com.glia.widgets.core.notification.domain.CallNotificationUseCase
@@ -179,12 +179,12 @@ internal class CallController(
         emitViewState(callState.engagementStarted())
     }
 
-    override fun startCall(mediaType: Engagement.MediaType?, upgradeToCall: Boolean) {
+    override fun startCall(mediaType: MediaType?, upgradeToCall: Boolean) {
         if (upgradeToCall || mediaType == null) {
             initCall(mediaType)
             return
         }
-        handleCallPermissionsUseCase.invoke(mediaType) { isPermissionsGranted: Boolean ->
+        handleCallPermissionsUseCase(mediaType) { isPermissionsGranted: Boolean ->
             if (isPermissionsGranted) {
                 initCall(mediaType)
             } else {
@@ -193,7 +193,7 @@ internal class CallController(
         }
     }
 
-    private fun initCall(mediaType: Engagement.MediaType?) {
+    private fun initCall(mediaType: MediaType?) {
         if (isShowOverlayPermissionRequestDialogUseCase()) {
             dialogController.showOverlayPermissionsDialog()
         } else {
@@ -361,10 +361,10 @@ internal class CallController(
 
     private fun handleMediaUpgradeAcceptResult(it: MediaUpgradeOffer) {
         d(TAG, "upgradeOfferChoiceSubmitSuccess")
-        val mediaType: Engagement.MediaType = if (it.video != null && it.video != MediaDirection.NONE) {
-            Engagement.MediaType.VIDEO
+        val mediaType: MediaType = if (it.video != null && it.video != MediaDirection.NONE) {
+            MediaType.VIDEO
         } else {
-            Engagement.MediaType.AUDIO
+            MediaType.AUDIO
         }
         emitViewState(callState.changeRequestedMediaType(mediaType))
     }

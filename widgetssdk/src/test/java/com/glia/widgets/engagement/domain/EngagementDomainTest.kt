@@ -5,7 +5,6 @@ import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.Operator
 import com.glia.androidsdk.comms.Media
 import com.glia.androidsdk.comms.MediaState
@@ -15,6 +14,7 @@ import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.fileupload.FileAttachmentRepository
+import com.glia.widgets.core.engagement.MediaType
 import com.glia.widgets.core.notification.domain.CallNotificationUseCase
 import com.glia.widgets.core.permissions.PermissionManager
 import com.glia.widgets.core.screensharing.MEDIA_PROJECTION_SERVICE_ACTION_START
@@ -328,7 +328,7 @@ class EngagementDomainTest {
         val secureConversationsRepository: SecureConversationsRepository = mockk(relaxUnitFun = true) {
             every { hasPendingSecureConversations } returns false
         }
-        val mediaType: Engagement.MediaType = mockk(relaxUnitFun = true)
+        val mediaType: MediaType = mockk(relaxUnitFun = true)
 
         val useCase: EnqueueForEngagementUseCase = EnqueueForEngagementUseCaseImpl(
             engagementRepository = engagementRepository,
@@ -350,7 +350,7 @@ class EngagementDomainTest {
         val secureConversationsRepository: SecureConversationsRepository = mockk(relaxUnitFun = true) {
             every { hasPendingSecureConversations } returns false
         }
-        val mediaType: Engagement.MediaType = mockk(relaxUnitFun = true)
+        val mediaType: MediaType = mockk(relaxUnitFun = true)
 
         val useCase: EnqueueForEngagementUseCase = EnqueueForEngagementUseCaseImpl(
             engagementRepository = engagementRepository,
@@ -372,7 +372,7 @@ class EngagementDomainTest {
         val secureConversationsRepository: SecureConversationsRepository = mockk(relaxUnitFun = true) {
             every { hasPendingSecureConversations } returns true
         }
-        val mediaType: Engagement.MediaType = mockk(relaxUnitFun = true)
+        val mediaType: MediaType = mockk(relaxUnitFun = true)
 
         val useCase: EnqueueForEngagementUseCase = EnqueueForEngagementUseCaseImpl(
             engagementRepository = engagementRepository,

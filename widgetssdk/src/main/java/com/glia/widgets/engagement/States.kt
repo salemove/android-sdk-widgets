@@ -1,10 +1,10 @@
 package com.glia.widgets.engagement
 
 import com.glia.androidsdk.Engagement.ActionOnEnd
-import com.glia.androidsdk.Engagement.MediaType
 import com.glia.androidsdk.Operator
 import com.glia.androidsdk.engagement.EngagementState
 import com.glia.androidsdk.engagement.Survey
+import com.glia.widgets.core.engagement.MediaType
 
 internal sealed interface State {
     data object NoEngagement : State

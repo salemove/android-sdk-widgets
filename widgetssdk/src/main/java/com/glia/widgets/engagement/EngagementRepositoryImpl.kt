@@ -5,7 +5,6 @@ import android.app.Activity
 import android.content.Intent
 import androidx.annotation.VisibleForTesting
 import com.glia.androidsdk.Engagement
-import com.glia.androidsdk.Engagement.MediaType
 import com.glia.androidsdk.EngagementRequest
 import com.glia.androidsdk.EngagementRequest.Outcome
 import com.glia.androidsdk.Glia
@@ -31,6 +30,7 @@ import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.androidsdk.screensharing.ScreenSharingRequest
 import com.glia.androidsdk.screensharing.VisitorScreenSharingState
 import com.glia.widgets.core.engagement.GliaOperatorRepository
+import com.glia.widgets.core.engagement.MediaType
 import com.glia.widgets.core.queue.QueueRepository
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.Data

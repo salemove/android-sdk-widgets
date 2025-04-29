@@ -7,6 +7,7 @@ import com.glia.androidsdk.Engagement
 import com.glia.widgets.chat.ChatView
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
+import com.glia.widgets.core.engagement.MediaType
 import com.glia.widgets.engagement.EndedBy
 import com.glia.widgets.engagement.ScreenSharingState
 import com.glia.widgets.engagement.State
@@ -143,7 +144,7 @@ internal class ActivityWatcherForChatHeadTest {
     fun `bubble will be updated when PreQueuing`() {
         mockShouldShowChatHead()
 
-        engagementStateFlowable.onNext(State.PreQueuing(Engagement.MediaType.TEXT))
+        engagementStateFlowable.onNext(State.PreQueuing(MediaType.TEXT))
         verifyBubbleIsShowed(times = 2)
     }
 
@@ -151,7 +152,7 @@ internal class ActivityWatcherForChatHeadTest {
     fun `bubble will be updated when Queueing is started`() {
         mockShouldShowChatHead()
 
-        engagementStateFlowable.onNext(State.Queuing("", Engagement.MediaType.TEXT))
+        engagementStateFlowable.onNext(State.Queuing("", MediaType.TEXT))
         verifyBubbleIsShowed(times = 2)
     }
 

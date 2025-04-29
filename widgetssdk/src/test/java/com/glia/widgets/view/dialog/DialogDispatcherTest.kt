@@ -1,7 +1,7 @@
 package com.glia.widgets.view.dialog
 
 import android.assertCurrentValue
-import com.glia.widgets.view.dialog.GlobalDialogController.State.NotificationPermissionDialog
+import com.glia.widgets.view.dialog.DialogDispatcher.State.NotificationPermissionDialog
 import io.mockk.mockk
 import io.mockk.verify
 import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
@@ -11,13 +11,13 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
-internal class GlobalDialogControllerTest {
-    lateinit var controller: GlobalDialogController
+internal class DialogDispatcherTest {
+    lateinit var dispatcher: DialogDispatcher
 
     @Before
     fun setUp() {
         RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
-        controller = GlobalDialogControllerImpl()
+        dispatcher = DialogDispatcherImpl()
     }
 
     @After
@@ -27,14 +27,14 @@ internal class GlobalDialogControllerTest {
 
     @Test
     fun `showNotificationPermissionDialog should emit NotificationPermissionDialog state`() {
-        val state = controller.state.test()
+        val state = dispatcher.state.test()
 
         state.assertEmpty().assertNotComplete()
 
         val onAllow: () -> Unit = mockk(relaxed = true)
         val onCancel: () -> Unit = mockk(relaxed = true)
 
-        controller.showNotificationPermissionDialog(onAllow, onCancel)
+        dispatcher.showNotificationPermissionDialog(onAllow, onCancel)
 
         val currentState = state.values().last().value as NotificationPermissionDialog
 
@@ -47,12 +47,12 @@ internal class GlobalDialogControllerTest {
 
     @Test
     fun `dismissDialog will produce DismissDialog state`() {
-        val state = controller.state.test()
+        val state = dispatcher.state.test()
 
         state.assertEmpty().assertNotComplete()
 
-        controller.dismissDialog()
+        dispatcher.dismissDialog()
 
-        state.assertCurrentValue(Predicate { it.value is GlobalDialogController.State.DismissDialog })
+        state.assertCurrentValue(Predicate { it.value is DialogDispatcher.State.DismissDialog })
     }
 }

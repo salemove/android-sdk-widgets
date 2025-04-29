@@ -1,6 +1,5 @@
 package com.glia.widgets.di
 
-import android.app.Application
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.Glia.OmnicoreEvent
 import com.glia.androidsdk.GliaConfig
@@ -20,7 +19,6 @@ import com.glia.androidsdk.site.SiteInfo
 import com.glia.androidsdk.visitor.Authentication
 import com.glia.androidsdk.visitor.VisitorInfo
 import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest
-import com.glia.widgets.core.authentication.AuthenticationManager
 import java.io.InputStream
 import java.util.Optional
 import java.util.function.Consumer
@@ -61,7 +59,7 @@ internal interface GliaCore {
     fun clearVisitorSession()
     fun getSiteInfo(callback: RequestCallback<SiteInfo?>)
     fun getOperator(operatorId: String, callback: RequestCallback<Operator?>)
-    fun getAuthenticationManager(behavior: Authentication.Behavior): AuthenticationManager
+    fun getAuthentication(behavior: Authentication.Behavior): Authentication
 
     fun ensureInitialized() {
         if (!isInitialized) {

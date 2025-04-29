@@ -13,7 +13,8 @@ import com.glia.widgets.helper.TAG
  *
  */
 internal class AuthenticationManager(
-    private val authentication: Authentication
+    private val authentication: Authentication,
+    private val onAuthenticationRequestedCallback: () -> Unit
 ) : Authentication {
     override fun setBehavior(behavior: Authentication.Behavior) {
         authentication.setBehavior(behavior)
@@ -24,8 +25,7 @@ internal class AuthenticationManager(
         externalAccessToken: String?,
         requestCallback: RequestCallback<Void>
     ) {
-        //TODO The business logic will be added on the next step
-//        Dependencies.controllerFactory.globalDialogController.showNotificationPermissionDialog(onAllow = {}, onCancel = {})
+        onAuthenticationRequestedCallback()
         Dependencies.destroyControllersAndResetQueueing()
 
         Logger.i(TAG, "Authenticate. Is external access token used: ${externalAccessToken != null}")

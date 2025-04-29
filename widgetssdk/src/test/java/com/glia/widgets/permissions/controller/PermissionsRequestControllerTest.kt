@@ -36,7 +36,7 @@ internal class PermissionsRequestControllerTest {
     @Test
     fun `request calls requestPermissions when current activity is ComponentActivity`() {
         val permissions = arrayOf("FirstPermission", "SecondPermission")
-        whenever(watcher.hasCurrentActivity()).thenReturn(true)
+        whenever(watcher.hasValidActivity()).thenReturn(true)
         whenever(watcher.currentActivityIsComponentActivity()).thenReturn(true)
         whenever(watcher.requestPermissions(permissions)).thenReturn(123)
 
@@ -51,7 +51,7 @@ internal class PermissionsRequestControllerTest {
     @Test
     fun `request calls requestPermissions when current activity is ComponentActivity, request hashCode is null`() {
         val permissions = arrayOf("FirstPermission", "SecondPermission")
-        whenever(watcher.hasCurrentActivity()).thenReturn(true)
+        whenever(watcher.hasValidActivity()).thenReturn(true)
         whenever(watcher.currentActivityIsComponentActivity()).thenReturn(true)
         whenever(watcher.requestPermissions(permissions)).thenReturn(null)
 
@@ -65,7 +65,7 @@ internal class PermissionsRequestControllerTest {
 
     @Test
     fun `request calls openSupportActivity when current activity is not ComponentActivity`() {
-        whenever(watcher.hasCurrentActivity()).thenReturn(true)
+        whenever(watcher.hasValidActivity()).thenReturn(true)
         whenever(watcher.currentActivityIsComponentActivity()).thenReturn(false)
         val permissions = arrayOf("FirstPermission", "SecondPermission")
 
@@ -79,7 +79,7 @@ internal class PermissionsRequestControllerTest {
 
     @Test
     fun `request caches permissionsRequest when there is no activity`() {
-        whenever(watcher.hasCurrentActivity()).thenReturn(false)
+        whenever(watcher.hasValidActivity()).thenReturn(false)
         val permissions = arrayOf("FirstPermission", "SecondPermission")
 
         controller.request(permissions)

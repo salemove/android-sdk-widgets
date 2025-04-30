@@ -122,4 +122,8 @@
     <string name="visitor_info_saving">Saving…</string>
     <string name="visitor_info_loading">Loading…</string>
 
+   <string name="push_notification_permission_granted">PN permission: Granted</string>
+   <string name="push_notification_permission_not_granted">PN permission: Not Granted</string>
+   <string name="push_notification_permission_not_required">PN permission: Not Required</string>
+
 </resources>

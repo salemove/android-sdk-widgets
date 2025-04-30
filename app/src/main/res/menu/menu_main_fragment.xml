@@ -52,9 +52,9 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/menu_broadcast_end_screen_sharing_event"
+        android:id="@+id/request_push_notifications_permission"
         android:enabled="true"
-        android:title="Broadcast End Screen Sharing Event"
+        android:title="Request Push Notifications Permission"
         android:visible="true"
         app:showAsAction="never" />
 

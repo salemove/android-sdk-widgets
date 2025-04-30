@@ -24,7 +24,7 @@ import com.glia.widgets.core.notification.device.NotificationManager
 import com.glia.widgets.core.permissions.PermissionManager
 import com.glia.widgets.core.secureconversations.SecureConversations
 import com.glia.widgets.core.secureconversations.SecureConversationsImpl
-import com.glia.widgets.core.visitor.Authentication
+import com.glia.widgets.authentication.Authentication
 import com.glia.widgets.engagement.completion.EngagementCompletionActivityWatcher
 import com.glia.widgets.entrywidget.EntryWidget
 import com.glia.widgets.entrywidget.EntryWidgetImpl

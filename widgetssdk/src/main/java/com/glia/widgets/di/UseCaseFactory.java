@@ -116,7 +116,7 @@ import com.glia.widgets.core.secureconversations.domain.SetLeaveSecureConversati
 import com.glia.widgets.core.secureconversations.domain.ShouldMarkMessagesReadUseCase;
 import com.glia.widgets.core.secureconversations.domain.ShowMessageLimitErrorUseCase;
 import com.glia.widgets.core.survey.domain.GliaSurveyAnswerUseCase;
-import com.glia.widgets.core.visitor.Authentication;
+import com.glia.widgets.authentication.Authentication;
 import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCase;
 import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCaseImpl;
 import com.glia.widgets.engagement.domain.CheckMediaUpgradePermissionsUseCase;

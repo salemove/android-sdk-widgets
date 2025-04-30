@@ -31,10 +31,10 @@ import com.glia.androidsdk.Glia
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.fcm.GliaPushMessage
 import com.glia.androidsdk.omnibrowse.Omnibrowse
-import com.glia.androidsdk.visitor.Authentication
 import com.glia.exampleapp.ExampleAppConfigManager.createDefaultConfig
 import com.glia.exampleapp.Utils.getAuthenticationBehaviorFromPrefs
 import com.glia.widgets.GliaWidgets
+import com.glia.widgets.authentication.Authentication
 import com.glia.widgets.entrywidget.EntryWidget
 import com.glia.widgets.launcher.EngagementLauncher
 import com.google.android.material.appbar.MaterialToolbar
@@ -274,7 +274,7 @@ class MainFragment : Fragment() {
                 initGliaWidgets()
                 requireActivity().runOnUiThread { showAuthenticationDialog(callback) }
             }
-        } else if (authentication != null && authentication!!.isAuthenticated) {
+        } else if (authentication?.isAuthenticated == true) {
             callback.onAuthenticated()
         } else {
             showAuthenticationDialog(callback)

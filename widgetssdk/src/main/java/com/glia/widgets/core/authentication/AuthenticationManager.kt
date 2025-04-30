@@ -2,7 +2,7 @@ package com.glia.widgets.core.authentication
 
 import com.glia.androidsdk.visitor.Authentication as CoreAuthentication
 import com.glia.androidsdk.RequestCallback
-import com.glia.widgets.core.visitor.Authentication
+import com.glia.widgets.authentication.Authentication
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.di.Dependencies.repositoryFactory
 import com.glia.widgets.helper.Logger
@@ -24,7 +24,7 @@ internal class AuthenticationManager(
     override fun authenticate(
         jwtToken: String,
         externalAccessToken: String?,
-        requestCallback: RequestCallback<Void>
+        authCallback: RequestCallback<Void>?
     ) {
         onAuthenticationRequestedCallback()
         Dependencies.destroyControllersAndResetQueueing()
@@ -36,11 +36,11 @@ internal class AuthenticationManager(
                 repositoryFactory.secureConversationsRepository.subscribe()
             }
 
-            requestCallback.onResult(void, gliaException)
+            authCallback?.onResult(void, gliaException)
         }
     }
 
-    override fun deauthenticate(requestCallback: RequestCallback<Void>) {
+    override fun deauthenticate(authCallback: RequestCallback<Void>?) {
         Logger.i(TAG, "Unauthenticate")
         //Need to end engagement before it's done on the core side to prevent unexpected behavior
         Dependencies.destroyControllersAndResetEngagementData()
@@ -49,12 +49,13 @@ internal class AuthenticationManager(
         //and we don't need secure conversations data for un-authenticated visitors.
         repositoryFactory.secureConversationsRepository.unsubscribeAndResetData()
 
-        authentication.deauthenticate(requestCallback)
+        authentication.deauthenticate(authCallback)
     }
 
-    override fun isAuthenticated(): Boolean = authentication.isAuthenticated
+    override val isAuthenticated: Boolean
+        get() = authentication.isAuthenticated
 
-    override fun refresh(jwtToken: String?, externalAccessToken: String?, authCallback: RequestCallback<Void>?) {
+    override fun refresh(jwtToken: String, externalAccessToken: String?, authCallback: RequestCallback<Void>?) {
         Logger.i(TAG, "Refresh authentication")
         authentication.refresh(jwtToken, externalAccessToken, authCallback)
     }

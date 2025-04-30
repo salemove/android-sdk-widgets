@@ -6,7 +6,7 @@ import android.content.res.Resources;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 
-import com.glia.widgets.core.visitor.Authentication;
+import com.glia.widgets.authentication.Authentication;
 
 import org.json.JSONException;
 import org.json.JSONObject;

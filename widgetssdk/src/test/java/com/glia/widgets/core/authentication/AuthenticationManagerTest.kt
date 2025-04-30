@@ -1,6 +1,6 @@
 package com.glia.widgets.core.authentication
 
-import com.glia.widgets.core.visitor.Authentication
+import com.glia.widgets.authentication.Authentication
 import junit.framework.TestCase.assertEquals
 import org.junit.Assert
 import org.junit.Test

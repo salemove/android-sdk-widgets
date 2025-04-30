@@ -17,7 +17,7 @@ import com.glia.widgets.core.liveobservation.LiveObservation
 import com.glia.widgets.core.queue.Queue
 import com.glia.widgets.core.queue.toWidgetsType
 import com.glia.widgets.core.secureconversations.SecureConversations
-import com.glia.widgets.core.visitor.Authentication
+import com.glia.widgets.authentication.Authentication
 import com.glia.widgets.core.visitor.VisitorInfo
 import com.glia.widgets.core.visitor.VisitorInfoUpdateRequest
 import com.glia.widgets.di.Dependencies
@@ -430,7 +430,7 @@ object GliaWidgets {
      * Exception may have the following cause:
      * [GliaWidgetsException.Cause.INVALID_INPUT] - when SDK is not initialized
      */
-    @Deprecated("Please use getAuthentication(behavior: com.glia.widgets.core.visitor.Authentication.Behavior)")
+    @Deprecated("Please use getAuthentication(behavior: com.glia.widgets.authentication.Authentication.Behavior)")
     @JvmStatic
     fun getAuthentication(behavior: com.glia.androidsdk.visitor.Authentication.Behavior): Authentication {
         try {

@@ -39,7 +39,7 @@
                     android:minHeight="?attr/actionBarSize"
                     app:elevation="0dp"
                     app:menu="@menu/menu_main_fragment"
-                    app:title="@string/app_name" />
+                    app:title="Widgets Testing App" />
 
             </com.google.android.material.appbar.AppBarLayout>
 

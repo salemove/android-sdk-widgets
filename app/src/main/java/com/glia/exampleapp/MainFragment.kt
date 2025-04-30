@@ -1,8 +1,11 @@
 package com.glia.exampleapp
 
+import android.Manifest
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.text.InputType
 import android.util.TypedValue
@@ -14,6 +17,8 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SwitchCompat
 import androidx.cardview.widget.CardView
@@ -30,7 +35,6 @@ import com.glia.androidsdk.visitor.Authentication
 import com.glia.exampleapp.ExampleAppConfigManager.createDefaultConfig
 import com.glia.exampleapp.Utils.getAuthenticationBehaviorFromPrefs
 import com.glia.widgets.GliaWidgets
-import com.glia.widgets.core.notification.NotificationActionReceiver
 import com.glia.widgets.entrywidget.EntryWidget
 import com.glia.widgets.launcher.EngagementLauncher
 import com.google.android.material.appbar.MaterialToolbar
@@ -68,6 +72,23 @@ class MainFragment : Fragment() {
         GliaWidgets.getEntryWidget(getQueueIdsFromPrefs(sharedPreferences))
     }
 
+    val pushNotificationPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+        updatePushNotificationPermissionState(isGranted)
+    }
+
+    private fun updatePushNotificationPermissionState(isGranted: Boolean? = null) {
+        val subtitle = when {
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU -> R.string.push_notification_permission_not_required
+            isGranted == true -> R.string.push_notification_permission_granted
+            isGranted == false -> R.string.push_notification_permission_not_granted
+            requireActivity().checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED ->
+                R.string.push_notification_permission_granted
+            else -> R.string.push_notification_permission_not_granted
+        }
+
+        requireView().findViewById<MaterialToolbar>(R.id.top_app_bar).setSubtitle(subtitle)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -76,6 +97,7 @@ class MainFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        updatePushNotificationPermissionState()
         containerView = view.findViewById(R.id.constraint_layout)
         val navController = NavHostFragment.findNavController(this)
 
@@ -155,20 +177,24 @@ class MainFragment : Fragment() {
                 startActivity(Intent(requireContext(), LegacyActivity::class.java))
                 true
             }
-            findItem(R.id.menu_broadcast_end_screen_sharing_event).setOnMenuItemClickListener {
-                simulateEndScreenSharingFromNotification()
-                true
+            findItem(R.id.request_push_notifications_permission).apply {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    isVisible = true
+                    setOnMenuItemClickListener {
+                        requestPushNotificationPermission()
+                        true
+                    }
+                } else {
+                    isVisible = false
+                }
             }
         }
 
         handleOpensFromPushNotification()
     }
 
-    private fun simulateEndScreenSharingFromNotification() {
-        val intent = Intent(requireContext(), NotificationActionReceiver::class.java)
-            .setAction("com.glia.widgets.core.notification.NotificationActionReceiver.ACTION_ON_SCREEN_SHARING_END_PRESSED")
-        requireContext().sendBroadcast(intent)
-    }
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun requestPushNotificationPermission() = pushNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
 
     private fun initMenu() {
         if (Glia.getCurrentEngagement().isPresent) {

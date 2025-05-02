@@ -11,7 +11,7 @@ import com.glia.androidsdk.comms.Video
 import com.glia.androidsdk.comms.VideoView
 import com.glia.androidsdk.comms.VisitorMediaState
 import com.glia.widgets.R
-import com.glia.widgets.core.engagement.MediaType
+import com.glia.widgets.engagement.MediaType
 import com.glia.widgets.databinding.CallActivityBinding
 import com.glia.widgets.di.ControllerFactory
 import com.glia.widgets.di.Dependencies

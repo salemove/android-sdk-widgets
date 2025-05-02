@@ -1,7 +1,7 @@
 package com.glia.widgets.helper
 
-import com.glia.widgets.core.engagement.MediaType
-import com.glia.widgets.core.queue.Queue
+import com.glia.widgets.engagement.MediaType
+import com.glia.widgets.queue.Queue
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.Assert.assertEquals

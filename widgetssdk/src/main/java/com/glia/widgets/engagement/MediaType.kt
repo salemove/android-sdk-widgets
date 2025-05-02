@@ -1,4 +1,4 @@
-package com.glia.widgets.core.engagement
+package com.glia.widgets.engagement
 
 /**
  * Defines different media types supported by Glia.

@@ -1,4 +1,4 @@
-package com.glia.widgets.core.secureconversations
+package com.glia.widgets.secureconversations
 
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback

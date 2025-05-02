@@ -17,13 +17,13 @@ import com.glia.widgets.core.authentication.AuthenticationManager
 import com.glia.widgets.core.callvisualizer.CallVisualizerManager
 import com.glia.widgets.core.chathead.ChatHeadManager
 import com.glia.widgets.core.dialog.PermissionDialogManager
-import com.glia.widgets.core.liveobservation.LiveObservation
-import com.glia.widgets.core.liveobservation.LiveObservationImpl
+import com.glia.widgets.liveobservation.LiveObservation
+import com.glia.widgets.liveobservation.LiveObservationImpl
 import com.glia.widgets.core.notification.device.INotificationManager
 import com.glia.widgets.core.notification.device.NotificationManager
 import com.glia.widgets.core.permissions.PermissionManager
-import com.glia.widgets.core.secureconversations.SecureConversations
-import com.glia.widgets.core.secureconversations.SecureConversationsImpl
+import com.glia.widgets.secureconversations.SecureConversations
+import com.glia.widgets.secureconversations.SecureConversationsImpl
 import com.glia.widgets.core.visitor.Authentication
 import com.glia.widgets.engagement.completion.EngagementCompletionActivityWatcher
 import com.glia.widgets.entrywidget.EntryWidget

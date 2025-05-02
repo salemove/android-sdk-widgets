@@ -1,4 +1,4 @@
-package com.glia.widgets.core.visitor
+package com.glia.widgets.visitor
 
 import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest
 
@@ -18,7 +18,7 @@ data class VisitorInfoUpdateRequest(
     val customAttrsUpdateMethod: CustomAttributesUpdateMethod?
 ) {
 
-    fun toCoreType(): VisitorInfoUpdateRequest {
+    internal fun toCoreType(): VisitorInfoUpdateRequest {
         return VisitorInfoUpdateRequest.Builder()
             .setName(name)
             .setEmail(email)

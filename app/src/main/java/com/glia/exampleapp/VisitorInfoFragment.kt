@@ -18,8 +18,8 @@ import com.glia.widgets.GliaWidgetsException
 import com.glia.widgets.callbacks.OnError
 import com.glia.widgets.callbacks.OnSuccess
 import com.glia.widgets.callbacks.OnComplete
-import com.glia.widgets.core.visitor.VisitorInfo
-import com.glia.widgets.core.visitor.VisitorInfoUpdateRequest
+import com.glia.widgets.visitor.VisitorInfo
+import com.glia.widgets.visitor.VisitorInfoUpdateRequest
 import java.util.UUID
 
 class VisitorInfoFragment : Fragment() {

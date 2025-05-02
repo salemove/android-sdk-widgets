@@ -1,4 +1,4 @@
-package com.glia.widgets.core.liveobservation
+package com.glia.widgets.liveobservation
 
 /**
  * Class responsible for handling Live Observation.

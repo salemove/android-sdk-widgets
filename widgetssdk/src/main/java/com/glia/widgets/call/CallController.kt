@@ -19,7 +19,7 @@ import com.glia.widgets.core.dialog.domain.ConfirmationDialogLinksUseCase
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
 import com.glia.widgets.core.dialog.model.ConfirmationDialogLinks
 import com.glia.widgets.core.dialog.model.Link
-import com.glia.widgets.core.engagement.MediaType
+import com.glia.widgets.engagement.MediaType
 import com.glia.widgets.core.engagement.domain.ConfirmationDialogUseCase
 import com.glia.widgets.core.engagement.domain.ShouldShowMediaEngagementViewUseCase
 import com.glia.widgets.core.notification.domain.CallNotificationUseCase

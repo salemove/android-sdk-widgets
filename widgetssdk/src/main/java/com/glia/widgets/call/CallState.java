@@ -3,11 +3,10 @@ package com.glia.widgets.call;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.comms.Media;
 import com.glia.androidsdk.comms.MediaState;
 import com.glia.androidsdk.comms.Video;
-import com.glia.widgets.core.engagement.MediaType;
+import com.glia.widgets.engagement.MediaType;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContract.FlipButtonState;
 

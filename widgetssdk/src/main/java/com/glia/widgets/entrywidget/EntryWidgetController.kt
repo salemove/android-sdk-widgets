@@ -6,10 +6,10 @@ import com.glia.widgets.chat.Intention
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.engagement.MediaType
 import com.glia.widgets.queue.Queue
-import com.glia.widgets.core.queue.QueueRepository
-import com.glia.widgets.core.queue.QueuesState
-import com.glia.widgets.core.secureconversations.SecureConversationsRepository
-import com.glia.widgets.core.secureconversations.domain.HasOngoingSecureConversationUseCase
+import com.glia.widgets.internal.queue.QueueRepository
+import com.glia.widgets.internal.queue.QueuesState
+import com.glia.widgets.internal.secureconversations.SecureConversationsRepository
+import com.glia.widgets.internal.secureconversations.domain.HasOngoingSecureConversationUseCase
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementStateUseCase

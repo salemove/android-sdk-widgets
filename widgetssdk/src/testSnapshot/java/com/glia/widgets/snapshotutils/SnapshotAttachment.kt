@@ -5,7 +5,7 @@ import androidx.core.net.toUri
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.widgets.chat.model.OperatorAttachmentItem
 import com.glia.widgets.chat.model.VisitorAttachmentItem
-import com.glia.widgets.core.fileupload.model.LocalAttachment
+import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 

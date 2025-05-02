@@ -2,7 +2,7 @@ package com.glia.widgets.view.head
 
 import com.glia.widgets.R
 import com.glia.widgets.SnapshotTest
-import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase
+import com.glia.widgets.internal.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase
 import com.glia.widgets.di.ControllerFactory
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.di.UseCaseFactory

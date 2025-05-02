@@ -12,10 +12,10 @@ import com.glia.widgets.chat.model.ChatState
 import com.glia.widgets.chat.model.CustomCardChatItem
 import com.glia.widgets.chat.model.GvaButton
 import com.glia.widgets.chat.model.OperatorMessageItem
-import com.glia.widgets.core.dialog.model.ConfirmationDialogLinks
-import com.glia.widgets.core.dialog.model.LeaveDialogAction
-import com.glia.widgets.core.dialog.model.Link
-import com.glia.widgets.core.fileupload.model.LocalAttachment
+import com.glia.widgets.internal.dialog.model.ConfirmationDialogLinks
+import com.glia.widgets.internal.dialog.model.LeaveDialogAction
+import com.glia.widgets.internal.dialog.model.Link
+import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.glia.widgets.entrywidget.EntryWidgetContract
 import com.glia.widgets.locale.LocaleString
 

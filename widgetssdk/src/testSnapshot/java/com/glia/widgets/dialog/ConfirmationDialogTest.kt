@@ -1,7 +1,7 @@
 package com.glia.widgets.dialog
 
 import com.glia.widgets.SnapshotTest
-import com.glia.widgets.core.dialog.model.Link
+import com.glia.widgets.internal.dialog.model.Link
 import com.glia.widgets.snapshotutils.SnapshotDialog
 import com.glia.widgets.view.dialog.base.DialogPayload
 import com.glia.widgets.view.dialog.base.DialogType

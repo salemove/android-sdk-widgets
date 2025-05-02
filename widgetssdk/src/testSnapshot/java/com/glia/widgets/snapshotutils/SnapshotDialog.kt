@@ -5,7 +5,7 @@ import android.view.View
 import androidx.annotation.DrawableRes
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
-import com.glia.widgets.core.dialog.model.Link
+import com.glia.widgets.internal.dialog.model.Link
 import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.view.dialog.base.DialogType
 import com.glia.widgets.view.dialog.base.DialogViewFactory

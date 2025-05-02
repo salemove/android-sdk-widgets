@@ -2,7 +2,7 @@ package com.glia.widgets.chat.domain.gva
 
 import com.glia.widgets.chat.model.Gva
 import com.glia.widgets.chat.model.OperatorChatItem
-import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
+import com.glia.widgets.internal.engagement.domain.model.ChatMessageInternal
 
 internal class MapGvaUseCase(
     private val getGvaTypeUseCase: GetGvaTypeUseCase,

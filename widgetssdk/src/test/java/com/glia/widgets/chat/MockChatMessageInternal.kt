@@ -2,7 +2,7 @@ package com.glia.widgets.chat
 
 import com.glia.androidsdk.chat.ChatMessage
 import com.glia.widgets.chat.model.Gva
-import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
+import com.glia.widgets.internal.engagement.domain.model.ChatMessageInternal
 import org.json.JSONObject
 import org.mockito.Mockito
 import org.mockito.kotlin.doReturn

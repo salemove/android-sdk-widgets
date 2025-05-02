@@ -13,8 +13,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
-import com.glia.widgets.core.fileupload.model.LocalAttachment
-import com.glia.widgets.core.fileupload.model.LocalAttachment.Status
+import com.glia.widgets.internal.fileupload.model.LocalAttachment
+import com.glia.widgets.internal.fileupload.model.LocalAttachment.Status
 import com.glia.widgets.databinding.ChatAttachmentUploadedItemBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.getColorCompat

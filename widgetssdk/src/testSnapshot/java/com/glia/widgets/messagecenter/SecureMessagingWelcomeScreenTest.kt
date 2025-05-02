@@ -3,7 +3,7 @@ package com.glia.widgets.messagecenter
 import com.android.ide.common.rendering.api.SessionParams
 import com.glia.widgets.R
 import com.glia.widgets.SnapshotTest
-import com.glia.widgets.core.fileupload.model.LocalAttachment
+import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.glia.widgets.snapshotutils.SnapshotMessageCenterView
 import com.glia.widgets.snapshotutils.SnapshotStrings
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme

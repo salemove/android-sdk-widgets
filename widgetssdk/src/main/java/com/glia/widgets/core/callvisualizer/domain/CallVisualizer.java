@@ -12,7 +12,10 @@ import androidx.annotation.NonNull;
  * Screen sharing and video engagements are available for such calls via Call Visualizer.
  * <p>
  * For more information, see the <a href="https://docs.glia.com/glia-mobile/docs/android-widgets-call-visualizer">Call Visualizer guide</a>.
+ *
+ * @deprecated use {@link com.glia.widgets.callvisualizer.CallVisualizer}
  */
+@Deprecated(since = "3.1.0")
 public interface CallVisualizer {
     /**
      * Creates a VisitorCodeView component that can be integrated into the client application

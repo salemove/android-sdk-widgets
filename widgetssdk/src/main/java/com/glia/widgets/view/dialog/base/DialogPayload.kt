@@ -2,7 +2,7 @@ package com.glia.widgets.view.dialog.base
 
 import android.view.View
 import androidx.annotation.DrawableRes
-import com.glia.widgets.core.dialog.model.Link
+import com.glia.widgets.internal.dialog.model.Link
 import com.glia.widgets.locale.LocaleString
 
 internal sealed interface DialogPayload {

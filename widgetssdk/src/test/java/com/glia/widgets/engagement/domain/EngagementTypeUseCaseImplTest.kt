@@ -3,7 +3,7 @@ package com.glia.widgets.engagement.domain
 import com.glia.androidsdk.comms.Audio
 import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.comms.Video
-import com.glia.widgets.core.engagement.MediaType
+import com.glia.widgets.engagement.MediaType
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK

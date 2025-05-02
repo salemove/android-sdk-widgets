@@ -7,7 +7,7 @@ import com.glia.androidsdk.Engagement
 import com.glia.widgets.chat.ChatView
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
-import com.glia.widgets.core.engagement.MediaType
+import com.glia.widgets.engagement.MediaType
 import com.glia.widgets.engagement.EndedBy
 import com.glia.widgets.engagement.ScreenSharingState
 import com.glia.widgets.engagement.State

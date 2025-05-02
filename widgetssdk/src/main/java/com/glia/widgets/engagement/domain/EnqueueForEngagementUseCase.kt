@@ -1,6 +1,6 @@
 package com.glia.widgets.engagement.domain
 
-import com.glia.widgets.core.engagement.MediaType
+import com.glia.widgets.engagement.MediaType
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.engagement.EngagementRepository
 

@@ -5,6 +5,7 @@ import android.content.Intent
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
 import com.glia.widgets.GliaWidgetsException.Companion.from
+import com.glia.widgets.authentication.Authentication
 import com.glia.widgets.callbacks.OnComplete
 import com.glia.widgets.callbacks.OnError
 import com.glia.widgets.callbacks.OnSuccess
@@ -12,13 +13,12 @@ import com.glia.widgets.chat.adapter.CustomCardAdapter
 import com.glia.widgets.chat.adapter.WebViewCardAdapter
 import com.glia.widgets.core.authentication.toCoreType
 import com.glia.widgets.core.callvisualizer.domain.CallVisualizer
-import com.glia.widgets.core.liveobservation.LiveObservation
-import com.glia.widgets.core.queue.Queue
-import com.glia.widgets.core.queue.toWidgetsType
-import com.glia.widgets.core.secureconversations.SecureConversations
-import com.glia.widgets.authentication.Authentication
-import com.glia.widgets.core.visitor.VisitorInfo
-import com.glia.widgets.core.visitor.VisitorInfoUpdateRequest
+import com.glia.widgets.liveobservation.LiveObservation
+import com.glia.widgets.queue.Queue
+import com.glia.widgets.queue.toWidgetsType
+import com.glia.widgets.secureconversations.SecureConversations
+import com.glia.widgets.visitor.VisitorInfo
+import com.glia.widgets.visitor.VisitorInfoUpdateRequest
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.di.Dependencies.callVisualizerManager
 import com.glia.widgets.di.Dependencies.configurationManager

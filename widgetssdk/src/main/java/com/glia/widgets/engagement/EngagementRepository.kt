@@ -9,7 +9,6 @@ import com.glia.androidsdk.comms.CameraDevice
 import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.androidsdk.screensharing.ScreenSharing.Mode
-import com.glia.widgets.core.engagement.MediaType
 import com.glia.widgets.helper.Data
 import io.reactivex.rxjava3.core.Flowable
 

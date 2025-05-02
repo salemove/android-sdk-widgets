@@ -4,6 +4,7 @@ import android.Manifest
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.glia.widgets.core.permissions.PermissionManager
+import com.glia.widgets.launcher.ConfigurationManager
 import com.glia.widgets.view.dialog.DialogDispatcher
 
 internal interface RequestPushNotificationDuringAuthenticationUseCase {
@@ -13,10 +14,16 @@ internal interface RequestPushNotificationDuringAuthenticationUseCase {
 internal class RequestPushNotificationDuringAuthenticationUseCaseImpl(
     private val isPushNotificationsSetUpUseCase: IsPushNotificationsSetUpUseCase,
     private val dialogDispatcher: DialogDispatcher,
-    private val permissionManager: PermissionManager
+    private val permissionManager: PermissionManager,
+    private val configurationManager: ConfigurationManager
 ) : RequestPushNotificationDuringAuthenticationUseCase {
     override fun invoke() {
         when {
+            configurationManager.suppressPushNotificationsPermissionRequestDuringAuthentication -> {
+                // Suppress permission request
+                return
+            }
+
             Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU -> {
                 // No need to request permission on Android versions below Tiramisu
                 return

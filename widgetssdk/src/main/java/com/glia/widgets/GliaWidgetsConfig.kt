@@ -46,6 +46,9 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
     @JvmField
     val manualLocaleOverride: String?
 
+    @JvmField
+    val suppressPushNotificationsPermissionRequestDuringAuthentication: Boolean?
+
     init {
         // The Context can be an Activity that has its life cycle.
         // To prevent storing the link to an Activity that can be destroyed, we need to take the Application Context.
@@ -64,6 +67,7 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
         enableBubbleOutsideApp = builder.enableBubbleOutsideApp
         enableBubbleInsideApp = builder.enableBubbleInsideApp
         manualLocaleOverride = builder.manualLocaleOverride
+        suppressPushNotificationsPermissionRequestDuringAuthentication = builder.suppressPushNotificationsPermissionRequestDuringAuthentication
     }
 
     /**
@@ -136,6 +140,8 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
         var enableBubbleInsideApp: Boolean? = null
             private set
         var manualLocaleOverride: String? = null
+            private set
+        var suppressPushNotificationsPermissionRequestDuringAuthentication: Boolean? = null
             private set
 
         /**
@@ -236,6 +242,15 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
          */
         fun setManualLocaleOverride(manualLocaleOverride: String?): Builder {
             this.manualLocaleOverride = manualLocaleOverride
+            return this
+        }
+
+        /**
+         * @param suppressPushNotificationsPermissionRequestDuringAuthentication - suppress push notifications permission request during authentication
+         * @return Builder instance
+         */
+        fun setSuppressPushNotificationsPermissionRequestDuringAuthentication(suppressPushNotificationsPermissionRequestDuringAuthentication: Boolean): Builder {
+            this.suppressPushNotificationsPermissionRequestDuringAuthentication = suppressPushNotificationsPermissionRequestDuringAuthentication
             return this
         }
 

@@ -134,6 +134,10 @@ object ExampleAppConfigManager {
             context.getString(R.string.settings_enable_bubble_inside_app),
             true
         )
+        val suppressPushNotificationDialogDuringAuthentication = preferences.getBoolean(
+            context.getString(R.string.pref_suppress_p_n_during_auth),
+            false
+        )
         val bounded = context.getString(R.string.screen_sharing_mode_app_bounded)
         val unbounded = context.getString(R.string.screen_sharing_mode_unbounded)
         val screenSharingMode = if (
@@ -156,6 +160,7 @@ object ExampleAppConfigManager {
             .setContext(context)
             .setUiJsonRemoteConfig(uiJsonRemoteConfig ?: Utils.getRemoteThemeByPrefs(preferences, context.resources))
             .setManualLocaleOverride(manualLocaleOverride)
+            .setSuppressPushNotificationsPermissionRequestDuringAuthentication(suppressPushNotificationDialogDuringAuthentication)
             .build()
     }
 }

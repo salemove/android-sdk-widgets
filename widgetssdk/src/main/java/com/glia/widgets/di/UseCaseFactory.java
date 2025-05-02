@@ -1088,7 +1088,8 @@ public class UseCaseFactory {
         return new RequestPushNotificationDuringAuthenticationUseCaseImpl(
             getIsPushNotificationsSetUpUseCase(),
             dialogDispatcher,
-            permissionManager
+            permissionManager,
+            configurationManager
         );
     }
 }

@@ -5,7 +5,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.glia.androidsdk.GliaConfig
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
-import com.glia.androidsdk.SiteApiKey
+import com.glia.androidsdk.SiteApiKey as CoreSiteApiKey
 import com.glia.androidsdk.omnibrowse.Omnibrowse
 import com.glia.widgets.callbacks.OnComplete
 import com.glia.widgets.callbacks.OnError
@@ -80,10 +80,42 @@ class GliaWidgetsTest {
         verify(gliaCore).init(captor.capture())
         verify(repositoryFactory).initialize()
         val gliaConfig = captor.lastValue
-        Assert.assertEquals(siteApiKey, gliaConfig.siteApiKey)
+        Assert.assertEquals(siteApiKey.id, gliaConfig.siteApiKey.id)
+        Assert.assertEquals(siteApiKey.secret, gliaConfig.siteApiKey.secret)
         Assert.assertEquals(siteId, gliaConfig.siteId)
         Assert.assertEquals(region, gliaConfig.region)
         Assert.assertEquals(applicationContext, gliaConfig.context)
+    }
+
+    @Test
+    fun onSdkInit_setApiKey_whenDeprecatedSiteApiKeyIsUsed() {
+        val siteApiKey = CoreSiteApiKey("SiteApiId", "SiteApiSecret")
+        val siteId = "SiteId"
+        val region = "Region"
+        val applicationContext = mock<Context>()
+        whenever(applicationContext.applicationContext).thenReturn(applicationContext)
+        val context = mock<Context>()
+        whenever(context.applicationContext).thenReturn(applicationContext)
+        val widgetsConfig = GliaWidgetsConfig.Builder()
+            .setSiteApiKey(siteApiKey)
+            .setSiteId(siteId)
+            .setRegion(region)
+            .setContext(context)
+            .build()
+        val callVisualizer = mock<Omnibrowse>()
+        whenever(gliaCore.callVisualizer).thenReturn(callVisualizer)
+        val callVisualizerController = mock<CallVisualizerController>()
+        whenever(controllerFactory.callVisualizerController).thenReturn(callVisualizerController)
+        val engagementRepository = mock<EngagementRepository>()
+        whenever(repositoryFactory.engagementRepository) doReturn engagementRepository
+        val queueRepository = mock<QueueRepository>()
+        whenever(repositoryFactory.queueRepository) doReturn queueRepository
+        GliaWidgets.init(widgetsConfig)
+        val captor = argumentCaptor<GliaConfig>()
+        verify(gliaCore).init(captor.capture())
+        val gliaConfig = captor.lastValue
+        Assert.assertEquals(siteApiKey.id, gliaConfig.siteApiKey.id)
+        Assert.assertEquals(siteApiKey.secret, gliaConfig.siteApiKey.secret)
     }
 
     @Test

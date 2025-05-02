@@ -4,6 +4,7 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
+import com.glia.widgets.internal.notification.NotificationFactory
 
 /**
  * Glia internal class.
@@ -12,7 +13,7 @@ import android.os.IBinder
  *
  * This service is used to remove push notifications about ongoing video/audio calls when the application is killed.
  */
-class NotificationRemovalService : Service() {
+internal class NotificationRemovalService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onTaskRemoved(rootIntent: Intent?) {

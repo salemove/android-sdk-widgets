@@ -2,10 +2,10 @@ package com.glia.widgets.view.head.controller
 
 import android.view.View
 import com.glia.androidsdk.Operator
-import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase
-import com.glia.widgets.core.chathead.domain.IsDisplayBubbleOutsideAppUseCase
-import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase
-import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase.Destinations
+import com.glia.widgets.internal.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase
+import com.glia.widgets.internal.chathead.domain.IsDisplayBubbleOutsideAppUseCase
+import com.glia.widgets.internal.chathead.domain.ResolveChatHeadNavigationUseCase
+import com.glia.widgets.internal.chathead.domain.ResolveChatHeadNavigationUseCase.Destinations
 import com.glia.widgets.engagement.domain.CurrentOperatorUseCase
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import com.glia.widgets.engagement.domain.EngagementTypeUseCase

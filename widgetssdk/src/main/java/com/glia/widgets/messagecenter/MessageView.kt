@@ -22,7 +22,7 @@ import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.AttachmentPopup
 import com.glia.widgets.chat.adapter.UploadAttachmentAdapter
-import com.glia.widgets.core.fileupload.model.LocalAttachment
+import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.glia.widgets.databinding.MessageCenterMessageViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Utils

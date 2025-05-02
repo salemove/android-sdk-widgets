@@ -1,7 +1,7 @@
 package com.glia.widgets.call.domain
 
 import com.glia.widgets.engagement.MediaType
-import com.glia.widgets.core.permissions.PermissionManager
+import com.glia.widgets.internal.permissions.PermissionManager
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
 import com.glia.widgets.permissions.PermissionsGrantedCallback
 

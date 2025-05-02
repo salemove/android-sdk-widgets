@@ -2,7 +2,7 @@ package com.glia.widgets.chat.domain
 
 import com.glia.androidsdk.chat.OperatorMessage
 import com.glia.widgets.chat.domain.gva.IsGvaUseCase
-import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
+import com.glia.widgets.internal.engagement.domain.model.ChatMessageInternal
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any

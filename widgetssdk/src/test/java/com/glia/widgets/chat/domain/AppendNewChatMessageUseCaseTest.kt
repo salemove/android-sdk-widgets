@@ -5,7 +5,7 @@ import com.glia.androidsdk.chat.OperatorMessage
 import com.glia.androidsdk.chat.SystemMessage
 import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.widgets.chat.ChatManager
-import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
+import com.glia.widgets.internal.engagement.domain.model.ChatMessageInternal
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith

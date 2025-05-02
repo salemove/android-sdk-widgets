@@ -1,7 +1,7 @@
 package com.glia.widgets.engagement.domain
 
 import android.os.Build
-import com.glia.widgets.core.notification.domain.RemoveScreenSharingNotificationUseCase
+import com.glia.widgets.internal.notification.domain.RemoveScreenSharingNotificationUseCase
 
 internal interface ReleaseScreenSharingResourcesUseCase {
     operator fun invoke()

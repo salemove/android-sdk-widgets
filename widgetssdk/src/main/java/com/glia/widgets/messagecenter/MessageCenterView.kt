@@ -17,9 +17,9 @@ import androidx.core.view.isVisible
 import com.glia.widgets.Constants
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
-import com.glia.widgets.core.dialog.DialogContract
-import com.glia.widgets.core.dialog.model.DialogState
-import com.glia.widgets.core.fileupload.model.LocalAttachment
+import com.glia.widgets.internal.dialog.DialogContract
+import com.glia.widgets.internal.dialog.model.DialogState
+import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.glia.widgets.databinding.MessageCenterViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger

@@ -28,10 +28,10 @@ import com.glia.widgets.chat.model.RemoteAttachmentItem
 import com.glia.widgets.chat.model.TapToRetryItem
 import com.glia.widgets.chat.model.VisitorAttachmentItem
 import com.glia.widgets.chat.model.VisitorChatItem
-import com.glia.widgets.core.engagement.domain.model.ChatHistoryResponse
-import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
-import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDelayUseCase
-import com.glia.widgets.core.secureconversations.domain.ShouldMarkMessagesReadUseCase
+import com.glia.widgets.internal.engagement.domain.model.ChatHistoryResponse
+import com.glia.widgets.internal.engagement.domain.model.ChatMessageInternal
+import com.glia.widgets.internal.secureconversations.domain.MarkMessagesReadWithDelayUseCase
+import com.glia.widgets.internal.secureconversations.domain.ShouldMarkMessagesReadUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG

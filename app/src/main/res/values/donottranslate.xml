@@ -52,6 +52,7 @@
     <string name="pref_send_message_button_tint_color">send_message_button_tint_color</string>
     <string name="pref_screen_sharing_mode">screen_sharing_mode</string>
     <string name="pref_authentication_behavior">authentication_behavior</string>
+    <string name="pref_suppress_p_n_during_auth">suppress_p_n_during_auth</string>
     <string name="default_value">default</string>
     <string name="color_blue_value">blue</string>
     <string name="color_grey_value">grey</string>

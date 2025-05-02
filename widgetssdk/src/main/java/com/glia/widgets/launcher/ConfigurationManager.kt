@@ -11,9 +11,8 @@ internal interface ConfigurationManager {
 
     val enableBubbleOutsideApp: Boolean
     val enableBubbleInsideApp: Boolean
-
+    val suppressPushNotificationsPermissionRequestDuringAuthentication: Boolean
     val queueIdsObservable: Flowable<List<String>>
-
     val visitorContextAssetId: String?
 
     /**
@@ -56,10 +55,17 @@ internal class ConfigurationManagerImpl : ConfigurationManager {
     override val visitorContextAssetId: String?
         get() = _visitorContextAssetId
 
+    private var _suppressPushNotificationsPermissionRequestDuringAuthentication: Boolean = false
+    override val suppressPushNotificationsPermissionRequestDuringAuthentication: Boolean
+        get() = _suppressPushNotificationsPermissionRequestDuringAuthentication
+
     override fun applyConfiguration(config: GliaWidgetsConfig) {
         config.screenSharingMode?.also { _screenSharingMode = it }
         config.enableBubbleInsideApp?.also { _enableBubbleInsideApp = it }
         config.enableBubbleOutsideApp?.also { _enableBubbleOutsideApp = it }
+        config.suppressPushNotificationsPermissionRequestDuringAuthentication?.also {
+            _suppressPushNotificationsPermissionRequestDuringAuthentication = it
+        }
     }
 
     override fun setQueueIds(queueIds: List<String>) {

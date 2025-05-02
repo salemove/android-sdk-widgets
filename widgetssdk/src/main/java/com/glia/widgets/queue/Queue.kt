@@ -1,9 +1,9 @@
-package com.glia.widgets.core.queue
+package com.glia.widgets.queue
 
 import com.glia.androidsdk.Engagement.MediaType as CoreSdkMediaType
 import com.glia.androidsdk.queuing.QueueState.Status as CoreSdkQueueState
 import com.glia.androidsdk.queuing.Queue as CoreSdkQueue
-import com.glia.widgets.core.engagement.MediaType
+import com.glia.widgets.engagement.MediaType
 import com.glia.widgets.view.unifiedui.Mergeable
 import com.glia.widgets.view.unifiedui.merge
 

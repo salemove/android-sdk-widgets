@@ -24,8 +24,8 @@ import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement
 import com.glia.widgets.UiTheme
-import com.glia.widgets.core.engagement.MediaType
-import com.glia.widgets.core.queue.Queue
+import com.glia.widgets.engagement.MediaType
+import com.glia.widgets.queue.Queue
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable

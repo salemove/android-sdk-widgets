@@ -2,7 +2,7 @@ package com.glia.widgets.call
 
 import android.graphics.Color
 import com.android.ide.common.rendering.api.SessionParams
-import com.glia.widgets.core.engagement.MediaType
+import com.glia.widgets.engagement.MediaType
 import com.glia.widgets.SnapshotTest
 import org.junit.Test
 

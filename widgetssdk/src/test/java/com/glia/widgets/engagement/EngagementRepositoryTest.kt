@@ -30,7 +30,6 @@ import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.androidsdk.screensharing.ScreenSharingRequest
 import com.glia.androidsdk.screensharing.VisitorScreenSharingState
 import com.glia.widgets.core.engagement.GliaOperatorRepository
-import com.glia.widgets.core.engagement.MediaType
 import com.glia.widgets.core.queue.QueueRepository
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.Data

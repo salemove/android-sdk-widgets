@@ -1,7 +1,6 @@
 package com.glia.widgets
 
 import android.content.Context
-import com.glia.androidsdk.SiteApiKey
 import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
@@ -176,7 +175,18 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
             return this
         }
 
-        fun setSiteApiKey(siteApiKey: SiteApiKey?): Builder {
+        @Deprecated(
+            "Use {@link #setSiteApiKey(SiteApiKey)}",
+            ReplaceWith(
+                "setSiteApiKey(SiteApiKey(id, secret))",
+                "com.glia.widgets.SiteApiKey"
+            )
+        )
+        fun setSiteApiKey(siteApiKey: com.glia.androidsdk.SiteApiKey?): Builder {
+            return siteApiKey?.toWidgetType()?.let { setSiteApiKey(it) } ?: this
+        }
+
+        fun setSiteApiKey(siteApiKey: SiteApiKey): Builder {
             this.siteApiKey = siteApiKey
             return this
         }

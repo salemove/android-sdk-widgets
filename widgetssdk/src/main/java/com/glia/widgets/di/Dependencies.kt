@@ -47,6 +47,7 @@ import com.glia.widgets.launcher.EngagementLauncherImpl
 import com.glia.widgets.locale.LocaleProvider
 import com.glia.widgets.operator.OperatorRequestActivityWatcher
 import com.glia.widgets.permissions.ActivityWatcherForPermissionsRequest
+import com.glia.widgets.toCoreType
 import com.glia.widgets.view.head.ActivityWatcherForChatHead
 import com.glia.widgets.view.head.ChatHeadContract
 import com.glia.widgets.view.snackbar.ActivityWatcherForSnackbar
@@ -264,7 +265,7 @@ internal object Dependencies {
     private fun createGliaConfig(gliaWidgetsConfig: GliaWidgetsConfig): GliaConfig {
         val builder = GliaConfig.Builder()
         gliaWidgetsConfig.siteApiKey?.let {
-            builder.setSiteApiKey(it)
+            builder.setSiteApiKey(it.toCoreType())
         } ?: throw RuntimeException("Site key or app token is missing")
         return builder
             .setSiteId(gliaWidgetsConfig.siteId)

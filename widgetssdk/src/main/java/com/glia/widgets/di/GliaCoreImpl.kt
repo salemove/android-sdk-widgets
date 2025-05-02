@@ -21,7 +21,7 @@ import com.glia.androidsdk.site.SiteInfo
 import com.glia.androidsdk.visitor.Authentication
 import com.glia.androidsdk.visitor.VisitorInfo
 import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest
-import com.glia.widgets.core.authentication.AuthenticationManager
+import com.glia.widgets.internal.authentication.AuthenticationManager
 import com.glia.widgets.engagement.MediaType
 import com.glia.widgets.queue.toCoreType
 import java.io.InputStream

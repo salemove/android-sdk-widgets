@@ -2,9 +2,8 @@ package com.glia.widgets.launcher
 
 import android.app.Activity
 import com.glia.androidsdk.Engagement
-import com.glia.widgets.callvisualizer.controller.CallVisualizerContract
 import com.glia.widgets.chat.Intention
-import com.glia.widgets.core.secureconversations.domain.HasOngoingSecureConversationUseCase
+import com.glia.widgets.internal.secureconversations.domain.HasOngoingSecureConversationUseCase
 import com.glia.widgets.engagement.domain.EngagementTypeUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 import com.glia.widgets.helper.Logger

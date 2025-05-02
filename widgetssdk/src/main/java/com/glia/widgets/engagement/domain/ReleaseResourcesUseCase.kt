@@ -1,9 +1,9 @@
 package com.glia.widgets.engagement.domain
 
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
-import com.glia.widgets.core.dialog.DialogContract
-import com.glia.widgets.core.fileupload.FileAttachmentRepository
-import com.glia.widgets.core.notification.domain.CallNotificationUseCase
+import com.glia.widgets.internal.dialog.DialogContract
+import com.glia.widgets.internal.fileupload.FileAttachmentRepository
+import com.glia.widgets.internal.notification.domain.CallNotificationUseCase
 import com.glia.widgets.di.Dependencies
 
 internal interface ReleaseResourcesUseCase {

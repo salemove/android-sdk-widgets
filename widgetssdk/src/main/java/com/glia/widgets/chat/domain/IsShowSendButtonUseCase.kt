@@ -1,7 +1,7 @@
 package com.glia.widgets.chat.domain
 
-import com.glia.widgets.core.fileupload.FileAttachmentRepository
-import com.glia.widgets.core.secureconversations.domain.ManageSecureMessagingStatusUseCase
+import com.glia.widgets.internal.fileupload.FileAttachmentRepository
+import com.glia.widgets.internal.secureconversations.domain.ManageSecureMessagingStatusUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 
 internal class IsShowSendButtonUseCase(

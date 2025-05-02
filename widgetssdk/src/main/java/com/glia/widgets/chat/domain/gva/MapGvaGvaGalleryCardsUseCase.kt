@@ -1,7 +1,7 @@
 package com.glia.widgets.chat.domain.gva
 
 import com.glia.widgets.chat.model.GvaGalleryCards
-import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
+import com.glia.widgets.internal.engagement.domain.model.ChatMessageInternal
 
 internal class MapGvaGvaGalleryCardsUseCase(
     private val parseGvaGalleryCardsUseCase: ParseGvaGalleryCardsUseCase

@@ -29,7 +29,6 @@ import com.glia.androidsdk.omnibrowse.Omnibrowse
 import com.glia.exampleapp.ExampleAppConfigManager.createDefaultConfig
 import com.glia.exampleapp.Utils.getAuthenticationBehaviorFromPrefs
 import com.glia.widgets.GliaWidgets
-import com.glia.widgets.core.notification.NotificationActionReceiver
 import com.glia.widgets.authentication.Authentication
 import com.glia.widgets.entrywidget.EntryWidget
 import com.glia.widgets.launcher.EngagementLauncher
@@ -173,7 +172,8 @@ class MainFragment : Fragment() {
     }
 
     private fun simulateEndScreenSharingFromNotification() {
-        val intent = Intent(requireContext(), NotificationActionReceiver::class.java)
+        val intent = Intent()
+            .setClassName(requireContext(), "com.glia.widgets.core.notification.NotificationActionReceiver")
             .setAction("com.glia.widgets.core.notification.NotificationActionReceiver.ACTION_ON_SCREEN_SHARING_END_PRESSED")
         requireContext().sendBroadcast(intent)
     }

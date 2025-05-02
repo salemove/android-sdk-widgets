@@ -10,7 +10,7 @@ import com.glia.androidsdk.omnibrowse.Omnibrowse
 import com.glia.widgets.callbacks.OnComplete
 import com.glia.widgets.callbacks.OnError
 import com.glia.widgets.callvisualizer.controller.CallVisualizerController
-import com.glia.widgets.core.queue.QueueRepository
+import com.glia.widgets.internal.queue.QueueRepository
 import com.glia.widgets.di.ControllerFactory
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.di.GliaCore

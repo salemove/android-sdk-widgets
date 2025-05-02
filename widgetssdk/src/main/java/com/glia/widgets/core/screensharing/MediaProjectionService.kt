@@ -6,7 +6,7 @@ import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
 import androidx.annotation.RequiresApi
-import com.glia.widgets.core.notification.NotificationFactory.createScreenSharingNotification
+import com.glia.widgets.internal.notification.NotificationFactory.createScreenSharingNotification
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
@@ -24,7 +24,7 @@ internal const val MEDIA_PROJECTION_SERVICE_ACTION_START = "com.glia.widgets.cor
  * Apps targeting SDK version 29 or later require a running foreground service for screen sharing.
  */
 @RequiresApi(api = Build.VERSION_CODES.O)
-class MediaProjectionService : Service() {
+internal class MediaProjectionService : Service() {
     private val compositeDisposable: CompositeDisposable by lazy { CompositeDisposable() }
     private val engagementStateUseCase: EngagementStateUseCase by lazy { Dependencies.useCaseFactory.engagementStateUseCase }
     private val informThatReadyToShareScreenUseCase: InformThatReadyToShareScreenUseCase by lazy { Dependencies.useCaseFactory.readyToShareScreenUseCase }

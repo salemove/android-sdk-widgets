@@ -6,7 +6,7 @@ import androidx.annotation.VisibleForTesting;
 
 import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.engagement.Survey;
-import com.glia.widgets.core.survey.domain.GliaSurveyAnswerUseCase;
+import com.glia.widgets.internal.survey.domain.GliaSurveyAnswerUseCase;
 
 import java.util.List;
 import java.util.stream.Collectors;

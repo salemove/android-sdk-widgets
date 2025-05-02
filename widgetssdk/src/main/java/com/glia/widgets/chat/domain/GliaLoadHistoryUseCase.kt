@@ -1,11 +1,11 @@
 package com.glia.widgets.chat.domain
 
 import com.glia.widgets.chat.data.GliaChatRepository
-import com.glia.widgets.core.engagement.domain.MapOperatorUseCase
-import com.glia.widgets.core.engagement.domain.model.ChatHistoryResponse
-import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
-import com.glia.widgets.core.secureconversations.SecureConversationsRepository
-import com.glia.widgets.core.secureconversations.domain.ManageSecureMessagingStatusUseCase
+import com.glia.widgets.internal.engagement.domain.MapOperatorUseCase
+import com.glia.widgets.internal.engagement.domain.model.ChatHistoryResponse
+import com.glia.widgets.internal.engagement.domain.model.ChatMessageInternal
+import com.glia.widgets.internal.secureconversations.SecureConversationsRepository
+import com.glia.widgets.internal.secureconversations.domain.ManageSecureMessagingStatusUseCase
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Single
 

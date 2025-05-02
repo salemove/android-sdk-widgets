@@ -9,10 +9,10 @@ import com.glia.widgets.chat.data.GliaChatRepository
 import com.glia.widgets.chat.model.VisitorAttachmentItem
 import com.glia.widgets.chat.model.VisitorChatItem
 import com.glia.widgets.chat.model.VisitorMessageItem
-import com.glia.widgets.core.fileupload.FileAttachmentRepository
-import com.glia.widgets.core.fileupload.model.LocalAttachment
-import com.glia.widgets.core.secureconversations.SecureConversationsRepository
-import com.glia.widgets.core.secureconversations.domain.ManageSecureMessagingStatusUseCase
+import com.glia.widgets.internal.fileupload.FileAttachmentRepository
+import com.glia.widgets.internal.fileupload.model.LocalAttachment
+import com.glia.widgets.internal.secureconversations.SecureConversationsRepository
+import com.glia.widgets.internal.secureconversations.domain.ManageSecureMessagingStatusUseCase
 import com.glia.widgets.engagement.domain.IsOperatorPresentUseCase
 
 internal class GliaSendMessageUseCase(

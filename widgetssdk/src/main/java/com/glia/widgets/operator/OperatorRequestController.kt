@@ -7,11 +7,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResult
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.comms.MediaUpgradeOffer
-import com.glia.widgets.core.dialog.DialogContract
-import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
-import com.glia.widgets.core.dialog.domain.SetOverlayPermissionRequestDialogShownUseCase
-import com.glia.widgets.core.dialog.model.DialogState
-import com.glia.widgets.core.permissions.domain.WithNotificationPermissionUseCase
+import com.glia.widgets.internal.dialog.DialogContract
+import com.glia.widgets.internal.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
+import com.glia.widgets.internal.dialog.domain.SetOverlayPermissionRequestDialogShownUseCase
+import com.glia.widgets.internal.dialog.model.DialogState
+import com.glia.widgets.internal.permissions.domain.WithNotificationPermissionUseCase
 import com.glia.widgets.core.screensharing.MediaProjectionService
 import com.glia.widgets.engagement.EngagementRepository
 import com.glia.widgets.engagement.ScreenSharingState

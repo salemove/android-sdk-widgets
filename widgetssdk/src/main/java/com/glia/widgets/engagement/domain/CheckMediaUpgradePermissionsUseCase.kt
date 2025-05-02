@@ -1,7 +1,7 @@
 package com.glia.widgets.engagement.domain
 
 import com.glia.androidsdk.comms.MediaUpgradeOffer
-import com.glia.widgets.core.permissions.PermissionManager
+import com.glia.widgets.internal.permissions.PermissionManager
 
 internal interface CheckMediaUpgradePermissionsUseCase {
     operator fun invoke(offer: MediaUpgradeOffer, callback: (granted: Boolean) -> Unit)

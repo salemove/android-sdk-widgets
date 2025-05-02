@@ -29,8 +29,8 @@ import com.glia.androidsdk.screensharing.LocalScreen
 import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.androidsdk.screensharing.ScreenSharingRequest
 import com.glia.androidsdk.screensharing.VisitorScreenSharingState
-import com.glia.widgets.core.engagement.GliaOperatorRepository
-import com.glia.widgets.core.queue.QueueRepository
+import com.glia.widgets.internal.engagement.GliaOperatorRepository
+import com.glia.widgets.internal.queue.QueueRepository
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.Data
 import com.glia.widgets.helper.Logger

@@ -1,11 +1,11 @@
 package com.glia.widgets.callvisualizer.controller
 
-import com.glia.widgets.core.dialog.DialogContract
-import com.glia.widgets.core.dialog.domain.ConfirmationDialogLinksUseCase
-import com.glia.widgets.core.dialog.model.ConfirmationDialogLinks
-import com.glia.widgets.core.dialog.model.DialogState
-import com.glia.widgets.core.dialog.model.Link
-import com.glia.widgets.core.engagement.domain.ConfirmationDialogUseCase
+import com.glia.widgets.internal.dialog.DialogContract
+import com.glia.widgets.internal.dialog.domain.ConfirmationDialogLinksUseCase
+import com.glia.widgets.internal.dialog.model.ConfirmationDialogLinks
+import com.glia.widgets.internal.dialog.model.DialogState
+import com.glia.widgets.internal.dialog.model.Link
+import com.glia.widgets.internal.engagement.domain.ConfirmationDialogUseCase
 import com.glia.widgets.engagement.domain.EngagementRequestUseCase
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import com.glia.widgets.engagement.domain.OnIncomingEngagementRequestTimeoutUseCase

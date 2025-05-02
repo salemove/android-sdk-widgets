@@ -3,7 +3,7 @@ package com.glia.widgets.chat.domain
 import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
-import com.glia.widgets.core.fileupload.model.LocalAttachment
+import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.glia.widgets.helper.createTempFileCompat
 import java.io.File
 import java.text.DateFormat

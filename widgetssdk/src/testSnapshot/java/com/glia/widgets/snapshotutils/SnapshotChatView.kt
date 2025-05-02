@@ -9,7 +9,7 @@ import com.glia.widgets.chat.ChatView
 import com.glia.widgets.chat.controller.ChatController
 import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.ChatState
-import com.glia.widgets.core.fileupload.model.LocalAttachment
+import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.glia.widgets.databinding.ChatActivityBinding
 import com.glia.widgets.di.ControllerFactory
 import com.glia.widgets.di.Dependencies

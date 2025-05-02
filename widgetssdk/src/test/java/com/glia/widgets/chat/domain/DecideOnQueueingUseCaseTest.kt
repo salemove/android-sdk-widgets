@@ -1,6 +1,6 @@
 package com.glia.widgets.chat.domain
 
-import com.glia.widgets.core.dialog.domain.SetOverlayPermissionRequestDialogShownUseCase
+import com.glia.widgets.internal.dialog.domain.SetOverlayPermissionRequestDialogShownUseCase
 import io.mockk.confirmVerified
 import io.mockk.mockk
 import io.mockk.verify

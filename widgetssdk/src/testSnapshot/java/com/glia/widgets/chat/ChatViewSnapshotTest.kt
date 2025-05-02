@@ -5,7 +5,7 @@ import com.glia.widgets.R
 import com.glia.widgets.SnapshotTest
 import com.glia.widgets.chat.model.ChatState
 import com.glia.widgets.chat.model.OperatorStatusItem
-import com.glia.widgets.core.fileupload.model.LocalAttachment
+import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.glia.widgets.entrywidget.EntryWidgetContract
 import com.glia.widgets.entrywidget.EntryWidgetView
 import com.glia.widgets.snapshotutils.SnapshotChatScreen

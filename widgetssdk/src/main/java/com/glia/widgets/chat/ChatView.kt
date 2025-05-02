@@ -45,10 +45,10 @@ import com.glia.widgets.chat.model.ChatInputMode
 import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.ChatState
 import com.glia.widgets.chat.model.CustomCardChatItem
-import com.glia.widgets.core.dialog.DialogContract
-import com.glia.widgets.core.dialog.model.DialogState
-import com.glia.widgets.core.dialog.model.LeaveDialogAction
-import com.glia.widgets.core.fileupload.model.LocalAttachment
+import com.glia.widgets.internal.dialog.DialogContract
+import com.glia.widgets.internal.dialog.model.DialogState
+import com.glia.widgets.internal.dialog.model.LeaveDialogAction
+import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.glia.widgets.databinding.ChatViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.entrywidget.EntryWidgetContract

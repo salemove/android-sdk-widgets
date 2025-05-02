@@ -3,8 +3,8 @@ package com.glia.widgets.messagecenter
 import android.net.Uri
 import com.glia.widgets.base.BaseController
 import com.glia.widgets.base.BaseView
-import com.glia.widgets.core.dialog.DialogContract
-import com.glia.widgets.core.fileupload.model.LocalAttachment
+import com.glia.widgets.internal.dialog.DialogContract
+import com.glia.widgets.internal.fileupload.model.LocalAttachment
 
 internal interface MessageCenterContract {
     interface Controller : BaseController {

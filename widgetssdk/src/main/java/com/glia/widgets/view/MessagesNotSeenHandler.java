@@ -2,7 +2,7 @@ package com.glia.widgets.view;
 
 import com.glia.androidsdk.chat.ChatMessage;
 import com.glia.widgets.chat.domain.GliaOnMessageUseCase;
-import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal;
+import com.glia.widgets.internal.engagement.domain.model.ChatMessageInternal;
 import com.glia.widgets.helper.Logger;
 
 import java.util.ArrayList;

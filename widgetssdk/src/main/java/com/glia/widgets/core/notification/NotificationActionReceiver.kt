@@ -15,7 +15,7 @@ import com.glia.widgets.helper.TAG
  *
  * This receiver is used to listen to push notification actions (e.g. button clicks).
  */
-class NotificationActionReceiver : BroadcastReceiver() {
+internal class NotificationActionReceiver : BroadcastReceiver() {
     private val endScreenSharingUseCase: EndScreenSharingUseCase by lazy {
         Dependencies.useCaseFactory.endScreenSharingUseCase
     }

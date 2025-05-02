@@ -1,6 +1,6 @@
 package com.glia.widgets.chat.domain
 
-import com.glia.widgets.core.dialog.domain.SetOverlayPermissionRequestDialogShownUseCase
+import com.glia.widgets.internal.dialog.domain.SetOverlayPermissionRequestDialogShownUseCase
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.processors.BehaviorProcessor
 

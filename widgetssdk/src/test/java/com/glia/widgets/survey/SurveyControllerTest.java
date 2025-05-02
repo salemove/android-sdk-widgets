@@ -9,7 +9,7 @@ import static org.mockito.Mockito.when;
 import static java.util.Collections.singletonList;
 
 import com.glia.androidsdk.engagement.Survey;
-import com.glia.widgets.core.survey.domain.GliaSurveyAnswerUseCase;
+import com.glia.widgets.internal.survey.domain.GliaSurveyAnswerUseCase;
 
 import org.junit.Before;
 import org.junit.Test;

@@ -16,7 +16,7 @@ import com.glia.androidsdk.omnibrowse.VisitorCode
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.callvisualizer.VisitorCodeContract
-import com.glia.widgets.core.callvisualizer.domain.CallVisualizer
+import com.glia.widgets.callvisualizer.CallVisualizer
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG

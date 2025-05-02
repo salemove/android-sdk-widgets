@@ -16,7 +16,7 @@ import androidx.core.view.isVisible
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.Intention
-import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase
+import com.glia.widgets.internal.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase
 import com.glia.widgets.databinding.ChatHeadViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase

@@ -10,7 +10,7 @@ import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.Accessibilit
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.widgets.R
-import com.glia.widgets.core.fileupload.model.LocalAttachment
+import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromNetworkUseCase

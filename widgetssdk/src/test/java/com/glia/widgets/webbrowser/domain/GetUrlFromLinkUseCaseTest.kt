@@ -1,6 +1,6 @@
 package com.glia.widgets.webbrowser.domain
 
-import com.glia.widgets.core.dialog.model.Link
+import com.glia.widgets.internal.dialog.model.Link
 import com.glia.widgets.locale.LocaleProvider
 import io.mockk.every
 import io.mockk.mockk

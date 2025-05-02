@@ -9,6 +9,8 @@ import com.glia.widgets.helper.NetworkState
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.unSafeSubscribe
 import com.glia.widgets.launcher.ConfigurationManager
+import com.glia.widgets.queue.Queue
+import com.glia.widgets.queue.toWidgetsType
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.processors.BehaviorProcessor

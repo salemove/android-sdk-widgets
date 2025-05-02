@@ -1,4 +1,4 @@
-package com.glia.widgets.core.visitor
+package com.glia.widgets.visitor
 
 /**
  * Provide Visitor information

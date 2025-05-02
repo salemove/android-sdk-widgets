@@ -1,6 +1,6 @@
 package com.glia.widgets.call;
 
-import com.glia.widgets.core.engagement.MediaType;
+import com.glia.widgets.engagement.MediaType;
 
 public class CallStateHelper {
     public final boolean integratorCallStarted;

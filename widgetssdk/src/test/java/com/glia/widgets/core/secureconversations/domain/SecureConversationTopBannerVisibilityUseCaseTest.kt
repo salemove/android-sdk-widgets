@@ -1,8 +1,8 @@
 package com.glia.widgets.core.secureconversations.domain
 
 import android.assertCurrentValue
-import com.glia.widgets.core.engagement.MediaType
-import com.glia.widgets.core.queue.Queue
+import com.glia.widgets.engagement.MediaType
+import com.glia.widgets.queue.Queue
 import com.glia.widgets.core.queue.QueueRepository
 import com.glia.widgets.core.queue.QueuesState
 import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins

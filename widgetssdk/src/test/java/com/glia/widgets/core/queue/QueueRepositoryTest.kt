@@ -9,6 +9,7 @@ import com.glia.widgets.helper.DeviceState
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.NetworkState
 import com.glia.widgets.launcher.ConfigurationManager
+import com.glia.widgets.queue.toWidgetsType
 import io.mockk.CapturingSlot
 import io.mockk.clearMocks
 import io.mockk.every

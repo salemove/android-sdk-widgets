@@ -2,8 +2,8 @@ package com.glia.widgets.call
 
 import com.glia.widgets.base.BaseController
 import com.glia.widgets.base.BaseView
-import com.glia.widgets.core.dialog.model.ConfirmationDialogLinks
-import com.glia.widgets.core.dialog.model.Link
+import com.glia.widgets.internal.dialog.model.ConfirmationDialogLinks
+import com.glia.widgets.internal.dialog.model.Link
 import com.glia.widgets.engagement.MediaType
 import com.glia.widgets.locale.LocaleString
 

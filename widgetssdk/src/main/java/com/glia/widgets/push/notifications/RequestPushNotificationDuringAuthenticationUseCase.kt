@@ -3,7 +3,7 @@ package com.glia.widgets.push.notifications
 import android.Manifest
 import android.os.Build
 import androidx.annotation.RequiresApi
-import com.glia.widgets.core.permissions.PermissionManager
+import com.glia.widgets.internal.permissions.PermissionManager
 import com.glia.widgets.launcher.ConfigurationManager
 import com.glia.widgets.view.dialog.DialogDispatcher
 

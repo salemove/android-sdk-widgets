@@ -2,7 +2,7 @@ package com.glia.widgets.callvisualizer.controller
 
 import com.glia.androidsdk.omnibrowse.VisitorCode
 import com.glia.widgets.callvisualizer.VisitorCodeContract
-import com.glia.widgets.core.callvisualizer.domain.VisitorCodeRepository
+import com.glia.widgets.internal.callvisualizer.domain.VisitorCodeRepository
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase

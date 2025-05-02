@@ -8,8 +8,8 @@ import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
-import com.glia.widgets.core.dialog.model.ConfirmationDialogLinks
-import com.glia.widgets.core.dialog.model.Link
+import com.glia.widgets.internal.dialog.model.ConfirmationDialogLinks
+import com.glia.widgets.internal.dialog.model.Link
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.domain.MediaUpgradeOfferData
 import com.glia.widgets.helper.isOneWayVideo

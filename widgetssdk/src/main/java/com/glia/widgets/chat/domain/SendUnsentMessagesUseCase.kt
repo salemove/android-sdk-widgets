@@ -5,8 +5,8 @@ import com.glia.androidsdk.RequestCallback
 import com.glia.androidsdk.chat.SendMessagePayload
 import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.widgets.chat.data.GliaChatRepository
-import com.glia.widgets.core.secureconversations.SecureConversationsRepository
-import com.glia.widgets.core.secureconversations.domain.ManageSecureMessagingStatusUseCase
+import com.glia.widgets.internal.secureconversations.SecureConversationsRepository
+import com.glia.widgets.internal.secureconversations.domain.ManageSecureMessagingStatusUseCase
 
 
 internal class SendUnsentMessagesUseCase(

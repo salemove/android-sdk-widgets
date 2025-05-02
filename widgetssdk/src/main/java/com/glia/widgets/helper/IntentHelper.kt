@@ -17,7 +17,7 @@ import com.glia.widgets.call.CallActivity
 import com.glia.widgets.callvisualizer.EndScreenSharingActivity
 import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.chat.Intention
-import com.glia.widgets.core.fileupload.model.LocalAttachment
+import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.glia.widgets.entrywidget.EntryWidgetActivity
 import com.glia.widgets.filepreview.ui.ImagePreviewActivity
 import com.glia.widgets.locale.LocaleString

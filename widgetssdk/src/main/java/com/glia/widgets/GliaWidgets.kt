@@ -11,9 +11,7 @@ import com.glia.widgets.callbacks.OnError
 import com.glia.widgets.callbacks.OnSuccess
 import com.glia.widgets.chat.adapter.CustomCardAdapter
 import com.glia.widgets.chat.adapter.WebViewCardAdapter
-import com.glia.widgets.core.authentication.toCoreType
-import com.glia.widgets.core.authentication.toWidgetsType
-import com.glia.widgets.core.callvisualizer.domain.CallVisualizer
+import com.glia.widgets.callvisualizer.CallVisualizer
 import com.glia.widgets.liveobservation.LiveObservation
 import com.glia.widgets.queue.Queue
 import com.glia.widgets.queue.toWidgetsType
@@ -41,6 +39,7 @@ import com.glia.widgets.fcm.PushNotifications
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.Logger.SITE_ID_KEY
 import com.glia.widgets.helper.Logger.addGlobalMetadata
+import com.glia.widgets.internal.authentication.toWidgetsType
 import com.glia.widgets.launcher.EngagementLauncher
 import io.reactivex.rxjava3.exceptions.UndeliverableException
 import io.reactivex.rxjava3.plugins.RxJavaPlugins
@@ -434,7 +433,7 @@ object GliaWidgets {
     @JvmStatic
     fun getAuthentication(behavior: com.glia.androidsdk.visitor.Authentication.Behavior): Authentication {
         try {
-            return Dependencies.getAuthenticationManager(behavior.toWidgetsType())
+            return getAuthenticationManager(behavior.toWidgetsType())
         } catch (gliaException: GliaException) {
             throw mapCoreExceptionToWidgets(gliaException)
         }

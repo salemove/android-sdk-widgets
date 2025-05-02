@@ -5,7 +5,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.viewbinding.ViewBinding
-import com.glia.widgets.core.dialog.model.Link
+import com.glia.widgets.internal.dialog.model.Link
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.helper.setText

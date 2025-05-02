@@ -33,7 +33,7 @@ import kotlin.math.roundToInt
  *
  * This service is used to display the Glia chat head (chat bubble) outside of the integrator's app.
  */
-class ChatHeadService : Service() {
+internal class ChatHeadService : Service() {
     private val windowManager: WindowManager by lazy { getSystemService()!! }
 
     private val chatHeadSize: Int get() = resources.getDimensionPixelSize(R.dimen.glia_chat_head_size)

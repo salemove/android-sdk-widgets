@@ -3,7 +3,7 @@ package com.glia.widgets.chat.domain
 import com.glia.androidsdk.chat.OperatorMessage
 import com.glia.androidsdk.chat.SystemMessage
 import com.glia.androidsdk.chat.VisitorMessage
-import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
+import com.glia.widgets.internal.engagement.domain.model.ChatMessageInternal
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
 import junit.framework.TestCase.assertTrue

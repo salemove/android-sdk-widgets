@@ -6,7 +6,7 @@ import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.OperatorAttachmentItem
 import com.glia.widgets.chat.model.OperatorMessageItem
-import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
+import com.glia.widgets.internal.engagement.domain.model.ChatMessageInternal
 import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Before

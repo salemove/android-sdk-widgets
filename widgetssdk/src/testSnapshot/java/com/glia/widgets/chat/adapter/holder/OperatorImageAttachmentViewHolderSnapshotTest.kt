@@ -8,7 +8,7 @@ import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.adapter.ChatAdapter
 import com.glia.widgets.chat.adapter.holder.imageattachment.OperatorImageAttachmentViewHolder
 import com.glia.widgets.chat.model.OperatorAttachmentItem
-import com.glia.widgets.core.fileupload.model.LocalAttachment
+import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.glia.widgets.databinding.ChatAttachmentOperatorImageLayoutBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.snapshotutils.SnapshotAttachment

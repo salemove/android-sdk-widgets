@@ -1,7 +1,7 @@
 package com.glia.widgets.view.dialog.base
 
 import androidx.appcompat.app.AlertDialog
-import com.glia.widgets.core.dialog.model.DialogState
+import com.glia.widgets.internal.dialog.model.DialogState
 
 internal interface DialogDelegate {
     fun showDialog(showDialogCallback: () -> AlertDialog)

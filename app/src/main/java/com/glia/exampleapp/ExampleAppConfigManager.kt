@@ -7,6 +7,7 @@ import androidx.preference.PreferenceManager
 import com.glia.androidsdk.SiteApiKey
 import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.widgets.GliaWidgetsConfig
+import androidx.core.content.edit
 
 /**
  * Helper class to obtain Glia Config params from deep-link or preferences.
@@ -26,6 +27,7 @@ object ExampleAppConfigManager {
     private const val REGION_ACCEPTANCE = "acceptance"
     private const val BASE_DOMAIN = "base_domain"
     private const val DEFAULT_BASE_DOMAIN = "at.samo.io"
+    private const val SUPPRESS_PN_DIALOG_KEY = "suppress_pn_permission_dialog"
 
     @JvmStatic
     fun obtainConfigFromDeepLink(data: Uri, applicationContext: Context): GliaWidgetsConfig {
@@ -33,6 +35,7 @@ object ExampleAppConfigManager {
         saveQueueIdToPrefs(data, applicationContext)
         saveVisitorContextAssetIdIfPresent(data, applicationContext)
         saveSiteIdToPrefs(data, applicationContext)
+        saveSuppressPushNotificationDialogToPrefs(data, applicationContext)
 
 //       We're not checking availability for every query param separately because this is for acceptance tests and we assume that link would be correct
         if (SECRET_KEY == data.lastPathSegment) {
@@ -55,35 +58,47 @@ object ExampleAppConfigManager {
     private fun saveRegionIfPresent(data: Uri, applicationContext: Context) {
         val visitorContextAssetId = data.getQueryParameter(REGION_KEY) ?: return
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-        sharedPreferences.edit().putString(
-            applicationContext.getString(R.string.pref_environment),
-            visitorContextAssetId
-        ).apply()
+        sharedPreferences.edit() {
+            putString(
+                applicationContext.getString(R.string.pref_environment),
+                visitorContextAssetId
+            )
+        }
     }
 
     private fun saveVisitorContextAssetIdIfPresent(data: Uri, applicationContext: Context) {
         val visitorContextAssetId = data.getQueryParameter(VISITOR_CONTEXT_ASSET_ID_KEY) ?: return
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-        sharedPreferences.edit().putString(
-            applicationContext.getString(R.string.pref_context_asset_id),
-            visitorContextAssetId
-        ).apply()
+        sharedPreferences.edit() {
+            putString(
+                applicationContext.getString(R.string.pref_context_asset_id),
+                visitorContextAssetId
+            )
+        }
     }
 
     private fun saveQueueIdToPrefs(data: Uri, applicationContext: Context) {
         val queueId = data.getQueryParameter(QUEUE_ID_KEY) ?: return
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-        sharedPreferences.edit()
-            .putString(applicationContext.getString(R.string.pref_queue_id), queueId)
-            .apply()
+        sharedPreferences.edit() {
+            putString(applicationContext.getString(R.string.pref_queue_id), queueId)
+        }
     }
 
     private fun saveSiteIdToPrefs(data: Uri, applicationContext: Context) {
         val siteId = data.getQueryParameter(SITE_ID_KEY) ?: return
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-        sharedPreferences.edit()
-            .putString(applicationContext.getString(R.string.pref_site_id), siteId)
-            .apply()
+        sharedPreferences.edit() {
+            putString(applicationContext.getString(R.string.pref_site_id), siteId)
+        }
+    }
+
+    private fun saveSuppressPushNotificationDialogToPrefs(data: Uri, applicationContext: Context) {
+        val suppressPnDialog = data.getQueryParameter(SUPPRESS_PN_DIALOG_KEY)?.toBooleanStrictOrNull() ?: return
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+        sharedPreferences.edit() {
+            putBoolean(applicationContext.getString(R.string.pref_suppress_p_n_during_auth), suppressPnDialog)
+        }
     }
 
     private fun saveSiteApiKeyAuthToPrefs(data: Uri, applicationContext: Context) {
@@ -91,10 +106,10 @@ object ExampleAppConfigManager {
         val apiKeySecret = data.getQueryParameter(API_KEY_SECRET_KEY)
         if (apiKeyId == null || apiKeySecret == null) return
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-        sharedPreferences.edit()
-            .putString(applicationContext.getString(R.string.pref_api_key_id), apiKeyId)
-            .putString(applicationContext.getString(R.string.pref_api_key_secret), apiKeySecret)
-            .apply()
+        sharedPreferences.edit() {
+            putString(applicationContext.getString(R.string.pref_api_key_id), apiKeyId)
+                .putString(applicationContext.getString(R.string.pref_api_key_secret), apiKeySecret)
+        }
     }
 
     @JvmStatic

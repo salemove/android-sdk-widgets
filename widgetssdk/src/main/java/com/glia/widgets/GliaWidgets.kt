@@ -39,6 +39,7 @@ import com.glia.widgets.fcm.PushNotifications
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.Logger.SITE_ID_KEY
 import com.glia.widgets.helper.Logger.addGlobalMetadata
+import com.glia.widgets.internal.authentication.toCoreType
 import com.glia.widgets.internal.authentication.toWidgetsType
 import com.glia.widgets.launcher.EngagementLauncher
 import io.reactivex.rxjava3.exceptions.UndeliverableException
@@ -425,15 +426,15 @@ object GliaWidgets {
      * Creates `Authentication` instance for a given JWT token.
      *
      * @param behavior authentication behavior
-     * @return `Authentication` object or throws [GliaWidgetsException] if error happened.
+     * @return `com.glia.androidsdk.visitor.Authentication` object or throws [GliaWidgetsException] if error happened.
      * Exception may have the following cause:
      * [GliaWidgetsException.Cause.INVALID_INPUT] - when SDK is not initialized
      */
     @Deprecated("Please use getAuthentication(behavior: com.glia.widgets.authentication.Authentication.Behavior)")
     @JvmStatic
-    fun getAuthentication(behavior: com.glia.androidsdk.visitor.Authentication.Behavior): Authentication {
+    fun getAuthentication(behavior: com.glia.androidsdk.visitor.Authentication.Behavior): com.glia.androidsdk.visitor.Authentication {
         try {
-            return getAuthenticationManager(behavior.toWidgetsType())
+            return getAuthenticationManager(behavior.toWidgetsType()).toCoreType()
         } catch (gliaException: GliaException) {
             throw mapCoreExceptionToWidgets(gliaException)
         }

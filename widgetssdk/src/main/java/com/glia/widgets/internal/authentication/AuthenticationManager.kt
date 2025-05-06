@@ -1,5 +1,6 @@
 package com.glia.widgets.internal.authentication
 
+import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.visitor.Authentication as CoreAuthentication
 import com.glia.androidsdk.RequestCallback
 import com.glia.widgets.authentication.Authentication
@@ -17,8 +18,8 @@ internal class AuthenticationManager(
     private val authentication: CoreAuthentication,
     private val onAuthenticationRequestedCallback: () -> Unit
 ) : Authentication {
-    override fun setBehavior(behavior: CoreAuthentication.Behavior) {
-        authentication.setBehavior(behavior)
+    override fun setBehavior(behavior: Authentication.Behavior) {
+        authentication.setBehavior(behavior.toCoreType())
     }
 
     override fun authenticate(
@@ -58,6 +59,44 @@ internal class AuthenticationManager(
     override fun refresh(jwtToken: String, externalAccessToken: String?, authCallback: RequestCallback<Void>?) {
         Logger.i(TAG, "Refresh authentication")
         authentication.refresh(jwtToken, externalAccessToken, authCallback)
+    }
+}
+
+internal fun Authentication.toCoreType(): CoreAuthentication = this.let { widgetAuthentication ->
+    object : CoreAuthentication {
+        override fun setBehavior(behavior: com.glia.androidsdk.visitor.Authentication.Behavior) {
+            widgetAuthentication.setBehavior(behavior.toWidgetsType())
+        }
+
+        override fun authenticate(jwtToken: String?, externalAccessToken: String?, authCallback: RequestCallback<Void>?) {
+            if (jwtToken.isNullOrBlank()) {
+                reportTokenInvalidError(authCallback)
+                return
+            }
+            widgetAuthentication.authenticate(jwtToken, externalAccessToken, authCallback)
+        }
+
+        override fun deauthenticate(authCallback: RequestCallback<Void>?) {
+            widgetAuthentication.deauthenticate(authCallback)
+        }
+
+        override fun isAuthenticated(): Boolean {
+            return widgetAuthentication.isAuthenticated
+        }
+
+        override fun refresh(jwtToken: String?, externalAccessToken: String?, authCallback: RequestCallback<Void>?) {
+            if (jwtToken.isNullOrBlank()) {
+                reportTokenInvalidError(authCallback)
+                return
+            }
+            widgetAuthentication.refresh(jwtToken, externalAccessToken, authCallback)
+        }
+
+        private fun reportTokenInvalidError(authCallback: RequestCallback<Void>?) {
+            val errorMessage = "JWT token is not valid or empty"
+            val invalidInputException = GliaException(errorMessage, GliaException.Cause.INVALID_INPUT)
+            authCallback?.onResult(null, invalidInputException)
+        }
     }
 }
 

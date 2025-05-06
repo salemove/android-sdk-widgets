@@ -2,7 +2,6 @@ package com.glia.widgets.authentication
 
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
-import com.glia.androidsdk.visitor.Authentication
 
 /**
  * Interface for managing authentication and de-authentication.
@@ -17,7 +16,7 @@ interface Authentication {
      * @param behavior authentication behavior
      * @throws GliaException [GliaException.Cause.INVALID_INPUT] - in case behavior is null.
      */
-    fun setBehavior(behavior: Authentication.Behavior)
+    fun setBehavior(behavior: Behavior)
 
     /**
      * Authenticates the visitor.

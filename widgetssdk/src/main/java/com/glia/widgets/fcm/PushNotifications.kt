@@ -1,7 +1,6 @@
 package com.glia.widgets.fcm
 
 import android.content.Context
-import android.os.Bundle
 import com.google.firebase.messaging.RemoteMessage
 
 /**
@@ -73,29 +72,6 @@ interface PushNotifications {
      * @param message - New FCM message
      */
     fun onNewMessage(message: RemoteMessage)
-
-    /**
-     * Should be called when the main activity is created.
-     *
-     * **Usage example:**
-     * ```kotlin
-     * override fun onCreate(savedInstanceState: Bundle?) {
-     *    super.onCreate(savedInstanceState)
-     *
-     *    ...
-     *
-     *    val pushMessage = GliaWidgets.getPushNotifications().handleOnMainActivityCreate(intent.extras)
-     *
-     *    if (pushMessage?.type == GliaPushMessage.PushType.CHAT_MESSAGE) {
-     *        // handle the opening of the push notification
-     *    }
-     * }
-     * ```
-     *
-     * @param bundle - Bundle passed to the main activity
-     * @return GliaPushMessage if the main activity is opened by clicking on the notification or {@code null} if not.
-     */
-    fun handleOnMainActivityCreate(bundle: Bundle?): GliaPushMessage?
 }
 
 internal class PushNotificationsImpl(
@@ -119,10 +95,5 @@ internal class PushNotificationsImpl(
 
     override fun onNewMessage(message: RemoteMessage) {
         pushNotifications.onNewMessage(message)
-    }
-
-    override fun handleOnMainActivityCreate(bundle: Bundle?): GliaPushMessage? {
-        val pushMessage = pushNotifications.handleOnMainActivityCreate(bundle)
-        return pushMessage?.let { GliaPushMessageImpl(it) }
     }
 }

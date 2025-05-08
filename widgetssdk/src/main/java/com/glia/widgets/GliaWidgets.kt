@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.Intent
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
-import com.glia.widgets.GliaWidgetsException.Companion.from
 import com.glia.widgets.authentication.Authentication
 import com.glia.widgets.callbacks.OnComplete
 import com.glia.widgets.callbacks.OnError
@@ -119,7 +118,7 @@ object GliaWidgets {
         try {
             Dependencies.onAppCreate(application)
         } catch (gliaException: GliaException) {
-            throw mapCoreExceptionToWidgets(gliaException)
+            throw gliaException.toWidgetsType()
         }
         setupRxErrorHandler()
         Logger.d(TAG, "onAppCreate")
@@ -142,7 +141,7 @@ object GliaWidgets {
             gliaThemeManager.applyJsonConfig(gliaWidgetsConfig.uiJsonRemoteConfig)
             glia().isInitialized = true
         } catch (gliaException: GliaException) {
-            val gliaWidgetsException = mapCoreExceptionToWidgets(gliaException)
+            val gliaWidgetsException = gliaException.toWidgetsType()
             throw gliaWidgetsException
         }
     }
@@ -181,11 +180,9 @@ object GliaWidgets {
             gliaThemeManager.applyJsonConfig(gliaWidgetsConfig.uiJsonRemoteConfig)
         } catch (exception: Exception) {
             if (exception is GliaException) {
-                val mappedException = mapCoreExceptionToWidgets(exception)
-                if (mappedException is GliaWidgetsException) {
-                    onError?.onError(mappedException)
-                    return
-                }
+                val mappedException = exception.toWidgetsType()
+                onError?.onError(mappedException)
+                return
             }
 
             Logger.e(TAG, "Glia Widgets SDK initialization failed")
@@ -228,7 +225,7 @@ object GliaWidgets {
                 onSuccess.onSuccess(queues.toWidgetsType())
             },
             onError = {
-                onError.onError(from(it))
+                onError.onError(it.toWidgetsType("Failed to get queues"))
             }
         )
     }
@@ -249,7 +246,7 @@ object GliaWidgets {
             setupQueueIds(queueIds)
             return engagementLauncher
         } catch (gliaException: GliaException) {
-            throw mapCoreExceptionToWidgets(gliaException)
+            throw gliaException.toWidgetsType()
         }
     }
 
@@ -272,7 +269,7 @@ object GliaWidgets {
             configurationManager.setQueueIds(queueIds)
             return entryWidget
         } catch (gliaException: GliaException) {
-            throw mapCoreExceptionToWidgets(gliaException)
+            throw gliaException.toWidgetsType()
         }
     }
 
@@ -303,7 +300,7 @@ object GliaWidgets {
         try {
             glia().onRequestPermissionsResult(requestCode, permissions, grantResults)
         } catch (gliaException: GliaException) {
-            throw mapCoreExceptionToWidgets(gliaException)
+            throw gliaException.toWidgetsType()
         }
     }
 
@@ -330,7 +327,7 @@ object GliaWidgets {
         try {
             repositoryFactory.engagementRepository.onActivityResult(requestCode, resultCode, data)
         } catch (gliaException: GliaException) {
-            throw mapCoreExceptionToWidgets(gliaException)
+            throw gliaException.toWidgetsType()
         }
     }
 
@@ -351,7 +348,7 @@ object GliaWidgets {
             RequestCallback { visitorInfo: com.glia.androidsdk.visitor.VisitorInfo?,
                               error: GliaException? ->
                 if (error != null || visitorInfo == null) {
-                    onError.onError(from(error))
+                    onError.onError(error.toWidgetsType("Failed to get visitor info"))
                 } else {
                     onSuccess.onSuccess(VisitorInfo(visitorInfo))
                 }
@@ -378,7 +375,7 @@ object GliaWidgets {
                 if (error == null) {
                     onComplete.onComplete()
                 } else {
-                    onError.onError(from(error))
+                    onError.onError(error.toWidgetsType())
                 }
             }
         glia().updateVisitorInfo(visitorInfoUpdateRequest.toCoreType(), updateCallback)
@@ -401,7 +398,7 @@ object GliaWidgets {
 
             glia().clearVisitorSession()
         } catch (gliaException: GliaException) {
-            throw mapCoreExceptionToWidgets(gliaException)
+            throw gliaException.toWidgetsType()
         }
     }
 
@@ -418,7 +415,7 @@ object GliaWidgets {
         try {
             useCaseFactory.endEngagementUseCase.invoke(EndedBy.CLEAR_STATE)
         } catch (gliaException: GliaException) {
-            throw mapCoreExceptionToWidgets(gliaException)
+            throw gliaException.toWidgetsType()
         }
     }
 
@@ -436,7 +433,7 @@ object GliaWidgets {
         try {
             return getAuthenticationManager(behavior.toWidgetsType()).toCoreType()
         } catch (gliaException: GliaException) {
-            throw mapCoreExceptionToWidgets(gliaException)
+            throw gliaException.toWidgetsType()
         }
     }
 
@@ -453,7 +450,7 @@ object GliaWidgets {
         try {
             return getAuthenticationManager(behavior)
         } catch (gliaException: GliaException) {
-            throw mapCoreExceptionToWidgets(gliaException)
+            throw gliaException.toWidgetsType()
         }
     }
 
@@ -470,7 +467,7 @@ object GliaWidgets {
         try {
             return secureConversations
         } catch (gliaException: GliaException) {
-            throw mapCoreExceptionToWidgets(gliaException)
+            throw gliaException.toWidgetsType()
         }
     }
 
@@ -487,7 +484,7 @@ object GliaWidgets {
         try {
             return liveObservation
         } catch (gliaException: GliaException) {
-            throw mapCoreExceptionToWidgets(gliaException)
+            throw gliaException.toWidgetsType()
         }
     }
 
@@ -556,10 +553,5 @@ object GliaWidgets {
             "RxErrorHandler",
             "Undeliverable exception received, not sure what to do. $message"
         )
-    }
-
-    private fun mapCoreExceptionToWidgets(gliaException: GliaException): RuntimeException {
-        val widgetsException = from(gliaException)
-        return widgetsException ?: gliaException
     }
 }

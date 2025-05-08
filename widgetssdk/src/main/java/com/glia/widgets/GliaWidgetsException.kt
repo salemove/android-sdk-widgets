@@ -1,5 +1,6 @@
 package com.glia.widgets
 
+import com.glia.widgets.GliaWidgetsException.Cause
 import com.glia.androidsdk.GliaException as GliaCoreException
 
 /**
@@ -7,8 +8,8 @@ import com.glia.androidsdk.GliaException as GliaCoreException
  * a {@link Cause} enum value for handling some of the errors programmatically.
  */
 class GliaWidgetsException internal constructor(
-    val debugMessage: String?,
-    val gliaCause: Cause?
+    val debugMessage: String,
+    val gliaCause: Cause
 ) : RuntimeException(
     debugMessage
 ) {
@@ -37,24 +38,36 @@ class GliaWidgetsException internal constructor(
     override fun toString(): String {
         return "GliaWidgetsException: " + this.debugMessage + ", cause: " + gliaCause.toString()
     }
-
-    internal companion object {
-        @JvmStatic
-        fun from(gliaException: GliaCoreException?): GliaWidgetsException? {
-            return gliaException?.let {
-                GliaWidgetsException(
-                    it.debugMessage,
-                    it.cause?.toWidgetsCause()
-                )
-            }
-        }
-
-        private fun GliaCoreException.Cause.toWidgetsCause(): Cause? {
-            return try {
-                GliaWidgetsException.Cause.valueOf(this.name)
-            } catch (e: IllegalArgumentException) {
-                null
-            }
-        }
-    }
 }
+
+internal fun GliaCoreException.toWidgetsType(): GliaWidgetsException = this.let {
+    GliaWidgetsException(
+        it.debugMessage,
+        it.cause.toWidgetsType()
+    )
+}
+
+internal fun GliaCoreException?.toWidgetsType(
+    defaultMessage: String,
+    defaultCause: Cause = Cause.INTERNAL_ERROR
+): GliaWidgetsException =
+    this?.toWidgetsType() ?: GliaWidgetsException(defaultMessage, defaultCause)
+
+private fun GliaCoreException.Cause.toWidgetsType(): Cause =
+    when(this) {
+        GliaCoreException.Cause.INVALID_INPUT -> Cause.INVALID_INPUT
+        GliaCoreException.Cause.INVALID_LOCALE -> Cause.INVALID_LOCALE
+        GliaCoreException.Cause.NETWORK_TIMEOUT -> Cause.NETWORK_TIMEOUT
+        GliaCoreException.Cause.INTERNAL_ERROR -> Cause.INTERNAL_ERROR
+        GliaCoreException.Cause.AUTHENTICATION_ERROR -> Cause.AUTHENTICATION_ERROR
+        GliaCoreException.Cause.PERMISSIONS_DENIED -> Cause.PERMISSIONS_DENIED
+        GliaCoreException.Cause.ALREADY_QUEUED -> Cause.ALREADY_QUEUED
+        GliaCoreException.Cause.FORBIDDEN -> Cause.FORBIDDEN
+        GliaCoreException.Cause.NOT_MAIN_THREAD -> Cause.NOT_MAIN_THREAD
+        GliaCoreException.Cause.FILE_FORMAT_UNSUPPORTED -> Cause.FILE_FORMAT_UNSUPPORTED
+        GliaCoreException.Cause.FILE_TOO_LARGE -> Cause.FILE_TOO_LARGE
+        GliaCoreException.Cause.FILE_UNAVAILABLE -> Cause.FILE_UNAVAILABLE
+        GliaCoreException.Cause.FILE_UPLOAD_FORBIDDEN -> Cause.FILE_UPLOAD_FORBIDDEN
+        GliaCoreException.Cause.QUEUE_CLOSED -> Cause.QUEUE_CLOSED
+        GliaCoreException.Cause.QUEUE_FULL -> Cause.QUEUE_FULL
+    }

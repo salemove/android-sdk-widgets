@@ -1,11 +1,8 @@
 package com.glia.widgets
 
 import com.glia.androidsdk.GliaException
-import io.mockk.every
-import io.mockk.mockk
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
 import org.junit.Test
 
 class GliaWidgetsExceptionTest {
@@ -20,30 +17,19 @@ class GliaWidgetsExceptionTest {
 
         assertEquals(allCoreCauses.size, allWidgetsCauses.size)
         gliaCoreExceptions.forEachIndexed { index, item ->
-            val widgetsException = GliaWidgetsException.from(item)
+            val widgetsException = item.toWidgetsType()
 
             assertNotNull(widgetsException)
-            assertEquals("Test message", widgetsException?.debugMessage)
-            assertEquals(widgetsException?.gliaCause, gliaWidgetsExceptions[index].gliaCause)
+            assertEquals("Test message", widgetsException.debugMessage)
+            assertEquals(widgetsException.gliaCause, gliaWidgetsExceptions[index].gliaCause)
         }
     }
 
     @Test
-    fun testFrom_withNullGliaException_returnsNull() {
-        val widgetsException = GliaWidgetsException.from(null)
-        assertNull(widgetsException)
-    }
-
-    @Test
-    fun testFrom_withUnknownCause_returnsGliaWidgetsExceptionWithNullCause() {
-        val unknownCause = mockk<GliaException.Cause>()
-        every { unknownCause.name } returns "UNKNOWN_CAUSE"
-
-        val coreException = GliaException("Test message", unknownCause)
-        val widgetsException = GliaWidgetsException.from(coreException)
-
-        assertNotNull(widgetsException)
-        assertEquals("Test message", widgetsException?.debugMessage)
-        assertNull(widgetsException?.gliaCause)
+    fun testFrom_withNullGliaException_returnsDefinedGliaWidgetsException() {
+        val nothing: GliaException? = null
+        val widgetsException = nothing.toWidgetsType("Test message", GliaWidgetsException.Cause.INVALID_INPUT)
+        assertEquals("Test message", widgetsException.debugMessage)
+        assertEquals(widgetsException.gliaCause, GliaWidgetsException.Cause.INVALID_INPUT)
     }
 }

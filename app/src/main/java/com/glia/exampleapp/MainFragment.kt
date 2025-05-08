@@ -34,6 +34,7 @@ import com.glia.androidsdk.omnibrowse.Omnibrowse
 import com.glia.exampleapp.ExampleAppConfigManager.createDefaultConfig
 import com.glia.exampleapp.Utils.getAuthenticationBehaviorFromPrefs
 import com.glia.widgets.GliaWidgets
+import com.glia.widgets.GliaWidgetsException
 import com.glia.widgets.authentication.Authentication
 import com.glia.widgets.entrywidget.EntryWidget
 import com.glia.widgets.launcher.EngagementLauncher
@@ -500,15 +501,15 @@ class MainFragment : Fragment() {
         var externalToken: String? = externalTokenInput.text.toString()
         if (externalToken!!.isEmpty()) externalToken = null
         authentication?.refresh(
-            jwt, externalToken
-        ) { _, exception ->
-            setupAuthButtonsVisibility()
-            if (exception != null || !authentication!!.isAuthenticated) {
-                showToast("Error: $exception")
-            } else {
+            jwt,
+            externalToken,
+            {
+                setupAuthButtonsVisibility()
                 showToast("Refreshed")
+            }, { exception ->
+                showToast("Error: $exception")
             }
-        }
+        )
         saveAuthToken(jwt)
     }
 
@@ -561,31 +562,28 @@ class MainFragment : Fragment() {
         if (externalAccessToken!!.isEmpty()) externalAccessToken = null
         authentication!!.authenticate(
             jwt,
-            externalAccessToken
-        ) { _, exception: GliaException? ->
-            if (exception == null && authentication!!.isAuthenticated) {
+            externalAccessToken,
+            {
                 setupAuthButtonsVisibility()
                 callback?.onAuthenticated()
-            } else {
-                if (exception?.cause == GliaException.Cause.AUTHENTICATION_ERROR) {
+            }, { exception ->
+                if (exception.gliaCause == GliaWidgetsException.Cause.AUTHENTICATION_ERROR) {
                     showToast(exception.message.toString())
                 } else {
                     showToast("Error: $exception")
                 }
             }
-        }
+        )
         saveAuthToken(jwt)
     }
 
     private fun deAuthenticate() {
         if (activity == null || containerView == null) return
-        authentication!!.deauthenticate { _, exception: GliaException? ->
-            if (exception == null && !authentication!!.isAuthenticated) {
-                setupAuthButtonsVisibility()
-            } else {
-                showToast("Error: $exception")
-            }
-        }
+        authentication!!.deauthenticate({
+            setupAuthButtonsVisibility()
+        }, { exception ->
+            showToast("Error: $exception")
+        })
     }
 
     private fun clearSession() {

@@ -1,7 +1,8 @@
 package com.glia.widgets.authentication
 
-import com.glia.androidsdk.GliaException
-import com.glia.androidsdk.RequestCallback
+import com.glia.widgets.GliaWidgetsException
+import com.glia.widgets.callbacks.OnComplete
+import com.glia.widgets.callbacks.OnError
 
 /**
  * Interface for managing authentication and de-authentication.
@@ -14,7 +15,7 @@ interface Authentication {
      * Sets the specified behavior.
      *
      * @param behavior authentication behavior
-     * @throws GliaException [GliaException.Cause.INVALID_INPUT] - in case behavior is null.
+     * @throws GliaWidgetsException [GliaWidgetsException.Cause.INVALID_INPUT] - in case behavior is null.
      */
     fun setBehavior(behavior: Behavior)
 
@@ -24,30 +25,36 @@ interface Authentication {
      * @param jwtToken                JWT token (Direct ID token) for visitor authentication.
      * @param externalAccessToken     An access token that can be used to make authenticated requests
      * to other systems on behalf of the authenticated visitor.
-     * @param authCallback callback to receive execution result
-     * (null for success or GliaException for error).
+     * @param onComplete Callback invoked when the update operation is successfully completed.
+     * @param onError Callback invoked when an error occurs during the update operation.
+     *                Provides a [GliaWidgetsException] describing the error.
      * Exception may have one of following causes:
-     * <br></br> [GliaException.Cause.NETWORK_TIMEOUT] - when request times out due to connection issues
-     * <br></br> [GliaException.Cause.INTERNAL_ERROR] - when internal error occurs
-     * <br></br> [GliaException.Cause.AUTHENTICATION_ERROR] - when authentication fails
+     * <br></br> [GliaWidgetsException.Cause.NETWORK_TIMEOUT] - when request times out due to connection issues
+     * <br></br> [GliaWidgetsException.Cause.INTERNAL_ERROR] - when internal error occurs
+     * <br></br> [GliaWidgetsException.Cause.AUTHENTICATION_ERROR] - when authentication fails
      */
     fun authenticate(
         jwtToken: String,
         externalAccessToken: String?,
-        authCallback: RequestCallback<Void>?
+        onComplete: OnComplete?,
+        onError: OnError?
     )
 
     /**
      * De-authenticates the visitor.
      *
-     * @param authCallback callback to receive execution result
-     * (null for success or GliaException for error).
+     * @param onComplete Callback invoked when the update operation is successfully completed.
+     * @param onError Callback invoked when an error occurs during the update operation.
+     *                Provides a [GliaWidgetsException] describing the error.
      * Exception may have one of following causes:
-     * <br></br> [GliaException.Cause.NETWORK_TIMEOUT] - when request times out due to connection issues
-     * <br></br> [GliaException.Cause.INTERNAL_ERROR] - when internal error occurs
-     * <br></br> [GliaException.Cause.AUTHENTICATION_ERROR] - when authentication fails
+     * <br></br> [GliaWidgetsException.Cause.NETWORK_TIMEOUT] - when request times out due to connection issues
+     * <br></br> [GliaWidgetsException.Cause.INTERNAL_ERROR] - when internal error occurs
+     * <br></br> [GliaWidgetsException.Cause.AUTHENTICATION_ERROR] - when authentication fails
      */
-    fun deauthenticate(authCallback: RequestCallback<Void>?)
+    fun deauthenticate(
+        onComplete: OnComplete?,
+        onError: OnError?
+    )
 
     /**
      * Check if Visitor is authenticated in Glia using the external authentication.
@@ -63,17 +70,19 @@ interface Authentication {
      * @param jwtToken                JWT token (Direct ID token) for visitor authentication.
      * @param externalAccessToken     An access token that can be used to make authenticated requests
      * to other systems on behalf of the authenticated visitor.
-     * @param authCallback callback to receive execution result
-     * (null for success or GliaException for error).
+     * @param onComplete Callback invoked when the update operation is successfully completed.
+     * @param onError Callback invoked when an error occurs during the update operation.
+     *                Provides a [GliaWidgetsException] describing the error.
      * Exception may have one of following causes:
-     * <br></br> [GliaException.Cause.NETWORK_TIMEOUT] - when request times out due to connection issues
-     * <br></br> [GliaException.Cause.INTERNAL_ERROR] - when internal error occurs
-     * <br></br> [GliaException.Cause.AUTHENTICATION_ERROR] - when authentication fails
+     * <br></br> [GliaWidgetsException.Cause.NETWORK_TIMEOUT] - when request times out due to connection issues
+     * <br></br> [GliaWidgetsException.Cause.INTERNAL_ERROR] - when internal error occurs
+     * <br></br> [GliaWidgetsException.Cause.AUTHENTICATION_ERROR] - when authentication fails
      */
     fun refresh(
         jwtToken: String,
         externalAccessToken: String?,
-        authCallback: RequestCallback<Void>?
+        onComplete: OnComplete?,
+        onError: OnError?
     )
 
     /**

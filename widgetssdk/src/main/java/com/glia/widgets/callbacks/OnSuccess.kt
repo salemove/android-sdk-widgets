@@ -11,5 +11,5 @@ fun interface OnSuccess<T> {
      *
      * @param result result returned if the request succeeded
      */
-    fun onSuccess(result: T?)
+    fun onSuccess(result: T)
 }

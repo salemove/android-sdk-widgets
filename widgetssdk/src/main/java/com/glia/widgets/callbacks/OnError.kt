@@ -11,5 +11,5 @@ fun interface OnError {
      *
      * @param exception GliaWidgetsException returned if the request failed
      */
-    fun onError(exception: GliaWidgetsException?)
+    fun onError(exception: GliaWidgetsException)
 }

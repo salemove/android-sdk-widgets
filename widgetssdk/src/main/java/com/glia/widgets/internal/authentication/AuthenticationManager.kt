@@ -4,10 +4,15 @@ import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.visitor.Authentication as CoreAuthentication
 import com.glia.androidsdk.RequestCallback
 import com.glia.widgets.authentication.Authentication
+import com.glia.widgets.callbacks.OnComplete
+import com.glia.widgets.callbacks.OnError
+import com.glia.widgets.callbacks.toOnComplete
+import com.glia.widgets.callbacks.toOnError
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.di.Dependencies.repositoryFactory
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
+import com.glia.widgets.toWidgetsType
 
 /**
  * Wrapper class for {@link com.glia.androidsdk.visitor.Authentication}
@@ -25,23 +30,29 @@ internal class AuthenticationManager(
     override fun authenticate(
         jwtToken: String,
         externalAccessToken: String?,
-        authCallback: RequestCallback<Void>?
+        onComplete: OnComplete?,
+        onError: OnError?
     ) {
         onAuthenticationRequestedCallback()
         Dependencies.destroyControllersAndResetQueueing()
 
         Logger.i(TAG, "Authenticate. Is external access token used: ${externalAccessToken != null}")
-        authentication.authenticate(jwtToken, externalAccessToken) { void, gliaException ->
-            if (gliaException == null) {
-                //Here we need to subscribe to secure conversations repository to get the data for authenticated visitors
-                repositoryFactory.secureConversationsRepository.subscribe()
+        authentication.authenticate(jwtToken, externalAccessToken) { _, gliaException ->
+            if (gliaException != null) {
+                onError?.onError(gliaException.toWidgetsType())
             }
+            //Here we need to subscribe to secure conversations repository to get the data for authenticated visitors
+            repositoryFactory.secureConversationsRepository.subscribe()
 
-            authCallback?.onResult(void, gliaException)
+            onComplete?.onComplete()
+
         }
     }
 
-    override fun deauthenticate(authCallback: RequestCallback<Void>?) {
+    override fun deauthenticate(
+        onComplete: OnComplete?,
+        onError: OnError?
+    ) {
         Logger.i(TAG, "Unauthenticate")
         //Need to end engagement before it's done on the core side to prevent unexpected behavior
         Dependencies.destroyControllersAndResetEngagementData()
@@ -50,19 +61,34 @@ internal class AuthenticationManager(
         //and we don't need secure conversations data for un-authenticated visitors.
         repositoryFactory.secureConversationsRepository.unsubscribeAndResetData()
 
-        authentication.deauthenticate(authCallback)
+        authentication.deauthenticate { _, gliaException ->
+            if (gliaException != null) {
+                onError?.onError(gliaException.toWidgetsType())
+            }
+            onComplete?.onComplete()
+        }
     }
 
     override val isAuthenticated: Boolean
         get() = authentication.isAuthenticated
 
-    override fun refresh(jwtToken: String, externalAccessToken: String?, authCallback: RequestCallback<Void>?) {
+    override fun refresh(jwtToken: String,
+                         externalAccessToken: String?,
+                         onComplete: OnComplete?,
+                         onError: OnError?
+    ) {
         Logger.i(TAG, "Refresh authentication")
-        authentication.refresh(jwtToken, externalAccessToken, authCallback)
+        authentication.refresh(jwtToken, externalAccessToken) { _, gliaException ->
+            if (gliaException != null) {
+                onError?.onError(gliaException.toWidgetsType())
+            }
+
+            onComplete?.onComplete()
+        }
     }
 }
 
-internal fun Authentication.toCoreType(): CoreAuthentication = this.let { widgetAuthentication ->
+internal fun AuthenticationManager.toCoreType(): CoreAuthentication = this.let { widgetAuthentication ->
     object : CoreAuthentication {
         override fun setBehavior(behavior: com.glia.androidsdk.visitor.Authentication.Behavior) {
             widgetAuthentication.setBehavior(behavior.toWidgetsType())
@@ -73,11 +99,11 @@ internal fun Authentication.toCoreType(): CoreAuthentication = this.let { widget
                 reportTokenInvalidError(authCallback)
                 return
             }
-            widgetAuthentication.authenticate(jwtToken, externalAccessToken, authCallback)
+            widgetAuthentication.authenticate(jwtToken, externalAccessToken, authCallback?.toOnComplete(), authCallback?.toOnError())
         }
 
         override fun deauthenticate(authCallback: RequestCallback<Void>?) {
-            widgetAuthentication.deauthenticate(authCallback)
+            widgetAuthentication.deauthenticate(authCallback?.toOnComplete(), authCallback?.toOnError())
         }
 
         override fun isAuthenticated(): Boolean {
@@ -89,7 +115,7 @@ internal fun Authentication.toCoreType(): CoreAuthentication = this.let { widget
                 reportTokenInvalidError(authCallback)
                 return
             }
-            widgetAuthentication.refresh(jwtToken, externalAccessToken, authCallback)
+            widgetAuthentication.refresh(jwtToken, externalAccessToken, authCallback?.toOnComplete(), authCallback?.toOnError())
         }
 
         private fun reportTokenInvalidError(authCallback: RequestCallback<Void>?) {

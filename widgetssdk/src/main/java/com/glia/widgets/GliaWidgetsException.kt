@@ -71,3 +71,29 @@ private fun GliaCoreException.Cause.toWidgetsType(): Cause =
         GliaCoreException.Cause.QUEUE_CLOSED -> Cause.QUEUE_CLOSED
         GliaCoreException.Cause.QUEUE_FULL -> Cause.QUEUE_FULL
     }
+
+internal fun GliaWidgetsException.toCoreType(): GliaCoreException = this.let {
+    GliaCoreException(
+        it.debugMessage,
+        it.gliaCause.toCoreType()
+    )
+}
+
+private fun Cause.toCoreType(): GliaCoreException.Cause =
+    when(this) {
+        Cause.INVALID_INPUT -> GliaCoreException.Cause.INVALID_INPUT
+        Cause.INVALID_LOCALE -> GliaCoreException.Cause.INVALID_LOCALE
+        Cause.NETWORK_TIMEOUT -> GliaCoreException.Cause.NETWORK_TIMEOUT
+        Cause.INTERNAL_ERROR -> GliaCoreException.Cause.INTERNAL_ERROR
+        Cause.AUTHENTICATION_ERROR -> GliaCoreException.Cause.AUTHENTICATION_ERROR
+        Cause.PERMISSIONS_DENIED -> GliaCoreException.Cause.PERMISSIONS_DENIED
+        Cause.ALREADY_QUEUED -> GliaCoreException.Cause.ALREADY_QUEUED
+        Cause.FORBIDDEN -> GliaCoreException.Cause.FORBIDDEN
+        Cause.NOT_MAIN_THREAD -> GliaCoreException.Cause.NOT_MAIN_THREAD
+        Cause.FILE_FORMAT_UNSUPPORTED -> GliaCoreException.Cause.FILE_FORMAT_UNSUPPORTED
+        Cause.FILE_TOO_LARGE -> GliaCoreException.Cause.FILE_TOO_LARGE
+        Cause.FILE_UNAVAILABLE -> GliaCoreException.Cause.FILE_UNAVAILABLE
+        Cause.FILE_UPLOAD_FORBIDDEN -> GliaCoreException.Cause.FILE_UPLOAD_FORBIDDEN
+        Cause.QUEUE_CLOSED -> GliaCoreException.Cause.QUEUE_CLOSED
+        Cause.QUEUE_FULL -> GliaCoreException.Cause.QUEUE_FULL
+    }

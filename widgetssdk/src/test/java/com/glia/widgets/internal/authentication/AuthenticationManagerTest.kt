@@ -7,6 +7,7 @@ import junit.framework.TestCase.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.mockito.Mockito.any
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.kotlin.argThat
@@ -16,7 +17,7 @@ import org.mockito.kotlin.whenever
 class AuthenticationManagerTest {
     @Test
     fun toCoreType_setBehavior_returnsCoreAuthenticationWithCorrectBehavior() {
-        val widgetAuthentication = mock<Authentication>()
+        val widgetAuthentication = mock<AuthenticationManager>()
         val coreAuthentication = widgetAuthentication.toCoreType()
 
         val behavior = com.glia.androidsdk.visitor.Authentication.Behavior.FORBIDDEN_DURING_ENGAGEMENT
@@ -27,7 +28,7 @@ class AuthenticationManagerTest {
 
     @Test
     fun toCoreType_authenticateWithValidJwtToken_callsAuthenticateOnWidgetAuthentication() {
-        val widgetAuthentication = mock<Authentication>()
+        val widgetAuthentication = mock<AuthenticationManager>()
         val coreAuthentication = widgetAuthentication.toCoreType()
 
         val jwtToken = "validToken"
@@ -36,12 +37,12 @@ class AuthenticationManagerTest {
 
         coreAuthentication.authenticate(jwtToken, externalAccessToken, callback)
 
-        verify(widgetAuthentication).authenticate(jwtToken, externalAccessToken, callback)
+        verify(widgetAuthentication).authenticate(eq(jwtToken), eq(externalAccessToken), any(), any())
     }
 
     @Test
     fun toCoreType_authenticateWithNullJwtToken_callsAuthCallbackWithInvalidInputError() {
-        val widgetAuthentication = mock<Authentication>()
+        val widgetAuthentication = mock<AuthenticationManager>()
         val coreAuthentication = widgetAuthentication.toCoreType()
 
         val callback = mock<RequestCallback<Void>>()
@@ -56,19 +57,19 @@ class AuthenticationManagerTest {
 
     @Test
     fun toCoreType_deauthenticate_callsDeauthenticateOnWidgetAuthentication() {
-        val widgetAuthentication = mock<Authentication>()
+        val widgetAuthentication = mock<AuthenticationManager>()
         val coreAuthentication = widgetAuthentication.toCoreType()
 
         val callback = mock<RequestCallback<Void>>()
 
         coreAuthentication.deauthenticate(callback)
 
-        verify(widgetAuthentication).deauthenticate(callback)
+        verify(widgetAuthentication).deauthenticate(any(), any())
     }
 
     @Test
     fun toCoreType_isAuthenticated_returnsCorrectValue() {
-        val widgetAuthentication = mock<Authentication>()
+        val widgetAuthentication = mock<AuthenticationManager>()
         whenever(widgetAuthentication.isAuthenticated).thenReturn(true)
 
         val coreAuthentication = widgetAuthentication.toCoreType()
@@ -78,7 +79,7 @@ class AuthenticationManagerTest {
 
     @Test
     fun toCoreType_refreshWithValidJwtToken_callsRefreshOnWidgetAuthentication() {
-        val widgetAuthentication = mock<Authentication>()
+        val widgetAuthentication = mock<AuthenticationManager>()
         val coreAuthentication = widgetAuthentication.toCoreType()
 
         val jwtToken = "validToken"
@@ -87,12 +88,12 @@ class AuthenticationManagerTest {
 
         coreAuthentication.refresh(jwtToken, externalAccessToken, callback)
 
-        verify(widgetAuthentication).refresh(jwtToken, externalAccessToken, callback)
+        verify(widgetAuthentication).refresh(eq(jwtToken), eq(externalAccessToken), any(), any())
     }
 
     @Test
     fun toCoreType_refreshWithNullJwtToken_callsAuthCallbackWithInvalidInputError() {
-        val widgetAuthentication = mock<Authentication>()
+        val widgetAuthentication = mock<AuthenticationManager>()
         val coreAuthentication = widgetAuthentication.toCoreType()
 
         val callback = mock<RequestCallback<Void>>()

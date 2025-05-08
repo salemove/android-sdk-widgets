@@ -9,13 +9,13 @@ import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest
  * @see {@link GliaWidgets#updateVisitorInfo(VisitorInfoUpdateRequest, OnWidgetsSuccess, OnWidgetsError)}
  */
 data class VisitorInfoUpdateRequest(
-    val name: String?,
-    val email: String?,
-    val phone: String?,
-    val note: String?,
-    val noteUpdateMethod: NoteUpdateMethod?,
-    val customAttributes: Map<String, String>?,
-    val customAttrsUpdateMethod: CustomAttributesUpdateMethod?
+    var name: String? = null,
+    var email: String? = null,
+    var phone: String? = null,
+    var note: String? = null,
+    var noteUpdateMethod: NoteUpdateMethod? = null,
+    var customAttributes: Map<String, String>? = null,
+    var customAttrsUpdateMethod: CustomAttributesUpdateMethod? = null
 ) {
 
     internal fun toCoreType(): VisitorInfoUpdateRequest {

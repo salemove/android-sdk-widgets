@@ -1,5 +1,7 @@
 package com.glia.widgets.callbacks
 
+import com.glia.androidsdk.RequestCallback
+
 /**
  * Callback used in some requests to Glia Widgets SDK.
  *
@@ -12,4 +14,8 @@ fun interface OnSuccess<T> {
      * @param result result returned if the request succeeded
      */
     fun onSuccess(result: T)
+}
+
+internal fun <T> RequestCallback<T>.toOnSuccess(): OnSuccess<T> {
+    return OnSuccess { onResult(it, null) }
 }

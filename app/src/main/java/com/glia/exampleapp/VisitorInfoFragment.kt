@@ -28,6 +28,7 @@ class VisitorInfoFragment : Fragment() {
     private lateinit var nameEditText: EditText
     private lateinit var emailEditText: EditText
     private lateinit var phoneEditText: EditText
+    private lateinit var externalIdEditText: EditText
     private lateinit var noteEditText: EditText
     private lateinit var noteModeSwitch: SwitchCompat
     private lateinit var customAttributesModeSwitch: SwitchCompat
@@ -48,6 +49,7 @@ class VisitorInfoFragment : Fragment() {
         nameEditText = view.findViewById(R.id.name_edit_text)
         emailEditText = view.findViewById(R.id.email_edit_text)
         phoneEditText = view.findViewById(R.id.phone_edit_text)
+        externalIdEditText = view.findViewById(R.id.external_id_text)
         noteEditText = view.findViewById(R.id.note_edit_text)
         noteModeSwitch = view.findViewById(R.id.note_mode_switch)
         customAttributesModeSwitch = view.findViewById(R.id.custom_attributes_mode_switch)
@@ -76,6 +78,7 @@ class VisitorInfoFragment : Fragment() {
         nameEditText.setText(visitorInfo.name)
         emailEditText.setText(visitorInfo.email)
         phoneEditText.setText(visitorInfo.phone)
+        externalIdEditText.setText(visitorInfo.externalId)
         noteEditText.setText(visitorInfo.note)
         customAttributesAdapter.setAttributes(visitorInfo.customAttributesMap)
     }
@@ -89,6 +92,7 @@ class VisitorInfoFragment : Fragment() {
             name = nameEditText.text.toString(),
             email = emailEditText.text.toString(),
             phone = phoneEditText.text.toString(),
+            externalId = externalIdEditText.text.toString(),
             note = noteEditText.text.toString(),
             customAttributes = obtainCustomAttributes(),
             customAttrsUpdateMethod = obtainCustomAttributesUpdateMethod(),

@@ -110,6 +110,7 @@
     <string name="visitor_info_name">Name</string>
     <string name="visitor_info_email">Email</string>
     <string name="visitor_info_phone">Phone</string>
+    <string name="visitor_info_external_id">External ID</string>
     <string name="visitor_info_note">Note</string>
     <string name="visitor_info_save">Save</string>
     <string name="visitor_info_note_save_mode">Note save mode:</string>

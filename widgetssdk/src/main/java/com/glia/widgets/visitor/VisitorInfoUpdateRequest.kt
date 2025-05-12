@@ -12,6 +12,7 @@ data class VisitorInfoUpdateRequest(
     var name: String? = null,
     var email: String? = null,
     var phone: String? = null,
+    var externalId: String? = null,
     var note: String? = null,
     var noteUpdateMethod: NoteUpdateMethod? = null,
     var customAttributes: Map<String, String>? = null,
@@ -23,6 +24,7 @@ data class VisitorInfoUpdateRequest(
             .setName(name)
             .setEmail(email)
             .setPhone(phone)
+            .setExternalId(externalId)
             .setNote(note)
             .setCustomAttributes(customAttributes)
             .setCustomAttrsUpdateMethod(customAttrsUpdateMethod?.toCoreType())

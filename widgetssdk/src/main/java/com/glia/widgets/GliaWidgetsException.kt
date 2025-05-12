@@ -54,7 +54,7 @@ internal fun GliaCoreException?.toWidgetsType(
 ): GliaWidgetsException =
     this?.toWidgetsType() ?: let {
         val exception = GliaWidgetsException(defaultMessage, defaultCause)
-        Logger.e("GliaWidgetsException", "The Core GliaException is null, using the default message and cause.", exception)
+        Logger.e("GliaWidgetsException", "The Core GliaException is null, using the default error message and cause.", exception)
         return@let exception
     }
 

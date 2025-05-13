@@ -7,15 +7,15 @@ import com.glia.androidsdk.RequestCallback
  *
  * @param <T> object expected to be returned by the request
 </T> */
-fun interface OnSuccess<T> {
+fun interface OnResult<T> {
     /**
      * Function that is fired if request succeeds with a result
      *
      * @param result result returned if the request succeeded
      */
-    fun onSuccess(result: T)
+    fun onResult(result: T)
 }
 
-internal fun <T> RequestCallback<T>.toOnSuccess(): OnSuccess<T> {
-    return OnSuccess { onResult(it, null) }
+internal fun <T> RequestCallback<T>.toOnResult(): OnResult<T> {
+    return OnResult { onResult(it, null) }
 }

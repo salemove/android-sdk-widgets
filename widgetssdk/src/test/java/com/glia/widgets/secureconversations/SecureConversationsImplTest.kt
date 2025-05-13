@@ -4,7 +4,7 @@ import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
 import com.glia.widgets.GliaWidgetsException
 import com.glia.widgets.callbacks.OnError
-import com.glia.widgets.callbacks.OnSuccess
+import com.glia.widgets.callbacks.OnResult
 import com.glia.widgets.toWidgetsType
 import io.mockk.*
 import org.junit.Before
@@ -23,23 +23,23 @@ class SecureConversationsImplTest {
     }
 
     @Test
-    fun `getUnreadMessageCount calls SDK and invokes onSuccess`() {
-        val onSuccess: OnSuccess<Int> = mockk(relaxed = true)
+    fun `getUnreadMessageCount calls SDK and invokes onResult`() {
+        val onResult: OnResult<Int> = mockk(relaxed = true)
         val onError: OnError = mockk(relaxed = true)
         val unreadCount = 5
         every { secureConversationsCore.getUnreadMessageCount(any()) } answers {
             firstArg<RequestCallback<Int>>().onResult(unreadCount, null)
         }
 
-        secureConversationsWidgets.getUnreadMessageCount(onSuccess, onError)
+        secureConversationsWidgets.getUnreadMessageCount(onResult, onError)
 
-        verify { onSuccess.onSuccess(unreadCount) }
+        verify { onResult.onResult(unreadCount) }
         verify(exactly = 0) { onError.onError(any()) }
     }
 
     @Test
     fun `getUnreadMessageCount calls SDK and invokes onError on failure`() {
-        val onSuccess: OnSuccess<Int> = mockk(relaxed = true)
+        val onResult: OnResult<Int> = mockk(relaxed = true)
         val onError: OnError = mockk(relaxed = true)
         val exception = mock<GliaException>()
         val widgetsException = GliaWidgetsException("Error", GliaWidgetsException.Cause.AUTHENTICATION_ERROR)
@@ -49,15 +49,15 @@ class SecureConversationsImplTest {
             firstArg<RequestCallback<Int>>().onResult(null, exception)
         }
 
-        secureConversationsWidgets.getUnreadMessageCount(onSuccess, onError)
+        secureConversationsWidgets.getUnreadMessageCount(onResult, onError)
 
         verify { onError.onError(widgetsException) }
-        verify(exactly = 0) { onSuccess.onSuccess(any()) }
+        verify(exactly = 0) { onResult.onResult(any()) }
     }
 
     @Test
     fun `subscribeToUnreadMessageCount adds callback and calls SDK`() {
-        val callback: OnSuccess<Int> = mockk(relaxed = true)
+        val callback: OnResult<Int> = mockk(relaxed = true)
         val requestCallbackSlot = slot<RequestCallback<Int>>()
         val unreadCount = 10
         every { secureConversationsCore.subscribeToUnreadMessageCount(capture(requestCallbackSlot)) } just Runs
@@ -67,12 +67,12 @@ class SecureConversationsImplTest {
         verify { secureConversationsCore.subscribeToUnreadMessageCount(any()) }
         assert(secureConversationsWidgets.subscribedCallbacks.containsKey(callback.hashCode()))
         requestCallbackSlot.captured.onResult(unreadCount, null)
-        verify { callback.onSuccess(unreadCount) }
+        verify { callback.onResult(unreadCount) }
     }
 
     @Test
     fun `subscribeToUnreadMessageCount does not subscribe the same callback twice`() {
-        val callback: OnSuccess<Int> = mockk(relaxed = true)
+        val callback: OnResult<Int> = mockk(relaxed = true)
         val requestCallbackSlot = slot<RequestCallback<Int>>()
         every { secureConversationsCore.subscribeToUnreadMessageCount(capture(requestCallbackSlot)) } just Runs
 
@@ -89,7 +89,7 @@ class SecureConversationsImplTest {
 
     @Test
     fun `unSubscribeFromUnreadMessageCount removes callback and calls SDK`() {
-        val callback: OnSuccess<Int> = mockk(relaxed = true)
+        val callback: OnResult<Int> = mockk(relaxed = true)
         val requestCallback: RequestCallback<Int> = mockk(relaxed = true)
         secureConversationsWidgets.subscribedCallbacks[callback.hashCode()] = requestCallback
 

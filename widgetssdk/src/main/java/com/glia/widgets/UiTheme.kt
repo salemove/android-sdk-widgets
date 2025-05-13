@@ -17,6 +17,7 @@ import com.glia.widgets.view.unifiedui.theme.AlertDialogConfiguration
 import com.glia.widgets.view.unifiedui.theme.ColorPallet
 import com.glia.widgets.view.unifiedui.theme.Icons
 import com.glia.widgets.view.unifiedui.theme.Properties
+import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
 import com.glia.widgets.view.unifiedui.theme.defaulttheme.AlertTheme
 import kotlinx.parcelize.Parcelize
@@ -512,11 +513,11 @@ internal data class UiTheme(
     }
 
     internal fun alertTheme(context: Context): AlertDialogConfiguration {
-        val theme = toColorPallet(context).run(::AlertTheme).copy(isVerticalAxis = isAlertDialogButtonUseVerticalAlignment())
+        val alertTheme = toColorPallet(context).run(::AlertTheme).copy(isVerticalAxis = isAlertDialogButtonUseVerticalAlignment())
+        val theme = UnifiedTheme(alertTheme = alertTheme, isWhiteLabel = whiteLabel)
 
         val properties = Properties(
-            typeface = fontRes?.let { ResourcesCompat.getFont(context, it) },
-            whiteLabel = whiteLabel
+            typeface = fontRes?.let { ResourcesCompat.getFont(context, it) }
         )
 
         val icons = Icons(

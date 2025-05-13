@@ -1,10 +1,10 @@
 package com.glia.widgets.view.dialog.option
 
 import android.view.LayoutInflater
-import androidx.core.view.isGone
 import com.glia.widgets.helper.setText
 import com.glia.widgets.view.dialog.base.DialogPayload
 import com.glia.widgets.view.dialog.base.DialogViewInflater
+import com.glia.widgets.view.unifiedui.applyWhiteLabel
 import com.glia.widgets.view.unifiedui.theme.AlertDialogConfiguration
 
 internal abstract class BaseOptionDialogViewInflater<T : BaseOptionDialogViewBinding<*>>(
@@ -15,10 +15,10 @@ internal abstract class BaseOptionDialogViewInflater<T : BaseOptionDialogViewBin
     override fun setup(binding: T, configuration: AlertDialogConfiguration, payload: DialogPayload.Option) {
         val theme = configuration.theme
 
-        binding.logoContainer.isGone = configuration.properties.whiteLabel ?: false
+        binding.logoContainer.applyWhiteLabel(theme.isWhiteLabel)
         binding.poweredByTv.setText(payload.poweredByText)
 
-        setupText(binding.messageTv, payload.message, theme.message, configuration.properties.typeface)
+        setupText(binding.messageTv, payload.message, theme.alertTheme?.message, configuration.properties.typeface)
     }
 }
 
@@ -29,18 +29,18 @@ internal open class DefaultOptionDialogViewInflater<T : DefaultOptionDialogViewB
 ) : BaseOptionDialogViewInflater<T>(binding, themeWrapper, payload) {
     final override fun setup(binding: T, configuration: AlertDialogConfiguration, payload: DialogPayload.Option) {
         super.setup(binding, configuration, payload)
-        val theme = configuration.theme
+        val alertTheme = configuration.theme.alertTheme
         setupButton(
             binding.positiveButton,
             payload.positiveButtonText,
-            theme.positiveButton,
+            alertTheme?.positiveButton,
             configuration.properties.typeface,
             payload.positiveButtonClickListener
         )
         setupButton(
             binding.negativeButton,
             payload.negativeButtonText,
-            theme.negativeButton,
+            alertTheme?.negativeButton,
             configuration.properties.typeface,
             payload.negativeButtonClickListener
         )
@@ -64,18 +64,18 @@ internal open class DefaultReversedOptionDialogViewInflater<T : DefaultReversedO
 ) : BaseOptionDialogViewInflater<T>(binding, themeWrapper, payload) {
     final override fun setup(binding: T, configuration: AlertDialogConfiguration, payload: DialogPayload.Option) {
         super.setup(binding, configuration, payload)
-        val theme = configuration.theme
+        val alertTheme = configuration.theme.alertTheme
         setupButton(
             binding.positiveButton,
             payload.positiveButtonText,
-            theme.negativeButton,// Since buttons are reversed, the positive button is actually GliaNegativeButton and should use NegativeButton theming
+            alertTheme?.negativeButton,// Since buttons are reversed, the positive button is actually GliaNegativeButton and should use NegativeButton theming
             configuration.properties.typeface,
             payload.positiveButtonClickListener
         )
         setupButton(
             binding.negativeButton,
             payload.negativeButtonText,
-            theme.positiveButton,// Since buttons are reversed, the positive button is actually GliaNegativeButton and should use NegativeButton theming
+            alertTheme?.positiveButton,// Since buttons are reversed, the positive button is actually GliaNegativeButton and should use NegativeButton theming
             configuration.properties.typeface,
             payload.negativeButtonClickListener
         )
@@ -117,18 +117,18 @@ internal open class DefaultOptionWithNegativeNeutralDialogViewInflater<T : Defau
 ) : BaseOptionDialogViewInflater<T>(binding, themeWrapper, payload) {
     final override fun setup(binding: T, configuration: AlertDialogConfiguration, payload: DialogPayload.Option) {
         super.setup(binding, configuration, payload)
-        val theme = configuration.theme
+        val alertTheme = configuration.theme.alertTheme
         setupButton(
             binding.negativeButton,      // Reversed button positions: negative button takes all properties of positive
             payload.positiveButtonText,
-            theme.positiveButton,
+            alertTheme?.positiveButton,
             configuration.properties.typeface,
             payload.positiveButtonClickListener
         )
         setupButton(
             binding.positiveButton,      // Reversed button positions: positive button takes all properties of negative
             payload.negativeButtonText,
-            theme.negativeNeutralButton, // Not 'negative' theme but from 'negative neutral' theme
+            alertTheme?.negativeNeutralButton, // Not 'negative' theme but from 'negative neutral' theme
             configuration.properties.typeface,
             payload.negativeButtonClickListener
         )

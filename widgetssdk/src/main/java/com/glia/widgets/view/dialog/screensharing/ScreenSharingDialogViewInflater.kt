@@ -1,11 +1,11 @@
 package com.glia.widgets.view.dialog.screensharing
 
 import android.view.LayoutInflater
-import androidx.core.view.isGone
 import com.glia.widgets.helper.setText
 import com.glia.widgets.view.dialog.base.DialogPayload
 import com.glia.widgets.view.dialog.base.DialogViewInflater
 import com.glia.widgets.view.unifiedui.applyImageColorTheme
+import com.glia.widgets.view.unifiedui.applyWhiteLabel
 import com.glia.widgets.view.unifiedui.theme.AlertDialogConfiguration
 
 internal open class BaseScreenSharingDialogViewInflater<T : BaseScreenSharingDialogViewBinding<*>>(
@@ -16,23 +16,23 @@ internal open class BaseScreenSharingDialogViewInflater<T : BaseScreenSharingDia
     final override fun setup(binding: T, configuration: AlertDialogConfiguration, payload: DialogPayload.ScreenSharing) {
         val theme = configuration.theme
 
-        binding.logoContainer.isGone = configuration.properties.whiteLabel ?: false
+        binding.logoContainer.applyWhiteLabel(theme.isWhiteLabel)
         binding.poweredByTv.setText(payload.poweredByText)
         configuration.icons.iconScreenSharingDialog?.also { binding.icon.setImageResource(it) }
-        binding.icon.applyImageColorTheme(theme.titleImageColor)
+        binding.icon.applyImageColorTheme(theme.alertTheme?.titleImageColor)
 
-        setupText(binding.messageTv, payload.message, theme.message, configuration.properties.typeface)
+        setupText(binding.messageTv, payload.message, theme.alertTheme?.message, configuration.properties.typeface)
         setupButton(
             binding.positiveBtn,
             payload.positiveButtonText,
-            theme.positiveButton,
+            theme.alertTheme?.positiveButton,
             configuration.properties.typeface,
             payload.positiveButtonClickListener
         )
         setupButton(
             binding.negativeBtn,
             payload.negativeButtonText,
-            theme.negativeButton,
+            theme.alertTheme?.negativeButton,
             configuration.properties.typeface,
             payload.negativeButtonClickListener
         )

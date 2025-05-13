@@ -30,9 +30,9 @@ internal abstract class DialogViewInflater<T : DialogViewBinding<out ViewBinding
     }
 
     private fun initialSetup(binding: T, configuration: AlertDialogConfiguration, payload: R) {
-        val alertTheme = configuration.theme
-        view.applyColorTheme(alertTheme.backgroundColor)
-        setupText(binding.titleTv, payload.title, alertTheme.title, configuration.properties.typeface)
+        val alertTheme = configuration.theme.alertTheme
+        view.applyColorTheme(alertTheme?.backgroundColor)
+        setupText(binding.titleTv, payload.title, alertTheme?.title, configuration.properties.typeface)
         setup(binding, configuration, payload)
     }
 

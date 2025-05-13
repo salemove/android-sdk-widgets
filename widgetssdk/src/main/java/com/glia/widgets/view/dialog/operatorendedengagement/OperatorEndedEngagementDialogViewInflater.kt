@@ -17,10 +17,10 @@ internal class OperatorEndedEngagementDialogViewInflater(
         configuration: AlertDialogConfiguration,
         payload: DialogPayload.OperatorEndedEngagement
     ) {
-        val theme = configuration.theme
+        val alertTheme = configuration.theme.alertTheme
 
-        setupText(binding.messageTv, payload.message, theme.message, configuration.properties.typeface)
-        setupButton(binding.button, payload.buttonText, theme.positiveButton, configuration.properties.typeface, payload.buttonClickListener)
+        setupText(binding.messageTv, payload.message, alertTheme?.message, configuration.properties.typeface)
+        setupButton(binding.button, payload.buttonText, alertTheme?.positiveButton, configuration.properties.typeface, payload.buttonClickListener)
     }
 
 }

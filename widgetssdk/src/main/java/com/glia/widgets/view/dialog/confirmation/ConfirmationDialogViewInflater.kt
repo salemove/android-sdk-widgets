@@ -6,6 +6,7 @@ import androidx.core.view.isVisible
 import com.glia.widgets.helper.setText
 import com.glia.widgets.view.dialog.base.DialogPayload
 import com.glia.widgets.view.dialog.base.DialogViewInflater
+import com.glia.widgets.view.unifiedui.applyWhiteLabel
 import com.glia.widgets.view.unifiedui.theme.AlertDialogConfiguration
 
 internal abstract class BaseConfirmationDialogViewInflater<T : BaseConfirmationDialogViewBinding<*>>(
@@ -16,10 +17,10 @@ internal abstract class BaseConfirmationDialogViewInflater<T : BaseConfirmationD
     override fun setup(binding: T, configuration: AlertDialogConfiguration, payload: DialogPayload.Confirmation) {
         val theme = configuration.theme
 
-        binding.logoContainer.isGone = configuration.properties.whiteLabel ?: false
+        binding.logoContainer.applyWhiteLabel(theme.isWhiteLabel)
         binding.poweredByTv.setText(payload.poweredByText)
 
-        setupText(binding.messageTv, payload.message, theme.message, configuration.properties.typeface)
+        setupText(binding.messageTv, payload.message, theme.alertTheme?.message, configuration.properties.typeface)
     }
 }
 
@@ -30,32 +31,32 @@ internal open class DefaultConfirmationDialogViewInflater<T : DefaultConfirmatio
 ) : BaseConfirmationDialogViewInflater<T>(binding, themeWrapper, payload) {
     final override fun setup(binding: T, configuration: AlertDialogConfiguration, payload: DialogPayload.Confirmation) {
         super.setup(binding, configuration, payload)
-        val theme = configuration.theme
+        val alertTheme = configuration.theme.alertTheme
         setupButton(
             binding.link1Button,
             payload.link1,
-            theme.linkButton,
+            alertTheme?.linkButton,
             configuration.properties.typeface,
             payload.link1ClickListener
         )
         setupButton(
             binding.link2Button,
             payload.link2,
-            theme.linkButton,
+            alertTheme?.linkButton,
             configuration.properties.typeface,
             payload.link2ClickListener
         )
         setupButton(
             binding.positiveButton,
             payload.positiveButtonText,
-            theme.positiveButton,
+            alertTheme?.positiveButton,
             configuration.properties.typeface,
             payload.positiveButtonClickListener
         )
         setupButton(
             binding.negativeButton,
             payload.negativeButtonText,
-            theme.negativeButton,
+            alertTheme?.negativeButton,
             configuration.properties.typeface,
             payload.negativeButtonClickListener
         )
@@ -84,18 +85,18 @@ internal open class DefaultReversedConfirmationDialogViewInflater<T : DefaultRev
 ) : BaseConfirmationDialogViewInflater<T>(binding, themeWrapper, payload) {
     final override fun setup(binding: T, configuration: AlertDialogConfiguration, payload: DialogPayload.Confirmation) {
         super.setup(binding, configuration, payload)
-        val theme = configuration.theme
+        val alertTheme = configuration.theme.alertTheme
         setupButton(
             binding.positiveButton,
             payload.positiveButtonText,
-            theme.negativeButton,// Since buttons are reversed, the positive button is actually GliaNegativeButton and should use NegativeButton theming
+            alertTheme?.negativeButton,// Since buttons are reversed, the positive button is actually GliaNegativeButton and should use NegativeButton theming
             configuration.properties.typeface,
             payload.positiveButtonClickListener
         )
         setupButton(
             binding.negativeButton,
             payload.negativeButtonText,
-            theme.positiveButton,// Since buttons are reversed, the positive button is actually GliaNegativeButton and should use NegativeButton theming
+            alertTheme?.positiveButton,// Since buttons are reversed, the positive button is actually GliaNegativeButton and should use NegativeButton theming
             configuration.properties.typeface,
             payload.negativeButtonClickListener
         )

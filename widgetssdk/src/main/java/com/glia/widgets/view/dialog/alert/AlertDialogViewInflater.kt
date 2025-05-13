@@ -18,10 +18,10 @@ internal class AlertDialogViewInflater(
     payload
 ) {
     override fun setup(binding: AlertDialogViewBinding, configuration: AlertDialogConfiguration, payload: DialogPayload.AlertDialog) {
-        val theme = configuration.theme
+        val alertTheme = configuration.theme.alertTheme
 
-        setupText(binding.messageTv, payload.message, theme.message, configuration.properties.typeface)
-        binding.closeBtn.applyImageColorTheme(theme.closeButtonColor)
+        setupText(binding.messageTv, payload.message, alertTheme?.message, configuration.properties.typeface)
+        binding.closeBtn.applyImageColorTheme(alertTheme?.closeButtonColor)
         binding.closeBtn.isVisible = payload.buttonVisible
         payload.buttonClickListener?.also(binding.closeBtn::setOnClickListener)
         payload.buttonDescription?.also { binding.closeBtn.setContentDescription(it) }

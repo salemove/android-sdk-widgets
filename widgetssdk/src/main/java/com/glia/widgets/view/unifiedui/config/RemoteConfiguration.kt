@@ -51,7 +51,10 @@ internal data class RemoteConfiguration(
     val webBrowserRemoteConfig: WebBrowserRemoteConfig?,
 
     @SerializedName("entryWidget")
-    val entryWidgetRemoteConfig: EntryWidgetRemoteConfig?
+    val entryWidgetRemoteConfig: EntryWidgetRemoteConfig?,
+
+    @SerializedName("isWhiteLabel")
+    val isWhiteLabel: Boolean?
 ) {
     fun toUnifiedTheme(): UnifiedTheme? {
         val defaultTheme = DefaultTheme(globalColorsConfig?.toColorPallet())
@@ -68,7 +71,8 @@ internal data class RemoteConfiguration(
                 ?.toSecureMessagingConfirmationScreenTheme(),
             snackBarTheme = snackBarRemoteConfig?.toSnackBarTheme(),
             webBrowserTheme = webBrowserRemoteConfig?.toWebBrowserTheme(),
-            entryWidgetTheme = entryWidgetRemoteConfig?.toEntryWidgetTheme()
+            entryWidgetTheme = entryWidgetRemoteConfig?.toEntryWidgetTheme(),
+            isWhiteLabel = isWhiteLabel
         )
 
         return defaultTheme merge unifiedTheme

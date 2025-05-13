@@ -218,9 +218,13 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
         }
 
         /**
+         * Screen sharing is deprecated. Please use Live Observation instead:
+         * https://docs.glia.com/glia-mobile/docs/android-live-observation
+         *
          * @param screenSharingMode - Screen sharing mode, either UNBOUND(default) or APP_BOUND
          * @return Builder instance
          */
+        @Deprecated("Please use Live Observation instead")
         fun setScreenSharingMode(screenSharingMode: ScreenSharing.Mode?): Builder {
             this.screenSharingMode = screenSharingMode
             return this

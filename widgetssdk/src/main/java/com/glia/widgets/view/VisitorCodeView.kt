@@ -40,6 +40,7 @@ import com.glia.widgets.view.unifiedui.applyImageColorTheme
 import com.glia.widgets.view.unifiedui.applyLayerTheme
 import com.glia.widgets.view.unifiedui.applyProgressColorTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
+import com.glia.widgets.view.unifiedui.applyWhiteLabel
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import java.util.concurrent.Executor
 
@@ -209,6 +210,7 @@ internal class VisitorCodeView internal constructor(
             closeButton.applyImageColorTheme(this?.visitorCodeTheme?.closeButtonColor)
             refreshButton.applyButtonTheme(this?.visitorCodeTheme?.refreshButton)
         }
+        logoContainer.applyWhiteLabel(theme?.isWhiteLabel)
     }
 
     private fun applyRuntimeThemeConfig(theme: UiTheme?) {

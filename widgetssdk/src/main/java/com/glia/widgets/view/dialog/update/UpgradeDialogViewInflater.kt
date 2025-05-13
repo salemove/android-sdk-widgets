@@ -6,6 +6,7 @@ import com.glia.widgets.helper.setText
 import com.glia.widgets.view.dialog.base.DialogPayload
 import com.glia.widgets.view.dialog.base.DialogViewInflater
 import com.glia.widgets.view.unifiedui.applyImageColorTheme
+import com.glia.widgets.view.unifiedui.applyWhiteLabel
 import com.glia.widgets.view.unifiedui.theme.AlertDialogConfiguration
 
 internal open class BaseUpgradeDialogViewInflater<T : BaseUpgradeDialogViewBinding<*>>(
@@ -16,26 +17,26 @@ internal open class BaseUpgradeDialogViewInflater<T : BaseUpgradeDialogViewBindi
     final override fun setup(binding: T, configuration: AlertDialogConfiguration, payload: DialogPayload.Upgrade) {
         val theme = configuration.theme
 
-        binding.logoContainer.isGone = configuration.properties.whiteLabel ?: false
+        binding.logoContainer.applyWhiteLabel(theme.isWhiteLabel)
         binding.poweredByTv.setText(payload.poweredByText)
 
         setupButton(
             binding.positiveBtn,
             payload.positiveButtonText,
-            theme.positiveButton,
+            theme.alertTheme?.positiveButton,
             configuration.properties.typeface,
             payload.positiveButtonClickListener
         )
         setupButton(
             binding.negativeBtn,
             payload.negativeButtonText,
-            theme.negativeButton,
+            theme.alertTheme?.negativeButton,
             configuration.properties.typeface,
             payload.negativeButtonClickListener
         )
         binding.titleIcon.apply {
             setImageResource(payload.iconRes)
-            applyImageColorTheme(theme.titleImageColor)
+            applyImageColorTheme(theme.alertTheme?.titleImageColor)
         }
     }
 }

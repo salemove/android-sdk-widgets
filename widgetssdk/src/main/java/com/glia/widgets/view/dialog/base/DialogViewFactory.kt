@@ -24,11 +24,11 @@ import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 
 internal class DialogViewFactory(context: Context, uiTheme: UiTheme, unifiedTheme: UnifiedTheme?) {
     private val configuration: AlertDialogConfiguration = uiTheme.alertTheme(context).run {
-        copy(theme = theme nullSafeMerge unifiedTheme?.alertTheme)
+        copy(theme = theme nullSafeMerge unifiedTheme)
     }
 
     private val layoutInflater: LayoutInflater = LayoutInflater.from(context)
-    private val isVerticalAxis: Boolean = configuration.theme.isVerticalAxis == true
+    private val isVerticalAxis: Boolean = configuration.theme.alertTheme?.isVerticalAxis == true
 
     fun createView(type: DialogType): View = getInflater(type).view
 

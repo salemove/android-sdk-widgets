@@ -17,6 +17,7 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.core.view.isGone
 import com.glia.widgets.R
 import com.glia.widgets.helper.applyShadow
 import com.glia.widgets.helper.colorForState
@@ -468,4 +469,8 @@ internal fun GliaSurveyOptionButton.applyOptionButtonTheme(theme: OptionButtonTh
             null
         )
     )
+}
+
+internal fun View.applyWhiteLabel(isWhiteLabel: Boolean?) {
+    isWhiteLabel?.let { isGone = it }
 }

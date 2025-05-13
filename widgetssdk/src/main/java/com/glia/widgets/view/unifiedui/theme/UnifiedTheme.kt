@@ -24,7 +24,8 @@ internal data class UnifiedTheme(
     val secureMessagingConfirmationScreenTheme: SecureMessagingConfirmationScreenTheme? = null,
     val snackBarTheme: SnackBarTheme? = null,
     val webBrowserTheme: WebBrowserTheme? = null,
-    val entryWidgetTheme: EntryWidgetTheme? = null
+    val entryWidgetTheme: EntryWidgetTheme? = null,
+    val isWhiteLabel: Boolean? = null
 ) : Mergeable<UnifiedTheme> {
     override fun merge(other: UnifiedTheme): UnifiedTheme = UnifiedTheme(
         alertTheme = alertTheme merge other.alertTheme,
@@ -37,7 +38,8 @@ internal data class UnifiedTheme(
         secureMessagingConfirmationScreenTheme = secureMessagingConfirmationScreenTheme merge other.secureMessagingConfirmationScreenTheme,
         snackBarTheme = snackBarTheme merge other.snackBarTheme,
         webBrowserTheme = webBrowserTheme merge other.webBrowserTheme,
-        entryWidgetTheme = entryWidgetTheme merge other.entryWidgetTheme
+        entryWidgetTheme = entryWidgetTheme merge other.entryWidgetTheme,
+        isWhiteLabel = isWhiteLabel merge other.isWhiteLabel
     )
 
 }

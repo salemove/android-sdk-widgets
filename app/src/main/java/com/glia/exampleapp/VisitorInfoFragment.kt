@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.GliaWidgetsException
 import com.glia.widgets.callbacks.OnError
-import com.glia.widgets.callbacks.OnSuccess
+import com.glia.widgets.callbacks.OnResult
 import com.glia.widgets.callbacks.OnComplete
 import com.glia.widgets.visitor.VisitorInfo
 import com.glia.widgets.visitor.VisitorInfoUpdateRequest
@@ -118,16 +118,16 @@ class VisitorInfoFragment : Fragment() {
 
     private fun getVisitorInfo() {
         saveButton.text = getString(R.string.visitor_info_loading)
-        val onSuccess: OnSuccess<VisitorInfo?> = OnSuccess { result ->
+        val onResult: OnResult<VisitorInfo?> = OnResult { result ->
             view?.post {
                 saveButton.text = getString(R.string.visitor_info_save)
                 result?.let { showVisitorInfo(it) }
             }
         }
 
-        val onError = OnError { exception -> exception?.let { showError(it) } }
+        val onError = OnError { exception -> showError(exception) }
 
-        GliaWidgets.getVisitorInfo(onSuccess, onError)
+        GliaWidgets.getVisitorInfo(onResult, onError)
     }
 
     private fun saveVisitorInfo(visitorInfo: VisitorInfoUpdateRequest) {
@@ -142,7 +142,7 @@ class VisitorInfoFragment : Fragment() {
 
         val onError = OnError { exception ->
             saveButton.text = getString(R.string.visitor_info_save)
-            exception?.let { showError(it) }
+            showError(exception)
         }
         GliaWidgets.updateVisitorInfo(visitorInfo, onComplete, onError)
     }

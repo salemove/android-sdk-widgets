@@ -85,9 +85,9 @@ internal class GliaCoreImpl : GliaCore {
         Glia.getChatHistory { messages, exception -> callback.onResult(messages?.toList(), exception) }
     }
 
-    override fun getQueues(onSuccess: (Array<Queue>) -> Unit, onError: (GliaException?) -> Unit) {
+    override fun getQueues(onResult: (Array<Queue>) -> Unit, onError: (GliaException?) -> Unit) {
         Glia.getQueues { queues, gliaException ->
-            queues?.also { onSuccess(it) } ?: onError(gliaException)
+            queues?.also { onResult(it) } ?: onError(gliaException)
         }
     }
 

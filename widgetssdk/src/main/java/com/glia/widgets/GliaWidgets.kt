@@ -7,7 +7,7 @@ import com.glia.androidsdk.RequestCallback
 import com.glia.widgets.authentication.Authentication
 import com.glia.widgets.callbacks.OnComplete
 import com.glia.widgets.callbacks.OnError
-import com.glia.widgets.callbacks.OnSuccess
+import com.glia.widgets.callbacks.OnResult
 import com.glia.widgets.chat.adapter.CustomCardAdapter
 import com.glia.widgets.chat.adapter.WebViewCardAdapter
 import com.glia.widgets.callvisualizer.CallVisualizer
@@ -210,19 +210,19 @@ object GliaWidgets {
     /**
      * Fetches all queues and their information for the current site.
      *
-     * @param onSuccess Callback invoked when the queues are successfully retrieved.
+     * @param onResult Callback invoked when the queues are successfully retrieved.
      *                  Provides a collection of [Queue] objects or `null` if no queues are available.
      * @param onError Callback invoked when an error occurs during the retrieval process.
      *                Provides a [GliaWidgetsException] describing the error.
      */
     @JvmStatic
     fun getQueues(
-        onSuccess: OnSuccess<Collection<Queue>?>,
+        onResult: OnResult<Collection<Queue>?>,
         onError: OnError
     ) {
         glia().getQueues(
-            onSuccess = { queues ->
-                onSuccess.onSuccess(queues.toWidgetsType())
+            onResult = { queues ->
+                onResult.onResult(queues.toWidgetsType())
             },
             onError = {
                 onError.onError(it.toWidgetsType("Failed to get queues"))
@@ -334,14 +334,14 @@ object GliaWidgets {
     /**
      * Fetches the visitor's information
      *
-     * @param onSuccess Callback invoked when the visitor information is successfully retrieved.
+     * @param onResult Callback invoked when the visitor information is successfully retrieved.
      *                  Provides the retrieved [VisitorInfo] or `null` if no information is available.
      * @param onError Callback invoked when an error occurs during the retrieval process.
      *                Provides a [GliaWidgetsException] describing the error.
      */
     @JvmStatic
     fun getVisitorInfo(
-        onSuccess: OnSuccess<VisitorInfo?>,
+        onResult: OnResult<VisitorInfo?>,
         onError: OnError
     ) {
         val callback =
@@ -350,7 +350,7 @@ object GliaWidgets {
                 if (error != null || visitorInfo == null) {
                     onError.onError(error.toWidgetsType("Failed to get visitor info"))
                 } else {
-                    onSuccess.onSuccess(VisitorInfo(visitorInfo))
+                    onResult.onResult(VisitorInfo(visitorInfo))
                 }
             }
         glia().getVisitorInfo(callback)

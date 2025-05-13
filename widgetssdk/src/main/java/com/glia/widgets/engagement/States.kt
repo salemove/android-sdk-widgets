@@ -46,7 +46,7 @@ internal enum class EndedBy {
     VISITOR
 }
 
-internal typealias FetchSurveyCallback = (onSuccess: (Survey) -> Unit, onError: () -> Unit) -> Unit
+internal typealias FetchSurveyCallback = (onResult: (Survey) -> Unit, onError: () -> Unit) -> Unit
 
 internal sealed interface EngagementUpdateState {
     data object Transferring : EngagementUpdateState

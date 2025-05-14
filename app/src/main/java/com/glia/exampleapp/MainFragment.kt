@@ -28,7 +28,6 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.preference.PreferenceManager
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.Glia
-import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.fcm.GliaPushMessage
 import com.glia.androidsdk.omnibrowse.Omnibrowse
 import com.glia.exampleapp.ExampleAppConfigManager.createDefaultConfig
@@ -540,7 +539,7 @@ class MainFragment : Fragment() {
                 view?.post { initMenu() }
             },
             onError = { error ->
-                error?.let { showToast(it.message.toString()) }
+                showToast(error.message.toString())
             }
         )
     }

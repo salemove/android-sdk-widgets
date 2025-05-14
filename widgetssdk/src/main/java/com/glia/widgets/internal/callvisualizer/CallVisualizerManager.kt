@@ -3,6 +3,7 @@ package com.glia.widgets.internal.callvisualizer
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
+import com.glia.widgets.callbacks.OnComplete
 import com.glia.widgets.callvisualizer.controller.CallVisualizerContract
 import com.glia.widgets.callvisualizer.CallVisualizer
 import com.glia.widgets.internal.callvisualizer.domain.VisitorCodeViewBuilderUseCase
@@ -26,12 +27,12 @@ internal class CallVisualizerManager(
     }
 
     @SuppressLint("CheckResult")
-    override fun onEngagementStart(runnable: Runnable) {
-        callVisualizerController.engagementStartFlow.unSafeSubscribe { runnable.run() }
+    override fun onEngagementStart(onComplete: OnComplete) {
+        callVisualizerController.engagementStartFlow.unSafeSubscribe { onComplete.onComplete() }
     }
 
     @SuppressLint("CheckResult")
-    override fun onEngagementEnd(runnable: Runnable) {
-        callVisualizerController.engagementEndFlow.unSafeSubscribe { runnable.run() }
+    override fun onEngagementEnd(onComplete: OnComplete) {
+        callVisualizerController.engagementEndFlow.unSafeSubscribe { onComplete.onComplete() }
     }
 }

@@ -156,22 +156,22 @@ object GliaWidgets {
     @JvmStatic
     @Synchronized
     fun init(gliaWidgetsConfig: GliaWidgetsConfig,
-             onComplete: OnComplete? = null,
-             onError: OnError? = null) {
+             onComplete: OnComplete,
+             onError: OnError) {
         Logger.i(TAG, "Initialize Glia Widgets SDK")
         try {
             val callback: RequestCallback<Boolean?> =
                 RequestCallback { _, exception ->
                     if (exception == null) {
                         glia().isInitialized = true
-                        onComplete?.onComplete()
+                        onComplete.onComplete()
                     } else {
                         Logger.i(TAG, "Glia Widgets SDK initialization failed")
                         val invalidInputError = GliaWidgetsException(
                             "Failed to initialise Glia Widgets SDK. Please check credentials.",
                             GliaWidgetsException.Cause.INVALID_INPUT
                         )
-                        onError?.onError(invalidInputError)
+                        onError.onError(invalidInputError)
                     }
                 }
 
@@ -181,7 +181,7 @@ object GliaWidgets {
         } catch (exception: Exception) {
             if (exception is GliaException) {
                 val mappedException = exception.toWidgetsType()
-                onError?.onError(mappedException)
+                onError.onError(mappedException)
                 return
             }
 
@@ -190,7 +190,7 @@ object GliaWidgets {
                 "Internal SDK error",
                 GliaWidgetsException.Cause.INTERNAL_ERROR
             )
-            onError?.onError(internalError)
+            onError.onError(internalError)
         }
     }
 
@@ -217,15 +217,15 @@ object GliaWidgets {
      */
     @JvmStatic
     fun getQueues(
-        onResult: OnResult<Collection<Queue>?>,
-        onError: OnError
+        onResult: OnResult<Collection<Queue>>,
+        onError: OnError? = null
     ) {
         glia().getQueues(
             onResult = { queues ->
                 onResult.onResult(queues.toWidgetsType())
             },
             onError = {
-                onError.onError(it.toWidgetsType("Failed to get queues"))
+                onError?.onError(it.toWidgetsType("Failed to get queues"))
             }
         )
     }
@@ -341,14 +341,14 @@ object GliaWidgets {
      */
     @JvmStatic
     fun getVisitorInfo(
-        onResult: OnResult<VisitorInfo?>,
-        onError: OnError
+        onResult: OnResult<VisitorInfo>,
+        onError: OnError? = null
     ) {
         val callback =
             RequestCallback { visitorInfo: com.glia.androidsdk.visitor.VisitorInfo?,
                               error: GliaException? ->
                 if (error != null || visitorInfo == null) {
-                    onError.onError(error.toWidgetsType("Failed to get visitor info"))
+                    onError?.onError(error.toWidgetsType("Failed to get visitor info"))
                 } else {
                     onResult.onResult(VisitorInfo(visitorInfo))
                 }

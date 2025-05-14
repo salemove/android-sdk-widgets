@@ -7,11 +7,11 @@ import junit.framework.TestCase.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import org.mockito.Mockito.any
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.verify
+import org.mockito.kotlin.any
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class AuthenticationManagerTest {
@@ -36,6 +36,19 @@ class AuthenticationManagerTest {
         val callback = mock<RequestCallback<Void>>()
 
         coreAuthentication.authenticate(jwtToken, externalAccessToken, callback)
+
+        verify(widgetAuthentication).authenticate(eq(jwtToken), eq(externalAccessToken), any(), any())
+    }
+
+    @Test
+    fun toCoreType_authenticateWithoutCallback_callsAuthenticateOnWidgetAuthentication() {
+        val widgetAuthentication = mock<AuthenticationManager>()
+        val coreAuthentication = widgetAuthentication.toCoreType()
+
+        val jwtToken = "validToken"
+        val externalAccessToken = "externalToken"
+
+        coreAuthentication.authenticate(jwtToken, externalAccessToken, null)
 
         verify(widgetAuthentication).authenticate(eq(jwtToken), eq(externalAccessToken), any(), any())
     }
@@ -68,6 +81,16 @@ class AuthenticationManagerTest {
     }
 
     @Test
+    fun toCoreType_deauthenticateWithoutCallback_callsDeauthenticateOnWidgetAuthentication() {
+        val widgetAuthentication = mock<AuthenticationManager>()
+        val coreAuthentication = widgetAuthentication.toCoreType()
+
+        coreAuthentication.deauthenticate(null)
+
+        verify(widgetAuthentication).deauthenticate(any(), any())
+    }
+
+    @Test
     fun toCoreType_isAuthenticated_returnsCorrectValue() {
         val widgetAuthentication = mock<AuthenticationManager>()
         whenever(widgetAuthentication.isAuthenticated).thenReturn(true)
@@ -87,6 +110,19 @@ class AuthenticationManagerTest {
         val callback = mock<RequestCallback<Void>>()
 
         coreAuthentication.refresh(jwtToken, externalAccessToken, callback)
+
+        verify(widgetAuthentication).refresh(eq(jwtToken), eq(externalAccessToken), any(), any())
+    }
+
+    @Test
+    fun toCoreType_refreshWithoutCallback_callsRefreshOnWidgetAuthentication() {
+        val widgetAuthentication = mock<AuthenticationManager>()
+        val coreAuthentication = widgetAuthentication.toCoreType()
+
+        val jwtToken = "validToken"
+        val externalAccessToken = "externalToken"
+
+        coreAuthentication.refresh(jwtToken, externalAccessToken, null)
 
         verify(widgetAuthentication).refresh(eq(jwtToken), eq(externalAccessToken), any(), any())
     }

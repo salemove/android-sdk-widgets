@@ -13,6 +13,6 @@ fun interface OnComplete {
     fun onComplete()
 }
 
-internal fun RequestCallback<Void>.toOnComplete(): OnComplete {
-    return OnComplete { onResult(null, null) }
+internal fun RequestCallback<Void>?.toOnComplete(): OnComplete {
+    return OnComplete { this?.onResult(null, null) }
 }

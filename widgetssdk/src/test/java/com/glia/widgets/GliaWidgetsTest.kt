@@ -22,11 +22,11 @@ import org.junit.ClassRule
 import org.junit.Test
 import org.junit.rules.TestRule
 import org.junit.runner.RunWith
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.never
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner

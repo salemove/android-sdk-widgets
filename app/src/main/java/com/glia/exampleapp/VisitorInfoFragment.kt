@@ -118,10 +118,10 @@ class VisitorInfoFragment : Fragment() {
 
     private fun getVisitorInfo() {
         saveButton.text = getString(R.string.visitor_info_loading)
-        val onResult: OnResult<VisitorInfo?> = OnResult { result ->
+        val onResult: OnResult<VisitorInfo> = OnResult { result ->
             view?.post {
                 saveButton.text = getString(R.string.visitor_info_save)
-                result?.let { showVisitorInfo(it) }
+                showVisitorInfo(result)
             }
         }
 

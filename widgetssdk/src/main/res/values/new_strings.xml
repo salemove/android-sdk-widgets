@@ -211,9 +211,9 @@
     <string name="engagement_confirm_title">Before We Continue</string>
     <string name="engagement_confirm_message">Please allow our representative to view this application screen for improved support.</string>
     <string name="engagement_confirm_link1_text">Terms and Conditions</string>
-    <string name="engagement_confirm_link1_url"/>
+    <string name="engagement_confirm_link1_url" />
     <string name="engagement_confirm_link2_text">Privacy Policies</string>
-    <string name="engagement_confirm_link2_url"/>
+    <string name="engagement_confirm_link2_url" />
     <string name="live_observation_indicator_message">Your app screen is visible to the operator.</string>
     <string name="engagement_incoming_request_timed_out_message">The engagement request is timed out.</string>
 
@@ -245,8 +245,10 @@
     <string name="entry_widget_call_visualizer_button_label">Call Visualizer</string>
     <string name="entry_widget_call_visualizer_description">You are already in contact with the support team</string>
 
-<!--    Push Notifications-->
-    <string name="push_notifications_alert_title">Allow Push Notifications</string>
-    <string name="push_notifications_alert_message">Please allow push notifications to receive new messages alerts.</string>
+    <!--    Push Notifications-->
+    <string name="push_notifications_alert_title">Stay In Touch</string>
+    <string name="push_notifications_alert_message">Allow push notifications so we can message you (and return your messages) in the app.</string>
+    <string name="push_notifications_alert_button_positive">Allow</string>
+    <string name="push_notifications_alert_button_negative">Not right now</string>
 
 </resources>

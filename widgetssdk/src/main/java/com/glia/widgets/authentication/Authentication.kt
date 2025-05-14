@@ -36,8 +36,8 @@ interface Authentication {
     fun authenticate(
         jwtToken: String,
         externalAccessToken: String?,
-        onComplete: OnComplete?,
-        onError: OnError?
+        onComplete: OnComplete,
+        onError: OnError
     )
 
     /**
@@ -52,8 +52,8 @@ interface Authentication {
      * <br></br> [GliaWidgetsException.Cause.AUTHENTICATION_ERROR] - when authentication fails
      */
     fun deauthenticate(
-        onComplete: OnComplete?,
-        onError: OnError?
+        onComplete: OnComplete,
+        onError: OnError
     )
 
     /**
@@ -81,8 +81,8 @@ interface Authentication {
     fun refresh(
         jwtToken: String,
         externalAccessToken: String?,
-        onComplete: OnComplete?,
-        onError: OnError?
+        onComplete: OnComplete,
+        onError: OnError
     )
 
     /**

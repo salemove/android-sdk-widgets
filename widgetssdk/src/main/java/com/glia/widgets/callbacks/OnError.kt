@@ -16,6 +16,6 @@ fun interface OnError {
     fun onError(exception: GliaWidgetsException)
 }
 
-internal fun RequestCallback<Void>.toOnError(): OnError {
-    return OnError { onResult(null, it.toCoreType()) }
+internal fun RequestCallback<Void>?.toOnError(): OnError {
+    return OnError { this?.onResult(null, it.toCoreType()) }
 }

@@ -30,8 +30,8 @@ internal class AuthenticationManager(
     override fun authenticate(
         jwtToken: String,
         externalAccessToken: String?,
-        onComplete: OnComplete?,
-        onError: OnError?
+        onComplete: OnComplete,
+        onError: OnError
     ) {
         onAuthenticationRequestedCallback()
         Dependencies.destroyControllersAndResetQueueing()
@@ -39,19 +39,19 @@ internal class AuthenticationManager(
         Logger.i(TAG, "Authenticate. Is external access token used: ${externalAccessToken != null}")
         authentication.authenticate(jwtToken, externalAccessToken) { _, gliaException ->
             if (gliaException != null) {
-                onError?.onError(gliaException.toWidgetsType())
+                onError.onError(gliaException.toWidgetsType())
             }
             //Here we need to subscribe to secure conversations repository to get the data for authenticated visitors
             repositoryFactory.secureConversationsRepository.subscribe()
 
-            onComplete?.onComplete()
+            onComplete.onComplete()
 
         }
     }
 
     override fun deauthenticate(
-        onComplete: OnComplete?,
-        onError: OnError?
+        onComplete: OnComplete,
+        onError: OnError
     ) {
         Logger.i(TAG, "Unauthenticate")
         //Need to end engagement before it's done on the core side to prevent unexpected behavior
@@ -63,9 +63,9 @@ internal class AuthenticationManager(
 
         authentication.deauthenticate { _, gliaException ->
             if (gliaException != null) {
-                onError?.onError(gliaException.toWidgetsType())
+                onError.onError(gliaException.toWidgetsType())
             }
-            onComplete?.onComplete()
+            onComplete.onComplete()
         }
     }
 
@@ -74,16 +74,16 @@ internal class AuthenticationManager(
 
     override fun refresh(jwtToken: String,
                          externalAccessToken: String?,
-                         onComplete: OnComplete?,
-                         onError: OnError?
+                         onComplete: OnComplete,
+                         onError: OnError
     ) {
         Logger.i(TAG, "Refresh authentication")
         authentication.refresh(jwtToken, externalAccessToken) { _, gliaException ->
             if (gliaException != null) {
-                onError?.onError(gliaException.toWidgetsType())
+                onError.onError(gliaException.toWidgetsType())
             }
 
-            onComplete?.onComplete()
+            onComplete.onComplete()
         }
     }
 }
@@ -99,11 +99,11 @@ internal fun AuthenticationManager.toCoreType(): CoreAuthentication = this.let {
                 reportTokenInvalidError(authCallback)
                 return
             }
-            widgetAuthentication.authenticate(jwtToken, externalAccessToken, authCallback?.toOnComplete(), authCallback?.toOnError())
+            widgetAuthentication.authenticate(jwtToken, externalAccessToken, authCallback.toOnComplete(), authCallback.toOnError())
         }
 
         override fun deauthenticate(authCallback: RequestCallback<Void>?) {
-            widgetAuthentication.deauthenticate(authCallback?.toOnComplete(), authCallback?.toOnError())
+            widgetAuthentication.deauthenticate(authCallback.toOnComplete(), authCallback.toOnError())
         }
 
         override fun isAuthenticated(): Boolean {
@@ -115,7 +115,7 @@ internal fun AuthenticationManager.toCoreType(): CoreAuthentication = this.let {
                 reportTokenInvalidError(authCallback)
                 return
             }
-            widgetAuthentication.refresh(jwtToken, externalAccessToken, authCallback?.toOnComplete(), authCallback?.toOnError())
+            widgetAuthentication.refresh(jwtToken, externalAccessToken, authCallback.toOnComplete(), authCallback.toOnError())
         }
 
         private fun reportTokenInvalidError(authCallback: RequestCallback<Void>?) {

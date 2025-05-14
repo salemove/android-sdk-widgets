@@ -12,10 +12,7 @@ import androidx.annotation.NonNull;
  * Screen sharing and video engagements are available for such calls via Call Visualizer.
  * <p>
  * For more information, see the <a href="https://docs.glia.com/glia-mobile/docs/android-widgets-call-visualizer">Call Visualizer guide</a>.
- *
- * @deprecated use {@link com.glia.widgets.callvisualizer.CallVisualizer}
  */
-@Deprecated(since = "3.1.0")
 public interface CallVisualizer {
     /**
      * Creates a VisitorCodeView component that can be integrated into the client application
@@ -54,9 +51,9 @@ public interface CallVisualizer {
     /**
      * Sets visitor context to the upcoming Call Visualizer engagement
      *
-     * @param visitorCodeContext is a visitor context asset ID
+     * @param visitorContextAssetId is a visitor context asset ID
      */
-    void addVisitorContext(@NonNull String visitorCodeContext);
+    void addVisitorContext(@NonNull String visitorContextAssetId);
 
     /**
      * Sets callback that will be called when Call Visualizer engagement is started.
@@ -64,7 +61,7 @@ public interface CallVisualizer {
      * Callback won't be triggered for engagement started before the callback has been set or the ongoing engagements.
      * Setting new callback will override the old one.
      *
-     * @param runnable The Runnable that will be executed on engagement start
+     * @param runnable The Runnable that will be executed on Call Visualizer engagement start
      */
     void onEngagementStart(@NonNull Runnable runnable);
 
@@ -74,7 +71,7 @@ public interface CallVisualizer {
      * Callback won't be triggered for engagement ended before the callback has been set.
      * Setting new callback will override the old one.
      *
-     * @param runnable The Runnable that will be executed on engagement end
+     * @param runnable The Runnable that will be executed on Call Visualizer engagement end
      */
     void onEngagementEnd(@NonNull Runnable runnable);
 

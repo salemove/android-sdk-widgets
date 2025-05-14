@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <!--    "network_security_config" is added to support GVA images for testing app-->
     <application
@@ -56,6 +57,11 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/ic_notification" />
+
+        <provider
+            android:name="com.glia.widgets.InitializationProvider"
+            android:authorities="${applicationId}.InitializationProvider"
+            tools:node="remove"/> <!-- Used the custom provider from the testing Application -->
 
         <provider
             android:name=".InitializationProvider"

@@ -108,11 +108,14 @@ object GliaWidgets {
     }
 
     /**
-     * Should be called when the application is starting in [Application].onCreate()
+     * This method is obsolete and no longer required.
+     * It is safe to remove calls to this method.
      *
      * @param application the application where it is initialized
      * @throws GliaWidgetsException with [GliaWidgetsException.Cause]
      */
+    @Deprecated("No longer required to call this method")
+    @JvmStatic
     @Synchronized
     fun onAppCreate(application: Application) {
         try {
@@ -515,7 +518,13 @@ object GliaWidgets {
 
     // More info about global Rx error handler:
     // https://github.com/ReactiveX/RxJava/wiki/What's-different-in-2.0#error-handling
-    private fun setupRxErrorHandler() {
+    internal fun setupRxErrorHandler() {
+        // Check if RxJava error handler is already set
+        if (RxJavaPlugins.getErrorHandler() != null) {
+            // RxJava error handler is already set by the application
+            return
+        }
+
         RxJavaPlugins.setErrorHandler { throwable: Throwable ->
             val error = (throwable as? UndeliverableException)?.cause ?: throwable
             when (error) {

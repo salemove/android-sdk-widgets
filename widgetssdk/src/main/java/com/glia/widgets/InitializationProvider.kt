@@ -5,13 +5,17 @@ import android.content.ContentProvider
 import android.content.ContentValues
 import android.database.Cursor
 import android.net.Uri
+import com.glia.widgets.di.Dependencies
 
 /**
  * @hide
  */
 open class InitializationProvider : ContentProvider() {
     override fun onCreate(): Boolean {
-        (context as? Application)?.let { GliaWidgets.onAppCreate(it) }
+        (context as? Application)?.let {
+            Dependencies.onAppCreate(it)
+            GliaWidgets.setupRxErrorHandler()
+        }
         return true
     }
 

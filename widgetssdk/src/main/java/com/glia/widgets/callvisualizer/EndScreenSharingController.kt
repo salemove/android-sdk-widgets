@@ -25,7 +25,7 @@ internal class EndScreenSharingController(private val endScreenSharingUseCase: E
     }
 
     override fun onActivityCreate() {
-        GliaWidgets.getCallVisualizer().onEngagementEnd { view?.finish() }
+        GliaWidgets.getCallVisualizer().onEngagementEnd(onComplete = { view?.finish() })
     }
 
     override fun onDestroy() {}

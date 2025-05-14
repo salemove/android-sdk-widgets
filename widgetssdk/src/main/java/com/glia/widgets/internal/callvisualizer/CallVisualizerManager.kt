@@ -31,8 +31,16 @@ internal class CallVisualizerManager(
         callVisualizerController.engagementStartFlow.unSafeSubscribe { onComplete.onComplete() }
     }
 
+    override fun onEngagementStart(runnable: Runnable) {
+        onEngagementStart(onComplete = { runnable.run() })
+    }
+
     @SuppressLint("CheckResult")
     override fun onEngagementEnd(onComplete: OnComplete) {
         callVisualizerController.engagementEndFlow.unSafeSubscribe { onComplete.onComplete() }
+    }
+
+    override fun onEngagementEnd(runnable: Runnable) {
+        onEngagementEnd(onComplete = { runnable.run() })
     }
 }

@@ -332,9 +332,9 @@ class MainFragment : Fragment() {
 
     private fun listenForCallVisualizerEngagements() {
         // If a Visitor Code is displayed as embedded view, then it should be hidden on engagement start
-        GliaWidgets.getCallVisualizer().onEngagementStart {
+        GliaWidgets.getCallVisualizer().onEngagementStart(onComplete = {
             activity?.runOnUiThread { removeVisitorCodeFromDedicatedView() }
-        }
+        })
     }
 
     private fun getQueueIdsFromPrefs(sharedPreferences: SharedPreferences): List<String> {

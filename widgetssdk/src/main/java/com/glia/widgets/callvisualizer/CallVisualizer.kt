@@ -12,7 +12,7 @@ import com.glia.widgets.callbacks.OnComplete
  *
  * For more information, see the [Call Visualizer guide](https://docs.glia.com/glia-mobile/docs/android-widgets-call-visualizer).
  */
-interface CallVisualizer {
+interface CallVisualizer: com.glia.widgets.core.callvisualizer.domain.CallVisualizer {
     /**
      * Creates a VisitorCodeView component that can be integrated into the client application
      *
@@ -22,7 +22,7 @@ interface CallVisualizer {
      * expired. During that time, the code can be used to initiate an engagement. Once the operator
      * has used the visitor code to initiate an engagement, the code will expire immediately.
      */
-    fun createVisitorCodeView(context: Context): View?
+    override fun createVisitorCodeView(context: Context): View?
 
     /**
      * Shows the visitor code in a dialog box on top of the current activity within your application.
@@ -31,14 +31,14 @@ interface CallVisualizer {
      *
      * Otherwise, it behaves the same way as [.createVisitorCodeView].
      */
-    fun showVisitorCodeDialog()
+    override fun showVisitorCodeDialog()
 
     /**
      * Sets visitor context to the upcoming Call Visualizer engagement
      *
-     * @param visitorContextAssetId is a visitor context asset ID
+     * @param visitorCodeContext is a visitor context asset ID
      */
-    fun addVisitorContext(visitorContextAssetId: String)
+    override fun addVisitorContext(visitorCodeContext: String)
 
     /**
      * Sets callback that will be called when Call Visualizer engagement is started.
@@ -56,7 +56,7 @@ interface CallVisualizer {
      * Callback won't be triggered for engagement ended before the callback has been set.
      * Setting new callback will override the old one.
      *
-     * @param onComplete The [OnComplete] callback that will be executed on Call Visualizer engagement end
+     * @param runnable The Runnable that will be executed on engagement end
      */
     fun onEngagementEnd(onComplete: OnComplete)
 }

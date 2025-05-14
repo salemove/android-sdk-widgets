@@ -8,12 +8,12 @@ import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
-import com.glia.widgets.internal.dialog.model.ConfirmationDialogLinks
-import com.glia.widgets.internal.dialog.model.Link
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.domain.MediaUpgradeOfferData
 import com.glia.widgets.helper.isOneWayVideo
 import com.glia.widgets.helper.isTwoWayVideo
+import com.glia.widgets.internal.dialog.model.ConfirmationDialogLinks
+import com.glia.widgets.internal.dialog.model.Link
 import com.glia.widgets.locale.LocaleProvider
 import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.locale.StringKey
@@ -294,8 +294,8 @@ internal object Dialogs {
         val payload = DialogPayload.Option(
             title = LocaleString(R.string.push_notifications_alert_title),
             message = LocaleString(R.string.push_notifications_alert_message),
-            positiveButtonText = allow,
-            negativeButtonText = cancel,
+            positiveButtonText = LocaleString(R.string.push_notifications_alert_button_positive),
+            negativeButtonText = LocaleString(R.string.push_notifications_alert_button_negative),
             poweredByText = poweredByText,
             positiveButtonClickListener = positiveButtonClickListener,
             negativeButtonClickListener = negativeButtonClickListener

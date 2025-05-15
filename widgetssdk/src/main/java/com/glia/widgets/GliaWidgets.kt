@@ -24,7 +24,7 @@ import com.glia.widgets.di.Dependencies.destroyControllersAndResetEngagementData
 import com.glia.widgets.di.Dependencies.engagementLauncher
 import com.glia.widgets.di.Dependencies.entryWidget
 import com.glia.widgets.di.Dependencies.getAuthenticationManager
-import com.glia.widgets.di.Dependencies.glia
+import com.glia.widgets.di.Dependencies.gliaCore
 import com.glia.widgets.di.Dependencies.gliaThemeManager
 import com.glia.widgets.di.Dependencies.liveObservation
 import com.glia.widgets.di.Dependencies.onSdkInit
@@ -66,6 +66,8 @@ object GliaWidgets {
     @JvmStatic
     val widgetsCoreSdkVersion: String
         get() = BuildConfig.GLIA_CORE_SDK_VERSION
+
+    private var isInitialized = false
 
     private var _customCardAdapter: CustomCardAdapter? = WebViewCardAdapter()
 
@@ -142,7 +144,7 @@ object GliaWidgets {
             onSdkInit(gliaWidgetsConfig)
             setupLoggingMetadata(gliaWidgetsConfig)
             gliaThemeManager.applyJsonConfig(gliaWidgetsConfig.uiJsonRemoteConfig)
-            glia().isInitialized = true
+            isInitialized = true
         } catch (gliaException: GliaException) {
             val gliaWidgetsException = gliaException.toWidgetsType()
             throw gliaWidgetsException
@@ -166,7 +168,7 @@ object GliaWidgets {
             val callback: RequestCallback<Boolean?> =
                 RequestCallback { _, exception ->
                     if (exception == null) {
-                        glia().isInitialized = true
+                        isInitialized = true
                         onComplete.onComplete()
                     } else {
                         Logger.i(TAG, "Glia Widgets SDK initialization failed")
@@ -207,7 +209,7 @@ object GliaWidgets {
      */
     @JvmStatic
     fun isInitialized(): Boolean {
-        return glia().isInitialized
+        return isInitialized
     }
 
     /**
@@ -223,7 +225,7 @@ object GliaWidgets {
         onResult: OnResult<Collection<Queue>>,
         onError: OnError? = null
     ) {
-        glia().getQueues(
+        gliaCore().getQueues(
             onResult = { queues ->
                 onResult.onResult(queues.toWidgetsType())
             },
@@ -264,7 +266,7 @@ object GliaWidgets {
     @Synchronized
     @JvmStatic
     fun getEntryWidget(queueIds: List<String>): EntryWidget {
-        if (!glia().isInitialized) {
+        if (!gliaCore().isInitialized) {
             Logger.e(TAG, "Attempt to get EntryWidget before SDK initialization")
         }
 
@@ -301,7 +303,7 @@ object GliaWidgets {
     ) {
         Logger.d(TAG, "onRequestPermissionsResult")
         try {
-            glia().onRequestPermissionsResult(requestCode, permissions, grantResults)
+            gliaCore().onRequestPermissionsResult(requestCode, permissions, grantResults)
         } catch (gliaException: GliaException) {
             throw gliaException.toWidgetsType()
         }
@@ -356,7 +358,7 @@ object GliaWidgets {
                     onResult.onResult(VisitorInfo(visitorInfo))
                 }
             }
-        glia().getVisitorInfo(callback)
+        gliaCore().getVisitorInfo(callback)
     }
 
     /**
@@ -381,7 +383,7 @@ object GliaWidgets {
                     onError.onError(error.toWidgetsType())
                 }
             }
-        glia().updateVisitorInfo(visitorInfoUpdateRequest.toCoreType(), updateCallback)
+        gliaCore().updateVisitorInfo(visitorInfoUpdateRequest.toCoreType(), updateCallback)
     }
 
     /**
@@ -399,7 +401,7 @@ object GliaWidgets {
             //and we don't need secure conversations data for un-authenticated visitors.
             repositoryFactory.secureConversationsRepository.unsubscribeAndResetData()
 
-            glia().clearVisitorSession()
+            gliaCore().clearVisitorSession()
         } catch (gliaException: GliaException) {
             throw gliaException.toWidgetsType()
         }
@@ -502,7 +504,7 @@ object GliaWidgets {
     }
 
     private fun setupQueueIds(queueIds: List<String>) {
-        glia().ensureInitialized()
+        gliaCore().ensureInitialized()
 
         configurationManager.setQueueIds(queueIds)
     }

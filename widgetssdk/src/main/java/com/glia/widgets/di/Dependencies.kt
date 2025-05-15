@@ -5,9 +5,9 @@ import android.os.Build
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
-import com.glia.androidsdk.Glia
 import com.glia.androidsdk.GliaConfig
 import com.glia.androidsdk.RequestCallback
+import com.glia.widgets.GliaWidgets
 import com.glia.widgets.GliaWidgetsConfig
 import com.glia.widgets.authentication.Authentication
 import com.glia.widgets.callvisualizer.CallVisualizerActivityWatcher
@@ -289,7 +289,7 @@ internal object Dependencies {
     }
 
     @JvmStatic
-    fun glia(): GliaCore {
+    fun gliaCore(): GliaCore {
         return gliaCore
     }
 
@@ -308,7 +308,7 @@ internal object Dependencies {
                 Lifecycle.Event.ON_PAUSE -> {
                     // Moved to on pause due to "IllegalStateException: Not allowed to start service app is in background"
                     // Related bug ticket MOB-4011
-                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S && Glia.isInitialized()) {
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S && GliaWidgets.isInitialized()) {
                         notificationManager.startNotificationRemovalService()
                     }
                 }

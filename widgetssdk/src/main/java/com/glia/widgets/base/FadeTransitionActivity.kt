@@ -55,12 +55,12 @@ open class FadeTransitionActivity : AppCompatActivity() {
         disposable?.dispose()
     }
 
-    override fun startActivity(intent: Intent?) {
+    override fun startActivity(intent: Intent) {
         super.startActivity(intent)
         overrideAnimationApi33()
     }
 
-    override fun startActivity(intent: Intent?, options: Bundle?) {
+    override fun startActivity(intent: Intent, options: Bundle?) {
         super.startActivity(intent, options)
         overrideAnimationApi33()
     }

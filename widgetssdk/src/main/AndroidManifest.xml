@@ -82,6 +82,14 @@
             android:launchMode="singleTask"
             android:theme="@style/Application.Glia.Translucent.Activity" />
 
+        <activity
+            android:name=".push.notifications.PushClickHandlerActivity"
+            android:launchMode="singleTask"
+            android:taskAffinity=""
+            android:excludeFromRecents="true"
+            android:theme="@style/Application.Glia.Translucent.Activity">
+        </activity>
+
         <service
             android:name=".core.chathead.ChatHeadService"
             android:enabled="true"

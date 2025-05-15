@@ -28,7 +28,11 @@ import java.util.Optional
 import java.util.function.Consumer
 
 internal class GliaCoreImpl : GliaCore {
-    override var isInitialized: Boolean = false
+    // GliaWidgets initialization process: The Core SDK is initialized first, followed by GliaWidgets.
+    // The `isInitialized` property represents the initialization state of the Core SDK (via `Glia.isInitialized()`).
+    // It is not connected to the Widgets-specific `GliaWidgets.isInitialized()` Boolean.
+    override val isInitialized: Boolean
+        get() = Glia.isInitialized()
 
     override val pushNotifications: PushNotifications
         get() = Glia.getPushNotifications()

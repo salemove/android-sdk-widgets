@@ -30,7 +30,7 @@ internal class EntryWidgetController @JvmOverloads constructor(
     private val hasOngoingSecureConversationUseCase: HasOngoingSecureConversationUseCase,
     private val engagementStateUseCase: EngagementStateUseCase,
     private val engagementTypeUseCase: EngagementTypeUseCase,
-    private val core: GliaCore,
+    private val gliaCore: GliaCore,
     private val engagementLauncher: EngagementLauncher,
     private val activityLauncher: ActivityLauncher,
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
@@ -76,7 +76,7 @@ internal class EntryWidgetController @JvmOverloads constructor(
     override fun setView(view: EntryWidgetContract.View, type: EntryWidgetContract.ViewType) {
         this.view = view
 
-        if (!core.isInitialized) {
+        if (!gliaCore.isInitialized) {
             showSdkNotInitializedState(type == EntryWidgetContract.ViewType.MESSAGING_LIVE_SUPPORT)
         }
 

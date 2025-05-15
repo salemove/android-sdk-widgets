@@ -12,7 +12,7 @@ import com.glia.widgets.chat.adapter.holder.WebViewViewHolder.MobileActionCallba
  *
  * @see WebViewViewHolder
  */
-internal class WebViewCardAdapter : CustomCardAdapter() {
+class WebViewCardAdapter : CustomCardAdapter() {
     private var mobileActionCallback: MobileActionCallback? = null
 
     /**
@@ -47,7 +47,15 @@ internal class WebViewCardAdapter : CustomCardAdapter() {
         return webViewViewHolder
     }
 
+    /**
+     * Companion object containing constants for the [WebViewCardAdapter].
+     * Provides the view type for the WebView card.
+     */
     companion object {
-        private const val WEB_VIEW_TYPE = 0
+
+        /**
+         * The view type for the WebView card.
+         */
+        const val WEB_VIEW_TYPE = 0
     }
 }

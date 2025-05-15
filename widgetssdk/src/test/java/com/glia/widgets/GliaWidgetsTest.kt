@@ -2,6 +2,7 @@ package com.glia.widgets
 
 import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.glia.androidsdk.Glia
 import com.glia.androidsdk.GliaConfig
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
@@ -50,10 +51,16 @@ class GliaWidgetsTest {
         Dependencies.controllerFactory = controllerFactory
         Dependencies.repositoryFactory = repositoryFactory
         Dependencies.localeProvider = mock()
+
+        // Reset the state before each test
+        GliaWidgets::class.java.getDeclaredField("isInitialized").apply {
+            isAccessible = true
+            set(null, false)
+        }
     }
 
     @Test
-    fun onSdkInit_setConfigToGliaCore_whenCalled() {
+    fun `init sets config to glia core when called`() {
         val siteApiKey = SiteApiKey("SiteApiId", "SiteApiSecret")
         val siteId = "SiteId"
         val region = "Region"
@@ -75,7 +82,9 @@ class GliaWidgetsTest {
         whenever(repositoryFactory.engagementRepository) doReturn engagementRepository
         val queueRepository = mock<QueueRepository>()
         whenever(repositoryFactory.queueRepository) doReturn queueRepository
+
         GliaWidgets.init(widgetsConfig)
+
         val captor = argumentCaptor<GliaConfig>()
         verify(gliaCore).init(captor.capture())
         verify(repositoryFactory).initialize()
@@ -85,10 +94,11 @@ class GliaWidgetsTest {
         Assert.assertEquals(siteId, gliaConfig.siteId)
         Assert.assertEquals(region, gliaConfig.region)
         Assert.assertEquals(applicationContext, gliaConfig.context)
+        Assert.assertTrue(GliaWidgets.isInitialized())
     }
 
     @Test
-    fun onSdkInit_setApiKey_whenDeprecatedSiteApiKeyIsUsed() {
+    fun `onSdkInit sets ApiKey when deprecated setSiteApiKey is used`() {
         val siteApiKey = CoreSiteApiKey("SiteApiId", "SiteApiSecret")
         val siteId = "SiteId"
         val region = "Region"
@@ -110,7 +120,9 @@ class GliaWidgetsTest {
         whenever(repositoryFactory.engagementRepository) doReturn engagementRepository
         val queueRepository = mock<QueueRepository>()
         whenever(repositoryFactory.queueRepository) doReturn queueRepository
+
         GliaWidgets.init(widgetsConfig)
+
         val captor = argumentCaptor<GliaConfig>()
         verify(gliaCore).init(captor.capture())
         val gliaConfig = captor.lastValue
@@ -139,6 +151,7 @@ class GliaWidgetsTest {
 
         verify(onComplete).onComplete()
         verify(onError, never()).onError(any())
+        Assert.assertTrue(GliaWidgets.isInitialized())
     }
 
     @Test
@@ -166,5 +179,47 @@ class GliaWidgetsTest {
             Assert.assertEquals(GliaWidgetsException.Cause.INVALID_INPUT, firstValue.gliaCause)
             Assert.assertEquals("Failed to initialise Glia Widgets SDK. Please check credentials.", firstValue.debugMessage)
         }
+    }
+
+    @Test
+    fun `isInitialized returns false before initialization`() {
+        Assert.assertFalse(Glia.isInitialized())
+        Assert.assertFalse(GliaWidgets.isInitialized())
+    }
+
+    @Test
+    fun `isInitialized returns false if initialization fails`() {
+        val siteApiKey = SiteApiKey("SiteApiId", "SiteApiSecret")
+        val widgetsConfig = GliaWidgetsConfig.Builder()
+            .setSiteApiKey(siteApiKey)
+            .build()
+        whenever(Dependencies.onSdkInit(widgetsConfig)).thenThrow(RuntimeException("Initialization failed"))
+
+        try {
+            GliaWidgets.init(widgetsConfig)
+        } catch (e: Exception) {
+            // Ignore exception
+        }
+
+        Assert.assertFalse(Glia.isInitialized())
+        Assert.assertFalse(GliaWidgets.isInitialized())
+    }
+
+    @Test
+    fun `isInitialized returns false if initialization with callbacks fails`() {
+        val siteApiKey = SiteApiKey("SiteApiId", "SiteApiSecret")
+        val widgetsConfig = GliaWidgetsConfig.Builder()
+            .setSiteApiKey(siteApiKey)
+            .build()
+        whenever(Dependencies.onSdkInit(widgetsConfig)).thenThrow(RuntimeException("Initialization failed"))
+
+        try {
+            GliaWidgets.init(widgetsConfig, mock(), mock())
+        } catch (e: Exception) {
+            // Ignore exception
+        }
+
+        Assert.assertFalse(Glia.isInitialized())
+        Assert.assertFalse(GliaWidgets.isInitialized())
     }
 }

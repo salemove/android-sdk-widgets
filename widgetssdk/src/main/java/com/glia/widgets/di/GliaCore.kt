@@ -26,7 +26,7 @@ import java.util.Optional
 import java.util.function.Consumer
 
 internal interface GliaCore {
-    var isInitialized: Boolean
+    val isInitialized: Boolean
     val pushNotifications: PushNotifications
     val currentEngagement: Optional<Engagement>
     val callVisualizer: Omnibrowse

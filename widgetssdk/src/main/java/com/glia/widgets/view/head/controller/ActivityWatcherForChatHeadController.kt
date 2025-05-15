@@ -1,6 +1,6 @@
 package com.glia.widgets.view.head.controller
 
-import com.glia.androidsdk.Glia
+import com.glia.widgets.GliaWidgets
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
 import com.glia.widgets.engagement.ScreenSharingState
@@ -88,7 +88,7 @@ internal class ActivityWatcherForChatHeadController(
 
         val viewName: String = gliaOrRootView?.javaClass?.simpleName.orEmpty()
         applicationChatHeadController.onResume(viewName)
-        if (Glia.isInitialized() && shouldShowAppBubble(viewName)) {
+        if (GliaWidgets.isInitialized() && shouldShowAppBubble(viewName)) {
             watcher.addChatHeadLayoutIfAbsent()
         }
     }

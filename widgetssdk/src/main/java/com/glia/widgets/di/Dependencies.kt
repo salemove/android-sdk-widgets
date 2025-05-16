@@ -48,12 +48,11 @@ import com.glia.widgets.permissions.ActivityWatcherForPermissionsRequest
 import com.glia.widgets.secureconversations.SecureConversations
 import com.glia.widgets.secureconversations.SecureConversationsImpl
 import com.glia.widgets.toCoreType
-import com.glia.widgets.view.dialog.ActivityWatcherForDialog
-import com.glia.widgets.view.dialog.DialogDispatcher
-import com.glia.widgets.view.dialog.DialogDispatcherImpl
+import com.glia.widgets.view.dialog.UiComponentsActivityWatcher
+import com.glia.widgets.view.dialog.UiComponentsDispatcher
+import com.glia.widgets.view.dialog.UiComponentsDispatcherImpl
 import com.glia.widgets.view.head.ActivityWatcherForChatHead
 import com.glia.widgets.view.head.ChatHeadContract
-import com.glia.widgets.view.snackbar.ActivityWatcherForSnackbar
 import com.glia.widgets.view.snackbar.liveobservation.ActivityWatcherForLiveObservation
 import com.glia.widgets.view.unifiedui.theme.UnifiedThemeManager
 
@@ -102,7 +101,7 @@ internal object Dependencies {
         EngagementLauncherImpl(
             activityLauncher = activityLauncher,
             configurationManager = configurationManager,
-            snackbarController = controllerFactory.snackbarController,
+            uiComponentsDispatcher = uiComponentsDispatcher,
             hasOngoingSecureConversationUseCase = useCaseFactory.hasOngoingSecureConversationUseCase,
             isQueueingOrLiveEngagementUseCase = useCaseFactory.isQueueingOrEngagementUseCase,
             engagementTypeUseCase = useCaseFactory.engagementTypeUseCase
@@ -130,10 +129,10 @@ internal object Dependencies {
     lateinit var repositoryFactory: RepositoryFactory
         @VisibleForTesting set
 
-    private val dialogDispatcher: DialogDispatcher by lazy { DialogDispatcherImpl() }
+    private val uiComponentsDispatcher: UiComponentsDispatcher by lazy { UiComponentsDispatcherImpl() }
 
     private val authenticationCallback: () -> Unit
-        get() = useCaseFactory.getRequestPushNotificationDuringAuthenticationUseCase(dialogDispatcher)::invoke
+        get() = useCaseFactory.getRequestPushNotificationDuringAuthenticationUseCase(uiComponentsDispatcher)::invoke
 
     @JvmStatic
     val secureConversations: SecureConversations by lazy {
@@ -246,15 +245,15 @@ internal object Dependencies {
         )
         application.registerActivityLifecycleCallbacks(operatorRequestActivityWatcher)
 
-        val activityWatcherForSnackbar = ActivityWatcherForSnackbar(
-            controllerFactory.snackbarController,
-            GliaActivityManagerImpl(),
-            localeProvider,
-            gliaThemeManager
+        application.registerActivityLifecycleCallbacks(
+            UiComponentsActivityWatcher(
+                GliaActivityManagerImpl(),
+                uiComponentsDispatcher,
+                localeProvider,
+                gliaThemeManager,
+                activityLauncher
+            )
         )
-        application.registerActivityLifecycleCallbacks(activityWatcherForSnackbar)
-
-        application.registerActivityLifecycleCallbacks(ActivityWatcherForDialog(GliaActivityManagerImpl(), dialogDispatcher))
     }
 
     @JvmStatic
@@ -346,7 +345,7 @@ internal object Dependencies {
         destroyControllers()
         //This function is called when the clear visitor session or de-authenticate is called
         //so these are the cases, where potentially the dialog can be shown
-        dialogDispatcher.dismissDialog()
+        uiComponentsDispatcher.dismissDialog()
     }
 
     fun destroyControllersAndResetQueueing() {

@@ -188,7 +188,7 @@ import com.glia.widgets.push.notifications.IsPushNotificationsSetUpUseCase;
 import com.glia.widgets.push.notifications.IsPushNotificationsSetUpUseCaseImpl;
 import com.glia.widgets.push.notifications.RequestPushNotificationDuringAuthenticationUseCase;
 import com.glia.widgets.push.notifications.RequestPushNotificationDuringAuthenticationUseCaseImpl;
-import com.glia.widgets.view.dialog.DialogDispatcher;
+import com.glia.widgets.view.dialog.UiComponentsDispatcher;
 import com.glia.widgets.view.snackbar.liveobservation.LiveObservationPopupUseCase;
 import com.glia.widgets.webbrowser.domain.GetUrlFromLinkUseCase;
 import com.glia.widgets.webbrowser.domain.GetUrlFromLinkUseCaseImpl;
@@ -1084,10 +1084,10 @@ public class UseCaseFactory {
     }
 
     @NonNull
-    public RequestPushNotificationDuringAuthenticationUseCase getRequestPushNotificationDuringAuthenticationUseCase(DialogDispatcher dialogDispatcher) {
+    public RequestPushNotificationDuringAuthenticationUseCase getRequestPushNotificationDuringAuthenticationUseCase(UiComponentsDispatcher uiComponentsDispatcher) {
         return new RequestPushNotificationDuringAuthenticationUseCaseImpl(
             getIsPushNotificationsSetUpUseCase(),
-            dialogDispatcher,
+            uiComponentsDispatcher,
             permissionManager,
             configurationManager
         );

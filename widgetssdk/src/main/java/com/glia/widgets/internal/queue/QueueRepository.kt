@@ -84,6 +84,11 @@ internal class QueueRepositoryImpl(
     }
 
     override fun fetchQueues() {
+        if (_queuesState.value is QueuesState.Loading) {
+            // Already loading queues, no need to fetch again
+            return
+        }
+
         // Fetch queues only if they are not already fetched or there was an error
         if (siteQueues.value == null || _queuesState.value is Error) {
             forceFetchQueues()

@@ -15,6 +15,12 @@ internal object NotificationFactory {
     const val NOTIFICATION_CALL_CHANNEL_ID = "call_channel"
     const val SCREEN_SHARING_NOTIFICATION_ID = 1
     const val CALL_NOTIFICATION_ID = 2
+
+    // We're using the same ID for secure messaging notifications, because we have the same hardcoded text for all the notifications,
+    // and there is no need to show 10 notifications with the same text.
+    const val SECURE_MESSAGING_NOTIFICATION_ID = 3
+    const val NOTIFICATION_SECURE_MESSAGING_CHANNEL_ID = "secure_messaging_channel"
+
     private val localeProvider by lazy { Dependencies.localeProvider }
 
     @JvmStatic
@@ -110,4 +116,14 @@ internal object NotificationFactory {
             .setSilent(true) // No sound or vibration and no heads-up notification
             .build()
     }
+
+    fun createSecureMessagingNotification(context: Context, content: String, contentIntent: PendingIntent): Notification =
+        NotificationCompat.Builder(context, NOTIFICATION_SECURE_MESSAGING_CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_chat)
+            .setContentIntent(contentIntent)
+            .setContentText(content)
+            .setPriority(NotificationCompat.PRIORITY_MAX)
+            .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+            .setAutoCancel(true)
+            .build()
 }

@@ -1,6 +1,7 @@
 package com.glia.widgets.fcm
 
-import com.glia.widgets.GliaWidgets
+import androidx.annotation.CallSuper
+import com.glia.widgets.di.Dependencies
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
@@ -26,15 +27,15 @@ import com.google.firebase.messaging.RemoteMessage
  * ```
  */
 class GliaFcmService : FirebaseMessagingService() {
+    private val pushNotifications by lazy { Dependencies.pushNotifications }
+
+    @CallSuper
     override fun onNewToken(token: String) {
-        super.onNewToken(token)
-        GliaWidgets.getPushNotifications()
-            .updateFcmToken(token)
+        pushNotifications.updateFcmToken(token)
     }
 
+    @CallSuper
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        super.onMessageReceived(remoteMessage)
-        GliaWidgets.getPushNotifications()
-            .onNewMessage(remoteMessage)
+        pushNotifications.onNewMessage(this, remoteMessage)
     }
 }

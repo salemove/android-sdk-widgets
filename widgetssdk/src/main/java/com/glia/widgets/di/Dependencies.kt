@@ -11,19 +11,6 @@ import com.glia.widgets.GliaWidgets
 import com.glia.widgets.GliaWidgetsConfig
 import com.glia.widgets.authentication.Authentication
 import com.glia.widgets.callvisualizer.CallVisualizerActivityWatcher
-import com.glia.widgets.internal.audio.AudioControlManager
-import com.glia.widgets.internal.audio.domain.OnAudioStartedUseCase
-import com.glia.widgets.internal.authentication.AuthenticationManager
-import com.glia.widgets.internal.callvisualizer.CallVisualizerManager
-import com.glia.widgets.internal.chathead.ChatHeadManager
-import com.glia.widgets.internal.dialog.PermissionDialogManager
-import com.glia.widgets.liveobservation.LiveObservation
-import com.glia.widgets.liveobservation.LiveObservationImpl
-import com.glia.widgets.internal.notification.device.INotificationManager
-import com.glia.widgets.internal.notification.device.NotificationManager
-import com.glia.widgets.internal.permissions.PermissionManager
-import com.glia.widgets.secureconversations.SecureConversations
-import com.glia.widgets.secureconversations.SecureConversationsImpl
 import com.glia.widgets.engagement.completion.EngagementCompletionActivityWatcher
 import com.glia.widgets.entrywidget.EntryWidget
 import com.glia.widgets.entrywidget.EntryWidgetImpl
@@ -37,20 +24,33 @@ import com.glia.widgets.helper.IntentHelperImpl
 import com.glia.widgets.helper.ResourceProvider
 import com.glia.widgets.helper.rx.GliaWidgetsSchedulers
 import com.glia.widgets.helper.rx.Schedulers
+import com.glia.widgets.internal.audio.AudioControlManager
+import com.glia.widgets.internal.audio.domain.OnAudioStartedUseCase
+import com.glia.widgets.internal.authentication.AuthenticationManager
 import com.glia.widgets.internal.authentication.toCoreType
+import com.glia.widgets.internal.callvisualizer.CallVisualizerManager
+import com.glia.widgets.internal.chathead.ChatHeadManager
+import com.glia.widgets.internal.dialog.PermissionDialogManager
+import com.glia.widgets.internal.notification.device.INotificationManager
+import com.glia.widgets.internal.notification.device.NotificationManager
+import com.glia.widgets.internal.permissions.PermissionManager
 import com.glia.widgets.launcher.ActivityLauncher
 import com.glia.widgets.launcher.ActivityLauncherImpl
 import com.glia.widgets.launcher.ConfigurationManager
 import com.glia.widgets.launcher.ConfigurationManagerImpl
 import com.glia.widgets.launcher.EngagementLauncher
 import com.glia.widgets.launcher.EngagementLauncherImpl
+import com.glia.widgets.liveobservation.LiveObservation
+import com.glia.widgets.liveobservation.LiveObservationImpl
 import com.glia.widgets.locale.LocaleProvider
 import com.glia.widgets.operator.OperatorRequestActivityWatcher
 import com.glia.widgets.permissions.ActivityWatcherForPermissionsRequest
+import com.glia.widgets.secureconversations.SecureConversations
+import com.glia.widgets.secureconversations.SecureConversationsImpl
+import com.glia.widgets.toCoreType
 import com.glia.widgets.view.dialog.ActivityWatcherForDialog
 import com.glia.widgets.view.dialog.DialogDispatcher
 import com.glia.widgets.view.dialog.DialogDispatcherImpl
-import com.glia.widgets.toCoreType
 import com.glia.widgets.view.head.ActivityWatcherForChatHead
 import com.glia.widgets.view.head.ChatHeadContract
 import com.glia.widgets.view.snackbar.ActivityWatcherForSnackbar
@@ -120,7 +120,10 @@ internal object Dependencies {
 
     @JvmStatic
     val pushNotifications: PushNotifications by lazy {
-        PushNotificationsImpl(gliaCore.pushNotifications)
+        PushNotificationsImpl(
+            gliaCore.pushNotifications,
+            controllerFactory.secureMessagingPushController
+        )
     }
 
     @JvmStatic
@@ -142,6 +145,10 @@ internal object Dependencies {
         LiveObservationImpl(gliaCore.liveObservation)
     }
 
+    private val applicationLifecycleManager: ApplicationLifecycleManager by lazy {
+        ApplicationLifecycleManager()
+    }
+
     @Synchronized
     @JvmStatic
     fun onAppCreate(application: Application) {
@@ -151,7 +158,6 @@ internal object Dependencies {
 
         resourceProvider = ResourceProvider(application.baseContext)
         localeProvider = LocaleProvider(resourceProvider)
-        notificationManager = NotificationManager(application)
         val downloadsFolderDataSource = DownloadsFolderDataSource(application)
         val deviceMonitor = DeviceMonitor(application)
         repositoryFactory = RepositoryFactory(gliaCore, downloadsFolderDataSource, configurationManager, deviceMonitor)
@@ -162,6 +168,8 @@ internal object Dependencies {
             repositoryFactory.permissionsRequestRepository,
             Build.VERSION.SDK_INT
         )
+
+        notificationManager = NotificationManager(application)
         val audioControlManager = AudioControlManager(application)
         useCaseFactory = UseCaseFactory(
             repositoryFactory,
@@ -185,12 +193,11 @@ internal object Dependencies {
             repositoryFactory,
             useCaseFactory,
             managerFactory,
-            gliaCore
+            gliaCore,
+            applicationLifecycleManager,
+            notificationManager
         )
-        initApplicationLifecycleObserver(
-            ApplicationLifecycleManager(),
-            controllerFactory.chatHeadController
-        )
+        initApplicationLifecycleObserver(applicationLifecycleManager, controllerFactory.chatHeadController)
 
         val callVisualizerActivityWatcher = CallVisualizerActivityWatcher(
             controllerFactory.callVisualizerController,

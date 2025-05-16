@@ -3,59 +3,64 @@ package com.glia.widgets.internal.notification.device
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Intent
 import android.os.Build
-import androidx.annotation.RequiresApi
+import androidx.annotation.StringRes
 import com.glia.widgets.R
-import com.glia.widgets.internal.notification.NotificationFactory
 import com.glia.widgets.core.notification.NotificationRemovalService
-import com.glia.widgets.internal.notification.areNotificationsEnabledForChannel
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
+import com.glia.widgets.internal.notification.NotificationFactory
+import com.glia.widgets.internal.notification.areNotificationsEnabledForChannel
 
-internal class NotificationManager(private val applicationContext: Application) : INotificationManager {
+internal class NotificationManager(
+    private val applicationContext: Application,
+) : INotificationManager {
     private val notificationManager: NotificationManager by lazy {
         applicationContext.getSystemService(NotificationManager::class.java)
     }
 
+    val notificationRemovalServiceIntent: Intent by lazy {
+        Intent(applicationContext, NotificationRemovalService::class.java)
+    }
+
     init {
-        createNotificationChannel()
+        createNotificationChannels()
     }
 
-    private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            createCallChannel()
-            createScreenSharingChannel()
-        }
+    private fun createNotificationChannels() {
+        createCallChannel()
+        createScreenSharingChannel()
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private fun createCallChannel() {
-        if (notificationManager.getNotificationChannel(NotificationFactory.NOTIFICATION_CALL_CHANNEL_ID) == null) {
-            /* Screen sharing notification importance should have the possible highest value,
-            because it shows the ongoing audio/video streaming and it is preferable to be as high as possible in notifications list */
-            val importance = NotificationManager.IMPORTANCE_HIGH
-            val notificationChannel = NotificationChannel(
-                NotificationFactory.NOTIFICATION_CALL_CHANNEL_ID,
-                applicationContext.getString(R.string.android_notification_audio_call_channel_name),
-                importance
-            )
-            notificationManager.createNotificationChannel(notificationChannel)
-        }
-    }
+    private fun createCallChannel() = createChannelIfDoesNotExist(
+        NotificationFactory.NOTIFICATION_CALL_CHANNEL_ID,
+        R.string.android_notification_audio_call_channel_name,
+        /* Call notification importance should have the possible highest value,
+        because it shows the ongoing audio/video streaming and it is preferable to be as high as possible in notifications list */
+        NotificationManager.IMPORTANCE_HIGH
+    )
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private fun createScreenSharingChannel() {
-        if (notificationManager.getNotificationChannel(NotificationFactory.NOTIFICATION_SCREEN_SHARING_CHANNEL_ID) == null) {
-            /* Screen sharing notification importance should have the possible highest value,
+    private fun createScreenSharingChannel() = createChannelIfDoesNotExist(
+        NotificationFactory.NOTIFICATION_SCREEN_SHARING_CHANNEL_ID,
+        R.string.android_notification_screen_sharing_channel_name,
+        /* Screen sharing notification importance should have the possible highest value,
             because it affects the Media projection service initialization and streaming timing */
-            val importance = NotificationManager.IMPORTANCE_HIGH
-            val notificationChannel = NotificationChannel(
-                NotificationFactory.NOTIFICATION_SCREEN_SHARING_CHANNEL_ID,
-                applicationContext.getString(R.string.android_notification_screen_sharing_channel_name),
-                importance
+        NotificationManager.IMPORTANCE_HIGH
+    )
+
+    override fun createSecureMessagingChannel() = createChannelIfDoesNotExist(
+        NotificationFactory.NOTIFICATION_SECURE_MESSAGING_CHANNEL_ID,
+        R.string.android_notification_secure_messaging_channel_name,
+        NotificationManager.IMPORTANCE_HIGH
+    )
+
+    private fun createChannelIfDoesNotExist(id: String, @StringRes nameRes: Int, importance: Int) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && notificationManager.getNotificationChannel(id) == null) {
+            notificationManager.createNotificationChannel(
+                NotificationChannel(id, applicationContext.getString(nameRes), importance)
             )
-            notificationManager.createNotificationChannel(notificationChannel)
         }
     }
 
@@ -91,7 +96,7 @@ internal class NotificationManager(private val applicationContext: Application) 
         // If this service is not already running, it will be instantiated and started (creating a process for it if needed);
         // if it is running then it remains running.
         try {
-            applicationContext.startService(Intent(applicationContext, NotificationRemovalService::class.java))
+            applicationContext.startService(notificationRemovalServiceIntent)
         } catch (error: Throwable) {
             // Above code is known to throw an error if app is in background
             Logger.e(TAG, "Failed to launch 'NotificationRemovalService'", error)
@@ -100,7 +105,7 @@ internal class NotificationManager(private val applicationContext: Application) 
 
     override fun removeCallNotification() {
         notificationManager.cancel(NotificationFactory.CALL_NOTIFICATION_ID)
-        applicationContext.stopService(Intent(applicationContext, NotificationRemovalService::class.java))
+        applicationContext.stopService(notificationRemovalServiceIntent)
     }
 
     /**
@@ -115,6 +120,19 @@ internal class NotificationManager(private val applicationContext: Application) 
      * Removes the screen sharing notification.
      */
     override fun removeScreenSharingNotification() = notificationManager.cancel(NotificationFactory.SCREEN_SHARING_NOTIFICATION_ID)
+
+    override fun showSecureMessageNotification(content: String, contentIntent: PendingIntent) {
+        if (areNotificationsEnabledForChannel(NotificationFactory.NOTIFICATION_SECURE_MESSAGING_CHANNEL_ID)) {
+            notificationManager.notify(
+                NotificationFactory.SECURE_MESSAGING_NOTIFICATION_ID,
+                NotificationFactory.createSecureMessagingNotification(
+                    applicationContext,
+                    content,
+                    contentIntent
+                )
+            )
+        }
+    }
 
     private fun areNotificationsEnabledForChannel(id: String) = applicationContext.areNotificationsEnabledForChannel(id)
 }

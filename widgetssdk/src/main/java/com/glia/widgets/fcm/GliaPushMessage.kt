@@ -19,6 +19,11 @@ interface GliaPushMessage {
         QUEUED_MESSAGE,
 
         /**
+         * When this is chat message from secure conversations
+         */
+        SECURE_CONVERSATION,
+
+        /**
          * Default value, could be received if value returned by server is not supported by current version of SDK
          */
         UNIDENTIFIED
@@ -70,5 +75,6 @@ internal fun com.glia.androidsdk.fcm.GliaPushMessage.PushType.toWidgetsType() : 
     when (this) {
         com.glia.androidsdk.fcm.GliaPushMessage.PushType.CHAT_MESSAGE -> GliaPushMessage.PushType.CHAT_MESSAGE
         com.glia.androidsdk.fcm.GliaPushMessage.PushType.QUEUED_MESSAGE -> GliaPushMessage.PushType.QUEUED_MESSAGE
+        com.glia.androidsdk.fcm.GliaPushMessage.PushType.SECURE_CONVERSATION -> GliaPushMessage.PushType.SECURE_CONVERSATION
         com.glia.androidsdk.fcm.GliaPushMessage.PushType.UNIDENTIFIED -> GliaPushMessage.PushType.UNIDENTIFIED
     }

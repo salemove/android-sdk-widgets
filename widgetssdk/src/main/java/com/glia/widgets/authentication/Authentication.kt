@@ -43,6 +43,8 @@ interface Authentication {
     /**
      * De-authenticates the visitor.
      *
+     * @param stopPushNotifications whether to unsubscribe from receiving push notifications for the de-authenticated visitor
+     * (null for success or GliaException for error).
      * @param onComplete Callback invoked when the update operation is successfully completed.
      * @param onError Callback invoked when an error occurs during the update operation.
      *                Provides a [GliaWidgetsException] describing the error.
@@ -52,9 +54,20 @@ interface Authentication {
      * <br></br> [GliaWidgetsException.Cause.AUTHENTICATION_ERROR] - when authentication fails
      */
     fun deauthenticate(
+        stopPushNotifications: Boolean,
         onComplete: OnComplete,
         onError: OnError
     )
+
+    /**
+     * Same as [deauthenticate] but with default value (true) for `stopPushNotifications` parameter.
+     */
+    fun deauthenticate(
+        onComplete: OnComplete,
+        onError: OnError
+    ) {
+        deauthenticate(true, onComplete, onError)
+    }
 
     /**
      * Check if Visitor is authenticated in Glia using the external authentication.

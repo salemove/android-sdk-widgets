@@ -50,6 +50,7 @@ internal class AuthenticationManager(
     }
 
     override fun deauthenticate(
+        stopPushNotifications: Boolean,
         onComplete: OnComplete,
         onError: OnError
     ) {
@@ -61,7 +62,7 @@ internal class AuthenticationManager(
         //and we don't need secure conversations data for un-authenticated visitors.
         repositoryFactory.secureConversationsRepository.unsubscribeAndResetData()
 
-        authentication.deauthenticate { _, gliaException ->
+        authentication.deauthenticate(stopPushNotifications) { _, gliaException ->
             if (gliaException != null) {
                 onError.onError(gliaException.toWidgetsType())
             }
@@ -94,24 +95,27 @@ internal fun AuthenticationManager.toCoreType(): CoreAuthentication = this.let {
             widgetAuthentication.setBehavior(behavior.toWidgetsType())
         }
 
-        override fun authenticate(jwtToken: String?, externalAccessToken: String?, authCallback: RequestCallback<Void>?) {
-            if (jwtToken.isNullOrBlank()) {
+        override fun authenticate(jwtToken: String, externalAccessToken: String?, authCallback: RequestCallback<Void>?) {
+            if (jwtToken.isBlank()) {
                 reportTokenInvalidError(authCallback)
                 return
             }
             widgetAuthentication.authenticate(jwtToken, externalAccessToken, authCallback.toOnComplete(), authCallback.toOnError())
         }
 
-        override fun deauthenticate(authCallback: RequestCallback<Void>?) {
+        override fun deauthenticate(stopPushNotifications: Boolean, authCallback: RequestCallback<Void>?) {
             widgetAuthentication.deauthenticate(authCallback.toOnComplete(), authCallback.toOnError())
         }
 
-        override fun isAuthenticated(): Boolean {
-            return widgetAuthentication.isAuthenticated
+        override fun deauthenticate(authCallback: RequestCallback<Void>?) {
+            deauthenticate(true, authCallback)
         }
 
-        override fun refresh(jwtToken: String?, externalAccessToken: String?, authCallback: RequestCallback<Void>?) {
-            if (jwtToken.isNullOrBlank()) {
+        override val isAuthenticated: Boolean
+            get() = widgetAuthentication.isAuthenticated
+
+        override fun refresh(jwtToken: String, externalAccessToken: String?, authCallback: RequestCallback<Void>?) {
+            if (jwtToken.isBlank()) {
                 reportTokenInvalidError(authCallback)
                 return
             }

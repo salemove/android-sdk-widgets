@@ -5,7 +5,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import com.glia.widgets.internal.permissions.PermissionManager
 import com.glia.widgets.launcher.ConfigurationManager
-import com.glia.widgets.view.dialog.DialogDispatcher
+import com.glia.widgets.view.dialog.UiComponentsDispatcher
 
 internal interface RequestPushNotificationDuringAuthenticationUseCase {
     operator fun invoke()
@@ -13,7 +13,7 @@ internal interface RequestPushNotificationDuringAuthenticationUseCase {
 
 internal class RequestPushNotificationDuringAuthenticationUseCaseImpl(
     private val isPushNotificationsSetUpUseCase: IsPushNotificationsSetUpUseCase,
-    private val dialogDispatcher: DialogDispatcher,
+    private val uiComponentsDispatcher: UiComponentsDispatcher,
     private val permissionManager: PermissionManager,
     private val configurationManager: ConfigurationManager
 ) : RequestPushNotificationDuringAuthenticationUseCase {
@@ -41,7 +41,7 @@ internal class RequestPushNotificationDuringAuthenticationUseCaseImpl(
 
             permissionManager.shouldShowPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
                 // Show rationale dialog
-                dialogDispatcher.showNotificationPermissionDialog(onAllow = {
+                uiComponentsDispatcher.showNotificationPermissionDialog(onAllow = {
                     requestNotificationPermission()
                 })
             }

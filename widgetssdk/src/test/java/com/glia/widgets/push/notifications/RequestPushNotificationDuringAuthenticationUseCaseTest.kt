@@ -4,7 +4,7 @@ import android.Manifest
 import android.os.Build
 import com.glia.widgets.internal.permissions.PermissionManager
 import com.glia.widgets.launcher.ConfigurationManager
-import com.glia.widgets.view.dialog.DialogDispatcher
+import com.glia.widgets.view.dialog.UiComponentsDispatcher
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
@@ -19,7 +19,7 @@ import org.robolectric.annotation.Config
 @Config(sdk = [Build.VERSION_CODES.VANILLA_ICE_CREAM])
 class RequestPushNotificationDuringAuthenticationUseCaseTest {
     private lateinit var isPushNotificationsSetUpUseCase: IsPushNotificationsSetUpUseCase
-    private lateinit var dialogDispatcher: DialogDispatcher
+    private lateinit var uiComponentsDispatcher: UiComponentsDispatcher
     private lateinit var permissionManager: PermissionManager
     private lateinit var configurationManager: ConfigurationManager
 
@@ -28,13 +28,13 @@ class RequestPushNotificationDuringAuthenticationUseCaseTest {
     @Before
     fun setUp() {
         isPushNotificationsSetUpUseCase = mockk()
-        dialogDispatcher = mockk(relaxUnitFun = true)
+        uiComponentsDispatcher = mockk(relaxUnitFun = true)
         permissionManager = mockk(relaxUnitFun = true)
         configurationManager = mockk()
 
         useCase = RequestPushNotificationDuringAuthenticationUseCaseImpl(
             isPushNotificationsSetUpUseCase = isPushNotificationsSetUpUseCase,
-            dialogDispatcher = dialogDispatcher,
+            uiComponentsDispatcher = uiComponentsDispatcher,
             permissionManager = permissionManager,
             configurationManager = configurationManager
         )
@@ -47,7 +47,7 @@ class RequestPushNotificationDuringAuthenticationUseCaseTest {
 
         useCase()
 
-        verify(exactly = 0) { dialogDispatcher.showNotificationPermissionDialog(any(), any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showNotificationPermissionDialog(any(), any()) }
         verify(exactly = 0) { permissionManager.handlePermissions(any(), any(), any(), any(), any()) }
     }
 
@@ -59,7 +59,7 @@ class RequestPushNotificationDuringAuthenticationUseCaseTest {
 
         useCase()
 
-        verify(exactly = 0) { dialogDispatcher.showNotificationPermissionDialog(any(), any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showNotificationPermissionDialog(any(), any()) }
         verify(exactly = 0) { permissionManager.handlePermissions(any(), any(), any(), any(), any()) }
     }
 
@@ -70,7 +70,7 @@ class RequestPushNotificationDuringAuthenticationUseCaseTest {
 
         useCase()
 
-        verify(exactly = 0) { dialogDispatcher.showNotificationPermissionDialog(any(), any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showNotificationPermissionDialog(any(), any()) }
         verify(exactly = 0) { permissionManager.handlePermissions(any(), any(), any(), any(), any()) }
     }
 
@@ -82,7 +82,7 @@ class RequestPushNotificationDuringAuthenticationUseCaseTest {
 
         useCase()
 
-        verify(exactly = 0) { dialogDispatcher.showNotificationPermissionDialog(any(), any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showNotificationPermissionDialog(any(), any()) }
         verify(exactly = 0) { permissionManager.handlePermissions(any(), any(), any(), any(), any()) }
     }
 
@@ -99,7 +99,7 @@ class RequestPushNotificationDuringAuthenticationUseCaseTest {
         useCase()
 
         verify { permissionManager.shouldShowPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) }
-        verify { dialogDispatcher.showNotificationPermissionDialog(capture(onAllowSlot), capture(onCancelSlot)) }
+        verify { uiComponentsDispatcher.showNotificationPermissionDialog(capture(onAllowSlot), capture(onCancelSlot)) }
 
         onCancelSlot.captured.invoke()
         verify(exactly = 0) { permissionManager.handlePermissions(any(), any(), any(), any(), any()) }
@@ -118,7 +118,7 @@ class RequestPushNotificationDuringAuthenticationUseCaseTest {
         useCase()
 
         verify { permissionManager.shouldShowPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) }
-        verify(exactly = 0) { dialogDispatcher.showNotificationPermissionDialog(any(), any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showNotificationPermissionDialog(any(), any()) }
         verify { permissionManager.handlePermissions(any(), eq(listOf(Manifest.permission.POST_NOTIFICATIONS)), any(), any(), any()) }
     }
 

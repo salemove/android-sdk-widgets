@@ -7,7 +7,7 @@ import com.glia.widgets.chat.Intention
 import com.glia.widgets.internal.secureconversations.domain.HasOngoingSecureConversationUseCase
 import com.glia.widgets.engagement.domain.EngagementTypeUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
-import com.glia.widgets.view.snackbar.SnackbarContract
+import com.glia.widgets.view.dialog.UiComponentsDispatcher
 
 /**
  * An interface for launching different types of engagements, such as chat,
@@ -79,7 +79,7 @@ interface EngagementLauncher {
 internal class EngagementLauncherImpl(
     private val activityLauncher: ActivityLauncher,
     private val configurationManager: ConfigurationManager,
-    private val snackbarController: SnackbarContract.Controller,
+    private val uiComponentsDispatcher: UiComponentsDispatcher,
     private val hasOngoingSecureConversationUseCase: HasOngoingSecureConversationUseCase,
     private val isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase,
     private val engagementTypeUseCase: EngagementTypeUseCase,
@@ -105,8 +105,8 @@ internal class EngagementLauncherImpl(
 
     override fun startChat(context: Context) {
         when {
-            engagementTypeUseCase.isCallVisualizer -> snackbarController.showSnackBar(R.string.entry_widget_call_visualizer_description)
-            isMediaEngagementOrMediaQueueing -> snackbarController.showSnackBar(R.string.entry_widget_call_visualizer_description)
+            engagementTypeUseCase.isCallVisualizer -> uiComponentsDispatcher.showSnackBar(R.string.entry_widget_call_visualizer_description)
+            isMediaEngagementOrMediaQueueing -> uiComponentsDispatcher.showSnackBar(R.string.entry_widget_call_visualizer_description)
             isEngagementOrQueueing -> activityLauncher.launchChat(context, Intention.RETURN_TO_CHAT)
             else -> hasOngoingSecureConversationUseCase(
                 onHasOngoingSecureConversation = {
@@ -132,9 +132,9 @@ internal class EngagementLauncherImpl(
 
     override fun startAudioCall(context: Context) {
         when {
-            engagementTypeUseCase.isCallVisualizer -> snackbarController.showSnackBar(R.string.entry_widget_call_visualizer_description)
+            engagementTypeUseCase.isCallVisualizer -> uiComponentsDispatcher.showSnackBar(R.string.entry_widget_call_visualizer_description)
             isMediaEngagementOrMediaQueueing -> activityLauncher.launchCall(context, null, false)
-            isChatEngagementOrChatQueueing -> snackbarController.showSnackBar(R.string.entry_widget_call_visualizer_description)
+            isChatEngagementOrChatQueueing -> uiComponentsDispatcher.showSnackBar(R.string.entry_widget_call_visualizer_description)
             else -> hasOngoingSecureConversationUseCase(
                 onHasOngoingSecureConversation = {
                     activityLauncher.launchChat(
@@ -160,9 +160,9 @@ internal class EngagementLauncherImpl(
 
     override fun startVideoCall(context: Context) {
         when {
-            engagementTypeUseCase.isCallVisualizer && !engagementTypeUseCase.hasVideo -> snackbarController.showSnackBar(R.string.entry_widget_call_visualizer_description)
+            engagementTypeUseCase.isCallVisualizer && !engagementTypeUseCase.hasVideo -> uiComponentsDispatcher.showSnackBar(R.string.entry_widget_call_visualizer_description)
             isMediaEngagementOrMediaQueueing -> activityLauncher.launchCall(context, null, false)
-            isChatEngagementOrChatQueueing -> snackbarController.showSnackBar(R.string.entry_widget_call_visualizer_description)
+            isChatEngagementOrChatQueueing -> uiComponentsDispatcher.showSnackBar(R.string.entry_widget_call_visualizer_description)
             else -> hasOngoingSecureConversationUseCase(
                 onHasOngoingSecureConversation = {
                     activityLauncher.launchChat(
@@ -188,13 +188,13 @@ internal class EngagementLauncherImpl(
 
     override fun startSecureMessaging(context: Context) {
         when {
-            engagementTypeUseCase.isCallVisualizer -> snackbarController.showSnackBar(R.string.entry_widget_call_visualizer_description)
+            engagementTypeUseCase.isCallVisualizer -> uiComponentsDispatcher.showSnackBar(R.string.entry_widget_call_visualizer_description)
             isChatEngagementOrChatQueueing -> activityLauncher.launchChat(
                 context,
                 Intention.RETURN_TO_CHAT
             )
 
-            isMediaEngagementOrMediaQueueing -> snackbarController.showSnackBar(R.string.entry_widget_call_visualizer_description)
+            isMediaEngagementOrMediaQueueing -> uiComponentsDispatcher.showSnackBar(R.string.entry_widget_call_visualizer_description)
             else -> hasOngoingSecureConversationUseCase(
                 onHasOngoingSecureConversation = {
                     activityLauncher.launchChat(

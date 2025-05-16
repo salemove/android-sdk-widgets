@@ -1,5 +1,7 @@
 package com.glia.widgets.internal.notification.device
 
+import android.app.PendingIntent
+
 internal interface INotificationManager {
     fun showAudioCallNotification()
     fun showVideoCallNotification(isTwoWayVideo: Boolean, hasAudio: Boolean)
@@ -7,4 +9,6 @@ internal interface INotificationManager {
     fun showScreenSharingNotification()
     fun removeScreenSharingNotification()
     fun startNotificationRemovalService()
+    fun showSecureMessageNotification(content: String, contentIntent: PendingIntent)
+    fun createSecureMessagingChannel()
 }

@@ -12,8 +12,6 @@ import com.glia.widgets.callvisualizer.controller.CallVisualizerController;
 import com.glia.widgets.callvisualizer.controller.VisitorCodeController;
 import com.glia.widgets.chat.ChatContract;
 import com.glia.widgets.chat.controller.ChatController;
-import com.glia.widgets.internal.dialog.DialogContract;
-import com.glia.widgets.internal.dialog.DialogController;
 import com.glia.widgets.engagement.completion.EngagementCompletionContract;
 import com.glia.widgets.engagement.completion.EngagementCompletionController;
 import com.glia.widgets.entrywidget.EntryWidgetContract;
@@ -21,14 +19,21 @@ import com.glia.widgets.entrywidget.EntryWidgetController;
 import com.glia.widgets.entrywidget.EntryWidgetHideController;
 import com.glia.widgets.filepreview.ui.ImagePreviewContract;
 import com.glia.widgets.filepreview.ui.ImagePreviewController;
+import com.glia.widgets.helper.ApplicationLifecycleManager;
+import com.glia.widgets.helper.IntentHelperImpl;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
+import com.glia.widgets.internal.dialog.DialogContract;
+import com.glia.widgets.internal.dialog.DialogController;
+import com.glia.widgets.internal.notification.device.INotificationManager;
 import com.glia.widgets.messagecenter.MessageCenterContract;
 import com.glia.widgets.messagecenter.MessageCenterController;
 import com.glia.widgets.operator.OperatorRequestContract;
 import com.glia.widgets.operator.OperatorRequestController;
 import com.glia.widgets.permissions.PermissionsRequestContract;
 import com.glia.widgets.permissions.controller.PermissionsRequestController;
+import com.glia.widgets.push.notifications.SecureMessagingPushController;
+import com.glia.widgets.push.notifications.SecureMessagingPushControllerImpl;
 import com.glia.widgets.survey.SurveyContract;
 import com.glia.widgets.survey.SurveyController;
 import com.glia.widgets.view.MessagesNotSeenHandler;
@@ -62,6 +67,8 @@ public class ControllerFactory {
     private final ImagePreviewContract.Controller filePreviewController;
     private final ManagerFactory managerFactory;
     private final GliaCore core;
+    private final ApplicationLifecycleManager applicationLifecycleManager;
+    private final INotificationManager notificationManager;
     private EngagementCompletionContract.Controller engagementCompletionController;
     private ChatContract.Controller retainedChatController;
     private CallContract.Controller retainedCallController;
@@ -76,7 +83,9 @@ public class ControllerFactory {
         RepositoryFactory repositoryFactory,
         UseCaseFactory useCaseFactory,
         ManagerFactory managerFactory,
-        GliaCore core
+        GliaCore core,
+        ApplicationLifecycleManager applicationLifecycleManager,
+        INotificationManager notificationManager
     ) {
         this.repositoryFactory = repositoryFactory;
         messagesNotSeenHandler = new MessagesNotSeenHandler(
@@ -85,6 +94,8 @@ public class ControllerFactory {
 
         this.useCaseFactory = useCaseFactory;
         this.core = core;
+        this.applicationLifecycleManager = applicationLifecycleManager;
+        this.notificationManager = notificationManager;
         this.dialogController = new DialogController();
         this.filePreviewController = new ImagePreviewController(
             useCaseFactory.createGetImageFileFromDownloadsUseCase(),
@@ -418,5 +429,15 @@ public class ControllerFactory {
             snackbarController = new SnackbarController();
         }
         return snackbarController;
+    }
+
+    @NonNull
+    public SecureMessagingPushController getSecureMessagingPushController() {
+        return new SecureMessagingPushControllerImpl(
+            applicationLifecycleManager,
+            notificationManager,
+            useCaseFactory.getIsNotificationPermissionGrantedUseCase(),
+            new IntentHelperImpl()
+        );
     }
 }

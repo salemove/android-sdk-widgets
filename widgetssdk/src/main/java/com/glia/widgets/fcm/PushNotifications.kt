@@ -1,7 +1,10 @@
 package com.glia.widgets.fcm
 
 import android.content.Context
+import com.glia.widgets.push.notifications.SecureMessagingPushController
+import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import com.glia.androidsdk.fcm.PushNotifications as CorePushNotifications
 
 /**
  * Interface for push notifications handling.
@@ -69,31 +72,48 @@ interface PushNotifications {
      *
      * @see GliaFcmService
      *
-     * @param message - New FCM message
+     * @param remoteMessage - New FCM message
+     * @param service - FCM service
      */
-    fun onNewMessage(message: RemoteMessage)
+    fun onNewMessage(service: FirebaseMessagingService, remoteMessage: RemoteMessage)
 }
 
+// Push notification key for the queue ID
+private const val QUEUE_ID_KEY = "queue_id"
+// Push notification key for the body
+private const val BODY_KEY = "body"
+// Push notification key for the event type
+private const val EVENT_TYPE_KEY = "event_type"
+// Push notification event type for secure messaging
+private const val SECURE_MESSAGING_TYPE = "engagement.secure_conversation.message"
+
 internal class PushNotificationsImpl(
-    private val pushNotifications: com.glia.androidsdk.fcm.PushNotifications
+    private val corePushNotifications: CorePushNotifications,
+    private val secureMessagingPushController: SecureMessagingPushController
 ) : PushNotifications {
     override fun subscribeTo(events: Collection<PushNotificationEvent>) {
-        pushNotifications.subscribeTo(events.toCoreType())
+        corePushNotifications.subscribeTo(events.toCoreType())
     }
 
     override fun subscribeTo(context: Context, types: Collection<PushNotificationType>) {
-        pushNotifications.subscribeTo(context, types.toCoreType())
+        corePushNotifications.subscribeTo(context, types.toCoreType())
     }
 
     override fun getPushEvents(): Set<PushNotificationEvent> {
-        return pushNotifications.pushEvents.toWidgetsType().toSet()
+        return corePushNotifications.pushEvents.toWidgetsType().toSet()
     }
 
     override fun updateFcmToken(newFcmToken: String?) {
-        pushNotifications.updateFcmToken(newFcmToken)
+        corePushNotifications.updateFcmToken(newFcmToken)
     }
 
-    override fun onNewMessage(message: RemoteMessage) {
-        pushNotifications.onNewMessage(message)
+    override fun onNewMessage(service: FirebaseMessagingService, remoteMessage: RemoteMessage) = with(remoteMessage) {
+        if (data[EVENT_TYPE_KEY] == SECURE_MESSAGING_TYPE) {
+            // This message must be handled internally, so we don't need to pass it to the core's push notifications
+            secureMessagingPushController.handleSecureMessage(service, data[QUEUE_ID_KEY].orEmpty(), data[BODY_KEY].orEmpty())
+        } else {
+            corePushNotifications.onNewMessage(this)
+        }
     }
+
 }

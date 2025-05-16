@@ -1,6 +1,7 @@
 package com.glia.widgets.helper
 
 import android.app.Activity
+import android.app.PendingIntent
 import android.content.ClipData
 import android.content.Context
 import android.content.Intent
@@ -17,11 +18,12 @@ import com.glia.widgets.call.CallActivity
 import com.glia.widgets.callvisualizer.EndScreenSharingActivity
 import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.chat.Intention
-import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.glia.widgets.entrywidget.EntryWidgetActivity
 import com.glia.widgets.filepreview.ui.ImagePreviewActivity
+import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.messagecenter.MessageCenterActivity
+import com.glia.widgets.push.notifications.PushClickHandlerActivity
 import com.glia.widgets.survey.SurveyActivity
 import com.glia.widgets.webbrowser.WebBrowserActivity
 import java.io.File
@@ -39,6 +41,8 @@ internal object ExtraKeys {
     const val MEDIA_TYPE = "media_type"
     const val SURVEY = "survey"
     const val IS_UPGRADE_TO_CALL = "call_screen_is_upgrade_to_call"
+
+    const val PN_QUEUE_ID = "queue_id"
 }
 
 internal interface IntentHelper {
@@ -69,7 +73,10 @@ internal interface IntentHelper {
     fun openUriIntent(uri: Uri): Intent
 
     fun openFileIntent(contentUri: Uri, fileContentType: String?): Intent
+
     fun entryWidgetIntent(activity: Activity): Intent
+
+    fun pushClickHandlerPendingIntent(context: Context, queueId: String): PendingIntent
 }
 
 internal class IntentHelperImpl : IntentHelper {
@@ -133,7 +140,7 @@ internal class IntentHelperImpl : IntentHelper {
     }
 
     override fun openEmailIntent(uri: Uri): Intent = Intent(Intent.ACTION_SENDTO)
-        .setData(Uri.parse("mailto:")) // This step makes sure that only email apps handle this.
+        .setData("mailto:".toUri()) // This step makes sure that only email apps handle this.
         .putExtra(Intent.EXTRA_EMAIL, arrayOf(uri.schemeSpecificPart))
 
     override fun dialerIntent(uri: Uri): Intent = Intent(Intent.ACTION_DIAL).setData(uri)
@@ -148,4 +155,13 @@ internal class IntentHelperImpl : IntentHelper {
 
     override fun entryWidgetIntent(activity: Activity): Intent = Intent(activity, EntryWidgetActivity::class.java)
         .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+
+    override fun pushClickHandlerPendingIntent(context: Context, queueId: String): PendingIntent = PendingIntent.getActivity(
+        context, 0, pushClickHandlerIntent(context, queueId),
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+    )
+
+    private fun pushClickHandlerIntent(context: Context, queueId: String): Intent = Intent(context, PushClickHandlerActivity::class.java)
+        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        .putExtra(ExtraKeys.PN_QUEUE_ID, queueId)
 }

@@ -11,12 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-      - run: cd .github/actions/deployment-action && npm i && tsc && cd -
-      # - name: Validate branch name before to start deployment
-      #   uses: ./.github/actions/deployment-action
-
-      - uses: actions/checkout@v3
       - name: Runs the deployment workflow in Bitrise
         run: |
           curl https://app.bitrise.io/app/${{ secrets.BITRISE_APP_ID }}/build/start.json --data '{"hook_info":{"type":"bitrise","build_trigger_token":"${{ secrets.BITRISE_BUILD_TRIGGER_TOKEN }}"},"build_params":{"branch":"master","workflow_id":"publish_to_nexus","environments":[{"mapped_to":"NEW_VERSION","value":"${{ github.event.inputs.version }}","is_expand":true}]},"triggered_by":"curl"}'

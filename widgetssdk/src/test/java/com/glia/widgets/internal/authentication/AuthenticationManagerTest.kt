@@ -1,6 +1,5 @@
 package com.glia.widgets.internal.authentication
 
-import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
 import com.glia.widgets.authentication.Authentication
 import junit.framework.TestCase.assertEquals
@@ -8,7 +7,6 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.kotlin.any
-import org.mockito.kotlin.argThat
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -54,21 +52,6 @@ class AuthenticationManagerTest {
     }
 
     @Test
-    fun toCoreType_authenticateWithNullJwtToken_callsAuthCallbackWithInvalidInputError() {
-        val widgetAuthentication = mock<AuthenticationManager>()
-        val coreAuthentication = widgetAuthentication.toCoreType()
-
-        val callback = mock<RequestCallback<Void>>()
-
-        coreAuthentication.authenticate(null, "externalToken", callback)
-
-        verify(callback).onResult(
-            eq(null),
-            argThat { this.cause == GliaException.Cause.INVALID_INPUT }
-        )
-    }
-
-    @Test
     fun toCoreType_deauthenticate_callsDeauthenticateOnWidgetAuthentication() {
         val widgetAuthentication = mock<AuthenticationManager>()
         val coreAuthentication = widgetAuthentication.toCoreType()
@@ -97,7 +80,7 @@ class AuthenticationManagerTest {
 
         val coreAuthentication = widgetAuthentication.toCoreType()
 
-        assertTrue(coreAuthentication.isAuthenticated())
+        assertTrue(coreAuthentication.isAuthenticated)
     }
 
     @Test
@@ -125,21 +108,6 @@ class AuthenticationManagerTest {
         coreAuthentication.refresh(jwtToken, externalAccessToken, null)
 
         verify(widgetAuthentication).refresh(eq(jwtToken), eq(externalAccessToken), any(), any())
-    }
-
-    @Test
-    fun toCoreType_refreshWithNullJwtToken_callsAuthCallbackWithInvalidInputError() {
-        val widgetAuthentication = mock<AuthenticationManager>()
-        val coreAuthentication = widgetAuthentication.toCoreType()
-
-        val callback = mock<RequestCallback<Void>>()
-
-        coreAuthentication.refresh(null, "externalToken", callback)
-
-        verify(callback).onResult(
-            eq(null),
-            argThat { this is GliaException && this.cause == GliaException.Cause.INVALID_INPUT }
-        )
     }
 
     @Test

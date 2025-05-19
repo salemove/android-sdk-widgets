@@ -49,13 +49,14 @@ internal class EntryWidgetImpl(
     }
 
     override fun getView(context: Context): View {
-        val entryWidgetTheme = themeManager.theme?.entryWidgetTheme
-        val adapter = EntryWidgetAdapter(EntryWidgetContract.ViewType.EMBEDDED_VIEW, entryWidgetTheme)
+        val unifiedTheme = themeManager.theme
+        val adapter = EntryWidgetAdapter(EntryWidgetContract.ViewType.EMBEDDED_VIEW, unifiedTheme?.entryWidgetTheme)
 
         //Wrapping with Glia theme to make the Theme available for embedded view
         return EntryWidgetView(context.wrapWithTheme()).apply {
+            unifiedThemeWhiteLabel = unifiedTheme?.isWhiteLabel
             setAdapter(adapter)
-            setEntryWidgetTheme(entryWidgetTheme)
+            setEntryWidgetTheme(unifiedTheme?.entryWidgetTheme)
         }
     }
 

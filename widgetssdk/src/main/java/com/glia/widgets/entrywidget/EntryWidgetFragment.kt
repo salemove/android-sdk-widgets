@@ -16,7 +16,7 @@ import com.glia.widgets.di.Dependencies
 import com.glia.widgets.entrywidget.adapter.EntryWidgetAdapter
 import com.glia.widgets.helper.wrapWithMaterialThemeOverlay
 import com.glia.widgets.view.unifiedui.applyLayerTheme
-import com.glia.widgets.view.unifiedui.theme.entrywidget.EntryWidgetTheme
+import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -38,12 +38,12 @@ internal class EntryWidgetFragment : BottomSheetDialogFragment() {
     ): View {
         val layoutInflater = LayoutInflater.from(requireContext().wrapWithMaterialThemeOverlay())
         val binding = EntryWidgetFragmentBinding.inflate(layoutInflater, container, false)
-        val entryWidgetsTheme = Dependencies.gliaThemeManager.theme?.entryWidgetTheme
+        val unifiedTheme = Dependencies.gliaThemeManager.theme
 
         setupView(
             requireContext(),
             binding,
-            entryWidgetsTheme
+            unifiedTheme
         )
 
         return binding.root
@@ -53,23 +53,24 @@ internal class EntryWidgetFragment : BottomSheetDialogFragment() {
     fun setupView(
         context: Context,
         binding: EntryWidgetFragmentBinding,
-        entryWidgetsTheme: EntryWidgetTheme?
+        unifiedTheme: UnifiedTheme?
     ) {
         val entryWidgetAdapter = EntryWidgetAdapter(
             EntryWidgetContract.ViewType.BOTTOM_SHEET,
-            entryWidgetsTheme
+            unifiedTheme?.entryWidgetTheme
         )
 
         EntryWidgetView(context).apply {
+            unifiedThemeWhiteLabel = unifiedTheme?.isWhiteLabel
             setAdapter(entryWidgetAdapter)
-            setEntryWidgetTheme(entryWidgetsTheme)
+            setEntryWidgetTheme(unifiedTheme?.entryWidgetTheme)
             binding.container.addView(this)
             onDismissListener = {
                 this@EntryWidgetFragment.dismiss()
             }
         }
 
-        entryWidgetsTheme?.background?.let {
+        unifiedTheme?.entryWidgetTheme?.background?.let {
             binding.root.applyLayerTheme(it)
         }
     }

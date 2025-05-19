@@ -19,7 +19,7 @@ internal class EntryWidgetBottomSheetTest : EntryWidgetEmbeddedViewTest() {
         entryWidgetFragment.setupView(
             context,
             binding,
-            unifiedTheme?.entryWidgetTheme
+            unifiedTheme
         )
 
         binding.container.allViews.forEach {

@@ -16,6 +16,7 @@ import com.glia.widgets.helper.getDrawableCompat
 import com.glia.widgets.helper.requireActivity
 import com.glia.widgets.helper.wrapWithMaterialThemeOverlay
 import com.glia.widgets.view.unifiedui.applyLayerTheme
+import com.glia.widgets.view.unifiedui.nullSafeMerge
 import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
 import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
 import com.glia.widgets.view.unifiedui.theme.entrywidget.EntryWidgetTheme
@@ -35,11 +36,17 @@ internal class EntryWidgetView : RecyclerView, EntryWidgetContract.View {
         get() = _viewAdapter ?: throw IllegalStateException("Make sure adapter is set up before attempting to show any items")
     private var dividerView: EntryWidgetItemDivider? = null
 
-    override val whiteLabel by lazy {
+    private val uiThemeWhiteLabel by lazy {
         TypedValue().run {
             context.theme.resolveAttribute(R.attr.whiteLabel, this, true)
             data != 0
         }
+    }
+
+    var unifiedThemeWhiteLabel: Boolean? = null
+
+    override val whiteLabel by lazy {
+        uiThemeWhiteLabel nullSafeMerge unifiedThemeWhiteLabel
     }
 
     init {

@@ -116,31 +116,31 @@ class MainFragment : Fragment() {
         val visitorContextAssetId = getContextAssetIdFromPrefs(sharedPreferences)
         view.findViewById<View>(R.id.chat_activity_button)
             .setOnClickListener {
-                visitorContextAssetId?.runCatching {
-                    engagementLauncher.startChat(requireActivity(), this)
-                }?.onFailure { error -> showToast("Error: ${error.message}") }
-                    ?: engagementLauncher.startChat(requireActivity())
+                runCatching {
+                    visitorContextAssetId?.run { engagementLauncher.startChat(requireActivity(), this) }
+                        ?: engagementLauncher.startChat(requireActivity())
+                }.onFailure { error -> showToast("Error: ${error.message}") }
             }
         view.findViewById<View>(R.id.audio_call_button)
             .setOnClickListener {
-                visitorContextAssetId?.runCatching {
-                    engagementLauncher.startAudioCall(requireActivity(), this)
-                }?.onFailure { error -> showToast("Error: ${error.message}") }
-                    ?: engagementLauncher.startAudioCall(requireActivity())
+                runCatching {
+                    visitorContextAssetId?.run { engagementLauncher.startAudioCall(requireActivity(), this) }
+                        ?: engagementLauncher.startAudioCall(requireActivity())
+                }.onFailure { error -> showToast("Error: ${error.message}") }
             }
         view.findViewById<View>(R.id.video_call_button)
             .setOnClickListener {
-                visitorContextAssetId?.runCatching {
-                    engagementLauncher.startVideoCall(requireActivity(), this)
-                }?.onFailure { error -> showToast("Error: ${error.message}") }
-                    ?: engagementLauncher.startVideoCall(requireActivity())
+                runCatching {
+                    visitorContextAssetId?.run { engagementLauncher.startVideoCall(requireActivity(), this) }
+                        ?: engagementLauncher.startVideoCall(requireActivity())
+                }.onFailure { error -> showToast("Error: ${error.message}") }
             }
         view.findViewById<View>(R.id.message_center_activity_button)
             .setOnClickListener {
-                visitorContextAssetId?.runCatching {
-                    engagementLauncher.startSecureMessaging(requireActivity(), this)
-                }?.onFailure { error -> showToast("Error: ${error.message}") }
-                    ?: engagementLauncher.startSecureMessaging(requireActivity())
+                runCatching {
+                    visitorContextAssetId?.run { engagementLauncher.startSecureMessaging(requireActivity(), this) }
+                        ?: engagementLauncher.startSecureMessaging(requireActivity())
+                }.onFailure { error -> showToast("Error: ${error.message}") }
             }
         view.findViewById<View>(R.id.end_engagement_button)
             .setOnClickListener { GliaWidgets.endEngagement() }
@@ -529,7 +529,7 @@ class MainFragment : Fragment() {
             createDefaultConfig(
                 context = requireActivity().applicationContext,
 //                uiJsonRemoteConfig = UnifiedUiConfigurationLoader.fetchLocalConfigSample(requireContext()),
-//                region = "us"
+//                region = "beta"
             ),
             onComplete = {
                 prepareAuthentication()

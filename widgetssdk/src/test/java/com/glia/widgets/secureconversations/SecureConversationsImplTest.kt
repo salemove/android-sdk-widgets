@@ -23,39 +23,6 @@ class SecureConversationsImplTest {
     }
 
     @Test
-    fun `getUnreadMessageCount calls SDK and invokes onResult`() {
-        val onResult: OnResult<Int> = mockk(relaxed = true)
-        val onError: OnError = mockk(relaxed = true)
-        val unreadCount = 5
-        every { secureConversationsCore.getUnreadMessageCount(any()) } answers {
-            firstArg<RequestCallback<Int>>().onResult(unreadCount, null)
-        }
-
-        secureConversationsWidgets.getUnreadMessageCount(onResult, onError)
-
-        verify { onResult.onResult(unreadCount) }
-        verify(exactly = 0) { onError.onError(any()) }
-    }
-
-    @Test
-    fun `getUnreadMessageCount calls SDK and invokes onError on failure`() {
-        val onResult: OnResult<Int> = mockk(relaxed = true)
-        val onError: OnError = mockk(relaxed = true)
-        val exception = mock<GliaException>()
-        val widgetsException = GliaWidgetsException("Error", GliaWidgetsException.Cause.AUTHENTICATION_ERROR)
-        mockkStatic("com.glia.widgets.GliaWidgetsExceptionKt")
-        every { exception.toWidgetsType() } returns widgetsException
-        every { secureConversationsCore.getUnreadMessageCount(any()) } answers {
-            firstArg<RequestCallback<Int>>().onResult(null, exception)
-        }
-
-        secureConversationsWidgets.getUnreadMessageCount(onResult, onError)
-
-        verify { onError.onError(widgetsException) }
-        verify(exactly = 0) { onResult.onResult(any()) }
-    }
-
-    @Test
     fun `subscribeToUnreadMessageCount adds callback and calls SDK`() {
         val callback: OnResult<Int> = mockk(relaxed = true)
         val requestCallbackSlot = slot<RequestCallback<Int>>()

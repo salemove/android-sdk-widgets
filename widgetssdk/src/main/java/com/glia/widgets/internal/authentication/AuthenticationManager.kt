@@ -46,6 +46,7 @@ internal class AuthenticationManager(
 
             onComplete.onComplete()
 
+            Dependencies.controllerFactory.pushClickHandlerController.onAuthenticated()
         }
     }
 
@@ -91,7 +92,7 @@ internal class AuthenticationManager(
 
 internal fun AuthenticationManager.toCoreType(): CoreAuthentication = this.let { widgetAuthentication ->
     object : CoreAuthentication {
-        override fun setBehavior(behavior: com.glia.androidsdk.visitor.Authentication.Behavior) {
+        override fun setBehavior(behavior: CoreAuthentication.Behavior) {
             widgetAuthentication.setBehavior(behavior.toWidgetsType())
         }
 

@@ -131,7 +131,7 @@ internal object Dependencies {
 
     private val uiComponentsDispatcher: UiComponentsDispatcher by lazy { UiComponentsDispatcherImpl() }
 
-    private val authenticationCallback: () -> Unit
+    private val authenticationRequestCallback: () -> Unit
         get() = useCaseFactory.getRequestPushNotificationDuringAuthenticationUseCase(uiComponentsDispatcher)::invoke
 
     @JvmStatic
@@ -194,7 +194,9 @@ internal object Dependencies {
             managerFactory,
             gliaCore,
             applicationLifecycleManager,
-            notificationManager
+            notificationManager,
+            configurationManager,
+            uiComponentsDispatcher
         )
         initApplicationLifecycleObserver(applicationLifecycleManager, controllerFactory.chatHeadController)
 
@@ -301,7 +303,7 @@ internal object Dependencies {
 
     @JvmStatic
     fun getAuthenticationManager(behavior: Authentication.Behavior): AuthenticationManager =
-        AuthenticationManager(gliaCore.getAuthentication(behavior.toCoreType()), authenticationCallback).apply {
+        AuthenticationManager(gliaCore.getAuthentication(behavior.toCoreType()), authenticationRequestCallback).apply {
             authenticationManagerProvider.authenticationManager = this
         }
 

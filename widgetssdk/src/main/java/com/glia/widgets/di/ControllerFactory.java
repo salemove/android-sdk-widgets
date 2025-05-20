@@ -26,18 +26,22 @@ import com.glia.widgets.helper.TimeCounter;
 import com.glia.widgets.internal.dialog.DialogContract;
 import com.glia.widgets.internal.dialog.DialogController;
 import com.glia.widgets.internal.notification.device.INotificationManager;
+import com.glia.widgets.launcher.ConfigurationManager;
 import com.glia.widgets.messagecenter.MessageCenterContract;
 import com.glia.widgets.messagecenter.MessageCenterController;
 import com.glia.widgets.operator.OperatorRequestContract;
 import com.glia.widgets.operator.OperatorRequestController;
 import com.glia.widgets.permissions.PermissionsRequestContract;
 import com.glia.widgets.permissions.controller.PermissionsRequestController;
+import com.glia.widgets.push.notifications.PushClickHandlerController;
+import com.glia.widgets.push.notifications.PushClickHandlerControllerImpl;
 import com.glia.widgets.push.notifications.SecureMessagingPushController;
 import com.glia.widgets.push.notifications.SecureMessagingPushControllerImpl;
 import com.glia.widgets.survey.SurveyContract;
 import com.glia.widgets.survey.SurveyController;
 import com.glia.widgets.view.MessagesNotSeenHandler;
 import com.glia.widgets.view.MinimizeHandler;
+import com.glia.widgets.view.dialog.UiComponentsDispatcher;
 import com.glia.widgets.view.head.ChatHeadContract;
 import com.glia.widgets.view.head.ChatHeadLayoutContract;
 import com.glia.widgets.view.head.ChatHeadPosition;
@@ -67,6 +71,8 @@ public class ControllerFactory {
     private final GliaCore core;
     private final ApplicationLifecycleManager applicationLifecycleManager;
     private final INotificationManager notificationManager;
+    private final ConfigurationManager configurationManager;
+    private final UiComponentsDispatcher uiComponentsDispatcher;
     private EngagementCompletionContract.Controller engagementCompletionController;
     private ChatContract.Controller retainedChatController;
     private CallContract.Controller retainedCallController;
@@ -75,6 +81,7 @@ public class ControllerFactory {
     private ActivityWatcherForChatHeadController activityWatcherForChatHeadController;
     private ActivityWatcherForLiveObservationController activityWatcherForLiveObservationController;
     private EntryWidgetHideController entryWidgetHideController;
+    private PushClickHandlerController pushClickHandlerController;
 
     public ControllerFactory(
         RepositoryFactory repositoryFactory,
@@ -82,7 +89,9 @@ public class ControllerFactory {
         ManagerFactory managerFactory,
         GliaCore core,
         ApplicationLifecycleManager applicationLifecycleManager,
-        INotificationManager notificationManager
+        INotificationManager notificationManager,
+        ConfigurationManager configurationManager,
+        UiComponentsDispatcher uiComponentsDispatcher
     ) {
         this.repositoryFactory = repositoryFactory;
         messagesNotSeenHandler = new MessagesNotSeenHandler(
@@ -93,6 +102,8 @@ public class ControllerFactory {
         this.core = core;
         this.applicationLifecycleManager = applicationLifecycleManager;
         this.notificationManager = notificationManager;
+        this.configurationManager = configurationManager;
+        this.uiComponentsDispatcher = uiComponentsDispatcher;
         this.dialogController = new DialogController();
         this.filePreviewController = new ImagePreviewController(
             useCaseFactory.createGetImageFileFromDownloadsUseCase(),
@@ -429,5 +440,16 @@ public class ControllerFactory {
             useCaseFactory.getIsNotificationPermissionGrantedUseCase(),
             new IntentHelperImpl()
         );
+    }
+
+    @NonNull
+    public PushClickHandlerController getPushClickHandlerController() {
+        if (pushClickHandlerController == null) {
+            pushClickHandlerController = new PushClickHandlerControllerImpl(
+                configurationManager,
+                uiComponentsDispatcher
+            );
+        }
+        return pushClickHandlerController;
     }
 }

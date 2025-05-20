@@ -7,7 +7,7 @@ import com.glia.widgets.internal.secureconversations.domain.HasOngoingSecureConv
 import com.glia.widgets.engagement.domain.EngagementTypeUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 import com.glia.widgets.helper.Logger
-import com.glia.widgets.view.snackbar.SnackbarContract
+import com.glia.widgets.view.dialog.UiComponentsDispatcher
 import io.mockk.MockKAnnotations
 import io.mockk.confirmVerified
 import io.mockk.every
@@ -32,7 +32,7 @@ class EngagementLauncherImplTest {
     private lateinit var engagementTypeUseCase: EngagementTypeUseCase
 
     @MockK(relaxUnitFun = true)
-    private lateinit var snackbarController: SnackbarContract.Controller
+    private lateinit var uiComponentsDispatcher: UiComponentsDispatcher
 
     @MockK
     private lateinit var activity: Activity
@@ -51,7 +51,7 @@ class EngagementLauncherImplTest {
         engagementLauncher = EngagementLauncherImpl(
             activityLauncher,
             configurationManager,
-            snackbarController,
+            uiComponentsDispatcher,
             hasOngoingSecureConversationUseCase,
             isQueueingOrLiveEngagementUseCase,
             engagementTypeUseCase,
@@ -80,7 +80,7 @@ class EngagementLauncherImplTest {
 
         verify { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
         verify { engagementTypeUseCase.isCallVisualizer }
-        verify(exactly = 1) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 1) { uiComponentsDispatcher.showSnackBar(any()) }
         verify(exactly = 0) { engagementTypeUseCase.isMediaEngagement }
         verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
         verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.isQueueing }
@@ -99,10 +99,10 @@ class EngagementLauncherImplTest {
 
         verify(exactly = 0) { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
         verify { engagementTypeUseCase.isCallVisualizer }
-        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showSnackBar(any()) }
         verify { engagementTypeUseCase.isMediaEngagement }
         verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
-        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showSnackBar(any()) }
         verify { isQueueingOrLiveEngagementUseCase.isQueueing }
         verify { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement }
         verify { activityLauncher.launchChat(any(), Intention.RETURN_TO_CHAT) }
@@ -119,10 +119,10 @@ class EngagementLauncherImplTest {
 
         verify(exactly = 0) { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
         verify { engagementTypeUseCase.isCallVisualizer }
-        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showSnackBar(any()) }
         verify { engagementTypeUseCase.isMediaEngagement }
         verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
-        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showSnackBar(any()) }
         verify { isQueueingOrLiveEngagementUseCase.isQueueing }
         verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement }
         verify { activityLauncher.launchChat(any(), Intention.RETURN_TO_CHAT) }
@@ -139,10 +139,10 @@ class EngagementLauncherImplTest {
 
         verify(exactly = 0) { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
         verify { engagementTypeUseCase.isCallVisualizer }
-        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showSnackBar(any()) }
         verify { engagementTypeUseCase.isMediaEngagement }
         verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
-        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showSnackBar(any()) }
         verify { isQueueingOrLiveEngagementUseCase.isQueueing }
         verify { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement }
         verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.RETURN_TO_CHAT) }
@@ -159,10 +159,10 @@ class EngagementLauncherImplTest {
 
         verify(exactly = 0) { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
         verify { engagementTypeUseCase.isCallVisualizer }
-        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showSnackBar(any()) }
         verify { engagementTypeUseCase.isMediaEngagement }
         verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
-        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showSnackBar(any()) }
         verify { isQueueingOrLiveEngagementUseCase.isQueueing }
         verify { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement }
         verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.RETURN_TO_CHAT) }
@@ -180,7 +180,7 @@ class EngagementLauncherImplTest {
 
         verify { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
         verify { engagementTypeUseCase.isCallVisualizer }
-        verify(exactly = 1) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 1) { uiComponentsDispatcher.showSnackBar(any()) }
         verify(exactly = 0) { engagementTypeUseCase.isMediaEngagement }
         verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
         verify(exactly = 0) { activityLauncher.launchCall(any(), null, false) }
@@ -199,13 +199,13 @@ class EngagementLauncherImplTest {
 
         verify(exactly = 0) { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
         verify { engagementTypeUseCase.isCallVisualizer }
-        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showSnackBar(any()) }
         verify { engagementTypeUseCase.isMediaEngagement }
         verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
         verify { activityLauncher.launchCall(any(), null, false) }
         verify(exactly = 0) { engagementTypeUseCase.isChatEngagement }
         verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
-        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showSnackBar(any()) }
         verify(exactly = 0) { hasOngoingSecureConversationUseCase(any(), any()) }
         verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.SC_DIALOG_START_AUDIO) }
         verify(exactly = 0) { activityLauncher.launchCall(any(), Engagement.MediaType.AUDIO, false) }
@@ -219,13 +219,13 @@ class EngagementLauncherImplTest {
 
         verify(exactly = 0) { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
         verify { engagementTypeUseCase.isCallVisualizer }
-        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showSnackBar(any()) }
         verify { engagementTypeUseCase.isMediaEngagement }
         verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
         verify { activityLauncher.launchCall(any(), null, false) }
         verify(exactly = 0) { engagementTypeUseCase.isChatEngagement }
         verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
-        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showSnackBar(any()) }
         verify(exactly = 0) { hasOngoingSecureConversationUseCase(any(), any()) }
         verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.SC_DIALOG_START_AUDIO) }
         verify(exactly = 0) { activityLauncher.launchCall(any(), Engagement.MediaType.AUDIO, false) }
@@ -244,7 +244,7 @@ class EngagementLauncherImplTest {
         verify(exactly = 0) { activityLauncher.launchCall(any(), null, false) }
         verify { engagementTypeUseCase.isChatEngagement }
         verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
-        verify(exactly = 1) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 1) { uiComponentsDispatcher.showSnackBar(any()) }
         verify(exactly = 0) { hasOngoingSecureConversationUseCase(any(), any()) }
         verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.SC_DIALOG_START_AUDIO) }
         verify(exactly = 0) { activityLauncher.launchCall(any(), Engagement.MediaType.AUDIO, false) }
@@ -263,7 +263,7 @@ class EngagementLauncherImplTest {
         verify(exactly = 0) { activityLauncher.launchCall(any(), null, false) }
         verify { engagementTypeUseCase.isChatEngagement }
         verify { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
-        verify(exactly = 1) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 1) { uiComponentsDispatcher.showSnackBar(any()) }
         verify(exactly = 0) { hasOngoingSecureConversationUseCase(any(), any()) }
         verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.SC_DIALOG_START_AUDIO) }
         verify(exactly = 0) { activityLauncher.launchCall(any(), Engagement.MediaType.AUDIO, false) }
@@ -277,13 +277,13 @@ class EngagementLauncherImplTest {
 
         verify(exactly = 0) { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
         verify { engagementTypeUseCase.isCallVisualizer }
-        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showSnackBar(any()) }
         verify { engagementTypeUseCase.isMediaEngagement }
         verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
         verify(exactly = 0) { activityLauncher.launchCall(any(), null, false) }
         verify { engagementTypeUseCase.isChatEngagement }
         verify { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
-        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showSnackBar(any()) }
         verify { hasOngoingSecureConversationUseCase(any(), any()) }
         verify { activityLauncher.launchChat(any(), Intention.SC_DIALOG_START_AUDIO) }
         verify(exactly = 0) { activityLauncher.launchCall(any(), Engagement.MediaType.AUDIO, false) }
@@ -297,13 +297,13 @@ class EngagementLauncherImplTest {
 
         verify(exactly = 0) { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
         verify { engagementTypeUseCase.isCallVisualizer }
-        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showSnackBar(any()) }
         verify { engagementTypeUseCase.isMediaEngagement }
         verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
         verify(exactly = 0) { activityLauncher.launchCall(any(), null, false) }
         verify { engagementTypeUseCase.isChatEngagement }
         verify { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
-        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showSnackBar(any()) }
         verify { hasOngoingSecureConversationUseCase(any(), any()) }
         verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.SC_DIALOG_START_AUDIO) }
         verify { activityLauncher.launchCall(any(), Engagement.MediaType.AUDIO, false) }
@@ -319,7 +319,7 @@ class EngagementLauncherImplTest {
         verify { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
         verify { engagementTypeUseCase.isCallVisualizer }
         verify { engagementTypeUseCase.hasVideo }
-        verify(exactly = 1) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 1) { uiComponentsDispatcher.showSnackBar(any()) }
         verify(exactly = 0) { engagementTypeUseCase.isMediaEngagement }
         verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
         verify(exactly = 0) { activityLauncher.launchCall(any(), null, false) }
@@ -339,13 +339,13 @@ class EngagementLauncherImplTest {
         verify { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
         verify { engagementTypeUseCase.isCallVisualizer }
         verify { engagementTypeUseCase.hasVideo }
-        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showSnackBar(any()) }
         verify { engagementTypeUseCase.isMediaEngagement }
         verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
         verify(exactly = 0) { activityLauncher.launchCall(any(), null, false) }
         verify { engagementTypeUseCase.isChatEngagement }
         verify { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
-        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showSnackBar(any()) }
         verify { hasOngoingSecureConversationUseCase(any(), any()) }
         verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.SC_DIALOG_START_VIDEO) }
         verify { activityLauncher.launchCall(any(), Engagement.MediaType.VIDEO, false) }
@@ -360,13 +360,13 @@ class EngagementLauncherImplTest {
         verify(exactly = 0) { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
         verify { engagementTypeUseCase.isCallVisualizer }
         verify(exactly = 0) { engagementTypeUseCase.hasVideo }
-        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showSnackBar(any()) }
         verify { engagementTypeUseCase.isMediaEngagement }
         verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
         verify { activityLauncher.launchCall(any(), null, false) }
         verify(exactly = 0) { engagementTypeUseCase.isChatEngagement }
         verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
-        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showSnackBar(any()) }
         verify(exactly = 0) { hasOngoingSecureConversationUseCase(any(), any()) }
         verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.SC_DIALOG_START_VIDEO) }
         verify(exactly = 0) { activityLauncher.launchCall(any(), Engagement.MediaType.VIDEO, false) }
@@ -381,13 +381,13 @@ class EngagementLauncherImplTest {
         verify(exactly = 0) { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
         verify { engagementTypeUseCase.isCallVisualizer }
         verify(exactly = 0) { engagementTypeUseCase.hasVideo }
-        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showSnackBar(any()) }
         verify { engagementTypeUseCase.isMediaEngagement }
         verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
         verify { activityLauncher.launchCall(any(), null, false) }
         verify(exactly = 0) { engagementTypeUseCase.isChatEngagement }
         verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
-        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showSnackBar(any()) }
         verify(exactly = 0) { hasOngoingSecureConversationUseCase(any(), any()) }
         verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.SC_DIALOG_START_VIDEO) }
         verify(exactly = 0) { activityLauncher.launchCall(any(), Engagement.MediaType.VIDEO, false) }
@@ -407,7 +407,7 @@ class EngagementLauncherImplTest {
         verify(exactly = 0) { activityLauncher.launchCall(any(), null, false) }
         verify { engagementTypeUseCase.isChatEngagement }
         verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
-        verify(exactly = 1) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 1) { uiComponentsDispatcher.showSnackBar(any()) }
         verify(exactly = 0) { hasOngoingSecureConversationUseCase(any(), any()) }
         verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.SC_DIALOG_START_VIDEO) }
         verify(exactly = 0) { activityLauncher.launchCall(any(), Engagement.MediaType.VIDEO, false) }
@@ -427,7 +427,7 @@ class EngagementLauncherImplTest {
         verify(exactly = 0) { activityLauncher.launchCall(any(), null, false) }
         verify { engagementTypeUseCase.isChatEngagement }
         verify { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
-        verify(exactly = 1) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 1) { uiComponentsDispatcher.showSnackBar(any()) }
         verify(exactly = 0) { hasOngoingSecureConversationUseCase(any(), any()) }
         verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.SC_DIALOG_START_VIDEO) }
         verify(exactly = 0) { activityLauncher.launchCall(any(), Engagement.MediaType.VIDEO, false) }
@@ -442,13 +442,13 @@ class EngagementLauncherImplTest {
         verify(exactly = 0) { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
         verify { engagementTypeUseCase.isCallVisualizer }
         verify(exactly = 0) { engagementTypeUseCase.hasVideo }
-        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showSnackBar(any()) }
         verify { engagementTypeUseCase.isMediaEngagement }
         verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
         verify(exactly = 0) { activityLauncher.launchCall(any(), null, false) }
         verify { engagementTypeUseCase.isChatEngagement }
         verify { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
-        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showSnackBar(any()) }
         verify { hasOngoingSecureConversationUseCase(any(), any()) }
         verify { activityLauncher.launchChat(any(), Intention.SC_DIALOG_START_VIDEO) }
         verify(exactly = 0) { activityLauncher.launchCall(any(), Engagement.MediaType.VIDEO, false) }
@@ -463,13 +463,13 @@ class EngagementLauncherImplTest {
         verify(exactly = 0) { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
         verify { engagementTypeUseCase.isCallVisualizer }
         verify(exactly = 0) { engagementTypeUseCase.hasVideo }
-        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showSnackBar(any()) }
         verify { engagementTypeUseCase.isMediaEngagement }
         verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
         verify(exactly = 0) { activityLauncher.launchCall(any(), null, false) }
         verify { engagementTypeUseCase.isChatEngagement }
         verify { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
-        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showSnackBar(any()) }
         verify { hasOngoingSecureConversationUseCase(any(), any()) }
         verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.SC_DIALOG_START_VIDEO) }
         verify { activityLauncher.launchCall(any(), Engagement.MediaType.VIDEO, false) }
@@ -484,7 +484,7 @@ class EngagementLauncherImplTest {
 
         verify { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
         verify { engagementTypeUseCase.isCallVisualizer }
-        verify(exactly = 1) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 1) { uiComponentsDispatcher.showSnackBar(any()) }
         verify(exactly = 0) { engagementTypeUseCase.isChatEngagement }
         verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
         verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.RETURN_TO_CHAT) }
@@ -503,13 +503,13 @@ class EngagementLauncherImplTest {
 
         verify(exactly = 0) { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
         verify { engagementTypeUseCase.isCallVisualizer }
-        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showSnackBar(any()) }
         verify { engagementTypeUseCase.isChatEngagement }
         verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
         verify { activityLauncher.launchChat(any(), Intention.RETURN_TO_CHAT) }
         verify(exactly = 0) { engagementTypeUseCase.isMediaEngagement }
         verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
-        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showSnackBar(any()) }
         verify(exactly = 0) { hasOngoingSecureConversationUseCase(any(), any()) }
         verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.SC_CHAT) }
         verify(exactly = 0) { activityLauncher.launchSecureMessagingWelcomeScreen(any()) }
@@ -523,13 +523,13 @@ class EngagementLauncherImplTest {
 
         verify(exactly = 0) { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
         verify { engagementTypeUseCase.isCallVisualizer }
-        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showSnackBar(any()) }
         verify { engagementTypeUseCase.isChatEngagement }
         verify { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
         verify { activityLauncher.launchChat(any(), Intention.RETURN_TO_CHAT) }
         verify(exactly = 0) { engagementTypeUseCase.isMediaEngagement }
         verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
-        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showSnackBar(any()) }
         verify(exactly = 0) { hasOngoingSecureConversationUseCase(any(), any()) }
         verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.SC_CHAT) }
         verify(exactly = 0) { activityLauncher.launchSecureMessagingWelcomeScreen(any()) }
@@ -548,7 +548,7 @@ class EngagementLauncherImplTest {
         verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.RETURN_TO_CHAT) }
         verify { engagementTypeUseCase.isMediaEngagement }
         verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
-        verify(exactly = 1) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 1) { uiComponentsDispatcher.showSnackBar(any()) }
         verify(exactly = 0) { hasOngoingSecureConversationUseCase(any(), any()) }
         verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.SC_CHAT) }
         verify(exactly = 0) { activityLauncher.launchSecureMessagingWelcomeScreen(any()) }
@@ -567,7 +567,7 @@ class EngagementLauncherImplTest {
         verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.RETURN_TO_CHAT) }
         verify { engagementTypeUseCase.isMediaEngagement }
         verify(exactly = 0) { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
-        verify(exactly = 1) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 1) { uiComponentsDispatcher.showSnackBar(any()) }
         verify(exactly = 0) { hasOngoingSecureConversationUseCase(any(), any()) }
         verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.SC_CHAT) }
         verify(exactly = 0) { activityLauncher.launchSecureMessagingWelcomeScreen(any()) }
@@ -581,13 +581,13 @@ class EngagementLauncherImplTest {
 
         verify(exactly = 0) { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
         verify { engagementTypeUseCase.isCallVisualizer }
-        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showSnackBar(any()) }
         verify { engagementTypeUseCase.isChatEngagement }
         verify { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
         verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.RETURN_TO_CHAT) }
         verify { engagementTypeUseCase.isMediaEngagement }
         verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
-        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showSnackBar(any()) }
         verify { hasOngoingSecureConversationUseCase(any(), any()) }
         verify { activityLauncher.launchChat(any(), Intention.SC_CHAT) }
         verify(exactly = 0) { activityLauncher.launchSecureMessagingWelcomeScreen(any()) }
@@ -601,13 +601,13 @@ class EngagementLauncherImplTest {
 
         verify(exactly = 0) { configurationManager.setVisitorContextAssetId(eq(visitorContextAssetId)) }
         verify { engagementTypeUseCase.isCallVisualizer }
-        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showSnackBar(any()) }
         verify { engagementTypeUseCase.isChatEngagement }
         verify { isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat }
         verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.RETURN_TO_CHAT) }
         verify { engagementTypeUseCase.isMediaEngagement }
         verify { isQueueingOrLiveEngagementUseCase.isQueueingForMedia }
-        verify(exactly = 0) { snackbarController.showSnackBar(any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showSnackBar(any()) }
         verify { hasOngoingSecureConversationUseCase(any(), any()) }
         verify(exactly = 0) { activityLauncher.launchChat(any(), Intention.SC_CHAT) }
         verify { activityLauncher.launchSecureMessagingWelcomeScreen(any()) }

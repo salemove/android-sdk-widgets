@@ -1,10 +1,7 @@
 package com.glia.widgets.secureconversations
 
 import com.glia.androidsdk.RequestCallback
-import com.glia.widgets.GliaWidgetsException
-import com.glia.widgets.callbacks.OnError
 import com.glia.widgets.callbacks.OnResult
-import com.glia.widgets.toWidgetsType
 
 /**
  * Secure Conversations offers the ability to asynchronously and securely communications for authenticated visitors.
@@ -14,24 +11,10 @@ import com.glia.widgets.toWidgetsType
  */
 interface SecureConversations {
     /**
-     * Returns the number of unread messages for the secure conversations.
-     * This number will increase with each message sent by the operator
-     * that the visitor has not yet marked as read.
-     *
-     * @param onResult [OnResult] a callback that returns the number of unread
-     * secure messages on success.
-     * @param onError [OnError] a callback that returns [GliaWidgetsException] on failure.
-     *
-     * Exception may have one of the following causes:
-     * [GliaWidgetsException.Cause.AUTHENTICATION_ERROR] -when a visitor is not authenticated
-     * [GliaWidgetsException.Cause.INVALID_INPUT] - when SDK is not initialized
-     */
-    fun getUnreadMessageCount(onResult: OnResult<Int>, onError: OnError? = null)
-
-    /**
      * Subscribes to updates of the unread message count.
      *
-     * This method allows you to receive updates whenever the unread message count changes.
+     * This method allows you to receive updates whenever the unread message count for
+     * the secure conversations changes. It doesn't count the live chat messages.
      * The provided callback will be triggered with the updated count.
      *
      * @param callback [OnResult] A callback that will be invoked with the updated unread message count.
@@ -62,16 +45,6 @@ class SecureConversationsImpl(
 ) : SecureConversations {
 
     internal val subscribedCallbacks: MutableMap<Int, RequestCallback<Int>> = mutableMapOf()
-
-    override fun getUnreadMessageCount(onResult: OnResult<Int>, onError: OnError?) {
-        secureConversations.getUnreadMessageCount { count, gliaException ->
-            if (gliaException != null || count == null) {
-                onError?.onError(gliaException.toWidgetsType("Failed to get unread message count"))
-            } else {
-                onResult.onResult(count)
-            }
-        }
-    }
 
     override fun subscribeToUnreadMessageCount(callback: OnResult<Int>) {
         if (subscribedCallbacks.containsKey(callback.hashCode())) {

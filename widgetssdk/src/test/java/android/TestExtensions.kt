@@ -63,4 +63,7 @@ internal fun <T : Any> mockkOneTimeEvent(value: T, isConsumed: Boolean = false):
     mockk(relaxUnitFun = true) {
         every { consumed } returns isConsumed
         every { this@mockk.value } returns value
+        every { consume(captureLambda()) } answers {
+            firstArg<T.() -> Unit>().invoke(value)
+        }
     }

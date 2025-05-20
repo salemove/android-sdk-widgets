@@ -1,7 +1,7 @@
 package com.glia.widgets.view.dialog
 
 import android.assertCurrentValue
-import com.glia.widgets.view.dialog.DialogDispatcher.State.NotificationPermissionDialog
+import com.glia.widgets.view.dialog.UiComponentsDispatcher.State.NotificationPermissionDialog
 import io.mockk.mockk
 import io.mockk.verify
 import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
@@ -11,13 +11,13 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
-internal class DialogDispatcherTest {
-    lateinit var dispatcher: DialogDispatcher
+internal class UiComponentsDispatcherTest {
+    lateinit var dispatcher: UiComponentsDispatcher
 
     @Before
     fun setUp() {
         RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
-        dispatcher = DialogDispatcherImpl()
+        dispatcher = UiComponentsDispatcherImpl()
     }
 
     @After
@@ -53,6 +53,28 @@ internal class DialogDispatcherTest {
 
         dispatcher.dismissDialog()
 
-        state.assertCurrentValue(Predicate { it.value is DialogDispatcher.State.DismissDialog })
+        state.assertCurrentValue(Predicate { it.value is UiComponentsDispatcher.State.DismissDialog })
+    }
+
+    @Test
+    fun `showSnackBar will produce ShowSnackBar state`() {
+        val state = dispatcher.state.test()
+
+        state.assertEmpty().assertNotComplete()
+
+        dispatcher.showSnackBar(1)
+
+        state.assertCurrentValue(Predicate { it.value is UiComponentsDispatcher.State.ShowSnackBar && it.value.messageResId == 1 })
+    }
+
+    @Test
+    fun `launchSCTranscriptActivity will produce LaunchSCTranscriptActivity state`() {
+        val state = dispatcher.state.test()
+
+        state.assertEmpty().assertNotComplete()
+
+        dispatcher.launchSCTranscriptActivity()
+
+        state.assertCurrentValue(Predicate { it.value is UiComponentsDispatcher.State.LaunchSCTranscriptActivity })
     }
 }

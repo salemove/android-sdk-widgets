@@ -214,6 +214,20 @@ class QueueRepositoryTest {
     }
 
     @Test
+    fun `fetchQueues will skip fetch request when the state is Loading`() {
+        initialize()
+        val subscriber = queueRepository.queuesState.test()
+        subscriber.assertCurrentValue(QueuesState.Loading)
+
+        queueRepository.fetchQueues()
+        queueRepository.fetchQueues()
+        queueRepository.fetchQueues()
+        subscriber.assertCurrentValue(QueuesState.Loading)
+
+        verify(exactly = 1) { gliaCore.getQueues(any(), any()) }
+    }
+
+    @Test
     fun `onQueuesReceived will emit Empty state when site has no Queues`() {
         initialize()
 

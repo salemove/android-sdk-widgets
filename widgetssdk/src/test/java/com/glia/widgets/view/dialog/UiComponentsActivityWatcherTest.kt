@@ -10,16 +10,22 @@ import android.view.View
 import androidx.appcompat.app.AlertDialog
 import com.glia.widgets.UiTheme
 import com.glia.widgets.call.CallActivity
+import com.glia.widgets.chat.Intention
 import com.glia.widgets.helper.GliaActivityManager
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.OneTimeEvent
 import com.glia.widgets.helper.withRuntimeTheme
+import com.glia.widgets.launcher.ActivityLauncher
 import com.glia.widgets.view.Dialogs
+import com.glia.widgets.view.snackbar.SnackBarDelegate
+import com.glia.widgets.view.snackbar.SnackBarDelegateFactory
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkConstructor
 import io.mockk.mockkObject
 import io.mockk.mockkStatic
 import io.mockk.slot
+import io.mockk.unmockkConstructor
 import io.mockk.unmockkObject
 import io.mockk.unmockkStatic
 import io.mockk.verify
@@ -30,11 +36,12 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
-internal class ActivityWatcherForDialogTest {
+internal class UiComponentsActivityWatcherTest {
     lateinit var activityManager: GliaActivityManager
-    lateinit var controller: DialogDispatcher
-    lateinit var watcher: ActivityWatcherForDialog
-    lateinit var stateFlowable: PublishProcessor<OneTimeEvent<DialogDispatcher.State>>
+    lateinit var dispatcher: UiComponentsDispatcher
+    lateinit var watcher: UiComponentsActivityWatcher
+    lateinit var activityLauncher: ActivityLauncher
+    lateinit var stateFlowable: PublishProcessor<OneTimeEvent<UiComponentsDispatcher.State>>
 
     @Before
     fun setUp() {
@@ -47,11 +54,19 @@ internal class ActivityWatcherForDialogTest {
         stateFlowable = PublishProcessor.create()
 
         activityManager = mockk(relaxUnitFun = true)
-        controller = mockk(relaxUnitFun = true) {
+        dispatcher = mockk(relaxUnitFun = true) {
             every { state } returns stateFlowable
         }
 
-        watcher = ActivityWatcherForDialog(activityManager, controller)
+        activityLauncher = mockk(relaxUnitFun = true)
+
+        watcher = UiComponentsActivityWatcher(
+            activityManager,
+            dispatcher,
+            mockk(),
+            mockk(relaxed = true),
+            activityLauncher
+        )
     }
 
     @After
@@ -68,7 +83,7 @@ internal class ActivityWatcherForDialogTest {
     @Test
     fun `handleState will skip when event is already consumed`() {
         val activity = mockkActivity()
-        val event = mockkOneTimeEvent(DialogDispatcher.State.DismissDialog, isConsumed = true)
+        val event = mockkOneTimeEvent(UiComponentsDispatcher.State.DismissDialog, isConsumed = true)
         stateFlowable.onNext(event)
         watcher.onActivityResumed(activity)
 
@@ -80,7 +95,7 @@ internal class ActivityWatcherForDialogTest {
     fun `handleState will skip when activity is finishing`() {
         val activity = mockkActivity(isFinishing = true)
         watcher.onActivityResumed(activity)
-        val event = mockkOneTimeEvent(DialogDispatcher.State.NotificationPermissionDialog({ }, {}))
+        val event = mockkOneTimeEvent(UiComponentsDispatcher.State.NotificationPermissionDialog({ }, {}))
         stateFlowable.onNext(event)
 
         verify { event.consumed }
@@ -95,7 +110,7 @@ internal class ActivityWatcherForDialogTest {
         watcher.onActivityResumed(activity)
         resumedActivity.values().forEach { it.clear() }
 
-        val event = mockkOneTimeEvent(DialogDispatcher.State.NotificationPermissionDialog({ }, {}))
+        val event = mockkOneTimeEvent(UiComponentsDispatcher.State.NotificationPermissionDialog({ }, {}))
         stateFlowable.onNext(event)
 
         verify { event.consumed }
@@ -114,7 +129,7 @@ internal class ActivityWatcherForDialogTest {
         watcher.onActivityResumed(activity)
         val onAllow = mockk<() -> Unit>(relaxed = true)
         val onCancel = mockk<() -> Unit>(relaxed = true)
-        val event = mockkOneTimeEvent(DialogDispatcher.State.NotificationPermissionDialog(onAllow, onCancel))
+        val event = mockkOneTimeEvent(UiComponentsDispatcher.State.NotificationPermissionDialog(onAllow, onCancel))
         stateFlowable.onNext(event)
 
         verify(exactly = 0) { Logger.d(any(), match(skippingMatcher)) }
@@ -140,20 +155,54 @@ internal class ActivityWatcherForDialogTest {
         watcher.onActivityResumed(activity)
         val onAllow = mockk<() -> Unit>(relaxed = true)
         val onCancel = mockk<() -> Unit>(relaxed = true)
-        val event = mockkOneTimeEvent(DialogDispatcher.State.NotificationPermissionDialog(onAllow, onCancel))
+        val event = mockkOneTimeEvent(UiComponentsDispatcher.State.NotificationPermissionDialog(onAllow, onCancel))
         stateFlowable.onNext(event)
 
         verify(exactly = 0) { Logger.d(any(), match(skippingMatcher)) }
         verify { Dialogs.showPushNotificationsPermissionDialog(any(), any(), any(), any()) }
 
-        val dismissEvent = mockkOneTimeEvent(DialogDispatcher.State.DismissDialog)
+        val dismissEvent = mockkOneTimeEvent(UiComponentsDispatcher.State.DismissDialog)
         every { dismissEvent.consume(captureLambda()) } answers {
-            firstArg<DialogDispatcher.State.DismissDialog.() -> Unit>().invoke(DialogDispatcher.State.DismissDialog)
+            firstArg<UiComponentsDispatcher.State.DismissDialog.() -> Unit>().invoke(UiComponentsDispatcher.State.DismissDialog)
         }
         stateFlowable.onNext(dismissEvent)
         verify { dialog.dismiss() }
         verify(exactly = 0) { onAllow() }
         verify(exactly = 0) { onCancel() }
+    }
+
+    @Test
+    fun `handleState will show the snackbar when state is ShowSnackBar`() {
+        val resId = 1234
+        val snackBarDelegate = mockk<SnackBarDelegate>(relaxed = true)
+
+        mockkConstructor(SnackBarDelegateFactory::class)
+
+        every { anyConstructed<SnackBarDelegateFactory>().createDelegate() } returns snackBarDelegate
+
+        val activity = mockkActivity()
+
+        watcher.onActivityResumed(activity)
+        val event = mockkOneTimeEvent(UiComponentsDispatcher.State.ShowSnackBar(resId))
+
+        stateFlowable.onNext(event)
+
+        verify { anyConstructed<SnackBarDelegateFactory>().createDelegate() }
+        verify { snackBarDelegate.show() }
+
+        unmockkConstructor(SnackBarDelegateFactory::class)
+    }
+
+    @Test
+    fun `handleState will launch the SC transcript when state is LaunchSCTranscriptActivity`() {
+        val activity = mockkActivity()
+
+        watcher.onActivityResumed(activity)
+        val event = mockkOneTimeEvent(UiComponentsDispatcher.State.LaunchSCTranscriptActivity)
+
+        stateFlowable.onNext(event)
+
+        verify { activityLauncher.launchChat(activity, Intention.SC_CHAT) }
     }
 
     private fun mockkActivity(isFinishing: Boolean = false) = mockk<CallActivity>(relaxed = true) {

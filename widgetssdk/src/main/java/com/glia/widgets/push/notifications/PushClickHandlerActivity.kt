@@ -20,7 +20,10 @@ internal class PushClickHandlerActivity : FadeTransitionActivity() {
 
         // We need launcher intent to run the app's default flow.
         if (appLauncherIntent != null) {
-            pushClickHandlerController.handlePushClick(intent.getStringExtra(ExtraKeys.PN_QUEUE_ID))
+            pushClickHandlerController.handlePushClick(
+                intent.getStringExtra(ExtraKeys.PN_QUEUE_ID),
+                intent.getStringExtra(ExtraKeys.PN_VISITOR_ID)!!
+            )
             startActivity(appLauncherIntent)
         }
 

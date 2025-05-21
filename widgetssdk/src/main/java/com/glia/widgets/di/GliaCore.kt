@@ -18,6 +18,7 @@ import com.glia.androidsdk.queuing.QueueTicket
 import com.glia.androidsdk.secureconversations.SecureConversations
 import com.glia.androidsdk.site.SiteInfo
 import com.glia.androidsdk.visitor.Authentication
+import com.glia.androidsdk.visitor.Visitor
 import com.glia.androidsdk.visitor.VisitorInfo
 import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest
 import com.glia.widgets.engagement.MediaType
@@ -73,4 +74,5 @@ internal interface GliaCore {
 
     fun subscribeToQueueStateUpdates(queueIds: List<String>, onError: Consumer<GliaException>, callback: Consumer<Queue>)
     fun unsubscribeFromQueueUpdates(onError: Consumer<GliaException>?, callback: Consumer<Queue>)
+    fun getCurrentVisitor(onSuccess: (Visitor) -> Unit, onError: () -> Unit)
 }

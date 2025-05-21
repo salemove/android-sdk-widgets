@@ -97,7 +97,6 @@ class MainFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        updatePushNotificationPermissionState()
         containerView = view.findViewById(R.id.constraint_layout)
         val navController = NavHostFragment.findNavController(this)
 
@@ -292,6 +291,8 @@ class MainFragment : Fragment() {
             }
             setupAuthButtonsVisibility()
         }
+
+        updatePushNotificationPermissionState()
     }
 
     private fun setupAuthButtonsVisibility() {
@@ -578,7 +579,7 @@ class MainFragment : Fragment() {
 
     private fun deAuthenticate() {
         if (activity == null || containerView == null) return
-        authentication!!.deauthenticate({
+        authentication!!.deauthenticate( {
             setupAuthButtonsVisibility()
         }, { exception ->
             showToast("Error: $exception")

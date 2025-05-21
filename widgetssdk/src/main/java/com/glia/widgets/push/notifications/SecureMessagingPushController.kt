@@ -8,7 +8,7 @@ import com.glia.widgets.internal.notification.device.INotificationManager
 import com.glia.widgets.internal.permissions.domain.IsNotificationPermissionGrantedUseCase
 
 internal interface SecureMessagingPushController {
-    fun handleSecureMessage(context: Context, queueId: String, content: String)
+    fun handleSecureMessage(context: Context, queueId: String?, content: String, visitorId: String)
 }
 
 internal class SecureMessagingPushControllerImpl(
@@ -27,7 +27,7 @@ internal class SecureMessagingPushControllerImpl(
     private val isOnForeground: Boolean
         get() = applicationLifecycleManager.isAtLeast(Lifecycle.State.RESUMED)
 
-    override fun handleSecureMessage(context: Context, queueId: String, content: String) {
+    override fun handleSecureMessage(context: Context, queueId: String?, content: String, visitorId: String) {
         when {
             // App is on foreground, so we don't need to show a notification
             isOnForeground -> return
@@ -37,7 +37,7 @@ internal class SecureMessagingPushControllerImpl(
 
             else -> notificationManager.showSecureMessageNotification(
                 content,
-                intentHelper.pushClickHandlerPendingIntent(context, queueId)
+                intentHelper.pushClickHandlerPendingIntent(context, queueId, visitorId)
             )
         }
     }

@@ -41,7 +41,7 @@ class SecureMessagingPushControllerTest {
     fun `handleSecureMessage does nothing when the app is on foreground`() {
         every { applicationLifecycleManager.isAtLeast(Lifecycle.State.RESUMED) } returns true
 
-        secureMessagingPushController.handleSecureMessage(mockk(), "queueId", "content")
+        secureMessagingPushController.handleSecureMessage(mockk(), "queueId", "content", "visitorId")
 
         verify(exactly = 0) { isNotificationPermissionGrantedUseCase() }
         verify(exactly = 0) { notificationManager.showSecureMessageNotification(any(), any()) }
@@ -52,7 +52,7 @@ class SecureMessagingPushControllerTest {
         every { applicationLifecycleManager.isAtLeast(Lifecycle.State.RESUMED) } returns false
         every { isNotificationPermissionGrantedUseCase() } returns false
 
-        secureMessagingPushController.handleSecureMessage(mockk(), "queueId", "content")
+        secureMessagingPushController.handleSecureMessage(mockk(), "queueId", "content", "visitorId")
 
         verify(exactly = 0) { notificationManager.showSecureMessageNotification(any(), any()) }
     }
@@ -62,14 +62,15 @@ class SecureMessagingPushControllerTest {
         val pendingIntent = mockk<PendingIntent>()
         val queueId = "queueId"
         val content = "content"
+        val visitorId = "visitorId"
 
         every { applicationLifecycleManager.isAtLeast(Lifecycle.State.RESUMED) } returns false
         every { isNotificationPermissionGrantedUseCase() } returns true
-        every { intentHelper.pushClickHandlerPendingIntent(any(), queueId) } returns pendingIntent
+        every { intentHelper.pushClickHandlerPendingIntent(any(), queueId, visitorId) } returns pendingIntent
 
-        secureMessagingPushController.handleSecureMessage(mockk(), queueId, content)
+        secureMessagingPushController.handleSecureMessage(mockk(), queueId, content, visitorId)
 
-        verify { intentHelper.pushClickHandlerPendingIntent(any(), queueId) }
+        verify { intentHelper.pushClickHandlerPendingIntent(any(), queueId, visitorId) }
         verify { notificationManager.showSecureMessageNotification(content, pendingIntent) }
     }
 

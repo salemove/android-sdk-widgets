@@ -447,7 +447,8 @@ public class ControllerFactory {
         if (pushClickHandlerController == null) {
             pushClickHandlerController = new PushClickHandlerControllerImpl(
                 configurationManager,
-                uiComponentsDispatcher
+                uiComponentsDispatcher,
+                core
             );
         }
         return pushClickHandlerController;

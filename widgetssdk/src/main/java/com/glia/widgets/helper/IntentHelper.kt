@@ -43,6 +43,7 @@ internal object ExtraKeys {
     const val IS_UPGRADE_TO_CALL = "call_screen_is_upgrade_to_call"
 
     const val PN_QUEUE_ID = "queue_id"
+    const val PN_VISITOR_ID = "visitor_id"
 }
 
 internal interface IntentHelper {
@@ -76,7 +77,7 @@ internal interface IntentHelper {
 
     fun entryWidgetIntent(activity: Activity): Intent
 
-    fun pushClickHandlerPendingIntent(context: Context, queueId: String): PendingIntent
+    fun pushClickHandlerPendingIntent(context: Context, queueId: String?, visitorId: String): PendingIntent
 }
 
 internal class IntentHelperImpl : IntentHelper {
@@ -156,12 +157,14 @@ internal class IntentHelperImpl : IntentHelper {
     override fun entryWidgetIntent(activity: Activity): Intent = Intent(activity, EntryWidgetActivity::class.java)
         .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
 
-    override fun pushClickHandlerPendingIntent(context: Context, queueId: String): PendingIntent = PendingIntent.getActivity(
-        context, 0, pushClickHandlerIntent(context, queueId),
+    override fun pushClickHandlerPendingIntent(context: Context, queueId: String?, visitorId: String): PendingIntent = PendingIntent.getActivity(
+        context, 0, pushClickHandlerIntent(context, queueId, visitorId),
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
     )
 
-    private fun pushClickHandlerIntent(context: Context, queueId: String): Intent = Intent(context, PushClickHandlerActivity::class.java)
-        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        .putExtra(ExtraKeys.PN_QUEUE_ID, queueId)
+    private fun pushClickHandlerIntent(context: Context, queueId: String?, visitorId: String): Intent =
+        Intent(context, PushClickHandlerActivity::class.java)
+            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            .putExtra(ExtraKeys.PN_QUEUE_ID, queueId)
+            .putExtra(ExtraKeys.PN_VISITOR_ID, visitorId)
 }

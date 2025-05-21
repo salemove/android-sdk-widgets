@@ -3,6 +3,8 @@ package com.glia.widgets.push.notifications
 import android.Manifest
 import android.os.Build
 import androidx.annotation.RequiresApi
+import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.TAG
 import com.glia.widgets.internal.permissions.PermissionManager
 import com.glia.widgets.launcher.ConfigurationManager
 import com.glia.widgets.view.dialog.UiComponentsDispatcher
@@ -19,10 +21,12 @@ internal class RequestPushNotificationDuringAuthenticationUseCaseImpl(
 ) : RequestPushNotificationDuringAuthenticationUseCase {
     override fun invoke() {
         when {
-            configurationManager.suppressPushNotificationsPermissionRequestDuringAuthentication -> {
-                // Suppress permission request
-                return
-            }
+            // Suppress permission request
+            configurationManager.suppressPushNotificationsPermissionRequestDuringAuthentication -> Logger.i(
+                TAG,
+                "Skipping push notifications permission prompt during authentication. suppressPushNotificationsPermissionRequestDuringAuthentication = true."
+            )
+
 
             Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU -> {
                 // No need to request permission on Android versions below Tiramisu
@@ -42,7 +46,16 @@ internal class RequestPushNotificationDuringAuthenticationUseCaseImpl(
             permissionManager.shouldShowPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
                 // Show rationale dialog
                 uiComponentsDispatcher.showNotificationPermissionDialog(onAllow = {
+                    Logger.i(
+                        TAG,
+                        "Visitor's decision for intermediate push notification permission is 'allowed'"
+                    )
                     requestNotificationPermission()
+                }, onCancel = {
+                    Logger.i(
+                        TAG,
+                        "Visitor's decision for intermediate push notification permission is 'declined'"
+                    )
                 })
             }
 
@@ -55,6 +68,12 @@ internal class RequestPushNotificationDuringAuthenticationUseCaseImpl(
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun requestNotificationPermission() = permissionManager.handlePermissions(
-        additionalPermissions = listOf(Manifest.permission.POST_NOTIFICATIONS)
+        additionalPermissions = listOf(Manifest.permission.POST_NOTIFICATIONS),
+        additionalPermissionsGrantedCallback = {
+            Logger.i(
+                TAG,
+                "Visitor's decision for push notification permission during auth. is 'allowed=$it'"
+            )
+        }
     )
 }

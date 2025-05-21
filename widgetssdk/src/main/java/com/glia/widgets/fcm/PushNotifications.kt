@@ -80,10 +80,16 @@ interface PushNotifications {
 
 // Push notification key for the queue ID
 private const val QUEUE_ID_KEY = "queue_id"
+
+// Push notification key for the visitor ID
+private const val VISITOR_ID_KEY = "visitor_id"
+
 // Push notification key for the body
 private const val BODY_KEY = "body"
+
 // Push notification key for the event type
 private const val EVENT_TYPE_KEY = "event_type"
+
 // Push notification event type for secure messaging
 private const val SECURE_MESSAGING_TYPE = "engagement.secure_conversation.message"
 
@@ -110,7 +116,12 @@ internal class PushNotificationsImpl(
     override fun onNewMessage(service: FirebaseMessagingService, remoteMessage: RemoteMessage) = with(remoteMessage) {
         if (data[EVENT_TYPE_KEY] == SECURE_MESSAGING_TYPE) {
             // This message must be handled internally, so we don't need to pass it to the core's push notifications
-            secureMessagingPushController.handleSecureMessage(service, data[QUEUE_ID_KEY].orEmpty(), data[BODY_KEY].orEmpty())
+            secureMessagingPushController.handleSecureMessage(
+                service,
+                data[QUEUE_ID_KEY],
+                data[BODY_KEY].orEmpty(),
+                data[VISITOR_ID_KEY] ?: return@with // Visitor ID is required, otherwise it is unclear if the message is for the current user
+            )
         } else {
             corePushNotifications.onNewMessage(this)
         }

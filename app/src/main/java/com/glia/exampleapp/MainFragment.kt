@@ -14,6 +14,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -83,6 +84,7 @@ class MainFragment : Fragment() {
             isGranted == false -> R.string.push_notification_permission_not_granted
             requireActivity().checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED ->
                 R.string.push_notification_permission_granted
+
             else -> R.string.push_notification_permission_not_granted
         }
 
@@ -302,6 +304,7 @@ class MainFragment : Fragment() {
                 containerView!!.findViewById<View>(R.id.initGliaWidgetsButton).visibility = View.VISIBLE
                 containerView!!.findViewById<View>(R.id.authenticationButton).visibility = View.GONE
                 containerView!!.findViewById<View>(R.id.deauthenticationButton).visibility = View.GONE
+                containerView!!.findViewById<View>(R.id.stop_push_notifications).visibility = View.GONE
                 containerView!!.findViewById<View>(R.id.visitor_info_button).visibility = View.GONE
                 containerView!!.findViewById<View>(R.id.visitor_code_button).visibility = View.GONE
                 containerView!!.findViewById<View>(R.id.visitor_code_switch_container).visibility = View.GONE
@@ -319,6 +322,7 @@ class MainFragment : Fragment() {
                 containerView!!.findViewById<View>(R.id.initGliaWidgetsButton).visibility = View.GONE
                 containerView!!.findViewById<View>(R.id.authenticationButton).visibility = View.GONE
                 containerView!!.findViewById<View>(R.id.deauthenticationButton).visibility = View.VISIBLE
+                containerView!!.findViewById<View>(R.id.stop_push_notifications).visibility = View.VISIBLE
                 containerView!!.findViewById<View>(R.id.refreshAuthButton).visibility = View.VISIBLE
             }
         } else {
@@ -326,6 +330,7 @@ class MainFragment : Fragment() {
                 containerView!!.findViewById<View>(R.id.initGliaWidgetsButton).visibility = View.GONE
                 containerView!!.findViewById<View>(R.id.authenticationButton).visibility = View.VISIBLE
                 containerView!!.findViewById<View>(R.id.deauthenticationButton).visibility = View.GONE
+                containerView!!.findViewById<View>(R.id.stop_push_notifications).visibility = View.GONE
                 containerView!!.findViewById<View>(R.id.refreshAuthButton).visibility = View.GONE
             }
         }
@@ -579,7 +584,9 @@ class MainFragment : Fragment() {
 
     private fun deAuthenticate() {
         if (activity == null || containerView == null) return
-        authentication!!.deauthenticate( {
+        val stopPushNotifications = containerView!!.findViewById<CheckBox>(R.id.stop_push_notifications).isChecked
+
+        authentication?.deauthenticate(stopPushNotifications, {
             setupAuthButtonsVisibility()
         }, { exception ->
             showToast("Error: $exception")

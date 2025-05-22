@@ -1,6 +1,7 @@
 package com.glia.widgets.view.dialog
 
 import android.assertCurrentValue
+import com.glia.widgets.chat.Intention
 import com.glia.widgets.view.dialog.UiComponentsDispatcher.State.NotificationPermissionDialog
 import io.mockk.mockk
 import io.mockk.verify
@@ -68,13 +69,13 @@ internal class UiComponentsDispatcherTest {
     }
 
     @Test
-    fun `launchSCTranscriptActivity will produce LaunchSCTranscriptActivity state`() {
+    fun `launchChatScreen will produce LaunchChatScreen state`() {
         val state = dispatcher.state.test()
 
         state.assertEmpty().assertNotComplete()
 
-        dispatcher.launchSCTranscriptActivity()
+        dispatcher.launchChatScreen(Intention.RETURN_TO_CHAT)
 
-        state.assertCurrentValue(Predicate { it.value is UiComponentsDispatcher.State.LaunchSCTranscriptActivity })
+        state.assertCurrentValue(Predicate { it.value is UiComponentsDispatcher.State.LaunchChatScreen && it.value.intention == Intention.RETURN_TO_CHAT })
     }
 }

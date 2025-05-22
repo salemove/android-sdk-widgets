@@ -448,7 +448,9 @@ public class ControllerFactory {
             pushClickHandlerController = new PushClickHandlerControllerImpl(
                 configurationManager,
                 uiComponentsDispatcher,
-                core
+                core,
+                useCaseFactory.getIsQueueingOrEngagementUseCase(),
+                useCaseFactory.createIsAuthenticatedUseCase()
             );
         }
         return pushClickHandlerController;

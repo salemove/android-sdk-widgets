@@ -154,9 +154,7 @@ internal class GliaCoreImpl : GliaCore {
         Glia.unsubscribeFromQueueUpdates(onError, callback)
     }
 
-    override fun getCurrentVisitor(onSuccess: (Visitor) -> Unit, onError: () -> Unit) {
-        Glia.getCurrentVisitor { visitor, gliaException ->
-            visitor?.let { onSuccess(it) } ?: onError()
-        }
+    override fun getCurrentVisitor(onSuccess: (Visitor) -> Unit) = Glia.getCurrentVisitor { visitor, _ ->
+        onSuccess(visitor ?: return@getCurrentVisitor)
     }
 }

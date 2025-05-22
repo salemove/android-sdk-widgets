@@ -2,7 +2,6 @@ package com.glia.widgets.view.dialog
 
 import android.app.Activity
 import com.glia.widgets.base.BaseSingleActivityWatcher
-import com.glia.widgets.chat.Intention
 import com.glia.widgets.helper.DialogHolderActivity
 import com.glia.widgets.helper.GliaActivityManager
 import com.glia.widgets.helper.Logger
@@ -52,8 +51,8 @@ internal class UiComponentsActivityWatcher(
                 showSnackbar(activity, state.messageResId)
             }
 
-            state is UiComponentsDispatcher.State.LaunchSCTranscriptActivity -> event.consume {
-                activityLauncher.launchChat(activity, Intention.SC_CHAT)
+            state is UiComponentsDispatcher.State.LaunchChatScreen -> event.consume {
+                activityLauncher.launchChat(activity, intention = state.intention)
             }
         }
     }

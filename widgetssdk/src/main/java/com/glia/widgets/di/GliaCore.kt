@@ -74,5 +74,5 @@ internal interface GliaCore {
 
     fun subscribeToQueueStateUpdates(queueIds: List<String>, onError: Consumer<GliaException>, callback: Consumer<Queue>)
     fun unsubscribeFromQueueUpdates(onError: Consumer<GliaException>?, callback: Consumer<Queue>)
-    fun getCurrentVisitor(onSuccess: (Visitor) -> Unit, onError: () -> Unit)
+    fun getCurrentVisitor(onSuccess: (Visitor) -> Unit)
 }

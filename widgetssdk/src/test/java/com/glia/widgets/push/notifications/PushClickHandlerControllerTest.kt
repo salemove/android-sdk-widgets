@@ -3,13 +3,15 @@ package com.glia.widgets.push.notifications
 import android.mock
 import android.unMock
 import com.glia.androidsdk.visitor.Visitor
+import com.glia.widgets.chat.Intention
+import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.di.GliaCore
+import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.launcher.ConfigurationManager
 import com.glia.widgets.view.dialog.UiComponentsDispatcher
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.slot
 import io.mockk.verify
 import org.junit.After
 import org.junit.Before
@@ -19,6 +21,8 @@ class PushClickHandlerControllerTest {
     private lateinit var configurationManager: ConfigurationManager
     private lateinit var uiComponentsDispatcher: UiComponentsDispatcher
     private lateinit var gliaCore: GliaCore
+    private lateinit var isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase
+    private lateinit var isAuthenticatedUseCase: IsAuthenticatedUseCase
 
     private lateinit var pushClickHandlerController: PushClickHandlerController
 
@@ -29,11 +33,15 @@ class PushClickHandlerControllerTest {
         configurationManager = mockk(relaxUnitFun = true)
         uiComponentsDispatcher = mockk(relaxUnitFun = true)
         gliaCore = mockk(relaxUnitFun = true)
+        isQueueingOrLiveEngagementUseCase = mockk(relaxUnitFun = true)
+        isAuthenticatedUseCase = mockk(relaxUnitFun = true)
 
         pushClickHandlerController = PushClickHandlerControllerImpl(
             configurationManager,
             uiComponentsDispatcher,
-            gliaCore
+            gliaCore,
+            isQueueingOrLiveEngagementUseCase,
+            isAuthenticatedUseCase
         )
     }
 
@@ -43,54 +51,108 @@ class PushClickHandlerControllerTest {
     }
 
     @Test
-    fun `onAuthenticated does nothing when the pendingPn is null`() {
-        pushClickHandlerController.onAuthenticated()
+    fun `handlePushClick will just log when ongoing engagement but visitor is not authenticated`() {
+        every { isAuthenticatedUseCase() } returns false
+        every { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement } returns true
+        val visitorId = "visitorId"
+        val queueId = "queueId"
 
-        verify(exactly = 0) { gliaCore.getCurrentVisitor(any(), any()) }
+        mockkGetCurrentVisitorCallback(visitorId, false)
+
+        pushClickHandlerController.handlePushClick(queueId, visitorId)
+
+        verify { gliaCore.getCurrentVisitor(any()) }
+        verify {
+            Logger.i(any(), "Secure message push with unauthenticated visitor is processed with no actions.")
+        }
+
         verify(exactly = 0) { configurationManager.setQueueIds(any()) }
-        verify(exactly = 0) { uiComponentsDispatcher.launchSCTranscriptActivity() }
+        verify(exactly = 0) { uiComponentsDispatcher.launchChatScreen(any()) }
     }
 
     @Test
-    fun `onAuthenticated does nothing when getting visitor is failed`() {
-        val visitorID = "visitorID"
+    fun `handlePushClick will just log when authenticated with different visitor`() {
+        every { isAuthenticatedUseCase() } returns true
+        every { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement } returns false
+        val visitorId = "visitorId"
         val queueId = "queueId"
-        val onResultSlot = slot<(Visitor) -> Unit>()
-        val onErrorSlot = slot<() -> Unit>()
 
-        pushClickHandlerController.handlePushClick(queueId, visitorID)
-        pushClickHandlerController.onAuthenticated()
+        mockkGetCurrentVisitorCallback(visitorId, true)
 
-        verify { gliaCore.getCurrentVisitor(capture(onResultSlot), capture(onErrorSlot)) }
+        pushClickHandlerController.handlePushClick(queueId, "anotherVisitorId")
 
-        onErrorSlot.captured.invoke()
+        verify { gliaCore.getCurrentVisitor(any()) }
 
-        //call onAuthenticated multiple times to check that it doesn't call getCurrentVisitor again and pendingPn is null
-        pushClickHandlerController.onAuthenticated()
-        pushClickHandlerController.onAuthenticated()
-        pushClickHandlerController.onAuthenticated()
-        verify(exactly = 1) { gliaCore.getCurrentVisitor(any(), any()) }
-
+        verify {
+            Logger.i(any(), "Secure message push with unmatching `visitor_id` processed with no actions.")
+        }
         verify(exactly = 0) { configurationManager.setQueueIds(any()) }
-        verify(exactly = 0) { uiComponentsDispatcher.launchSCTranscriptActivity() }
+        verify(exactly = 0) { uiComponentsDispatcher.launchChatScreen(any()) }
+    }
+
+    @Test
+    fun `handlePushClick will open SC transcript screen when authenticated but no ongoing engagement`() {
+        every { isAuthenticatedUseCase() } returns true
+        every { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement } returns false
+        val visitorId = "visitorId"
+        val queueId = "queueId"
+
+        mockkGetCurrentVisitorCallback(visitorId, true)
+
+        pushClickHandlerController.handlePushClick(queueId, visitorId)
+
+        verify { gliaCore.getCurrentVisitor(any()) }
+
+        verify { configurationManager.setQueueIds(listOf(queueId)) }
+        verify { uiComponentsDispatcher.launchChatScreen(Intention.SC_CHAT) }
+        verify {
+            Logger.i(any(), "Secure message push with matching `visitor_id` and authenticated visitor is processed to open chat transcript.")
+        }
+    }
+
+    @Test
+    fun `handlePushClick will open Live Chat screen when authenticated and has ongoing engagement`() {
+        every { isAuthenticatedUseCase() } returns true
+        every { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement } returns true
+        val visitorId = "visitorId"
+        val queueId = "queueId"
+
+        mockkGetCurrentVisitorCallback(visitorId, true)
+
+        pushClickHandlerController.handlePushClick(queueId, visitorId)
+
+        verify { gliaCore.getCurrentVisitor(any()) }
+
+        verify { configurationManager.setQueueIds(listOf(queueId)) }
+        verify { uiComponentsDispatcher.launchChatScreen(Intention.RETURN_TO_CHAT) }
+        verify {
+            Logger.i(any(), "Secure message push with matching `visitor_id` and authenticated visitor is processed to open chat transcript.")
+        }
+    }
+
+    @Test
+    fun `onAuthenticated does nothing when no engagement and not authenticated yet`() {
+        every { isAuthenticatedUseCase() } returns false
+        every { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement } returns false
+
+        pushClickHandlerController.onAuthenticated()
+
+        verify(exactly = 0) { gliaCore.getCurrentVisitor(any()) }
+        verify(exactly = 0) { configurationManager.setQueueIds(any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.launchChatScreen(any()) }
     }
 
     @Test
     fun `onAuthenticated logs when the auth is failed`() {
-        val visitorID = "visitorID"
+        every { isAuthenticatedUseCase() } returns false
+        every { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement } returns false
+        val visitorId = "visitorId"
         val queueId = "queueId"
-        val visitor = mockk<Visitor> {
-            every { visitorId } returns visitorID
-            every { isVisitorAuthenticated } returns false
-        }
-        val onResultSlot = slot<(Visitor) -> Unit>()
-
-        pushClickHandlerController.handlePushClick(queueId, visitorID)
+        mockkGetCurrentVisitorCallback(visitorId, false)
+        pushClickHandlerController.handlePushClick(queueId, visitorId)
         pushClickHandlerController.onAuthenticated()
 
-        verify { gliaCore.getCurrentVisitor(capture(onResultSlot), any()) }
-
-        onResultSlot.captured(visitor)
+        verify { gliaCore.getCurrentVisitor(any()) }
 
         verify {
             Logger.i(
@@ -103,28 +165,24 @@ class PushClickHandlerControllerTest {
         pushClickHandlerController.onAuthenticated()
         pushClickHandlerController.onAuthenticated()
         pushClickHandlerController.onAuthenticated()
-        verify(exactly = 1) { gliaCore.getCurrentVisitor(any(), any()) }
+        verify(exactly = 1) { gliaCore.getCurrentVisitor(any()) }
 
         verify(exactly = 0) { configurationManager.setQueueIds(any()) }
-        verify(exactly = 0) { uiComponentsDispatcher.launchSCTranscriptActivity() }
+        verify(exactly = 0) { uiComponentsDispatcher.launchChatScreen(any()) }
     }
 
     @Test
     fun `onAuthenticated logs when the visitor ids does not match`() {
-        val visitorID = "visitorID"
+        every { isAuthenticatedUseCase() } returns false
+        every { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement } returns false
+        val visitorId = "visitorId"
         val queueId = "queueId"
-        val visitor = mockk<Visitor> {
-            every { visitorId } returns "anothervisitorID"
-            every { isVisitorAuthenticated } returns true
-        }
-        val onResultSlot = slot<(Visitor) -> Unit>()
+        mockkGetCurrentVisitorCallback(visitorId, true)
 
-        pushClickHandlerController.handlePushClick(queueId, visitorID)
+        pushClickHandlerController.handlePushClick(queueId, "anotherVisitorId")
         pushClickHandlerController.onAuthenticated()
 
-        verify { gliaCore.getCurrentVisitor(capture(onResultSlot), any()) }
-
-        onResultSlot.captured(visitor)
+        verify { gliaCore.getCurrentVisitor( any()) }
 
         verify {
             Logger.i(
@@ -137,31 +195,26 @@ class PushClickHandlerControllerTest {
         pushClickHandlerController.onAuthenticated()
         pushClickHandlerController.onAuthenticated()
         pushClickHandlerController.onAuthenticated()
-        verify(exactly = 1) { gliaCore.getCurrentVisitor(any(), any()) }
+        verify(exactly = 1) { gliaCore.getCurrentVisitor( any()) }
 
         verify(exactly = 0) { configurationManager.setQueueIds(any()) }
-        verify(exactly = 0) { uiComponentsDispatcher.launchSCTranscriptActivity() }
+        verify(exactly = 0) { uiComponentsDispatcher.launchChatScreen(any()) }
     }
 
     @Test
     fun `onAuthenticated launches sc transcript activity when visitor ids match`() {
-        val visitorID = "visitorID"
+        every { isAuthenticatedUseCase() } returns false
+        every { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement } returns false
+        val visitorId = "visitorId"
         val queueId = "queueId"
-        val visitor = mockk<Visitor> {
-            every { visitorId } returns visitorID
-            every { isVisitorAuthenticated } returns true
-        }
-        val onResultSlot = slot<(Visitor) -> Unit>()
-
-        pushClickHandlerController.handlePushClick(queueId, visitorID)
+        mockkGetCurrentVisitorCallback(visitorId, true)
+        pushClickHandlerController.handlePushClick(queueId, visitorId)
         pushClickHandlerController.onAuthenticated()
 
-        verify { gliaCore.getCurrentVisitor(capture(onResultSlot), any()) }
-
-        onResultSlot.captured(visitor)
+        verify { gliaCore.getCurrentVisitor(any()) }
 
         verify { configurationManager.setQueueIds(any()) }
-        verify { uiComponentsDispatcher.launchSCTranscriptActivity() }
+        verify { uiComponentsDispatcher.launchChatScreen(Intention.SC_CHAT) }
         verify {
             Logger.i(
                 any(),
@@ -173,31 +226,26 @@ class PushClickHandlerControllerTest {
         pushClickHandlerController.onAuthenticated()
         pushClickHandlerController.onAuthenticated()
         pushClickHandlerController.onAuthenticated()
-        verify(exactly = 1) { gliaCore.getCurrentVisitor(any(), any()) }
+        verify(exactly = 1) { gliaCore.getCurrentVisitor(any()) }
 
         verify(exactly = 1) { configurationManager.setQueueIds(listOf(queueId)) }
-        verify(exactly = 1) { uiComponentsDispatcher.launchSCTranscriptActivity() }
+        verify(exactly = 1) { uiComponentsDispatcher.launchChatScreen(any()) }
     }
 
     @Test
     fun `onAuthenticated creates empty list when the queue id is null`() {
-        val visitorID = "visitorID"
+        every { isAuthenticatedUseCase() } returns false
+        every { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement } returns false
+        val visitorId = "visitorId"
         val queueId = null
-        val visitor = mockk<Visitor> {
-            every { visitorId } returns visitorID
-            every { isVisitorAuthenticated } returns true
-        }
-        val onResultSlot = slot<(Visitor) -> Unit>()
-
-        pushClickHandlerController.handlePushClick(queueId, visitorID)
+        mockkGetCurrentVisitorCallback(visitorId, true)
+        pushClickHandlerController.handlePushClick(queueId, visitorId)
         pushClickHandlerController.onAuthenticated()
 
-        verify { gliaCore.getCurrentVisitor(capture(onResultSlot), any()) }
-
-        onResultSlot.captured(visitor)
+        verify { gliaCore.getCurrentVisitor(any()) }
 
         verify { configurationManager.setQueueIds(any()) }
-        verify { uiComponentsDispatcher.launchSCTranscriptActivity() }
+        verify { uiComponentsDispatcher.launchChatScreen(any()) }
         verify {
             Logger.i(
                 any(),
@@ -209,10 +257,21 @@ class PushClickHandlerControllerTest {
         pushClickHandlerController.onAuthenticated()
         pushClickHandlerController.onAuthenticated()
         pushClickHandlerController.onAuthenticated()
-        verify(exactly = 1) { gliaCore.getCurrentVisitor(any(), any()) }
+        verify(exactly = 1) { gliaCore.getCurrentVisitor(any()) }
 
         verify(exactly = 1) { configurationManager.setQueueIds(match { it.isEmpty() }) }
-        verify(exactly = 1) { uiComponentsDispatcher.launchSCTranscriptActivity() }
+        verify(exactly = 1) { uiComponentsDispatcher.launchChatScreen(any()) }
+    }
+
+    private fun mockkGetCurrentVisitorCallback(id: String, authenticated: Boolean) {
+        val visitor = mockk<Visitor> {
+            every { visitorId } returns id
+            every { isVisitorAuthenticated } returns authenticated
+        }
+
+        every { gliaCore.getCurrentVisitor(captureLambda()) } answers {
+            firstArg<(Visitor) -> Unit>().invoke(visitor)
+        }
     }
 
 }

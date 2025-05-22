@@ -80,7 +80,7 @@ class VisitorInfoFragment : Fragment() {
         phoneEditText.setText(visitorInfo.phone)
         externalIdEditText.setText(visitorInfo.externalId)
         noteEditText.setText(visitorInfo.note)
-        customAttributesAdapter.setAttributes(visitorInfo.customAttributesMap)
+        customAttributesAdapter.setAttributes(visitorInfo.customAttributes)
     }
 
     private fun showError(exception: GliaWidgetsException) {

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,8 +10,7 @@
      ChatHeadLayout is added from MainFragment.
      ScrollView can have only one child and it's child should have wrap_content height. -->
 
-    <ScrollView xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipChildren="false"
@@ -32,10 +33,10 @@
 
                 <com.google.android.material.appbar.MaterialToolbar
                     android:id="@+id/top_app_bar"
-                    android:layout_height="wrap_content"
-                    android:elevation="0dp"
                     style="@style/Widget.MaterialComponents.Toolbar.Primary"
                     android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:elevation="0dp"
                     android:minHeight="?attr/actionBarSize"
                     app:elevation="0dp"
                     app:menu="@menu/menu_main_fragment"
@@ -57,21 +58,22 @@
                 android:orientation="vertical"
                 app:layout_constraintGuide_end="16dp" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/settings_button"
+                style="@style/TestAppButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/margin_m"
+                android:layout_marginTop="8dp"
                 android:text="@string/main_open_settings"
                 app:layout_constraintEnd_toEndOf="@id/end_guideline"
                 app:layout_constraintStart_toStartOf="@id/start_guideline"
                 app:layout_constraintTop_toBottomOf="@id/tool_bar_layout" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/entry_widget_button"
+                style="@style/TestAppButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_m"
                 android:paddingEnd="36dp"
                 android:text="@string/main_start_entry_widget"
                 app:icon="@drawable/ic_chat"
@@ -83,54 +85,53 @@
                 android:id="@+id/entry_widget_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="-10dp"
-                app:layout_constraintTop_toBottomOf="@id/entry_widget_button"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/entry_widget_button" />
 
             <TextView
                 android:id="@+id/entry_widget_bottom_sheet_label"
+                style="@style/Application.Glia.Subtitle2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="@style/Application.Glia.Subtitle2"
-                android:textColor="@color/glia_black_color"
-                android:text="@string/main_start_entry_widget_bottom_sheet"
                 android:layout_marginEnd="@dimen/glia_medium"
-                app:layout_constraintTop_toTopOf="@id/entry_widget_switch"
+                android:text="@string/main_start_entry_widget_bottom_sheet"
+                android:textColor="@color/glia_black_color"
                 app:layout_constraintBottom_toBottomOf="@id/entry_widget_switch"
-                app:layout_constraintEnd_toStartOf="@+id/entry_widget_switch" />
+                app:layout_constraintEnd_toStartOf="@+id/entry_widget_switch"
+                app:layout_constraintTop_toTopOf="@id/entry_widget_switch" />
 
             <TextView
                 android:id="@+id/entry_widget_switch_view_label"
+                style="@style/Application.Glia.Subtitle2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="@style/Application.Glia.Subtitle2"
-                android:textColor="@color/glia_black_color"
-                android:text="@string/main_start_entry_widget_embedded_view"
                 android:layout_marginStart="@dimen/glia_medium"
-                app:layout_constraintTop_toTopOf="@id/entry_widget_switch"
+                android:text="@string/main_start_entry_widget_embedded_view"
+                android:textColor="@color/glia_black_color"
                 app:layout_constraintBottom_toBottomOf="@id/entry_widget_switch"
-                app:layout_constraintStart_toEndOf="@+id/entry_widget_switch" />
+                app:layout_constraintStart_toEndOf="@+id/entry_widget_switch"
+                app:layout_constraintTop_toTopOf="@id/entry_widget_switch" />
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/entry_widget_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/glia_large"
                 android:visibility="visible"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="0dp"
-                app:strokeColor="@color/glia_shade_color"
-                android:layout_margin="@dimen/glia_large"
-                app:strokeWidth="1dp"
                 app:layout_constraintEnd_toEndOf="@id/end_guideline"
                 app:layout_constraintStart_toStartOf="@id/start_guideline"
-                app:layout_constraintTop_toBottomOf="@id/entry_widget_switch" />
+                app:layout_constraintTop_toBottomOf="@id/entry_widget_switch"
+                app:strokeColor="@color/glia_shade_color"
+                app:strokeWidth="1dp" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/chat_activity_button"
+                style="@style/TestAppButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_m"
                 android:paddingEnd="36dp"
                 android:text="@string/main_start_chat_flow"
                 app:icon="@drawable/ic_baseline_chat_bubble"
@@ -138,11 +139,11 @@
                 app:layout_constraintStart_toStartOf="@id/start_guideline"
                 app:layout_constraintTop_toBottomOf="@id/entry_widget_container" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/audio_call_button"
+                style="@style/TestAppButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_m"
                 android:paddingEnd="36dp"
                 android:text="@string/main_start_audio_call"
                 app:icon="@drawable/ic_baseline_call"
@@ -150,11 +151,11 @@
                 app:layout_constraintStart_toStartOf="@id/start_guideline"
                 app:layout_constraintTop_toBottomOf="@id/chat_activity_button" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/video_call_button"
+                style="@style/TestAppButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_m"
                 android:paddingEnd="36dp"
                 android:text="@string/main_start_video_call"
                 app:icon="@drawable/ic_baseline_videocam"
@@ -162,11 +163,11 @@
                 app:layout_constraintStart_toStartOf="@id/start_guideline"
                 app:layout_constraintTop_toBottomOf="@id/audio_call_button" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/message_center_activity_button"
+                style="@style/TestAppButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_m"
                 android:paddingEnd="36dp"
                 android:text="@string/main_start_message_center_flow"
                 app:icon="@drawable/ic_secure_message"
@@ -174,85 +175,105 @@
                 app:layout_constraintStart_toStartOf="@id/start_guideline"
                 app:layout_constraintTop_toBottomOf="@id/video_call_button" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/end_engagement_button"
+                style="@style/TestAppButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_m"
                 android:text="@string/main_end_engagement"
                 app:layout_constraintEnd_toStartOf="@+id/end_guideline"
                 app:layout_constraintStart_toStartOf="@+id/start_guideline"
                 app:layout_constraintTop_toBottomOf="@+id/message_center_activity_button" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/initGliaWidgetsButton"
+                style="@style/TestAppButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_m"
                 android:text="@string/main_init_glia"
                 android:visibility="visible"
                 app:layout_constraintEnd_toStartOf="@+id/end_guideline"
                 app:layout_constraintStart_toStartOf="@+id/start_guideline"
                 app:layout_constraintTop_toBottomOf="@+id/end_engagement_button" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/authenticationButton"
+                style="@style/TestAppButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_m"
                 android:text="@string/main_authenticate"
                 android:visibility="gone"
                 app:layout_constraintEnd_toStartOf="@+id/end_guideline"
                 app:layout_constraintStart_toStartOf="@+id/start_guideline"
                 app:layout_constraintTop_toBottomOf="@+id/initGliaWidgetsButton" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/deauthenticationButton"
-                android:layout_width="0dp"
+                style="@style/TestAppButton"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_m"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
                 android:text="@string/main_deauthenticate"
                 android:visibility="gone"
-                app:layout_constraintEnd_toStartOf="@+id/end_guideline"
-                app:layout_constraintStart_toStartOf="@+id/start_guideline"
+                app:layout_constraintEnd_toStartOf="@+id/stop_push_notifications"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/authenticationButton" />
 
-            <Button
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/stop_push_notifications"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingEnd="8dp"
+                android:text="Stop Pushes"
+                android:visibility="gone"
+                app:buttonTint="?attr/colorPrimary"
+                app:checkedState="checked"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/end_guideline"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintStart_toEndOf="@+id/deauthenticationButton"
+                app:layout_constraintTop_toBottomOf="@+id/authenticationButton" />
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/refreshAuthButton"
+                style="@style/TestAppButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_m"
                 android:text="@string/main_refresh_auth"
                 android:visibility="gone"
                 app:layout_constraintEnd_toStartOf="@+id/end_guideline"
                 app:layout_constraintStart_toStartOf="@+id/start_guideline"
-                app:layout_constraintTop_toBottomOf="@+id/deauthenticationButton" />
+                app:layout_constraintTop_toBottomOf="@+id/stop_push_notifications" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/visitor_info_button"
+                style="@style/TestAppButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_m"
                 android:text="@string/visitor_info"
                 app:layout_constraintEnd_toEndOf="@id/end_guideline"
                 app:layout_constraintStart_toStartOf="@id/start_guideline"
                 app:layout_constraintTop_toBottomOf="@id/refreshAuthButton" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/clear_session_button"
+                style="@style/TestAppButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_m"
                 android:text="@string/main_clear_visitor_session"
                 app:layout_constraintEnd_toStartOf="@+id/end_guideline"
                 app:layout_constraintStart_toStartOf="@+id/start_guideline"
                 app:layout_constraintTop_toBottomOf="@+id/visitor_info_button" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/visitor_code_button"
+                style="@style/TestAppButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_m"
                 android:text="@string/main_show_visitor_code"
                 app:layout_constraintEnd_toStartOf="@+id/end_guideline"
                 app:layout_constraintStart_toStartOf="@+id/start_guideline"
@@ -262,40 +283,39 @@
                 android:id="@+id/visitor_code_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="-10dp"
-                app:layout_constraintTop_toBottomOf="@id/visitor_code_button"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/visitor_code_button" />
 
             <TextView
                 android:id="@+id/visitor_code_dialog_label"
+                style="@style/Application.Glia.Subtitle2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="@style/Application.Glia.Subtitle2"
-                android:textColor="@color/glia_black_color"
-                android:text="Inside dialog"
                 android:layout_marginEnd="@dimen/glia_medium"
-                app:layout_constraintTop_toTopOf="@id/visitor_code_switch"
+                android:text="Inside dialog"
+                android:textColor="@color/glia_black_color"
                 app:layout_constraintBottom_toBottomOf="@id/visitor_code_switch"
-                app:layout_constraintEnd_toStartOf="@+id/visitor_code_switch" />
+                app:layout_constraintEnd_toStartOf="@+id/visitor_code_switch"
+                app:layout_constraintTop_toTopOf="@id/visitor_code_switch" />
 
             <TextView
                 android:id="@+id/visitor_code_view_label"
+                style="@style/Application.Glia.Subtitle2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="@style/Application.Glia.Subtitle2"
-                android:textColor="@color/glia_black_color"
-                android:text="Integrated view"
                 android:layout_marginStart="@dimen/glia_medium"
-                app:layout_constraintTop_toTopOf="@id/visitor_code_switch"
+                android:text="Integrated view"
+                android:textColor="@color/glia_black_color"
                 app:layout_constraintBottom_toBottomOf="@id/visitor_code_switch"
-                app:layout_constraintStart_toEndOf="@+id/visitor_code_switch" />
+                app:layout_constraintStart_toEndOf="@+id/visitor_code_switch"
+                app:layout_constraintTop_toTopOf="@id/visitor_code_switch" />
 
             <androidx.constraintlayout.widget.Group
                 android:id="@+id/visitor_code_switch_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:constraint_referenced_ids="visitor_code_switch, visitor_code_dialog_label, visitor_code_view_label"/>
+                app:constraint_referenced_ids="visitor_code_switch, visitor_code_dialog_label, visitor_code_view_label" />
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/visitor_code_container"

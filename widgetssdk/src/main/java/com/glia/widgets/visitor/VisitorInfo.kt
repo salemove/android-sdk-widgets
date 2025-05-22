@@ -10,7 +10,7 @@ data class VisitorInfo(
     val email: String? = null,
     val phone: String? = null,
     val note: String? = null,
-    val customAttributesMap: Map<String, String>,
+    val customAttributes: Map<String, String>,
     val generatedName: String? = null,
     val banned: Boolean? = null,
     val href: String? = null,

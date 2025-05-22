@@ -194,11 +194,11 @@ internal class UiComponentsActivityWatcherTest {
     }
 
     @Test
-    fun `handleState will launch the SC transcript when state is LaunchSCTranscriptActivity`() {
+    fun `handleState will launch the the Chat with provided intention when state is LaunchChatScreen`() {
         val activity = mockkActivity()
 
         watcher.onActivityResumed(activity)
-        val event = mockkOneTimeEvent(UiComponentsDispatcher.State.LaunchSCTranscriptActivity)
+        val event = mockkOneTimeEvent(UiComponentsDispatcher.State.LaunchChatScreen(Intention.SC_CHAT))
 
         stateFlowable.onNext(event)
 

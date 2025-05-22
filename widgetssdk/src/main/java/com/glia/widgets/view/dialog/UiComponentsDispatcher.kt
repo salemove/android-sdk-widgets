@@ -1,6 +1,7 @@
 package com.glia.widgets.view.dialog
 
 import androidx.annotation.StringRes
+import com.glia.widgets.chat.Intention
 import com.glia.widgets.helper.OneTimeEvent
 import com.glia.widgets.helper.asOneTimeStateFlowable
 import com.glia.widgets.view.dialog.UiComponentsDispatcher.State.DismissDialog
@@ -19,13 +20,13 @@ internal interface UiComponentsDispatcher {
     fun showSnackBar(@StringRes messageResId: Int)
 
     // Activity
-    fun launchSCTranscriptActivity()
+    fun launchChatScreen(intention: Intention)
 
     sealed interface State {
         data object DismissDialog : State
         data class NotificationPermissionDialog(val onAllow: () -> Unit, val onCancel: () -> Unit) : State
         data class ShowSnackBar(@StringRes val messageResId: Int) : State
-        data object LaunchSCTranscriptActivity : State
+        data class LaunchChatScreen(val intention: Intention) : State
     }
 }
 
@@ -40,5 +41,5 @@ internal class UiComponentsDispatcherImpl : UiComponentsDispatcher {
 
     override fun showSnackBar(messageResId: Int) = _state.onNext(UiComponentsDispatcher.State.ShowSnackBar(messageResId))
 
-    override fun launchSCTranscriptActivity() = _state.onNext(UiComponentsDispatcher.State.LaunchSCTranscriptActivity)
+    override fun launchChatScreen(intention: Intention) = _state.onNext(UiComponentsDispatcher.State.LaunchChatScreen(intention))
 }

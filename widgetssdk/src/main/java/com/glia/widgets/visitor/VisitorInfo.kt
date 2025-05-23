@@ -12,7 +12,7 @@ data class VisitorInfo(
     val note: String? = null,
     val customAttributes: Map<String, String>,
     val generatedName: String? = null,
-    val banned: Boolean? = null,
+    val banned: Boolean,
     val href: String? = null,
     val id: String? = null,
     val externalId: String? = null,

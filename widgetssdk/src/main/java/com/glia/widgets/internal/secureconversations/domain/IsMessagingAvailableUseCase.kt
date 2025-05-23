@@ -24,5 +24,5 @@ internal class IsMessagingAvailableUseCase(private val queueRepository: QueueRep
     private fun isMessagingAvailable(queues: List<Queue>): Boolean = queues.asSequence()
         .filterNot { it.status == Queue.Status.CLOSED }
         .filterNot { it.status == Queue.Status.UNKNOWN }
-        .any { it.medias.contains(MediaType.MESSAGING) } // Support messaging
+        .any { it.media.contains(MediaType.MESSAGING) } // Support messaging
 }

@@ -15,7 +15,7 @@ class SupportedMediaTypesTest {
     fun `supportedMediaTypes returns MESSAGING when queue is FULL and contains MESSAGING`() {
         val queue: Queue = mockk {
             every { status } returns Queue.Status.FULL
-            every { medias } returns listOf(MediaType.TEXT, MediaType.MESSAGING)
+            every { media } returns listOf(MediaType.TEXT, MediaType.MESSAGING)
         }
 
         val supportedMediaTypes = queue.supportedMediaTypes()
@@ -28,7 +28,7 @@ class SupportedMediaTypesTest {
     fun `supportedMediaTypes returns null when queue is FULL and does not contain MESSAGING`() {
         val queue: Queue = mockk {
             every { status } returns Queue.Status.FULL
-            every { medias } returns listOf(MediaType.TEXT, MediaType.AUDIO)
+            every { media } returns listOf(MediaType.TEXT, MediaType.AUDIO)
         }
 
         val supportedMediaTypes = queue.supportedMediaTypes()
@@ -40,7 +40,7 @@ class SupportedMediaTypesTest {
     fun `supportedMediaTypes returns MESSAGING when queue is UNSTAFFED and contains MESSAGING`() {
         val queue: Queue = mockk {
             every { status } returns Queue.Status.UNSTAFFED
-            every { medias } returns listOf(MediaType.TEXT, MediaType.MESSAGING)
+            every { media } returns listOf(MediaType.TEXT, MediaType.MESSAGING)
         }
 
         val supportedMediaTypes = queue.supportedMediaTypes()
@@ -53,7 +53,7 @@ class SupportedMediaTypesTest {
     fun `supportedMediaTypes returns MESSAGING when queue is UNSTAFFED and does not contain MESSAGING`() {
         val queue: Queue = mockk {
             every { status } returns Queue.Status.UNSTAFFED
-            every { medias } returns listOf(MediaType.TEXT, MediaType.VIDEO)
+            every { media } returns listOf(MediaType.TEXT, MediaType.VIDEO)
         }
 
         val supportedMediaTypes = queue.supportedMediaTypes()
@@ -65,7 +65,7 @@ class SupportedMediaTypesTest {
     fun `supportedMediaTypes filters out Phone and UNKNOWN when queue is OPEN`() {
         val queue: Queue = mockk {
             every { status } returns Queue.Status.OPEN
-            every { medias } returns listOf(MediaType.PHONE, MediaType.UNKNOWN)
+            every { media } returns listOf(MediaType.PHONE, MediaType.UNKNOWN)
         }
 
         val supportedMediaTypes = queue.supportedMediaTypes()
@@ -77,7 +77,7 @@ class SupportedMediaTypesTest {
     fun `supportedMediaTypes filters returns all types except Phone and UNKNOWN when queue is OPEN`() {
         val queue: Queue = mockk {
             every { status } returns Queue.Status.OPEN
-            every { medias } returns listOf(
+            every { media } returns listOf(
                 MediaType.TEXT,
                 MediaType.AUDIO,
                 MediaType.VIDEO,
@@ -100,7 +100,7 @@ class SupportedMediaTypesTest {
     fun `supportedMediaTypes returns null when queue is CLOSED`() {
         val queue: Queue = mockk {
             every { status } returns Queue.Status.CLOSED
-            every { medias } returns listOf(MediaType.TEXT, MediaType.UNKNOWN)
+            every { media } returns listOf(MediaType.TEXT, MediaType.UNKNOWN)
         }
 
         val supportedMediaTypes = queue.supportedMediaTypes()
@@ -112,7 +112,7 @@ class SupportedMediaTypesTest {
     fun `supportedMediaTypes returns null when queue status is UNKNOWN`() {
         val queue: Queue = mockk {
             every { status } returns Queue.Status.UNKNOWN
-            every { medias } returns listOf(MediaType.TEXT, MediaType.UNKNOWN)
+            every { media } returns listOf(MediaType.TEXT, MediaType.UNKNOWN)
         }
 
         val supportedMediaTypes = queue.supportedMediaTypes()

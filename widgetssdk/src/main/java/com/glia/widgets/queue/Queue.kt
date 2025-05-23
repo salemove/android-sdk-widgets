@@ -17,7 +17,7 @@ data class Queue(
     val name: String,
     val isDefault: Boolean?,
     val lastUpdatedMillis: Long,
-    val medias: List<MediaType>,
+    val media: List<MediaType>,
     val status: Status
 ) : Mergeable<Queue> {
     /**
@@ -55,7 +55,7 @@ data class Queue(
         name = name merge other.name,
         isDefault = isDefault merge other.isDefault,
         lastUpdatedMillis = lastUpdatedMillis merge other.lastUpdatedMillis,
-        medias = medias merge other.medias,
+        media = media merge other.media,
         status = status merge other.status
     )
 }
@@ -65,7 +65,7 @@ internal fun CoreSdkQueue.toWidgetsType(): Queue = Queue(
     name = name,
     isDefault = isDefault,
     lastUpdatedMillis = lastUpdatedMillis,
-    medias = state.medias.map { it.toWidgetsType() },
+    media = state.medias.map { it.toWidgetsType() },
     status = state.status.toWidgetsType()
 )
 

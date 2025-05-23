@@ -45,9 +45,9 @@ internal fun ColorStateList?.colorForState(state: IntArray): Int? = this?.getCol
 internal fun String.separateStringWithSymbol(symbol: String): String = asSequence().joinToString(symbol)
 
 internal fun Queue.supportedMediaTypes(): List<MediaType>? = when {
-    status == Queue.Status.OPEN -> medias.filterNot { it == MediaType.PHONE || it == MediaType.UNKNOWN }.takeIf { it.isNotEmpty() }
-    status == Queue.Status.FULL && medias.contains(MediaType.MESSAGING) -> listOf(MediaType.MESSAGING)
-    status == Queue.Status.UNSTAFFED && medias.contains(MediaType.MESSAGING) -> listOf(MediaType.MESSAGING)
+    status == Queue.Status.OPEN -> media.filterNot { it == MediaType.PHONE || it == MediaType.UNKNOWN }.takeIf { it.isNotEmpty() }
+    status == Queue.Status.FULL && media.contains(MediaType.MESSAGING) -> listOf(MediaType.MESSAGING)
+    status == Queue.Status.UNSTAFFED && media.contains(MediaType.MESSAGING) -> listOf(MediaType.MESSAGING)
     else -> null
 }
 

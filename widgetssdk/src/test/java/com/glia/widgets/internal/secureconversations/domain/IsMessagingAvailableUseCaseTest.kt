@@ -116,7 +116,7 @@ class IsMessagingAvailableUseCaseTest {
     private fun createQueueWithStatus(status: Queue.Status, supportsMessaging: Boolean): Queue {
         val queue = mockk<Queue>()
         every { queue.status } returns status
-        every { queue.medias } returns if (supportsMessaging) listOf(MediaType.MESSAGING) else listOf(
+        every { queue.media } returns if (supportsMessaging) listOf(MediaType.MESSAGING) else listOf(
             MediaType.TEXT,
             MediaType.AUDIO
         )

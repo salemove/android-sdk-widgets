@@ -40,6 +40,7 @@ import com.glia.widgets.entrywidget.EntryWidget
 import com.glia.widgets.launcher.EngagementLauncher
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.card.MaterialCardView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlin.concurrent.thread
 import kotlin.properties.Delegates
 
@@ -399,7 +400,7 @@ class MainFragment : Fragment() {
 
     private fun showAuthenticationDialog(callback: OnAuthCallback?) {
         if (context == null) return
-        val builder = AlertDialog.Builder(requireContext())
+        val builder = MaterialAlertDialogBuilder(requireContext())
         val jwtInput = prepareJwtInputViewEditText()
         val externalTokenInput = prepareExternalTokenInputViewEditText()
         jwtInput.setText(authToken)

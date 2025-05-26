@@ -60,13 +60,13 @@ interface Authentication {
     )
 
     /**
-     * Same as [deauthenticate] but with default value (true) for `stopPushNotifications` parameter.
+     * Same as [deauthenticate] but with default value `false` for `stopPushNotifications` parameter.
      */
     fun deauthenticate(
         onComplete: OnComplete,
         onError: OnError
     ) {
-        deauthenticate(true, onComplete, onError)
+        deauthenticate(false, onComplete, onError)
     }
 
     /**

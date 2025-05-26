@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.GliaAndroidSDKWidgetsExample" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="Theme.GliaAndroidSDKWidgetsExample" parent="Theme.Material3.Light.NoActionBar">
         <item name="colorPrimary">@color/color_primary</item>
+        <item name="colorOutline">@color/color_dark_grayish_blue</item>
         <item name="android:statusBarColor">?attr/colorPrimary</item>
         <item name="materialButtonStyle">@style/Application.GliaAndroidSdkWidgetsExample.Button
         </item>
@@ -34,18 +35,11 @@
         <item name="gliaNewMessagesDividerTextColor">@color/color_pure_yellow</item>
     </style>
 
-    <style name="Application.GliaAndroidSdkWidgetsExample.Button" parent="@style/Widget.MaterialComponents.Button.TextButton.Icon">
-        <item name="backgroundTint">@android:color/transparent</item>
+    <style name="Application.GliaAndroidSdkWidgetsExample.Button" parent="@style/Widget.Material3.Button.TextButton.Icon">
         <item name="android:textColor">@color/color_black_text</item>
         <item name="textAllCaps">false</item>
         <item name="iconTint">?attr/colorPrimary</item>
-    </style>
-
-    <style name="TestAppButton" parent="Widget.Material3.Button.IconButton">
-        <item name="android:insetTop">2dp</item>
-        <item name="android:insetBottom">2dp</item>
-        <item name="android:textSize">14sp</item>
-        <item name="strokeColor">@color/color_dark_grayish_blue</item>
+        <item name="android:textAppearance">?attr/textAppearanceButton</item>
     </style>
 
 </resources>

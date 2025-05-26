@@ -58,9 +58,8 @@
                 android:orientation="vertical"
                 app:layout_constraintGuide_end="16dp" />
 
-            <com.google.android.material.button.MaterialButton
+            <Button
                 android:id="@+id/settings_button"
-                style="@style/TestAppButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -69,9 +68,8 @@
                 app:layout_constraintStart_toStartOf="@id/start_guideline"
                 app:layout_constraintTop_toBottomOf="@id/tool_bar_layout" />
 
-            <com.google.android.material.button.MaterialButton
+            <Button
                 android:id="@+id/entry_widget_button"
-                style="@style/TestAppButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:paddingEnd="36dp"
@@ -127,9 +125,8 @@
                 app:strokeColor="@color/glia_shade_color"
                 app:strokeWidth="1dp" />
 
-            <com.google.android.material.button.MaterialButton
+            <Button
                 android:id="@+id/chat_activity_button"
-                style="@style/TestAppButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:paddingEnd="36dp"
@@ -139,9 +136,8 @@
                 app:layout_constraintStart_toStartOf="@id/start_guideline"
                 app:layout_constraintTop_toBottomOf="@id/entry_widget_container" />
 
-            <com.google.android.material.button.MaterialButton
+            <Button
                 android:id="@+id/audio_call_button"
-                style="@style/TestAppButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:paddingEnd="36dp"
@@ -151,9 +147,8 @@
                 app:layout_constraintStart_toStartOf="@id/start_guideline"
                 app:layout_constraintTop_toBottomOf="@id/chat_activity_button" />
 
-            <com.google.android.material.button.MaterialButton
+            <Button
                 android:id="@+id/video_call_button"
-                style="@style/TestAppButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:paddingEnd="36dp"
@@ -163,9 +158,8 @@
                 app:layout_constraintStart_toStartOf="@id/start_guideline"
                 app:layout_constraintTop_toBottomOf="@id/audio_call_button" />
 
-            <com.google.android.material.button.MaterialButton
+            <Button
                 android:id="@+id/message_center_activity_button"
-                style="@style/TestAppButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:paddingEnd="36dp"
@@ -175,9 +169,8 @@
                 app:layout_constraintStart_toStartOf="@id/start_guideline"
                 app:layout_constraintTop_toBottomOf="@id/video_call_button" />
 
-            <com.google.android.material.button.MaterialButton
+            <Button
                 android:id="@+id/end_engagement_button"
-                style="@style/TestAppButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/main_end_engagement"
@@ -185,9 +178,8 @@
                 app:layout_constraintStart_toStartOf="@+id/start_guideline"
                 app:layout_constraintTop_toBottomOf="@+id/message_center_activity_button" />
 
-            <com.google.android.material.button.MaterialButton
+            <Button
                 android:id="@+id/initGliaWidgetsButton"
-                style="@style/TestAppButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/main_init_glia"
@@ -196,9 +188,8 @@
                 app:layout_constraintStart_toStartOf="@+id/start_guideline"
                 app:layout_constraintTop_toBottomOf="@+id/end_engagement_button" />
 
-            <com.google.android.material.button.MaterialButton
+            <Button
                 android:id="@+id/authenticationButton"
-                style="@style/TestAppButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/main_authenticate"
@@ -207,9 +198,8 @@
                 app:layout_constraintStart_toStartOf="@+id/start_guideline"
                 app:layout_constraintTop_toBottomOf="@+id/initGliaWidgetsButton" />
 
-            <com.google.android.material.button.MaterialButton
+            <Button
                 android:id="@+id/deauthenticationButton"
-                style="@style/TestAppButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingStart="16dp"
@@ -227,10 +217,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingEnd="8dp"
+                android:paddingStart="0dp"
                 android:text="Stop Pushes"
                 android:visibility="gone"
                 app:buttonTint="?attr/colorPrimary"
-                app:checkedState="checked"
+                app:checkedState="unchecked"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/end_guideline"
                 app:layout_constraintHorizontal_bias="0.5"
@@ -238,9 +229,8 @@
                 app:layout_constraintStart_toEndOf="@+id/deauthenticationButton"
                 app:layout_constraintTop_toBottomOf="@+id/authenticationButton" />
 
-            <com.google.android.material.button.MaterialButton
+            <Button
                 android:id="@+id/refreshAuthButton"
-                style="@style/TestAppButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/main_refresh_auth"
@@ -249,9 +239,8 @@
                 app:layout_constraintStart_toStartOf="@+id/start_guideline"
                 app:layout_constraintTop_toBottomOf="@+id/stop_push_notifications" />
 
-            <com.google.android.material.button.MaterialButton
+            <Button
                 android:id="@+id/visitor_info_button"
-                style="@style/TestAppButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/visitor_info"
@@ -259,9 +248,8 @@
                 app:layout_constraintStart_toStartOf="@id/start_guideline"
                 app:layout_constraintTop_toBottomOf="@id/refreshAuthButton" />
 
-            <com.google.android.material.button.MaterialButton
+            <Button
                 android:id="@+id/clear_session_button"
-                style="@style/TestAppButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/main_clear_visitor_session"
@@ -269,9 +257,8 @@
                 app:layout_constraintStart_toStartOf="@+id/start_guideline"
                 app:layout_constraintTop_toBottomOf="@+id/visitor_info_button" />
 
-            <com.google.android.material.button.MaterialButton
+            <Button
                 android:id="@+id/visitor_code_button"
-                style="@style/TestAppButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/main_show_visitor_code"

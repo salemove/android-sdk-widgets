@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="Theme.GliaAndroidSDKWidgetsExample" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="Theme.GliaAndroidSDKWidgetsExample" parent="Theme.Material3.Light.NoActionBar">
         <item name="colorPrimary">@color/color_primary</item>
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimary</item>
         <item name="materialButtonStyle">@style/Application.GliaAndroidSdkWidgetsExample.Button

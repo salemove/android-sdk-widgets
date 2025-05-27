@@ -109,7 +109,7 @@ internal fun AuthenticationManager.toCoreType(): CoreAuthentication = this.let {
         }
 
         override fun deauthenticate(authCallback: RequestCallback<Void>?) {
-            deauthenticate(true, authCallback)
+            widgetAuthentication.deauthenticate(authCallback.toOnComplete(), authCallback.toOnError())
         }
 
         override val isAuthenticated: Boolean

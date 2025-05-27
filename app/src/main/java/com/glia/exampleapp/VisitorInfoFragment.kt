@@ -125,7 +125,11 @@ class VisitorInfoFragment : Fragment() {
             }
         }
 
-        val onError = OnError { exception -> showError(exception) }
+        val onError = OnError { exception ->
+            activity?.runOnUiThread {
+                showError(exception)
+            }
+        }
 
         GliaWidgets.getVisitorInfo(onResult, onError)
     }

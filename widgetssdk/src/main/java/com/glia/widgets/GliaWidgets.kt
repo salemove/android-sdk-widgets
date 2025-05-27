@@ -358,7 +358,12 @@ object GliaWidgets {
                     onResult.onResult(VisitorInfo(visitorInfo))
                 }
             }
-        gliaCore().getVisitorInfo(callback)
+
+        try {
+            gliaCore().getVisitorInfo(callback)
+        } catch (gliaException: GliaException) {
+            throw gliaException.toWidgetsType()
+        }
     }
 
     /**

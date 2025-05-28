@@ -67,7 +67,7 @@ workflows:
       - opts:
           is_expand: false
         VERSION_INCREMENT_TYPE: patch
-  increment_project_version:
+  authenticated_increment_project_version:
     description: Task builds an SDK and uploads it to Nexus.
     steps:
       - activate-ssh-key@4: { }

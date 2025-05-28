@@ -180,8 +180,8 @@
     <string name="glia_dialog_leave_queue_no">@string/glia_dialog_no</string>
     <string name="glia_notification_screen_sharing_title">Screen Sharing Started</string>
     <string name="glia_notification_screen_sharing_message">You are currently sharing your screen.\nSelect \'End Sharing\' to stop.</string>
-    <string name="glia_notification_screen_sharing_channel_name">Screen sharing notification channel</string>
-    <string name="glia_notification_call_channel_name">Call notification channel</string>
+    <string name="glia_notification_screen_sharing_channel_name">Screen sharing sessions</string>
+    <string name="glia_notification_call_channel_name">Incoming calls</string>
     <string name="glia_notification_audio_call_title">Audio Call Started</string>
     <string name="glia_notification_audio_call_message">Your microphone is now on, and the operator can hear you.</string>
     <string name="glia_notification_two_way_video_call_title">Two-Way Video Started</string>

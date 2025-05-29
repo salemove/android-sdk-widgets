@@ -97,7 +97,8 @@
         <attr name="chatStartingCaptionTextColor" format="reference" />
         <attr name="chatStartedHeadingTextColor" format="reference" />
         <attr name="chatStartedCaptionTextColor" format="reference" />
-
+        <!-- @deprecated This attribute is deprecated and will be removed in future.
+             Use Unified Customization instead: https://docs.glia.com/glia-mobile/docs/android-widgets-unified-customization. -->
         <attr name="whiteLabel" />
         <attr name="gliaAlertDialogButtonUseVerticalAlignment" />
     </declare-styleable>

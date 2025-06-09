@@ -1,6 +1,7 @@
 package android
 
 import android.content.Intent
+import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.OneTimeEvent
 import io.mockk.Runs
@@ -20,6 +21,7 @@ internal const val COMMON_EXTENSIONS_CLASS_PATH = "com.glia.widgets.helper.Commo
 internal const val CONTEXT_EXTENSIONS_CLASS_PATH = "com.glia.widgets.helper.ContextExtensions"
 internal const val FILE_HELPER_EXTENSIONS_CLASS_PATH = "com.glia.widgets.helper.FileHelper"
 internal const val LOGGER_PATH = "com.glia.widgets.helper.Logger"
+internal const val DEPS_PATH = "com.glia.widgets.di.Dependencies"
 
 fun <T> Class<T>.readRawResource(resName: String): String = classLoader?.getResourceAsStream(resName)?.run {
     bufferedReader(StandardCharsets.UTF_8).use { it.readText() }
@@ -56,6 +58,16 @@ internal fun Logger.mock() {
 //Extension function to unMock the static logger
 internal fun Logger.unMock() {
     unmockkStatic(LOGGER_PATH)
+}
+
+// Extension function to mock the [Dependencies] class
+internal fun Dependencies.mock() {
+    mockkStatic(DEPS_PATH)
+}
+
+// Extension function to unMock the [Dependencies] class
+internal fun Dependencies.unMock() {
+    unmockkStatic(DEPS_PATH)
 }
 
 //Extension function to mock the [OneTimeEvent] class, that is used in multiple places.

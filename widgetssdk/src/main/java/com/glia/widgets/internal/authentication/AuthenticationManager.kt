@@ -48,8 +48,10 @@ internal class AuthenticationManager(
                 //Here we need to subscribe to secure conversations repository to get the data for authenticated visitors
                 repositoryFactory.secureConversationsRepository.subscribe()
                 onComplete.onComplete()
-                Dependencies.controllerFactory.pushClickHandlerController.onAuthenticated()
             }
+
+            //This function must be called inside authentication callback regardless of the result, because we need to handle failed authentication as well
+            Dependencies.controllerFactory.pushClickHandlerController.onAuthenticationAttempt()
         }
     }
 

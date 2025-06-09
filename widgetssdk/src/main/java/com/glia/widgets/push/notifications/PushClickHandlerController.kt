@@ -12,7 +12,7 @@ import com.glia.widgets.view.dialog.UiComponentsDispatcher
 
 internal interface PushClickHandlerController {
     fun handlePushClick(queueId: String?, visitorId: String)
-    fun onAuthenticationAttempt()
+    fun onAuthenticated()
 }
 
 private class PendingPn(val queueId: String?, val visitorId: String)
@@ -43,7 +43,7 @@ internal class PushClickHandlerControllerImpl(
         }
     }
 
-    override fun onAuthenticationAttempt() {
+    override fun onAuthenticated() {
         handlePendingPushNotification(pendingPn ?: return)
         pendingPn = null
     }

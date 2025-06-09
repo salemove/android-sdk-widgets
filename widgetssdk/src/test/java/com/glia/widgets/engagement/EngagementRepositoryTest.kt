@@ -29,12 +29,12 @@ import com.glia.androidsdk.screensharing.LocalScreen
 import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.androidsdk.screensharing.ScreenSharingRequest
 import com.glia.androidsdk.screensharing.VisitorScreenSharingState
+import com.glia.widgets.internal.engagement.GliaOperatorRepository
+import com.glia.widgets.internal.queue.QueueRepository
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.Data
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.formattedName
-import com.glia.widgets.internal.engagement.GliaOperatorRepository
-import com.glia.widgets.internal.queue.QueueRepository
 import com.glia.widgets.launcher.ConfigurationManager
 import io.mockk.CapturingSlot
 import io.mockk.MockKAnnotations
@@ -367,10 +367,8 @@ class EngagementRepositoryTest {
         }
 
         if (ongoingEngagement) {
-            if (endedBy == EndedBy.VISITOR) {
+            if (endedBy != EndedBy.OPERATOR) {
                 verify { engagement.end(any()) }
-            } else {
-                verify(exactly = 0) { engagement.end(any()) }
             }
 
             verifyUnsubscribedFromEngagement()

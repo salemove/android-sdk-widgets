@@ -29,6 +29,8 @@ import com.glia.androidsdk.screensharing.LocalScreen
 import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.androidsdk.screensharing.ScreenSharingRequest
 import com.glia.androidsdk.screensharing.VisitorScreenSharingState
+import com.glia.widgets.internal.engagement.GliaOperatorRepository
+import com.glia.widgets.internal.queue.QueueRepository
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.Data
 import com.glia.widgets.helper.Logger
@@ -39,8 +41,6 @@ import com.glia.widgets.helper.isQueueUnavailable
 import com.glia.widgets.helper.isRetain
 import com.glia.widgets.helper.isUnknown
 import com.glia.widgets.helper.unSafeSubscribe
-import com.glia.widgets.internal.engagement.GliaOperatorRepository
-import com.glia.widgets.internal.queue.QueueRepository
 import com.glia.widgets.launcher.ConfigurationManager
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
@@ -220,14 +220,13 @@ internal class EngagementRepositoryImpl(
             unsubscribeFromEvents(it)
             resetState()
 
-            //End the current engagement only when it is ended by the visitor.
-            if (endedBy == EndedBy.VISITOR) {
-                it.end { ex -> ex?.also { Logger.d(TAG, "Ending engagement failed") } }
-            }
+            it.end { ex -> ex?.also { Logger.d(TAG, "Ending engagement failed") } }
 
-            val state = State.EngagementEnded(it.isCallVisualizer, endedBy, it.state.actionOnEnd) { onSuccess, onError ->
-                fetchSurvey(it, onError, onSuccess)
-            }
+            val state = State.EngagementEnded(
+                it.isCallVisualizer,
+                endedBy,
+                it.state.actionOnEnd
+            ) { onSuccess, onError -> fetchSurvey(it, onError, onSuccess) }
 
             _engagementState.onNext(state)
 

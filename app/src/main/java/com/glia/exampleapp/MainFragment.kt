@@ -556,7 +556,11 @@ class MainFragment : Fragment() {
         authentication = GliaWidgets.getAuthentication(getAuthenticationBehaviorFromPrefs(sharedPreferences, resources))
     }
 
-    private fun authenticate(jwtInput: EditText, externalTokenInput: EditText, callback: OnAuthCallback?) {
+    private fun authenticate(
+        jwtInput: EditText,
+        externalTokenInput: EditText,
+        callback: OnAuthCallback?
+    ) {
         if (activity == null || containerView == null) return
         prepareAuthentication()
         val jwt = jwtInput.text.toString()

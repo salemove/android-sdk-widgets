@@ -131,11 +131,11 @@ class PushClickHandlerControllerTest {
     }
 
     @Test
-    fun `onAuthenticated does nothing when no engagement and not authenticated yet`() {
+    fun `onAuthenticationAttempt does nothing when no engagement and not authenticated yet`() {
         every { isAuthenticatedUseCase() } returns false
         every { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement } returns false
 
-        pushClickHandlerController.onAuthenticated()
+        pushClickHandlerController.onAuthenticationAttempt()
 
         verify(exactly = 0) { gliaCore.getCurrentVisitor(any()) }
         verify(exactly = 0) { configurationManager.setQueueIds(any()) }
@@ -143,14 +143,14 @@ class PushClickHandlerControllerTest {
     }
 
     @Test
-    fun `onAuthenticated logs when the auth is failed`() {
+    fun `onAuthenticationAttempt logs when the auth is failed`() {
         every { isAuthenticatedUseCase() } returns false
         every { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement } returns false
         val visitorId = "visitorId"
         val queueId = "queueId"
         mockkGetCurrentVisitorCallback(visitorId, false)
         pushClickHandlerController.handlePushClick(queueId, visitorId)
-        pushClickHandlerController.onAuthenticated()
+        pushClickHandlerController.onAuthenticationAttempt()
 
         verify { gliaCore.getCurrentVisitor(any()) }
 
@@ -161,10 +161,10 @@ class PushClickHandlerControllerTest {
             )
         }
 
-        //call onAuthenticated multiple times to check that it doesn't call getCurrentVisitor again and pendingPn is null
-        pushClickHandlerController.onAuthenticated()
-        pushClickHandlerController.onAuthenticated()
-        pushClickHandlerController.onAuthenticated()
+        //call onAuthenticationAttempt multiple times to check that it doesn't call getCurrentVisitor again and pendingPn is null
+        pushClickHandlerController.onAuthenticationAttempt()
+        pushClickHandlerController.onAuthenticationAttempt()
+        pushClickHandlerController.onAuthenticationAttempt()
         verify(exactly = 1) { gliaCore.getCurrentVisitor(any()) }
 
         verify(exactly = 0) { configurationManager.setQueueIds(any()) }
@@ -172,7 +172,7 @@ class PushClickHandlerControllerTest {
     }
 
     @Test
-    fun `onAuthenticated logs when the visitor ids does not match`() {
+    fun `onAuthenticationAttempt logs when the visitor ids does not match`() {
         every { isAuthenticatedUseCase() } returns false
         every { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement } returns false
         val visitorId = "visitorId"
@@ -180,7 +180,7 @@ class PushClickHandlerControllerTest {
         mockkGetCurrentVisitorCallback(visitorId, true)
 
         pushClickHandlerController.handlePushClick(queueId, "anotherVisitorId")
-        pushClickHandlerController.onAuthenticated()
+        pushClickHandlerController.onAuthenticationAttempt()
 
         verify { gliaCore.getCurrentVisitor( any()) }
 
@@ -191,10 +191,10 @@ class PushClickHandlerControllerTest {
             )
         }
 
-        //call onAuthenticated multiple times to check that it doesn't call getCurrentVisitor again and pendingPn is null
-        pushClickHandlerController.onAuthenticated()
-        pushClickHandlerController.onAuthenticated()
-        pushClickHandlerController.onAuthenticated()
+        //call onAuthenticationAttempt multiple times to check that it doesn't call getCurrentVisitor again and pendingPn is null
+        pushClickHandlerController.onAuthenticationAttempt()
+        pushClickHandlerController.onAuthenticationAttempt()
+        pushClickHandlerController.onAuthenticationAttempt()
         verify(exactly = 1) { gliaCore.getCurrentVisitor( any()) }
 
         verify(exactly = 0) { configurationManager.setQueueIds(any()) }
@@ -202,14 +202,14 @@ class PushClickHandlerControllerTest {
     }
 
     @Test
-    fun `onAuthenticated launches sc transcript activity when visitor ids match`() {
+    fun `onAuthenticationAttempt launches sc transcript activity when visitor ids match`() {
         every { isAuthenticatedUseCase() } returns false
         every { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement } returns false
         val visitorId = "visitorId"
         val queueId = "queueId"
         mockkGetCurrentVisitorCallback(visitorId, true)
         pushClickHandlerController.handlePushClick(queueId, visitorId)
-        pushClickHandlerController.onAuthenticated()
+        pushClickHandlerController.onAuthenticationAttempt()
 
         verify { gliaCore.getCurrentVisitor(any()) }
 
@@ -222,10 +222,10 @@ class PushClickHandlerControllerTest {
             )
         }
 
-        //call onAuthenticated multiple times to check that it doesn't call getCurrentVisitor again and pendingPn is null
-        pushClickHandlerController.onAuthenticated()
-        pushClickHandlerController.onAuthenticated()
-        pushClickHandlerController.onAuthenticated()
+        //call onAuthenticationAttempt multiple times to check that it doesn't call getCurrentVisitor again and pendingPn is null
+        pushClickHandlerController.onAuthenticationAttempt()
+        pushClickHandlerController.onAuthenticationAttempt()
+        pushClickHandlerController.onAuthenticationAttempt()
         verify(exactly = 1) { gliaCore.getCurrentVisitor(any()) }
 
         verify(exactly = 1) { configurationManager.setQueueIds(listOf(queueId)) }
@@ -233,30 +233,27 @@ class PushClickHandlerControllerTest {
     }
 
     @Test
-    fun `onAuthenticated creates empty list when the queue id is null`() {
+    fun `onAuthenticationAttempt creates empty list when the queue id is null`() {
         every { isAuthenticatedUseCase() } returns false
         every { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement } returns false
         val visitorId = "visitorId"
         val queueId = null
         mockkGetCurrentVisitorCallback(visitorId, true)
         pushClickHandlerController.handlePushClick(queueId, visitorId)
-        pushClickHandlerController.onAuthenticated()
+        pushClickHandlerController.onAuthenticationAttempt()
 
         verify { gliaCore.getCurrentVisitor(any()) }
 
         verify { configurationManager.setQueueIds(any()) }
         verify { uiComponentsDispatcher.launchChatScreen(any()) }
         verify {
-            Logger.i(
-                any(),
-                "Secure message push with matching `visitor_id` and authenticated visitor is processed to open chat transcript."
-            )
+            Logger.i(any(), "Secure message push with matching `visitor_id` and authenticated visitor is processed to open chat transcript.")
         }
 
-        //call onAuthenticated multiple times to check that it doesn't call getCurrentVisitor again and pendingPn is null
-        pushClickHandlerController.onAuthenticated()
-        pushClickHandlerController.onAuthenticated()
-        pushClickHandlerController.onAuthenticated()
+        //call onAuthenticationAttempt multiple times to check that it doesn't call getCurrentVisitor again and pendingPn is null
+        pushClickHandlerController.onAuthenticationAttempt()
+        pushClickHandlerController.onAuthenticationAttempt()
+        pushClickHandlerController.onAuthenticationAttempt()
         verify(exactly = 1) { gliaCore.getCurrentVisitor(any()) }
 
         verify(exactly = 1) { configurationManager.setQueueIds(match { it.isEmpty() }) }

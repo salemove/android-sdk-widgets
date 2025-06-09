@@ -33,12 +33,7 @@ interface Authentication {
      * <br></br> [GliaWidgetsException.Cause.INTERNAL_ERROR] - when internal error occurs
      * <br></br> [GliaWidgetsException.Cause.AUTHENTICATION_ERROR] - when authentication fails
      */
-    fun authenticate(
-        jwtToken: String,
-        externalAccessToken: String?,
-        onComplete: OnComplete,
-        onError: OnError
-    )
+    fun authenticate(jwtToken: String, externalAccessToken: String?, onComplete: OnComplete, onError: OnError)
 
     /**
      * De-authenticates the visitor.
@@ -53,21 +48,12 @@ interface Authentication {
      * <br></br> [GliaWidgetsException.Cause.INTERNAL_ERROR] - when internal error occurs
      * <br></br> [GliaWidgetsException.Cause.AUTHENTICATION_ERROR] - when authentication fails
      */
-    fun deauthenticate(
-        stopPushNotifications: Boolean,
-        onComplete: OnComplete,
-        onError: OnError
-    )
+    fun deauthenticate(stopPushNotifications: Boolean, onComplete: OnComplete, onError: OnError)
 
     /**
      * Same as [deauthenticate] but with default value `false` for `stopPushNotifications` parameter.
      */
-    fun deauthenticate(
-        onComplete: OnComplete,
-        onError: OnError
-    ) {
-        deauthenticate(false, onComplete, onError)
-    }
+    fun deauthenticate(onComplete: OnComplete, onError: OnError) = deauthenticate(false, onComplete, onError)
 
     /**
      * Check if Visitor is authenticated in Glia using the external authentication.
@@ -91,12 +77,7 @@ interface Authentication {
      * <br></br> [GliaWidgetsException.Cause.INTERNAL_ERROR] - when internal error occurs
      * <br></br> [GliaWidgetsException.Cause.AUTHENTICATION_ERROR] - when authentication fails
      */
-    fun refresh(
-        jwtToken: String,
-        externalAccessToken: String?,
-        onComplete: OnComplete,
-        onError: OnError
-    )
+    fun refresh(jwtToken: String, externalAccessToken: String?, onComplete: OnComplete, onError: OnError)
 
     /**
      * Behavior for authentication and de-authentication.

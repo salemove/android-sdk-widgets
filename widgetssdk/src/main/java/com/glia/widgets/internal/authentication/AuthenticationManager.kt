@@ -1,7 +1,6 @@
 package com.glia.widgets.internal.authentication
 
 import com.glia.androidsdk.GliaException
-import com.glia.androidsdk.visitor.Authentication as CoreAuthentication
 import com.glia.androidsdk.RequestCallback
 import com.glia.widgets.authentication.Authentication
 import com.glia.widgets.callbacks.OnComplete
@@ -13,6 +12,7 @@ import com.glia.widgets.di.Dependencies.repositoryFactory
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.toWidgetsType
+import com.glia.androidsdk.visitor.Authentication as CoreAuthentication
 
 /**
  * Wrapper class for {@link com.glia.androidsdk.visitor.Authentication}
@@ -23,69 +23,61 @@ internal class AuthenticationManager(
     private val authentication: CoreAuthentication,
     private val onAuthenticationRequestedCallback: () -> Unit
 ) : Authentication {
-    override fun setBehavior(behavior: Authentication.Behavior) {
-        authentication.setBehavior(behavior.toCoreType())
-    }
-
-    override fun authenticate(
-        jwtToken: String,
-        externalAccessToken: String?,
-        onComplete: OnComplete,
-        onError: OnError
-    ) {
-        onAuthenticationRequestedCallback()
-        Dependencies.destroyControllersAndResetQueueing()
-
-        Logger.i(TAG, "Authenticate. Is external access token used: ${externalAccessToken != null}")
-        authentication.authenticate(jwtToken, externalAccessToken) { _, gliaException ->
-            if (gliaException != null) {
-                onError.onError(gliaException.toWidgetsType())
-            }
-            //Here we need to subscribe to secure conversations repository to get the data for authenticated visitors
-            repositoryFactory.secureConversationsRepository.subscribe()
-
-            onComplete.onComplete()
-
-            Dependencies.controllerFactory.pushClickHandlerController.onAuthenticated()
-        }
-    }
-
-    override fun deauthenticate(
-        stopPushNotifications: Boolean,
-        onComplete: OnComplete,
-        onError: OnError
-    ) {
-        Logger.i(TAG, "Unauthenticate")
-        //Need to end engagement before it's done on the core side to prevent unexpected behavior
-        Dependencies.destroyControllersAndResetEngagementData()
-
-        //Here we reset the secure conversations repository to clear the data, because the visitor is de-authenticated
-        //and we don't need secure conversations data for un-authenticated visitors.
-        repositoryFactory.secureConversationsRepository.unsubscribeAndResetData()
-
-        authentication.deauthenticate(stopPushNotifications) { _, gliaException ->
-            if (gliaException != null) {
-                onError.onError(gliaException.toWidgetsType())
-            }
-            onComplete.onComplete()
-        }
-    }
 
     override val isAuthenticated: Boolean
         get() = authentication.isAuthenticated
 
-    override fun refresh(jwtToken: String,
-                         externalAccessToken: String?,
-                         onComplete: OnComplete,
-                         onError: OnError
-    ) {
+    override fun setBehavior(behavior: Authentication.Behavior) {
+        authentication.setBehavior(behavior.toCoreType())
+    }
+
+    override fun authenticate(jwtToken: String, externalAccessToken: String?, onComplete: OnComplete, onError: OnError) {
+        onAuthenticationRequestedCallback()
+
+        Logger.i(TAG, "Authenticate. Is external access token used: ${externalAccessToken != null}")
+
+        authentication.authenticate(jwtToken, externalAccessToken) { _, gliaException ->
+            Dependencies.controllerFactory.pushClickHandlerController.onAuthenticationAttempt()
+
+            if (gliaException != null) {
+                onError.onError(gliaException.toWidgetsType())
+            } else {
+                Dependencies.destroyControllersAndResetQueueing()
+
+                //Here we need to subscribe to secure conversations repository to get the data for authenticated visitors
+                repositoryFactory.secureConversationsRepository.subscribe()
+
+                onComplete.onComplete()
+            }
+        }
+    }
+
+    override fun deauthenticate(stopPushNotifications: Boolean, onComplete: OnComplete, onError: OnError) {
+        Logger.i(TAG, "Unauthenticate")
+
+        authentication.deauthenticate(stopPushNotifications) { _, gliaException ->
+            if (gliaException != null) {
+                onError.onError(gliaException.toWidgetsType())
+            } else {
+                Dependencies.destroyControllersAndResetEngagementData()
+
+                //Here we reset the secure conversations repository to clear the data, because the visitor is de-authenticated
+                //and we don't need secure conversations data for un-authenticated visitors.
+                repositoryFactory.secureConversationsRepository.unsubscribeAndResetData()
+                onComplete.onComplete()
+            }
+        }
+    }
+
+    override fun refresh(jwtToken: String, externalAccessToken: String?, onComplete: OnComplete, onError: OnError) {
         Logger.i(TAG, "Refresh authentication")
+
         authentication.refresh(jwtToken, externalAccessToken) { _, gliaException ->
             if (gliaException != null) {
                 onError.onError(gliaException.toWidgetsType())
+            } else {
+                onComplete.onComplete()
             }
-
-            onComplete.onComplete()
         }
     }
 }
@@ -101,6 +93,7 @@ internal fun AuthenticationManager.toCoreType(): CoreAuthentication = this.let {
                 reportTokenInvalidError(authCallback)
                 return
             }
+
             widgetAuthentication.authenticate(jwtToken, externalAccessToken, authCallback.toOnComplete(), authCallback.toOnError())
         }
 
@@ -120,6 +113,7 @@ internal fun AuthenticationManager.toCoreType(): CoreAuthentication = this.let {
                 reportTokenInvalidError(authCallback)
                 return
             }
+
             widgetAuthentication.refresh(jwtToken, externalAccessToken, authCallback.toOnComplete(), authCallback.toOnError())
         }
 

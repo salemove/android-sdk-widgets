@@ -399,6 +399,7 @@ object GliaWidgets {
     fun clearVisitorSession() {
         Logger.i(TAG, "Clear visitor session")
         try {
+            //Need to clear engagement state and unsubscribe from engagement related callbacks before it's done on the core side to prevent unexpected behavior
             destroyControllersAndResetEngagementData()
 
             //Here we reset the secure conversations repository to clear the data,
@@ -406,6 +407,7 @@ object GliaWidgets {
             //and we don't need secure conversations data for un-authenticated visitors.
             repositoryFactory.secureConversationsRepository.unsubscribeAndResetData()
 
+            // This function will end the ongoing engagement itself if it is present
             gliaCore().clearVisitorSession()
         } catch (gliaException: GliaException) {
             throw gliaException.toWidgetsType()

@@ -23,6 +23,10 @@ internal class AuthenticationManager(
     private val authentication: CoreAuthentication,
     private val onAuthenticationRequestedCallback: () -> Unit
 ) : Authentication {
+
+    override val isAuthenticated: Boolean
+        get() = authentication.isAuthenticated
+
     override fun setBehavior(behavior: Authentication.Behavior) {
         authentication.setBehavior(behavior.toCoreType())
     }
@@ -40,13 +44,12 @@ internal class AuthenticationManager(
         authentication.authenticate(jwtToken, externalAccessToken) { _, gliaException ->
             if (gliaException != null) {
                 onError.onError(gliaException.toWidgetsType())
+            } else {
+                //Here we need to subscribe to secure conversations repository to get the data for authenticated visitors
+                repositoryFactory.secureConversationsRepository.subscribe()
+                onComplete.onComplete()
+                Dependencies.controllerFactory.pushClickHandlerController.onAuthenticated()
             }
-            //Here we need to subscribe to secure conversations repository to get the data for authenticated visitors
-            repositoryFactory.secureConversationsRepository.subscribe()
-
-            onComplete.onComplete()
-
-            Dependencies.controllerFactory.pushClickHandlerController.onAuthenticated()
         }
     }
 
@@ -66,13 +69,11 @@ internal class AuthenticationManager(
         authentication.deauthenticate(stopPushNotifications) { _, gliaException ->
             if (gliaException != null) {
                 onError.onError(gliaException.toWidgetsType())
+            } else {
+                onComplete.onComplete()
             }
-            onComplete.onComplete()
         }
     }
-
-    override val isAuthenticated: Boolean
-        get() = authentication.isAuthenticated
 
     override fun refresh(jwtToken: String,
                          externalAccessToken: String?,
@@ -83,9 +84,9 @@ internal class AuthenticationManager(
         authentication.refresh(jwtToken, externalAccessToken) { _, gliaException ->
             if (gliaException != null) {
                 onError.onError(gliaException.toWidgetsType())
+            } else {
+                onComplete.onComplete()
             }
-
-            onComplete.onComplete()
         }
     }
 }

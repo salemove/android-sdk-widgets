@@ -11,12 +11,6 @@ import com.glia.widgets.callbacks.OnResult
 import com.glia.widgets.chat.adapter.CustomCardAdapter
 import com.glia.widgets.chat.adapter.WebViewCardAdapter
 import com.glia.widgets.core.callvisualizer.domain.CallVisualizer
-import com.glia.widgets.liveobservation.LiveObservation
-import com.glia.widgets.queue.Queue
-import com.glia.widgets.queue.toWidgetsType
-import com.glia.widgets.secureconversations.SecureConversations
-import com.glia.widgets.visitor.VisitorInfo
-import com.glia.widgets.visitor.VisitorInfoUpdateRequest
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.di.Dependencies.callVisualizerManager
 import com.glia.widgets.di.Dependencies.configurationManager
@@ -32,7 +26,6 @@ import com.glia.widgets.di.Dependencies.pushNotifications
 import com.glia.widgets.di.Dependencies.repositoryFactory
 import com.glia.widgets.di.Dependencies.secureConversations
 import com.glia.widgets.di.Dependencies.useCaseFactory
-import com.glia.widgets.engagement.EndedBy
 import com.glia.widgets.entrywidget.EntryWidget
 import com.glia.widgets.fcm.PushNotifications
 import com.glia.widgets.helper.Logger
@@ -41,6 +34,12 @@ import com.glia.widgets.helper.Logger.addGlobalMetadata
 import com.glia.widgets.internal.authentication.toCoreType
 import com.glia.widgets.internal.authentication.toWidgetsType
 import com.glia.widgets.launcher.EngagementLauncher
+import com.glia.widgets.liveobservation.LiveObservation
+import com.glia.widgets.queue.Queue
+import com.glia.widgets.queue.toWidgetsType
+import com.glia.widgets.secureconversations.SecureConversations
+import com.glia.widgets.visitor.VisitorInfo
+import com.glia.widgets.visitor.VisitorInfoUpdateRequest
 import io.reactivex.rxjava3.exceptions.UndeliverableException
 import io.reactivex.rxjava3.plugins.RxJavaPlugins
 import java.io.IOException
@@ -160,9 +159,11 @@ object GliaWidgets {
      */
     @JvmStatic
     @Synchronized
-    fun init(gliaWidgetsConfig: GliaWidgetsConfig,
-             onComplete: OnComplete,
-             onError: OnError) {
+    fun init(
+        gliaWidgetsConfig: GliaWidgetsConfig,
+        onComplete: OnComplete,
+        onError: OnError
+    ) {
         Logger.i(TAG, "Initialize Glia Widgets SDK")
         try {
             val callback: RequestCallback<Boolean?> =
@@ -423,7 +424,9 @@ object GliaWidgets {
     fun endEngagement() {
         Logger.i(TAG, "End engagement by integrator")
         try {
-            useCaseFactory.endEngagementUseCase.invoke(EndedBy.CLEAR_STATE)
+            useCaseFactory.endEngagementUseCase.silently()
+            // Here we destroy controllers to not keep queueing state for authenticated chat when it is minimized
+            Dependencies.destroyControllers()
         } catch (gliaException: GliaException) {
             throw gliaException.toWidgetsType()
         }

@@ -352,7 +352,7 @@ internal object Dependencies {
 
     fun destroyControllersAndResetQueueing() {
         controllerFactory.destroyControllersForAuthentication()
-        repositoryFactory.engagementRepository.resetQueueing()
+        repositoryFactory.engagementRepository.cancelQueuing()
     }
 
     internal class AuthenticationManagerProvider {

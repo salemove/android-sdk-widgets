@@ -38,30 +38,8 @@ import com.glia.widgets.chat.model.GvaButton
 import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.chat.model.VisitorAttachmentItem
 import com.glia.widgets.chat.model.VisitorChatItem
-import com.glia.widgets.internal.dialog.DialogContract
-import com.glia.widgets.internal.dialog.domain.ConfirmationDialogLinksUseCase
-import com.glia.widgets.internal.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
-import com.glia.widgets.internal.dialog.model.LeaveDialogAction
-import com.glia.widgets.internal.dialog.model.Link
-import com.glia.widgets.internal.engagement.domain.ConfirmationDialogUseCase
-import com.glia.widgets.internal.engagement.domain.UpdateOperatorDefaultImageUrlUseCase
-import com.glia.widgets.internal.fileupload.domain.AddFileAttachmentsObserverUseCase
-import com.glia.widgets.internal.fileupload.domain.AddFileToAttachmentAndUploadUseCase
-import com.glia.widgets.internal.fileupload.domain.FileUploadLimitNotExceededObservableUseCase
-import com.glia.widgets.internal.fileupload.domain.GetFileAttachmentsUseCase
-import com.glia.widgets.internal.fileupload.domain.RemoveFileAttachmentUseCase
-import com.glia.widgets.internal.fileupload.model.LocalAttachment
-import com.glia.widgets.internal.notification.domain.CallNotificationUseCase
-import com.glia.widgets.internal.permissions.domain.RequestNotificationPermissionIfPushNotificationsSetUpUseCase
-import com.glia.widgets.internal.permissions.domain.WithCameraPermissionUseCase
-import com.glia.widgets.internal.permissions.domain.WithReadWritePermissionsUseCase
-import com.glia.widgets.internal.secureconversations.domain.HasOngoingSecureConversationUseCase
-import com.glia.widgets.internal.secureconversations.domain.IsMessagingAvailableUseCase
-import com.glia.widgets.internal.secureconversations.domain.ManageSecureMessagingStatusUseCase
-import com.glia.widgets.internal.secureconversations.domain.SecureConversationTopBannerVisibilityUseCase
-import com.glia.widgets.internal.secureconversations.domain.SetLeaveSecureConversationDialogVisibleUseCase
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.engagement.EndedBy
+import com.glia.widgets.engagement.EndAction
 import com.glia.widgets.engagement.EngagementUpdateState
 import com.glia.widgets.engagement.ScreenSharingState
 import com.glia.widgets.engagement.State
@@ -85,9 +63,30 @@ import com.glia.widgets.helper.TimeCounter.FormattedTimerStatusListener
 import com.glia.widgets.helper.exists
 import com.glia.widgets.helper.formattedName
 import com.glia.widgets.helper.imageUrl
-import com.glia.widgets.helper.isRetain
 import com.glia.widgets.helper.isValid
 import com.glia.widgets.helper.unSafeSubscribe
+import com.glia.widgets.internal.dialog.DialogContract
+import com.glia.widgets.internal.dialog.domain.ConfirmationDialogLinksUseCase
+import com.glia.widgets.internal.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
+import com.glia.widgets.internal.dialog.model.LeaveDialogAction
+import com.glia.widgets.internal.dialog.model.Link
+import com.glia.widgets.internal.engagement.domain.ConfirmationDialogUseCase
+import com.glia.widgets.internal.engagement.domain.UpdateOperatorDefaultImageUrlUseCase
+import com.glia.widgets.internal.fileupload.domain.AddFileAttachmentsObserverUseCase
+import com.glia.widgets.internal.fileupload.domain.AddFileToAttachmentAndUploadUseCase
+import com.glia.widgets.internal.fileupload.domain.FileUploadLimitNotExceededObservableUseCase
+import com.glia.widgets.internal.fileupload.domain.GetFileAttachmentsUseCase
+import com.glia.widgets.internal.fileupload.domain.RemoveFileAttachmentUseCase
+import com.glia.widgets.internal.fileupload.model.LocalAttachment
+import com.glia.widgets.internal.notification.domain.CallNotificationUseCase
+import com.glia.widgets.internal.permissions.domain.RequestNotificationPermissionIfPushNotificationsSetUpUseCase
+import com.glia.widgets.internal.permissions.domain.WithCameraPermissionUseCase
+import com.glia.widgets.internal.permissions.domain.WithReadWritePermissionsUseCase
+import com.glia.widgets.internal.secureconversations.domain.HasOngoingSecureConversationUseCase
+import com.glia.widgets.internal.secureconversations.domain.IsMessagingAvailableUseCase
+import com.glia.widgets.internal.secureconversations.domain.ManageSecureMessagingStatusUseCase
+import com.glia.widgets.internal.secureconversations.domain.SecureConversationTopBannerVisibilityUseCase
+import com.glia.widgets.internal.secureconversations.domain.SetLeaveSecureConversationDialogVisibleUseCase
 import com.glia.widgets.view.MessagesNotSeenHandler
 import com.glia.widgets.view.MinimizeHandler
 import com.glia.widgets.webbrowser.domain.GetUrlFromLinkUseCase
@@ -571,9 +570,7 @@ internal class ChatController(
     }
 
     private fun subscribeToMediaUpgradeEvents() {
-        mediaUpgradeDisposable.addAll(
-            acceptMediaUpgradeOfferUseCase.result.subscribe { handleMediaUpgradeAcceptResult() }
-        )
+        mediaUpgradeDisposable.addAll(acceptMediaUpgradeOfferUseCase.result.subscribe { handleMediaUpgradeAcceptResult() })
     }
 
     private fun handleMediaUpgradeAcceptResult() {
@@ -583,10 +580,7 @@ internal class ChatController(
     private fun onEngagementStateChanged(state: State) {
         when (state) {
             is State.EngagementEnded -> {
-                if (!isQueueingOrOngoingEngagement) {
-                    dialogController.dismissDialogs()
-                }
-                if (state.action.isRetain) {
+                if (state.endAction is EndAction.Retain) {
                     onTransferredToSecureConversation()
                 }
             }
@@ -712,7 +706,7 @@ internal class ChatController(
 
     private fun endChat() {
         Logger.d(TAG, "Stop, engagement ended")
-        endEngagementUseCase(EndedBy.VISITOR)
+        endEngagementUseCase()
         chatManager.reset()
         mediaUpgradeDisposable.clear()
         emitViewState { chatState.chatUnavailableState() }
@@ -754,9 +748,7 @@ internal class ChatController(
         }
     }
 
-    override fun singleChoiceOptionClicked(
-        item: OperatorMessageItem.ResponseCard, selectedOption: SingleChoiceOption
-    ) {
+    override fun singleChoiceOptionClicked(item: OperatorMessageItem.ResponseCard, selectedOption: SingleChoiceOption) {
         Logger.d(TAG, "singleChoiceOptionClicked, id: ${item.id}")
         sendMessageUseCase.execute(selectedOption.asSingleChoiceResponse(), sendMessageCallback)
         chatManager.onChatAction(ChatManager.Action.ResponseCardClicked(item))

@@ -3,12 +3,11 @@ package com.glia.widgets.view.head
 import android.app.Activity
 import android.view.View
 import android.view.Window
-import com.glia.androidsdk.Engagement
 import com.glia.widgets.chat.ChatView
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
+import com.glia.widgets.engagement.EndAction
 import com.glia.widgets.engagement.MediaType
-import com.glia.widgets.engagement.EndedBy
 import com.glia.widgets.engagement.ScreenSharingState
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
@@ -114,8 +113,8 @@ internal class ActivityWatcherForChatHeadTest {
 
     @Test
     fun `bubble will be removed when engagement or queueing ended`() {
-        engagementStateFlowable.onNext(State.EngagementEnded(true, EndedBy.OPERATOR, Engagement.ActionOnEnd.UNKNOWN, mock()))
-        engagementStateFlowable.onNext(State.EngagementEnded(false, EndedBy.CLEAR_STATE, Engagement.ActionOnEnd.UNKNOWN, mock()))
+        engagementStateFlowable.onNext(State.EngagementEnded(EndAction.ClearStateCallVisualizer))
+        engagementStateFlowable.onNext(State.EngagementEnded(EndAction.Retain))
         engagementStateFlowable.onNext(State.QueueUnstaffed)
         engagementStateFlowable.onNext(State.UnexpectedErrorHappened)
         engagementStateFlowable.onNext(State.QueueingCanceled)

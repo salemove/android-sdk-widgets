@@ -8,6 +8,7 @@ import com.glia.widgets.authentication.Authentication
 import com.glia.widgets.callbacks.OnComplete
 import com.glia.widgets.callbacks.OnError
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.engagement.EngagementRepository
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.internal.secureconversations.SecureConversationsRepository
 import com.glia.widgets.push.notifications.PushClickHandlerController
@@ -29,6 +30,7 @@ internal class AuthenticationManagerTest {
     private lateinit var onAuthenticationRequestCallback: () -> Unit
 
     private lateinit var secureConversationsRepository: SecureConversationsRepository
+    private lateinit var engagementRepository: EngagementRepository
 
     private lateinit var authenticationManager: AuthenticationManager
     private lateinit var pushClickHandlerController: PushClickHandlerController
@@ -39,11 +41,13 @@ internal class AuthenticationManagerTest {
         coreAuthentication = mockk(relaxUnitFun = true)
         onAuthenticationRequestCallback = mockk<() -> Unit>(relaxed = true)
         secureConversationsRepository = mockk(relaxUnitFun = true)
+        engagementRepository = mockk(relaxUnitFun = true)
         pushClickHandlerController = mockk(relaxUnitFun = true)
         Logger.mock()
         Dependencies.mock()
 
         every { Dependencies.repositoryFactory.secureConversationsRepository } returns secureConversationsRepository
+        every { Dependencies.repositoryFactory.engagementRepository } returns engagementRepository
         every { Dependencies.controllerFactory.pushClickHandlerController } returns pushClickHandlerController
 
         authenticationManager = AuthenticationManager(coreAuthentication, onAuthenticationRequestCallback)
@@ -166,14 +170,15 @@ internal class AuthenticationManagerTest {
         authenticationManager.deauthenticate(stopPushNotifications, onComplete, onError)
 
         verify { Logger.i(any(), any()) }
-        verify { Dependencies.destroyControllersAndResetEngagementData() }
-        verify { secureConversationsRepository.unsubscribeAndResetData() }
+        verify { engagementRepository.cancelQueuing() }
         verify {
             coreAuthentication.deauthenticate(eq(stopPushNotifications), capture(authCallbackSlot))
         }
 
         authCallbackSlot.captured.onResult(null, null)
 
+        verify { Dependencies.destroyControllersAndResetEngagementData() }
+        verify { secureConversationsRepository.unsubscribeAndResetData() }
         verify { onComplete.onComplete() }
 
         verify(exactly = 0) { onError.onError(any()) }
@@ -191,8 +196,7 @@ internal class AuthenticationManagerTest {
         authenticationManager.deauthenticate(stopPushNotifications, onComplete, onError)
 
         verify { Logger.i(any(), any()) }
-        verify { Dependencies.destroyControllersAndResetEngagementData() }
-        verify { secureConversationsRepository.unsubscribeAndResetData() }
+        verify { engagementRepository.cancelQueuing() }
         verify {
             coreAuthentication.deauthenticate(eq(stopPushNotifications), capture(authCallbackSlot))
         }
@@ -200,6 +204,8 @@ internal class AuthenticationManagerTest {
         authCallbackSlot.captured.onResult(null, GliaException("error", GliaException.Cause.INVALID_INPUT))
 
         verify(exactly = 0) { onComplete.onComplete() }
+        verify(exactly = 0) { Dependencies.destroyControllersAndResetEngagementData() }
+        verify(exactly = 0) { secureConversationsRepository.unsubscribeAndResetData() }
 
         verify { onError.onError(any()) }
     }

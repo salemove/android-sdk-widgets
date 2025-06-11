@@ -1,6 +1,5 @@
 package com.glia.widgets.engagement
 
-import com.glia.androidsdk.Engagement.ActionOnEnd
 import com.glia.androidsdk.Operator
 import com.glia.androidsdk.engagement.EngagementState
 import com.glia.androidsdk.engagement.Survey
@@ -13,12 +12,7 @@ internal sealed interface State {
     data object UnexpectedErrorHappened : State
     data object QueueingCanceled : State
     data class EngagementStarted(val isCallVisualizer: Boolean) : State
-    data class EngagementEnded(
-        val isCallVisualizer: Boolean,
-        val endedBy: EndedBy,
-        val action: ActionOnEnd,
-        val fetchSurveyCallback: FetchSurveyCallback
-    ) : State
+    data class EngagementEnded(val endAction: EndAction) : State
 
     data object TransferredToSecureConversation : State
     data class Update(val state: EngagementState, val updateState: EngagementUpdateState) : State
@@ -40,13 +34,13 @@ internal sealed interface State {
         }
 }
 
-internal enum class EndedBy {
-    CLEAR_STATE,
-    OPERATOR,
-    VISITOR
+internal sealed interface EndAction {
+    data object Retain : EndAction
+    data object ClearStateRegular : EndAction
+    data object ClearStateCallVisualizer : EndAction
+    data class ShowSurvey(val survey: Survey) : EndAction
+    data object ShowEndDialog : EndAction
 }
-
-internal typealias FetchSurveyCallback = (onResult: (Survey) -> Unit, onError: () -> Unit) -> Unit
 
 internal sealed interface EngagementUpdateState {
     data object Transferring : EngagementUpdateState

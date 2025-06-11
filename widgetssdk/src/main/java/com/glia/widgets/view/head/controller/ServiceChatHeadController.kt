@@ -89,7 +89,6 @@ internal class ServiceChatHeadController(
             Destinations.CALL_VIEW -> chatHeadView?.navigateToCall()
             Destinations.SCREEN_SHARING -> chatHeadView?.navigateToEndScreenSharing()
             Destinations.CHAT_VIEW -> chatHeadView?.navigateToChat()
-            else -> chatHeadView?.navigateToChat()
         }
     }
 
@@ -99,7 +98,7 @@ internal class ServiceChatHeadController(
     }
 
 
-    private fun handleEngagementState(state: com.glia.widgets.engagement.State) {
+    private fun handleEngagementState(state: EngagementState) {
         when (state) {
             is EngagementState.EngagementStarted -> {
                 newEngagementLoaded()

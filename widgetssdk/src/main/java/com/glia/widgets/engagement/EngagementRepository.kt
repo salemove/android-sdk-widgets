@@ -46,7 +46,6 @@ internal interface EngagementRepository {
 
     fun initialize()
     fun reset()
-    fun resetQueueing()
     //used for ending engagement after visitor ends engagement explicitly
     fun endEngagement()
     //used for ending engagement after integrator ends the engagement from outside of SDK, for example [GliaWidgets.endEngagement]

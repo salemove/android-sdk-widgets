@@ -201,10 +201,6 @@ internal class EngagementRepositoryImpl(
         }
     }
 
-    override fun resetQueueing() {
-        cancelQueuing()
-    }
-
     private fun resetState(retainSecureMessagingState: Boolean = false) {
         _isSecureMessagingRequested = retainSecureMessagingState
         _operatorMediaState.onNext(Data.Empty)
@@ -253,17 +249,22 @@ internal class EngagementRepositoryImpl(
         ensureNotScTransferredEngagement {
             end { ex -> ex?.also { Logger.d(TAG, "Ending engagement failed") } }
 
-            currentEngagement = null
             Logger.i(TAG, "Engagement ended locally, ended by:visitor")
-            unsubscribeFromEvents(this)
-            resetState()
+            currentEngagement = null
+
+            unsubscribeAndResetState(this)
 
             //Since this function is called only when engagement is ended by visitor, it won't be a Call Visualizer
             //Sending [ClearStateRegular] action to close all the activities and release resources until the survey is loaded
             _engagementState.onNext(State.EngagementEnded(endAction = EndAction.ClearStateRegular))
 
             if (state.actionOnEnd.isSurvey) {
-                fetchSurvey(this)
+                getSurvey { survey, _ ->
+                    if (survey != null) {
+                        Logger.i(TAG, "Survey loaded")
+                        _engagementState.onNext(State.EngagementEnded(endAction = EndAction.ShowSurvey(survey)))
+                    }
+                }
             }
         }
     }
@@ -583,20 +584,18 @@ internal class EngagementRepositoryImpl(
                 state.actionOnEnd.isSurvey -> {
                     //Sending [ClearStateRegular] action to close all the activities and release resources until the survey is loaded
                     _engagementState.onNext(State.EngagementEnded(endAction = EndAction.ClearStateRegular))
-                    fetchSurvey(this)
+                    getSurvey { survey, _ ->
+                        if (survey != null) {
+                            Logger.i(TAG, "Survey loaded")
+                            _engagementState.onNext(State.EngagementEnded(endAction = EndAction.ShowSurvey(survey)))
+                        } else {
+                            _engagementState.onNext(State.EngagementEnded(endAction = EndAction.ShowEndDialog))
+                        }
+                    }
                 }
 
-                else -> _engagementState.onNext(State.EngagementEnded(endAction = EndAction.ClearStateRegular))
+                else -> _engagementState.onNext(State.EngagementEnded(endAction = EndAction.ShowEndDialog))
 
-            }
-        }
-    }
-
-    private fun fetchSurvey(engagement: Engagement) {
-        engagement.getSurvey { survey, _ ->
-            if (survey != null) {
-                Logger.i(TAG, "Survey loaded")
-                _engagementState.onNext(State.EngagementEnded(endAction = EndAction.ShowSurvey(survey)))
             }
         }
     }

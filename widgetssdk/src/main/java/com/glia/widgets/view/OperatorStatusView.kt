@@ -7,10 +7,10 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.withStyledAttributes
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import coil3.dispose
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.databinding.OperatorStatusViewBinding
-import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.addColorFilter
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getColorStateListCompat
@@ -22,7 +22,6 @@ import com.glia.widgets.view.unifiedui.theme.chat.OnHoldOverlayTheme
 import com.glia.widgets.view.unifiedui.theme.chat.OperatorTheme
 import com.glia.widgets.view.unifiedui.theme.chat.UserImageTheme
 import com.google.android.material.imageview.ShapeableImageView
-import com.squareup.picasso.Picasso
 import kotlin.properties.Delegates
 
 internal class OperatorStatusView @JvmOverloads constructor(
@@ -87,7 +86,7 @@ internal class OperatorStatusView @JvmOverloads constructor(
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        Picasso.get().cancelRequest(profilePictureView)
+        profilePictureView.dispose()
     }
 
     fun setTheme(theme: UiTheme) {

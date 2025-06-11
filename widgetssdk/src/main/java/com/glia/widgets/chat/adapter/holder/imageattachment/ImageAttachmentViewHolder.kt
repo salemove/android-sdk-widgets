@@ -8,9 +8,9 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat
 import androidx.recyclerview.widget.RecyclerView
+import coil3.load
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.widgets.R
-import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromNetworkUseCase
@@ -18,8 +18,8 @@ import com.glia.widgets.helper.Logger.d
 import com.glia.widgets.helper.Logger.e
 import com.glia.widgets.helper.fileName
 import com.glia.widgets.helper.rx.Schedulers
+import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.google.android.material.imageview.ShapeableImageView
-import com.squareup.picasso.Picasso
 import io.reactivex.rxjava3.disposables.Disposable
 
 internal open class ImageAttachmentViewHolder(
@@ -41,7 +41,7 @@ internal open class ImageAttachmentViewHolder(
             .onErrorResumeNext { getImageFileFromDownloadsUseCase.invoke(imageName) }
             .doOnError { error: Throwable -> d(TAG, imageName + " failed loading from downloads: " + error.message) }
             .doOnSuccess { _: Bitmap? -> d(TAG, "loaded from downloads: $imageName") }
-            .onErrorResumeNext { getImageFileFromNetworkUseCase.invoke(attachmentFile)}
+            .onErrorResumeNext { getImageFileFromNetworkUseCase.invoke(attachmentFile) }
             .doOnError { error: Throwable -> d(TAG, imageName + " failed loading from network: " + error.message) }
             .doOnSuccess { _: Bitmap? -> d(TAG, "loaded from network: $imageName") }
             .subscribeOn(schedulers.computationScheduler)
@@ -55,9 +55,7 @@ internal open class ImageAttachmentViewHolder(
     }
 
     fun bind(localAttachment: LocalAttachment) {
-        Picasso.get()
-            .load(localAttachment.uri)
-            .into(imageView)
+        imageView.load(localAttachment.uri)
     }
 
     private fun setAccessibilityActions() {

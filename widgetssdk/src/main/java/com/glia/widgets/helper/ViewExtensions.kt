@@ -31,6 +31,12 @@ import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat
 import androidx.core.view.children
 import androidx.core.widget.TextViewCompat
+import coil3.ImageLoader
+import coil3.request.ErrorResult
+import coil3.request.ImageRequest
+import coil3.request.SuccessResult
+import coil3.request.crossfade
+import coil3.request.target
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.model.KeyPath
@@ -40,8 +46,6 @@ import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.locale.StringKeyPair
 import com.glia.widgets.view.textview.SingleLineHintEditText
 import com.google.android.material.button.MaterialButton
-import com.squareup.picasso.Callback
-import com.squareup.picasso.Picasso
 
 internal fun View.getColorCompat(@ColorRes resId: Int) = ContextCompat.getColor(context, resId)
 internal fun View.getColorStateListCompat(@ColorRes resId: Int) =
@@ -117,22 +121,30 @@ internal fun LottieAnimationView.addColorFilter(
 internal fun ImageView.load(
     url: String?,
     onSuccess: (() -> Unit)? = null,
-    onError: ((ex: Exception) -> Unit)? = null
+    onError: ((ex: Throwable) -> Unit)? = null
 ) {
-    val callback = if (onSuccess == null && onError == null) {
-        null
-    } else {
-        object : Callback {
-            override fun onSuccess() {
-                onSuccess?.invoke()
-            }
+    val imageListener = object : ImageRequest.Listener {
+        override fun onSuccess(request: ImageRequest, result: SuccessResult) {
+            onSuccess?.invoke()
+        }
 
-            override fun onError(e: Exception) {
-                onError?.invoke(e)
-            }
+        override fun onError(request: ImageRequest, result: ErrorResult) {
+            onError?.invoke(result.throwable)
         }
     }
-    Picasso.get().load(url).into(this, callback)
+
+    val request = ImageRequest.Builder(context)
+        .data(url)
+        .crossfade(true) // A crossfade animation when a request completes successfully.
+        .listener(imageListener)
+        .target(this)
+        .build()
+
+    val imageLoader = ImageLoader.Builder(context)
+        .crossfade(true) // A crossfade animation when a request completes successfully.
+        .build()
+
+    imageLoader.enqueue(request)
 }
 
 internal val View.layoutInflater: LayoutInflater get() = LayoutInflater.from(this.context)

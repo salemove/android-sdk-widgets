@@ -1,6 +1,5 @@
 package com.glia.widgets.push.notifications
 
-import android.content.Intent
 import android.os.Bundle
 import com.glia.widgets.base.FadeTransitionActivity
 import com.glia.widgets.di.Dependencies
@@ -12,11 +11,7 @@ internal class PushClickHandlerActivity : FadeTransitionActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // About these flags and overall why this activity has separate affinity etc. please refer to the official documentation:
-        // https://developer.android.com/develop/ui/views/notifications/navigation#ExtendedNotification
-        val appLauncherIntent = packageManager.getLaunchIntentForPackage(packageName)?.apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
+        val appLauncherIntent = packageManager.getLaunchIntentForPackage(packageName)
 
         // We need launcher intent to run the app's default flow.
         if (appLauncherIntent != null) {

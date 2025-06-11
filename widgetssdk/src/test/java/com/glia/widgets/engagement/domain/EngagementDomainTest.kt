@@ -15,7 +15,6 @@ import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
 import com.glia.widgets.core.screensharing.MEDIA_PROJECTION_SERVICE_ACTION_START
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.MediaType
-import com.glia.widgets.engagement.EndedBy
 import com.glia.widgets.engagement.EngagementRepository
 import com.glia.widgets.engagement.ScreenSharingState
 import com.glia.widgets.helper.Data
@@ -189,11 +188,13 @@ class EngagementDomainTest {
 
         val useCase: EndEngagementUseCase = EndEngagementUseCaseImpl(engagementRepository = repository)
 
-        useCase(EndedBy.OPERATOR)
+        useCase()
+        useCase.silently()
 
-        verify { repository.isQueueing }
-        verify { repository.cancelQueuing() }
-        verify(exactly = 0) { repository.endEngagement(any()) }
+        verify(exactly = 2) { repository.isQueueing }
+        verify(exactly = 2) { repository.cancelQueuing() }
+        verify(exactly = 0) { repository.endEngagement() }
+        verify(exactly = 0) { repository.terminateEngagement() }
 
         confirmVerified(repository)
     }
@@ -206,10 +207,27 @@ class EngagementDomainTest {
 
         val useCase: EndEngagementUseCase = EndEngagementUseCaseImpl(engagementRepository = repository)
 
-        useCase(EndedBy.OPERATOR)
+        useCase()
 
         verify { repository.isQueueing }
-        verify { repository.endEngagement(eq(EndedBy.OPERATOR)) }
+        verify { repository.endEngagement() }
+        verify(exactly = 0) { repository.cancelQueuing() }
+
+        confirmVerified(repository)
+    }
+
+    @Test
+    fun `EndEngagementUseCase silently will call endEngagementSilently when isQueueing is false`() {
+        val repository: EngagementRepository = mockk(relaxed = true) {
+            every { isQueueing } returns false
+        }
+
+        val useCase: EndEngagementUseCase = EndEngagementUseCaseImpl(engagementRepository = repository)
+
+        useCase.silently()
+
+        verify { repository.isQueueing }
+        verify { repository.terminateEngagement() }
         verify(exactly = 0) { repository.cancelQueuing() }
 
         confirmVerified(repository)

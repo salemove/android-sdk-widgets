@@ -115,7 +115,7 @@ internal class ActivityWatcherForChatHeadTest {
     @Test
     fun `bubble will be removed when engagement or queueing ended`() {
         engagementStateFlowable.onNext(State.EngagementEnded(true, EndedBy.OPERATOR, Engagement.ActionOnEnd.UNKNOWN, mock()))
-        engagementStateFlowable.onNext(State.EngagementEnded(false, EndedBy.CLEAR_STATE, Engagement.ActionOnEnd.UNKNOWN, mock()))
+        engagementStateFlowable.onNext(State.EngagementEnded(false, EndedBy.INTEGRATOR, Engagement.ActionOnEnd.UNKNOWN, mock()))
         engagementStateFlowable.onNext(State.QueueUnstaffed)
         engagementStateFlowable.onNext(State.UnexpectedErrorHappened)
         engagementStateFlowable.onNext(State.QueueingCanceled)

@@ -351,7 +351,7 @@ class EngagementRepositoryTest {
 
     private fun verifyEngagementEnd(
         ongoingEngagement: Boolean = true,
-        endedBy: EndedBy = EndedBy.CLEAR_STATE,
+        endedBy: EndedBy = EndedBy.INTEGRATOR,
         actionOnEnd: ActionOnEnd = ActionOnEnd.END_NOTIFICATION
     ) {
         repository.apply {
@@ -615,7 +615,7 @@ class EngagementRepositoryTest {
         mockEngagementAndStart()
         fillStates()
         operatorTypingCallbackSlot.captured.accept(OperatorTypingStatus { true })
-        repository.endEngagement(EndedBy.CLEAR_STATE)
+        repository.endEngagement(EndedBy.INTEGRATOR)
         verify { engagement.state }
         operatorTypingStatusTestObserver.assertNotComplete().assertValues(true, false)
 
@@ -838,7 +838,7 @@ class EngagementRepositoryTest {
                 State.TransferredToSecureConversation
             )
 
-        repository.endEngagement(EndedBy.CLEAR_STATE)
+        repository.endEngagement(EndedBy.INTEGRATOR)
         verify { state5.isLiveEngagementTransferredToSecureConversation }
         verify(exactly = 0) { engagement.end(any()) }
     }
@@ -1232,7 +1232,7 @@ class EngagementRepositoryTest {
         assertFalse(repositorySpy.isSecureMessagingRequested)
 
         verify { repositorySpy.cancelQueuing() }
-        verify(inverse = true) { repositorySpy.endEngagement(eq(EndedBy.CLEAR_STATE)) }
+        verify(inverse = true) { repositorySpy.endEngagement(eq(EndedBy.INTEGRATOR)) }
     }
 
     @Test
@@ -1242,7 +1242,7 @@ class EngagementRepositoryTest {
 
         repositorySpy.reset()
 
-        verify { repositorySpy.endEngagement(eq(EndedBy.CLEAR_STATE)) }
+        verify { repositorySpy.endEngagement(eq(EndedBy.INTEGRATOR)) }
         verify(inverse = true) { repositorySpy.cancelQueuing() }
     }
 

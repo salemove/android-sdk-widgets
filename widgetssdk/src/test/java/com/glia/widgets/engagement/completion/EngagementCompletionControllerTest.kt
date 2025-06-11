@@ -56,7 +56,7 @@ class EngagementCompletionControllerTest {
         engagementStateProcessor.onNext(
             State.EngagementEnded(
                 true,
-                EndedBy.CLEAR_STATE,
+                EndedBy.INTEGRATOR,
                 Engagement.ActionOnEnd.END_NOTIFICATION,
                 fetchSurveyCallback
             )
@@ -72,7 +72,7 @@ class EngagementCompletionControllerTest {
         engagementStateProcessor.onNext(
             State.EngagementEnded(
                 false,
-                EndedBy.CLEAR_STATE,
+                EndedBy.INTEGRATOR,
                 Engagement.ActionOnEnd.END_NOTIFICATION,
                 fetchSurveyCallback
             )

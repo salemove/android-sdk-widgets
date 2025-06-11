@@ -1,11 +1,6 @@
 package com.glia.widgets.callvisualizer.controller
 
-import com.glia.widgets.internal.dialog.DialogContract
-import com.glia.widgets.internal.dialog.domain.ConfirmationDialogLinksUseCase
-import com.glia.widgets.internal.dialog.model.ConfirmationDialogLinks
-import com.glia.widgets.internal.dialog.model.DialogState
-import com.glia.widgets.internal.dialog.model.Link
-import com.glia.widgets.internal.engagement.domain.ConfirmationDialogUseCase
+import com.glia.widgets.engagement.EndAction
 import com.glia.widgets.engagement.domain.EngagementRequestUseCase
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import com.glia.widgets.engagement.domain.OnIncomingEngagementRequestTimeoutUseCase
@@ -14,6 +9,12 @@ import com.glia.widgets.helper.OneTimeEvent
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.asOneTimeStateFlowable
 import com.glia.widgets.helper.unSafeSubscribe
+import com.glia.widgets.internal.dialog.DialogContract
+import com.glia.widgets.internal.dialog.domain.ConfirmationDialogLinksUseCase
+import com.glia.widgets.internal.dialog.model.ConfirmationDialogLinks
+import com.glia.widgets.internal.dialog.model.DialogState
+import com.glia.widgets.internal.dialog.model.Link
+import com.glia.widgets.internal.engagement.domain.ConfirmationDialogUseCase
 import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.webbrowser.domain.GetUrlFromLinkUseCase
 import io.reactivex.rxjava3.core.Flowable
@@ -59,7 +60,7 @@ internal class CallVisualizerController(
     private val _state: PublishProcessor<CallVisualizerContract.State> = PublishProcessor.create()
     override val state: Flowable<OneTimeEvent<CallVisualizerContract.State>> = _state.asOneTimeStateFlowable()
     override val engagementStartFlow: Flowable<EngagementState> get() = engagementStateUseCase().filter { it is EngagementState.EngagementStarted && it.isCallVisualizer }
-    override val engagementEndFlow: Flowable<EngagementState> get() = engagementStateUseCase().filter { it is EngagementState.EngagementEnded && it.isCallVisualizer }
+    override val engagementEndFlow: Flowable<EngagementState> get() = engagementStateUseCase().filter { it is EngagementState.EngagementEnded && it.endAction is EndAction.ClearStateCallVisualizer }
 
     private var visitorContextAssetId: String? = null
 
@@ -79,9 +80,7 @@ internal class CallVisualizerController(
             is DialogState.VisitorCode -> _state.onNext(CallVisualizerContract.State.DisplayVisitorCodeDialog)
             is DialogState.None -> _state.onNext(CallVisualizerContract.State.DismissDialog)
             is DialogState.CVConfirmation -> _state.onNext(
-                CallVisualizerContract.State.DisplayConfirmationDialog(
-                    confirmationDialogLinksUseCase()
-                )
+                CallVisualizerContract.State.DisplayConfirmationDialog(confirmationDialogLinksUseCase())
             )
 
             else -> {

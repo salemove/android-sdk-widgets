@@ -66,7 +66,7 @@ internal val Operator.formattedName: String get() = name.substringBefore(' ')
 
 internal val Operator.imageUrl: String? get() = picture?.url?.getOrNull()
 
-internal fun UiTheme?.isAlertDialogButtonUseVerticalAlignment(): Boolean = this?.gliaAlertDialogButtonUseVerticalAlignment ?: false
+internal fun UiTheme?.isAlertDialogButtonUseVerticalAlignment(): Boolean = this?.gliaAlertDialogButtonUseVerticalAlignment == true
 
 /**
  * Returns styled text from the provided HTML string. Replaces \n to <br> regardless of the operating system where the string was created.
@@ -118,7 +118,7 @@ internal fun <T : Any> FlowableProcessor<T>.asOneTimeStateFlowable(): Flowable<O
 
 internal fun Uri.exists(context: Context): Boolean = context.contentResolver.query(this, null, null, null, null)?.use {
     it.moveToFirst()
-} ?: false
+} == true
 
 internal fun createTempFileCompat(prefix: String, suffix: String? = null, directory: File? = null): File =
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

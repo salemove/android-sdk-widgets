@@ -99,7 +99,8 @@ dependencies {
   implementation libs.java.material
   implementation libs.java.constraintlayout
   implementation libs.lifecycle.process
-  implementation libs.media.picasso
+  implementation libs.media.coil.core
+  implementation libs.media.coil.network
 
   // Used for audio and video permissions by CallActivity
   implementation libs.java.rxandroid

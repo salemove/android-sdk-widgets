@@ -28,7 +28,8 @@ javaNavVersion = "2.9.0"
 dataGsonVersion = "2.13.0"
 firebaseBomVersion = "33.14.0"
 mediaAudioswitch = "1.2.0"
-mediaPicassoVersion = "2.71828"
+mediaCoilCoreVersion = "3.2.0"
+mediaCoilNetworkVersion = "3.2.0"
 mediaLottieVersion = "6.6.6"
 mediaExifInterfaceVersion = "1.4.1"
 testEspressoVersion = "3.6.1"
@@ -64,7 +65,8 @@ java-rxandroid = { module = "io.reactivex.rxjava3:rxandroid", version.ref = "jav
 java-rxjava = { module = "io.reactivex.rxjava3:rxjava", version.ref = "javaRxJava3Version" }
 lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "javaLifecycleProcessVersion" }
 media-lottie = { module = "com.airbnb.android:lottie", version.ref = "mediaLottieVersion" }
-media-picasso = { module = "com.squareup.picasso:picasso", version.ref = "mediaPicassoVersion" }
+media-coil-core = { module = "io.coil-kt.coil3:coil", version.ref = "mediaCoilCoreVersion" }
+media-coil-network = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "mediaCoilNetworkVersion" }
 media-audioswitch = { module = "com.twilio:audioswitch", version.ref = "mediaAudioswitch" }
 media-exif-interface = { module = "androidx.exifinterface:exifinterface", version.ref = "mediaExifInterfaceVersion" }
 test-core-testing = { module = "androidx.arch.core:core-testing", version.ref = "archCoreVersion" }

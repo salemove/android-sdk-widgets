@@ -162,6 +162,8 @@ internal class IntentHelperImpl : IntentHelper {
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
     )
 
+    // About these flags and overall why this activity has separate affinity etc. please refer to the official documentation:
+    // https://developer.android.com/develop/ui/views/notifications/navigation#ExtendedNotification
     private fun pushClickHandlerIntent(context: Context, queueId: String?, visitorId: String): Intent =
         Intent(context, PushClickHandlerActivity::class.java)
             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)

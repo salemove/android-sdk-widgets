@@ -126,6 +126,7 @@ dependencies {
   testImplementation libs.test.core.testing
   testImplementation libs.test.robolectric
   testImplementation libs.test.mockk.android
+  testImplementation("io.coil-kt.coil3:coil-test:3.2.0")
   androidTestImplementation libs.test.mockk.android
   androidTestImplementation libs.test.ext.junit
   androidTestImplementation libs.test.espresso.core

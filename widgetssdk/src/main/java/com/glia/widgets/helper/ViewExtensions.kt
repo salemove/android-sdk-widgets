@@ -118,7 +118,7 @@ internal fun LottieAnimationView.addColorFilter(
     PorterDuffColorFilter(color, mode)
 }
 
-internal fun ImageView.load(
+/*internal*/ fun ImageView.load( // TODO: commented 'internal' temporarily
     url: String?,
     onSuccess: (() -> Unit)? = null,
     onError: ((ex: Throwable) -> Unit)? = null

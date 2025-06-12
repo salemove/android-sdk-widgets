@@ -8,14 +8,14 @@ import com.glia.widgets.databinding.ChatOperatorMessageLayoutBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.snapshotutils.SnapshotChatScreen
 import com.glia.widgets.snapshotutils.SnapshotOperatorMessage
-import com.glia.widgets.snapshotutils.SnapshotPicasso
+import com.glia.widgets.snapshotutils.SnapshotCoil
 import com.glia.widgets.snapshotutils.SnapshotProviders
 import com.glia.widgets.snapshotutils.SnapshotStrings
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.google.gson.JsonObject
 import org.junit.Test
 
-internal class OperatorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen, SnapshotProviders, SnapshotPicasso, SnapshotOperatorMessage, SnapshotStrings {
+internal class OperatorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen, SnapshotProviders, SnapshotCoil, SnapshotOperatorMessage, SnapshotStrings {
 
     // MARK: Plain text
 
@@ -151,7 +151,7 @@ internal class OperatorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotC
     // MARK: utils for tests
 
     private fun setupView(item: OperatorMessageItem, unifiedTheme: UnifiedTheme? = null): OperatorMessageViewHolder {
-        picassoMock(listOf(R.drawable.test_banner, R.drawable.test_launcher2))
+        mockCoil(listOf(R.drawable.test_banner, R.drawable.test_launcher2))
         unifiedTheme?.let { Dependencies.gliaThemeManager.theme = it }
 
         setOnEndListener {

@@ -12,14 +12,14 @@ import com.glia.widgets.databinding.ChatAttachmentOperatorFileLayoutBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.snapshotutils.SnapshotAttachment
 import com.glia.widgets.snapshotutils.SnapshotChatScreen
-import com.glia.widgets.snapshotutils.SnapshotPicasso
+import com.glia.widgets.snapshotutils.SnapshotCoil
 import com.glia.widgets.snapshotutils.SnapshotProviders
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import org.junit.Test
 
 internal class OperatorFileAttachmentViewHolderSnapshotTest : SnapshotTest(
     renderingMode = fullWidthRenderMode
-), SnapshotChatScreen, SnapshotAttachment, SnapshotProviders, SnapshotPicasso {
+), SnapshotChatScreen, SnapshotAttachment, SnapshotProviders, SnapshotCoil {
 
     // MARK: without header
 
@@ -152,7 +152,7 @@ internal class OperatorFileAttachmentViewHolderSnapshotTest : SnapshotTest(
     // MARK: utils for tests
 
     private fun setupView(item: OperatorAttachmentItem.File, unifiedTheme: UnifiedTheme? = null): OperatorFileAttachmentViewHolder {
-        picassoMock(listOf(R.drawable.test_launcher2))
+        mockCoil(listOf(R.drawable.test_launcher2))
         unifiedTheme?.let { Dependencies.gliaThemeManager.theme = it }
 
         setOnEndListener {

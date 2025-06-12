@@ -12,13 +12,13 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import coil3.load
 import com.glia.widgets.R
 import com.glia.widgets.databinding.ChatAttachmentUploadedItemBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getColorStateListCompat
 import com.glia.widgets.helper.layoutInflater
+import com.glia.widgets.helper.load
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.toFileExtensionOrEmpty
 import com.glia.widgets.internal.fileupload.model.LocalAttachment
@@ -150,7 +150,7 @@ internal class ViewHolder(
 
             if (attachment.isImage) {
                 showExtensionTypeImage()
-                extensionTypeImage.load(attachment.uri)
+                extensionTypeImage.load(attachment.uri.toString())
             } else {
                 showExtensionTypeText()
                 extensionTypeText.text = displayName.toFileExtensionOrEmpty().uppercase()

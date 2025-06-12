@@ -14,14 +14,14 @@ import com.glia.widgets.di.Dependencies
 import com.glia.widgets.snapshotutils.SnapshotAttachment
 import com.glia.widgets.snapshotutils.SnapshotChatScreen
 import com.glia.widgets.snapshotutils.SnapshotGetImageFile
-import com.glia.widgets.snapshotutils.SnapshotPicasso
+import com.glia.widgets.snapshotutils.SnapshotCoil
 import com.glia.widgets.snapshotutils.SnapshotProviders
 import com.glia.widgets.snapshotutils.SnapshotSchedulers
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import org.junit.Test
 
 internal class OperatorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen, SnapshotAttachment, SnapshotGetImageFile,
-    SnapshotSchedulers, SnapshotProviders, SnapshotPicasso {
+    SnapshotSchedulers, SnapshotProviders, SnapshotCoil {
 
     // MARK: without header
 
@@ -156,7 +156,7 @@ internal class OperatorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), S
     private fun setupView(item: OperatorAttachmentItem.Image, unifiedTheme: UnifiedTheme? = null): OperatorImageAttachmentViewHolder {
         unifiedTheme?.let { Dependencies.gliaThemeManager.theme = it }
 
-        picassoMock(listOf(R.drawable.test_launcher2))
+        mockCoil(listOf(R.drawable.test_launcher2))
         val imageFileMock = getImageFileMock(R.drawable.test_banner)
         val schedulersMock = schedulersMock()
 

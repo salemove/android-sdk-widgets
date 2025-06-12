@@ -8,15 +8,14 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat
 import androidx.recyclerview.widget.RecyclerView
-import coil3.load
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.widgets.R
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromNetworkUseCase
-import com.glia.widgets.helper.Logger.d
-import com.glia.widgets.helper.Logger.e
+import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.fileName
+import com.glia.widgets.helper.load
 import com.glia.widgets.helper.rx.Schedulers
 import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.google.android.material.imageview.ShapeableImageView
@@ -36,26 +35,26 @@ internal open class ImageAttachmentViewHolder(
         imageView.setImageResource(android.R.color.darker_gray) // clear the previous view state
         val imageName = attachmentFile.fileName
         disposable = getImageFileFromCacheUseCase.invoke(imageName)
-            .doOnError { error: Throwable -> d(TAG, "failed loading from cache: " + imageName + " reason: " + error.message) }
-            .doOnSuccess { _: Bitmap? -> d(TAG, "loaded from cache: $imageName") }
+            .doOnError { error: Throwable -> Logger.d(TAG, "failed loading from cache: " + imageName + " reason: " + error.message) }
+            .doOnSuccess { _: Bitmap? -> Logger.d(TAG, "loaded from cache: $imageName") }
             .onErrorResumeNext { getImageFileFromDownloadsUseCase.invoke(imageName) }
-            .doOnError { error: Throwable -> d(TAG, imageName + " failed loading from downloads: " + error.message) }
-            .doOnSuccess { _: Bitmap? -> d(TAG, "loaded from downloads: $imageName") }
+            .doOnError { error: Throwable -> Logger.d(TAG, imageName + " failed loading from downloads: " + error.message) }
+            .doOnSuccess { _: Bitmap? -> Logger.d(TAG, "loaded from downloads: $imageName") }
             .onErrorResumeNext { getImageFileFromNetworkUseCase.invoke(attachmentFile) }
-            .doOnError { error: Throwable -> d(TAG, imageName + " failed loading from network: " + error.message) }
-            .doOnSuccess { _: Bitmap? -> d(TAG, "loaded from network: $imageName") }
+            .doOnError { error: Throwable -> Logger.d(TAG, imageName + " failed loading from network: " + error.message) }
+            .doOnSuccess { _: Bitmap? -> Logger.d(TAG, "loaded from network: $imageName") }
             .subscribeOn(schedulers.computationScheduler)
             .observeOn(schedulers.mainScheduler)
             .subscribe({ bm: Bitmap? -> imageView.setImageBitmap(bm) }
             ) { error: Throwable ->
-                error.message?.let { e(TAG, it) }
+                error.message?.let { Logger.e(TAG, it) }
                 imageView.setBackgroundColor(Color.BLACK)
             }
         setAccessibilityActions()
     }
 
     fun bind(localAttachment: LocalAttachment) {
-        imageView.load(localAttachment.uri)
+        imageView.load(localAttachment.uri.toString())
     }
 
     private fun setAccessibilityActions() {

@@ -25,16 +25,18 @@ import androidx.annotation.StyleableRes
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.util.Consumer
 import androidx.core.view.AccessibilityDelegateCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat
 import androidx.core.view.children
 import androidx.core.widget.TextViewCompat
-import coil3.ImageLoader
+import coil3.SingletonImageLoader
 import coil3.request.ErrorResult
 import coil3.request.ImageRequest
 import coil3.request.SuccessResult
+import coil3.request.allowHardware
 import coil3.request.crossfade
 import coil3.request.target
 import com.airbnb.lottie.LottieAnimationView
@@ -120,16 +122,17 @@ internal fun LottieAnimationView.addColorFilter(
 
 internal fun ImageView.load(
     url: String?,
-    onSuccess: (() -> Unit)? = null,
-    onError: ((ex: Throwable) -> Unit)? = null
+    onSuccess: Consumer<Unit>? = null,
+    onError: Consumer<Throwable>? = null
 ) {
+
     val imageListener = object : ImageRequest.Listener {
         override fun onSuccess(request: ImageRequest, result: SuccessResult) {
-            onSuccess?.invoke()
+            onSuccess?.accept(Unit)
         }
 
         override fun onError(request: ImageRequest, result: ErrorResult) {
-            onError?.invoke(result.throwable)
+            onError?.accept(result.throwable)
         }
     }
 
@@ -137,14 +140,13 @@ internal fun ImageView.load(
         .data(url)
         .crossfade(true) // A crossfade animation when a request completes successfully.
         .listener(imageListener)
+        // Disable hardware bitmaps to avoid 'java.lang.IllegalArgumentException: Software rendering doesn't support hardware bitmaps' exception.
+        // See https://coil-kt.github.io/coil/recipes/#shared-element-transitions
+        .allowHardware(false)
         .target(this)
         .build()
 
-    val imageLoader = ImageLoader.Builder(context)
-        .crossfade(true) // A crossfade animation when a request completes successfully.
-        .build()
-
-    imageLoader.enqueue(request)
+    SingletonImageLoader.get(context).enqueue(request)
 }
 
 internal val View.layoutInflater: LayoutInflater get() = LayoutInflater.from(this.context)

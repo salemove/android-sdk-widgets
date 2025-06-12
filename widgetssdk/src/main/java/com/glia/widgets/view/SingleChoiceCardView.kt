@@ -98,7 +98,7 @@ internal class SingleChoiceCardView @JvmOverloads constructor(
     private fun setupImage(imageUrl: String?) {
         binding.image.apply {
             this.isVisible = imageUrl != null
-            load(imageUrl)
+            imageUrl?.let { load(it) }
         }
     }
 

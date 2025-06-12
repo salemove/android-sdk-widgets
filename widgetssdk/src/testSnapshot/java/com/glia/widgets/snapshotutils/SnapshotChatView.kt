@@ -23,7 +23,7 @@ import org.mockito.kotlin.whenever
 import java.util.concurrent.Executor
 
 internal interface SnapshotChatView : SnapshotContent, SnapshotTheme, SnapshotActivityWindow, SnapshotProviders,
-    SnapshotGetImageFile, SnapshotSchedulers, SnapshotAttachment, SnapshotPicasso, SnapshotLottie, SnapshotThemeConfiguration {
+    SnapshotGetImageFile, SnapshotSchedulers, SnapshotAttachment, SnapshotCoil, SnapshotLottie, SnapshotThemeConfiguration {
 
     data class Mock(
         val activityMock: SnapshotActivityWindow.Mock,
@@ -69,7 +69,7 @@ internal interface SnapshotChatView : SnapshotContent, SnapshotTheme, SnapshotAc
 
         val mock = chatViewMock()
 
-        imageResources?.let { picassoMock(imageResources) }
+        imageResources?.let { mockCoil(imageResources) }
 
         val chatViewCaptor: KArgumentCaptor<ChatContract.View> = argumentCaptor()
         val chatActivityBinding = ChatActivityBinding.inflate(layoutInflater)

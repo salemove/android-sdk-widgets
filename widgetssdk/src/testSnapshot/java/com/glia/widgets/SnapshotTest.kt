@@ -2,12 +2,19 @@ package com.glia.widgets
 
 import android.content.Context
 import android.content.res.Resources
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import androidx.annotation.RawRes
 import app.cash.paparazzi.DeviceConfig
 import app.cash.paparazzi.InstantAnimationsRule
 import app.cash.paparazzi.Paparazzi
+import coil3.ColorImage
+import coil3.DrawableImage
+import coil3.ImageLoader
+import coil3.SingletonImageLoader
+import coil3.annotation.DelicateCoilApi
+import coil3.test.FakeImageLoaderEngine
 import com.android.ide.common.rendering.api.SessionParams.RenderingMode
 import com.glia.widgets.snapshotutils.OnTestEnded
 import com.glia.widgets.snapshotutils.SnapshotContent
@@ -75,9 +82,21 @@ internal open class SnapshotTest(
         _paparazzi.snapshot(view, name, offsetMillis)
     }
 
+//    @OptIn(DelicateCoilApi::class)
     @Before
     open fun setUp() {
         providerMockReset()
+
+//    Solution from https://coil-kt.github.io/coil/testing/
+//        val engine = FakeImageLoaderEngine.Builder()
+//            .intercept("https://fake.url",ColorImage(Color.RED))
+////            .intercept(Any(), ColorImage(Color.RED))
+//            .default(ColorImage(Color.BLUE))
+//            .build()
+//        val imageLoader = ImageLoader.Builder(_paparazzi.context)
+//            .components { add(engine) }
+//            .build()
+//        SingletonImageLoader.setUnsafe(imageLoader)
     }
 
     @After

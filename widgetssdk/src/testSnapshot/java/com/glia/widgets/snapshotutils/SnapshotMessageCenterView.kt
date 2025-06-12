@@ -18,7 +18,7 @@ import org.mockito.kotlin.whenever
 import java.util.concurrent.Executor
 
 internal interface SnapshotMessageCenterView : SnapshotTestLifecycle, SnapshotContent,
-    SnapshotActivityWindow, SnapshotProviders, SnapshotAttachment, SnapshotPicasso, SnapshotTheme {
+    SnapshotActivityWindow, SnapshotProviders, SnapshotAttachment, SnapshotCoil, SnapshotTheme {
 
     data class Mock(
         val activityMock: SnapshotActivityWindow.Mock,
@@ -56,7 +56,7 @@ internal interface SnapshotMessageCenterView : SnapshotTestLifecycle, SnapshotCo
 
         unifiedTheme?.let { Dependencies.gliaThemeManager.theme = it }
 
-        imageResources?.let { picassoMock(imageResources) }
+        imageResources?.let { mockCoil(imageResources) }
 
         val messageCenterView = MessageCenterView(context)
 

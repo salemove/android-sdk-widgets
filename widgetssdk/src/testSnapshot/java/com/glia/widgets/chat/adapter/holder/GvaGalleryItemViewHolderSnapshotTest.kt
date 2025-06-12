@@ -10,11 +10,11 @@ import com.glia.widgets.chat.model.GvaButton
 import com.glia.widgets.chat.model.GvaGalleryCard
 import com.glia.widgets.databinding.ChatGvaGalleryItemBinding
 import com.glia.widgets.snapshotutils.SnapshotGva
-import com.glia.widgets.snapshotutils.SnapshotPicasso
+import com.glia.widgets.snapshotutils.SnapshotCoil
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import org.junit.Test
 
-internal class GvaGalleryItemViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, SnapshotPicasso {
+internal class GvaGalleryItemViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, SnapshotCoil {
 
     // MARK: tests with all views
 
@@ -270,7 +270,7 @@ internal class GvaGalleryItemViewHolderSnapshotTest : SnapshotTest(), SnapshotGv
         unifiedTheme: UnifiedTheme? = null,
         height: Int? = null
     ): ViewData {
-        picassoMock(imageResources = listOf(imageRes))
+        mockCoil(imageResources = listOf(imageRes))
 
         val binding = ChatGvaGalleryItemBinding.inflate(layoutInflater)
         val viewHolder = GvaGalleryItemViewHolder(binding, {}, UiTheme(), unifiedTheme)

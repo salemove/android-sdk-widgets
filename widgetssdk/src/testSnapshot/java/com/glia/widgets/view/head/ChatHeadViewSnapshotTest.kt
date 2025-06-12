@@ -9,7 +9,7 @@ import com.glia.widgets.di.UseCaseFactory
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
 import com.glia.widgets.snapshotutils.SnapshotChatView
 import com.glia.widgets.snapshotutils.SnapshotLottie
-import com.glia.widgets.snapshotutils.SnapshotPicasso
+import com.glia.widgets.snapshotutils.SnapshotCoil
 import com.glia.widgets.snapshotutils.SnapshotProviders
 import com.glia.widgets.snapshotutils.SnapshotThemeConfiguration
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
@@ -20,7 +20,7 @@ import java.util.concurrent.Executor
 
 internal class ChatHeadViewSnapshotTest : SnapshotTest(
     maxPercentDifference = 0.01
-), SnapshotChatView, SnapshotProviders, SnapshotLottie, SnapshotPicasso, SnapshotThemeConfiguration {
+), SnapshotChatView, SnapshotProviders, SnapshotLottie, SnapshotCoil, SnapshotThemeConfiguration {
 
     // MARK: Default state
 
@@ -305,7 +305,7 @@ internal class ChatHeadViewSnapshotTest : SnapshotTest(
         lottieMock()
         localeProviderMock()
         resourceProviderMock()
-        picassoMock(listOf(R.drawable.test_launcher2))
+        mockCoil(listOf(R.drawable.test_launcher2))
 
         val controllerFactoryMock = mock<ControllerFactory>()
         val chatHeadControllerMock = mock<ChatHeadContract.Controller>()

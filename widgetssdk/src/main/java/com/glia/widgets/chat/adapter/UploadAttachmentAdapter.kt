@@ -12,9 +12,8 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import coil3.load
 import com.glia.widgets.R
-import com.glia.widgets.internal.fileupload.model.LocalAttachment
-import com.glia.widgets.internal.fileupload.model.LocalAttachment.Status
 import com.glia.widgets.databinding.ChatAttachmentUploadedItemBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.getColorCompat
@@ -22,6 +21,8 @@ import com.glia.widgets.helper.getColorStateListCompat
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.toFileExtensionOrEmpty
+import com.glia.widgets.internal.fileupload.model.LocalAttachment
+import com.glia.widgets.internal.fileupload.model.LocalAttachment.Status
 import com.glia.widgets.locale.StringKey
 import com.glia.widgets.locale.StringKeyPair
 import com.glia.widgets.view.unifiedui.applyCardLayerTheme
@@ -33,7 +34,6 @@ import com.glia.widgets.view.unifiedui.theme.chat.FileUploadBarTheme
 import com.glia.widgets.view.unifiedui.theme.chat.UploadFileTheme
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.progressindicator.LinearProgressIndicator
-import com.squareup.picasso.Picasso
 import com.google.android.material.R as Material_R
 
 /**
@@ -150,11 +150,7 @@ internal class ViewHolder(
 
             if (attachment.isImage) {
                 showExtensionTypeImage()
-                Picasso.get()
-                    .load(attachment.uri)
-                    .resize(1024, 1024)
-                    .onlyScaleDown()
-                    .into(extensionTypeImage)
+                extensionTypeImage.load(attachment.uri)
             } else {
                 showExtensionTypeText()
                 extensionTypeText.text = displayName.toFileExtensionOrEmpty().uppercase()

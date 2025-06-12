@@ -99,7 +99,8 @@ dependencies {
   implementation libs.java.material
   implementation libs.java.constraintlayout
   implementation libs.lifecycle.process
-  implementation libs.media.picasso
+  implementation libs.media.coil.core
+  implementation libs.media.coil.network
 
   // Used for audio and video permissions by CallActivity
   implementation libs.java.rxandroid
@@ -125,6 +126,7 @@ dependencies {
   testImplementation libs.test.core.testing
   testImplementation libs.test.robolectric
   testImplementation libs.test.mockk.android
+  testImplementation("io.coil-kt.coil3:coil-test:3.2.0")
   androidTestImplementation libs.test.mockk.android
   androidTestImplementation libs.test.ext.junit
   androidTestImplementation libs.test.espresso.core

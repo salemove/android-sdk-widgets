@@ -1,5 +1,6 @@
 package com.glia.widgets.chat.adapter.holder
 
+import com.glia.widgets.R
 import com.glia.widgets.SnapshotTest
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.model.OperatorStatusItem
@@ -8,14 +9,14 @@ import com.glia.widgets.di.Dependencies
 import com.glia.widgets.snapshotutils.SnapshotChatScreen
 import com.glia.widgets.snapshotutils.SnapshotChatView
 import com.glia.widgets.snapshotutils.SnapshotLottie
-import com.glia.widgets.snapshotutils.SnapshotPicasso
+import com.glia.widgets.snapshotutils.SnapshotCoil
 import com.glia.widgets.snapshotutils.SnapshotProviders
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import org.junit.Test
 
 internal class OperatorStatusViewHolderSnapshotTest : SnapshotTest(
     renderingMode = fullWidthRenderMode
-), SnapshotChatScreen, SnapshotChatView, SnapshotProviders, SnapshotPicasso, SnapshotLottie {
+), SnapshotChatScreen, SnapshotChatView, SnapshotProviders, SnapshotCoil, SnapshotLottie {
 
     // MARK: Connected
 
@@ -215,7 +216,7 @@ internal class OperatorStatusViewHolderSnapshotTest : SnapshotTest(
         unifiedTheme: UnifiedTheme? = null
     ): ViewData {
         lottieMock()
-        picassoMock(imageLoadError = imageLoadError)
+        mockCoil(listOf(R.drawable.test_banner), imageLoadError = imageLoadError)
 
         unifiedTheme?.let { Dependencies.gliaThemeManager.theme = it }
 

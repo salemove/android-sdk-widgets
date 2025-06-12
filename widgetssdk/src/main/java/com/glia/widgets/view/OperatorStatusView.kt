@@ -160,20 +160,24 @@ internal class OperatorStatusView @JvmOverloads constructor(
 
     fun showProfileImageOnConnect(profileImgUrl: String?) {
         updateProfilePictureViewSize(operatorImageLargeSize)
-        profilePictureView.load(profileImgUrl, onSuccess = {
-            updatePlaceholderView(operatorImageLargeSize, 0, GONE)
-        }, onError = {
-            showPlaceholder()
-        })
+        profilePictureView.load(
+            profileImgUrl,
+            onSuccess = {
+                updatePlaceholderView(operatorImageLargeSize, 0, GONE)
+            }, onError = {
+                showPlaceholder()
+            })
     }
 
     fun showProfileImage(profileImgUrl: String?) {
         updateProfilePictureViewSize(operatorImageSize)
-        profilePictureView.load(profileImgUrl, onSuccess = {
-            updatePlaceholderView(operatorImageSize, 0, GONE)
-        }, onError = {
-            showPlaceholder()
-        })
+        profilePictureView.load(
+            profileImgUrl,
+            onSuccess = {
+                updatePlaceholderView(operatorImageSize, 0, GONE)
+            }, onError = {
+                showPlaceholder()
+            })
     }
 
     fun showPlaceholder() {

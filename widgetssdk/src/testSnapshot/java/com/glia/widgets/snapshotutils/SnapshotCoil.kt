@@ -33,11 +33,13 @@ interface SnapshotCoil: SnapshotTestLifecycle {
 //        mockkStatic("android.widget.ImageView")
 
         var index = 0
-        every { any<ImageView>().load(any()) } answers {
+        every { any<ImageView>().load(any(), null, null) } answers {
             firstArg<ImageView>().setImageResource(R.drawable.test_banner)
         }
         index += 1
-        unmockkStatic("com.glia.widgets.helper.ViewExtensionsKt")
+        setOnEndListener {
+            unmockkStatic("com.glia.widgets.helper.ViewExtensionsKt")
+        }
     }
 
     @DrawableRes

@@ -235,7 +235,7 @@ internal class EngagementRepositoryImpl(
         _engagementState.onNext(State.EngagementEnded(endAction = endAction))
     }
 
-    override fun endEngagementSilently() {
+    override fun terminateEngagement() {
         ensureNotScTransferredEngagement {
             end { ex -> ex?.also { Logger.d(TAG, "Ending engagement failed") } }
 

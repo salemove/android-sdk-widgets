@@ -566,7 +566,7 @@ class EngagementRepositoryTest {
     }
 
     @Test
-    fun `endEngagementSilently will return when ongoing engagement is transferred SC`() {
+    fun `terminateEngagement will return when ongoing engagement is transferred SC`() {
         operator = mockk(relaxUnitFun = true)
         engagementState = mockk(relaxUnitFun = true)
         media = mockk(relaxUnitFun = true)
@@ -589,7 +589,7 @@ class EngagementRepositoryTest {
         repository.engagementState.test().assertValue(State.TransferredToSecureConversation).assertValueCount(1).assertNotComplete()
         verify { operatorRepository.emit(any()) }
 
-        repository.endEngagementSilently()
+        repository.terminateEngagement()
         verify(exactly = 0) { engagement.end(any()) }
         repository.engagementState.test().assertValue(State.TransferredToSecureConversation).assertValueCount(1).assertNotComplete()
     }
@@ -618,7 +618,7 @@ class EngagementRepositoryTest {
         repository.engagementState.test().assertValue(State.TransferredToSecureConversation).assertValueCount(1).assertNotComplete()
         verify { operatorRepository.emit(any()) }
 
-        repository.endEngagementSilently()
+        repository.terminateEngagement()
         verify(exactly = 0) { engagement.end(any()) }
         repository.engagementState.test().assertValue(State.TransferredToSecureConversation).assertValueCount(1).assertNotComplete()
     }
@@ -630,19 +630,19 @@ class EngagementRepositoryTest {
     }
 
     @Test
-    fun `endEngagementSilently() will do nothing when no ongoing engagement`() {
+    fun `terminateEngagement() will do nothing when no ongoing engagement`() {
         repository.endEngagement()
         verifyEngagementEnd(ongoingEngagement = false)
     }
 
     @Test
-    fun `endEngagementSilently() will emit EngagementEnded state`() {
+    fun `terminateEngagement() will emit EngagementEnded state`() {
         val operatorTypingStatusTestObserver = repository.operatorTypingStatus.test()
         mockEngagementAndStart(actionOnEnd = ActionOnEnd.SHOW_SURVEY)
         repository.updateIsSecureMessagingRequested(true)
         fillStates()
         operatorTypingCallbackSlot.captured.accept(OperatorTypingStatus { true })
-        repository.endEngagementSilently()
+        repository.terminateEngagement()
 
         operatorTypingStatusTestObserver.assertNotComplete().assertValues(true, false)
         verify { engagement.end(any()) }

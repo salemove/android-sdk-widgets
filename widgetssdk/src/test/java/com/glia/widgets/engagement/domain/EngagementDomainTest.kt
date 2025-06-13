@@ -194,7 +194,7 @@ class EngagementDomainTest {
         verify(exactly = 2) { repository.isQueueing }
         verify(exactly = 2) { repository.cancelQueuing() }
         verify(exactly = 0) { repository.endEngagement() }
-        verify(exactly = 0) { repository.endEngagementSilently() }
+        verify(exactly = 0) { repository.terminateEngagement() }
 
         confirmVerified(repository)
     }
@@ -227,7 +227,7 @@ class EngagementDomainTest {
         useCase.silently()
 
         verify { repository.isQueueing }
-        verify { repository.endEngagementSilently() }
+        verify { repository.terminateEngagement() }
         verify(exactly = 0) { repository.cancelQueuing() }
 
         confirmVerified(repository)

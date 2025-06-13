@@ -13,7 +13,7 @@ internal class EndEngagementUseCaseImpl(private val engagementRepository: Engage
     }
 
     override fun silently() = cancelQueueingOrElse {
-        engagementRepository.endEngagementSilently()
+        engagementRepository.terminateEngagement()
     }
 
     private fun cancelQueueingOrElse(callback: () -> Unit) {

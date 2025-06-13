@@ -31,12 +31,7 @@ internal class AuthenticationManager(
         authentication.setBehavior(behavior.toCoreType())
     }
 
-    override fun authenticate(
-        jwtToken: String,
-        externalAccessToken: String?,
-        onComplete: OnComplete,
-        onError: OnError
-    ) {
+    override fun authenticate(jwtToken: String, externalAccessToken: String?, onComplete: OnComplete, onError: OnError) {
         onAuthenticationRequestedCallback()
         Dependencies.destroyControllersAndResetQueueing()
 
@@ -55,33 +50,29 @@ internal class AuthenticationManager(
         }
     }
 
-    override fun deauthenticate(
-        stopPushNotifications: Boolean,
-        onComplete: OnComplete,
-        onError: OnError
-    ) {
+    override fun deauthenticate(stopPushNotifications: Boolean, onComplete: OnComplete, onError: OnError) {
         Logger.i(TAG, "Unauthenticate")
-        //Need to end engagement before it's done on the core side to prevent unexpected behavior
-        Dependencies.destroyControllersAndResetEngagementData()
 
-        //Here we reset the secure conversations repository to clear the data, because the visitor is de-authenticated
-        //and we don't need secure conversations data for un-authenticated visitors.
-        repositoryFactory.secureConversationsRepository.unsubscribeAndResetData()
+        //Need to cancel queueing before de-authentication, because it uses current visitor id, so after de-authentication will be impossible.
+        repositoryFactory.engagementRepository.cancelQueuing()
 
         authentication.deauthenticate(stopPushNotifications) { _, gliaException ->
             if (gliaException != null) {
                 onError.onError(gliaException.toWidgetsType())
             } else {
+                //Reset controllers and data on success block, to keep current engagement interactive in case de-authentication is forbidden during engagement
+                Dependencies.destroyControllersAndResetEngagementData()
+
+                //Here we reset the secure conversations repository to clear the data, because the visitor is de-authenticated
+                //and we don't need secure conversations data for un-authenticated visitors.
+                repositoryFactory.secureConversationsRepository.unsubscribeAndResetData()
+
                 onComplete.onComplete()
             }
         }
     }
 
-    override fun refresh(jwtToken: String,
-                         externalAccessToken: String?,
-                         onComplete: OnComplete,
-                         onError: OnError
-    ) {
+    override fun refresh(jwtToken: String, externalAccessToken: String?, onComplete: OnComplete, onError: OnError) {
         Logger.i(TAG, "Refresh authentication")
         authentication.refresh(jwtToken, externalAccessToken) { _, gliaException ->
             if (gliaException != null) {

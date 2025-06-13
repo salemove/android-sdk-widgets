@@ -2,7 +2,6 @@ package com.glia.widgets.entrywidget
 
 import android.COMMON_EXTENSIONS_CLASS_PATH
 import android.app.Activity
-import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.engagement.EngagementState
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.engagement.MediaType
@@ -12,7 +11,7 @@ import com.glia.widgets.internal.queue.QueuesState
 import com.glia.widgets.internal.secureconversations.SecureConversationsRepository
 import com.glia.widgets.internal.secureconversations.domain.HasOngoingSecureConversationUseCase
 import com.glia.widgets.di.GliaCore
-import com.glia.widgets.engagement.EndedBy
+import com.glia.widgets.engagement.EndAction
 import com.glia.widgets.engagement.EngagementUpdateState
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
@@ -666,8 +665,8 @@ class EntryWidgetControllerTest {
         testPrepareItemsBasedOnQueuesCalledForEngagementState(State.QueueingCanceled)
         testPrepareItemsBasedOnQueuesCalledForEngagementState(State.EngagementStarted(false))
         testPrepareItemsBasedOnQueuesCalledForEngagementState(State.EngagementStarted(true))
-        testPrepareItemsBasedOnQueuesCalledForEngagementState(State.EngagementEnded(false, EndedBy.VISITOR, Engagement.ActionOnEnd.UNKNOWN, mockk()))
-        testPrepareItemsBasedOnQueuesCalledForEngagementState(State.EngagementEnded(true, EndedBy.OPERATOR, Engagement.ActionOnEnd.UNKNOWN, mockk()))
+        testPrepareItemsBasedOnQueuesCalledForEngagementState(State.EngagementEnded(EndAction.Retain))
+        testPrepareItemsBasedOnQueuesCalledForEngagementState(State.EngagementEnded(EndAction.ShowEndDialog))
         testPrepareItemsBasedOnQueuesCalledForEngagementState(State.TransferredToSecureConversation)
     }
 

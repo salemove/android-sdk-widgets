@@ -1,13 +1,12 @@
 package com.glia.widgets.callvisualizer.controller
 
-import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.IncomingEngagementRequest
+import com.glia.widgets.engagement.EndAction
 import com.glia.widgets.internal.dialog.DialogContract
 import com.glia.widgets.internal.dialog.domain.ConfirmationDialogLinksUseCase
 import com.glia.widgets.internal.dialog.model.DialogState
 import com.glia.widgets.internal.dialog.model.Link
 import com.glia.widgets.internal.engagement.domain.ConfirmationDialogUseCase
-import com.glia.widgets.engagement.EndedBy
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementRequestUseCase
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
@@ -101,7 +100,7 @@ class CallVisualizerControllerTest {
 
         verify { engagementStateUseCase() }
 
-        engagementStateProcessor.onNext(State.EngagementEnded(true, EndedBy.OPERATOR, Engagement.ActionOnEnd.END_NOTIFICATION, mockk()))
+        engagementStateProcessor.onNext(State.EngagementEnded(EndAction.ClearStateCallVisualizer))
 
         engagementEnd.assertNotComplete().assertValueCount(1)
     }

@@ -20,7 +20,6 @@ import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.androidsdk.comms.OperatorMediaState
 import com.glia.androidsdk.comms.VisitorMediaState
 import com.glia.androidsdk.engagement.EngagementState
-import com.glia.androidsdk.engagement.Survey
 import com.glia.androidsdk.omnibrowse.Omnibrowse
 import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement
 import com.glia.androidsdk.omnicore.OmnicoreEngagement
@@ -29,8 +28,6 @@ import com.glia.androidsdk.screensharing.LocalScreen
 import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.androidsdk.screensharing.ScreenSharingRequest
 import com.glia.androidsdk.screensharing.VisitorScreenSharingState
-import com.glia.widgets.internal.engagement.GliaOperatorRepository
-import com.glia.widgets.internal.queue.QueueRepository
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.Data
 import com.glia.widgets.helper.Logger
@@ -39,8 +36,11 @@ import com.glia.widgets.helper.isAudioOrVideo
 import com.glia.widgets.helper.isCallVisualizer
 import com.glia.widgets.helper.isQueueUnavailable
 import com.glia.widgets.helper.isRetain
-import com.glia.widgets.helper.isUnknown
+import com.glia.widgets.helper.isShowEndDialog
+import com.glia.widgets.helper.isSurvey
 import com.glia.widgets.helper.unSafeSubscribe
+import com.glia.widgets.internal.engagement.GliaOperatorRepository
+import com.glia.widgets.internal.queue.QueueRepository
 import com.glia.widgets.launcher.ConfigurationManager
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
@@ -193,11 +193,12 @@ internal class EngagementRepositoryImpl(
 
     override fun reset() {
         _isSecureMessagingRequested = false
-        currentEngagement?.let { endEngagement(EndedBy.CLEAR_STATE) } ?: cancelQueuing()
-    }
 
-    override fun resetQueueing() {
-        cancelQueuing()
+        if (currentState?.isQueueing == true) {
+            cancelQueuing()
+        } else {
+            ensureNotScTransferredEngagement(::clearState)
+        }
     }
 
     private fun resetState(retainSecureMessagingState: Boolean = false) {
@@ -210,28 +211,60 @@ internal class EngagementRepositoryImpl(
         markScreenSharingEnded()
     }
 
-    override fun endEngagement(endedBy: EndedBy) {
+    private fun ensureNotScTransferredEngagement(callback: Engagement.() -> Unit) = currentEngagement
         //This is required to not end the transferred engagement
-        if (isTransferredSecureConversation) return
+        ?.takeUnless { isTransferredSecureConversation }
+        ?.run(callback)
 
-        currentEngagement?.also {
+    private fun unsubscribeAndResetState(engagement: Engagement, retainSecureMessagingState: Boolean = false) {
+        unsubscribeFromEvents(engagement)
+        resetState(retainSecureMessagingState)
+    }
+
+    private fun clearState(engagement: Engagement) {
+        currentEngagement = null
+
+        unsubscribeAndResetState(engagement)
+
+        val endAction = if (engagement.isCallVisualizer) {
+            EndAction.ClearStateCallVisualizer
+        } else {
+            EndAction.ClearStateRegular
+        }
+
+        _engagementState.onNext(State.EngagementEnded(endAction = endAction))
+    }
+
+    override fun terminateEngagement() {
+        ensureNotScTransferredEngagement {
+            end { ex -> ex?.also { Logger.d(TAG, "Ending engagement failed") } }
+
+            Logger.i(TAG, "Engagement ended locally, ended by:integrator")
+
+            clearState(this)
+        }
+    }
+
+    override fun endEngagement() {
+        ensureNotScTransferredEngagement {
+            end { ex -> ex?.also { Logger.d(TAG, "Ending engagement failed") } }
+
+            Logger.i(TAG, "Engagement ended locally, ended by:visitor")
             currentEngagement = null
-            Logger.i(TAG, "Engagement ended locally, ended by:$endedBy")
-            unsubscribeFromEvents(it)
-            resetState()
 
-            it.end { ex -> ex?.also { Logger.d(TAG, "Ending engagement failed") } }
+            unsubscribeAndResetState(this)
 
-            val state = State.EngagementEnded(
-                it.isCallVisualizer,
-                endedBy,
-                it.state.actionOnEnd
-            ) { onSuccess, onError -> fetchSurvey(it, onError, onSuccess) }
+            //Since this function is called only when engagement is ended by visitor, it won't be a Call Visualizer
+            //Sending [ClearStateRegular] action to close all the activities and release resources until the survey is loaded
+            _engagementState.onNext(State.EngagementEnded(endAction = EndAction.ClearStateRegular))
 
-            _engagementState.onNext(state)
-
-            if (state.action.isUnknown) {
-                Logger.w(TAG, "Engagement ended with unknown case.")
+            if (state.actionOnEnd.isSurvey) {
+                getSurvey { survey, _ ->
+                    if (survey != null) {
+                        Logger.i(TAG, "Survey loaded")
+                        _engagementState.onNext(State.EngagementEnded(endAction = EndAction.ShowSurvey(survey)))
+                    }
+                }
             }
         }
     }
@@ -340,19 +373,6 @@ internal class EngagementRepositoryImpl(
                 Logger.d(TAG, "Media upgrade offer successfully declined")
             } else {
                 Logger.d(TAG, "Failed to decline media upgrade offer")
-            }
-        }
-    }
-
-    private fun fetchSurvey(engagement: Engagement, onError: () -> Unit = {}, onSuccess: (Survey) -> Unit) {
-        engagement.getSurvey { survey, _ ->
-            when {
-                survey != null -> {
-                    Logger.i(TAG, "Survey loaded")
-                    onSuccess(survey)
-                }
-
-                else -> onError()
             }
         }
     }
@@ -550,23 +570,32 @@ internal class EngagementRepositoryImpl(
     }
 
     private fun handleEngagementEnd() {
-        Logger.i(TAG, "Engagement ended by Operator")
-        currentEngagement?.also {
+        ensureNotScTransferredEngagement {
             currentEngagement = null
-            unsubscribeFromEvents(it)
+            Logger.i(TAG, "Engagement ended by Operator")
+            unsubscribeFromEvents(this)
+            resetState(state.actionOnEnd.isRetain)
 
-            resetState(it.state.actionOnEnd.isRetain)
+            when {
+                //We need just silently clear internal state when Call Visualizer engagement ends
+                this.isCallVisualizer -> _engagementState.onNext(State.EngagementEnded(endAction = EndAction.ClearStateCallVisualizer))
+                state.actionOnEnd.isRetain -> _engagementState.onNext(State.EngagementEnded(endAction = EndAction.Retain))
+                state.actionOnEnd.isShowEndDialog -> _engagementState.onNext(State.EngagementEnded(endAction = EndAction.ShowEndDialog))
+                state.actionOnEnd.isSurvey -> {
+                    //Sending [ClearStateRegular] action to close all the activities and release resources until the survey is loaded
+                    _engagementState.onNext(State.EngagementEnded(endAction = EndAction.ClearStateRegular))
+                    getSurvey { survey, _ ->
+                        if (survey != null) {
+                            Logger.i(TAG, "Survey loaded")
+                            _engagementState.onNext(State.EngagementEnded(endAction = EndAction.ShowSurvey(survey)))
+                        } else {
+                            _engagementState.onNext(State.EngagementEnded(endAction = EndAction.ShowEndDialog))
+                        }
+                    }
+                }
 
-            val state = State.EngagementEnded(
-                it.isCallVisualizer,
-                EndedBy.OPERATOR,
-                it.state.actionOnEnd
-            ) { onSuccess, onError -> fetchSurvey(it, onError, onSuccess) }
+                else -> _engagementState.onNext(State.EngagementEnded(endAction = EndAction.ShowEndDialog))
 
-            _engagementState.onNext(state)
-
-            if (it.state.actionOnEnd.isUnknown) {
-                Logger.w(TAG, "Engagement ended with unknown case.")
             }
         }
     }

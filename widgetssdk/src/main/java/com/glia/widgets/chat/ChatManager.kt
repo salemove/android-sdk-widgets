@@ -3,9 +3,13 @@ package com.glia.widgets.chat
 import android.text.format.DateUtils
 import androidx.annotation.VisibleForTesting
 import com.glia.androidsdk.chat.FilesAttachment
+import com.glia.androidsdk.chat.OperatorMessage
 import com.glia.androidsdk.chat.SendMessagePayload
 import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.androidsdk.chat.VisitorMessage
+import com.glia.widgets.ActivityType
+import com.glia.widgets.OTel
+import com.glia.widgets.attributes
 import com.glia.widgets.chat.domain.AddNewMessagesDividerUseCase
 import com.glia.widgets.chat.domain.AppendHistoryChatMessageUseCase
 import com.glia.widgets.chat.domain.AppendNewChatMessageUseCase
@@ -36,6 +40,7 @@ import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.isValid
+import io.opentelemetry.api.trace.Span
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
@@ -125,6 +130,10 @@ internal class ChatManager(
         return historyEvent.toFlowable()
     }
 
+    private fun getChatTraceSpan(): Span? {
+        return OTel.getActivitySpan(ActivityType.CHAT_SCREEN)
+    }
+
     @VisibleForTesting
     fun subscribeToMessages(onOperatorMessageReceived: (count: Int) -> Unit): Flowable<State> = Flowable.merge(onMessage(), onAction())
         .doOnNext { onOperatorMessageReceived(it.addedMessagesCount) }
@@ -196,6 +205,9 @@ internal class ChatManager(
         check(chatMessage.chatMessage.isValid()) { "Invalid chat message passed -> ${chatMessage.chatMessage}" }
 
         if (messagesState.isNew(chatMessage)) {
+            if (chatMessage.chatMessage is OperatorMessage) {
+                getChatTraceSpan()?.addEvent("operator_message_received", attributes("message_id", chatMessage.chatMessage.id))
+            }
             appendNewChatMessageUseCase(messagesState, chatMessage)
             if (chatMessage.chatMessage is VisitorMessage) {
                 checkUnsentMessages(messagesState)

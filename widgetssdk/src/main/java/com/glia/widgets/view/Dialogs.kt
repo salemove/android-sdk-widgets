@@ -48,7 +48,7 @@ internal object Dialogs {
             buttonClickListener = buttonClickListener
         )
 
-        return dialogService.showDialog(context, uiTheme, DialogType.AlertDialog(payload))
+        return dialogService.showDialog(context, uiTheme, DialogType.AlertDialog(payload, "No Operators"))
     }
 
     fun showUnexpectedErrorDialog(context: Context, uiTheme: UiTheme, buttonClickListener: View.OnClickListener): AlertDialog {
@@ -59,7 +59,7 @@ internal object Dialogs {
             buttonDescription = closeBtnAccessibility,
             buttonClickListener = buttonClickListener
         )
-        return dialogService.showDialog(context, uiTheme, DialogType.AlertDialog(payload))
+        return dialogService.showDialog(context, uiTheme, DialogType.AlertDialog(payload, "Unexpected Error"))
     }
 
     fun showMissingPermissionsDialog(context: Context, uiTheme: UiTheme, buttonClickListener: View.OnClickListener): AlertDialog {
@@ -70,7 +70,7 @@ internal object Dialogs {
             buttonDescription = closeBtnAccessibility,
             buttonClickListener = buttonClickListener
         )
-        return dialogService.showDialog(context, uiTheme, DialogType.AlertDialog(payload))
+        return dialogService.showDialog(context, uiTheme, DialogType.AlertDialog(payload, "Missing Permission"))
     }
 
     fun showOverlayPermissionsDialog(
@@ -89,7 +89,7 @@ internal object Dialogs {
             negativeButtonClickListener = negativeButtonClickListener
         )
 
-        return dialogService.showDialog(context, uiTheme, DialogType.Option(payload))
+        return dialogService.showDialog(context, uiTheme, DialogType.Option(payload, "Overlay Permission Request"))
     }
 
     fun showEndEngagementDialog(
@@ -108,7 +108,7 @@ internal object Dialogs {
             negativeButtonClickListener = negativeButtonClickListener
         )
 
-        return dialogService.showDialog(context, uiTheme, DialogType.ReversedOption(payload))
+        return dialogService.showDialog(context, uiTheme, DialogType.ReversedOption(payload, "Engagement End Confirmation"))
     }
 
     fun showExitQueueDialog(
@@ -128,7 +128,7 @@ internal object Dialogs {
 
         )
 
-        return dialogService.showDialog(context, uiTheme, DialogType.ReversedOption(payload))
+        return dialogService.showDialog(context, uiTheme, DialogType.ReversedOption(payload, "Exit Queue Confirmation"))
     }
 
     fun showUnAuthenticatedDialog(context: Context, uiTheme: UiTheme, buttonClickListener: View.OnClickListener): AlertDialog {
@@ -139,7 +139,7 @@ internal object Dialogs {
             buttonDescription = closeBtnAccessibility,
             buttonClickListener = buttonClickListener
         )
-        return dialogService.showDialog(context, uiTheme, DialogType.AlertDialog(payload))
+        return dialogService.showDialog(context, uiTheme, DialogType.AlertDialog(payload, "Not Authenticated"))
     }
 
     fun showEngagementConfirmationDialog(
@@ -244,7 +244,7 @@ internal object Dialogs {
             message = LocaleString(R.string.message_center_unavailable_message)
         )
 
-        return dialogService.showDialog(context, theme, DialogType.AlertDialog(payload), onShow = onShow) {
+        return dialogService.showDialog(context, theme, DialogType.AlertDialog(payload, "Message Center Unavailable"), onShow = onShow) {
             window?.apply {
                 setGravity(Gravity.BOTTOM)
                 allowOutsideTouch()
@@ -301,7 +301,7 @@ internal object Dialogs {
             negativeButtonClickListener = negativeButtonClickListener
         )
 
-        return dialogService.showDialog(context, uiTheme, DialogType.Option(payload))
+        return dialogService.showDialog(context, uiTheme, DialogType.Option(payload, "Push Notification Permission Request"))
     }
 
     private fun Window.allowOutsideTouch() {

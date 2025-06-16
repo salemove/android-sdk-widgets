@@ -9,6 +9,7 @@ import com.glia.androidsdk.GliaConfig
 import com.glia.androidsdk.RequestCallback
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.GliaWidgetsConfig
+import com.glia.widgets.OTel
 import com.glia.widgets.authentication.Authentication
 import com.glia.widgets.callvisualizer.CallVisualizerActivityWatcher
 import com.glia.widgets.engagement.completion.EngagementCompletionActivityWatcher
@@ -55,6 +56,8 @@ import com.glia.widgets.view.head.ActivityWatcherForChatHead
 import com.glia.widgets.view.head.ChatHeadContract
 import com.glia.widgets.view.snackbar.liveobservation.ActivityWatcherForLiveObservation
 import com.glia.widgets.view.unifiedui.theme.UnifiedThemeManager
+import io.opentelemetry.api.trace.Span
+import java.util.concurrent.atomic.AtomicReference
 
 
 internal object Dependencies {
@@ -314,11 +317,16 @@ internal object Dependencies {
         lifecycleManager.addObserver { _, event: Lifecycle.Event ->
             when (event) {
                 Lifecycle.Event.ON_PAUSE -> {
+                    OTel.onAppPaused()
                     // Moved to on pause due to "IllegalStateException: Not allowed to start service app is in background"
                     // Related bug ticket MOB-4011
                     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S && GliaWidgets.isInitialized()) {
                         notificationManager.startNotificationRemovalService()
                     }
+                }
+
+                Lifecycle.Event.ON_RESUME -> {
+                    OTel.onAppResumed()
                 }
 
                 Lifecycle.Event.ON_STOP -> chatBubbleController.onApplicationStop()

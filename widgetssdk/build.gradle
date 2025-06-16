@@ -95,6 +95,11 @@ tasks.register("publishCoreSdkToLocalMaven") {
 apply from: "${rootProject.projectDir}/scripts/direct-core.gradle"
 
 dependencies {
+  implementation libs.opentelemetry.sdk
+  implementation libs.opentelemetry.trace.propagators
+  implementation libs.opentelemetry.trace.exporter
+  implementation libs.opentelemetry.trace.logging
+
   implementation libs.java.appcompat
   implementation libs.java.material
   implementation libs.java.constraintlayout

@@ -13,7 +13,10 @@ import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.engagement.EngagementFile
 import com.glia.androidsdk.site.SiteInfo
+import com.glia.widgets.ActivityType
 import com.glia.widgets.Constants
+import com.glia.widgets.OTel
+import com.glia.widgets.attributes
 import com.glia.widgets.chat.ChatContract
 import com.glia.widgets.chat.ChatManager
 import com.glia.widgets.chat.ChatView
@@ -91,6 +94,8 @@ import com.glia.widgets.helper.unSafeSubscribe
 import com.glia.widgets.view.MessagesNotSeenHandler
 import com.glia.widgets.view.MinimizeHandler
 import com.glia.widgets.webbrowser.domain.GetUrlFromLinkUseCase
+import io.opentelemetry.api.common.Attributes
+import io.opentelemetry.api.trace.Span
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -157,6 +162,7 @@ internal class ChatController(
     private val sendMessageCallback: GliaSendMessageUseCase.Listener = object : GliaSendMessageUseCase.Listener {
         override fun messageSent(message: VisitorMessage?) {
             Logger.d(TAG, "messageSent: $message, id: ${message?.id}")
+            getChatTraceSpan()?.addEvent("message_sent", attributes("message_id", message?.id))
             onMessageSent(message)
         }
 
@@ -182,6 +188,11 @@ internal class ChatController(
 
         override fun error(ex: GliaException, messageId: String) {
             Logger.e(TAG, "Message send exception", ex)
+            getChatTraceSpan()?.addEvent("message_error", Attributes.builder()
+                .put("message_id", messageId)
+                .put("error_details", ex.toString())
+                .build()
+            )
 
             showMessageError(messageId)
         }
@@ -420,6 +431,7 @@ internal class ChatController(
 
     override fun sendMessage(message: String) {
         Logger.d(TAG, "Send MESSAGE: $message")
+        getChatTraceSpan()?.addEvent("sending_message")
         clearMessagePreview()
         sendMessageUseCase.execute(message, sendMessageCallback)
         addQuickReplyButtons(emptyList())
@@ -583,6 +595,7 @@ internal class ChatController(
     private fun onEngagementStateChanged(state: State) {
         when (state) {
             is State.EngagementEnded -> {
+                getChatTraceSpan()?.addEvent("engagement_ended")
                 if (!isQueueingOrOngoingEngagement) {
                     dialogController.dismissDialogs()
                 }
@@ -593,7 +606,11 @@ internal class ChatController(
 
             is State.EngagementStarted -> if (!state.isCallVisualizer) newEngagementLoaded()
             is State.Update -> handleEngagementStateUpdate(state.updateState)
-            is State.PreQueuing, is State.Queuing -> queueForEngagementStarted()
+            is State.PreQueuing -> queueForEngagementStarted()
+            is State.Queuing -> {
+                getChatTraceSpan()?.addEvent("queuing_started")
+                queueForEngagementStarted()
+            }
             is State.QueueUnstaffed, is State.UnexpectedErrorHappened, is State.QueueingCanceled -> emitViewState { chatState.chatUnavailableState() }
             State.TransferredToSecureConversation -> onTransferredToSecureConversation()
 
@@ -623,14 +640,17 @@ internal class ChatController(
     }
 
     private fun onOperatorConnected(operator: Operator) {
+        getChatTraceSpan()?.addEvent("operator_connected")
         operatorConnected(operator.formattedName, operator.imageUrl)
     }
 
     private fun onOperatorChanged(operator: Operator) {
+        getChatTraceSpan()?.addEvent("operator_changed")
         operatorChanged(operator.formattedName, operator.imageUrl)
     }
 
     private fun onTransferring() {
+        getChatTraceSpan()?.addEvent("engagement_transferring")
         emitViewState { chatState.transferring() }
         chatManager.onChatAction(ChatManager.Action.Transferring)
     }
@@ -660,6 +680,7 @@ internal class ChatController(
     }
 
     private fun error(error: String) {
+        getChatTraceSpan()?.addEvent("error", attributes("error_details", error))
         Logger.e(TAG, error)
         dialogController.showUnexpectedErrorDialog()
         emitViewState { chatState.chatUnavailableState() }
@@ -790,6 +811,7 @@ internal class ChatController(
     }
 
     private fun newEngagementLoaded() {
+        getChatTraceSpan()?.addEvent("engagement_started")
         emitViewState { chatState.engagementStarted() }
         chatManager.reloadHistoryIfNeeded()
     }
@@ -812,8 +834,13 @@ internal class ChatController(
         }
     }
 
+    private fun getChatTraceSpan(): Span? {
+        return OTel.getActivitySpan(ActivityType.CHAT_SCREEN)
+    }
+
     private fun onHistoryLoaded(hasHistory: Boolean) {
         Logger.d(TAG, "historyLoaded")
+        getChatTraceSpan()?.addEvent("history_loaded")
 
         val isSecureEngagement = manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging
 
@@ -955,6 +982,7 @@ internal class ChatController(
     }
 
     override fun onRetryClicked(messageId: String) {
+        getChatTraceSpan()?.addEvent("message_retry_clicked", attributes("message_id", messageId))
         chatManager.onChatAction(ChatManager.Action.OnRetryClicked(messageId))
     }
 

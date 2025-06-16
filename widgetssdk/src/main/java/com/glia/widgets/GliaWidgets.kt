@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Intent
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
+import com.glia.widgets.OTel.addSessionInfo
 import com.glia.widgets.authentication.Authentication
 import com.glia.widgets.callbacks.OnComplete
 import com.glia.widgets.callbacks.OnError
@@ -41,6 +42,8 @@ import com.glia.widgets.helper.Logger.addGlobalMetadata
 import com.glia.widgets.internal.authentication.toCoreType
 import com.glia.widgets.internal.authentication.toWidgetsType
 import com.glia.widgets.launcher.EngagementLauncher
+import io.opentelemetry.api.common.Attributes
+import io.opentelemetry.api.trace.StatusCode
 import io.reactivex.rxjava3.exceptions.UndeliverableException
 import io.reactivex.rxjava3.plugins.RxJavaPlugins
 import java.io.IOException
@@ -163,19 +166,34 @@ object GliaWidgets {
     fun init(gliaWidgetsConfig: GliaWidgetsConfig,
              onComplete: OnComplete,
              onError: OnError) {
+        val span = OTel.newSpan("SDK: Init", Attributes.builder()
+            .put("site_id", gliaWidgetsConfig.siteId)
+            .put("site_api_key_id", gliaWidgetsConfig.siteApiKey?.id)
+            .put("company_name", gliaWidgetsConfig.companyName?.ifBlank { null } ?: "<empty>")
+            .put("manual_locale_override", gliaWidgetsConfig.manualLocaleOverride ?: "<empty>")
+            .put("site_api_key_secret", gliaWidgetsConfig.siteApiKey?.secret?.maskSecretWithStars()?.ifBlank { null } ?: "<empty>")
+            .build()).startSpan()
+        gliaWidgetsConfig.context?.let {
+            span.addSessionInfo(it)
+        }
         Logger.i(TAG, "Initialize Glia Widgets SDK")
         try {
             val callback: RequestCallback<Boolean?> =
                 RequestCallback { _, exception ->
                     if (exception == null) {
                         isInitialized = true
+                        span.end()
+                        span.setStatus(StatusCode.OK)
                         onComplete.onComplete()
                     } else {
+                        span.recordException(exception)
+                        span.setStatus(StatusCode.ERROR)
                         Logger.i(TAG, "Glia Widgets SDK initialization failed")
                         val invalidInputError = GliaWidgetsException(
                             "Failed to initialise Glia Widgets SDK. Please check credentials.",
                             GliaWidgetsException.Cause.INVALID_INPUT
                         )
+                        span.end()
                         onError.onError(invalidInputError)
                     }
                 }
@@ -184,6 +202,8 @@ object GliaWidgets {
             setupLoggingMetadata(gliaWidgetsConfig)
             gliaThemeManager.applyJsonConfig(gliaWidgetsConfig.uiJsonRemoteConfig)
         } catch (exception: Exception) {
+            span.recordException(exception)
+            span.setStatus(StatusCode.ERROR)
             if (exception is GliaException) {
                 val mappedException = exception.toWidgetsType()
                 onError.onError(mappedException)
@@ -195,8 +215,21 @@ object GliaWidgets {
                 "Internal SDK error",
                 GliaWidgetsException.Cause.INTERNAL_ERROR
             )
+            span.end()
             onError.onError(internalError)
         }
+    }
+
+    private fun String.maskSecretWithStars(): String {
+        var maskedString = ""
+        for (i in 1 .. length) {
+            if (length < 10 || i in 8..32) {
+                maskedString += "*"
+            } else {
+                maskedString += this[i-1]
+            }
+        }
+        return maskedString
     }
 
     /**

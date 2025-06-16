@@ -1,6 +1,7 @@
 package com.glia.widgets.view.dialog
 
 import android.app.Activity
+import com.glia.widgets.OTel
 import com.glia.widgets.base.BaseSingleActivityWatcher
 import com.glia.widgets.helper.DialogHolderActivity
 import com.glia.widgets.helper.GliaActivityManager
@@ -89,4 +90,23 @@ internal class UiComponentsActivityWatcher(
         finishActivity(DialogHolderActivity::class)
     }
 
+    override fun onActivityStarted(activity: Activity) {
+        super.onActivityStarted(activity)
+        OTel.onActivityStarted(activity)
+    }
+
+    override fun onActivityDestroyed(activity: Activity) {
+        super.onActivityDestroyed(activity)
+        OTel.onActivityDestroyed(activity)
+    }
+
+    override fun onActivityPostResumed(activity: Activity) {
+        super.onActivityPostResumed(activity)
+        OTel.onActivityResumed(activity)
+    }
+
+    override fun onActivityPostPaused(activity: Activity) {
+        super.onActivityPostPaused(activity)
+        OTel.onActivityPaused(activity)
+    }
 }

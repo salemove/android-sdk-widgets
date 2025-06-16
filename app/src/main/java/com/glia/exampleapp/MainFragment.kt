@@ -35,6 +35,7 @@ import com.glia.exampleapp.ExampleAppConfigManager.createDefaultConfig
 import com.glia.exampleapp.Utils.getAuthenticationBehaviorFromPrefs
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.GliaWidgetsException
+import com.glia.widgets.OTel
 import com.glia.widgets.authentication.Authentication
 import com.glia.widgets.entrywidget.EntryWidget
 import com.glia.widgets.launcher.EngagementLauncher
@@ -595,6 +596,7 @@ class MainFragment : Fragment() {
     }
 
     private fun clearSession() {
+        OTel.closeSessionSpan()
         GliaWidgets.clearVisitorSession()
         setupAuthButtonsVisibility()
     }

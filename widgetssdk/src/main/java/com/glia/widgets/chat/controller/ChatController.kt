@@ -431,7 +431,7 @@ internal class ChatController(
 
     override fun sendMessage(message: String) {
         Logger.d(TAG, "Send MESSAGE: $message")
-        getChatTraceSpan()?.addEvent("sending_message")
+//        getChatTraceSpan()?.addEvent("sending_message")
         clearMessagePreview()
         sendMessageUseCase.execute(message, sendMessageCallback)
         addQuickReplyButtons(emptyList())

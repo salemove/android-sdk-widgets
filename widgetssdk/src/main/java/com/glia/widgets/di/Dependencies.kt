@@ -317,7 +317,7 @@ internal object Dependencies {
         lifecycleManager.addObserver { _, event: Lifecycle.Event ->
             when (event) {
                 Lifecycle.Event.ON_PAUSE -> {
-                    OTel.onAppPaused()
+                    OTel.newSpan("App: On Paused").startSpan().end()
                     // Moved to on pause due to "IllegalStateException: Not allowed to start service app is in background"
                     // Related bug ticket MOB-4011
                     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S && GliaWidgets.isInitialized()) {
@@ -326,6 +326,7 @@ internal object Dependencies {
                 }
 
                 Lifecycle.Event.ON_RESUME -> {
+                    OTel.newSpan("App: On Resumed").startSpan().end()
                     OTel.onAppResumed()
                 }
 

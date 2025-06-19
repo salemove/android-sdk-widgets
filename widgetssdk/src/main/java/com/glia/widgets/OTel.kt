@@ -61,12 +61,10 @@ object OTel {
             .setTracerProvider(tracerProvider)
             .buildAndRegisterGlobal()
 
-        defaultTracerScope = instance.getTracer("android_sdk_tracer")
+        defaultTracerScope = instance.getTracer("android_sdk_tracer", GliaWidgets.widgetsSdkVersion)
 
         appLifeSpan = defaultTracerScope
             .spanBuilder("App: Session")
-            .setAttribute("sdk_widgets_version", GliaWidgets.widgetsSdkVersion)
-            .setAttribute("sdk_core_version", GliaWidgets.widgetsCoreSdkVersion)
             .startSpan()
 
         sessionScope = appLifeSpan.makeCurrent()
@@ -81,6 +79,8 @@ object OTel {
 
     fun Span.addSessionInfo(context: android.content.Context): Span {
         val sessionInfo = SessionDebugData(context)
+        setAttribute("sdk_widgets_version", GliaWidgets.widgetsSdkVersion)
+        setAttribute("sdk_core_version", GliaWidgets.widgetsCoreSdkVersion)
         setAttribute("app_version", sessionInfo.client.appVersion)
         setAttribute("app_name", context.applicationInfo.loadLabel(context.packageManager).toString())
         setAttribute("app_bundle_id", sessionInfo.client.packageName)

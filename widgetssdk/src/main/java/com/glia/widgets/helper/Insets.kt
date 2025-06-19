@@ -53,7 +53,7 @@ internal typealias WindowInsetsAnimationCallback = (insets: Insets) -> Unit
  *
  * [WindowCompat.setDecorFitsSystemWindows] should be called, to make callbacks work.
  *
- * @see <a href="https://developer.android.com/develop/ui/views/layout/insets">Work with window insets and cutouts</a>
+ * See [Work with window insets and cutouts](https://developer.android.com/develop/ui/views/layout/insets")
  */
 internal class SimpleWindowInsetsAndAnimationHandler(
     private val target: View,

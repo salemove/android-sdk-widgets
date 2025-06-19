@@ -79,13 +79,27 @@ android {
   }
 }
 
-tasks.register('publishToLocalMaven') {
-  dependsOn ':widgetssdk:publishSnapshotPublicationToMavenLocal'
+tasks.register('publishSnapshotPublicationToMavenLocal', GradleBuild) {
+  description = 'Publishes the Snapshot publication to Maven Local with -SNAPSHOT suffix'
+  group = 'publishing'
+
+  tasks = ['publishMavenPublicationToMavenLocal']
+  startParameter.projectProperties = ['snapshot': 'yes']
 }
 
+//The snapshot will be automatically available in the Central Portal snapshot repository directly after the task finished.
+tasks.register('publishSnapshotPublicationToMavenCentralRepository', GradleBuild) {
+  description = 'Publishes the Snapshot publication to Maven Local with -SNAPSHOT suffix'
+  group = 'publishing'
+
+  tasks = ['publishMavenPublicationToMavenCentralRepository']
+  startParameter.projectProperties = ['snapshot': 'yes']
+}
+
+//For this task we need android core sdk to be set up for releasing to maven local repository.
 tasks.register("publishCoreSdkToLocalMaven") {
   if (gliaCoreSdkUseDirect) {
-    dependsOn gradle.includedBuild("gliaCore").task(":androidSdk:publishToLocalMaven")
+    dependsOn gradle.includedBuild("gliaCore").task(":androidSdk:publishSnapshotPublicationToMavenLocal")
   } else {
     println("Cannot publish Core SDK to local maven repository!")
     println("Core SDK is not configured to be used directly.")
@@ -135,15 +149,6 @@ dependencies {
   testImplementation libs.test.json
 
   lintChecks project(':lint_checker')
-}
-
-ext {
-  PUBLISH_GROUP_ID = 'com.glia'
-  PUBLISH_VERSION = android.defaultConfig.versionName
-  PUBLISH_ARTIFACT_ID = 'android-widgets'
-  PUBLISH_MODULE_DESCRIPTION = 'Glia Android Widgets SDK'
-  PUBLISH_ORGANISATION_NAME = 'Glia'
-  PUBLISH_ORGANISATION_URL = 'https://www.glia.com/'
 }
 
 apply from: "${rootProject.projectDir}/scripts/publish-module.gradle"

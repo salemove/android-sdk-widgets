@@ -282,11 +282,8 @@ object GliaWidgets {
      * Accepts permissions request results.
      *
      *
-     * Some functionalities, for example Video or Audio calls, require to request runtime permissions via
-     * [][<a href=]//developer.android.com/reference/android/app/Activity.html.requestPermissions">&lt;a href=&quot;https://developer.android.com/reference/android/app/Activity.html#requestPermissions(java.lang.String[],%20int)&quot;&gt;Activity#requestPermissions(String[], int)&lt;/a&gt;.
-     * The results of such request is passed to your activity's
-     * [][ <a href=]//developer.android.com/reference/android/app/Activity.html.onRequestPermissionsResult"> &lt;a href=&quot;https://developer.android.com/reference/android/app/Activity.html#onRequestPermissionsResult(int,%2520java.lang.String%5B%5D,%2520int%5B%5D)&quot;&gt;Activity#onRequestPermissionsResult(int, String[], int[])&lt;/a&gt;
-     *
+     * Some functionalities, for example Video or Audio calls, require to request [runtime permissions](https://developer.android.com/reference/androidx/core/app/ActivityCompat?hl=en#requestPermissions(android.app.Activity,java.lang.String[],int)).
+     * The results of such request is passed to your activity's [onRequestPermissionsResult()](https://developer.android.com/reference/androidx/core/app/ActivityCompat.OnRequestPermissionsResultCallback?hl=en#onRequestPermissionsResult(int,java.lang.String[],int[])) function.
      *
      * Your activity in turn must call this method to pass the results of the request to Glia SDK.
      *
@@ -296,11 +293,7 @@ object GliaWidgets {
      */
     @Deprecated("This method is no longer required, as all the required permissions are now managed internally.")
     @JvmStatic
-    fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ) {
+    fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         Logger.d(TAG, "onRequestPermissionsResult")
         try {
             gliaCore().onRequestPermissionsResult(requestCode, permissions, grantResults)
@@ -312,15 +305,10 @@ object GliaWidgets {
     /**
      * Accepts permissions request results.
      *
-     *
-     * Some functionalities, for example Video or Audio calls, require to request runtime permissions via
-     * [][<a href=]//developer.android.com/reference/android/app/Activity.html.requestPermissions">&lt;a href=&quot;https://developer.android.com/reference/android/app/Activity.html#requestPermissions(java.lang.String[],%20int)&quot;&gt;Activity#requestPermissions(String[], int)&lt;/a&gt;.
-     * The results of such request is passed to your activity's
-     * [][ <a href=]//developer.android.com/reference/android/app/Activity.html.onRequestPermissionsResult"> &lt;a href=&quot;https://developer.android.com/reference/android/app/Activity.html#onRequestPermissionsResult(int,%2520java.lang.String%5B%5D,%2520int%5B%5D)&quot;&gt;Activity#onRequestPermissionsResult(int, String[], int[])&lt;/a&gt;
-     *
+     * Some functionalities, for example Video or Audio calls, require to request [runtime permissions](https://developer.android.com/reference/androidx/core/app/ActivityCompat?hl=en#requestPermissions(android.app.Activity,java.lang.String[],int)).
+     * The results of such request is passed to your activity's [onRequestPermissionsResult()](https://developer.android.com/reference/androidx/core/app/ActivityCompat.OnRequestPermissionsResultCallback?hl=en#onRequestPermissionsResult(int,java.lang.String[],int[])) function.
      *
      * Your activity in turn must call this method to pass the results of the request to Glia SDK.
-     *
      *
      * This method is no-op for other non-Glia triggered results.
      *

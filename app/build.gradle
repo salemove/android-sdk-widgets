@@ -97,7 +97,7 @@ afterEvaluate {
   // We generate the local Widgets SDK dependency to ensure the testing application
   // can work with the SDK interfaces the same as it will on a release.
   // This build is used for acceptance tests
-  preReleaseBuild.dependsOn ':widgetssdk:publishToLocalMaven'
+  preReleaseBuild.dependsOn ':widgetssdk:publishSnapshotPublicationToMavenLocal'
 }
 
 dependencies {
@@ -111,8 +111,8 @@ dependencies {
   implementation libs.firebase.messaging
 
   debugImplementation project(path: ':widgetssdk')
-  // To test against properly compiled SDK, the SDK is auto-uploaded to local maven with '_snapshot' suffix
-  releaseImplementation "com.glia:android-widgets:${widgetsVersionName}_snapshot"
+  // To test against properly compiled SDK, the SDK is auto-uploaded to local maven with '-SNAPSHOT' suffix
+  releaseImplementation "com.glia:android-widgets:${widgetsVersionName}-SNAPSHOT"
 
   implementation libs.java.core.ktx
 

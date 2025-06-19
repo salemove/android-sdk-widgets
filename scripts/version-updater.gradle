@@ -3,51 +3,51 @@
  */
 
 ext {
-    gradlePropertiesFilePath = "${rootProject.projectDir}/version.properties"
-    gliaCoreSdkVersionTagInProperties = 'dependency.coreSdk.version'
-    gliaCoreSdkVersionTag = 'gliaSdkVersion'
-    widgetsVersionNameTagInProperties = 'widgets.versionName'
-    widgetsVersionNameTag = 'widgetsVersionName'
-    widgetsVersionCodeTagInProperties = 'widgets.versionCode'
-    widgetsVersionCodeTag = 'widgetsVersionCode'
+  gradlePropertiesFilePath = "${rootProject.projectDir}/version.properties"
+  gliaCoreSdkVersionTagInProperties = 'dependency.coreSdk.version'
+  gliaCoreSdkVersionTag = 'gliaSdkVersion'
+  widgetsVersionNameTagInProperties = 'widgets.versionName'
+  widgetsVersionNameTag = 'widgetsVersionName'
+  widgetsVersionCodeTagInProperties = 'widgets.versionCode'
+  widgetsVersionCodeTag = 'widgetsVersionCode'
 
-    saveProperty = {String propertyKey, String propertyValue ->
-        saveProperties(Collections.singletonMap(propertyKey, propertyValue))
-    }
+  saveProperty = { String propertyKey, String propertyValue ->
+    saveProperties(Collections.singletonMap(propertyKey, propertyValue))
+  }
 
-    saveProperties = {Map<String, String> properties ->
-        Properties gradleProperties = PropertiesIO.readProperties(getProject().gradlePropertiesFilePath)
-        properties.forEach((propertyKey, propertyValue) -> {
-            gradleProperties[propertyKey] = propertyValue
-        })
-        PropertiesIO.saveProperties(gradleProperties, getProject().gradlePropertiesFilePath)
-    }
+  saveProperties = { Map<String, String> properties ->
+    Properties gradleProperties = PropertiesIO.readProperties(getProject().gradlePropertiesFilePath)
+    properties.forEach((propertyKey, propertyValue) -> {
+      gradleProperties[propertyKey] = propertyValue
+    })
+    PropertiesIO.saveProperties(gradleProperties, getProject().gradlePropertiesFilePath)
+  }
 }
 
 exposeGradlePropertiesToBuildScripts()
 
 def exposeGradlePropertiesToBuildScripts() {
-    Properties gradleProperties = PropertiesIO.readProperties(gradlePropertiesFilePath)
-    ext[gliaCoreSdkVersionTag] = gradleProperties.getProperty(gliaCoreSdkVersionTagInProperties)
-    ext[widgetsVersionNameTag] = gradleProperties.getProperty(widgetsVersionNameTagInProperties)
-    ext[widgetsVersionCodeTag] = Integer.parseInt(gradleProperties.getProperty(widgetsVersionCodeTagInProperties))
+  Properties gradleProperties = PropertiesIO.readProperties(gradlePropertiesFilePath)
+  ext[gliaCoreSdkVersionTag] = gradleProperties.getProperty(gliaCoreSdkVersionTagInProperties)
+  ext[widgetsVersionNameTag] = gradleProperties.getProperty(widgetsVersionNameTagInProperties)
+  ext[widgetsVersionCodeTag] = Integer.parseInt(gradleProperties.getProperty(widgetsVersionCodeTagInProperties))
 }
 
 /**
  * This class is responsible to reading and writing Property files
  */
 class PropertiesIO {
-    static Properties readProperties(String propertiesFilePath) {
-        File gradlePropsFile = new File(propertiesFilePath)
-        Properties gradleProperties = new Properties()
-        gradleProperties.load(new FileInputStream(gradlePropsFile))
-        return gradleProperties
-    }
+  static Properties readProperties(String propertiesFilePath) {
+    File gradlePropsFile = new File(propertiesFilePath)
+    Properties gradleProperties = new Properties()
+    gradleProperties.load(new FileInputStream(gradlePropsFile))
+    return gradleProperties
+  }
 
-    static void saveProperties(Properties properties, String propertiesFilePath) {
-        File gradlePropsFile = new File(propertiesFilePath)
-        properties.store(gradlePropsFile.newWriter(), null)
-    }
+  static void saveProperties(Properties properties, String propertiesFilePath) {
+    File gradlePropsFile = new File(propertiesFilePath)
+    properties.store(gradlePropsFile.newWriter(), null)
+  }
 }
 
 /**
@@ -56,17 +56,17 @@ class PropertiesIO {
  * ./gradlew saveCoreSdkVersion --coreSdkVersion=0.77.2
  */
 class UpdateCoreSdkVersion extends DefaultTask {
-    private String newCoreSdkVersion
+  private String newCoreSdkVersion
 
-    @Option(option = "coreSdkVersion", description = "Core SDK version that should be overriden in configuration files")
-    void setCoreSdkVersion(String coreSdkVersion) {
-        this.newCoreSdkVersion = coreSdkVersion
-    }
+  @Option(option = "coreSdkVersion", description = "Core SDK version that should be overriden in configuration files")
+  void setCoreSdkVersion(String coreSdkVersion) {
+    this.newCoreSdkVersion = coreSdkVersion
+  }
 
-    @TaskAction
-    void write() {
-        getProject().saveProperty(getProject().gliaCoreSdkVersionTagInProperties, newCoreSdkVersion)
-    }
+  @TaskAction
+  void write() {
+    getProject().saveProperty(getProject().gliaCoreSdkVersionTagInProperties, newCoreSdkVersion)
+  }
 }
 
 /**
@@ -75,59 +75,59 @@ class UpdateCoreSdkVersion extends DefaultTask {
  * ./gradlew saveWidgetsVersion --type=patch
  */
 class UpdateProjectVersion extends DefaultTask {
-    private String versionUpdateType
+  private String versionUpdateType
 
-    @Option(option = "type", description = "Type of version update. Can be 'patch', 'minor', or 'major'.")
-    UpdateProjectVersion setVersionUpdateType(String versionUpdateType) {
-        this.versionUpdateType = versionUpdateType
-        return this
+  @Option(option = "type", description = "Type of version update. Can be 'patch', 'minor', or 'major'.")
+  UpdateProjectVersion setVersionUpdateType(String versionUpdateType) {
+    this.versionUpdateType = versionUpdateType
+    return this
+  }
+
+  @TaskAction
+  void write() {
+    Map<String, String> propertiesMap = new HashMap<>()
+    propertiesMap.put(getProject().widgetsVersionCodeTagInProperties, updatedVersionCode())
+    propertiesMap.put(getProject().widgetsVersionNameTagInProperties, updatedVersionName())
+    getProject().saveProperties(propertiesMap)
+  }
+
+  private String updatedVersionCode() {
+    Integer currentVersionCode = getProject().widgetsVersionCode.toInteger()
+    Integer updatedVersionCode = currentVersionCode + 1
+
+    return updatedVersionCode.toString()
+  }
+
+  private String updatedVersionName() {
+    String[] versionPartitioned = getProject().widgetsVersionName.split("\\.")
+
+    switch (this.versionUpdateType) {
+      case "patch":
+        int updatedPatchVersion = versionPartitioned[2].toInteger() + 1
+        versionPartitioned[2] = updatedPatchVersion.toString()
+        break
+
+      case "minor":
+        int updatedMinorVersion = versionPartitioned[1].toInteger() + 1
+        versionPartitioned[1] = updatedMinorVersion.toString()
+        versionPartitioned[2] = "0"
+        break
+
+      case "major":
+        int updatedMajorVersion = versionPartitioned[0].toInteger() + 1
+        versionPartitioned[0] = updatedMajorVersion.toString()
+        versionPartitioned[1] = "0"
+        versionPartitioned[2] = "0"
+        break
+
+      default:
+        throw new Exception("Invalid version update type '$this.versionUpdateType'")
     }
 
-    @TaskAction
-    void write() {
-        Map<String, String> propertiesMap = new HashMap<>();
-        propertiesMap.put(getProject().widgetsVersionCodeTagInProperties, updatedVersionCode())
-        propertiesMap.put(getProject().widgetsVersionNameTagInProperties, updatedVersionName())
-        getProject().saveProperties(propertiesMap)
-    }
+    String newVersionName = String.join(".", versionPartitioned)
 
-    private String updatedVersionCode() {
-        Integer currentVersionCode = getProject().widgetsVersionCode.toInteger()
-        Integer updatedVersionCode = currentVersionCode + 1
-
-        return updatedVersionCode.toString()
-    }
-
-    private String updatedVersionName() {
-        String[] versionPartitioned = getProject().widgetsVersionName.split("\\.")
-
-        switch (this.versionUpdateType) {
-            case "patch":
-                int updatedPatchVersion = versionPartitioned[2].toInteger() + 1
-                versionPartitioned[2] = updatedPatchVersion.toString()
-                break;
-
-            case "minor":
-                int updatedMinorVersion = versionPartitioned[1].toInteger() + 1
-                versionPartitioned[1] = updatedMinorVersion.toString()
-                versionPartitioned[2] = "0"
-                break;
-
-            case "major":
-                int updatedMajorVersion = versionPartitioned[0].toInteger() + 1
-                versionPartitioned[0] = updatedMajorVersion.toString()
-                versionPartitioned[1] = "0"
-                versionPartitioned[2] = "0"
-                break;
-
-            default:
-                throw new Exception("Invalid version update type '$this.versionUpdateType'")
-        }
-
-        String newVersionName = String.join(".", versionPartitioned)
-
-        return newVersionName
-    }
+    return newVersionName
+  }
 }
 
 tasks.register('saveCoreSdkVersion', UpdateCoreSdkVersion)
@@ -138,20 +138,20 @@ tasks.register('saveWidgetsVersion', UpdateProjectVersion)
  * Usage example:
  * ./gradlew bumpVersionMinorLevel
  */
-task bumpVersionMinorLevel {
-    doLast {
-        String[] versionPartitioned = widgetsVersionName.split("\\.")
-        int updatedMinorVersion = versionPartitioned[1].toInteger() + 1
-        versionPartitioned[1] = updatedMinorVersion.toString()
-        versionPartitioned[2] = "0"
-        String newVersionName = String.join(".", versionPartitioned)
-        String newVersionCode = (widgetsVersionCode + 1).toString()
+tasks.register('bumpVersionMinorLevel') {
+  doLast {
+    String[] versionPartitioned = widgetsVersionName.split("\\.")
+    int updatedMinorVersion = versionPartitioned[1].toInteger() + 1
+    versionPartitioned[1] = updatedMinorVersion.toString()
+    versionPartitioned[2] = "0"
+    String newVersionName = String.join(".", versionPartitioned)
+    String newVersionCode = (widgetsVersionCode + 1).toString()
 
-        Map<String, String> propertiesMap = new HashMap<>();
-        propertiesMap.put(getProject().widgetsVersionNameTagInProperties, newVersionName)
-        propertiesMap.put(getProject().widgetsVersionCodeTagInProperties, newVersionCode)
-        saveProperties(propertiesMap)
-    }
+    Map<String, String> propertiesMap = new HashMap<>()
+    propertiesMap.put(getProject().widgetsVersionNameTagInProperties, newVersionName)
+    propertiesMap.put(getProject().widgetsVersionCodeTagInProperties, newVersionCode)
+    saveProperties(propertiesMap)
+  }
 }
 
 /**
@@ -159,7 +159,6 @@ task bumpVersionMinorLevel {
  * Usage example:
  * ./gradlew -q printCurrentVersionName
  */
-task printCurrentVersionName {
-    println widgetsVersionName
+tasks.register('printCurrentVersionName') {
+  println widgetsVersionName
 }
-

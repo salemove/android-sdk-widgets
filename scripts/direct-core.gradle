@@ -32,7 +32,7 @@ ext {
 
   gliaCoreSdkDirectPathVersion = 'direct_localPath'
 
-  coreSdkDebugVersion = {String defaultVersion ->
+  coreSdkDebugVersion = { String defaultVersion ->
     if (gliaCoreSdkUseDirect) {
       return gliaCoreSdkDirectPathVersion
     } else {
@@ -40,9 +40,9 @@ ext {
     }
   }
 
-  coreSdkSnapshotVersion = {String defaultVersion ->
+  coreSdkSnapshotVersion = { String defaultVersion ->
     if (gliaCoreSdkUseDirect) {
-      return "${gliaCoreSdkDirectVersion}_snapshot"
+      return "${gliaCoreSdkDirectVersion}-SNAPSHOT"
     } else {
       return defaultVersion
     }
@@ -128,17 +128,17 @@ def printDirectCoreSdkInfo(Boolean gliaCoreSdkUseDirect, String coreSdkPath, Str
     } else {
       println(
         "No Core SDK path is set!\n" +
-        "You can set it in the local.properties using the \"dependency.coreSdk.path\" " +
-        "or provide it via the \$CORE_SDK_PATH environment variable.\n" +
-        "\nIf you don't want to use the Core SDK directly, " +
-        "set the \"dependency.coreSdk.useDirect\" in the local.properties to false."
+          "You can set it in the local.properties using the \"dependency.coreSdk.path\" " +
+          "or provide it via the \$CORE_SDK_PATH environment variable.\n" +
+          "\nIf you don't want to use the Core SDK directly, " +
+          "set the \"dependency.coreSdk.useDirect\" in the local.properties to false."
       )
     }
   } else {
     println(
       "The project is not configured to use the Core SDK from the direct path!\n" +
-      "If you want to use the Core SDK directly, " +
-      "add the \"dependency.coreSdk.useDirect=true\" to the local.properties."
+        "If you want to use the Core SDK directly, " +
+        "add the \"dependency.coreSdk.useDirect=true\" to the local.properties."
     )
   }
   println("----------------------Direct Core SDK-----------------------\n")

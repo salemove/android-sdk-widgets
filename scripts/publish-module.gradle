@@ -1,85 +1,60 @@
-apply plugin: 'maven-publish'
-apply plugin: 'signing'
+apply plugin: 'com.vanniktech.maven.publish'
 
 group = PUBLISH_GROUP_ID
 version = PUBLISH_VERSION
 
-publishing {
-    publications {
-        snapshot(MavenPublication) {
-            groupId PUBLISH_GROUP_ID
-            artifactId PUBLISH_ARTIFACT_ID
-            version = PUBLISH_VERSION + '_snapshot'
 
-            setupFilesForPublishing(it)
-        }
+mavenPublishing {
+  def isSnapshot = findProperty("snapshot")?.toString() == "yes"
+  //Plugin automatically publishes snapshot to the Maven Central when the version name ends with `-SNAPSHOT`
+  //To publish snapshot release simply call the publishing command with gradle property `-Psnapshot=yes`
+  //for example `./gradlew androidSdk:publishMavenPublicationToMavenLocal -Psnapshot=yes`
 
-        release(MavenPublication) {
-            groupId PUBLISH_GROUP_ID
-            artifactId PUBLISH_ARTIFACT_ID
-            version PUBLISH_VERSION
+  version = isSnapshot ? PUBLISH_VERSION + "-SNAPSHOT" : PUBLISH_VERSION
+  coordinates(PUBLISH_GROUP_ID, PUBLISH_ARTIFACT_ID, version)
 
-            setupFilesForPublishing(it)
-        }
+  pom {
+    name = PUBLISH_ARTIFACT_ID
+    description = PUBLISH_MODULE_DESCRIPTION
+    inceptionYear = "2021"
+    url = PUBLISH_ORGANISATION_URL
+
+    licenses {
+      license {
+        url = 'https://raw.githubusercontent.com/salemove/android-sdk-widgets/master/LICENSE.txt'
+      }
     }
-}
-
-def setupFilesForPublishing(publication) {
-    afterEvaluate {
-        // Two artifacts, the `aar` (or `jar`) and the sources
-        if (project.plugins.findPlugin("com.android.library")) {
-            publication.from components.release
-        } else {
-            publication.from components.java
-        }
+    organization {
+      name = PUBLISH_ORGANISATION_NAME
+      url = PUBLISH_ORGANISATION_URL
     }
-
-    // Remove optional dependencies from the Widgets SDK
-    // to avoid requiring integrators to include them in their applications.
-    publication.pom.withXml {
-        final pomNode = asNode()
-        pomNode.dependencyManagement.dependencies.'*'.findAll() {
-            it.artifactId.text() == 'firebase-bom'
-        }.each() {
-            it.parent().remove(it)
-        }
-        pomNode.dependencies.'*'.findAll() {
-            it.artifactId.text() == 'firebase-messaging'
-        }.each() {
-            it.parent().remove(it)
-        }
-    }
-
-    publication.pom {
-        name = PUBLISH_ARTIFACT_ID
-        description = PUBLISH_MODULE_DESCRIPTION
+    developers {
+      developer {
+        name = 'Glia Technologies'
         url = PUBLISH_ORGANISATION_URL
-        licenses {
-            license {
-                url = 'https://raw.githubusercontent.com/salemove/android-sdk-widgets/master/LICENSE.txt'
-            }
-        }
-        organization {
-            name = PUBLISH_ORGANISATION_NAME
-            url = PUBLISH_ORGANISATION_URL
-        }
-        developers {
-            developer {
-                name = 'Glia Technologies'
-                url = PUBLISH_ORGANISATION_URL
-            }
-        }
-        scm {
-            url = 'https://github.com/salemove/android-sdk-widgets.git'
-        }
+      }
     }
+    scm {
+      url = 'https://github.com/salemove/android-sdk-widgets.git'
+    }
+
+    excludeOptionalDependencies(it)
+  }
 }
 
-signing {
-    useInMemoryPgpKeys(
-            rootProject.ext["signing.keyId"],
-            rootProject.ext["signing.key"],
-            rootProject.ext["signing.password"],
-    )
-    sign publishing.publications.release
+//Excludes the Firebase Messaging from the .aar dependencies to avoid requiring integrators to include them in their applications.
+def excludeOptionalDependencies(mavenPom) {
+  mavenPom.withXml {
+    final pomNode = asNode()
+    pomNode.dependencyManagement.dependencies.'*'.findAll() {
+      it.artifactId.text() == 'firebase-bom'
+    }.each() {
+      it.parent().remove(it)
+    }
+    pomNode.dependencies.'*'.findAll() {
+      it.artifactId.text() == 'firebase-messaging'
+    }.each() {
+      it.parent().remove(it)
+    }
+  }
 }

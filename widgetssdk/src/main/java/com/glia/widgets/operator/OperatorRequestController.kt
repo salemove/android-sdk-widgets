@@ -145,9 +145,9 @@ internal class OperatorRequestController(
      * 4. Wait until the [MediaProjectionService.startForeground] function is called. **This step is the most important one because otherwise, the system will throw [SecurityException].**
      * 5. Notify core sdk that permission is granted[Engagement.onActivityResult])
      *
+     * See: [Media projection service requirements]("https://github.com/salemove/android-sdk-widgets/pull/1007#:~:text=Media%20projection%20service%20requirements")
      * @see [EngagementRepository.onActivityResultSkipScreenSharingPermissionRequest]
      * @see [EngagementRepository.onReadyToShareScreen]
-     * @see <a href="https://github.com/salemove/android-sdk-widgets/pull/1007#:~:text=Media%20projection%20service%20requirements">Media projection service requirements</a>
      *
      * @note Call the [MediaProjectionManager.createScreenCaptureIntent] method before starting the foreground service[MediaProjectionService].
      * Doing so shows a permission notification to the user; the user must grant the permission before you can create the service.

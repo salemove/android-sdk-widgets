@@ -232,7 +232,7 @@ workflows:
                 set -x
                 
                 # this will run Gradle script to deploy library and related artifacts to Maven Central
-                ./gradlew clean widgetssdk:publishReleasePublicationToSonatypeRepository
+                ./gradlew clean widgetssdk:publishMavenPublicationToMavenCentralRepository
       - git-tag@1:
           title: Create Git tag
           inputs:

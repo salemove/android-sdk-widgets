@@ -11,20 +11,37 @@ buildscript {
 }
 
 plugins {
-  alias libs.plugins.nexus.publish
+  alias libs.plugins.maven.publish
   alias libs.plugins.dokka
   alias libs.plugins.kt.lint
   alias libs.plugins.kotlin.android apply false
   alias libs.plugins.paparazzi apply false
 }
 
+apply from: "${rootDir}/scripts/version-updater.gradle"
+
 allprojects {
+
+  project.ext {
+    PUBLISH_GROUP_ID = 'com.glia'
+    PUBLISH_VERSION = widgetsVersionName
+    PUBLISH_ARTIFACT_ID = 'android-widgets'
+    PUBLISH_MODULE_DESCRIPTION = 'Glia Android Widgets SDK'
+    PUBLISH_ORGANISATION_NAME = 'Glia'
+    PUBLISH_ORGANISATION_URL = 'https://www.glia.com/'
+  }
+
   repositories {
     google()
     mavenCentral()
 
     // Needed for some automated and manual testing (e.g: acceptance tests)
     mavenLocal()
+
+    // Needed for using SNAPSHOT releases
+    maven {
+      url 'https://central.sonatype.com/repository/maven-snapshots/'
+    }
   }
 }
 
@@ -69,9 +86,4 @@ subprojects {
   }
 }
 
-tasks.register('clean', Delete) {
-  delete rootProject.layout.buildDirectory
-}
-
-apply from: "${rootDir}/scripts/publish-settings.gradle"
-apply from: "${rootDir}/scripts/version-updater.gradle"
+apply from: "${rootDir}/scripts/publish-module.gradle"

@@ -59,24 +59,42 @@ subprojects {
   }
 }
 
-subprojects {
-  // This is setup of Dokka. It is used for generating API docs web page from in-doc comments
-  // See official Dokka docs for more information: https://kotlin.github.io/dokka/
-  apply plugin: 'org.jetbrains.dokka'
-  tasks.withType(DokkaTask).configureEach {
-    String currentYear = Calendar.getInstance().get(Calendar.YEAR)
-    String gliaSvgLogoPath = rootProject.file("dokkaAssets/logo-icon.svg")
-    // These configurations currently apply only to dokkaHtml and not to dokkaJavadoc.
-    // Have not found how to solve this. But at current Dokka version (1.9.20)
-    // Javadoc plugin is still in 'early stages' of development.
-    String configurationJson = $/{
-      "footerMessage": "(c) ${currentYear} Glia Technologies, Inc. All rights reserved.",
-      "customAssets": ["${gliaSvgLogoPath}"]
-    }/$
-    pluginsMapConfiguration.set(["org.jetbrains.dokka.base.DokkaBase": configurationJson])
-
-    moduleName = "Glia Android Widgets SDK"
-    suppressInheritedMembers.set(true)
+// This is setup of Dokka. It is used for generating API docs web page from in-doc comments
+// See official Dokka docs for more information: https://kotlinlang.org/docs/dokka-gradle.html
+// Migration to Dokka Gradle plugin v2: https://kotlinlang.org/docs/dokka-migration.html
+dokka {
+  moduleName = "Glia Android Widgets SDK"
+  dokkaPublications {
+    html {
+      suppressInheritedMembers = true
+      failOnWarning = true
+    }
+  }
+  dokkaSourceSets {
+    main {
+      sourceRoots.from(file("widgetssdk/src/main"))
+      // Exclude internal package
+      perPackageOption {
+        matchingRegex.set(".*internal.*") // Regex to exclude internal
+        suppress.set(true)
+      }
+      sourceLink {
+        localDirectory = file("widgetssdk/src/main/java")
+        remoteUrl = new URI("https://github.com/salemove/android-sdk-widgets/tree/master/widgetssdk/src/main/java")
+        remoteLineSuffix = "#L"
+      }
+    }
+  }
+  String currentYear = Calendar.getInstance().get(Calendar.YEAR)
+  String gliaSvgLogoPath = rootProject.file("dokkaAssets/logo-icon.svg")
+  pluginsConfiguration {
+    html {
+      customAssets.from("${gliaSvgLogoPath}")
+      footerMessage = "(c) ${currentYear} Glia Technologies, Inc. All rights reserved."
+    }
+  }
+  dokkaPublications.html {
+    outputDirectory.set(file("widgetssdk/build/dokka/html"))
   }
 
   // This adds support for @hide keyword inside in-code docs

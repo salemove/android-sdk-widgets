@@ -212,7 +212,7 @@ workflows:
       - gradle-runner@3:
           title: Generate JavaDoc
           inputs:
-            - gradle_task: $WIDGET_SDK_MODULE:dokkaJavadoc
+            - gradle_task: dokkaGenerate
       - amazon-s3-upload@3:
           title: Upload JavaDoc
           inputs:

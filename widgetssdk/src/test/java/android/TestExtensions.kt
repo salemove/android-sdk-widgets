@@ -30,7 +30,7 @@ fun <T> Class<T>.readRawResource(resName: String): String = classLoader?.getReso
 val Intent.targetActivityName: String? get() = component?.shortClassName
 
 /**
- * Since the is no way out of the box to assert the current value of a TestSubscriber, this function does it using [TestSubscriber.assertValueAt]
+ * Since there is no way out of the box to assert the current value of a TestSubscriber, this function does it using [TestSubscriber.assertValueAt]
  * function with the latest index of the values list.
  */
 fun <T : Any> TestSubscriber<T>.assertCurrentValue(expected: T): TestSubscriber<T> = run {
@@ -38,7 +38,7 @@ fun <T : Any> TestSubscriber<T>.assertCurrentValue(expected: T): TestSubscriber<
 }
 
 /**
- * Since the is no way out of the box to assert the current value of a TestSubscriber, this function does it using [TestSubscriber.assertValueAt]
+ * Since there is no way out of the box to assert the current value of a TestSubscriber, this function does it using [TestSubscriber.assertValueAt]
  * function with the latest index of the values list.
  */
 fun <T : Any> TestSubscriber<T>.assertCurrentValue(predicate: Predicate<T>): TestSubscriber<T> = run {

@@ -43,6 +43,8 @@ import com.glia.widgets.internal.authentication.toCoreType
 import com.glia.widgets.internal.authentication.toWidgetsType
 import com.glia.widgets.launcher.EngagementLauncher
 import io.opentelemetry.api.common.Attributes
+import io.opentelemetry.api.trace.Span
+import io.opentelemetry.api.trace.SpanKind
 import io.opentelemetry.api.trace.StatusCode
 import io.reactivex.rxjava3.exceptions.UndeliverableException
 import io.reactivex.rxjava3.plugins.RxJavaPlugins
@@ -166,13 +168,14 @@ object GliaWidgets {
     fun init(gliaWidgetsConfig: GliaWidgetsConfig,
              onComplete: OnComplete,
              onError: OnError) {
-        val span = OTel.newSpan("SDK: Init", Attributes.builder()
-            .put("site_id", gliaWidgetsConfig.siteId)
-            .put("site_api_key_id", gliaWidgetsConfig.siteApiKey?.id)
-            .put("company_name", gliaWidgetsConfig.companyName?.ifBlank { null } ?: "<empty>")
-            .put("manual_locale_override", gliaWidgetsConfig.manualLocaleOverride ?: "<empty>")
-            .put("site_api_key_secret", gliaWidgetsConfig.siteApiKey?.secret?.maskSecretWithStars()?.ifBlank { null } ?: "<empty>")
-            .build()).startSpan()
+        val span = OTel.newSdkSpan("SDK: API: init")
+            .setAttribute("site_id", gliaWidgetsConfig.siteId)
+            .setAttribute("site_api_key_id", gliaWidgetsConfig.siteApiKey?.id)
+            .setAttribute("company_name", gliaWidgetsConfig.companyName?.ifBlank { null } ?: "<empty>")
+            .setAttribute("manual_locale_override", gliaWidgetsConfig.manualLocaleOverride ?: "<empty>")
+            .setAttribute("site_api_key_secret", gliaWidgetsConfig.siteApiKey?.secret?.maskSecretWithStars()?.ifBlank { null } ?: "<empty>")
+            .setSpanKind(SpanKind.CLIENT)
+            .startSpan()
         gliaWidgetsConfig.context?.let {
             span.addSessionInfo(it)
         }
@@ -242,7 +245,16 @@ object GliaWidgets {
      */
     @JvmStatic
     fun isInitialized(): Boolean {
-        return isInitialized
+        var span: Span? = null
+        try {
+            span = OTel.newSdkSpan("SDK: API: isInitialized")
+                .setAttribute("isInitialized", isInitialized.toString())
+                .setSpanKind(SpanKind.CLIENT)
+                .startSpan()
+            return isInitialized
+        } finally {
+            span?.end()
+        }
     }
 
     /**
@@ -280,11 +292,20 @@ object GliaWidgets {
     @JvmStatic
     fun getEngagementLauncher(queueIds: List<String>): EngagementLauncher {
         Logger.i(TAG, "Returning an Engagement Launcher")
+        var span: Span? = null
         try {
+            span = OTel.newSdkSpan("SDK: API: getEngagementLauncher")
+                .setSpanKind(SpanKind.CLIENT)
+                .setAttribute("queueIds", queueIds.toString())
+                .startSpan()
             setupQueueIds(queueIds)
             return engagementLauncher
         } catch (gliaException: GliaException) {
+            span?.recordException(gliaException)
+            span?.setStatus(StatusCode.ERROR)
             throw gliaException.toWidgetsType()
+        } finally {
+            span?.end()
         }
     }
 

@@ -2,12 +2,15 @@ package com.glia.widgets.launcher
 
 import android.content.Context
 import com.glia.androidsdk.Engagement
+import com.glia.widgets.OTel
 import com.glia.widgets.R
 import com.glia.widgets.chat.Intention
 import com.glia.widgets.internal.secureconversations.domain.HasOngoingSecureConversationUseCase
 import com.glia.widgets.engagement.domain.EngagementTypeUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 import com.glia.widgets.view.dialog.UiComponentsDispatcher
+import io.opentelemetry.api.trace.Span
+import io.opentelemetry.api.trace.SpanKind
 
 /**
  * An interface for launching different types of engagements, such as chat,
@@ -104,24 +107,40 @@ internal class EngagementLauncherImpl(
         get() = engagementTypeUseCase.isChatEngagement || isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat
 
     override fun startChat(context: Context) {
-        when {
-            engagementTypeUseCase.isCallVisualizer -> uiComponentsDispatcher.showSnackBar(R.string.entry_widget_call_visualizer_description)
-            isMediaEngagementOrMediaQueueing -> uiComponentsDispatcher.showSnackBar(R.string.entry_widget_call_visualizer_description)
-            isEngagementOrQueueing -> activityLauncher.launchChat(context, Intention.RETURN_TO_CHAT)
-            else -> hasOngoingSecureConversationUseCase(
-                onHasOngoingSecureConversation = {
-                    activityLauncher.launchChat(
-                        context,
-                        Intention.SC_DIALOG_ENQUEUE_FOR_TEXT
-                    )
-                },
-                onNoOngoingSecureConversation = {
-                    activityLauncher.launchChat(
-                        context,
-                        Intention.LIVE_CHAT
-                    )
+        val span = OTel.newSdkSpan("SDK: API: startChat")
+            .setSpanKind(SpanKind.CLIENT)
+            .startSpan()
+        try {
+            when {
+                engagementTypeUseCase.isCallVisualizer -> {
+                    span.setAttribute("details", "Already has a ongoing CV engagement, aborting call")
+                    uiComponentsDispatcher.showSnackBar(R.string.entry_widget_call_visualizer_description)
                 }
-            )
+                isMediaEngagementOrMediaQueueing -> {
+                    span.setAttribute("details", "Already has a ongoing media engagement, aborting call")
+                    uiComponentsDispatcher.showSnackBar(R.string.entry_widget_call_visualizer_description)
+                }
+                isEngagementOrQueueing -> {
+                    span.setAttribute("details", "Already has a chat engagement, opening chat screen")
+                    activityLauncher.launchChat(context, Intention.RETURN_TO_CHAT)
+                }
+                else -> hasOngoingSecureConversationUseCase(
+                    onHasOngoingSecureConversation = {
+                        activityLauncher.launchChat(
+                            context,
+                            Intention.SC_DIALOG_ENQUEUE_FOR_TEXT
+                        )
+                    },
+                    onNoOngoingSecureConversation = {
+                        activityLauncher.launchChat(
+                            context,
+                            Intention.LIVE_CHAT
+                        )
+                    }
+                )
+            }
+        } finally {
+            span.end()
         }
     }
 

@@ -8,6 +8,7 @@ import com.glia.widgets.messagecenter.MessageCenterActivity
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.api.trace.SpanBuilder
+import io.opentelemetry.api.trace.SpanKind
 import io.opentelemetry.api.trace.StatusCode
 import io.opentelemetry.api.trace.Tracer
 import io.opentelemetry.context.Context
@@ -20,6 +21,9 @@ import io.opentelemetry.sdk.resources.Resource
 import io.opentelemetry.sdk.trace.SdkTracerProvider
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.lang.ref.WeakReference
 import java.util.concurrent.TimeUnit
 
@@ -28,10 +32,11 @@ object OTel {
     val instance: OpenTelemetrySdk
 
     private val defaultTracerScope: Tracer
-    private var appLifeSpan: Span
-    private var sessionScope: Scope
+    private lateinit var appContext: Context
+    private lateinit var sdkContext: Context
     private val activitySpamMap = HashMap<ActivityType, Span>()
     private var topActivityRef: WeakReference<Activity>? = null
+    private var closingCallback: (() -> Unit)? = null
 
     init {
         val jaegerOtlpExporter: OtlpHttpSpanExporter =
@@ -63,18 +68,21 @@ object OTel {
 
         defaultTracerScope = instance.getTracer("android_sdk_tracer", GliaWidgets.widgetsSdkVersion)
 
-        appLifeSpan = defaultTracerScope
-            .spanBuilder("App: Session")
-            .startSpan()
+        val sessionSpan = defaultTracerScope.spanBuilder("Session").startSpan()
+        sessionSpan.makeCurrent()
+        val appSpan = defaultTracerScope.spanBuilder("App").setParent(Context.current()).startSpan()
+        val sdkSpan = defaultTracerScope.spanBuilder("SDK").setParent(Context.current()).startSpan()
 
-        sessionScope = appLifeSpan.makeCurrent()
 
-        Runtime.getRuntime().addShutdownHook(Thread{
-            appLifeSpan.end()
-            sessionScope.close()
-            tracerProvider.shutdown()
-        })
+        appContext = Context.current().with(appSpan)
+        sdkContext = Context.current().with(sdkSpan)
 
+        closingCallback = {
+            appSpan.end()
+            sdkSpan.end()
+            sessionSpan.end()
+            instance.close()
+        }
     }
 
     fun Span.addSessionInfo(context: android.content.Context): Span {
@@ -90,27 +98,27 @@ object OTel {
         return this
     }
 
-    fun newSpan(spanName: String, customAttributes: Attributes? = null): SpanBuilder {
+    fun newSdkSpan(spanName: String, customAttributes: Attributes? = null): SpanBuilder {
+        return newSpan(sdkContext, spanName, customAttributes)
+    }
+
+    fun newAppSpan(spanName: String, customAttributes: Attributes? = null): SpanBuilder {
+        return newSpan(appContext, spanName, customAttributes)
+    }
+
+    private fun newSpan(context: Context, spanName: String, customAttributes: Attributes? = null): SpanBuilder {
         return defaultTracerScope
             .spanBuilder(spanName)
-            .setParent(Context.current().with(appLifeSpan))
+            .setSpanKind(SpanKind.INTERNAL)
+            .setParent(context)
             .apply { customAttributes?.let { setAllAttributes(it) } }
     }
 
-    fun trace(spanName: String, customAttributes: Attributes? = null, codeBlock: (Span) -> Unit) {
-        val span = newSpan(spanName, customAttributes).startSpan()
-        try {
-            codeBlock(span)
-        }catch (error: Throwable) {
-            span.setStatus(StatusCode.ERROR)
-            span.recordException(error)
-        } finally {
-            span.end()
+    fun closeSession() {
+        activitySpamMap.values.forEach{
+            it.end()
         }
-    }
-
-    fun closeSessionSpan() {
-        appLifeSpan.end()
+        closingCallback?.invoke()
     }
 
     fun onActivityResumed(activity: Activity) {
@@ -122,7 +130,7 @@ object OTel {
                 activitySpamMap.remove(ActivityType.NOT_GLIA)
             } else {
                 if (!activitySpamMap.contains(ActivityType.NOT_GLIA)) {
-                    activitySpamMap[ActivityType.NOT_GLIA] = newSpan(ActivityType.NOT_GLIA.traceName).startSpan()
+                    activitySpamMap[ActivityType.NOT_GLIA] = newAppSpan(ActivityType.NOT_GLIA.traceName).startSpan()
                 }
                 activitySpamMap[ActivityType.NOT_GLIA]?.addEvent("One of client's activities resumed")
             }
@@ -132,7 +140,7 @@ object OTel {
     fun onActivityStarted(activity: Activity) {
         ActivityType.from(activity).let {
             if (it.isGlia || !activitySpamMap.containsKey(it)) {
-                activitySpamMap[it] = newSpan(it.traceName).startSpan()
+                activitySpamMap[it] = newAppSpan(it.traceName).startSpan()
             } else {
                 activitySpamMap[ActivityType.NOT_GLIA]?.addEvent("Another client's activity started")
             }

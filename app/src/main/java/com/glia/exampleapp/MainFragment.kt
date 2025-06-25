@@ -596,7 +596,7 @@ class MainFragment : Fragment() {
     }
 
     private fun clearSession() {
-        OTel.closeSessionSpan()
+        OTel.closeSession()
         GliaWidgets.clearVisitorSession()
         setupAuthButtonsVisibility()
     }

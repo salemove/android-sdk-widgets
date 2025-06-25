@@ -36,7 +36,7 @@ internal class DialogService(private val unifiedTheme: UnifiedTheme?) {
         val spanRef = AtomicReference<Span>()
 
         alertDialog.setOnShowListener{
-            OTel.newSpan(type.trace).startSpan().also(spanRef::set)
+            OTel.newAppSpan(type.trace).startSpan().also(spanRef::set)
             onShow?.invoke(alertDialog)
         }
         alertDialog.setOnDismissListener{

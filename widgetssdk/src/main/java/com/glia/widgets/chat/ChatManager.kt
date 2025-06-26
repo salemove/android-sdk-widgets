@@ -168,7 +168,9 @@ internal class ChatManager(
     }
 
     private fun sendMessage(payload: SendMessagePayload) {
+        getChatTraceSpan()?.addEvent("message_sending", attributes("message_id", payload.messageId))
         sendUnsentMessagesUseCase(payload, {
+            getChatTraceSpan()?.addEvent("message_sent", attributes("message_id", payload.messageId))
             onChatAction(Action.OnMessageSent(it))
         }, {
             onChatAction(Action.OnSendMessageError(payload.messageId))

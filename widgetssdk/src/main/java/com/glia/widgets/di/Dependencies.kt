@@ -56,8 +56,6 @@ import com.glia.widgets.view.head.ActivityWatcherForChatHead
 import com.glia.widgets.view.head.ChatHeadContract
 import com.glia.widgets.view.snackbar.liveobservation.ActivityWatcherForLiveObservation
 import com.glia.widgets.view.unifiedui.theme.UnifiedThemeManager
-import io.opentelemetry.api.trace.Span
-import java.util.concurrent.atomic.AtomicReference
 
 
 internal object Dependencies {
@@ -317,7 +315,7 @@ internal object Dependencies {
         lifecycleManager.addObserver { _, event: Lifecycle.Event ->
             when (event) {
                 Lifecycle.Event.ON_PAUSE -> {
-                    OTel.newAppSpan("App: On Paused").startSpan().end()
+                    OTel.onAppInBackground()
                     // Moved to on pause due to "IllegalStateException: Not allowed to start service app is in background"
                     // Related bug ticket MOB-4011
                     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S && GliaWidgets.isInitialized()) {
@@ -326,11 +324,12 @@ internal object Dependencies {
                 }
 
                 Lifecycle.Event.ON_RESUME -> {
-                    OTel.newAppSpan("App: On Resumed").startSpan().end()
-                    OTel.onAppResumed()
+                    OTel.onAppInForeground()
                 }
 
-                Lifecycle.Event.ON_STOP -> chatBubbleController.onApplicationStop()
+                Lifecycle.Event.ON_STOP -> {
+                    chatBubbleController.onApplicationStop()
+                }
                 Lifecycle.Event.ON_DESTROY -> chatBubbleController.onDestroy()
                 else -> { /* no-op */
                 }

@@ -161,7 +161,6 @@ internal class ChatController(
 
     private val sendMessageCallback: GliaSendMessageUseCase.Listener = object : GliaSendMessageUseCase.Listener {
         override fun messageSent(message: VisitorMessage?) {
-            Logger.d(TAG, "messageSent: $message, id: ${message?.id}")
             getChatTraceSpan()?.addEvent("message_sent", attributes("message_id", message?.id))
             onMessageSent(message)
         }

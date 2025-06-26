@@ -9,11 +9,8 @@ import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.api.trace.SpanBuilder
 import io.opentelemetry.api.trace.SpanKind
-import io.opentelemetry.api.trace.StatusCode
 import io.opentelemetry.api.trace.Tracer
 import io.opentelemetry.context.Context
-import io.opentelemetry.context.ContextKey
-import io.opentelemetry.context.Scope
 import io.opentelemetry.exporter.logging.LoggingSpanExporter
 import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporter
 import io.opentelemetry.sdk.OpenTelemetrySdk
@@ -21,9 +18,6 @@ import io.opentelemetry.sdk.resources.Resource
 import io.opentelemetry.sdk.trace.SdkTracerProvider
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.lang.ref.WeakReference
 import java.util.concurrent.TimeUnit
 
@@ -80,6 +74,7 @@ object OTel {
         closingCallback = {
             appSpan.end()
             sdkSpan.end()
+            appState?.end()
             sessionSpan.end()
             instance.close()
         }
@@ -125,9 +120,9 @@ object OTel {
         topActivityRef = WeakReference(activity)
         ActivityType.from(activity).let {
             if (it.isGlia) {
-                activitySpamMap[it]?.addEvent("Activity Resumed")
                 activitySpamMap[ActivityType.NOT_GLIA]?.end()
                 activitySpamMap.remove(ActivityType.NOT_GLIA)
+                activitySpamMap[it] = newAppSpan(it.traceName).startSpan()
             } else {
                 if (!activitySpamMap.contains(ActivityType.NOT_GLIA)) {
                     activitySpamMap[ActivityType.NOT_GLIA] = newAppSpan(ActivityType.NOT_GLIA.traceName).startSpan()
@@ -139,9 +134,7 @@ object OTel {
 
     fun onActivityStarted(activity: Activity) {
         ActivityType.from(activity).let {
-            if (it.isGlia || !activitySpamMap.containsKey(it)) {
-                activitySpamMap[it] = newAppSpan(it.traceName).startSpan()
-            } else {
+            if (!it.isGlia) {
                 activitySpamMap[ActivityType.NOT_GLIA]?.addEvent("Another client's activity started")
             }
         }
@@ -149,8 +142,10 @@ object OTel {
 
     fun onActivityPaused(activity: Activity) {
         ActivityType.from(activity).let {
-            if (it.isGlia) {
-                activitySpamMap[it]?.addEvent("Activity Paused")
+            println("onActivityPaused: ${it.traceName}, ${!activitySpamMap.containsKey(it)}")
+            if (it.isGlia || !activitySpamMap.containsKey(it)) {
+                activitySpamMap[it]?.end()
+                activitySpamMap.remove(it)
             } else {
                 activitySpamMap[ActivityType.NOT_GLIA]?.addEvent("One of client's activities paused")
             }
@@ -159,16 +154,16 @@ object OTel {
 
     fun onActivityDestroyed(activity: Activity) {
         ActivityType.from(activity).let {
-            if (it.isGlia) {
-                activitySpamMap[it]?.end()
-                activitySpamMap.remove(it)
-            } else {
+            if (!it.isGlia) {
                 activitySpamMap[ActivityType.NOT_GLIA]?.addEvent("One of client's activities destroyed")
             }
         }
     }
 
-    fun onAppPaused() {
+//    private var appState: Span? = null
+    fun onAppInBackground() {
+//        appState?.end()
+//        appState = newAppSpan("App: Background").startSpan()
         topActivityRef?.get()?.let { activity ->
             ActivityType.from(activity).let { activityType ->
                 activitySpamMap[activityType]?.addEvent("App went into background")
@@ -176,7 +171,9 @@ object OTel {
         }
     }
 
-    fun onAppResumed() {
+    fun onAppInForeground() {
+//        appState?.end()
+//        appState = newAppSpan("App: Foreground").startSpan()
         topActivityRef?.get()?.let { activity ->
             ActivityType.from(activity).let { activityType ->
                 activitySpamMap[activityType]?.addEvent("App returned into foreground")

@@ -245,16 +245,7 @@ object GliaWidgets {
      */
     @JvmStatic
     fun isInitialized(): Boolean {
-        var span: Span? = null
-        try {
-            span = OTel.newSdkSpan("SDK: API: isInitialized")
-                .setAttribute("isInitialized", isInitialized.toString())
-                .setSpanKind(SpanKind.CLIENT)
-                .startSpan()
-            return isInitialized
-        } finally {
-            span?.end()
-        }
+        return isInitialized
     }
 
     /**

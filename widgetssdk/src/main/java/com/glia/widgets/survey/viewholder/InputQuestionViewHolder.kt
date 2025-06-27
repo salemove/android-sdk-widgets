@@ -1,6 +1,5 @@
 package com.glia.widgets.survey.viewholder
 
-import android.graphics.Color
 import android.graphics.Typeface
 import android.view.View
 import android.widget.EditText
@@ -24,6 +23,7 @@ import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
 import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 import com.glia.widgets.view.unifiedui.theme.survey.OptionButtonTheme
 import com.glia.widgets.view.unifiedui.theme.survey.SurveyInputQuestionTheme
+import androidx.core.graphics.toColorInt
 
 internal class InputQuestionViewHolder(
     val binding: SurveyInputQuestionItemBinding,
@@ -76,17 +76,16 @@ internal class InputQuestionViewHolder(
 
     private fun createOptionButtonTheme(optionButtonConfiguration: OptionButtonConfiguration): OptionButtonTheme {
         val strokeWidth = optionButtonConfiguration.normalLayer.borderWidth.toFloat()
-        val normalStrokeColor = Color.parseColor(optionButtonConfiguration.normalLayer.borderColor)
-        val highlightedStrokeColor =
-            Color.parseColor(optionButtonConfiguration.highlightedLayer.borderColor)
-        val backgroundColor =
-            ColorTheme(Color.parseColor(optionButtonConfiguration.normalLayer.backgroundColor))
+        val normalStrokeColor = optionButtonConfiguration.normalLayer.borderColor.toColorInt()
+        val selectedStrokeColor = optionButtonConfiguration.selectedLayer.borderColor.toColorInt()
+        val highlightedStrokeColor = optionButtonConfiguration.highlightedLayer.borderColor.toColorInt()
+        val backgroundColor = ColorTheme(optionButtonConfiguration.normalLayer.backgroundColor.toColorInt())
 
         return OptionButtonTheme(
             normalText = TextTheme(),
             normalLayer = LayerTheme(fill = backgroundColor, stroke = normalStrokeColor, borderWidth = strokeWidth),
             selectedText = TextTheme(),
-            selectedLayer = LayerTheme(),
+            selectedLayer = LayerTheme(fill = backgroundColor, stroke = selectedStrokeColor, borderWidth = strokeWidth),
             highlightedText = TextTheme(),
             highlightedLayer = LayerTheme(fill = backgroundColor, stroke = highlightedStrokeColor, borderWidth = strokeWidth),
             fontSize = null,
@@ -112,8 +111,16 @@ internal class InputQuestionViewHolder(
         comment.setHintTextColor(itemView.getColorCompat(R.color.glia_shade_color))
         val textSize = optionButtonStyle.normalText.textSize
         comment.textSize = textSize
-        comment.onFocusChangeListener = View.OnFocusChangeListener { _, _ ->
+        comment.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
             setAnswer(comment.text.toString())
+
+            if (hasFocus) {
+                comment.applyTextTheme(inputTheme?.text)
+                comment.applyLayerTheme(optionButtonTheme.selectedLayer)
+            } else {
+                comment.applyTextTheme(inputTheme?.text)
+                comment.applyLayerTheme(optionButtonTheme.normalLayer)
+            }
         }
         comment.doAfterTextChanged { setAnswer(it.toString()) }
 

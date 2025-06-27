@@ -11,7 +11,7 @@
         app:cardElevation="8dp"
         android:layout_marginTop="32dp">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/content_view"
             android:orientation="vertical"
             android:layout_width="match_parent"
@@ -19,12 +19,16 @@
 
             <TextView
                 android:id="@+id/survey_title"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
                 android:layout_marginTop="@dimen/glia_large_x_large"
                 android:layout_marginEnd="24dp"
-                android:layout_gravity="center" />
+                android:gravity="center"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/survey_list"/>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/survey_list"
@@ -33,20 +37,40 @@
                 android:scrollbars="horizontal"
                 android:layout_weight="1"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:listitem="@layout/survey_scale_question_item" />
+                tools:listitem="@layout/survey_scale_question_item"
+                app:layout_constraintTop_toBottomOf="@+id/survey_title"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/button_panel"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="8dp"
+                android:background="@drawable/shadow_up_bg"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/button_panel" />
 
             <LinearLayout
                 android:id="@+id/button_panel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:elevation="4dp"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                app:layout_constraintTop_toBottomOf="@+id/survey_list"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent">
 
                 <com.glia.widgets.view.button.GliaNegativeButton
                     android:id="@+id/btn_cancel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/glia_medium"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:textSize="16sp"
+                    android:layout_marginStart="@dimen/glia_large_x_large"
+                    android:layout_marginEnd="@dimen/glia_large"
+                    android:layout_marginVertical="@dimen/glia_large_x_large"
                     android:layout_weight="1"
                     tools:text="@string/general_cancel" />
 
@@ -54,13 +78,17 @@
                     android:id="@+id/btn_submit"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/glia_medium"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:textSize="16sp"
+                    android:layout_marginEnd="@dimen/glia_large_x_large"
+                    android:layout_marginVertical="@dimen/glia_large_x_large"
                     android:layout_weight="1"
                     tools:text="@string/general_submit" />
 
             </LinearLayout>
 
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.cardview.widget.CardView>
 

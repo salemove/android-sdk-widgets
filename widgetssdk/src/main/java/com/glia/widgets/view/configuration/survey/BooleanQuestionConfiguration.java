@@ -78,6 +78,7 @@ public class BooleanQuestionConfiguration implements Parcelable {
 
         @SuppressLint("ResourceType")
         private OptionButtonConfiguration prepareDefaultButtonConfiguration(ResourceProvider resourceProvider) {
+            int borderWidth = resourceProvider.getDimensionPixelSize(R.dimen.glia_survey_default_border_width);
             ColorStateList normalTextColor = resourceProvider.getColorStateList(R.color.glia_dark_color);
             ColorStateList selectedTextColor = resourceProvider.getColorStateList(R.color.glia_light_color);
             TextConfiguration normalText = new TextConfiguration.Builder()
@@ -97,16 +98,19 @@ public class BooleanQuestionConfiguration implements Parcelable {
                     .backgroundColor(resourceProvider.getString(R.color.glia_light_color))
                     .borderColor(resourceProvider.getString(R.color.glia_stroke_gray))
                     .cornerRadius(resourceProvider.getDimension(R.dimen.glia_survey_default_corner_radius))
+                    .borderWidth(borderWidth)
                     .build();
             LayerConfiguration selectedLayer = new LayerConfiguration.Builder()
                     .backgroundColor(resourceProvider.getString(R.color.glia_primary_color))
                     .borderColor(resourceProvider.getString(R.color.glia_primary_color))
                     .cornerRadius(resourceProvider.getDimension(R.dimen.glia_survey_default_corner_radius))
+                    .borderWidth(borderWidth)
                     .build();
             LayerConfiguration highlightedLayer = new LayerConfiguration.Builder()
                     .backgroundColor(resourceProvider.getString(R.color.glia_light_color))
                     .borderColor(resourceProvider.getString(R.color.glia_negative_color))
                     .cornerRadius(resourceProvider.getDimension(R.dimen.glia_survey_default_corner_radius))
+                    .borderWidth(borderWidth)
                     .build();
             return new OptionButtonConfiguration.Builder()
                     .normalText(normalText)

@@ -17,6 +17,8 @@ internal interface IResourceProvider {
 
     fun getDimension(dimensionId: Int): Int
 
+    fun getDimensionPixelSize(dimensionId: Int): Int
+
     fun convertDpToPixel(dp: Float): Float
 
     fun convertSpToPixel(sp: Float): Float

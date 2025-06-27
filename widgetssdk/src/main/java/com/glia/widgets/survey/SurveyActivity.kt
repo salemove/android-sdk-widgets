@@ -1,7 +1,11 @@
 package com.glia.widgets.survey
 
+import android.graphics.Rect
 import android.os.Build
 import android.os.Bundle
+import android.view.MotionEvent
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
@@ -61,6 +65,22 @@ internal class SurveyActivity : AppCompatActivity(), SurveyView.OnFinishListener
         // the app from the Recents menu and the app's backstack was empty.
 
         finishAndRemoveTask()
+    }
+
+    // Override the default dispatchTouchEvent to remove focus when tapping outside of an EditText
+    override fun dispatchTouchEvent(event: MotionEvent): Boolean {
+        if (event.action == MotionEvent.ACTION_DOWN) {
+            (currentFocus as? EditText)?.let { editText ->
+                val outRect = Rect()
+                editText.getGlobalVisibleRect(outRect)
+                if (!outRect.contains(event.rawX.toInt(), event.rawY.toInt())) {
+                    editText.clearFocus()
+                    (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager)
+                        .hideSoftInputFromWindow(editText.windowToken, 0)
+                }
+            }
+        }
+        return super.dispatchTouchEvent(event)
     }
 
     override fun finishAndRemoveTask() {

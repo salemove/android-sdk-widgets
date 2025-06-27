@@ -20,25 +20,48 @@
         app:layout_constraintEnd_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <com.glia.widgets.view.button.GliaSurveyOptionButton
-        android:id="@+id/yes_button"
-        android:layout_width="0dp"
-        android:layout_height="@dimen/glia_survey_option_button_height"
+    <androidx.constraintlayout.helper.widget.Flow
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/glia_large"
-        android:layout_marginStart="@dimen/glia_large_x_large"
         android:layout_marginBottom="@dimen/glia_large"
+        android:paddingStart="@dimen/glia_large_x_large"
+        android:paddingEnd="@dimen/glia_large_x_large"
+        app:constraint_referenced_ids="yes_button, no_button"
+        app:flow_wrapMode="chain"
+        app:flow_horizontalGap="@dimen/glia_large"
+        app:flow_verticalGap="@dimen/glia_large"
+        app:flow_horizontalBias="0"
         app:layout_constraintBottom_toTopOf="@id/required_error"
         app:layout_constraintTop_toBottomOf="@id/tv_title"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0" />
+
+    <com.glia.widgets.view.button.GliaSurveyOptionButton
+        android:id="@+id/yes_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minHeight="@dimen/glia_survey_option_button_height"
+        android:elevation="0dp"
+        android:stateListAnimator="@null"
+        app:layout_constraintBottom_toTopOf="@id/required_error"
+        app:layout_constraintTop_toBottomOf="@id/tv_title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/no_button"
         tools:text="@string/general_yes" />
 
     <com.glia.widgets.view.button.GliaSurveyOptionButton
         android:id="@+id/no_button"
-        android:layout_width="0dp"
-        android:layout_height="@dimen/glia_survey_option_button_height"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minHeight="@dimen/glia_survey_option_button_height"
         android:layout_marginStart="@dimen/glia_large"
+        android:elevation="0dp"
+        android:stateListAnimator="@null"
         app:layout_constraintTop_toTopOf="@id/yes_button"
         app:layout_constraintStart_toEndOf="@+id/yes_button"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="@id/yes_button"
         tools:text="@string/general_no" />
 

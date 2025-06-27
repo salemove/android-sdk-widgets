@@ -93,7 +93,8 @@ internal class SingleQuestionViewHolder(
             val height =
                 context.resources.getDimensionPixelSize(R.dimen.glia_survey_radio_button_height)
             radioButton.layoutParams =
-                LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height)
+                LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+            radioButton.minHeight = height
 
             singleTheme?.option?.also(radioButton::applyTextTheme)
 

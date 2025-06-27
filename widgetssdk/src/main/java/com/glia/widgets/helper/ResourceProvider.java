@@ -54,6 +54,12 @@ public class ResourceProvider implements IResourceProvider {
     }
 
     @Override
+    public int getDimensionPixelSize(int dimensionId) {
+        Resources resources = weakContext.get().getResources();
+        return resources.getDimensionPixelSize(dimensionId);
+    }
+
+    @Override
     public float convertDpToPixel(float dp) {
         return applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, weakContext.get());
     }

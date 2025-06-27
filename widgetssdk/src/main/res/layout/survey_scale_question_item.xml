@@ -37,67 +37,67 @@
         app:layout_constraintTop_toBottomOf="@id/tv_title"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0"/>
+        app:layout_constraintHorizontal_bias="0" />
 
-        <com.glia.widgets.view.button.GliaSurveyOptionButton
-            android:id="@+id/scale_1_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minHeight="@dimen/glia_survey_option_button_height"
-            android:minWidth="@dimen/glia_survey_option_button_min_width"
-            android:text="@string/glia_survey_scale_item_1"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/scale_2_button" />
+    <com.glia.widgets.view.button.GliaSurveyOptionButton
+        android:id="@+id/scale_1_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minHeight="@dimen/glia_survey_option_button_height"
+        android:minWidth="@dimen/glia_survey_option_button_min_width"
+        android:text="@string/glia_survey_scale_item_1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/scale_2_button" />
 
-        <com.glia.widgets.view.button.GliaSurveyOptionButton
-            android:id="@+id/scale_2_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minHeight="@dimen/glia_survey_option_button_height"
-            android:minWidth="@dimen/glia_survey_option_button_min_width"
-            android:text="@string/glia_survey_scale_item_2"
-            app:layout_constraintTop_toTopOf="@id/scale_1_button"
-            app:layout_constraintStart_toEndOf="@+id/scale_1_button"
-            app:layout_constraintEnd_toStartOf="@+id/scale_3_button"
-            app:layout_constraintBottom_toBottomOf="@id/scale_1_button" />
+    <com.glia.widgets.view.button.GliaSurveyOptionButton
+        android:id="@+id/scale_2_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minHeight="@dimen/glia_survey_option_button_height"
+        android:minWidth="@dimen/glia_survey_option_button_min_width"
+        android:text="@string/glia_survey_scale_item_2"
+        app:layout_constraintTop_toTopOf="@id/scale_1_button"
+        app:layout_constraintStart_toEndOf="@+id/scale_1_button"
+        app:layout_constraintEnd_toStartOf="@+id/scale_3_button"
+        app:layout_constraintBottom_toBottomOf="@id/scale_1_button" />
 
-        <com.glia.widgets.view.button.GliaSurveyOptionButton
-            android:id="@+id/scale_3_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minHeight="@dimen/glia_survey_option_button_height"
-            android:minWidth="@dimen/glia_survey_option_button_min_width"
-            android:text="@string/glia_survey_scale_item_3"
-            app:layout_constraintTop_toTopOf="@id/scale_1_button"
-            app:layout_constraintStart_toEndOf="@+id/scale_2_button"
-            app:layout_constraintEnd_toStartOf="@+id/scale_4_button"
-            app:layout_constraintBottom_toBottomOf="@id/scale_1_button" />
+    <com.glia.widgets.view.button.GliaSurveyOptionButton
+        android:id="@+id/scale_3_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minHeight="@dimen/glia_survey_option_button_height"
+        android:minWidth="@dimen/glia_survey_option_button_min_width"
+        android:text="@string/glia_survey_scale_item_3"
+        app:layout_constraintTop_toTopOf="@id/scale_1_button"
+        app:layout_constraintStart_toEndOf="@+id/scale_2_button"
+        app:layout_constraintEnd_toStartOf="@+id/scale_4_button"
+        app:layout_constraintBottom_toBottomOf="@id/scale_1_button" />
 
-        <com.glia.widgets.view.button.GliaSurveyOptionButton
-            android:id="@+id/scale_4_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minHeight="@dimen/glia_survey_option_button_height"
-            android:minWidth="@dimen/glia_survey_option_button_min_width"
-            android:text="@string/glia_survey_scale_item_4"
-            app:layout_constraintTop_toTopOf="@id/scale_1_button"
-            app:layout_constraintStart_toEndOf="@+id/scale_3_button"
-            app:layout_constraintEnd_toStartOf="@+id/scale_5_button"
-            app:layout_constraintBottom_toBottomOf="@id/scale_1_button" />
+    <com.glia.widgets.view.button.GliaSurveyOptionButton
+        android:id="@+id/scale_4_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minHeight="@dimen/glia_survey_option_button_height"
+        android:minWidth="@dimen/glia_survey_option_button_min_width"
+        android:text="@string/glia_survey_scale_item_4"
+        app:layout_constraintTop_toTopOf="@id/scale_1_button"
+        app:layout_constraintStart_toEndOf="@+id/scale_3_button"
+        app:layout_constraintEnd_toStartOf="@+id/scale_5_button"
+        app:layout_constraintBottom_toBottomOf="@id/scale_1_button" />
 
-        <com.glia.widgets.view.button.GliaSurveyOptionButton
-            android:id="@+id/scale_5_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minHeight="@dimen/glia_survey_option_button_height"
-            android:minWidth="@dimen/glia_survey_option_button_min_width"
-            android:text="@string/glia_survey_scale_item_5"
-            app:layout_constraintTop_toTopOf="@id/scale_1_button"
-            app:layout_constraintStart_toEndOf="@+id/scale_4_button"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="@id/scale_1_button" />
+    <com.glia.widgets.view.button.GliaSurveyOptionButton
+        android:id="@+id/scale_5_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minHeight="@dimen/glia_survey_option_button_height"
+        android:minWidth="@dimen/glia_survey_option_button_min_width"
+        android:text="@string/glia_survey_scale_item_5"
+        app:layout_constraintTop_toTopOf="@id/scale_1_button"
+        app:layout_constraintStart_toEndOf="@+id/scale_4_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/scale_1_button" />
 
     <TextView
         android:id="@+id/required_error"

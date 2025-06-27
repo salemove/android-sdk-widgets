@@ -19,12 +19,12 @@
 
             <TextView
                 android:id="@+id/survey_title"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
                 android:layout_marginTop="@dimen/glia_large_x_large"
                 android:layout_marginEnd="24dp"
-                android:layout_gravity="center" />
+                android:gravity="center" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/survey_list"

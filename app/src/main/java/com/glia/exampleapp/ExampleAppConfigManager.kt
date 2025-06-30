@@ -153,15 +153,7 @@ object ExampleAppConfigManager {
             context.getString(R.string.pref_suppress_p_n_during_auth),
             false
         )
-        val bounded = context.getString(R.string.screen_sharing_mode_app_bounded)
-        val unbounded = context.getString(R.string.screen_sharing_mode_unbounded)
-        val screenSharingMode = if (
-            preferences.getString(context.getString(R.string.pref_screen_sharing_mode), bounded) == bounded
-        ) {
-            ScreenSharing.Mode.APP_BOUNDED
-        } else {
-            ScreenSharing.Mode.UNBOUNDED
-        }
+
         val manualLocaleOverride = preferences.getString(context.getString(R.string.pref_manual_locale_override), null)
         return GliaWidgetsConfig.Builder()
             .setSiteApiKey(SiteApiKey(apiKeyId!!, apiKeySecret!!))
@@ -171,7 +163,6 @@ object ExampleAppConfigManager {
             .setCompanyName(companyName)
             .enableBubbleOutsideApp(enableBubbleOutsideApp)
             .enableBubbleInsideApp(enableBubbleInsideApp)
-            .setScreenSharingMode(screenSharingMode)
             .setContext(context)
             .setUiJsonRemoteConfig(uiJsonRemoteConfig ?: Utils.getRemoteThemeByPrefs(preferences, context.resources))
             .setManualLocaleOverride(manualLocaleOverride)

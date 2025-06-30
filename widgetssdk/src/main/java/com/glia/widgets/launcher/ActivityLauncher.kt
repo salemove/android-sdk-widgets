@@ -19,7 +19,6 @@ internal interface ActivityLauncher {
     fun launchChat(context: Context, intention: Intention)
     fun launchCall(context: Context, mediaType: MediaType?, upgradeToCall: Boolean)
     fun launchSecureMessagingWelcomeScreen(context: Context)
-    fun launchEndScreenSharing(context: Context)
     fun launchWebBrowser(context: Context, title: LocaleString, url: String)
     fun launchOverlayPermission(context: Context, onSuccess: () -> Unit = {}, onFailure: () -> Unit = {})
     fun launchImagePreview(context: Context, attachment: AttachmentFile, options: Bundle? = null)
@@ -52,8 +51,6 @@ internal class ActivityLauncherImpl(
         engagementRepository.updateIsSecureMessagingRequested(true)
         context.startActivity(intentHelper.secureMessagingWelcomeScreenIntent(context))
     }
-
-    override fun launchEndScreenSharing(context: Context) = context.startActivity(intentHelper.endScreenSharingIntent(context))
 
     override fun launchWebBrowser(context: Context, title: LocaleString, url: String) =
         context.startActivity(intentHelper.webBrowserIntent(context, title, url))

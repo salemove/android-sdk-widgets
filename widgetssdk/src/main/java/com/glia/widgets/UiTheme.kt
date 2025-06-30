@@ -238,10 +238,10 @@ internal data class UiTheme(
     val iconUpgradeVideoDialog: Int? = null,
 
     /**
-     * The icon resId used in the header of of a screen sharing upgrade dialog
+     * The icon resId used in the Entry Widget for CallVisualizer engagement
      */
     @DrawableRes
-    val iconScreenSharingDialog: Int? = null,
+    val iconCallVisualizer: Int? = null,
 
     /**
      * The icon resId used to set the call's video on
@@ -296,18 +296,6 @@ internal data class UiTheme(
      */
     @DrawableRes
     val iconOnHold: Int? = null,
-
-    /**
-     * The icon resId used when visitor is sharing the screen
-     */
-    @DrawableRes
-    val iconEndScreenShare: Int? = null,
-
-    /**
-     * The icon tint resId when visitor is sharing the screen
-     */
-    @DrawableRes
-    val endScreenShareTintColor: Int? = null,
 
     /**
      * Connecting Operator Status Layout Heading Text Color
@@ -403,7 +391,7 @@ internal data class UiTheme(
         iconCallAudioOn = builder.iconCallAudioOn,
         iconChatVideoUpgrade = builder.iconChatVideoUpgrade,
         iconUpgradeVideoDialog = builder.iconUpgradeVideoDialog,
-        iconScreenSharingDialog = builder.iconScreenSharingDialog,
+        iconCallVisualizer = builder.iconCallVisualizer,
         iconCallVideoOn = builder.iconCallVideoOn,
         iconCallAudioOff = builder.iconCallAudioOff,
         iconCallVideoOff = builder.iconCallVideoOff,
@@ -413,8 +401,6 @@ internal data class UiTheme(
         iconCallMinimize = builder.iconCallMinimize,
         iconPlaceholder = builder.iconPlaceholder,
         iconOnHold = builder.iconOnHold,
-        iconEndScreenShare = builder.iconEndScreenShare,
-        endScreenShareTintColor = builder.endScreenShareTintColor,
         whiteLabel = builder.whiteLabel,
         gliaAlertDialogButtonUseVerticalAlignment =
         builder.gliaAlertDialogButtonUseVerticalAlignment,
@@ -469,7 +455,7 @@ internal data class UiTheme(
         iconCallAudioOn = iconCallAudioOn merge other.iconCallAudioOn,
         iconChatVideoUpgrade = iconChatVideoUpgrade merge other.iconChatVideoUpgrade,
         iconUpgradeVideoDialog = iconUpgradeVideoDialog merge other.iconUpgradeVideoDialog,
-        iconScreenSharingDialog = iconScreenSharingDialog merge other.iconScreenSharingDialog,
+        iconCallVisualizer = iconCallVisualizer merge other.iconCallVisualizer,
         iconCallVideoOn = iconCallVideoOn merge other.iconCallVideoOn,
         iconCallAudioOff = iconCallAudioOff merge other.iconCallAudioOff,
         iconCallVideoOff = iconCallVideoOff merge other.iconCallVideoOff,
@@ -479,8 +465,6 @@ internal data class UiTheme(
         iconCallMinimize = iconCallMinimize merge other.iconCallMinimize,
         iconPlaceholder = iconPlaceholder merge other.iconPlaceholder,
         iconOnHold = iconOnHold merge other.iconOnHold,
-        iconEndScreenShare = iconEndScreenShare merge other.iconEndScreenShare,
-        endScreenShareTintColor = endScreenShareTintColor merge other.endScreenShareTintColor,
         gliaChatStartingHeadingTextColor = gliaChatStartingHeadingTextColor merge other.gliaChatStartingHeadingTextColor,
         gliaChatStartingCaptionTextColor = gliaChatStartingCaptionTextColor merge other.gliaChatStartingCaptionTextColor,
         gliaChatStartedHeadingTextColor = gliaChatStartedHeadingTextColor merge other.gliaChatStartedHeadingTextColor,
@@ -521,8 +505,7 @@ internal data class UiTheme(
         )
 
         val icons = Icons(
-            iconLeaveQueue = iconLeaveQueue,
-            iconScreenSharingDialog = iconScreenSharingDialog
+            iconLeaveQueue = iconLeaveQueue
         )
 
         return AlertDialogConfiguration(theme, properties, icons)
@@ -780,10 +763,10 @@ internal data class UiTheme(
             private set
 
         /**
-         * The icon resId used in the header of of a screen sharing upgrade dialog
+         * The icon resId used in the Entry Widget for CallVisualizer engagement
          */
         @DrawableRes
-        var iconScreenSharingDialog: Int? = null
+        var iconCallVisualizer: Int? = null
             private set
 
         /**
@@ -850,17 +833,10 @@ internal data class UiTheme(
             private set
 
         /**
-         * The icon resId used when visitor is sharing the screen
+         * The icon tint resId when visitor is in a call visualizer engagement
          */
-        @DrawableRes
-        var iconEndScreenShare: Int? = null
-            private set
-
-        /**
-         * The icon tint resId when visitor is sharing the screen
-         */
-        @DrawableRes
-        var endScreenShareTintColor: Int? = null
+        @ColorRes
+        var iconCallVisualizerTintColor: Int? = null
             private set
 
         /**
@@ -974,6 +950,10 @@ internal data class UiTheme(
             visitorCodeBorderColor = color
         }
 
+        fun setIconCallVisualizerTintColor(@ColorRes color: Int?) {
+            iconCallVisualizerTintColor = color
+        }
+
         fun setOperatorMessageBackgroundColor(@ColorRes color: Int?) {
             operatorMessageBackgroundColor = color
         }
@@ -1038,8 +1018,8 @@ internal data class UiTheme(
             this.iconUpgradeVideoDialog = iconUpgradeVideoDialog
         }
 
-        fun setIconScreenSharingDialog(@DrawableRes iconScreenSharingDialog: Int?) {
-            this.iconScreenSharingDialog = iconScreenSharingDialog
+        fun setIconCallVisualizer(@DrawableRes icon: Int?) {
+            this.iconCallVisualizer = icon
         }
 
         fun setIconCallVideoOn(@DrawableRes iconCallVideoOn: Int?) {
@@ -1076,14 +1056,6 @@ internal data class UiTheme(
 
         fun setIconOnHold(@DrawableRes iconOnHold: Int?) {
             this.iconOnHold = iconOnHold
-        }
-
-        fun setIconEndScreenShare(@DrawableRes iconEndScreenShare: Int?) {
-            this.iconEndScreenShare = iconEndScreenShare
-        }
-
-        fun setEndScreenShareTintColor(@DrawableRes endScreenShareTint: Int?) {
-            this.endScreenShareTintColor = endScreenShareTint
         }
 
         fun setWhiteLabel(whiteLabel: Boolean?) {
@@ -1197,7 +1169,7 @@ internal data class UiTheme(
             iconCallAudioOn = theme.iconCallAudioOn
             iconChatVideoUpgrade = theme.iconChatVideoUpgrade
             iconUpgradeVideoDialog = theme.iconUpgradeVideoDialog
-            iconScreenSharingDialog = theme.iconScreenSharingDialog
+            iconCallVisualizer = theme.iconCallVisualizer
             iconCallVideoOn = theme.iconCallVideoOn
             iconCallAudioOff = theme.iconCallAudioOff
             iconCallVideoOff = theme.iconCallVideoOff
@@ -1207,8 +1179,6 @@ internal data class UiTheme(
             iconCallMinimize = theme.iconCallMinimize
             iconPlaceholder = theme.iconPlaceholder
             iconOnHold = theme.iconOnHold
-            iconEndScreenShare = theme.iconEndScreenShare
-            endScreenShareTintColor = theme.endScreenShareTintColor
             whiteLabel = theme.whiteLabel
             headerEndButtonConfiguration = theme.gliaEndButtonConfiguration
             positiveButtonConfiguration = theme.gliaPositiveButtonConfiguration

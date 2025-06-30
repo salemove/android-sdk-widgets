@@ -24,7 +24,6 @@ import com.glia.widgets.internal.engagement.domain.ConfirmationDialogUseCase
 import com.glia.widgets.internal.engagement.domain.ShouldShowMediaEngagementViewUseCase
 import com.glia.widgets.internal.notification.domain.CallNotificationUseCase
 import com.glia.widgets.engagement.EngagementUpdateState
-import com.glia.widgets.engagement.ScreenSharingState
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCase
 import com.glia.widgets.engagement.domain.EndEngagementUseCase
@@ -35,7 +34,6 @@ import com.glia.widgets.engagement.domain.FlipVisitorCameraUseCase
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 import com.glia.widgets.engagement.domain.OperatorMediaUseCase
-import com.glia.widgets.engagement.domain.ScreenSharingUseCase
 import com.glia.widgets.engagement.domain.ToggleVisitorAudioMediaStateUseCase
 import com.glia.widgets.engagement.domain.ToggleVisitorVideoMediaStateUseCase
 import com.glia.widgets.engagement.domain.VisitorMediaUseCase
@@ -89,7 +87,6 @@ internal class CallController(
     private val isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase,
     private val enqueueForEngagementUseCase: EnqueueForEngagementUseCase,
     private val decideOnQueueingUseCase: DecideOnQueueingUseCase,
-    private val screenSharingUseCase: ScreenSharingUseCase,
     private val getUrlFromLinkUseCase: GetUrlFromLinkUseCase
 ) : CallContract.Controller {
     private val disposable = CompositeDisposable()
@@ -113,7 +110,6 @@ internal class CallController(
 
         subscribeToEngagement()
         decideOnQueueingUseCase().unSafeSubscribe { enqueueForEngagement() }
-        screenSharingUseCase().unSafeSubscribe { handleScreenSharingState(it) }
     }
 
     private fun subscribeToEngagement() {
@@ -145,18 +141,6 @@ internal class CallController(
                 onNewOperatorMediaState(operatorMedia)
                 callNotificationUseCase(visitorMedia, operatorMedia)
             }
-    }
-
-    private fun handleScreenSharingState(screenSharingState: ScreenSharingState) {
-        when (screenSharingState) {
-            ScreenSharingState.Ended -> emitViewState(callState.endScreenSharing())
-            ScreenSharingState.RequestAccepted -> emitViewState(callState.startScreenSharing())
-            ScreenSharingState.Started -> emitViewState(callState.startScreenSharing())
-            is ScreenSharingState.FailedToAcceptRequest -> view?.showToast(screenSharingState.message)
-            else -> {
-                //no-op
-            }
-        }
     }
 
     private fun onNewVisitorMediaState(visitorMediaState: MediaState?) {
@@ -288,11 +272,6 @@ internal class CallController(
 
     override fun onDestroy() {
         throw RuntimeException("no op")
-    }
-
-    override fun stopScreenSharingClicked() {
-        screenSharingUseCase.end()
-        emitViewState(callState.endScreenSharing())
     }
 
     override fun onPause() {

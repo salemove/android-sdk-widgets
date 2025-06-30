@@ -11,7 +11,6 @@ internal interface EngagementTypeUseCase {
     val isMediaEngagement: Boolean
     val isChatEngagement: Boolean
     val isCallVisualizer: Boolean
-    val isCallVisualizerScreenSharing: Boolean
     val hasVideo: Boolean
 
     operator fun invoke(): Flowable<MediaType>
@@ -20,7 +19,6 @@ internal interface EngagementTypeUseCase {
 internal class EngagementTypeUseCaseImpl(
     private val isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase,
     private val isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase,
-    private val screenSharingUseCase: ScreenSharingUseCase,
     private val operatorMediaUseCase: OperatorMediaUseCase,
     private val visitorMediaUseCase: VisitorMediaUseCase,
     private val isOperatorPresentUseCase: IsOperatorPresentUseCase,
@@ -34,7 +32,6 @@ internal class EngagementTypeUseCaseImpl(
     override val isMediaEngagement: Boolean get() = hasOngoingEngagement && isOperatorPresentUseCase() && hasAnyMedia
     override val isChatEngagement: Boolean get() = hasOngoingEngagement && !isCurrentEngagementCallVisualizerUseCase() && isOperatorPresentUseCase() && !hasAnyMedia
     override val isCallVisualizer: Boolean get() = isCurrentEngagementCallVisualizerUseCase()
-    override val isCallVisualizerScreenSharing: Boolean get() = isCurrentEngagementCallVisualizerUseCase() && screenSharingUseCase.isSharing
     private val operatorMediaObservable by lazy { operatorMediaUseCase() }
 
     override fun invoke(): Flowable<MediaType> {

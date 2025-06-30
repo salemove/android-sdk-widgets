@@ -24,9 +24,8 @@
         <item name="gliaSendMessageButtonTintColor">@color/color_pure_yellow</item>
         <item name="gliaIconAppBarBack">@drawable/ic_baseline_volume_off</item>
         <item name="gliaIconCallMinimize">@drawable/ic_person</item>
-        <item name="gliaEndScreenShareTintColor">@color/color_pure_yellow</item>
-        <item name="gliaIconEndScreenShare">@drawable/ic_screensharing</item>
-        <item name="gliaIconScreenSharingDialog">@drawable/ic_screensharing_off</item>
+        <item name="gliaIconCallVisualizerTintColor">@color/color_pure_yellow</item>
+        <item name="gliaIconCallVisualizer">@drawable/ic_callvisualizer</item>
         <item name="gliaBrandPrimaryColor">@color/color_pure_yellow</item>
         <item name="gliaVisitorCodeStyle">@style/TextAppearance.AppCompat</item>
         <item name="gliaAlertDialogButtonUseVerticalAlignment">true</item>

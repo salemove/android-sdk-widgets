@@ -16,7 +16,6 @@ import androidx.core.view.isVisible
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.Intention
-import com.glia.widgets.internal.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase
 import com.glia.widgets.databinding.ChatHeadViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
@@ -59,12 +58,10 @@ internal class ChatHeadView @JvmOverloads constructor(
 
     @Suppress("JoinDeclarationAndAssignment")
     private var serviceChatHeadController: ChatHeadContract.Controller
-    private var isCallVisualizerScreenSharingUseCase: IsCallVisualizerScreenSharingUseCase
     private var isCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase
 
     init {
         serviceChatHeadController = Dependencies.controllerFactory.chatHeadController
-        isCallVisualizerScreenSharingUseCase = Dependencies.useCaseFactory.createIsCallVisualizerScreenSharingUseCase()
         isCallVisualizerUseCase = Dependencies.useCaseFactory.isCurrentEngagementCallVisualizer
         setAccessibilityLabels()
         readTypedArray()
@@ -132,18 +129,6 @@ internal class ChatHeadView @JvmOverloads constructor(
         }
     }
 
-    override fun showScreenSharing() {
-        post {
-            binding.apply {
-                placeholderView.visibility = GONE
-                profilePictureView.setImageDrawable(null)
-                profilePictureView.backgroundTintList = getColorStateListCompat(configuration.backgroundColorRes)
-                placeholderView.setImageResource(configuration.iconScreenSharingDialog)
-                placeholderView.visibility = VISIBLE
-            }
-        }
-    }
-
     override fun showOnHold() {
         post { binding.onHoldIcon.visibility = VISIBLE }
     }
@@ -176,10 +161,6 @@ internal class ChatHeadView @JvmOverloads constructor(
         activityLauncher.launchCall(context, null, false)
     }
 
-    override fun navigateToEndScreenSharing() {
-        activityLauncher.launchEndScreenSharing(context)
-    }
-
     private fun createConfiguration(buildTimeTheme: UiTheme): ChatHeadConfiguration {
         return buildTimeTheme.chatHeadConfiguration.let {
             ChatHeadConfiguration.builder()
@@ -191,7 +172,6 @@ internal class ChatHeadView @JvmOverloads constructor(
                 .backgroundColorRes(it?.backgroundColorRes ?: buildTimeTheme.brandPrimaryColor)
                 .iconOnHold(it?.iconOnHold ?: buildTimeTheme.iconOnHold)
                 .iconOnHoldTintList(it?.iconOnHoldTintList ?: buildTimeTheme.baseLightColor)
-                .iconScreenSharingDialog(it?.iconScreenSharingDialog ?: buildTimeTheme.iconScreenSharingDialog)
                 .build()
         }
     }
@@ -215,13 +195,8 @@ internal class ChatHeadView @JvmOverloads constructor(
     }
 
     private fun updatePlaceholderImageView() {
-        val placeholderIcon = if (isCallVisualizerScreenSharingUseCase()) {
-            configuration.iconScreenSharingDialog
-        } else {
-            configuration.operatorPlaceholderIcon
-        }
         binding.placeholderView.apply {
-            setImageResource(placeholderIcon)
+            setImageResource(configuration.operatorPlaceholderIcon)
             setBackgroundColor(getColorCompat(configuration.operatorPlaceholderBackgroundColor))
             imageTintList = getColorStateListCompat(configuration.operatorPlaceholderIconTintList)
         }

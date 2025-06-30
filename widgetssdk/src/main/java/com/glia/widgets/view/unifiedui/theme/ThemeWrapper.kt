@@ -10,8 +10,7 @@ internal data class AlertDialogConfiguration(
 )
 
 internal data class Icons(
-    @DrawableRes val iconLeaveQueue: Int?,
-    @DrawableRes val iconScreenSharingDialog: Int?,
+    @DrawableRes val iconLeaveQueue: Int?
 )
 
 internal data class Properties(

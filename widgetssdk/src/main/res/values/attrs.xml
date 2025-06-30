@@ -38,8 +38,8 @@
         <attr name="iconChatVideoUpgrade" format="reference" />
         <!-- The icon resId used in the header of an video upgrade dialog -->
         <attr name="iconUpgradeVideoDialog" format="reference" />
-        <!-- The icon resId used in the header of a screen sharing upgrade dialog and in the call visualizer screen sharing bubble-->
-        <attr name="iconScreenSharingDialog" format="reference" />
+        <!-- The icon resId used in the Entry Widget for the case of CallVisualizer engagement-->
+        <attr name="iconCallVisualizer" format="reference" />
         <!-- The icon resId used to set the call's video on -->
         <attr name="iconCallVideoOn" format="reference" />
         <!-- The icon resId used to set the call's audio off -->
@@ -58,9 +58,6 @@
         <attr name="iconPlaceholder" format="reference" />
         <!-- The icon resId used when visitor is put on hold by operator -->
         <attr name="iconOnHold" format="reference" />
-        <!-- The icon resID used when visitor is sharing the screen -->
-        <attr name="iconEndScreenShare" format="reference" />
-
         <!-- Visitor message background color -->
         <attr name="visitorMessageBackgroundColor" format="reference" />
         <!-- Visitor message text color -->
@@ -79,10 +76,10 @@
         <attr name="botActionButtonSelectedTextColor" format="reference" />
         <!-- Send message button tint color -->
         <attr name="chatSendMessageButtonTintColor" format="reference" />
+        <!-- Call Visualizer icon tint color -->
+        <attr name="iconCallVisualizerTintColor" format="reference" />
         <!-- Chat background color -->
         <attr name="gliaChatBackgroundColor" format="reference" />
-        <!-- The icon resID used when visitor is sharing the screen -->
-        <attr name="endScreenShareTintColor" format="reference" />
         <!--The color of "new messages" divider in the chat-->
         <attr name="newMessagesDividerColor" format="reference" />
         <!--The color of "new messages" divider text in the chat-->
@@ -136,8 +133,8 @@
     <attr name="gliaIconChatVideoUpgrade" format="reference" />
     <!-- The icon resId used in the header of a video upgrade dialog -->
     <attr name="gliaIconUpgradeVideoDialog" format="reference" />
-    <!-- The icon resId used in the header of of a screen sharing upgrade dialog -->
-    <attr name="gliaIconScreenSharingDialog" format="reference" />
+    <!-- The icon resId used in the Entry Widget for CallVisualizer -->
+    <attr name="gliaIconCallVisualizer" format="reference" />
     <!-- The icon resId used to set the call's video on -->
     <attr name="gliaIconCallVideoOn" format="reference" />
     <!-- The icon resId used to set the call's audio off -->
@@ -156,8 +153,6 @@
     <attr name="gliaIconPlaceholder" format="reference" />
     <!-- The icon resId used when visitor is put on hold by operator -->
     <attr name="gliaIconOnHold" format="reference" />
-    <!-- The icon resID used when visitor is sharing the screen -->
-    <attr name="gliaIconEndScreenShare" format="reference" />
 
     <!-- Header colors -->
     <attr name="gliaChatHeaderTitleTintColor" format="reference" />
@@ -192,10 +187,8 @@
     <attr name="gliaBotActionButtonSelectedTextColor" format="reference" />
     <!-- Send message button tint color -->
     <attr name="gliaSendMessageButtonTintColor" format="reference" />
-    <!-- The icon resID used when visitor is sharing the screen -->
-    <attr name="gliaEndScreenShareTintColor" format="reference" />
-
-
+    <!-- CallVisualizer icon tint color-->
+    <attr name="gliaIconCallVisualizerTintColor" format="reference" />
     <attr name="gliaVisitorCodeStyle" format="reference" />
     <attr name="whiteLabel" format="boolean" />
     <attr name="gliaAlertDialogButtonUseVerticalAlignment" format="boolean" />

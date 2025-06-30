@@ -37,7 +37,6 @@ internal interface CallContract {
         fun onUserInteraction()
         fun shouldShowMediaEngagementView(upgradeToCall: Boolean): Boolean
         fun onDestroy(retained: Boolean)
-        fun stopScreenSharingClicked()
     }
 
     interface View : BaseView<Controller> {

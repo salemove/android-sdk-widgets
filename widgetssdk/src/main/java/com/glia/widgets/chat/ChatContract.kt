@@ -57,7 +57,6 @@ internal interface ChatContract {
         fun show()
         fun onPause()
         fun onResume()
-        fun onForceStopScreenSharing()
         fun onTakePhotoClicked()
         fun onImageCaptured(result: Boolean)
         fun onContentChosen(uri: Uri)

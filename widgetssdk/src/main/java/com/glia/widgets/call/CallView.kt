@@ -161,7 +161,6 @@ internal class CallView(
             onBackClickedListener?.onBackClicked()
         }
         appBar.setOnEndChatClickedListener { callController?.leaveChatClicked() }
-        appBar.setOnEndCallButtonClickedListener { callController?.stopScreenSharingClicked() }
         appBar.setOnXClickedListener { callController?.leaveChatQueueClicked() }
         chatButton.setOnClickListener { callController?.chatButtonClicked() }
         speakerButton.setOnClickListener { callController?.onSpeakerButtonPressed() }
@@ -737,12 +736,6 @@ internal class CallView(
             if (callState.isOnlyTimeChanged) return@post
 
             setupEndButton(callState)
-
-            if (callState.isSharingScreen) {
-                appBar.showEndScreenSharingButton()
-            } else {
-                appBar.hideEndScreenSharingButton()
-            }
 
             callState.isCurrentCallVideo?.also {
                 if (it) {

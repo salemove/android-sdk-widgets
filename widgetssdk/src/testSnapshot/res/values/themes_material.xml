@@ -10,7 +10,7 @@
         <item name="gliaSystemNegativeColor">@color/glia_negative_color</item>
         <item name="gliaSystemAgentBubbleColor">@color/glia_neutral_color</item>
         <item name="gliaChatBackgroundColor">@color/glia_chat_background_color</item>
-        <item name="gliaEndScreenShareTintColor">@color/glia_light_color</item>
+        <item name="gliaIconCallVisualizerTintColor">@color/glia_light_color</item>
         <item name="gliaIconAppBarBack">@drawable/ic_baseline_arrow_back</item>
         <item name="gliaIconLeaveQueue">@drawable/ic_baseline_close</item>
         <item name="gliaIconSendMessage">@drawable/ic_baseline_send</item>
@@ -28,8 +28,7 @@
         <item name="gliaIconCallMinimize">@drawable/ic_minimize</item>
         <item name="gliaIconPlaceholder">@drawable/ic_person</item>
         <item name="gliaIconOnHold">@drawable/ic_pause_circle</item>
-        <item name="gliaIconEndScreenShare">@drawable/ic_screensharing_off</item>
-        <item name="gliaIconScreenSharingDialog">@drawable/ic_screensharing</item>
+        <item name="gliaIconCallVisualizer">@drawable/ic_callvisualizer</item>
 
         <item name="gliaSendMessageButtonTintColor">?attr/gliaBrandPrimaryColor</item>
 

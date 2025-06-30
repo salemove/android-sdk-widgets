@@ -15,7 +15,6 @@ import com.glia.androidsdk.Engagement.MediaType
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.androidsdk.engagement.Survey
 import com.glia.widgets.call.CallActivity
-import com.glia.widgets.callvisualizer.EndScreenSharingActivity
 import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.chat.Intention
 import com.glia.widgets.entrywidget.EntryWidgetActivity
@@ -60,8 +59,6 @@ internal interface IntentHelper {
     fun shareImageIntent(context: Context, fileName: String): Intent
 
     fun surveyIntent(context: Context, survey: Survey): Intent
-
-    fun endScreenSharingIntent(context: Context): Intent
 
     fun webBrowserIntent(context: Context, title: LocaleString, url: String): Intent
 
@@ -125,10 +122,6 @@ internal class IntentHelperImpl : IntentHelper {
 
     override fun surveyIntent(context: Context, survey: Survey): Intent = Intent(context, SurveyActivity::class.java)
         .putExtra(ExtraKeys.SURVEY, survey as Parcelable)
-        .setSafeFlags(context)
-
-    override fun endScreenSharingIntent(context: Context): Intent = Intent(context, EndScreenSharingActivity::class.java)
-        .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
         .setSafeFlags(context)
 
     override fun webBrowserIntent(context: Context, title: LocaleString, url: String): Intent = Intent(context, WebBrowserActivity::class.java)

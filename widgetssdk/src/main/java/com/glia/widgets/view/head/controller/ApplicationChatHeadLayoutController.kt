@@ -1,15 +1,12 @@
 package com.glia.widgets.view.head.controller
 
 import com.glia.androidsdk.Operator
-import com.glia.widgets.internal.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase
 import com.glia.widgets.internal.chathead.domain.IsDisplayBubbleInsideAppUseCase
 import com.glia.widgets.internal.chathead.domain.ResolveChatHeadNavigationUseCase
 import com.glia.widgets.internal.chathead.domain.ResolveChatHeadNavigationUseCase.Destinations
-import com.glia.widgets.engagement.ScreenSharingState
 import com.glia.widgets.engagement.domain.CurrentOperatorUseCase
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import com.glia.widgets.engagement.domain.EngagementTypeUseCase
-import com.glia.widgets.engagement.domain.ScreenSharingUseCase
 import com.glia.widgets.engagement.domain.VisitorMediaUseCase
 import com.glia.widgets.helper.imageUrl
 import com.glia.widgets.helper.unSafeSubscribe
@@ -21,11 +18,9 @@ internal class ApplicationChatHeadLayoutController(
     private val isDisplayBubbleInsideAppUseCase: IsDisplayBubbleInsideAppUseCase,
     private val navigationDestinationUseCase: ResolveChatHeadNavigationUseCase,
     private val messagesNotSeenHandler: MessagesNotSeenHandler,
-    private val isCallVisualizerScreenSharingUseCase: IsCallVisualizerScreenSharingUseCase,
     private val engagementStateUseCase: EngagementStateUseCase,
     private val currentOperatorUseCase: CurrentOperatorUseCase,
     private val visitorMediaUseCase: VisitorMediaUseCase,
-    private val screenSharingUseCase: ScreenSharingUseCase,
     private val engagementTypeUseCase: EngagementTypeUseCase
 ) : ChatHeadLayoutContract.Controller {
     private var chatHeadLayout: ChatHeadLayoutContract.View? = null
@@ -70,15 +65,6 @@ internal class ApplicationChatHeadLayoutController(
         }
         visitorMediaUseCase.onHoldState.unSafeSubscribe(::onHoldChanged)
         currentOperatorUseCase().unSafeSubscribe(::operatorDataLoaded)
-        screenSharingUseCase().filter { isCallVisualizerScreenSharingUseCase() }.unSafeSubscribe {
-            when (it) {
-                ScreenSharingState.Ended -> {
-                    chatHeadLayout?.hide()
-                    updateChatHeadView()
-                }
-                else -> updateChatHeadView()
-            }
-        }
     }
 
     private fun onEngagementUpdated() {
@@ -92,7 +78,6 @@ internal class ApplicationChatHeadLayoutController(
         when (destination) {
             Destinations.CALL_VIEW -> chatHeadLayout?.navigateToCall()
             Destinations.CHAT_VIEW -> chatHeadLayout?.navigateToChat()
-            Destinations.SCREEN_SHARING -> chatHeadLayout?.navigateToEndScreenSharing()
         }
     }
 
@@ -173,12 +158,6 @@ internal class ApplicationChatHeadLayoutController(
     }
 
     private fun decideOnEngagementBubbleDesign(view: ChatHeadLayoutContract.View) {
-        if (isCallVisualizerScreenSharingUseCase() && !engagementTypeUseCase.isMediaEngagement) {
-            // Show screen sharing icon only if there is no 1 or 2 way video
-            view.showScreenSharing()
-            return
-        }
-
         operatorProfileImgUrl?.also(view::showOperatorImage) ?: view.showPlaceholder()
     }
 

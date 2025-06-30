@@ -2,22 +2,16 @@ package com.glia.widgets.internal.chathead.domain
 
 import com.glia.widgets.internal.permissions.PermissionManager
 import com.glia.widgets.engagement.domain.EngagementTypeUseCase
-import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
-import com.glia.widgets.engagement.domain.ScreenSharingUseCase
 import com.glia.widgets.launcher.ConfigurationManager
 
 internal class IsDisplayBubbleInsideAppUseCase(
     isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase,
-    isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase,
-    screenSharingUseCase: ScreenSharingUseCase,
     permissionManager: PermissionManager,
     configurationManager: ConfigurationManager,
     engagementTypeUseCase: EngagementTypeUseCase
 ) : IsDisplayBubbleUseCase(
     isQueueingOrLiveEngagementUseCase,
-    isCurrentEngagementCallVisualizerUseCase,
-    screenSharingUseCase,
     permissionManager,
     configurationManager,
     engagementTypeUseCase

@@ -70,9 +70,6 @@
     <string name="settings_runtime_theme">Enable Runtime Theme</string>
     <string name="settings_visitor_context_asset_id">Visitor context asset id</string>
     <string name="settings_use_alert_dialog_button_vertical_alignment">Align AlertDialog Buttons Vertically</string>
-    <string name="settings_screen_sharing_mode_title">Screen sharing mode</string>
-    <string name="settings_screen_sharing_mode_unbounded">Unbounded</string>
-    <string name="settings_screen_sharing_mode_app_bounded">App bounded</string>
     <string name="settings_authentication_behavior_title">Authentication behavior</string>
     <string name="settings_authentication_behavior_forbidden_during_engagement">Forbidden during engagement</string>
     <string name="settings_authentication_behavior_allowed_during_engagement">Allowed during engagement</string>

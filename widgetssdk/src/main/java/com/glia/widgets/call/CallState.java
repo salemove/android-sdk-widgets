@@ -30,7 +30,6 @@ class CallState {
     public final boolean isOnlyTimeChanged;
     public final boolean isCallVisualizer;
 
-    public final boolean isSharingScreen;
     public final FlipButtonState flipButtonState;
 
     private CallState(Builder builder) {
@@ -46,7 +45,6 @@ class CallState {
         this.isOnHold = builder.isOnHold;
         this.isOnlyTimeChanged = builder.isOnlyTimeChanged;
         this.isCallVisualizer = builder.isCallVisualizer;
-        this.isSharingScreen = builder.isSharingScreen;
         this.flipButtonState = builder.flipButtonState;
     }
 
@@ -81,7 +79,6 @@ class CallState {
             isOnHold == callState.isOnHold &&
             isOnlyTimeChanged == callState.isOnlyTimeChanged &&
             isCallVisualizer == callState.isCallVisualizer &&
-            isSharingScreen == callState.isSharingScreen &&
             flipButtonState == callState.flipButtonState;
     }
 
@@ -90,7 +87,7 @@ class CallState {
         return Objects.hash(integratorCallStarted, isVisible, messagesNotSeen,
             callStatus, landscapeLayoutControlsVisible, isMuted, hasVideo,
             requestedMediaType, isSpeakerOn, isOnHold, isOnlyTimeChanged,
-            isCallVisualizer, isSharingScreen, flipButtonState);
+            isCallVisualizer, flipButtonState);
     }
 
     public boolean showOperatorStatusView() {
@@ -159,7 +156,6 @@ class CallState {
             ", isSpeakerOn: " + isSpeakerOn +
             ", isOnHold: " + isOnHold +
             ", isCallVisualizer: " + isCallVisualizer +
-            ", isSharingScreen: " + isSharingScreen +
             '}';
     }
 
@@ -378,14 +374,6 @@ class CallState {
             .createCallState();
     }
 
-    public CallState startScreenSharing() {
-        return new Builder().copyFrom(this).setIsSharingScreen(true).createCallState();
-    }
-
-    public CallState endScreenSharing() {
-        return new Builder().copyFrom(this).setIsSharingScreen(false).createCallState();
-    }
-
     public ViewState getMuteButtonViewState() {
         if (isCallVisualizer) {
             return ViewState.HIDE;
@@ -587,7 +575,6 @@ class CallState {
             //as we are updating this field only when only time is changed, so needs to make it false every time.
             isOnlyTimeChanged = false;
             isCallVisualizer = callState.isCallVisualizer;
-            isSharingScreen = callState.isSharingScreen;
             flipButtonState = callState.flipButtonState;
             return this;
         }

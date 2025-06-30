@@ -20,11 +20,9 @@ internal interface ChatHeadContract {
         fun showUnreadMessageCount(count: Int)
         fun showPlaceholder()
         fun showQueueing()
-        fun showScreenSharing()
         fun showOnHold()
         fun hideOnHold()
         fun navigateToChat()
         fun navigateToCall()
-        fun navigateToEndScreenSharing()
     }
 }

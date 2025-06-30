@@ -4,8 +4,6 @@ import androidx.annotation.NonNull;
 
 import com.glia.widgets.call.CallContract;
 import com.glia.widgets.call.CallController;
-import com.glia.widgets.callvisualizer.EndScreenSharingContract;
-import com.glia.widgets.callvisualizer.EndScreenSharingController;
 import com.glia.widgets.callvisualizer.VisitorCodeContract;
 import com.glia.widgets.callvisualizer.controller.CallVisualizerContract;
 import com.glia.widgets.callvisualizer.controller.CallVisualizerController;
@@ -152,7 +150,6 @@ public class ControllerFactory {
                 useCaseFactory.getIsQueueingOrEngagementUseCase(),
                 useCaseFactory.getQueueForEngagementUseCase(),
                 useCaseFactory.getDecideOnQueueingUseCase(),
-                useCaseFactory.getScreenSharingUseCase(),
                 useCaseFactory.getTakePictureUseCase(),
                 useCaseFactory.getUriToFileAttachmentUseCase(),
                 useCaseFactory.getWithCameraPermissionUseCase(),
@@ -202,7 +199,6 @@ public class ControllerFactory {
                 useCaseFactory.getIsQueueingOrEngagementUseCase(),
                 useCaseFactory.getQueueForEngagementUseCase(),
                 useCaseFactory.getDecideOnQueueingUseCase(),
-                useCaseFactory.getScreenSharingUseCase(),
                 useCaseFactory.createGetUrlFromLinkUseCase()
             );
         }
@@ -264,11 +260,9 @@ public class ControllerFactory {
                 useCaseFactory.getResolveChatHeadNavigationUseCase(),
                 messagesNotSeenHandler,
                 new ChatHeadPosition(),
-                useCaseFactory.createIsCallVisualizerScreenSharingUseCase(),
                 useCaseFactory.getEngagementStateUseCase(),
                 useCaseFactory.getCurrentOperatorUseCase(),
                 useCaseFactory.getVisitorMediaUseCase(),
-                useCaseFactory.getScreenSharingUseCase(),
                 useCaseFactory.getEngagementTypeUseCase()
             );
         }
@@ -281,11 +275,9 @@ public class ControllerFactory {
                 useCaseFactory.getIsDisplayApplicationChatHeadUseCase(),
                 useCaseFactory.getResolveChatHeadNavigationUseCase(),
                 messagesNotSeenHandler,
-                useCaseFactory.createIsCallVisualizerScreenSharingUseCase(),
                 useCaseFactory.getEngagementStateUseCase(),
                 useCaseFactory.getCurrentOperatorUseCase(),
                 useCaseFactory.getVisitorMediaUseCase(),
-                useCaseFactory.getScreenSharingUseCase(),
                 useCaseFactory.getEngagementTypeUseCase()
             );
         }
@@ -338,10 +330,6 @@ public class ControllerFactory {
         );
     }
 
-    public EndScreenSharingContract.Controller getEndScreenSharingController() {
-        return new EndScreenSharingController(useCaseFactory.getEndScreenSharingUseCase());
-    }
-
     public VisitorCodeContract.Controller getVisitorCodeController() {
         return new VisitorCodeController(
             callVisualizerController,
@@ -356,7 +344,6 @@ public class ControllerFactory {
             activityWatcherForChatHeadController = new ActivityWatcherForChatHeadController(
                 serviceChatHeadController,
                 getChatHeadLayoutController(),
-                useCaseFactory.getScreenSharingUseCase(),
                 useCaseFactory.getEngagementStateUseCase(),
                 useCaseFactory.createIsFromCallScreenUseCase(),
                 useCaseFactory.createUpdateFromCallScreenUseCase(),
@@ -399,15 +386,12 @@ public class ControllerFactory {
             useCaseFactory.getAcceptMediaUpgradeOfferUseCase(),
             useCaseFactory.getDeclineMediaUpgradeOfferUseCase(),
             useCaseFactory.getCheckMediaUpgradePermissionsUseCase(),
-            useCaseFactory.getScreenSharingUseCase(),
             useCaseFactory.getCurrentOperatorUseCase(),
             useCaseFactory.createIsShowOverlayPermissionRequestDialogUseCase(),
             useCaseFactory.getIsCurrentEngagementCallVisualizer(),
             useCaseFactory.createSetOverlayPermissionRequestDialogShownUseCase(),
             dialogController,
-            useCaseFactory.getWithNotificationPermissionUseCase(),
-            useCaseFactory.getPrepareToScreenSharingUseCase(),
-            useCaseFactory.getReleaseScreenSharingResourcesUseCase()
+            useCaseFactory.getWithNotificationPermissionUseCase()
         );
     }
 

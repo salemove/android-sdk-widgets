@@ -48,12 +48,3 @@ internal sealed interface EngagementUpdateState {
     data class OperatorConnected(val operator: Operator) : EngagementUpdateState
     data class OperatorChanged(val operator: Operator) : EngagementUpdateState
 }
-
-internal sealed interface ScreenSharingState {
-    data object Requested : ScreenSharingState
-    data object Started : ScreenSharingState
-    data object RequestAccepted : ScreenSharingState
-    data object RequestDeclined : ScreenSharingState
-    data class FailedToAcceptRequest(val message: String) : ScreenSharingState
-    data object Ended : ScreenSharingState
-}

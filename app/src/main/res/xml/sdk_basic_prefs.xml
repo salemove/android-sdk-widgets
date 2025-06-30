@@ -60,15 +60,6 @@
 
         <ListPreference
             android:layout_height="wrap_content"
-            android:defaultValue="@string/screen_sharing_mode_unbounded"
-            android:entries="@array/screen_sharing_mode_keys"
-            android:entryValues="@array/screen_sharing_mode_values"
-            android:key="@string/pref_screen_sharing_mode"
-            android:title="@string/settings_screen_sharing_mode_title"
-            app:useSimpleSummaryProvider="true" />
-
-        <ListPreference
-            android:layout_height="wrap_content"
             android:defaultValue="@string/authentication_behavior_allowed_during_engagement"
             android:entries="@array/authentication_behavior_keys"
             android:entryValues="@array/authentication_behavior_values"

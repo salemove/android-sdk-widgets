@@ -214,7 +214,6 @@ internal class EntryWidgetController @JvmOverloads constructor(
 
             is EntryWidgetContract.ItemType.CallVisualizerOngoing -> {
                 if (engagementTypeUseCase.isMediaEngagement) activityLauncher.launchCall(activity, null, false)
-                else if (engagementTypeUseCase.isCallVisualizerScreenSharing) activityLauncher.launchEndScreenSharing(activity)
             }
 
             EntryWidgetContract.ItemType.ErrorState -> onRetryButtonClicked()

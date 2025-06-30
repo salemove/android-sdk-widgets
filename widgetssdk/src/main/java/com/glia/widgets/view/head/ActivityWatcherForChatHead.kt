@@ -10,7 +10,6 @@ import androidx.core.util.Pair
 import androidx.core.view.contains
 import com.glia.widgets.R
 import com.glia.widgets.base.BaseActivityStackWatcher
-import com.glia.widgets.callvisualizer.EndScreenSharingView
 import com.glia.widgets.chat.ChatView
 import com.glia.widgets.chat.Intention
 import com.glia.widgets.filepreview.ui.ImagePreviewView
@@ -73,10 +72,6 @@ internal class ActivityWatcherForChatHead(
         )
         chatHeadLayout.setNavigationCallback(
             object : ChatHeadLayout.NavigationCallback {
-                override fun onNavigateToEndScreenSharing() {
-                    navigateToEndScreenSharing(resumedActivity)
-                }
-
                 override fun onNavigateToChat() {
                     navigateToChat(resumedActivity)
                 }
@@ -151,7 +146,6 @@ internal class ActivityWatcherForChatHead(
         activity?.let {
             gliaView = it.findViewById(R.id.call_view)
                 ?: it.findViewById<ImagePreviewView>(R.id.preview_view)
-                    ?: it.findViewById<EndScreenSharingView>(R.id.screen_sharing_screen_view)
         }
         return gliaView != null
     }
@@ -161,7 +155,6 @@ internal class ActivityWatcherForChatHead(
             return it.findViewById(R.id.call_view)
                 ?: it.findViewById<ImagePreviewView>(R.id.preview_view)
                 ?: it.findViewById<ChatView>(R.id.chat_view)
-                ?: it.findViewById<EndScreenSharingView>(R.id.screen_sharing_screen_view)
                 ?: it.findViewById<MessageCenterView>(R.id.message_center_view)
                 ?: it.findViewById<DialogHolderView>(R.id.dialog_holder_activity_view_id)
                 ?: it.findViewById(android.R.id.content)
@@ -171,10 +164,6 @@ internal class ActivityWatcherForChatHead(
 
     private fun navigateToChat(activity: Activity?) {
         activity?.also { activityLauncher.launchChat(it, Intention.RETURN_TO_CHAT) }
-    }
-
-    private fun navigateToEndScreenSharing(activity: Activity?) {
-        activity?.also(activityLauncher::launchEndScreenSharing)
     }
 
     private fun navigateToCall(activity: Activity?) {

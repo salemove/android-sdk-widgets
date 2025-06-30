@@ -23,7 +23,6 @@ internal interface DialogContract {
         fun dismissOverlayPermissionsDialog()
         fun dismissMessageCenterUnavailableDialog()
         fun dismissCVEngagementConfirmationDialog()
-        fun showStartScreenSharingDialog()
         fun showMessageCenterUnavailableDialog()
         fun showUnauthenticatedDialog()
         fun showEngagementConfirmationDialog()
@@ -116,11 +115,6 @@ internal class DialogController : DialogContract.Controller {
     override fun dismissCVEngagementConfirmationDialog() {
         Logger.d(TAG, "Dismiss CV Live Observation Opt In Dialog")
         dialogManager.remove(DialogState.CVConfirmation)
-    }
-
-    override fun showStartScreenSharingDialog() {
-        Logger.i(TAG, "Show Start Screen Sharing Dialog")
-        dialogManager.addAndEmit(DialogState.StartScreenSharing)
     }
 
     override fun showMessageCenterUnavailableDialog() {

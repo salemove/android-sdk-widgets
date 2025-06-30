@@ -115,10 +115,6 @@
         <item>@string/font_expletus_value</item>
         <item>@string/font_tangerine_value</item>
     </array>
-    <array name="screen_sharing_mode_keys">
-        <item>@string/settings_screen_sharing_mode_unbounded</item>
-        <item>@string/settings_screen_sharing_mode_app_bounded</item>
-    </array>
     <array name="screen_sharing_mode_values">
         <item>@string/screen_sharing_mode_unbounded</item>
         <item>@string/screen_sharing_mode_app_bounded</item>

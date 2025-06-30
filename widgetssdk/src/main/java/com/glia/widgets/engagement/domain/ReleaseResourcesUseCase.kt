@@ -11,7 +11,6 @@ internal interface ReleaseResourcesUseCase {
 }
 
 internal class ReleaseResourcesUseCaseImpl(
-    private val releaseScreenSharingResourcesUseCase: ReleaseScreenSharingResourcesUseCase,
     private val callNotificationUseCase: CallNotificationUseCase,
     private val fileAttachmentRepository: FileAttachmentRepository,
     private val updateFromCallScreenUseCase: UpdateFromCallScreenUseCase,
@@ -20,7 +19,6 @@ internal class ReleaseResourcesUseCaseImpl(
     override fun invoke() {
         dialogController.dismissDialogs()
         fileAttachmentRepository.detachAllFiles()
-        releaseScreenSharingResourcesUseCase()
         callNotificationUseCase.removeAllNotifications()
         updateFromCallScreenUseCase(false)
         Dependencies.destroyControllers()

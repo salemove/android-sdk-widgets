@@ -31,7 +31,6 @@ internal class NotificationManager(
 
     private fun createNotificationChannels() {
         createCallChannel()
-        createScreenSharingChannel()
     }
 
     private fun createCallChannel() = createChannelIfDoesNotExist(
@@ -39,14 +38,6 @@ internal class NotificationManager(
         R.string.android_notification_audio_call_channel_name,
         /* Call notification importance should have the possible highest value,
         because it shows the ongoing audio/video streaming and it is preferable to be as high as possible in notifications list */
-        NotificationManager.IMPORTANCE_HIGH
-    )
-
-    private fun createScreenSharingChannel() = createChannelIfDoesNotExist(
-        NotificationFactory.NOTIFICATION_SCREEN_SHARING_CHANNEL_ID,
-        R.string.android_notification_screen_sharing_channel_name,
-        /* Screen sharing notification importance should have the possible highest value,
-            because it affects the Media projection service initialization and streaming timing */
         NotificationManager.IMPORTANCE_HIGH
     )
 
@@ -107,19 +98,6 @@ internal class NotificationManager(
         notificationManager.cancel(NotificationFactory.CALL_NOTIFICATION_ID)
         applicationContext.stopService(notificationRemovalServiceIntent)
     }
-
-    /**
-     * Displays notification informing the user that screen sharing is active.
-     */
-    override fun showScreenSharingNotification() = notificationManager.notify(
-        NotificationFactory.SCREEN_SHARING_NOTIFICATION_ID,
-        NotificationFactory.createScreenSharingNotification(applicationContext)
-    )
-
-    /**
-     * Removes the screen sharing notification.
-     */
-    override fun removeScreenSharingNotification() = notificationManager.cancel(NotificationFactory.SCREEN_SHARING_NOTIFICATION_ID)
 
     override fun showSecureMessageNotification(content: String, contentIntent: PendingIntent) {
         if (areNotificationsEnabledForChannel(NotificationFactory.NOTIFICATION_SECURE_MESSAGING_CHANNEL_ID)) {

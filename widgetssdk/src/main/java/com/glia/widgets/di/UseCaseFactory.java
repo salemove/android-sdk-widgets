@@ -64,7 +64,6 @@ import com.glia.widgets.authentication.Authentication;
 import com.glia.widgets.internal.audio.AudioControlManager;
 import com.glia.widgets.internal.audio.domain.OnAudioStartedUseCase;
 import com.glia.widgets.internal.audio.domain.TurnSpeakerphoneUseCase;
-import com.glia.widgets.internal.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase;
 import com.glia.widgets.internal.callvisualizer.domain.VisitorCodeViewBuilderUseCase;
 import com.glia.widgets.internal.chathead.ChatHeadManager;
 import com.glia.widgets.internal.chathead.domain.IsDisplayBubbleInsideAppUseCase;
@@ -89,8 +88,6 @@ import com.glia.widgets.internal.fileupload.domain.GetFileAttachmentsUseCase;
 import com.glia.widgets.internal.fileupload.domain.RemoveFileAttachmentUseCase;
 import com.glia.widgets.internal.notification.device.INotificationManager;
 import com.glia.widgets.internal.notification.domain.CallNotificationUseCase;
-import com.glia.widgets.internal.notification.domain.RemoveScreenSharingNotificationUseCase;
-import com.glia.widgets.internal.notification.domain.ShowScreenSharingNotificationUseCase;
 import com.glia.widgets.internal.permissions.PermissionManager;
 import com.glia.widgets.internal.permissions.domain.IsNotificationPermissionGrantedUseCase;
 import com.glia.widgets.internal.permissions.domain.IsNotificationPermissionGrantedUseCaseImpl;
@@ -127,8 +124,6 @@ import com.glia.widgets.engagement.domain.DeclineMediaUpgradeOfferUseCase;
 import com.glia.widgets.engagement.domain.DeclineMediaUpgradeOfferUseCaseImpl;
 import com.glia.widgets.engagement.domain.EndEngagementUseCase;
 import com.glia.widgets.engagement.domain.EndEngagementUseCaseImpl;
-import com.glia.widgets.engagement.domain.EndScreenSharingUseCase;
-import com.glia.widgets.engagement.domain.EndScreenSharingUseCaseImpl;
 import com.glia.widgets.engagement.domain.EngagementRequestUseCase;
 import com.glia.widgets.engagement.domain.EngagementRequestUseCaseImpl;
 import com.glia.widgets.engagement.domain.EngagementStateUseCase;
@@ -141,8 +136,6 @@ import com.glia.widgets.engagement.domain.FlipCameraButtonStateUseCase;
 import com.glia.widgets.engagement.domain.FlipCameraButtonStateUseCaseImpl;
 import com.glia.widgets.engagement.domain.FlipVisitorCameraUseCase;
 import com.glia.widgets.engagement.domain.FlipVisitorCameraUseCaseImpl;
-import com.glia.widgets.engagement.domain.InformThatReadyToShareScreenUseCase;
-import com.glia.widgets.engagement.domain.InformThatReadyToShareScreenUseCaseImpl;
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase;
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCaseImpl;
 import com.glia.widgets.engagement.domain.IsOperatorPresentUseCase;
@@ -157,18 +150,8 @@ import com.glia.widgets.engagement.domain.OperatorMediaUseCase;
 import com.glia.widgets.engagement.domain.OperatorMediaUseCaseImpl;
 import com.glia.widgets.engagement.domain.OperatorTypingUseCase;
 import com.glia.widgets.engagement.domain.OperatorTypingUseCaseImpl;
-import com.glia.widgets.engagement.domain.PrepareToScreenSharingUseCase;
-import com.glia.widgets.engagement.domain.PrepareToScreenSharingUseCaseImpl;
 import com.glia.widgets.engagement.domain.ReleaseResourcesUseCase;
 import com.glia.widgets.engagement.domain.ReleaseResourcesUseCaseImpl;
-import com.glia.widgets.engagement.domain.ReleaseScreenSharingResourcesUseCase;
-import com.glia.widgets.engagement.domain.ReleaseScreenSharingResourcesUseCaseImpl;
-import com.glia.widgets.engagement.domain.ScreenSharingUseCase;
-import com.glia.widgets.engagement.domain.ScreenSharingUseCaseImpl;
-import com.glia.widgets.engagement.domain.StartMediaProjectionServiceUseCase;
-import com.glia.widgets.engagement.domain.StartMediaProjectionServiceUseCaseImpl;
-import com.glia.widgets.engagement.domain.StopMediaProjectionServiceUseCase;
-import com.glia.widgets.engagement.domain.StopMediaProjectionServiceUseCaseImpl;
 import com.glia.widgets.engagement.domain.ToggleVisitorAudioMediaStateUseCase;
 import com.glia.widgets.engagement.domain.ToggleVisitorAudioMediaStateUseCaseImpl;
 import com.glia.widgets.engagement.domain.ToggleVisitorVideoMediaStateUseCase;
@@ -202,8 +185,6 @@ import java.util.Optional;
  */
 public class UseCaseFactory {
     private static CallNotificationUseCase callNotificationUseCase;
-    private static ShowScreenSharingNotificationUseCase showScreenSharingNotificationUseCase;
-    private static RemoveScreenSharingNotificationUseCase removeScreenSharingNotificationUseCase;
     private static IsDisplayBubbleOutsideAppUseCase isDisplayBubbleOutsideAppUseCase;
     private static IsDisplayBubbleInsideAppUseCase isDisplayBubbleInsideAppUseCase;
     private static ResolveChatHeadNavigationUseCase resolveChatHeadNavigationUseCase;
@@ -277,8 +258,6 @@ public class UseCaseFactory {
         if (isDisplayBubbleOutsideAppUseCase == null) {
             isDisplayBubbleOutsideAppUseCase = new IsDisplayBubbleOutsideAppUseCase(
                 getIsQueueingOrEngagementUseCase(),
-                getIsCurrentEngagementCallVisualizer(),
-                getScreenSharingUseCase(),
                 chatHeadManager,
                 permissionManager,
                 configurationManager,
@@ -293,8 +272,6 @@ public class UseCaseFactory {
         if (isDisplayBubbleInsideAppUseCase == null) {
             isDisplayBubbleInsideAppUseCase = new IsDisplayBubbleInsideAppUseCase(
                 getIsQueueingOrEngagementUseCase(),
-                getIsCurrentEngagementCallVisualizer(),
-                getScreenSharingUseCase(),
                 permissionManager,
                 configurationManager,
                 getEngagementTypeUseCase()
@@ -308,8 +285,7 @@ public class UseCaseFactory {
         if (resolveChatHeadNavigationUseCase == null) {
             resolveChatHeadNavigationUseCase = new ResolveChatHeadNavigationUseCase(
                 getIsQueueingOrEngagementUseCase(),
-                getEngagementTypeUseCase(),
-                createIsCallVisualizerScreenSharingUseCase()
+                getEngagementTypeUseCase()
             );
         }
         return resolveChatHeadNavigationUseCase;
@@ -328,20 +304,6 @@ public class UseCaseFactory {
         if (callNotificationUseCase == null)
             callNotificationUseCase = new CallNotificationUseCase(notificationManager);
         return callNotificationUseCase;
-    }
-
-    @NonNull
-    public ShowScreenSharingNotificationUseCase createShowScreenSharingNotificationUseCase() {
-        if (showScreenSharingNotificationUseCase == null)
-            showScreenSharingNotificationUseCase = new ShowScreenSharingNotificationUseCase(notificationManager);
-        return showScreenSharingNotificationUseCase;
-    }
-
-    @NonNull
-    public RemoveScreenSharingNotificationUseCase createRemoveScreenSharingNotificationUseCase() {
-        if (removeScreenSharingNotificationUseCase == null)
-            removeScreenSharingNotificationUseCase = new RemoveScreenSharingNotificationUseCase(notificationManager);
-        return removeScreenSharingNotificationUseCase;
     }
 
     @NonNull
@@ -540,11 +502,6 @@ public class UseCaseFactory {
     @NonNull
     public CustomCardShouldShowUseCase createCustomCardShouldShowUseCase() {
         return new CustomCardShouldShowUseCase(GliaWidgets.getCustomCardAdapter());
-    }
-
-    @NonNull
-    public IsCallVisualizerScreenSharingUseCase createIsCallVisualizerScreenSharingUseCase() {
-        return new IsCallVisualizerScreenSharingUseCase(getEngagementTypeUseCase());
     }
 
     @NonNull
@@ -863,7 +820,6 @@ public class UseCaseFactory {
     @NonNull
     public ReleaseResourcesUseCase getReleaseResourcesUseCase(DialogContract.Controller dialogController) {
         return new ReleaseResourcesUseCaseImpl(
-            getReleaseScreenSharingResourcesUseCase(),
             createCallNotificationUseCase(),
             repositoryFactory.getGliaFileAttachmentRepository(),
             createUpdateFromCallScreenUseCase(),
@@ -891,7 +847,6 @@ public class UseCaseFactory {
         return new EngagementTypeUseCaseImpl(
             getIsQueueingOrEngagementUseCase(),
             getIsCurrentEngagementCallVisualizer(),
-            getScreenSharingUseCase(),
             getOperatorMediaUseCase(),
             getVisitorMediaUseCase(),
             getIsOperatorPresentUseCase()
@@ -944,11 +899,6 @@ public class UseCaseFactory {
     }
 
     @NonNull
-    public ScreenSharingUseCase getScreenSharingUseCase() {
-        return new ScreenSharingUseCaseImpl(repositoryFactory.getEngagementRepository(), getReleaseScreenSharingResourcesUseCase(), configurationManager);
-    }
-
-    @NonNull
     public DecideOnQueueingUseCase getDecideOnQueueingUseCase() {
         return new DecideOnQueueingUseCaseImpl(createSetOverlayPermissionRequestDialogShownUseCase());
     }
@@ -961,11 +911,6 @@ public class UseCaseFactory {
     @NonNull
     public CheckMediaUpgradePermissionsUseCase getCheckMediaUpgradePermissionsUseCase() {
         return new CheckMediaUpgradePermissionsUseCaseImpl(permissionManager);
-    }
-
-    @NonNull
-    public EndScreenSharingUseCase getEndScreenSharingUseCase() {
-        return new EndScreenSharingUseCaseImpl(getScreenSharingUseCase());
     }
 
     @NonNull
@@ -1023,38 +968,6 @@ public class UseCaseFactory {
         return new RequestNotificationPermissionIfPushNotificationsSetUpUseCaseImpl(
             getWithNotificationPermissionUseCase(),
             getIsPushNotificationsSetUpUseCase()
-        );
-    }
-
-    @NonNull
-    public InformThatReadyToShareScreenUseCase getReadyToShareScreenUseCase() {
-        return new InformThatReadyToShareScreenUseCaseImpl(repositoryFactory.getEngagementRepository());
-    }
-
-    @NonNull
-    public StartMediaProjectionServiceUseCase getStartMediaProjectionServiceUseCase() {
-        return new StartMediaProjectionServiceUseCaseImpl(applicationContext);
-    }
-
-    @NonNull
-    public StopMediaProjectionServiceUseCase getStopMediaProjectionServiceUseCase() {
-        return new StopMediaProjectionServiceUseCaseImpl(applicationContext);
-    }
-
-    @NonNull
-    public ReleaseScreenSharingResourcesUseCase getReleaseScreenSharingResourcesUseCase() {
-        return new ReleaseScreenSharingResourcesUseCaseImpl(
-            createRemoveScreenSharingNotificationUseCase(),
-            getStopMediaProjectionServiceUseCase()
-        );
-    }
-
-    @NonNull
-    public PrepareToScreenSharingUseCase getPrepareToScreenSharingUseCase() {
-        return new PrepareToScreenSharingUseCaseImpl(
-            createShowScreenSharingNotificationUseCase(),
-            getStartMediaProjectionServiceUseCase(),
-            getReadyToShareScreenUseCase()
         );
     }
 

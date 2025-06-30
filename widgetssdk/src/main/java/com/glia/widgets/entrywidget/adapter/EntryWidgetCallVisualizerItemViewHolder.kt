@@ -37,7 +37,7 @@ internal class EntryWidgetCallVisualizerItemViewHolder(
     ) {
         binding.root.setOnClickListener(onClickListener)
         binding.root.contentDescription = null
-        binding.icon.setImageResource(R.drawable.ic_screensharing)
+        binding.icon.setImageResource(R.drawable.ic_callvisualizer)
         binding.title.setLocaleText(R.string.entry_widget_call_visualizer_button_label)
         binding.loadingGroup.isVisible = itemType == EntryWidgetContract.ItemType.LoadingState
         binding.description.setLocaleText(R.string.entry_widget_call_visualizer_description)

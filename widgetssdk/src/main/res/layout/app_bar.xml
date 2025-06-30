@@ -31,17 +31,6 @@
             android:layout_marginEnd="@dimen/glia_large"
             android:orientation="horizontal">
 
-            <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/end_screen_sharing_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginEnd="@dimen/glia_medium"
-                android:background="@null"
-                android:padding="@dimen/glia_medium"
-                android:src="@drawable/ic_screensharing_off"
-                android:visibility="gone" />
-
             <com.glia.widgets.view.header.button.GliaEndButton
                 android:id="@+id/end_button"
                 style="?attr/gliaHeaderEndButtonStyle"

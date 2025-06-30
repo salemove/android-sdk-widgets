@@ -14,8 +14,6 @@ internal interface OperatorRequestContract {
         data class RequestMediaUpgrade(val data: MediaUpgradeOfferData) : State
         data class OpenCallActivity(val mediaType: Engagement.MediaType) : State
         object DismissAlertDialog : State
-        data class ShowScreenSharingDialog(val operatorName: String?) : State
-        object AcquireMediaProjectionToken : State
         data class DisplayToast(val message: String) : State
         object ShowOverlayDialog : State
         object OpenOverlayPermissionScreen : State
@@ -25,9 +23,6 @@ internal interface OperatorRequestContract {
         val state: Flowable<OneTimeEvent<State>>
         fun onMediaUpgradeAccepted(offer: MediaUpgradeOffer, activity: Activity)
         fun onMediaUpgradeDeclined(offer: MediaUpgradeOffer, activity: Activity)
-        fun onScreenSharingDialogAccepted(activity: Activity)
-        fun onScreenSharingDialogDeclined(activity: Activity)
-        fun onMediaProjectionResultReceived(result: ActivityResult, activity: ComponentActivity)
         fun onOverlayPermissionRequestAccepted(activity: Activity)
         fun onOverlayPermissionRequestDeclined(activity: Activity)
         fun overlayPermissionScreenOpened()

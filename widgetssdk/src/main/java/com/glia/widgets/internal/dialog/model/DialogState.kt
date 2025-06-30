@@ -7,7 +7,6 @@ internal sealed interface DialogState {
     data object OverlayPermission : DialogState
     data object CVOverlayPermission : DialogState
     data object ExitQueue : DialogState
-    data object StartScreenSharing : DialogState
     data object VisitorCode : DialogState
     data object MessageCenterUnavailable : DialogState
     data object Unauthenticated : DialogState

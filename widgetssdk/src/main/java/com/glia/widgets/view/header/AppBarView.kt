@@ -5,7 +5,6 @@ import android.util.AttributeSet
 import android.view.MenuItem
 import android.widget.TextView
 import androidx.annotation.DrawableRes
-import androidx.appcompat.widget.AppCompatImageButton
 import androidx.core.content.withStyledAttributes
 import androidx.core.view.children
 import androidx.core.view.isGone
@@ -19,7 +18,6 @@ import com.glia.widgets.helper.ResourceProvider
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.helper.applyButtonTheme
 import com.glia.widgets.helper.applyIconColorTheme
-import com.glia.widgets.helper.applyImageColorTheme
 import com.glia.widgets.helper.applyTextTheme
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getFontCompat
@@ -65,7 +63,6 @@ internal class AppBarView @JvmOverloads constructor(
 
     private val leaveQueueIcon: MenuItem
         get() = binding.toolbar.menu.findItem(R.id.leave_queue_button)
-    private val endScreenShareButton: AppCompatImageButton = binding.endScreenSharingButton
 
     private fun setDefaults(attrs: AttributeSet?) {
         context.withStyledAttributes(attrs, R.styleable.AppBarView) {
@@ -78,7 +75,6 @@ internal class AppBarView @JvmOverloads constructor(
             }
             binding.endButton.setLocaleText(R.string.general_end)
             binding.endButton.setLocaleContentDescription(R.string.android_app_bar_end_engagement_accessibility_label)
-            binding.endScreenSharingButton.setLocaleContentDescription(R.string.screen_sharing_visitor_screen_end_title)
 
             val titleColorRes = getTypedArrayResId(
                 this,
@@ -124,14 +120,12 @@ internal class AppBarView @JvmOverloads constructor(
         // icons
         uiTheme.iconAppBarBack?.also(binding.toolbar::setNavigationIcon)
         uiTheme.iconLeaveQueue?.also(leaveQueueIcon::setIcon)
-        uiTheme.iconEndScreenShare?.also(endScreenShareButton::setImageResource)
 
         // colors
         val brandPrimaryColor = uiTheme.brandPrimaryColor?.let(::getColorCompat)
         val baseLightColor = uiTheme.baseLightColor?.let(::getColorCompat)
         val systemNegativeColor = uiTheme.systemNegativeColor?.let(::getColorCompat)
         val exitQueueButtonColor = uiTheme.gliaChatHeaderExitQueueButtonTintColor?.let(::getColorCompat) ?: baseLightColor
-        val endScreenShareButtonColor = uiTheme.endScreenShareTintColor?.let(::getColorCompat)
         val chatHeaderTitleColor = uiTheme.gliaChatHeaderTitleTintColor?.let(::getColorCompat)
         val chatHeaderHomeButtonColor = uiTheme.gliaChatHeaderHomeButtonTintColor?.let(::getColorCompat)
         val textFont = uiTheme.fontRes?.let(::getFontCompat)
@@ -140,7 +134,6 @@ internal class AppBarView @JvmOverloads constructor(
         brandPrimaryColor?.also { setBackgroundColor(it) }
 
         leaveQueueIcon.applyIconColorTheme(exitQueueButtonColor)
-        endScreenShareButton.applyImageColorTheme(endScreenShareButtonColor)
         binding.title.applyTextTheme(chatHeaderTitleColor, textFont)
         binding.endButton.applyButtonTheme(
             backgroundColor = systemNegativeColor,
@@ -167,16 +160,7 @@ internal class AppBarView @JvmOverloads constructor(
 
     fun showXButton() {
         binding.endButton.isGone = true
-        endScreenShareButton.isGone = true
         leaveQueueIcon.isVisible = true
-    }
-
-    fun showEndScreenSharingButton() {
-        endScreenShareButton.isVisible = true
-    }
-
-    fun hideEndScreenSharingButton() {
-        endScreenShareButton.isGone = true
     }
 
     fun showEndButton() {
@@ -202,10 +186,6 @@ internal class AppBarView @JvmOverloads constructor(
 
     fun setOnEndChatClickedListener(onEndChatClicked: OnEndChatClicked) {
         binding.endButton.setOnClickListener { onEndChatClicked() }
-    }
-
-    fun setOnEndCallButtonClickedListener(onEndScreenSharingClicked: OnEndScreenSharingClicked) {
-        binding.endScreenSharingButton.setOnClickListener { onEndScreenSharingClicked() }
     }
 
     fun hideLeaveButtons() {
@@ -249,10 +229,6 @@ internal class AppBarView @JvmOverloads constructor(
     }
 
     fun interface OnEndChatClicked {
-        operator fun invoke()
-    }
-
-    fun interface OnEndScreenSharingClicked {
         operator fun invoke()
     }
 }

@@ -124,19 +124,8 @@ internal class EngagementRepositoryImpl(
     private val _operatorTypingStatus: PublishProcessor<Boolean> = PublishProcessor.create()
     override val operatorTypingStatus: Flowable<Boolean> = _operatorTypingStatus.distinctUntilChanged()
 
-    //--Screen Sharing--
-    private val screenSharingRequestCallback = Consumer<ScreenSharingRequest>(::handleScreenSharingRequest)
-    private val screenSharingRequestResponseCallback = Consumer<GliaException>(::handleScreenSharingRequestResponse)
-    private val screenSharingStateCallback = Consumer<VisitorScreenSharingState>(::handleScreenSharingState)
-
-    private val _screenSharingState: BehaviorProcessor<ScreenSharingState> = BehaviorProcessor.create()
-    override val screenSharingState: Flowable<ScreenSharingState> = _screenSharingState.onBackpressureLatest()
-
     private val readyToShareScreenProcessor: PublishProcessor<Unit> = PublishProcessor.create()
     private val mediaProjectionActivityResultProcessor: PublishProcessor<Pair<Int, Intent?>> = PublishProcessor.create()
-
-    private var currentScreenSharingRequest: ScreenSharingRequest? = null
-    private var currentScreenSharingScreen: LocalScreen? = null
 
     private val queueIngDisposable = CompositeDisposable()
 
@@ -163,9 +152,6 @@ internal class EngagementRepositoryImpl(
 
     override val isQueueingOrLiveEngagement: Boolean
         get() = isQueueing || hasOngoingLiveEngagement
-
-    override val isSharingScreen: Boolean
-        get() = currentEngagement != null && _screenSharingState.run { value == ScreenSharingState.Started || value == ScreenSharingState.RequestAccepted }
 
     private var _isSecureMessagingRequested: Boolean = false
     override val isSecureMessagingRequested: Boolean
@@ -208,7 +194,6 @@ internal class EngagementRepositoryImpl(
         _currentOperator.onNext(Data.Empty)
         _onHoldState.onNext(false)
         _operatorTypingStatus.onNext(false)
-        markScreenSharingEnded()
     }
 
     private fun ensureNotScTransferredEngagement(callback: Engagement.() -> Unit) = currentEngagement
@@ -449,7 +434,6 @@ internal class EngagementRepositoryImpl(
         subscribeToEngagementEvents(engagement)
         subscribeToEngagementMediaEvents(engagement.media)
         subscribeToEngagementChatEvents(engagement.chat)
-        subscribeToScreenSharingEvents(engagement.screenSharing)
         handleVisitorCamera(engagement.media)
     }
 
@@ -467,7 +451,6 @@ internal class EngagementRepositoryImpl(
 
         subscribeToEngagementEvents(engagement)
         subscribeToEngagementMediaEvents(engagement.media)
-        subscribeToScreenSharingEvents(engagement.screenSharing)
         handleVisitorCamera(engagement.media)
         //No need for chat events here
     }
@@ -508,21 +491,10 @@ internal class EngagementRepositoryImpl(
         chat.off(Chat.Events.OPERATOR_TYPING_STATUS, operatorTypingCallback)
     }
 
-    private fun subscribeToScreenSharingEvents(screenSharing: ScreenSharing) {
-        screenSharing.on(ScreenSharing.Events.SCREEN_SHARING_REQUEST, screenSharingRequestCallback)
-        screenSharing.on(ScreenSharing.Events.VISITOR_STATE, screenSharingStateCallback)
-    }
-
-    private fun unSubscribeFromScreenSharingEvents(screenSharing: ScreenSharing) {
-        screenSharing.off(ScreenSharing.Events.SCREEN_SHARING_REQUEST, screenSharingRequestCallback)
-        screenSharing.off(ScreenSharing.Events.VISITOR_STATE, screenSharingStateCallback)
-    }
-
     private fun unsubscribeFromEvents(engagement: Engagement) {
         unsubscribeFromEngagementEvents(engagement)
         unsubscribeFromEngagementMediaEvents(engagement.media)
         unsubscribeFromEngagementChatEvents(engagement.chat)
-        unSubscribeFromScreenSharingEvents(engagement.screenSharing)
     }
 
     private fun handleEngagementState(state: EngagementState) {
@@ -668,82 +640,8 @@ internal class EngagementRepositoryImpl(
         _operatorTypingStatus.onNext(operatorTypingStatus.isTyping)
     }
 
-    //--Screen Sharing--
-    private fun handleScreenSharingRequest(request: ScreenSharingRequest) {
-        Logger.d(TAG, "Received screen sharing request")
-        currentScreenSharingRequest = request
-        _screenSharingState.onNext(ScreenSharingState.Requested)
-    }
-
-    private fun handleScreenSharingState(state: VisitorScreenSharingState) {
-        when (state.status ?: return) {
-            ScreenSharing.Status.SHARING -> onScreenSharingStarted(state.localScreen ?: return)
-            ScreenSharing.Status.NOT_SHARING -> onScreenSharingEnded()
-        }
-    }
-
-    private fun handleScreenSharingRequestResponse(ex: GliaException?) {
-        currentScreenSharingRequest = null
-        if (ex == null) {
-            _screenSharingState.onNext(ScreenSharingState.RequestAccepted)
-            return
-        }
-
-        Logger.e(TAG, "Failed to accept screen sharing request", ex)
-        _screenSharingState.onNext(ScreenSharingState.FailedToAcceptRequest(ex.debugMessage))
-    }
-
-    private fun onScreenSharingStarted(localScreen: LocalScreen) {
-        if (_screenSharingState.value is ScreenSharingState.Started) return
-
-        Logger.i(TAG, "Screen sharing started")
-        _screenSharingState.onNext(ScreenSharingState.Started)
-        currentScreenSharingScreen = localScreen
-    }
-
-    private fun onScreenSharingEnded() {
-        Logger.i(TAG, "Screen sharing ended")
-        markScreenSharingEnded()
-    }
-
-    private fun markScreenSharingEnded() {
-        _screenSharingState.onNext(ScreenSharingState.Ended)
-        currentScreenSharingScreen = null
-    }
-
-    override fun endScreenSharing() {
-        Logger.i(TAG, "Screen sharing ended by visitor")
-        currentScreenSharingScreen?.stopSharing()
-        currentScreenSharingScreen = null
-        _screenSharingState.onNext(ScreenSharingState.Ended)
-    }
-
-    override fun declineScreenSharingRequest() {
-        Logger.i(TAG, "Screen sharing declined by visitor")
-        // Pass RESULT_CANCELED to Core SDK to stop waiting for a permission result.
-        // Otherwise, subsequent screen sharing requests won't be shown to the visitor.
-        // Also see related bug ticket: MOB-2102
-        onActivityResult(SKIP_ASKING_SCREEN_SHARING_PERMISSION_RESULT_CODE, Activity.RESULT_CANCELED, null)
-        currentScreenSharingRequest?.decline()
-        currentScreenSharingRequest = null
-        _screenSharingState.onNext(ScreenSharingState.RequestDeclined)
-    }
-
-    override fun acceptScreenSharingWithAskedPermission(activity: Activity, mode: ScreenSharing.Mode) {
-        Logger.i(TAG, "Screen sharing accepted by visitor, permission asked")
-        currentScreenSharingRequest?.accept(mode, activity, SKIP_ASKING_SCREEN_SHARING_PERMISSION_RESULT_CODE, screenSharingRequestResponseCallback)
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         currentEngagement?.onActivityResult(requestCode, resultCode, intent)
-    }
-
-    override fun onActivityResultSkipScreenSharingPermissionRequest(resultCode: Int, intent: Intent?) {
-        mediaProjectionActivityResultProcessor.onNext(resultCode to intent)
-    }
-
-    override fun onReadyToShareScreen() {
-        readyToShareScreenProcessor.onNext(Unit)
     }
 
     override fun updateIsSecureMessagingRequested(isSecureMessagingRequested: Boolean) {

@@ -2,14 +2,12 @@ package com.glia.widgets.view.head.controller
 
 import android.view.View
 import com.glia.androidsdk.Operator
-import com.glia.widgets.internal.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase
 import com.glia.widgets.internal.chathead.domain.IsDisplayBubbleOutsideAppUseCase
 import com.glia.widgets.internal.chathead.domain.ResolveChatHeadNavigationUseCase
 import com.glia.widgets.internal.chathead.domain.ResolveChatHeadNavigationUseCase.Destinations
 import com.glia.widgets.engagement.domain.CurrentOperatorUseCase
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import com.glia.widgets.engagement.domain.EngagementTypeUseCase
-import com.glia.widgets.engagement.domain.ScreenSharingUseCase
 import com.glia.widgets.engagement.domain.VisitorMediaUseCase
 import com.glia.widgets.helper.Logger.d
 import com.glia.widgets.helper.TAG
@@ -25,11 +23,9 @@ internal class ServiceChatHeadController(
     private val resolveChatHeadNavigationUseCase: ResolveChatHeadNavigationUseCase,
     messagesNotSeenHandler: MessagesNotSeenHandler,
     private var _chatHeadPosition: ChatHeadPosition,
-    private val isCallVisualizerScreenSharingUseCase: IsCallVisualizerScreenSharingUseCase,
     engagementStateUseCase: EngagementStateUseCase,
     currentOperatorUseCase: CurrentOperatorUseCase,
     visitorMediaUseCase: VisitorMediaUseCase,
-    screenSharingUseCase: ScreenSharingUseCase,
     private val engagementTypeUseCase: EngagementTypeUseCase
 ) : ChatHeadContract.Controller {
     private var chatHeadView: ChatHeadContract.View? = null
@@ -54,9 +50,6 @@ internal class ServiceChatHeadController(
         currentOperatorUseCase().unSafeSubscribe(::operatorDataLoaded)
         messagesNotSeenHandler.addListener(::onUnreadMessageCountChange)
         visitorMediaUseCase.onHoldState.unSafeSubscribe(::onHoldChanged)
-        screenSharingUseCase().filter { isCallVisualizerScreenSharingUseCase() }.unSafeSubscribe {
-            toggleChatHead()
-        }
     }
 
     override fun onResume(view: View?) {
@@ -87,7 +80,6 @@ internal class ServiceChatHeadController(
     override fun onChatHeadClicked() {
         when (resolveChatHeadNavigationUseCase.execute()) {
             Destinations.CALL_VIEW -> chatHeadView?.navigateToCall()
-            Destinations.SCREEN_SHARING -> chatHeadView?.navigateToEndScreenSharing()
             Destinations.CHAT_VIEW -> chatHeadView?.navigateToChat()
         }
     }
@@ -181,13 +173,6 @@ internal class ServiceChatHeadController(
 
     private fun decideOnBubbleDesign() {
         val view = chatHeadView ?: return
-
-        if (isCallVisualizerScreenSharingUseCase() && !engagementTypeUseCase.isMediaEngagement) {
-            // Show screen sharing icon only if there is no 1 or 2 way video
-            view.showScreenSharing()
-            return
-        }
-
         operatorProfileImgUrl?.also(view::showOperatorImage) ?: view.showPlaceholder()
     }
 

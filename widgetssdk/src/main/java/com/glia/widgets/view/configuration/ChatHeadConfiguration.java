@@ -18,7 +18,6 @@ public class ChatHeadConfiguration implements Parcelable {
     private final Integer backgroundColorRes;
     private final Integer iconOnHold;
     private final Integer iconOnHoldTintList;
-    private final Integer iconScreenSharingDialog;
 
     private ChatHeadConfiguration(
             Builder builder
@@ -31,7 +30,6 @@ public class ChatHeadConfiguration implements Parcelable {
         backgroundColorRes = builder.backgroundColorRes;
         iconOnHold = builder.iconOnHold;
         iconOnHoldTintList = builder.iconOnHoldTintList;
-        iconScreenSharingDialog = builder.iconScreenSharingDialog;
     }
 
     protected ChatHeadConfiguration(Parcel in) {
@@ -74,11 +72,6 @@ public class ChatHeadConfiguration implements Parcelable {
             iconOnHoldTintList = null;
         } else {
             iconOnHoldTintList = in.readInt();
-        }
-        if (in.readByte() == 0) {
-            iconScreenSharingDialog = null;
-        } else {
-            iconScreenSharingDialog = in.readInt();
         }
     }
 
@@ -132,12 +125,6 @@ public class ChatHeadConfiguration implements Parcelable {
             dest.writeByte((byte) 1);
             dest.writeInt(iconOnHoldTintList);
         }
-        if (iconScreenSharingDialog == null) {
-            dest.writeByte((byte) 0);
-        } else {
-            dest.writeByte((byte) 1);
-            dest.writeInt(iconScreenSharingDialog);
-        }
     }
 
     @Override
@@ -189,10 +176,6 @@ public class ChatHeadConfiguration implements Parcelable {
         return iconOnHoldTintList;
     }
 
-    public Integer getIconScreenSharingDialog() {
-        return iconScreenSharingDialog;
-    }
-
     /**
      * Please use remote configurations {@link com.glia.widgets.GliaWidgetsConfig.Builder#setUiJsonRemoteConfig(String)}
      */
@@ -208,7 +191,6 @@ public class ChatHeadConfiguration implements Parcelable {
         private Integer backgroundColorRes;
         private Integer iconOnHold;
         private Integer iconOnHoldTintList;
-        private Integer iconScreenSharingDialog;
 
         public Builder() {
         }
@@ -222,7 +204,6 @@ public class ChatHeadConfiguration implements Parcelable {
             backgroundColorRes = buildTime.backgroundColorRes;
             iconOnHold = buildTime.iconOnHold;
             iconOnHoldTintList = buildTime.iconOnHoldTintList;
-            iconScreenSharingDialog = buildTime.iconScreenSharingDialog;
         }
 
         public Builder operatorPlaceholderBackgroundColor(Integer operatorPlaceholderBackgroundColor) {
@@ -262,11 +243,6 @@ public class ChatHeadConfiguration implements Parcelable {
 
         public Builder iconOnHoldTintList(Integer iconOnHoldTintList) {
             this.iconOnHoldTintList = iconOnHoldTintList;
-            return this;
-        }
-
-        public Builder iconScreenSharingDialog(Integer iconScreenSharingDialog) {
-            this.iconScreenSharingDialog = iconScreenSharingDialog;
             return this;
         }
 

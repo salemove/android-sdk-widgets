@@ -6,7 +6,6 @@ import android.media.projection.MediaProjectionManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.collection.ArrayMap
 import androidx.core.content.getSystemService
 import com.glia.androidsdk.Engagement
@@ -39,10 +38,7 @@ internal class OperatorRequestActivityWatcher(
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
         super.onActivityCreated(activity, savedInstanceState)
-
         if (activity !is ComponentActivity) return
-
-        registerForMediaProjectionPermissionResult(activity)
     }
 
     override fun onActivityDestroyed(activity: Activity) {
@@ -60,8 +56,6 @@ internal class OperatorRequestActivityWatcher(
             state is ControllerState.DismissAlertDialog -> event.consume { dismissAlertDialogSilently() }
             state is ControllerState.OpenCallActivity -> event.consume { openCallActivity(state.mediaType, activity) }
             state is ControllerState.RequestMediaUpgrade -> showUpgradeDialog(state, activity, event::markConsumed)
-            state is ControllerState.ShowScreenSharingDialog -> showScreenSharingDialog(state.operatorName, activity, event::markConsumed)
-            state is ControllerState.AcquireMediaProjectionToken -> requestMediaProjection(activity, event::markConsumed)
             state is ControllerState.DisplayToast -> event.consume { displayToast(activity, state.message) }
             state is ControllerState.ShowOverlayDialog -> showOverlayDialog(activity, event::markConsumed)
             state is ControllerState.OpenOverlayPermissionScreen -> event.consume { openOverlayPermissionsScreen(activity) }
@@ -70,15 +64,6 @@ internal class OperatorRequestActivityWatcher(
 
     private fun displayToast(activity: Activity, message: String) {
         activity.showToast(message)
-    }
-
-    private fun requestMediaProjection(activity: Activity, consumeCallback: () -> Unit) {
-        enforceComponentActivity(activity) {
-            consumeCallback()
-            mediaProjectionResultLaunchers[activity.localClassName]?.launch(
-                activity.getSystemService<MediaProjectionManager>()?.createScreenCaptureIntent()
-            )
-        }
     }
 
     private fun openOverlayPermissionsScreen(activity: Activity) {
@@ -91,21 +76,6 @@ internal class OperatorRequestActivityWatcher(
             })
     }
 
-    private fun enforceComponentActivity(activity: Activity, callback: () -> Unit) {
-        if (activity is ComponentActivity) {
-            callback()
-        } else {
-            launchDialogHolderActivity(activity)
-        }
-    }
-
-    private fun registerForMediaProjectionPermissionResult(activity: ComponentActivity) {
-        mediaProjectionResultLaunchers[activity.localClassName] =
-            activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                controller.onMediaProjectionResultReceived(it, activity)
-            }
-    }
-
     private fun showOverlayDialog(activity: Activity, consumeCallback: () -> Unit) {
         showAlertDialogWithStyledContext(activity) { context, uiTheme ->
             Dialogs.showOverlayPermissionsDialog(context, uiTheme, {
@@ -114,18 +84,6 @@ internal class OperatorRequestActivityWatcher(
             }) {
                 consumeCallback()
                 controller.onOverlayPermissionRequestDeclined(activity)
-            }
-        }
-    }
-
-    private fun showScreenSharingDialog(operatorName: String?, activity: Activity, consumeCallback: () -> Unit) {
-        showAlertDialogWithStyledContext(activity) { context, uiTheme ->
-            Dialogs.showScreenSharingDialog(context, uiTheme, operatorName, {
-                consumeCallback()
-                controller.onScreenSharingDialogAccepted(activity)
-            }) {
-                consumeCallback()
-                controller.onScreenSharingDialogDeclined(activity)
             }
         }
     }

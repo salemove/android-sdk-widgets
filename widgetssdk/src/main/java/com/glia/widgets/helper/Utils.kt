@@ -295,14 +295,6 @@ internal object Utils {
                     R.attr.gliaIconUpgradeVideoDialog
                 )
             )
-            setIconScreenSharingDialog(
-                getTypedArrayIntegerValue(
-                    typedArray,
-                    context,
-                    R.styleable.GliaView_iconScreenSharingDialog,
-                    R.attr.gliaIconScreenSharingDialog
-                )
-            )
             setIconCallVideoOn(
                 getTypedArrayIntegerValue(
                     typedArray,
@@ -373,22 +365,6 @@ internal object Utils {
                     context,
                     R.styleable.GliaView_iconOnHold,
                     R.attr.gliaIconOnHold
-                )
-            )
-            setIconEndScreenShare(
-                getTypedArrayIntegerValue(
-                    typedArray,
-                    context,
-                    R.styleable.GliaView_iconEndScreenShare,
-                    R.attr.gliaIconEndScreenShare
-                )
-            )
-            setEndScreenShareTintColor(
-                getTypedArrayIntegerValue(
-                    typedArray,
-                    context,
-                    R.styleable.GliaView_endScreenShareTintColor,
-                    R.attr.gliaEndScreenShareTintColor
                 )
             )
             setWhiteLabel(

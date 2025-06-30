@@ -67,10 +67,6 @@
             android:name="com.glia.widgets.webbrowser.WebBrowserActivity"
             android:launchMode="singleTask"
             android:theme="@style/Application.Glia.Chat.Activity" />
-        <activity
-            android:name=".callvisualizer.EndScreenSharingActivity"
-            android:launchMode="singleTask"
-            android:theme="@style/Application.Glia.Call.Activity" />
 
         <activity
             android:name=".entrywidget.EntryWidgetActivity"
@@ -95,21 +91,7 @@
             android:enabled="true"
             android:stopWithTask="true" />
 
-        <service
-            android:name=".core.screensharing.MediaProjectionService"
-            android:exported="false"
-            android:foregroundServiceType="mediaProjection"
-            tools:targetApi="o" />
-
         <service android:name=".core.notification.NotificationRemovalService" />
-
-        <receiver
-            android:name=".core.notification.NotificationActionReceiver"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.glia.widgets.core.notification.NotificationActionReceiver.ACTION_ON_SCREEN_SHARING_END_PRESSED" />
-            </intent-filter>
-        </receiver>
 
         <provider
             android:name=".core.fileupload.GliaFileProvider"

@@ -531,11 +531,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         } else {
             binding.appBarView.hideLeaveButtons()
         }
-        if (chatState.isSharingScreen) {
-            binding.appBarView.showEndScreenSharingButton()
-        } else {
-            binding.appBarView.hideEndScreenSharingButton()
-        }
+
         if (chatState.isSecureMessaging) {
             showToolbar(LocaleString(R.string.message_center_header))
             binding.appBarView.hideBackButton()
@@ -703,10 +699,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         setupAddAttachmentButton()
         binding.appBarView.setOnBackClickedListener { controller?.onBackArrowClicked() }
         binding.appBarView.setOnEndChatClickedListener { controller?.leaveChatClicked() }
-        binding.appBarView.setOnEndCallButtonClickedListener {
-            controller?.onForceStopScreenSharing()
-            binding.appBarView.hideEndScreenSharingButton()
-        }
         binding.appBarView.setOnXClickedListener { controller?.onXButtonClicked() }
         binding.newMessagesIndicatorCard.setOnClickListener { controller?.newMessagesIndicatorClicked() }
         binding.gvaQuickRepliesLayout.onItemClickedListener = GvaChipGroup.OnItemClickedListener {

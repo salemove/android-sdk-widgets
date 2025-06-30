@@ -3,11 +3,9 @@ package com.glia.widgets.view.head.controller
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
-import com.glia.widgets.engagement.ScreenSharingState
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
-import com.glia.widgets.engagement.domain.ScreenSharingUseCase
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.unSafeSubscribe
@@ -17,7 +15,6 @@ import com.glia.widgets.view.head.ChatHeadLayoutContract
 internal class ActivityWatcherForChatHeadController(
     private var serviceChatHeadController: ChatHeadContract.Controller,
     private var applicationChatHeadController: ChatHeadLayoutContract.Controller,
-    private val screenSharingUseCase: ScreenSharingUseCase,
     private val engagementStateUseCase: EngagementStateUseCase,
     private val isFromCallScreenUseCase: IsFromCallScreenUseCase,
     private val updateFromCallScreenUseCase: UpdateFromCallScreenUseCase,
@@ -32,8 +29,6 @@ internal class ActivityWatcherForChatHeadController(
 
     override fun init() {
         engagementStateUseCase().unSafeSubscribe(::handleEngagementState)
-        screenSharingUseCase().filter { it is ScreenSharingState.RequestAccepted && isCurrentEngagementCallVisualizerUseCase() }
-            .unSafeSubscribe { showBubble() }
     }
 
     private fun handleEngagementState(state: State) {

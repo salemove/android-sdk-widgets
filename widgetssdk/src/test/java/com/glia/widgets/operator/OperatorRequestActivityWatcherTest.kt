@@ -293,61 +293,6 @@ class OperatorRequestActivityWatcherTest {
     }
 
     @Test
-    fun `state AcquireMediaProjectionToken will launch DialogHolderActivity if activity is not a Component activity`() {
-        fireState<Activity>(controllerState, watcher, OperatorRequestContract.State.AcquireMediaProjectionToken) { _, activity ->
-            val intentSlot = slot<Intent>()
-            verify { activity.startActivity(capture(intentSlot)) }
-            Assert.assertEquals(DialogHolderActivity::class.qualifiedName, intentSlot.captured.targetActivityName)
-        }
-    }
-
-    @Test
-    fun `state AcquireMediaProjectionToken will request media projection with the resumed activity if activity is a Component activity`() {
-        val resultLauncher: ActivityResultLauncher<Intent> = mockk(relaxUnitFun = true)
-        val resultLauncher2: ActivityResultLauncher<Intent> = mockk(relaxUnitFun = true)
-
-        val mockkActivity: ChatActivity = mockk(relaxed = true) {
-            every { registerForActivityResult(any<ActivityResultContracts.StartActivityForResult>(), any()) } returns resultLauncher
-            every { localClassName } returns "com.glia.ChatActivity"
-        }
-
-        val mockkActivity2: CallActivity = mockk(relaxed = true) {
-            every { registerForActivityResult(any<ActivityResultContracts.StartActivityForResult>(), any()) } returns resultLauncher2
-            every { localClassName } returns "com.glia.CallActivity"
-        }
-
-        watcher.onActivityCreated(mockkActivity, null)
-        watcher.onActivityDestroyed(mockkActivity)
-        watcher.onActivityCreated(mockkActivity, null)
-        watcher.onActivityCreated(mockkActivity2, null)
-        verify { mockkActivity == any() }
-        verify(atLeast = 3) { mockkActivity.localClassName }
-        verify { mockkActivity.registerForActivityResult(any<ActivityResultContracts.StartActivityForResult>(), any()) }
-        verify { mockkActivity2.localClassName }
-        verify { mockkActivity2.registerForActivityResult(any<ActivityResultContracts.StartActivityForResult>(), any()) }
-
-        every { any<Activity>().withRuntimeTheme(captureLambda()) } answers {
-            secondArg<(Context, UiTheme) -> Unit>().invoke(mockkActivity, UiTheme())
-        }
-
-        val event: OneTimeEvent<OperatorRequestContract.State> = createMockEvent(OperatorRequestContract.State.AcquireMediaProjectionToken)
-
-        watcher.onActivityResumed(mockkActivity)
-        controllerState.onNext(event)
-
-        verify { mockkActivity.isFinishing }
-        verify { event.value }
-        verify { event.consumed }
-        verify(exactly = 0) { mockkActivity.startActivity(any()) }
-        verify { event.markConsumed() }
-        verify { mockkActivity.localClassName }
-        verify { resultLauncher.launch(any()) }
-        verify(exactly = 0) { resultLauncher2.launch(any()) }
-
-        confirmVerified(mockkActivity, resultLauncher, mockkActivity2, resultLauncher2)
-    }
-
-    @Test
     fun `state OpenOverlayPermissionScreen will open overlay permissions screen when system can handle that intent`() {
         val onSuccessSlot = slot<() -> Unit>()
         fireState<ChatActivity>(
@@ -375,60 +320,6 @@ class OperatorRequestActivityWatcherTest {
             verify { controller.failedToOpenOverlayPermissionScreen() }
             confirmVerified(activityLauncher)
         }
-    }
-
-    @Test
-    fun `showScreenSharingDialog will call onScreenSharingDialogAccepted when dialog is accepted`() {
-        mockkObject(Dialogs)
-        fireState<ChatActivity>(
-            controllerState,
-            watcher,
-            OperatorRequestContract.State.ShowScreenSharingDialog("operator_name")
-        ) { state, activity ->
-            val onAcceptSlot = slot<View.OnClickListener>()
-            val onDeclineSlot = slot<View.OnClickListener>()
-            verify {
-                Dialogs.showScreenSharingDialog(
-                    activity,
-                    any(),
-                    "operator_name",
-                    capture(onAcceptSlot),
-                    capture(onDeclineSlot)
-                )
-            }
-            onAcceptSlot.captured.onClick(mockk())
-
-            verify { state.markConsumed() }
-            verify { controller.onScreenSharingDialogAccepted(activity) }
-        }
-        unmockkObject(Dialogs)
-    }
-
-    @Test
-    fun `showScreenSharingDialog will call onScreenSharingDialogDeclined when dialog is declined`() {
-        mockkObject(Dialogs)
-        fireState<ChatActivity>(
-            controllerState,
-            watcher,
-            OperatorRequestContract.State.ShowScreenSharingDialog("operator_name")
-        ) { state, activity ->
-            val onAcceptSlot = slot<View.OnClickListener>()
-            val onDeclineSlot = slot<View.OnClickListener>()
-            verify {
-                Dialogs.showScreenSharingDialog(
-                    activity,
-                    any(),
-                    "operator_name",
-                    capture(onAcceptSlot),
-                    capture(onDeclineSlot)
-                )
-            }
-            onDeclineSlot.captured.onClick(mockk())
-
-            verify { state.markConsumed() }
-            verify { controller.onScreenSharingDialogDeclined(activity) }
-        }
-        unmockkObject(Dialogs)
     }
 
     @Test
@@ -481,24 +372,6 @@ class OperatorRequestActivityWatcherTest {
             verify { controller.onOverlayPermissionRequestDeclined(activity) }
         }
         unmockkObject(Dialogs)
-    }
-
-    @Test
-    fun `onActivityCreated will register for media projection result if activity is component activity`() {
-        val activity: ChatActivity = mockk(relaxed = true)
-        watcher.onActivityCreated(activity, null)
-
-        val activityResultSlot = slot<ActivityResultCallback<ActivityResult>>()
-
-        verify { activity.registerForActivityResult(any<ActivityResultContracts.StartActivityForResult>(), capture(activityResultSlot)) }
-
-        val activityResult = mockk<ActivityResult>()
-
-        activityResultSlot.captured.onActivityResult(activityResult)
-        verify { activity.localClassName }
-        verify { controller.onMediaProjectionResultReceived(activityResult, activity) }
-
-        confirmVerified(activity, controller)
     }
 
     private fun mockLogger() {

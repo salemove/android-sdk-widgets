@@ -8,11 +8,9 @@ import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
 import com.glia.widgets.engagement.EndAction
 import com.glia.widgets.engagement.MediaType
-import com.glia.widgets.engagement.ScreenSharingState
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
-import com.glia.widgets.engagement.domain.ScreenSharingUseCase
 import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadContract
 import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadController
 import com.glia.widgets.view.head.controller.ApplicationChatHeadLayoutController
@@ -37,7 +35,6 @@ import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 internal class ActivityWatcherForChatHeadTest {
-    private val screenSharingStateFlowable: PublishProcessor<ScreenSharingState> = PublishProcessor.create()
     private val engagementStateFlowable: PublishProcessor<State> = PublishProcessor.create()
     private val watcher = Mockito.mock(ActivityWatcherForChatHeadContract.Watcher::class.java)
     private val serviceChatHeadController = Mockito.mock(ServiceChatHeadController::class.java)
@@ -49,13 +46,10 @@ internal class ActivityWatcherForChatHeadTest {
     private val engagementStateUseCase: EngagementStateUseCase = mock {
         on { invoke() } doReturn engagementStateFlowable
     }
-    private val screenSharingUseCase: ScreenSharingUseCase = mock {
-        on { invoke() } doReturn screenSharingStateFlowable
-    }
+
     private val controller = ActivityWatcherForChatHeadController(
         serviceChatHeadController,
         applicationChatHeadController,
-        screenSharingUseCase,
         engagementStateUseCase,
         isFromCallScreenUseCase,
         updateFromCallScreenUseCase,
@@ -76,7 +70,6 @@ internal class ActivityWatcherForChatHeadTest {
         controller.init()
 
         verify(engagementStateUseCase).invoke()
-        verify(screenSharingUseCase).invoke()
 
         cleanup()
         resetMocks()
@@ -91,15 +84,6 @@ internal class ActivityWatcherForChatHeadTest {
     fun `onActivityResumed bubble is resumed`() {
         `onActivityResumed callbacks are set when call or chat are not active`()
         verify(applicationChatHeadController).onResume(any())
-    }
-
-    @Test
-    fun `bubble is resumed when screenSharing is started and current engagement is CV`() {
-        mockShouldShowChatHead()
-
-        screenSharingStateFlowable.onNext(ScreenSharingState.RequestAccepted)
-
-        verifyBubbleIsShowed()
     }
 
     @Test
@@ -191,11 +175,11 @@ internal class ActivityWatcherForChatHeadTest {
     }
 
     private fun resetMocks() {
-        reset(watcher, serviceChatHeadController, screenSharingUseCase)
+        reset(watcher, serviceChatHeadController)
     }
 
     @After
     fun cleanup() {
-        verifyNoMoreInteractions(watcher, serviceChatHeadController, screenSharingUseCase)
+        verifyNoMoreInteractions(watcher, serviceChatHeadController)
     }
 }

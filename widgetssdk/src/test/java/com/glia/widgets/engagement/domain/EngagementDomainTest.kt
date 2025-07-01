@@ -12,11 +12,9 @@ import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.androidsdk.comms.Video
 import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
-import com.glia.widgets.core.screensharing.MEDIA_PROJECTION_SERVICE_ACTION_START
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.MediaType
 import com.glia.widgets.engagement.EngagementRepository
-import com.glia.widgets.engagement.ScreenSharingState
 import com.glia.widgets.helper.Data
 import com.glia.widgets.helper.formattedName
 import com.glia.widgets.internal.dialog.DialogContract
@@ -234,62 +232,9 @@ class EngagementDomainTest {
     }
 
     @Test
-    fun `EngagementTypeUseCase isCallVisualizerScreenSharing returns true when current engagement is call visualizer`() {
-        val isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase = mockk(relaxUnitFun = true)
-        val isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase = mockk(relaxUnitFun = true)
-        val screenSharingUseCase: ScreenSharingUseCase = mockk(relaxUnitFun = true)
-        val operatorMediaUseCase: OperatorMediaUseCase = mockk(relaxUnitFun = true)
-        val visitorMediaUseCase: VisitorMediaUseCase = mockk(relaxUnitFun = true)
-        val isOperatorPresentUseCase: IsOperatorPresentUseCase = mockk(relaxUnitFun = true)
-
-        every { isCurrentEngagementCallVisualizerUseCase() } returns true
-        every { visitorMediaUseCase.hasMedia } returns false
-        every { operatorMediaUseCase.hasMedia } returns false
-        every { screenSharingUseCase.isSharing } returns true
-
-        val useCase: EngagementTypeUseCase = EngagementTypeUseCaseImpl(
-            isQueueingOrLiveEngagementUseCase = isQueueingOrLiveEngagementUseCase,
-            isCurrentEngagementCallVisualizerUseCase = isCurrentEngagementCallVisualizerUseCase,
-            screenSharingUseCase = screenSharingUseCase,
-            operatorMediaUseCase = operatorMediaUseCase,
-            visitorMediaUseCase = visitorMediaUseCase,
-            isOperatorPresentUseCase = isOperatorPresentUseCase
-        )
-
-        assertTrue(useCase.isCallVisualizerScreenSharing)
-    }
-
-    @Test
-    fun `EngagementTypeUseCase isCallVisualizerScreenSharing returns true even when engagement has media`() {
-        val isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase = mockk(relaxUnitFun = true)
-        val isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase = mockk(relaxUnitFun = true)
-        val screenSharingUseCase: ScreenSharingUseCase = mockk(relaxUnitFun = true)
-        val operatorMediaUseCase: OperatorMediaUseCase = mockk(relaxUnitFun = true)
-        val visitorMediaUseCase: VisitorMediaUseCase = mockk(relaxUnitFun = true)
-        val isOperatorPresentUseCase: IsOperatorPresentUseCase = mockk(relaxUnitFun = true)
-
-        every { isCurrentEngagementCallVisualizerUseCase() } returns true
-        every { visitorMediaUseCase.hasMedia } returns true
-        every { operatorMediaUseCase.hasMedia } returns true
-        every { screenSharingUseCase.isSharing } returns true
-
-        val useCase: EngagementTypeUseCase = EngagementTypeUseCaseImpl(
-            isQueueingOrLiveEngagementUseCase = isQueueingOrLiveEngagementUseCase,
-            isCurrentEngagementCallVisualizerUseCase = isCurrentEngagementCallVisualizerUseCase,
-            screenSharingUseCase = screenSharingUseCase,
-            operatorMediaUseCase = operatorMediaUseCase,
-            visitorMediaUseCase = visitorMediaUseCase,
-            isOperatorPresentUseCase = isOperatorPresentUseCase
-        )
-
-        assertTrue(useCase.isCallVisualizerScreenSharing)
-    }
-
-    @Test
     fun `EngagementTypeUseCase isChatEngagement returns true when engagement has no media, is not a cv and operator is present`() {
         val isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase = mockk(relaxUnitFun = true)
         val isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase = mockk(relaxUnitFun = true)
-        val screenSharingUseCase: ScreenSharingUseCase = mockk(relaxUnitFun = true)
         val operatorMediaUseCase: OperatorMediaUseCase = mockk(relaxUnitFun = true)
         val visitorMediaUseCase: VisitorMediaUseCase = mockk(relaxUnitFun = true)
         val isOperatorPresentUseCase: IsOperatorPresentUseCase = mockk(relaxUnitFun = true)
@@ -303,7 +248,6 @@ class EngagementDomainTest {
         val useCase: EngagementTypeUseCase = EngagementTypeUseCaseImpl(
             isQueueingOrLiveEngagementUseCase = isQueueingOrLiveEngagementUseCase,
             isCurrentEngagementCallVisualizerUseCase = isCurrentEngagementCallVisualizerUseCase,
-            screenSharingUseCase = screenSharingUseCase,
             operatorMediaUseCase = operatorMediaUseCase,
             visitorMediaUseCase = visitorMediaUseCase,
             isOperatorPresentUseCase = isOperatorPresentUseCase
@@ -316,7 +260,6 @@ class EngagementDomainTest {
     fun `EngagementTypeUseCase isMediaEngagement returns true when engagement has  media and operator is present`() {
         val isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase = mockk(relaxUnitFun = true)
         val isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase = mockk(relaxUnitFun = true)
-        val screenSharingUseCase: ScreenSharingUseCase = mockk(relaxUnitFun = true)
         val operatorMediaUseCase: OperatorMediaUseCase = mockk(relaxUnitFun = true)
         val visitorMediaUseCase: VisitorMediaUseCase = mockk(relaxUnitFun = true)
         val isOperatorPresentUseCase: IsOperatorPresentUseCase = mockk(relaxUnitFun = true)
@@ -329,7 +272,6 @@ class EngagementDomainTest {
         val useCase: EngagementTypeUseCase = EngagementTypeUseCaseImpl(
             isQueueingOrLiveEngagementUseCase = isQueueingOrLiveEngagementUseCase,
             isCurrentEngagementCallVisualizerUseCase = isCurrentEngagementCallVisualizerUseCase,
-            screenSharingUseCase = screenSharingUseCase,
             operatorMediaUseCase = operatorMediaUseCase,
             visitorMediaUseCase = visitorMediaUseCase,
             isOperatorPresentUseCase = isOperatorPresentUseCase
@@ -419,20 +361,6 @@ class EngagementDomainTest {
         assertTrue(useCase())
         assertFalse(useCase.isQueueingForMedia)
         assertFalse(useCase.hasOngoingLiveEngagement)
-    }
-
-    @Test
-    fun `StartMediaProjectionServiceUseCase invoke sets proper action to intent`() {
-        val context: Context = mockk(relaxed = true)
-        val useCase: StartMediaProjectionServiceUseCase = StartMediaProjectionServiceUseCaseImpl(context)
-
-        useCase()
-
-        val intentSlot = slot<Intent>()
-
-        verify { context.startForegroundService(capture(intentSlot)) }
-
-        assertEquals(MEDIA_PROJECTION_SERVICE_ACTION_START, intentSlot.captured.action)
     }
 
     @Test
@@ -557,14 +485,12 @@ class EngagementDomainTest {
         mockkStatic(Dependencies::class)
 
         every { Dependencies.destroyControllers() } just Runs
-        val releaseScreenSharingResourcesUseCase: ReleaseScreenSharingResourcesUseCase = mockk(relaxUnitFun = true)
         val callNotificationUseCase: CallNotificationUseCase = mockk(relaxUnitFun = true)
         val fileAttachmentRepository: FileAttachmentRepository = mockk(relaxUnitFun = true)
         val updateFromCallScreenUseCase: UpdateFromCallScreenUseCase = mockk(relaxUnitFun = true)
         val dialogController: DialogContract.Controller = mockk(relaxUnitFun = true)
 
         val useCase: ReleaseResourcesUseCase = ReleaseResourcesUseCaseImpl(
-            releaseScreenSharingResourcesUseCase = releaseScreenSharingResourcesUseCase,
             callNotificationUseCase = callNotificationUseCase,
             fileAttachmentRepository = fileAttachmentRepository,
             updateFromCallScreenUseCase = updateFromCallScreenUseCase,
@@ -576,56 +502,12 @@ class EngagementDomainTest {
         verifyOrder {
             dialogController.dismissDialogs()
             fileAttachmentRepository.detachAllFiles()
-            releaseScreenSharingResourcesUseCase()
             callNotificationUseCase.removeAllNotifications()
             updateFromCallScreenUseCase(false)
             Dependencies.destroyControllers()
         }
 
         unmockkStatic(Dependencies::class)
-    }
-
-    @Test
-    fun `ScreenSharingUseCase test`() {
-        val mode = ScreenSharing.Mode.UNBOUNDED
-        val engagementRepository: EngagementRepository = mockk(relaxUnitFun = true)
-        val releaseScreenSharingResourcesUseCase: ReleaseScreenSharingResourcesUseCase = mockk(relaxUnitFun = true)
-
-        val configurationManager = mockk<ConfigurationManager> {
-            every { screenSharingMode } returns mode
-        }
-        val useCase: ScreenSharingUseCase = ScreenSharingUseCaseImpl(
-            engagementRepository = engagementRepository,
-            releaseScreenSharingResourcesUseCase = releaseScreenSharingResourcesUseCase,
-            configurationManager
-        )
-
-        every { engagementRepository.isSharingScreen } returns true
-        every { engagementRepository.screenSharingState } returns Flowable.just(ScreenSharingState.Started)
-
-        assertTrue(useCase.isSharing)
-        assertEquals(ScreenSharingState.Started, useCase().blockingFirst())
-
-        verify { engagementRepository.isSharingScreen }
-        verify { engagementRepository.screenSharingState }
-
-        useCase.end()
-        verify { engagementRepository.endScreenSharing() }
-        verify { releaseScreenSharingResourcesUseCase() }
-
-        useCase.declineRequest()
-        verify { engagementRepository.declineScreenSharingRequest() }
-
-        val activity: Activity = mockk(relaxUnitFun = true)
-        useCase.acceptRequestWithAskedPermission(activity)
-        verify { engagementRepository.acceptScreenSharingWithAskedPermission(activity, mode) }
-
-        val resultCode = 1
-        val intent: Intent = mockk(relaxUnitFun = true)
-        useCase.onActivityResultSkipPermissionRequest(resultCode, intent)
-        verify { engagementRepository.onActivityResultSkipScreenSharingPermissionRequest(resultCode, intent) }
-
-        confirmVerified(engagementRepository, releaseScreenSharingResourcesUseCase)
     }
 
     @Test

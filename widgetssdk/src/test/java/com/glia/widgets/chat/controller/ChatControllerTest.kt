@@ -52,7 +52,6 @@ import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 import com.glia.widgets.engagement.domain.OperatorMediaUseCase
 import com.glia.widgets.engagement.domain.OperatorTypingUseCase
 import com.glia.widgets.engagement.domain.ReleaseResourcesUseCase
-import com.glia.widgets.engagement.domain.ScreenSharingUseCase
 import com.glia.widgets.entrywidget.EntryWidgetContract
 import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase
 import com.glia.widgets.filepreview.domain.usecase.IsFileReadyForPreviewUseCase
@@ -119,7 +118,6 @@ class ChatControllerTest {
     private lateinit var isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase
     private lateinit var enqueueForEngagementUseCase: EnqueueForEngagementUseCase
     private lateinit var decideOnQueueingUseCase: DecideOnQueueingUseCase
-    private lateinit var screenSharingUseCase: ScreenSharingUseCase
     private lateinit var takePictureUseCase: TakePictureUseCase
     private lateinit var uriToFileAttachmentUseCase: UriToFileAttachmentUseCase
     private lateinit var withCameraPermissionUseCase: WithCameraPermissionUseCase
@@ -191,10 +189,6 @@ class ChatControllerTest {
             on { invoke() } doReturn Flowable.just(Unit)
         }
 
-        screenSharingUseCase = mock {
-            on { invoke() } doReturn Flowable.empty()
-        }
-
         takePictureUseCase = mock()
         uriToFileAttachmentUseCase = mock()
         withCameraPermissionUseCase = mock()
@@ -246,7 +240,6 @@ class ChatControllerTest {
             isQueueingOrLiveEngagementUseCase = isQueueingOrLiveEngagementUseCase,
             enqueueForEngagementUseCase = enqueueForEngagementUseCase,
             decideOnQueueingUseCase = decideOnQueueingUseCase,
-            screenSharingUseCase = screenSharingUseCase,
             takePictureUseCase = takePictureUseCase,
             uriToFileAttachmentUseCase = uriToFileAttachmentUseCase,
             withCameraPermissionUseCase = withCameraPermissionUseCase,

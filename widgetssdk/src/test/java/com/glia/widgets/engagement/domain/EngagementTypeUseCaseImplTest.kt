@@ -20,8 +20,6 @@ class EngagementTypeUseCaseImplTest {
     @MockK
     private lateinit var isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase
     @MockK
-    private lateinit var screenSharingUseCase: ScreenSharingUseCase
-    @MockK
     private lateinit var operatorMediaUseCase: OperatorMediaUseCase
     @MockK
     private lateinit var visitorMediaUseCase: VisitorMediaUseCase
@@ -36,7 +34,6 @@ class EngagementTypeUseCaseImplTest {
         useCase = EngagementTypeUseCaseImpl(
             isQueueingOrLiveEngagementUseCase,
             isCurrentEngagementCallVisualizerUseCase,
-            screenSharingUseCase,
             operatorMediaUseCase,
             visitorMediaUseCase,
             isOperatorPresentUseCase

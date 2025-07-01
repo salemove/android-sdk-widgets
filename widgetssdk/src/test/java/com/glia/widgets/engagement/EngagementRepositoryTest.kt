@@ -25,10 +25,6 @@ import com.glia.androidsdk.omnibrowse.Omnibrowse
 import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement
 import com.glia.androidsdk.omnicore.OmnicoreEngagement
 import com.glia.androidsdk.queuing.QueueTicket
-import com.glia.androidsdk.screensharing.LocalScreen
-import com.glia.androidsdk.screensharing.ScreenSharing
-import com.glia.androidsdk.screensharing.ScreenSharingRequest
-import com.glia.androidsdk.screensharing.VisitorScreenSharingState
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.Data
 import com.glia.widgets.helper.Logger
@@ -80,14 +76,10 @@ class EngagementRepositoryTest {
     private lateinit var operatorMediaStateUpdateCallbackSlot: CapturingSlot<Consumer<OperatorMediaState>>
     private lateinit var visitorMediaStateUpdateCallbackSlot: CapturingSlot<Consumer<VisitorMediaState>>
     private lateinit var operatorTypingCallbackSlot: CapturingSlot<Consumer<OperatorTypingStatus>>
-    private lateinit var screenSharingRequestCallbackSlot: CapturingSlot<Consumer<ScreenSharingRequest>>
-    private lateinit var screenSharingRequestResponseCallbackSlot: CapturingSlot<Consumer<GliaException>>
-    private lateinit var screenSharingStateCallbackSlot: CapturingSlot<Consumer<VisitorScreenSharingState>>
 
     private lateinit var engagement: Engagement
     private lateinit var media: Media
     private lateinit var chat: Chat
-    private lateinit var screenSharing: ScreenSharing
     private lateinit var operator: Operator
     private lateinit var engagementState: EngagementState
     private lateinit var cameraDevice: CameraDevice
@@ -114,9 +106,6 @@ class EngagementRepositoryTest {
         operatorMediaStateUpdateCallbackSlot = slot()
         visitorMediaStateUpdateCallbackSlot = slot()
         operatorTypingCallbackSlot = slot()
-        screenSharingRequestCallbackSlot = slot()
-        screenSharingRequestResponseCallbackSlot = slot()
-        screenSharingStateCallbackSlot = slot()
 
         every { core.callVisualizer } returns callVisualizer
         configurationManager = mockk<ConfigurationManager> {
@@ -150,7 +139,6 @@ class EngagementRepositoryTest {
         val visitorMediaStateTest = repository.visitorMediaState.test()
         val onHoldStateTest = repository.onHoldState.test()
         val operatorMediaStateTest = repository.operatorMediaState.test()
-        val screenSharingStateTest = repository.screenSharingState.test()
         val visitorCameraStateTest = repository.visitorCameraState.test()
 
         repository.initialize()
@@ -173,14 +161,12 @@ class EngagementRepositoryTest {
             operatorMediaStateTest.assertNotComplete().assertValue(Data.Empty).assertValueCount(1)
             assertNull(currentOperatorValue)
             assertNull(operatorCurrentMediaState)
-            screenSharingStateTest.assertNotComplete().assertNoValues()
             assertFalse(isQueueingOrLiveEngagement)
             assertFalse(hasOngoingLiveEngagement)
             assertFalse(isQueueing)
             assertFalse(isQueueingForMedia)
             assertFalse(isCallVisualizerEngagement)
             assertFalse(isOperatorPresent)
-            assertFalse(isSharingScreen)
             visitorCameraStateTest.assertNotComplete().assertNoValues()
         }
     }
@@ -194,7 +180,6 @@ class EngagementRepositoryTest {
 
         media = mockk(relaxUnitFun = true)
         chat = mockk(relaxUnitFun = true)
-        screenSharing = mockk(relaxUnitFun = true)
         cameraDevice = mockk(relaxUnitFun = true)
 
         operator = mockk(relaxUnitFun = true) {
@@ -209,7 +194,6 @@ class EngagementRepositoryTest {
         every { engagementState.isLiveEngagementTransferredToSecureConversation } returns false
         every { engagement.media } returns media
         every { engagement.chat } returns chat
-        every { engagement.screenSharing } returns screenSharing
         every { media.currentCameraDevice } returns cameraDevice
 
         val stateTestSubscriber = repository.engagementState.test()
@@ -248,14 +232,10 @@ class EngagementRepositoryTest {
         verify { media.on(Media.Events.VISITOR_STATE_UPDATE, capture(visitorMediaStateUpdateCallbackSlot)) }
         verify { media.currentCameraDevice }
 
-        verify { screenSharing.on(ScreenSharing.Events.SCREEN_SHARING_REQUEST, capture(screenSharingRequestCallbackSlot)) }
-        verify { screenSharing.on(ScreenSharing.Events.VISITOR_STATE, capture(screenSharingStateCallbackSlot)) }
-
         verify { engagement.state }
         verify { engagementState.operator }
         verify { engagementState.visitorStatus }
         verify { engagement.media }
-        verify { engagement.screenSharing }
 
         if (!callVisualizer) {
             verify { engagement.chat }
@@ -354,9 +334,6 @@ class EngagementRepositoryTest {
             visitorMediaState.test().assertNotComplete().assertValue(Data.Empty)
             onHoldState.test().assertNotComplete().assertValue(false)
             operatorMediaState.test().assertNotComplete().assertValue(Data.Empty)
-            if (ongoingEngagement) {
-                screenSharingState.test().assertNotComplete().assertValue(ScreenSharingState.Ended)
-            }
             assertNull(operatorCurrentMediaState)
             assertNull(currentOperatorValue)
         }
@@ -385,11 +362,7 @@ class EngagementRepositoryTest {
         verify { media.off(Media.Events.OPERATOR_STATE_UPDATE, any()) }
         verify { media.off(Media.Events.VISITOR_STATE_UPDATE, any()) }
 
-        verify { screenSharing.off(ScreenSharing.Events.SCREEN_SHARING_REQUEST, any()) }
-        verify { screenSharing.off(ScreenSharing.Events.VISITOR_STATE, any()) }
-
         verify { engagement.media }
-        verify { engagement.screenSharing }
         verify { chat.off(Chat.Events.OPERATOR_TYPING_STATUS, any()) }
         verify { engagement.chat }
 
@@ -397,33 +370,7 @@ class EngagementRepositoryTest {
     }
 
     private fun confirmEngagementVerified() {
-        confirmVerified(engagement, chat, media, screenSharing)
-    }
-
-    private fun requestScreenSharing(testBody: (ScreenSharingRequest) -> Unit) {
-        val screenSharingRequest: ScreenSharingRequest = mockk(relaxUnitFun = true)
-        mockEngagementAndStart()
-        val operatorName = "operator_name"
-
-        val operator1: Operator = mockk(relaxed = true) {
-            every { id } returns "1"
-            every { formattedName } returns operatorName
-        }
-
-        val state1: EngagementState = mockk(relaxed = true) {
-            every { operator } returns operator1
-            every { visitorStatus } returns EngagementState.VisitorStatus.ENGAGED
-            every { id } returns "s_1"
-        }
-
-        engagementStateCallbackSlot.captured.accept(state1)
-        verify { operatorRepository.emit(operator1) }
-
-        screenSharingRequestCallbackSlot.captured.accept(screenSharingRequest)
-
-        repository.screenSharingState.test().assertNotComplete().assertValue(ScreenSharingState.Requested)
-        testBody(screenSharingRequest)
-        confirmVerified(screenSharingRequest)
+        confirmVerified(engagement, chat, media)
     }
 
     @After
@@ -546,7 +493,6 @@ class EngagementRepositoryTest {
         engagementState = mockk(relaxUnitFun = true)
         media = mockk(relaxUnitFun = true)
         chat = mockk(relaxUnitFun = true)
-        screenSharing = mockk(relaxUnitFun = true)
         cameraDevice = mockk(relaxUnitFun = true)
         every { engagementState.visitorStatus } returns EngagementState.VisitorStatus.TRANSFERRING
         every { engagementState.isLiveEngagementTransferredToSecureConversation } returns true
@@ -558,7 +504,6 @@ class EngagementRepositoryTest {
         every { engagement.state } returns engagementState
         every { engagement.media } returns media
         every { engagement.chat } returns chat
-        every { engagement.screenSharing } returns screenSharing
 
         omniCoreEngagementCallbackSlot.captured.accept(engagement as OmnicoreEngagement)
         repository.engagementState.test().assertValue(State.TransferredToSecureConversation).assertValueCount(1).assertNotComplete()
@@ -571,7 +516,6 @@ class EngagementRepositoryTest {
         engagementState = mockk(relaxUnitFun = true)
         media = mockk(relaxUnitFun = true)
         chat = mockk(relaxUnitFun = true)
-        screenSharing = mockk(relaxUnitFun = true)
         cameraDevice = mockk(relaxUnitFun = true)
         every { engagementState.visitorStatus } returns EngagementState.VisitorStatus.TRANSFERRING
         every { engagementState.isLiveEngagementTransferredToSecureConversation } returns true
@@ -583,7 +527,6 @@ class EngagementRepositoryTest {
         every { engagement.state } returns engagementState
         every { engagement.media } returns media
         every { engagement.chat } returns chat
-        every { engagement.screenSharing } returns screenSharing
 
         omniCoreEngagementCallbackSlot.captured.accept(engagement as OmnicoreEngagement)
         repository.engagementState.test().assertValue(State.TransferredToSecureConversation).assertValueCount(1).assertNotComplete()
@@ -600,7 +543,6 @@ class EngagementRepositoryTest {
         engagementState = mockk(relaxUnitFun = true)
         media = mockk(relaxUnitFun = true)
         chat = mockk(relaxUnitFun = true)
-        screenSharing = mockk(relaxUnitFun = true)
         cameraDevice = mockk(relaxUnitFun = true)
         every { engagementState.visitorStatus } returns EngagementState.VisitorStatus.TRANSFERRING
         every { engagementState.isLiveEngagementTransferredToSecureConversation } returns true
@@ -612,7 +554,6 @@ class EngagementRepositoryTest {
         every { engagement.state } returns engagementState
         every { engagement.media } returns media
         every { engagement.chat } returns chat
-        every { engagement.screenSharing } returns screenSharing
 
         omniCoreEngagementCallbackSlot.captured.accept(engagement as OmnicoreEngagement)
         repository.engagementState.test().assertValue(State.TransferredToSecureConversation).assertValueCount(1).assertNotComplete()
@@ -1391,96 +1332,10 @@ class EngagementRepositoryTest {
     }
 
     @Test
-    fun `declineScreenSharingRequest will send CANCELED result to core`() {
-        requestScreenSharing {
-            repository.declineScreenSharingRequest()
-            verify { engagement.onActivityResult(SKIP_ASKING_SCREEN_SHARING_PERMISSION_RESULT_CODE, Activity.RESULT_CANCELED, null) }
-            verify { it.decline() }
-            repository.screenSharingState.test().assertNotComplete().assertValue(ScreenSharingState.RequestDeclined)
-            assertFalse(repository.isSharingScreen)
-        }
-    }
-
-    @Test
-    fun `acceptScreenSharingWithAskedPermission will accept request with SKIP_ASKING_SCREEN_SHARING_PERMISSION_RESULT_CODE result code`() {
-        val activity: Activity = mockk()
-        val screenSharingMode = ScreenSharing.Mode.APP_BOUNDED
-        requestScreenSharing {
-            repository.acceptScreenSharingWithAskedPermission(activity, screenSharingMode)
-            val onAcceptResultSlot = slot<Consumer<GliaException?>>()
-
-            verify { it.accept(screenSharingMode, activity, SKIP_ASKING_SCREEN_SHARING_PERMISSION_RESULT_CODE, capture(onAcceptResultSlot)) }
-            val debugMessageText = "debuuugg meeeeeesage"
-
-            onAcceptResultSlot.captured.accept(GliaException(debugMessageText, GliaException.Cause.NETWORK_TIMEOUT))
-
-            repository.screenSharingState.test().assertNotComplete().assertValue(ScreenSharingState.FailedToAcceptRequest(debugMessageText))
-            assertFalse(repository.isSharingScreen)
-        }
-    }
-
-    @Test
     fun `onActivityResult will call appropriate engagement function when ongoing engagement`() {
         mockEngagementAndStart()
         repository.onActivityResult(1, 2, null)
         verify { engagement.onActivityResult(1, 2, null) }
-    }
-
-    @Test
-    fun `onActivityResultSkipScreenSharingPermissionRequest will call appropriate engagement function with special request code when ongoing engagement`() {
-        mockEngagementAndStart()
-        repository.onActivityResultSkipScreenSharingPermissionRequest(1, null)
-        repository.onReadyToShareScreen()
-        repository.onReadyToShareScreen()
-        verify { engagement.onActivityResult(SKIP_ASKING_SCREEN_SHARING_PERMISSION_RESULT_CODE, 1, null) }
-    }
-
-    @Test
-    fun `endScreenSharing will end screen sharing`() {
-        val screenSharingStateTestSubscriber = repository.screenSharingState.test()
-        val localScreen: LocalScreen = mockk(relaxed = true)
-        mockEngagementAndStart()
-
-        screenSharingStateCallbackSlot.captured.accept(VisitorScreenSharingState(ScreenSharing.Status.SHARING, localScreen))
-        screenSharingStateCallbackSlot.captured.accept(VisitorScreenSharingState(ScreenSharing.Status.SHARING, localScreen))
-        screenSharingStateCallbackSlot.captured.accept(VisitorScreenSharingState(ScreenSharing.Status.SHARING, localScreen))
-        assertTrue(repository.isSharingScreen)
-        repository.endScreenSharing()
-
-        verify { localScreen.stopSharing() }
-        assertFalse(repository.isSharingScreen)
-        screenSharingStateTestSubscriber
-            .assertValueCount(2)
-            .assertValuesOnly(
-                ScreenSharingState.Started,
-                ScreenSharingState.Ended
-            )
-
-        confirmVerified(localScreen)
-
-    }
-
-    @Test
-    fun `NOT_SHARING status will mark screen sharing ended`() {
-        val screenSharingStateTestSubscriber = repository.screenSharingState.test()
-        val localScreen: LocalScreen = mockk(relaxed = true)
-        mockEngagementAndStart()
-
-        screenSharingStateCallbackSlot.captured.accept(VisitorScreenSharingState(ScreenSharing.Status.SHARING, localScreen))
-        assertTrue(repository.isSharingScreen)
-        screenSharingStateCallbackSlot.captured.accept(VisitorScreenSharingState(ScreenSharing.Status.NOT_SHARING, localScreen))
-
-        verify(inverse = true) { localScreen.stopSharing() }
-        assertFalse(repository.isSharingScreen)
-        screenSharingStateTestSubscriber
-            .assertValueCount(2)
-            .assertValuesOnly(
-                ScreenSharingState.Started,
-                ScreenSharingState.Ended
-            )
-
-        confirmVerified(localScreen)
-
     }
 
     @Test
@@ -1509,7 +1364,6 @@ class EngagementRepositoryTest {
 
         val newMedia: Media = mockk(relaxUnitFun = true)
         val newChat: Chat = mockk(relaxUnitFun = true)
-        val newScreenSharing: ScreenSharing = mockk(relaxUnitFun = true)
 
         val newOperator: Operator = mockk(relaxUnitFun = true)
         val newEngagementState: EngagementState = mockk(relaxUnitFun = true)
@@ -1519,7 +1373,6 @@ class EngagementRepositoryTest {
         every { newEngagement.state } returns newEngagementState
         every { newEngagement.media } returns newMedia
         every { newEngagement.chat } returns newChat
-        every { newEngagement.screenSharing } returns newScreenSharing
         every { newMedia.currentCameraDevice } returns null
 
         omniCoreEngagementCallbackSlot.captured.accept(newEngagement)
@@ -1537,20 +1390,16 @@ class EngagementRepositoryTest {
         verify { newMedia.on(Media.Events.VISITOR_STATE_UPDATE, any()) }
         verify { newMedia.currentCameraDevice }
 
-        verify { newScreenSharing.on(ScreenSharing.Events.SCREEN_SHARING_REQUEST, any()) }
-        verify { newScreenSharing.on(ScreenSharing.Events.VISITOR_STATE, any()) }
-
         verify { newChat.on(Chat.Events.OPERATOR_TYPING_STATUS, any()) }
 
         verify { newEngagement.state }
         verify { newEngagementState.operator }
         verify { newEngagement.media }
-        verify { newEngagement.screenSharing }
         verify { newEngagement.chat }
         //emit new engagement end
 
         verifyUnsubscribedFromEngagement()
-        confirmVerified(newEngagement, newMedia, newChat, newScreenSharing)
+        confirmVerified(newEngagement, newMedia, newChat)
     }
 
 
@@ -1580,7 +1429,6 @@ class EngagementRepositoryTest {
 
         val newMedia: Media = mockk(relaxUnitFun = true)
         val newChat: Chat = mockk(relaxUnitFun = true)
-        val newScreenSharing: ScreenSharing = mockk(relaxUnitFun = true)
 
         val newOperator: Operator = mockk(relaxUnitFun = true)
         val newEngagementState: EngagementState = mockk(relaxUnitFun = true)
@@ -1590,7 +1438,6 @@ class EngagementRepositoryTest {
         every { newEngagement.state } returns newEngagementState
         every { newEngagement.media } returns newMedia
         every { newEngagement.chat } returns newChat
-        every { newEngagement.screenSharing } returns newScreenSharing
         every { newMedia.currentCameraDevice } returns mockk()
 
         callVisualizerEngagementCallbackSlot.captured.accept(newEngagement)
@@ -1608,20 +1455,16 @@ class EngagementRepositoryTest {
         verify { newMedia.on(Media.Events.VISITOR_STATE_UPDATE, any()) }
         verify { newMedia.currentCameraDevice }
 
-        verify { newScreenSharing.on(ScreenSharing.Events.SCREEN_SHARING_REQUEST, any()) }
-        verify { newScreenSharing.on(ScreenSharing.Events.VISITOR_STATE, any()) }
-
         verify(exactly = 0) { newChat.on(Chat.Events.OPERATOR_TYPING_STATUS, any()) }
 
         verify { newEngagement.state }
         verify { newEngagementState.operator }
         verify { newEngagement.media }
-        verify { newEngagement.screenSharing }
         verify(exactly = 0) { newEngagement.chat }
         //emit new engagement end
 
         verifyUnsubscribedFromEngagement()
-        confirmVerified(newEngagement, newMedia, newChat, newScreenSharing)
+        confirmVerified(newEngagement, newMedia, newChat)
     }
 
     @Test

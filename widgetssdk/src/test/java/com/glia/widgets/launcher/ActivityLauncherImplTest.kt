@@ -97,15 +97,6 @@ class ActivityLauncherImplTest {
     }
 
     @Test
-    fun `launchEndScreenSharing starts end screen sharing activity`() {
-        every { context.startActivity(any()) } just Runs
-
-        activityLauncher.launchEndScreenSharing(context)
-
-        verify { context.startActivity(any()) }
-    }
-
-    @Test
     fun `launchWebBrowser starts web browser activity`() {
         val url = "https://example.com"
         every { context.startActivity(any()) } just Runs

@@ -80,17 +80,16 @@ dokka {
       }
       sourceLink {
         localDirectory = file("widgetssdk/src/main/java")
-        remoteUrl = new URI("https://github.com/salemove/android-sdk-widgets/tree/master/widgetssdk/src/main/java")
+        remoteUrl = new URI("https://github.com/salemove/android-sdk-widgets/blob/master/widgetssdk/src/main/java")
         remoteLineSuffix = "#L"
       }
     }
   }
-  String currentYear = Calendar.getInstance().get(Calendar.YEAR)
   String gliaSvgLogoPath = rootProject.file("dokkaAssets/logo-icon.svg")
   pluginsConfiguration {
     html {
       customAssets.from("${gliaSvgLogoPath}")
-      footerMessage = "(c) ${currentYear} Glia Technologies, Inc. All rights reserved."
+      footerMessage = "© Glia Technologies, Inc. All rights reserved."
     }
   }
   dokkaPublications.html {

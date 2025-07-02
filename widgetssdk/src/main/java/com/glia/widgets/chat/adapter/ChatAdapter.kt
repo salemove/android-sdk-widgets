@@ -39,7 +39,6 @@ import com.glia.widgets.chat.model.SystemChatItem
 import com.glia.widgets.chat.model.TapToRetryItem
 import com.glia.widgets.chat.model.VisitorAttachmentItem
 import com.glia.widgets.chat.model.VisitorMessageItem
-import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.glia.widgets.databinding.ChatAttachmentOperatorFileLayoutBinding
 import com.glia.widgets.databinding.ChatAttachmentOperatorImageLayoutBinding
 import com.glia.widgets.databinding.ChatAttachmentVisitorFileLayoutBinding
@@ -60,6 +59,7 @@ import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseC
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromNetworkUseCase
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.rx.Schedulers
+import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.glia.widgets.view.SingleChoiceCardView.OnOptionClickedListener
 
 internal class ChatAdapter(

@@ -45,10 +45,6 @@ import com.glia.widgets.chat.model.ChatInputMode
 import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.ChatState
 import com.glia.widgets.chat.model.CustomCardChatItem
-import com.glia.widgets.internal.dialog.DialogContract
-import com.glia.widgets.internal.dialog.model.DialogState
-import com.glia.widgets.internal.dialog.model.LeaveDialogAction
-import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.glia.widgets.databinding.ChatViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.entrywidget.EntryWidgetContract
@@ -72,6 +68,10 @@ import com.glia.widgets.helper.requireActivity
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.setLocaleHint
 import com.glia.widgets.helper.setLocaleText
+import com.glia.widgets.internal.dialog.DialogContract
+import com.glia.widgets.internal.dialog.model.DialogState
+import com.glia.widgets.internal.dialog.model.LeaveDialogAction
+import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.glia.widgets.launcher.ActivityLauncher
 import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.view.Dialogs
@@ -418,7 +418,8 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     override fun showEngagementConfirmationDialog() {
         controller?.getConfirmationDialogLinks()?.let { links ->
             showDialog {
-                Dialogs.showEngagementConfirmationDialog(context = context,
+                Dialogs.showEngagementConfirmationDialog(
+                    context = context,
                     theme = theme,
                     links = links,
                     positiveButtonClickListener = { onEngagementConfirmationDialogAllowed() },

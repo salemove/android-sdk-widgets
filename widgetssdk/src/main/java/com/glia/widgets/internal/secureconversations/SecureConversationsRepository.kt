@@ -7,10 +7,10 @@ import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.androidsdk.secureconversations.SecureConversations
 import com.glia.widgets.chat.data.GliaChatRepository
 import com.glia.widgets.chat.domain.GliaSendMessageUseCase
-import com.glia.widgets.internal.queue.QueueRepository
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.asStateFlowable
 import com.glia.widgets.helper.unSafeSubscribe
+import com.glia.widgets.internal.queue.QueueRepository
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.processors.BehaviorProcessor

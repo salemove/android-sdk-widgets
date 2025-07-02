@@ -3,7 +3,7 @@
     android:height="4dp"
     android:viewportWidth="33"
     android:viewportHeight="4">
-  <path
-      android:pathData="M2.5,0L30.5,0A2,2 0,0 1,32.5 2L32.5,2A2,2 0,0 1,30.5 4L2.5,4A2,2 0,0 1,0.5 2L0.5,2A2,2 0,0 1,2.5 0z"
-      android:fillColor="?attr/gliaBaseShadeColor" />
+    <path
+        android:pathData="M2.5,0L30.5,0A2,2 0,0 1,32.5 2L32.5,2A2,2 0,0 1,30.5 4L2.5,4A2,2 0,0 1,0.5 2L0.5,2A2,2 0,0 1,2.5 0z"
+        android:fillColor="?attr/gliaBaseShadeColor" />
 </vector>

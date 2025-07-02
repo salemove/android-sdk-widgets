@@ -213,25 +213,25 @@ public class SurveyStyle implements Parcelable {
                                                                       int backgroundColorId) {
             ColorStateList buttonTexColor = resourceProvider.getColorStateList(R.color.glia_light_color);
             TextConfiguration textConfiguration =
-                    new TextConfiguration.Builder().textColor(buttonTexColor).build(resourceProvider);
+                new TextConfiguration.Builder().textColor(buttonTexColor).build(resourceProvider);
             return new ButtonConfiguration.Builder()
-                    .backgroundColor(resourceProvider.getColorStateList(backgroundColorId))
-                    .textConfiguration(textConfiguration)
-                    .build(resourceProvider);
+                .backgroundColor(resourceProvider.getColorStateList(backgroundColorId))
+                .textConfiguration(textConfiguration)
+                .build(resourceProvider);
         }
 
         private TextConfiguration prepareDefaultTitleConfiguration(ResourceProvider resourceProvider) {
             ColorStateList color = resourceProvider.getColorStateList(R.color.glia_dark_color);
             return new TextConfiguration.Builder()
-                    .textColor(color)
-                    .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_survey_title_text_size))
-                    .build(resourceProvider);
+                .textColor(color)
+                .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_survey_title_text_size))
+                .build(resourceProvider);
         }
 
         private LayerConfiguration prepareDefaultBackgroundConfiguration(ResourceProvider resourceProvider) {
             return new LayerConfiguration.Builder()
-                    .cornerRadius(resourceProvider.getDimension(R.dimen.glia_survey_default_survey_corner_radius))
-                    .build();
+                .cornerRadius(resourceProvider.getDimension(R.dimen.glia_survey_default_survey_corner_radius))
+                .build();
         }
     }
 

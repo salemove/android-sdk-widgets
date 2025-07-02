@@ -1,9 +1,9 @@
 package com.glia.widgets.internal.secureconversations.domain
 
 import com.glia.widgets.engagement.MediaType
-import com.glia.widgets.internal.secureconversations.SecureConversationsRepository
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
+import com.glia.widgets.internal.secureconversations.SecureConversationsRepository
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify

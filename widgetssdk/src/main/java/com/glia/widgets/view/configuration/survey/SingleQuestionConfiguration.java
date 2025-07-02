@@ -98,18 +98,18 @@ public class SingleQuestionConfiguration implements Parcelable {
         private TextConfiguration prepareDefaultTextConfiguration(ResourceProvider resourceProvider) {
             ColorStateList optionTextColor = resourceProvider.getColorStateList(R.color.glia_dark_color);
             return new TextConfiguration.Builder()
-                    .textColor(optionTextColor)
-                    .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
-                    .build(resourceProvider);
+                .textColor(optionTextColor)
+                .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
+                .build(resourceProvider);
         }
 
         private TextConfiguration prepareDefaultTitleConfiguration(ResourceProvider resourceProvider) {
             ColorStateList titleColor = resourceProvider.getColorStateList(R.color.glia_dark_color);
             return new TextConfiguration.Builder()
-                    .textColor(titleColor)
-                    .bold(true)
-                    .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
-                    .build(resourceProvider);
+                .textColor(titleColor)
+                .bold(true)
+                .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
+                .build(resourceProvider);
         }
     }
 

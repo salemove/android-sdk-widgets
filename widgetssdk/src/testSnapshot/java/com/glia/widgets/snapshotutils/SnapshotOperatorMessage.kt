@@ -27,7 +27,7 @@ internal interface SnapshotOperatorMessage : SnapshotStrings {
         operatorId: String? = "operatorId",
         operatorName: String? = "Snap Shot",
         content: String?,
-        singleChoiceOptions: List<SingleChoiceOption> = shortLengthTexts().mapIndexed{ i, s -> singleChoiceOption(s, i.toString())},
+        singleChoiceOptions: List<SingleChoiceOption> = shortLengthTexts().mapIndexed { i, s -> singleChoiceOption(s, i.toString()) },
         choiceCardImageUrl: String? = null
     ) = OperatorMessageItem.ResponseCard(
         id, timestamp, showChatHead, operatorProfileImgUrl, operatorId, operatorName, content, singleChoiceOptions, choiceCardImageUrl

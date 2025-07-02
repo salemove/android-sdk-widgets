@@ -33,6 +33,7 @@ internal interface GliaCore {
     val callVisualizer: Omnibrowse
     val secureConversations: SecureConversations
     val liveObservation: LiveObservation
+
     @Throws(GliaException::class)
     fun init(config: GliaConfig)
     fun init(config: GliaConfig, callback: RequestCallback<Boolean?>)

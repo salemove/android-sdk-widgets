@@ -14,7 +14,7 @@ import io.mockk.unmockkStatic
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-interface SnapshotActivityWindow: SnapshotTestLifecycle {
+interface SnapshotActivityWindow : SnapshotTestLifecycle {
 
     data class Mock(
         var activityMock: Activity,

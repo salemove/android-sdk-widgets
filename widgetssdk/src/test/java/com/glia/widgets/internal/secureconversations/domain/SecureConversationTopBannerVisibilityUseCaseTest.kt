@@ -2,9 +2,9 @@ package com.glia.widgets.internal.secureconversations.domain
 
 import android.assertCurrentValue
 import com.glia.widgets.engagement.MediaType
-import com.glia.widgets.queue.Queue
 import com.glia.widgets.internal.queue.QueueRepository
 import com.glia.widgets.internal.queue.QueuesState
+import com.glia.widgets.queue.Queue
 import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.schedulers.Schedulers

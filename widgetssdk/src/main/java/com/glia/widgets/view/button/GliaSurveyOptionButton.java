@@ -55,18 +55,18 @@ public class GliaSurveyOptionButton extends BaseConfigurableButton {
         LayerConfiguration highlightedLayer = buttonConfiguration.getHighlightedLayer();
 
         ColorStateList strokeColor =
-                isError ? ColorStateList.valueOf(Color.parseColor(highlightedLayer.getBorderColor())) :
-                        isSelected() ?
-                                ColorStateList.valueOf(Color.parseColor(selectedLayer.getBorderColor())) :
-                                ColorStateList.valueOf(Color.parseColor(normalLayer.getBorderColor()));
+            isError ? ColorStateList.valueOf(Color.parseColor(highlightedLayer.getBorderColor())) :
+                isSelected() ?
+                    ColorStateList.valueOf(Color.parseColor(selectedLayer.getBorderColor())) :
+                    ColorStateList.valueOf(Color.parseColor(normalLayer.getBorderColor()));
 
         ColorStateList backgroundColor = isSelected() ?
-                ColorStateList.valueOf(Color.parseColor(selectedLayer.getBackgroundColor())) :
-                ColorStateList.valueOf(Color.parseColor(normalLayer.getBackgroundColor()));
+            ColorStateList.valueOf(Color.parseColor(selectedLayer.getBackgroundColor())) :
+            ColorStateList.valueOf(Color.parseColor(normalLayer.getBackgroundColor()));
 
         ColorStateList textColor = isSelected() ?
-                buttonConfiguration.getSelectedText().getTextColor() :
-                buttonConfiguration.getNormalText().getTextColor();
+            buttonConfiguration.getSelectedText().getTextColor() :
+            buttonConfiguration.getNormalText().getTextColor();
 
         setStrokeColor(strokeColor);
         setStrokeWidth(normalLayer.getBorderWidth());

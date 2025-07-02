@@ -9,13 +9,13 @@ import androidx.appcompat.app.AlertDialog
 import com.glia.widgets.UiTheme
 import com.glia.widgets.callvisualizer.controller.CallVisualizerContract
 import com.glia.widgets.chat.ChatActivity
-import com.glia.widgets.internal.dialog.model.ConfirmationDialogLinks
-import com.glia.widgets.internal.dialog.model.Link
 import com.glia.widgets.helper.DialogHolderActivity
 import com.glia.widgets.helper.GliaActivityManager
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.OneTimeEvent
 import com.glia.widgets.helper.withRuntimeTheme
+import com.glia.widgets.internal.dialog.model.ConfirmationDialogLinks
+import com.glia.widgets.internal.dialog.model.Link
 import com.glia.widgets.launcher.ActivityLauncher
 import com.glia.widgets.locale.LocaleProvider
 import com.glia.widgets.locale.LocaleString

@@ -13,10 +13,10 @@ import com.glia.widgets.chat.model.CustomCardChatItem
 import com.glia.widgets.chat.model.OperatorStatusItem
 import com.glia.widgets.chat.model.SystemChatItem
 import com.glia.widgets.chat.model.VisitorMessageItem
-import com.glia.widgets.internal.engagement.domain.model.ChatMessageInternal
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.asSingleChoice
+import com.glia.widgets.internal.engagement.domain.model.ChatMessageInternal
 
 internal class AppendHistoryChatMessageUseCase(
     private val appendHistoryVisitorChatItemUseCase: AppendHistoryVisitorChatItemUseCase,

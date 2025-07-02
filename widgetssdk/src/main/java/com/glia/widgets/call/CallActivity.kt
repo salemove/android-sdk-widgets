@@ -6,8 +6,8 @@ import com.glia.widgets.base.FadeTransitionActivity
 import com.glia.widgets.call.CallView.OnNavigateToChatListener
 import com.glia.widgets.call.CallView.OnNavigateToWebBrowserListener
 import com.glia.widgets.chat.Intention
-import com.glia.widgets.engagement.MediaType
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.engagement.MediaType
 import com.glia.widgets.helper.ExtraKeys
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG

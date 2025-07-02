@@ -87,4 +87,4 @@ kt-lint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlintVersion" 
 paparazzi = { id = "app.cash.paparazzi", version.ref = "paparazziVersion" }
 # Publishing
 # Library reference: https://vanniktech.github.io/gradle-maven-publish-plugin/central/
-maven-publish = { id = "com.vanniktech.maven.publish" , version.ref = "mavenPublish" }
+maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }

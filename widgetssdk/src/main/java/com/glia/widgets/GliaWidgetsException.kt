@@ -59,7 +59,7 @@ internal fun GliaCoreException?.toWidgetsType(
     }
 
 private fun GliaCoreException.Cause.toWidgetsType(): Cause =
-    when(this) {
+    when (this) {
         GliaCoreException.Cause.INVALID_INPUT -> Cause.INVALID_INPUT
         GliaCoreException.Cause.INVALID_LOCALE -> Cause.INVALID_LOCALE
         GliaCoreException.Cause.NETWORK_TIMEOUT -> Cause.NETWORK_TIMEOUT
@@ -85,7 +85,7 @@ internal fun GliaWidgetsException.toCoreType(): GliaCoreException = this.let {
 }
 
 private fun Cause.toCoreType(): GliaCoreException.Cause =
-    when(this) {
+    when (this) {
         Cause.INVALID_INPUT -> GliaCoreException.Cause.INVALID_INPUT
         Cause.INVALID_LOCALE -> GliaCoreException.Cause.INVALID_LOCALE
         Cause.NETWORK_TIMEOUT -> GliaCoreException.Cause.NETWORK_TIMEOUT

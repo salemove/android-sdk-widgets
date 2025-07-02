@@ -9,202 +9,202 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/leftGuideline"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_begin="16dp"/>
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/leftGuideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_begin="16dp" />
 
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/rightGuideline"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_end="16dp"/>
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/rightGuideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_end="16dp" />
 
-        <Space
-            android:id="@+id/top_space"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@id/icon"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_chainStyle="packed"
-            app:layout_constraintVertical_weight="2" />
+            <Space
+                android:id="@+id/top_space"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                app:layout_constraintBottom_toTopOf="@id/icon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed"
+                app:layout_constraintVertical_weight="2" />
 
-        <ImageView
-            android:id="@+id/icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:src="@drawable/ic_secure_message"
-            app:tint="?attr/gliaBrandPrimaryColor"
-            android:importantForAccessibility="no"
-            app:layout_constraintBottom_toTopOf="@id/title"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="@id/leftGuideline"
-            app:layout_constraintTop_toBottomOf="@+id/top_space" />
+            <ImageView
+                android:id="@+id/icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:src="@drawable/ic_secure_message"
+                app:tint="?attr/gliaBrandPrimaryColor"
+                android:importantForAccessibility="no"
+                app:layout_constraintBottom_toTopOf="@id/title"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@id/leftGuideline"
+                app:layout_constraintTop_toBottomOf="@+id/top_space" />
 
-        <TextView
-            android:id="@+id/title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            tools:text="@string/message_center_title"
-            android:textAppearance="?attr/textAppearanceHeadline3"
-            app:layout_constrainedWidth="true"
-            app:layout_constraintBottom_toTopOf="@id/description"
-            app:layout_constraintEnd_toEndOf="@id/rightGuideline"
-            app:layout_constraintStart_toStartOf="@id/leftGuideline"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintTop_toBottomOf="@+id/icon" />
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                tools:text="@string/message_center_title"
+                android:textAppearance="?attr/textAppearanceHeadline3"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintBottom_toTopOf="@id/description"
+                app:layout_constraintEnd_toEndOf="@id/rightGuideline"
+                app:layout_constraintStart_toStartOf="@id/leftGuideline"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintTop_toBottomOf="@+id/icon" />
 
-        <TextView
-            android:id="@+id/description"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="@string/message_center_description"
-            android:textColor="?attr/gliaBaseDarkColor"
-            android:textSize="16sp"
-            app:layout_constrainedWidth="true"
-            app:layout_constraintBottom_toTopOf="@id/btn_check_messages"
-            app:layout_constraintEnd_toEndOf="@id/rightGuideline"
-            app:layout_constraintStart_toStartOf="@id/leftGuideline"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintTop_toBottomOf="@+id/title"/>
+            <TextView
+                android:id="@+id/description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="@string/message_center_description"
+                android:textColor="?attr/gliaBaseDarkColor"
+                android:textSize="16sp"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintBottom_toTopOf="@id/btn_check_messages"
+                app:layout_constraintEnd_toEndOf="@id/rightGuideline"
+                app:layout_constraintStart_toStartOf="@id/leftGuideline"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintTop_toBottomOf="@+id/title" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_check_messages"
-            style="?android:attr/borderlessButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            tools:text="@string/message_center_check_messages_btn"
-            android:textAllCaps="false"
-            android:textColor="?attr/gliaBrandPrimaryColor"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toTopOf="@id/message_title"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/description" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_check_messages"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                tools:text="@string/message_center_check_messages_btn"
+                android:textAllCaps="false"
+                android:textColor="?attr/gliaBrandPrimaryColor"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toTopOf="@id/message_title"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/description" />
 
-        <androidx.constraintlayout.widget.Group
-            android:id="@+id/send_message_group"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="invisible"
-            tools:visibility="visible"
-            app:constraint_referenced_ids="message_title, message_edit_text, attachments_recycler_view, btn_send_message" />
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/send_message_group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="invisible"
+                tools:visibility="visible"
+                app:constraint_referenced_ids="message_title, message_edit_text, attachments_recycler_view, btn_send_message" />
 
-        <TextView
-            android:id="@+id/message_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/glia_welcome_screen_input_title_margin"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
-            android:textAppearance="?attr/textAppearanceHeadline3"
-            android:textSize="14sp"
-            app:layout_constraintBottom_toTopOf="@id/message_edit_text"
-            app:layout_constraintEnd_toStartOf="@id/add_attachment_button"
-            app:layout_constraintHorizontal_chainStyle="spread_inside"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="@id/leftGuideline"
-            app:layout_constraintTop_toBottomOf="@+id/btn_check_messages"
-            tools:text="@string/message_center_message_title" />
+            <TextView
+                android:id="@+id/message_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/glia_welcome_screen_input_title_margin"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
+                android:textAppearance="?attr/textAppearanceHeadline3"
+                android:textSize="14sp"
+                app:layout_constraintBottom_toTopOf="@id/message_edit_text"
+                app:layout_constraintEnd_toStartOf="@id/add_attachment_button"
+                app:layout_constraintHorizontal_chainStyle="spread_inside"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@id/leftGuideline"
+                app:layout_constraintTop_toBottomOf="@+id/btn_check_messages"
+                tools:text="@string/message_center_message_title" />
 
-        <ImageButton
-            android:id="@+id/add_attachment_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/glia_chat_add_attachment_description"
-            android:paddingStart="16dp"
-            android:paddingTop="22dp"
-            android:paddingEnd="16dp"
-            android:paddingBottom="13dp"
-            android:src="@drawable/ic_add_attachment"
-            app:layout_constraintBottom_toTopOf="@id/message_edit_text"
-            app:layout_constraintEnd_toEndOf="parent" />
+            <ImageButton
+                android:id="@+id/add_attachment_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/glia_chat_add_attachment_description"
+                android:paddingStart="16dp"
+                android:paddingTop="22dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="13dp"
+                android:src="@drawable/ic_add_attachment"
+                app:layout_constraintBottom_toTopOf="@id/message_edit_text"
+                app:layout_constraintEnd_toEndOf="parent" />
 
-        <com.glia.widgets.messagecenter.StatefulEditText
-            android:id="@+id/message_edit_text"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:gravity="start"
-            android:inputType="textCapSentences|textMultiLine"
-            android:textColor="?attr/gliaBaseDarkColor"
-            android:importantForAutofill="no"
-            android:padding="@dimen/glia_large"
-            android:textColorHint="?attr/gliaBaseNormalColor"
-            android:textCursorDrawable="@null"
-            app:layout_constraintBottom_toTopOf="@id/error_text_view"
-            app:layout_constraintStart_toStartOf="@id/leftGuideline"
-            app:layout_constraintEnd_toEndOf="@id/rightGuideline"
-            app:layout_constraintHeight_min="@dimen/glia_welcome_screen_input_min_height"
-            app:layout_constraintTop_toBottomOf="@+id/message_title"
-            app:layout_constraintVertical_weight="7" />
+            <com.glia.widgets.messagecenter.StatefulEditText
+                android:id="@+id/message_edit_text"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:gravity="start"
+                android:inputType="textCapSentences|textMultiLine"
+                android:textColor="?attr/gliaBaseDarkColor"
+                android:importantForAutofill="no"
+                android:padding="@dimen/glia_large"
+                android:textColorHint="?attr/gliaBaseNormalColor"
+                android:textCursorDrawable="@null"
+                app:layout_constraintBottom_toTopOf="@id/error_text_view"
+                app:layout_constraintStart_toStartOf="@id/leftGuideline"
+                app:layout_constraintEnd_toEndOf="@id/rightGuideline"
+                app:layout_constraintHeight_min="@dimen/glia_welcome_screen_input_min_height"
+                app:layout_constraintTop_toBottomOf="@+id/message_title"
+                app:layout_constraintVertical_weight="7" />
 
-        <TextView
-            android:id="@+id/error_text_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            tools:text="@string/message_center_message_limit_error_message"
-            android:drawablePadding="@dimen/glia_small"
-            android:visibility="gone"
-            app:drawableStartCompat="@drawable/ic_attention"
-            android:textColor="?attr/gliaSystemNegativeColor"
-            app:layout_constraintTop_toBottomOf="@id/message_edit_text"
-            app:layout_constraintStart_toStartOf="@id/leftGuideline"
-            app:layout_constraintEnd_toEndOf="@id/rightGuideline"
-            app:layout_constraintBottom_toTopOf="@id/attachments_recycler_view"
-            app:layout_constraintHorizontal_bias="0.0"/>
+            <TextView
+                android:id="@+id/error_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                tools:text="@string/message_center_message_limit_error_message"
+                android:drawablePadding="@dimen/glia_small"
+                android:visibility="gone"
+                app:drawableStartCompat="@drawable/ic_attention"
+                android:textColor="?attr/gliaSystemNegativeColor"
+                app:layout_constraintTop_toBottomOf="@id/message_edit_text"
+                app:layout_constraintStart_toStartOf="@id/leftGuideline"
+                app:layout_constraintEnd_toEndOf="@id/rightGuideline"
+                app:layout_constraintBottom_toTopOf="@id/attachments_recycler_view"
+                app:layout_constraintHorizontal_bias="0.0" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/attachments_recycler_view"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:overScrollMode="never"
-            app:layout_constraintBottom_toTopOf="@id/btn_send_message"
-            app:layout_constraintStart_toStartOf="@id/leftGuideline"
-            app:layout_constraintEnd_toEndOf="@id/rightGuideline"
-            app:layout_constraintTop_toBottomOf="@id/error_text_view"
-            tools:itemCount="1"
-            tools:listitem="@layout/chat_attachment_uploaded_item" />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/attachments_recycler_view"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:overScrollMode="never"
+                app:layout_constraintBottom_toTopOf="@id/btn_send_message"
+                app:layout_constraintStart_toStartOf="@id/leftGuideline"
+                app:layout_constraintEnd_toEndOf="@id/rightGuideline"
+                app:layout_constraintTop_toBottomOf="@id/error_text_view"
+                tools:itemCount="1"
+                tools:listitem="@layout/chat_attachment_uploaded_item" />
 
-        <com.glia.widgets.messagecenter.ProgressButton
-            android:id="@+id/btn_send_message"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"
-            app:layout_constraintBottom_toTopOf="@id/bottom_space"
-            app:layout_constraintStart_toStartOf="@id/leftGuideline"
-            app:layout_constraintEnd_toEndOf="@id/rightGuideline"
-            app:layout_constraintTop_toBottomOf="@+id/attachments_recycler_view" />
+            <com.glia.widgets.messagecenter.ProgressButton
+                android:id="@+id/btn_send_message"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                app:layout_constraintBottom_toTopOf="@id/bottom_space"
+                app:layout_constraintStart_toStartOf="@id/leftGuideline"
+                app:layout_constraintEnd_toEndOf="@id/rightGuideline"
+                app:layout_constraintTop_toBottomOf="@+id/attachments_recycler_view" />
 
-        <Space
-            android:id="@+id/bottom_space"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btn_send_message"
-            app:layout_constraintVertical_weight="2" />
+            <Space
+                android:id="@+id/bottom_space"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/btn_send_message"
+                app:layout_constraintVertical_weight="2" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </FrameLayout>
 

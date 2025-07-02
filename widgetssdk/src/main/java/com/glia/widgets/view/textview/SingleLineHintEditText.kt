@@ -19,7 +19,8 @@ import androidx.appcompat.widget.AppCompatEditText
  * in the same ticket: https://glia.atlassian.net/browse/MOB-3860?focusedCommentId=459642.
  * To prevent this from happening this implementation forces hint to always be one-line
  */
-internal class SingleLineHintEditText @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) : AppCompatEditText(context, attrs, defStyleAttr) {
+internal class SingleLineHintEditText @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
+    AppCompatEditText(context, attrs, defStyleAttr) {
 
     private var hintOverride: CharSequence? = null
     var maxLinesOverride: Int = 0

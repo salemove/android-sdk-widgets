@@ -15,6 +15,7 @@ import org.junit.Test
 class FlipCameraButtonStateUseCaseTest {
     @MockK(relaxUnitFun = true)
     private lateinit var engagementRepository: EngagementRepository
+
     @MockK(relaxUnitFun = true)
     private lateinit var flipVisitorCameraUseCase: FlipVisitorCameraUseCase
     private lateinit var useCase: FlipCameraButtonStateUseCase

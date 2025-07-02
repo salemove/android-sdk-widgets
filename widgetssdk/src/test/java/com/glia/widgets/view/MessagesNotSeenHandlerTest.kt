@@ -1,9 +1,11 @@
 package com.glia.widgets.view
 
 import com.glia.widgets.chat.domain.GliaOnMessageUseCase
-import com.glia.widgets.internal.engagement.domain.model.ChatMessageInternal
 import com.glia.widgets.helper.Logger
-import io.mockk.*
+import com.glia.widgets.internal.engagement.domain.model.ChatMessageInternal
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import io.reactivex.rxjava3.core.Observable
 import org.junit.Before
 import org.junit.Test

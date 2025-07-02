@@ -62,6 +62,6 @@ public class QuestionItem {
         if (o == null || getClass() != o.getClass()) return false;
         QuestionItem that = (QuestionItem) o;
         return showError == that.showError && question.equals(that.question)
-                && Objects.equals(answer, that.answer);
+            && Objects.equals(answer, that.answer);
     }
 }

@@ -1,9 +1,9 @@
 package com.glia.widgets.internal.dialog.domain
 
-import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.R
-import com.glia.widgets.internal.dialog.model.Link
 import com.glia.widgets.internal.dialog.model.ConfirmationDialogLinks
+import com.glia.widgets.internal.dialog.model.Link
+import com.glia.widgets.locale.LocaleString
 
 internal class ConfirmationDialogLinksUseCase {
 

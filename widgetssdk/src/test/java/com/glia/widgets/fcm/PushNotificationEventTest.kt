@@ -1,9 +1,9 @@
 package com.glia.widgets.fcm
 
-import com.glia.androidsdk.fcm.PushNotificationEvent as CorePushNotificationEvent
-import com.glia.androidsdk.fcm.PushNotificationType as CorePushNotificationType
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import com.glia.androidsdk.fcm.PushNotificationEvent as CorePushNotificationEvent
+import com.glia.androidsdk.fcm.PushNotificationType as CorePushNotificationType
 
 class PushNotificationEventTest {
 

@@ -14,7 +14,7 @@ import org.mockito.kotlin.spy
  * Force classes that extend this interface to declare a property that will handle all the required logic with
  * a simple constructor.
  */
-internal interface SnapshotProviders: SnapshotContent, SnapshotTestLifecycle {
+internal interface SnapshotProviders : SnapshotContent, SnapshotTestLifecycle {
     var _snapshotProvider: SnapshotProviderImp
 
     fun resourceProviderMock() = _snapshotProvider.resourceProvider

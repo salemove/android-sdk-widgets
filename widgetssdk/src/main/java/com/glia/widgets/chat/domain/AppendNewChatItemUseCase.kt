@@ -14,10 +14,10 @@ import com.glia.widgets.chat.model.LocalAttachmentItem
 import com.glia.widgets.chat.model.OperatorChatItem
 import com.glia.widgets.chat.model.VisitorChatItem
 import com.glia.widgets.chat.model.VisitorMessageItem
-import com.glia.widgets.internal.engagement.domain.model.ChatMessageInternal
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.asSingleChoice
+import com.glia.widgets.internal.engagement.domain.model.ChatMessageInternal
 
 /**
  * Use case for appending a new chat message to the chat state.

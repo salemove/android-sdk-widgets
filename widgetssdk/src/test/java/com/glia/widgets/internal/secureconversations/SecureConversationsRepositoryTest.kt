@@ -7,8 +7,8 @@ import com.glia.androidsdk.chat.SendMessagePayload
 import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.androidsdk.secureconversations.SecureConversations
 import com.glia.widgets.chat.data.GliaChatRepository
-import com.glia.widgets.internal.queue.QueueRepository
 import com.glia.widgets.di.GliaCore
+import com.glia.widgets.internal.queue.QueueRepository
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk

@@ -381,7 +381,14 @@ class QueueRepositoryTest {
         subscribeToQueueUpdatesCallbackSlot.captured.accept(updatedDefaultQueue)
 
         queueRepository.queuesState.test()
-            .assertCurrentValue(QueuesState.Queues(listOf(updatedDefaultQueue.toWidgetsType().copy(isDefault = true), nonDefaultQueue.toWidgetsType())))
+            .assertCurrentValue(
+                QueuesState.Queues(
+                    listOf(
+                        updatedDefaultQueue.toWidgetsType().copy(isDefault = true),
+                        nonDefaultQueue.toWidgetsType()
+                    )
+                )
+            )
         queueRepository.relevantQueueIds.test()
             .assertValue(listOf(defaultQueue.id, nonDefaultQueue.id))
     }

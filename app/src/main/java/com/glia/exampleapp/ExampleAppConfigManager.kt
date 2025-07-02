@@ -3,10 +3,10 @@ package com.glia.exampleapp
 import android.content.Context
 import android.content.SharedPreferences
 import android.net.Uri
+import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import com.glia.androidsdk.SiteApiKey
 import com.glia.widgets.GliaWidgetsConfig
-import androidx.core.content.edit
 
 /**
  * Helper class to obtain Glia Config params from deep-link or preferences.

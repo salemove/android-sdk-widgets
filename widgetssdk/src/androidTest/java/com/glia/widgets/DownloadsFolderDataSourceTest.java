@@ -26,7 +26,7 @@ public class DownloadsFolderDataSourceTest {
 
     @Rule
     public GrantPermissionRule mRuntimePermissionRule = GrantPermissionRule
-            .grant(Manifest.permission.READ_EXTERNAL_STORAGE);
+        .grant(Manifest.permission.READ_EXTERNAL_STORAGE);
 
     @Before
     public void setUp() {
@@ -37,87 +37,87 @@ public class DownloadsFolderDataSourceTest {
     @Test
     public void putImageToDownloads_completesSuccessfully_whenValidArguments() {
         dataSource.putImageToDownloads(IMAGE_NAME, BITMAP)
-                .test()
-                .assertComplete();
+            .test()
+            .assertComplete();
     }
 
     @Test
     public void putImageToDownloads_emitsNullPointerException_whenNullImageNameArgument() {
         dataSource.putImageToDownloads(null, BITMAP)
-                .test()
-                .assertError(NullPointerException.class);
+            .test()
+            .assertError(NullPointerException.class);
     }
 
     @Test
     public void putImageToDownloads_emitsNullPointerException_whenNullBitmapArgument() {
         dataSource.putImageToDownloads(IMAGE_NAME, null)
-                .test()
-                .assertError(NullPointerException.class);
+            .test()
+            .assertError(NullPointerException.class);
     }
 
     @Test
     public void putImageToDownloads_emitsNullPointerException_whenNullArguments() {
         dataSource.putImageToDownloads(null, null)
-                .test()
-                .assertError(NullPointerException.class);
+            .test()
+            .assertError(NullPointerException.class);
     }
 
     @Test
     public void getImageFromDownloadsFolder_emitsFileNotFoundException_whenImageNotInDownloadsFolder() {
         dataSource.getImageFromDownloadsFolder(IMAGE_NAME)
-                .test()
-                .assertError(FileNotFoundException.class);
+            .test()
+            .assertError(FileNotFoundException.class);
     }
 
     @Test
     public void getImageFromDownloadsFolder_emitsNullPointerException_whenNullArgument() {
         dataSource.getImageFromDownloadsFolder(null)
-                .test()
-                .assertError(NullPointerException.class);
+            .test()
+            .assertError(NullPointerException.class);
     }
 
     @Test
     public void downloadFileToDownloads_completesSuccessfully_whenValidArguments() {
         dataSource.downloadFileToDownloads(
-                        IMAGE_NAME,
-                        "content_type",
-                        INPUT_STREAM
-                )
-                .test()
-                .assertComplete();
+                IMAGE_NAME,
+                "content_type",
+                INPUT_STREAM
+            )
+            .test()
+            .assertComplete();
     }
 
     @Test
     public void downloadFileToDownloads_emitsNullPointerException_whenNullFileNameArgument() {
         dataSource.downloadFileToDownloads(
-                        null,
-                        "content_type",
-                        INPUT_STREAM
-                )
-                .test()
-                .assertError(NullPointerException.class);
+                null,
+                "content_type",
+                INPUT_STREAM
+            )
+            .test()
+            .assertError(NullPointerException.class);
     }
 
     @Test
     public void downloadFileToDownloads_completesSuccessfully_whenNullContentTypeArgument() {
         dataSource.downloadFileToDownloads(
-                        IMAGE_NAME,
-                        null,
-                        INPUT_STREAM
-                )
-                .test()
-                .assertComplete();
+                IMAGE_NAME,
+                null,
+                INPUT_STREAM
+            )
+            .test()
+            .assertComplete();
     }
 
     @Test
     public void downloadFileToDownloads_emitsNullPointerException_whenNullInputStreamArgument() {
         dataSource.downloadFileToDownloads(
-                        IMAGE_NAME,
-                        "content_type",
-                        null
-                )
-                .test()
-                .assertError(NullPointerException.class);
+                IMAGE_NAME,
+                "content_type",
+                null
+            )
+            .test()
+            .assertError(NullPointerException.class);
     }
 
     private static final String IMAGE_NAME = "IMAGE_NAME";

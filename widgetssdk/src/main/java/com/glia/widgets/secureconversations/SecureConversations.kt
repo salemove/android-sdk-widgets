@@ -52,10 +52,10 @@ class SecureConversationsImpl(
             return
         }
         val requestCallback: RequestCallback<Int> = RequestCallback { count, gliaException ->
-                if (gliaException == null && count != null) {
-                    callback.onResult(count)
-                }
+            if (gliaException == null && count != null) {
+                callback.onResult(count)
             }
+        }
         subscribedCallbacks[callback.hashCode()] = requestCallback
         secureConversations.subscribeToUnreadMessageCount(requestCallback)
     }

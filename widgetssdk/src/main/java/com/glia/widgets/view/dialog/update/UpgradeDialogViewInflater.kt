@@ -1,7 +1,6 @@
 package com.glia.widgets.view.dialog.update
 
 import android.view.LayoutInflater
-import androidx.core.view.isGone
 import com.glia.widgets.helper.setText
 import com.glia.widgets.view.dialog.base.DialogPayload
 import com.glia.widgets.view.dialog.base.DialogViewInflater

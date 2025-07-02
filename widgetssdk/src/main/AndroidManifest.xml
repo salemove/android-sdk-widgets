@@ -83,8 +83,7 @@
             android:launchMode="singleTask"
             android:taskAffinity=""
             android:excludeFromRecents="true"
-            android:theme="@style/Application.Glia.Translucent.Activity">
-        </activity>
+            android:theme="@style/Application.Glia.Translucent.Activity" />
 
         <service
             android:name=".core.chathead.ChatHeadService"

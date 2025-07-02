@@ -59,7 +59,7 @@ internal open class SnapshotTest(
         }
     }
 
-    override var _snapshotProvider:SnapshotProviderImp = SnapshotProviderImp(mock<Context>())
+    override var _snapshotProvider: SnapshotProviderImp = SnapshotProviderImp(mock<Context>())
 
     fun snapshot(
         view: View,

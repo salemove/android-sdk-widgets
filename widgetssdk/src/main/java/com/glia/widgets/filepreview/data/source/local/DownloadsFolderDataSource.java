@@ -48,11 +48,11 @@ public class DownloadsFolderDataSource {
 
         return Maybe.create(emitter -> {
             Uri uri = FileHelper.getContentUriCompat(
-                    imageName,
-                    context
+                imageName,
+                context
             );
             Bitmap bitmap = BitmapFactory.decodeStream(
-                    context.getContentResolver().openInputStream(uri)
+                context.getContentResolver().openInputStream(uri)
             );
             if (bitmap == null) {
                 emitter.onError(new FileNotFoundException());

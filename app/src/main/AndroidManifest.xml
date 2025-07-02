@@ -61,7 +61,7 @@
         <provider
             android:name="com.glia.widgets.InitializationProvider"
             android:authorities="${applicationId}.InitializationProvider"
-            tools:node="remove"/> <!-- Used the custom provider from the testing Application -->
+            tools:node="remove" /> <!-- Used the custom provider from the testing Application -->
 
         <provider
             android:name=".InitializationProvider"

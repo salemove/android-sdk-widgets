@@ -29,10 +29,10 @@ public class Application extends android.app.Application {
         }
 
         FirebaseOptions options = new FirebaseOptions.Builder()
-                .setProjectId(projectId)
-                .setApplicationId(appId)
-                .setApiKey(apiKey)
-                .build();
+            .setProjectId(projectId)
+            .setApplicationId(appId)
+            .setApiKey(apiKey)
+            .build();
         FirebaseApp.initializeApp(this, options);
     }
 }

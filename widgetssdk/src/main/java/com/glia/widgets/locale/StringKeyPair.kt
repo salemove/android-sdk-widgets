@@ -7,12 +7,13 @@ import kotlinx.parcelize.Parcelize
  * @hide
  */
 @Parcelize
-data class StringKeyPair(val key: StringKey, val value: String): Parcelable {
+data class StringKeyPair(val key: StringKey, val value: String) : Parcelable {
     constructor(deprecatedStringKeyPair: com.glia.widgets.StringKeyPair) : this(
         StringKey.from(deprecatedStringKeyPair.key),
         deprecatedStringKeyPair.value
     )
 }
+
 /**
  * @hide
  */

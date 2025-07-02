@@ -1,9 +1,9 @@
 package com.glia.widgets.internal.secureconversations.domain
 
+import com.glia.widgets.helper.rx.Schedulers
 import com.glia.widgets.internal.fileupload.FileAttachmentRepository
 import com.glia.widgets.internal.secureconversations.SecureConversationsRepository
 import com.glia.widgets.internal.secureconversations.SendMessageRepository
-import com.glia.widgets.helper.rx.Schedulers
 import com.glia.widgets.messagecenter.MessageCenterState
 import io.reactivex.rxjava3.core.Observable
 

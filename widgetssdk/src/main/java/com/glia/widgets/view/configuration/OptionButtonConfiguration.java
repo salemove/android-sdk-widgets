@@ -139,9 +139,9 @@ public class OptionButtonConfiguration implements Parcelable {
 
         private TextConfiguration prepareDefaultTextConfiguration(ResourceProvider resourceProvider, int textColor) {
             return new TextConfiguration.Builder()
-                    .textColor(resourceProvider.getColorStateList(textColor))
-                    .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
-                    .build(resourceProvider);
+                .textColor(resourceProvider.getColorStateList(textColor))
+                .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
+                .build(resourceProvider);
         }
     }
 

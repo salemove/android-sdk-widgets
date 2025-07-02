@@ -75,20 +75,20 @@ public abstract class BaseConfigurableButton extends MaterialButton {
 
     private void createBuildTimeConfiguration() {
         TextConfiguration textConfiguration = TextConfiguration
-                .builder()
-                .textColor(getTextColors())
-                .textColorHighlight(getHighlightColor())
-                .hintColor(getHintTextColors())
-                .textSize(getTextSize())
-                .build(resourceProvider);
+            .builder()
+            .textColor(getTextColors())
+            .textColorHighlight(getHighlightColor())
+            .hintColor(getHintTextColors())
+            .textSize(getTextSize())
+            .build(resourceProvider);
 
         buttonConfiguration = ButtonConfiguration
-                .builder()
-                .textConfiguration(textConfiguration)
-                .backgroundColor(getBackgroundTintList())
-                .strokeColor(getStrokeColor())
-                .strokeWidth(getStrokeWidth())
-                .build(resourceProvider);
+            .builder()
+            .textConfiguration(textConfiguration)
+            .backgroundColor(getBackgroundTintList())
+            .strokeColor(getStrokeColor())
+            .strokeWidth(getStrokeWidth())
+            .build(resourceProvider);
     }
 
     @Deprecated

@@ -33,8 +33,8 @@ public class GetOperatorUseCaseTest {
         stubGetOperatorResponse(operator);
 
         getOperatorUseCase.invoke(operator.getId())
-                .test()
-                .assertResult(Optional.of(operator));
+            .test()
+            .assertResult(Optional.of(operator));
     }
 
     @Test
@@ -42,8 +42,8 @@ public class GetOperatorUseCaseTest {
         stubGetOperatorResponse(null);
 
         getOperatorUseCase.invoke(operator.getId())
-                .test()
-                .assertResult(Optional.empty());
+            .test()
+            .assertResult(Optional.empty());
     }
 
     private void stubGetOperatorResponse(LocalOperator operator) {

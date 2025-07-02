@@ -31,6 +31,7 @@ class SimpleStatefulWidgetAdapterTest {
     data class Theme(val color: Int? = null, val size: Int? = null) : Mergeable<Theme> {
         override fun merge(other: Theme): Theme = Theme(color merge other.color, size merge other.size)
     }
+
     enum class State {
         ENABLED,
         DISABLED,

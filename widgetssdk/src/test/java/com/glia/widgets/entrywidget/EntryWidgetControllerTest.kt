@@ -4,22 +4,22 @@ import android.COMMON_EXTENSIONS_CLASS_PATH
 import android.app.Activity
 import com.glia.androidsdk.engagement.EngagementState
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
-import com.glia.widgets.engagement.MediaType
-import com.glia.widgets.queue.Queue
-import com.glia.widgets.internal.queue.QueueRepository
-import com.glia.widgets.internal.queue.QueuesState
-import com.glia.widgets.internal.secureconversations.SecureConversationsRepository
-import com.glia.widgets.internal.secureconversations.domain.HasOngoingSecureConversationUseCase
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.engagement.EndAction
 import com.glia.widgets.engagement.EngagementUpdateState
+import com.glia.widgets.engagement.MediaType
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import com.glia.widgets.engagement.domain.EngagementTypeUseCase
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.mediaTypes
+import com.glia.widgets.internal.queue.QueueRepository
+import com.glia.widgets.internal.queue.QueuesState
+import com.glia.widgets.internal.secureconversations.SecureConversationsRepository
+import com.glia.widgets.internal.secureconversations.domain.HasOngoingSecureConversationUseCase
 import com.glia.widgets.launcher.ActivityLauncher
 import com.glia.widgets.launcher.EngagementLauncher
+import com.glia.widgets.queue.Queue
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
@@ -679,7 +679,16 @@ class EntryWidgetControllerTest {
 
         val entryWidgetController = mockk<EntryWidgetController>(relaxed = true)
         every { entryWidgetController.prepareItemsBasedOnQueues(mockk(), mockk(), mockk()) } returns mock()
-        every { entryWidgetController.mapToEntryWidgetItems(engagementState, engagementType, queuesState, unreadMessagesCount, hasOngoingSc, isViewWhiteLabel) } answers {
+        every {
+            entryWidgetController.mapToEntryWidgetItems(
+                engagementState,
+                engagementType,
+                queuesState,
+                unreadMessagesCount,
+                hasOngoingSc,
+                isViewWhiteLabel
+            )
+        } answers {
             callOriginal()
         }
 

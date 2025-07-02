@@ -12,7 +12,7 @@ import com.android.tools.lint.detector.api.SourceCodeScanner
 import org.jetbrains.uast.UClass
 import org.jetbrains.uast.UElement
 
-class UndocumentedApiDetector: Detector(), SourceCodeScanner {
+class UndocumentedApiDetector : Detector(), SourceCodeScanner {
     override fun getApplicableUastTypes(): List<Class<out UElement>> {
         return listOf(UClass::class.java)
     }

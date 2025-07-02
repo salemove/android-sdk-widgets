@@ -100,15 +100,21 @@ internal class VerticalReversedOptionDialogViewInflater(
 )
 
 
-internal class OptionWithNegativeNeutralDialogViewInflater(layoutInflater: LayoutInflater, themeWrapper: AlertDialogConfiguration, payload: DialogPayload.Option) :
-    DefaultOptionWithNegativeNeutralDialogViewInflater<OptionDialogViewBinding>(OptionDialogViewBinding(layoutInflater), themeWrapper, payload)
+internal class OptionWithNegativeNeutralDialogViewInflater(
+    layoutInflater: LayoutInflater,
+    themeWrapper: AlertDialogConfiguration,
+    payload: DialogPayload.Option
+) : DefaultOptionWithNegativeNeutralDialogViewInflater<OptionDialogViewBinding>(OptionDialogViewBinding(layoutInflater), themeWrapper, payload)
 
 internal class VerticalOptionWithNegativeNeutralDialogViewInflater(
     layoutInflater: LayoutInflater,
     themeWrapper: AlertDialogConfiguration,
     payload: DialogPayload.Option
-) :
-    DefaultOptionWithNegativeNeutralDialogViewInflater<VerticalOptionDialogViewBinding>(VerticalOptionDialogViewBinding(layoutInflater), themeWrapper, payload)
+) : DefaultOptionWithNegativeNeutralDialogViewInflater<VerticalOptionDialogViewBinding>(
+        VerticalOptionDialogViewBinding(layoutInflater),
+        themeWrapper,
+        payload
+    )
 
 internal open class DefaultOptionWithNegativeNeutralDialogViewInflater<T : DefaultOptionDialogViewBinding<*>>(
     binding: T,

@@ -76,7 +76,11 @@ internal class VerticalConfirmationDialogViewInflater(
     themeWrapper: AlertDialogConfiguration,
     payload: DialogPayload.Confirmation
 ) :
-    DefaultConfirmationDialogViewInflater<VerticalConfirmationDialogViewBinding>(VerticalConfirmationDialogViewBinding(layoutInflater), themeWrapper, payload)
+    DefaultConfirmationDialogViewInflater<VerticalConfirmationDialogViewBinding>(
+        VerticalConfirmationDialogViewBinding(layoutInflater),
+        themeWrapper,
+        payload
+    )
 
 internal open class DefaultReversedConfirmationDialogViewInflater<T : DefaultReversedConfirmationDialogViewBinding<*>>(
     binding: T,

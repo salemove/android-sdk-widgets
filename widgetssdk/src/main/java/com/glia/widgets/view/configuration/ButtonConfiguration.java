@@ -22,7 +22,7 @@ public class ButtonConfiguration implements Parcelable {
     private final TextConfiguration textConfiguration;
 
     private ButtonConfiguration(
-            Builder builder
+        Builder builder
     ) {
         backgroundColor = builder.backgroundColor;
         strokeColor = builder.strokeColor;
@@ -146,8 +146,8 @@ public class ButtonConfiguration implements Parcelable {
             Logger.logDeprecatedClassUse(ButtonConfiguration.class.getSimpleName() + "." + TAG);
             if (textConfiguration == null) {
                 textConfiguration = new TextConfiguration.Builder()
-                        .textColor(resourceProvider.getColorStateList(R.color.glia_light_color))
-                        .build(resourceProvider);
+                    .textColor(resourceProvider.getColorStateList(R.color.glia_light_color))
+                    .build(resourceProvider);
             }
             return new ButtonConfiguration(this);
         }

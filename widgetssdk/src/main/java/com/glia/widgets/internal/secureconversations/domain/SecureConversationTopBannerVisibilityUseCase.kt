@@ -1,10 +1,10 @@
 package com.glia.widgets.internal.secureconversations.domain
 
 import com.glia.widgets.engagement.MediaType
-import com.glia.widgets.queue.Queue
+import com.glia.widgets.helper.mediaTypes
 import com.glia.widgets.internal.queue.QueueRepository
 import com.glia.widgets.internal.queue.QueuesState
-import com.glia.widgets.helper.mediaTypes
+import com.glia.widgets.queue.Queue
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Flowable
 

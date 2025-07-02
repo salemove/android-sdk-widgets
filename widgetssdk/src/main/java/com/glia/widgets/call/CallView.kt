@@ -26,12 +26,10 @@ import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.UiTheme.UiThemeBuilder
 import com.glia.widgets.call.CallState.ViewState
-import com.glia.widgets.internal.dialog.DialogContract
-import com.glia.widgets.internal.dialog.model.DialogState
-import com.glia.widgets.engagement.MediaType
 import com.glia.widgets.databinding.CallButtonsLayoutBinding
 import com.glia.widgets.databinding.CallViewBinding
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.engagement.MediaType
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.SimpleWindowInsetsAndAnimationHandler
 import com.glia.widgets.helper.TAG
@@ -47,6 +45,8 @@ import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.setLocaleHint
 import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.helper.showToast
+import com.glia.widgets.internal.dialog.DialogContract
+import com.glia.widgets.internal.dialog.model.DialogState
 import com.glia.widgets.launcher.ActivityLauncher
 import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.locale.StringKey

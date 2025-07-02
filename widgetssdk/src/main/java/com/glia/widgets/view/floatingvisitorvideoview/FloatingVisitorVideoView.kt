@@ -11,7 +11,6 @@ import androidx.core.view.get
 import androidx.core.view.isVisible
 import com.glia.androidsdk.comms.VideoView
 import com.glia.widgets.R
-import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContract.FlipButtonState

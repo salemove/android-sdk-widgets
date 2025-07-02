@@ -1,8 +1,8 @@
 package com.glia.widgets
 
-import com.glia.androidsdk.SiteApiKey as CoreSiteApiKey
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import com.glia.androidsdk.SiteApiKey as CoreSiteApiKey
 
 class SiteApiKeyTest {
 

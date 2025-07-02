@@ -1,9 +1,9 @@
 package com.glia.widgets.internal.secureconversations.domain
 
-import com.glia.widgets.internal.secureconversations.SecureConversationsRepository
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import com.glia.widgets.helper.unSafeSubscribe
+import com.glia.widgets.internal.secureconversations.SecureConversationsRepository
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Flowable
 

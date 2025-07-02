@@ -7,8 +7,8 @@ import com.glia.widgets.chat.model.OperatorAttachmentItem
 import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.chat.model.VisitorAttachmentItem
 import com.glia.widgets.chat.model.VisitorChatItem
-import com.glia.widgets.internal.engagement.domain.model.ChatMessageInternal
 import com.glia.widgets.helper.isImage
+import com.glia.widgets.internal.engagement.domain.model.ChatMessageInternal
 import kotlin.jvm.optionals.getOrNull
 
 internal class MapOperatorAttachmentUseCase {

@@ -1,8 +1,8 @@
 package com.glia.widgets.engagement.domain
 
+import com.glia.widgets.engagement.EngagementRepository
 import com.glia.widgets.engagement.MediaType
 import com.glia.widgets.internal.secureconversations.SecureConversationsRepository
-import com.glia.widgets.engagement.EngagementRepository
 
 internal interface EnqueueForEngagementUseCase {
     operator fun invoke(mediaType: MediaType = MediaType.TEXT)

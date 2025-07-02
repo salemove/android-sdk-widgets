@@ -5,10 +5,7 @@ import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.util.TypedValue;
 
-import androidx.annotation.ColorInt;
-import androidx.annotation.ColorRes;
 import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
 import androidx.annotation.VisibleForTesting;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;

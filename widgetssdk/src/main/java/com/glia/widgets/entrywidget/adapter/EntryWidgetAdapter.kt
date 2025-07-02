@@ -100,17 +100,21 @@ internal class EntryWidgetAdapter(
                 errorMessageTheme = errorMessageTheme,
                 errorButtonTheme = errorButtonTheme
             )
+
             ViewType.PROVIDED_BY_ITEM.ordinal -> EntryWidgetPoweredByViewHolder(
                 EntryWidgetPoweredByItemBinding.inflate(parent.layoutInflater, parent, false)
             )
+
             ViewType.MESSAGING_MEDIA_TYPE_ITEM.ordinal -> EntryWidgetMessagingItemViewHolder(
                 EntryWidgetMessagingItemBinding.inflate(parent.layoutInflater, parent, false),
                 itemTheme = mediaTypeItemsTheme?.mediaTypeItem
             )
+
             ViewType.CALL_VISUALIZER_ITEM.ordinal -> EntryWidgetCallVisualizerItemViewHolder(
                 EntryWidgetCallVisualizerItemBinding.inflate(parent.layoutInflater, parent, false),
                 itemTheme = mediaTypeItemsTheme?.mediaTypeItem
             )
+
             else -> EntryWidgetLiveItemViewHolder(
                 EntryWidgetLiveItemBinding.inflate(parent.layoutInflater, parent, false),
                 itemTheme = mediaTypeItemsTheme?.mediaTypeItem,

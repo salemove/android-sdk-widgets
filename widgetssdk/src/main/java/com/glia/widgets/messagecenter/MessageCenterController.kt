@@ -11,6 +11,9 @@ import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.chat.domain.SiteInfoUseCase
 import com.glia.widgets.chat.domain.TakePictureUseCase
 import com.glia.widgets.chat.domain.UriToFileAttachmentUseCase
+import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
+import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.TAG
 import com.glia.widgets.internal.dialog.DialogContract
 import com.glia.widgets.internal.fileupload.domain.AddFileAttachmentsObserverUseCase
 import com.glia.widgets.internal.fileupload.domain.AddFileToAttachmentAndUploadUseCase
@@ -25,9 +28,6 @@ import com.glia.widgets.internal.secureconversations.domain.ResetMessageCenterUs
 import com.glia.widgets.internal.secureconversations.domain.SendMessageButtonStateUseCase
 import com.glia.widgets.internal.secureconversations.domain.SendSecureMessageUseCase
 import com.glia.widgets.internal.secureconversations.domain.ShowMessageLimitErrorUseCase
-import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
-import com.glia.widgets.helper.Logger
-import com.glia.widgets.helper.TAG
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 

@@ -9,10 +9,10 @@ import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.androidsdk.engagement.Survey
 import com.glia.widgets.chat.Intention
-import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.glia.widgets.engagement.EngagementRepository
 import com.glia.widgets.helper.IntentHelper
 import com.glia.widgets.helper.safeStartActivity
+import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.glia.widgets.locale.LocaleString
 import io.mockk.Runs
 import io.mockk.every

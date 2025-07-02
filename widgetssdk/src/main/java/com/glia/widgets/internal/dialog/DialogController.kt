@@ -1,9 +1,9 @@
 package com.glia.widgets.internal.dialog
 
-import com.glia.widgets.internal.dialog.model.DialogState
-import com.glia.widgets.internal.dialog.model.LeaveDialogAction
 import com.glia.widgets.engagement.domain.MediaUpgradeOfferData
 import com.glia.widgets.helper.Logger
+import com.glia.widgets.internal.dialog.model.DialogState
+import com.glia.widgets.internal.dialog.model.LeaveDialogAction
 
 private const val TAG = "DialogController"
 

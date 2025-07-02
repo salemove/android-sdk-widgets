@@ -52,7 +52,7 @@ internal class AttachmentPopupSnapshotTest : SnapshotTest(), SnapshotTheme, Snap
     private fun setupView(
         unifiedTheme: AttachmentsPopupTheme? = null,
         viewCallback: (View) -> Unit
-    ) : AttachmentPopup {
+    ): AttachmentPopup {
 
         return AttachmentPopup(
             context,

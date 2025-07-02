@@ -2,11 +2,11 @@ package com.glia.widgets.internal.chathead.domain
 
 import com.glia.widgets.call.CallView
 import com.glia.widgets.chat.ChatView
-import com.glia.widgets.internal.permissions.PermissionManager
 import com.glia.widgets.engagement.domain.EngagementTypeUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 import com.glia.widgets.filepreview.ui.ImagePreviewView
 import com.glia.widgets.helper.DialogHolderView
+import com.glia.widgets.internal.permissions.PermissionManager
 import com.glia.widgets.launcher.ConfigurationManager
 import com.glia.widgets.messagecenter.MessageCenterView
 

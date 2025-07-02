@@ -2,7 +2,7 @@ plugins {
   id("java-library")
   id("org.jetbrains.kotlin.jvm")
   id("com.android.lint")
-  id ("kotlin")
+  id("kotlin")
 }
 
 //Detailed information about advantages of Java toolchain https://developer.android.com/build/jdks#toolchain

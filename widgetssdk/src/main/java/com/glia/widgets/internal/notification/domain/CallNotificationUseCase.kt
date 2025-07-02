@@ -2,9 +2,9 @@ package com.glia.widgets.internal.notification.domain
 
 import com.glia.androidsdk.comms.MediaDirection
 import com.glia.androidsdk.comms.MediaState
-import com.glia.widgets.internal.notification.device.INotificationManager
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
+import com.glia.widgets.internal.notification.device.INotificationManager
 
 internal class CallNotificationUseCase(
     private val notificationManager: INotificationManager

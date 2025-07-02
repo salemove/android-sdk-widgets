@@ -60,6 +60,7 @@ internal class EntryWidgetMessagingItemViewHolder(
                 binding.description.setLocaleText(R.string.entry_widget_secure_messaging_button_description)
                 binding.description.setLocaleHint(R.string.entry_widget_secure_messaging_button_accessibility_hint)
             }
+
             else -> {
                 binding.description.setLocaleText(R.string.entry_widget_ongoing_engagement_description)
                 binding.description.setLocaleHint(R.string.entry_widget_ongoing_engagement_button_accessibility_hint)

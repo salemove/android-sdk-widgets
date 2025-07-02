@@ -5,8 +5,8 @@ import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.Operator
 import com.glia.androidsdk.Operator.Picture
 import com.glia.androidsdk.RequestCallback
-import com.glia.widgets.internal.engagement.data.LocalOperator
 import com.glia.widgets.di.GliaCore
+import com.glia.widgets.internal.engagement.data.LocalOperator
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Before

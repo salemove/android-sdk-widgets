@@ -16,7 +16,10 @@ internal class FlipVisitorCameraUseCaseImpl(private val repository: EngagementRe
         get() {
             val cameras = repository.cameras ?: return null
             val currentVisitorCamera = repository.currentVisitorCamera.value
-            return getNextCameraByFacing(cameras, currentVisitorCamera)  // If it is not possible to get the next camera according to the facing of the cameras,
+            return getNextCameraByFacing(
+                cameras,
+                currentVisitorCamera
+            )  // If it is not possible to get the next camera according to the facing of the cameras,
                 ?: getNextAvailableCamera(cameras, currentVisitorCamera) // will try to get the next camera from the list.
         }
 

@@ -68,7 +68,7 @@ public class OutlinedOptionView extends FrameLayout {
     private void addRippleEffect() {
         TypedValue outValue = new TypedValue();
         this.getContext().getTheme().resolveAttribute(
-                android.R.attr.selectableItemBackground, outValue, true);
+            android.R.attr.selectableItemBackground, outValue, true);
         setForeground(ContextCompat.getDrawable(this.getContext(), outValue.resourceId));
     }
 

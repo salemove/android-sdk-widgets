@@ -25,7 +25,7 @@ public class TextConfiguration implements Parcelable {
     private Boolean bold;
 
     private TextConfiguration(
-            Builder builder
+        Builder builder
     ) {
         this.textSize = builder.textSize;
         this.textColor = builder.textColor;

@@ -32,6 +32,7 @@ internal class EntryWidgetErrorStateViewHolder(
                 binding.description.setLocaleText(R.string.entry_widget_empty_state_description)
                 binding.button.isVisible = false
             }
+
             EntryWidgetContract.ItemType.ErrorState -> {
                 binding.title.setLocaleText(R.string.entry_widget_error_state_title)
                 binding.description.setLocaleText(R.string.entry_widget_error_state_description)
@@ -39,6 +40,7 @@ internal class EntryWidgetErrorStateViewHolder(
                 binding.button.setOnClickListener(onClickListener)
                 binding.button.isVisible = true
             }
+
             EntryWidgetContract.ItemType.SdkNotInitializedState -> {
                 binding.title.setLocaleText(R.string.entry_widget_error_state_title)
                 binding.description.setLocaleText(R.string.entry_widget_error_state_description)
@@ -46,6 +48,7 @@ internal class EntryWidgetErrorStateViewHolder(
                 binding.button.setOnClickListener(onClickListener)
                 binding.button.isVisible = false
             }
+
             else -> {
                 // Do nothing
             }

@@ -15,9 +15,9 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.GliaWidgetsException
+import com.glia.widgets.callbacks.OnComplete
 import com.glia.widgets.callbacks.OnError
 import com.glia.widgets.callbacks.OnResult
-import com.glia.widgets.callbacks.OnComplete
 import com.glia.widgets.visitor.VisitorInfo
 import com.glia.widgets.visitor.VisitorInfoUpdateRequest
 import java.util.UUID
@@ -152,7 +152,7 @@ class VisitorInfoFragment : Fragment() {
     }
 }
 
-private class CustomAttributesAdapter: RecyclerView.Adapter<CustomAttributesAdapter.CustomAttributeViewHolder>() {
+private class CustomAttributesAdapter : RecyclerView.Adapter<CustomAttributesAdapter.CustomAttributeViewHolder>() {
     private val attributes = mutableListOf<Attribute>()
 
     fun setAttributes(attributes: Map<String, String>) {
@@ -188,7 +188,7 @@ private class CustomAttributesAdapter: RecyclerView.Adapter<CustomAttributesAdap
         val keyEditText: EditText,
         val valueEditText: EditText,
         val deleteButton: Button
-    ): RecyclerView.ViewHolder(itemView) {
+    ) : RecyclerView.ViewHolder(itemView) {
         private var onTextChanged: (() -> Unit)? = null
 
         init {
@@ -246,7 +246,8 @@ private class CustomAttributesAdapter: RecyclerView.Adapter<CustomAttributesAdap
     }
 
     override fun onBindViewHolder(holder: CustomAttributeViewHolder, position: Int) {
-        holder.bind(attributes[position],
+        holder.bind(
+            attributes[position],
             { attribute ->
                 val index = attributes.indexOfFirst { it.id == attribute.id }
                 if (index < 0) return@bind

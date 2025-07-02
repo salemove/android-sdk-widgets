@@ -12,7 +12,7 @@ import com.glia.widgets.view.dialog.base.DialogViewFactory
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.google.gson.JsonObject
 
-internal interface SnapshotDialog: SnapshotTheme, SnapshotProviders {
+internal interface SnapshotDialog : SnapshotTheme, SnapshotProviders {
     val title: LocaleString
         get() = LocaleString(R.string.dialog_title)
 

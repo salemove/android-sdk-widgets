@@ -2,8 +2,8 @@ package com.glia.widgets.internal.secureconversations.domain
 
 import androidx.annotation.VisibleForTesting
 import com.glia.widgets.chat.data.ChatScreenRepository
-import com.glia.widgets.internal.secureconversations.SecureConversationsRepository
 import com.glia.widgets.helper.Logger
+import com.glia.widgets.internal.secureconversations.SecureConversationsRepository
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
 import java.util.concurrent.TimeUnit
@@ -47,7 +47,7 @@ internal class MarkMessagesReadWithDelayUseCase(
             return@switchMap delayIf(isLeaveDialogVisible, delay) { !isLeaveDialogVisible && delay > 0 }
         }
 
-    private fun<T: Any> delayIf(value: T, delay: Long, condition: () -> Boolean): Flowable<T> {
+    private fun <T : Any> delayIf(value: T, delay: Long, condition: () -> Boolean): Flowable<T> {
         val flowable = Flowable.just(value)
         if (condition()) {
             return flowable.delay(delay, TimeUnit.SECONDS)

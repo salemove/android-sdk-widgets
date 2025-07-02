@@ -402,8 +402,7 @@ internal data class UiTheme(
         iconPlaceholder = builder.iconPlaceholder,
         iconOnHold = builder.iconOnHold,
         whiteLabel = builder.whiteLabel,
-        gliaAlertDialogButtonUseVerticalAlignment =
-        builder.gliaAlertDialogButtonUseVerticalAlignment,
+        gliaAlertDialogButtonUseVerticalAlignment = builder.gliaAlertDialogButtonUseVerticalAlignment,
         gliaEndButtonConfiguration = builder.headerEndButtonConfiguration,
         gliaPositiveButtonConfiguration = builder.positiveButtonConfiguration,
         gliaNegativeButtonConfiguration = builder.negativeButtonConfiguration,

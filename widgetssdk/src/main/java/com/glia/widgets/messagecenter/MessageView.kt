@@ -22,7 +22,6 @@ import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.AttachmentPopup
 import com.glia.widgets.chat.adapter.UploadAttachmentAdapter
-import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.glia.widgets.databinding.MessageCenterMessageViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Utils
@@ -34,6 +33,7 @@ import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.setLocaleHint
 import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.helper.wrapWithMaterialThemeOverlay
+import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.glia.widgets.view.unifiedui.applyColorTheme
 import com.glia.widgets.view.unifiedui.applyImageColorTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme

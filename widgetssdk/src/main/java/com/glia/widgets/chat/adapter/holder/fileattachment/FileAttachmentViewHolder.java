@@ -11,9 +11,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.widgets.R;
-import com.glia.widgets.internal.fileupload.model.LocalAttachment;
 import com.glia.widgets.helper.FileHelper;
 import com.glia.widgets.helper.ViewExtensionsKt;
+import com.glia.widgets.internal.fileupload.model.LocalAttachment;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 
 /**

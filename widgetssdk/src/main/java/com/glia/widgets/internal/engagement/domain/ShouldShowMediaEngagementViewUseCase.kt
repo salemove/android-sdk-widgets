@@ -9,9 +9,9 @@ internal class ShouldShowMediaEngagementViewUseCase(
 ) {
     fun execute(isUpgradeToCall: Boolean): Boolean {
         return hasNoQueueingAndEngagementOngoing() ||
-                hasMediaQueueingOngoing() ||
-                hasOngoingMediaEngagement() ||
-                isUpgradeToCall
+            hasMediaQueueingOngoing() ||
+            hasOngoingMediaEngagement() ||
+            isUpgradeToCall
     }
 
     private fun hasNoQueueingAndEngagementOngoing(): Boolean {

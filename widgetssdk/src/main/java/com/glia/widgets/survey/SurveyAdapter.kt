@@ -43,14 +43,17 @@ internal class SurveyAdapter(
                 val binding = SurveyScaleQuestionItemBinding.inflate(inflater, parent, false)
                 ScaleQuestionViewHolder(binding, style)
             }
+
             SURVEY_YES_NO -> {
                 val binding = SurveyBooleanQuestionItemBinding.inflate(inflater, parent, false)
                 BooleanQuestionViewHolder(binding, style)
             }
+
             SURVEY_SINGLE_CHOICE -> {
                 val binding = SurveySingleQuestionItemBinding.inflate(inflater, parent, false)
                 SingleQuestionViewHolder(binding, style)
             }
+
             else -> {
                 val binding = SurveyInputQuestionItemBinding.inflate(inflater, parent, false)
                 InputQuestionViewHolder(binding, style)

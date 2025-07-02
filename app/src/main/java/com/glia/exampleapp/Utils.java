@@ -38,16 +38,16 @@ class Utils {
         Integer systemNegativeColorId = getColorValueFromPrefs(R.string.pref_system_negative_color, sharedPreferences, resources);
 
         JSONObject remoteThemeJson = new JSONObject()
-                .put("globalColors", new JSONObject()
-                        .put("primary", toHexColor(brandPrimaryColorId, resources))
-                        .put("secondary", toHexColor(brandSecondaryColorId, resources))
-                        .put("baseNormal", toHexColor(baseNormalColorId, resources))
-                        .put("baseLight", toHexColor(baseLightColorId, resources))
-                        .put("baseDark", toHexColor(baseDarkColorId, resources))
-                        .put("baseShade", toHexColor(baseShadeColorId, resources))
-                        .put("background", toHexColor(backgroundColorId, resources))
-                        .put("systemNegative", toHexColor(systemNegativeColorId, resources))
-                );
+            .put("globalColors", new JSONObject()
+                .put("primary", toHexColor(brandPrimaryColorId, resources))
+                .put("secondary", toHexColor(brandSecondaryColorId, resources))
+                .put("baseNormal", toHexColor(baseNormalColorId, resources))
+                .put("baseLight", toHexColor(baseLightColorId, resources))
+                .put("baseDark", toHexColor(baseDarkColorId, resources))
+                .put("baseShade", toHexColor(baseShadeColorId, resources))
+                .put("background", toHexColor(backgroundColorId, resources))
+                .put("systemNegative", toHexColor(systemNegativeColorId, resources))
+            );
         return remoteThemeJson.toString();
     }
 
@@ -59,6 +59,7 @@ class Utils {
         // %08X gives you zero-padded hex that is 8 chars long)
         return String.format("#%08X", resources.getColor(intColor, null));
     }
+
     public static Integer getColorValueFromPrefs(@StringRes int keyValue, SharedPreferences sharedPreferences, Resources resources) {
         String colorGrey = resources.getString(R.string.color_grey_value);
         String colorRed = resources.getString(R.string.color_red_value);

@@ -1,11 +1,11 @@
 package com.glia.widgets.internal.chathead.domain
 
-import com.glia.widgets.internal.chathead.ChatHeadManager
-import com.glia.widgets.internal.permissions.PermissionManager
 import com.glia.widgets.engagement.domain.EngagementTypeUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
+import com.glia.widgets.internal.chathead.ChatHeadManager
+import com.glia.widgets.internal.permissions.PermissionManager
 import com.glia.widgets.launcher.ConfigurationManager
 
 /**

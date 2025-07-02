@@ -15,7 +15,8 @@ import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.google.gson.JsonObject
 import org.junit.Test
 
-internal class OperatorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen, SnapshotProviders, SnapshotCoil, SnapshotOperatorMessage, SnapshotStrings {
+internal class OperatorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen, SnapshotProviders, SnapshotCoil, SnapshotOperatorMessage,
+    SnapshotStrings {
 
     // MARK: Plain text
 

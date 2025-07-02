@@ -4,9 +4,9 @@ import android.content.Context
 import com.glia.androidsdk.Engagement
 import com.glia.widgets.R
 import com.glia.widgets.chat.Intention
-import com.glia.widgets.internal.secureconversations.domain.HasOngoingSecureConversationUseCase
 import com.glia.widgets.engagement.domain.EngagementTypeUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
+import com.glia.widgets.internal.secureconversations.domain.HasOngoingSecureConversationUseCase
 import com.glia.widgets.view.dialog.UiComponentsDispatcher
 
 /**

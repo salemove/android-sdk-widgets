@@ -35,7 +35,11 @@ internal class DialogViewFactory(context: Context, uiTheme: UiTheme, unifiedThem
         type is DialogType.Option -> OptionDialogViewInflater(layoutInflater, configuration, type.payload)
         type is DialogType.ReversedOption && isVerticalAxis -> VerticalReversedOptionDialogViewInflater(layoutInflater, configuration, type.payload)
         type is DialogType.ReversedOption -> ReversedOptionDialogViewInflater(layoutInflater, configuration, type.payload)
-        type is DialogType.OptionWithNegativeNeutral && isVerticalAxis -> VerticalOptionWithNegativeNeutralDialogViewInflater(layoutInflater, configuration, type.payload)
+        type is DialogType.OptionWithNegativeNeutral && isVerticalAxis -> VerticalOptionWithNegativeNeutralDialogViewInflater(
+            layoutInflater,
+            configuration,
+            type.payload
+        )
         type is DialogType.OptionWithNegativeNeutral -> OptionWithNegativeNeutralDialogViewInflater(layoutInflater, configuration, type.payload)
         type is DialogType.Confirmation && isVerticalAxis -> VerticalConfirmationDialogViewInflater(layoutInflater, configuration, type.payload)
         type is DialogType.Confirmation -> ConfirmationDialogViewInflater(layoutInflater, configuration, type.payload)

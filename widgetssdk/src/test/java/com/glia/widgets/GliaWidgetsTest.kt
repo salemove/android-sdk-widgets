@@ -6,17 +6,16 @@ import com.glia.androidsdk.Glia
 import com.glia.androidsdk.GliaConfig
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
-import com.glia.androidsdk.SiteApiKey as CoreSiteApiKey
 import com.glia.androidsdk.omnibrowse.Omnibrowse
 import com.glia.widgets.callbacks.OnComplete
 import com.glia.widgets.callbacks.OnError
 import com.glia.widgets.callvisualizer.controller.CallVisualizerController
-import com.glia.widgets.internal.queue.QueueRepository
 import com.glia.widgets.di.ControllerFactory
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.di.RepositoryFactory
 import com.glia.widgets.engagement.EngagementRepository
+import com.glia.widgets.internal.queue.QueueRepository
 import org.junit.Assert
 import org.junit.Before
 import org.junit.ClassRule
@@ -31,6 +30,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
+import com.glia.androidsdk.SiteApiKey as CoreSiteApiKey
 
 @get:ClassRule
 val rule: TestRule = InstantTaskExecutorRule()

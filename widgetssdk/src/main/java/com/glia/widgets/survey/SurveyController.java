@@ -66,7 +66,7 @@ public class SurveyController implements SurveyContract.Controller {
 
     private boolean isEqualsSurveys(@NonNull Survey survey, @NonNull Survey otherSurvey) {
         return survey.getId().equals(otherSurvey.getId())
-                && survey.getEngagementId().equals(otherSurvey.getEngagementId());
+            && survey.getEngagementId().equals(otherSurvey.getEngagementId());
     }
 
     private boolean isStateContainQuestions(@NonNull SurveyState state) {
@@ -75,20 +75,20 @@ public class SurveyController implements SurveyContract.Controller {
 
     private void setTitle(String title) {
         setState(new SurveyState.Builder()
-                .copyFrom(state)
-                .setTitle(title)
-                .createSurveyState()
+            .copyFrom(state)
+            .setTitle(title)
+            .createSurveyState()
         );
     }
 
     private void setQuestions(@NonNull Survey survey) {
         List<QuestionItem> questionItems = survey.getQuestions().stream()
-                .map(this::makeQuestionItem)
-                .collect(Collectors.toList());
+            .map(this::makeQuestionItem)
+            .collect(Collectors.toList());
         setState(new SurveyState.Builder()
-                .copyFrom(state)
-                .setQuestions(questionItems)
-                .createSurveyState()
+            .copyFrom(state)
+            .setQuestions(questionItems)
+            .createSurveyState()
         );
     }
 
@@ -99,9 +99,9 @@ public class SurveyController implements SurveyContract.Controller {
             List<Survey.Question.Option> options = question.getOptions();
             if (options != null) {
                 Survey.Question.Option option = options.stream()
-                        .filter(Survey.Question.Option::isDefault)
-                        .findFirst()
-                        .orElse(null);
+                    .filter(Survey.Question.Option::isDefault)
+                    .findFirst()
+                    .orElse(null);
                 if (option != null) {
                     answer = Survey.Answer.makeAnswer(questionId, option.getId());
                 }
@@ -121,12 +121,12 @@ public class SurveyController implements SurveyContract.Controller {
             return;
         }
         state.questions.stream()
-                .filter(item -> item.getQuestion().getId().equals(answer.getQuestionId()))
-                .findFirst()
-                .ifPresent(item -> {
-                    setAnswer(item, answer);
-                    hideSoftKeyboardIfNeeds(item);
-                });
+            .filter(item -> item.getQuestion().getId().equals(answer.getQuestionId()))
+            .findFirst()
+            .ifPresent(item -> {
+                setAnswer(item, answer);
+                hideSoftKeyboardIfNeeds(item);
+            });
     }
 
     private void hideSoftKeyboardIfNeeds(QuestionItem item) {
@@ -189,9 +189,9 @@ public class SurveyController implements SurveyContract.Controller {
                 }
             });
             questionItems.stream()
-                    .filter(QuestionItem::isShowError)
-                    .findFirst()
-                    .ifPresent(item -> view.scrollTo(questionItems.indexOf(item)));
+                .filter(QuestionItem::isShowError)
+                .findFirst()
+                .ifPresent(item -> view.scrollTo(questionItems.indexOf(item)));
         });
     }
 

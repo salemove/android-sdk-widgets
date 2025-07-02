@@ -4,9 +4,9 @@ import android.app.Activity
 import android.content.Context
 import android.view.View
 import com.glia.widgets.chat.Intention
-import com.glia.widgets.internal.secureconversations.domain.HasOngoingSecureConversationUseCase
 import com.glia.widgets.entrywidget.adapter.EntryWidgetAdapter
 import com.glia.widgets.helper.wrapWithTheme
+import com.glia.widgets.internal.secureconversations.domain.HasOngoingSecureConversationUseCase
 import com.glia.widgets.launcher.ActivityLauncher
 import com.glia.widgets.view.unifiedui.theme.UnifiedThemeManager
 

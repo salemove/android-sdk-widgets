@@ -20,7 +20,7 @@ public class ChatHeadConfiguration implements Parcelable {
     private final Integer iconOnHoldTintList;
 
     private ChatHeadConfiguration(
-            Builder builder
+        Builder builder
     ) {
         operatorPlaceholderBackgroundColor = builder.operatorPlaceholderBackgroundColor;
         operatorPlaceholderIcon = builder.operatorPlaceholderIcon;

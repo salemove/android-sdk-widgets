@@ -6,10 +6,10 @@ import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
 import com.glia.androidsdk.engagement.EngagementFile
 import com.glia.androidsdk.secureconversations.SecureConversations
+import com.glia.widgets.di.GliaCore
 import com.glia.widgets.internal.engagement.exception.EngagementMissingException
 import com.glia.widgets.internal.fileupload.domain.AddFileToAttachmentAndUploadUseCase
 import com.glia.widgets.internal.fileupload.model.LocalAttachment
-import com.glia.widgets.di.GliaCore
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot

@@ -1,8 +1,6 @@
 package com.glia.widgets.view.floatingvisitorvideoview
 
 import com.glia.androidsdk.comms.MediaState
-import com.glia.widgets.base.BaseController
-import com.glia.widgets.base.BaseView
 
 internal interface FloatingVisitorVideoContract {
 

@@ -1,10 +1,10 @@
 package com.glia.widgets.view.unifiedui.config.entrywidget
 
+import com.glia.widgets.view.unifiedui.config.base.ButtonRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.LayerRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.TextRemoteConfig
-import com.glia.widgets.view.unifiedui.config.base.ButtonRemoteConfig
-import com.google.gson.annotations.SerializedName
 import com.glia.widgets.view.unifiedui.theme.entrywidget.EntryWidgetTheme
+import com.google.gson.annotations.SerializedName
 
 internal data class EntryWidgetRemoteConfig(
     @SerializedName("background")

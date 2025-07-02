@@ -4,9 +4,9 @@ import androidx.annotation.VisibleForTesting
 import androidx.collection.SimpleArrayMap
 import androidx.core.util.Consumer
 import com.glia.androidsdk.Operator
-import com.glia.widgets.internal.engagement.data.LocalOperator
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.imageUrl
+import com.glia.widgets.internal.engagement.data.LocalOperator
 
 internal interface GliaOperatorRepository {
     fun getOperatorById(operatorId: String, callback: Consumer<LocalOperator?>)

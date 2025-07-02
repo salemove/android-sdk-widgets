@@ -24,9 +24,9 @@ public class ViewHelpers {
         private final View.OnClickListener onChatHeadClickedListener;
 
         public OnTouchListener(
-                OnRequestInitialCoordinates onRequestInitialCoordinates,
-                OnMoveListener onMoveListener,
-                View.OnClickListener onChatHeadClickedListener
+            OnRequestInitialCoordinates onRequestInitialCoordinates,
+            OnMoveListener onMoveListener,
+            View.OnClickListener onChatHeadClickedListener
         ) {
             this.onRequestInitialCoordinates = onRequestInitialCoordinates;
             this.onMoveListener = onMoveListener;

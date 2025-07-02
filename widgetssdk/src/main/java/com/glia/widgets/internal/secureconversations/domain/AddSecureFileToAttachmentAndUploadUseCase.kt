@@ -39,6 +39,7 @@ internal class AddSecureFileToAttachmentAndUploadUseCase(private val fileAttachm
     private fun isSupportedFileSizeExceeded(file: LocalAttachment): Boolean {
         return file.size >= AddFileToAttachmentAndUploadUseCase.SUPPORTED_FILE_SIZE
     }
+
     private fun isSupportedFileCountExceeded(): Boolean {
         return fileAttachmentRepository.getAttachedFilesCount() > FileUploadLimitNotExceededObservableUseCase.FILE_UPLOAD_LIMIT
     }

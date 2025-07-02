@@ -1,11 +1,11 @@
 package com.glia.widgets.internal.secureconversations.domain
 
+import com.glia.widgets.engagement.EngagementRepository
 import com.glia.widgets.engagement.MediaType
-import com.glia.widgets.queue.Queue
+import com.glia.widgets.engagement.State
 import com.glia.widgets.internal.queue.QueueRepository
 import com.glia.widgets.internal.queue.QueuesState
-import com.glia.widgets.engagement.EngagementRepository
-import com.glia.widgets.engagement.State
+import com.glia.widgets.queue.Queue
 import io.reactivex.rxjava3.core.Flowable
 
 internal class IsMessagingAvailableUseCase(private val queueRepository: QueueRepository, private val engagementRepository: EngagementRepository) {

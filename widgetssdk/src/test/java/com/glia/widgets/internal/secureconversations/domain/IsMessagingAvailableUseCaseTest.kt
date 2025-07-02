@@ -1,12 +1,12 @@
 package com.glia.widgets.internal.secureconversations.domain
 
 import android.COMMON_EXTENSIONS_CLASS_PATH
+import com.glia.widgets.engagement.EngagementRepository
 import com.glia.widgets.engagement.MediaType
-import com.glia.widgets.queue.Queue
+import com.glia.widgets.engagement.State
 import com.glia.widgets.internal.queue.QueueRepository
 import com.glia.widgets.internal.queue.QueuesState
-import com.glia.widgets.engagement.EngagementRepository
-import com.glia.widgets.engagement.State
+import com.glia.widgets.queue.Queue
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic

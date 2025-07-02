@@ -4,8 +4,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-
 import static java.util.Collections.singletonList;
 
 import com.glia.androidsdk.engagement.Survey;
@@ -35,8 +33,8 @@ public class SurveyControllerTest {
         surveyController.survey = survey;
 
         surveyController.state = new SurveyState.Builder()
-                .setQuestions(singletonList(mock(QuestionItem.class)))
-                .createSurveyState();
+            .setQuestions(singletonList(mock(QuestionItem.class)))
+            .createSurveyState();
 
         assertTrue(surveyController.isAlreadyInit(survey));
     }
@@ -59,8 +57,8 @@ public class SurveyControllerTest {
         surveyController.survey = survey;
 
         surveyController.state = new SurveyState.Builder()
-                .setQuestions(new ArrayList<>())
-                .createSurveyState();
+            .setQuestions(new ArrayList<>())
+            .createSurveyState();
 
         assertFalse(surveyController.isAlreadyInit(survey));
     }
@@ -73,8 +71,8 @@ public class SurveyControllerTest {
         surveyController.survey = survey;
 
         surveyController.state = new SurveyState.Builder()
-                .setQuestions(singletonList(mock(QuestionItem.class)))
-                .createSurveyState();
+            .setQuestions(singletonList(mock(QuestionItem.class)))
+            .createSurveyState();
 
         Survey anotherSurvey = mock(Survey.class);
         when(anotherSurvey.getId()).thenReturn("surveyId");
@@ -90,8 +88,8 @@ public class SurveyControllerTest {
         surveyController.survey = survey;
 
         surveyController.state = new SurveyState.Builder()
-                .setQuestions(singletonList(mock(QuestionItem.class)))
-                .createSurveyState();
+            .setQuestions(singletonList(mock(QuestionItem.class)))
+            .createSurveyState();
 
         Survey anotherSurvey = mock(Survey.class);
         when(anotherSurvey.getId()).thenReturn("anotherSurveyId");
@@ -107,8 +105,8 @@ public class SurveyControllerTest {
         surveyController.survey = survey;
 
         surveyController.state = new SurveyState.Builder()
-                .setQuestions(singletonList(mock(QuestionItem.class)))
-                .createSurveyState();
+            .setQuestions(singletonList(mock(QuestionItem.class)))
+            .createSurveyState();
 
         assertFalse(surveyController.isAlreadyInit(null));
     }
@@ -118,8 +116,8 @@ public class SurveyControllerTest {
         surveyController.survey = null;
 
         surveyController.state = new SurveyState.Builder()
-                .setQuestions(singletonList(mock(QuestionItem.class)))
-                .createSurveyState();
+            .setQuestions(singletonList(mock(QuestionItem.class)))
+            .createSurveyState();
 
         Survey survey = mock(Survey.class);
         when(survey.getId()).thenReturn("surveyId");
@@ -132,8 +130,8 @@ public class SurveyControllerTest {
         surveyController.survey = null;
 
         surveyController.state = new SurveyState.Builder()
-                .setQuestions(singletonList(mock(QuestionItem.class)))
-                .createSurveyState();
+            .setQuestions(singletonList(mock(QuestionItem.class)))
+            .createSurveyState();
 
         assertFalse(surveyController.isAlreadyInit(null));
     }

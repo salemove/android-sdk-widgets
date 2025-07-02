@@ -2,8 +2,8 @@ package com.glia.widgets.chat.adapter
 
 import androidx.annotation.VisibleForTesting
 import com.glia.androidsdk.chat.SingleChoiceAttachment
-import com.glia.androidsdk.chat.ChatMessage as CoreChatMessage
 import org.json.JSONObject
+import com.glia.androidsdk.chat.ChatMessage as CoreChatMessage
 
 /**
  * Represents a chat message in the Glia Widgets SDK.

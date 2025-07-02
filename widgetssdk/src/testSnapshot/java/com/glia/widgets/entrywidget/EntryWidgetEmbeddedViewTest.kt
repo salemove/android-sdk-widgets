@@ -136,6 +136,7 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
             )
         )
     }
+
     @Test
     fun contactsWithBadgeWhiteLabelWithUnifiedThemeWithGlobalColors() {
         snapshot(
@@ -734,7 +735,7 @@ internal open class EntryWidgetEmbeddedViewTest : SnapshotTest(
         items: List<EntryWidgetContract.ItemType> = listOf(EntryWidgetContract.ItemType.PoweredBy),
         viewType: EntryWidgetContract.ViewType = EntryWidgetContract.ViewType.EMBEDDED_VIEW,
         unifiedTheme: UnifiedTheme? = null
-    ) : View {
+    ): View {
 
         val entryWidgetTheme = unifiedTheme?.entryWidgetTheme
 

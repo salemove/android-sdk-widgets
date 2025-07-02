@@ -1,7 +1,7 @@
 package com.glia.widgets.secureconversations.domain
 
-import com.glia.widgets.internal.secureconversations.domain.ManageSecureMessagingStatusUseCase
 import com.glia.widgets.engagement.EngagementRepository
+import com.glia.widgets.internal.secureconversations.domain.ManageSecureMessagingStatusUseCase
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify

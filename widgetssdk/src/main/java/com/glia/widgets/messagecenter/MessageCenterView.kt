@@ -17,9 +17,6 @@ import androidx.core.view.isVisible
 import com.glia.widgets.Constants
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
-import com.glia.widgets.internal.dialog.DialogContract
-import com.glia.widgets.internal.dialog.model.DialogState
-import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.glia.widgets.databinding.MessageCenterViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
@@ -32,6 +29,9 @@ import com.glia.widgets.helper.insetsController
 import com.glia.widgets.helper.isKeyboardVisible
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.rootWindowInsetsCompat
+import com.glia.widgets.internal.dialog.DialogContract
+import com.glia.widgets.internal.dialog.model.DialogState
+import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.view.Dialogs
 import com.glia.widgets.view.dialog.base.DialogDelegate

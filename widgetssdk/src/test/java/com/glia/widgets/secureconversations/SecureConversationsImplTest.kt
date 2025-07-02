@@ -1,15 +1,15 @@
 package com.glia.widgets.secureconversations
 
-import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
-import com.glia.widgets.GliaWidgetsException
-import com.glia.widgets.callbacks.OnError
 import com.glia.widgets.callbacks.OnResult
-import com.glia.widgets.toWidgetsType
-import io.mockk.*
+import io.mockk.Runs
+import io.mockk.every
+import io.mockk.just
+import io.mockk.mockk
+import io.mockk.slot
+import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.mock
 
 class SecureConversationsImplTest {
 

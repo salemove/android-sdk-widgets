@@ -5,10 +5,10 @@ import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
 import com.glia.androidsdk.engagement.EngagementFile
 import com.glia.androidsdk.secureconversations.SecureConversations
+import com.glia.widgets.di.GliaCore
 import com.glia.widgets.internal.engagement.exception.EngagementMissingException
 import com.glia.widgets.internal.fileupload.domain.AddFileToAttachmentAndUploadUseCase
 import com.glia.widgets.internal.fileupload.model.LocalAttachment
-import com.glia.widgets.di.GliaCore
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlin.jvm.optionals.getOrNull
@@ -63,7 +63,11 @@ internal class FileAttachmentRepositoryImpl(
         _observable.onNext(getFileAttachments() + file)
     }
 
-    override fun uploadFile(shouldUseSecureMessagingEndpoints: Boolean, file: LocalAttachment, listener: AddFileToAttachmentAndUploadUseCase.Listener) {
+    override fun uploadFile(
+        shouldUseSecureMessagingEndpoints: Boolean,
+        file: LocalAttachment,
+        listener: AddFileToAttachmentAndUploadUseCase.Listener
+    ) {
         if (shouldUseSecureMessagingEndpoints) {
             uploadFileForSecureConversation(file, listener)
         } else {

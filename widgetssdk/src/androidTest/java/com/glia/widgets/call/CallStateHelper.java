@@ -134,32 +134,32 @@ public class CallStateHelper {
 
         public CallStateHelper build() {
             return new CallStateHelper(
-                    integratorCallStarted,
-                    isVisible,
-                    messagesNotSeen,
-                    callStatus,
-                    landscapeLayoutControlsVisible,
-                    isMuted,
-                    hasVideo,
-                    queueTicketId,
-                    companyName,
-                    requestedMediaType,
-                    isSpeakerOn
+                integratorCallStarted,
+                isVisible,
+                messagesNotSeen,
+                callStatus,
+                landscapeLayoutControlsVisible,
+                isMuted,
+                hasVideo,
+                queueTicketId,
+                companyName,
+                requestedMediaType,
+                isSpeakerOn
             );
         }
     }
 
     public CallState makeCallState() {
         return new CallState.Builder()
-                .setIntegratorCallStarted(integratorCallStarted)
-                .setVisible(isVisible)
-                .setMessagesNotSeen(messagesNotSeen)
-                .setCallStatus(callStatus)
-                .setLandscapeLayoutControlsVisible(landscapeLayoutControlsVisible)
-                .setIsMuted(isMuted)
-                .setHasVideo(hasVideo)
-                .setRequestedMediaType(requestedMediaType)
-                .setIsSpeakerOn(isSpeakerOn)
-                .createCallState();
+            .setIntegratorCallStarted(integratorCallStarted)
+            .setVisible(isVisible)
+            .setMessagesNotSeen(messagesNotSeen)
+            .setCallStatus(callStatus)
+            .setLandscapeLayoutControlsVisible(landscapeLayoutControlsVisible)
+            .setIsMuted(isMuted)
+            .setHasVideo(hasVideo)
+            .setRequestedMediaType(requestedMediaType)
+            .setIsSpeakerOn(isSpeakerOn)
+            .createCallState();
     }
 }

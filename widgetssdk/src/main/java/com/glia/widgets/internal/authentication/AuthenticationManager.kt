@@ -1,7 +1,6 @@
 package com.glia.widgets.internal.authentication
 
 import com.glia.androidsdk.GliaException
-import com.glia.androidsdk.visitor.Authentication as CoreAuthentication
 import com.glia.androidsdk.RequestCallback
 import com.glia.widgets.authentication.Authentication
 import com.glia.widgets.callbacks.OnComplete
@@ -13,6 +12,7 @@ import com.glia.widgets.di.Dependencies.repositoryFactory
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.toWidgetsType
+import com.glia.androidsdk.visitor.Authentication as CoreAuthentication
 
 /**
  * Wrapper class for {@link com.glia.androidsdk.visitor.Authentication}

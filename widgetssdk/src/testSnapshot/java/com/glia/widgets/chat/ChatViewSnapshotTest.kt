@@ -178,10 +178,12 @@ internal class ChatViewSnapshotTest : SnapshotTest(), SnapshotChatView, Snapshot
         message = mediumLengthTexts()[2],
         unifiedTheme = unifiedTheme
     )
-        .apply { if (clickTopBanner) {
-            chatView.findViewById<EntryWidgetView>(R.id.sc_top_banner_options).showItems(defaultMediaTypesForTopBanner)
-            chatView.findViewById<ImageView>(R.id.sc_top_banner_icon).performClick()
-        } }
+        .apply {
+            if (clickTopBanner) {
+                chatView.findViewById<EntryWidgetView>(R.id.sc_top_banner_options).showItems(defaultMediaTypesForTopBanner)
+                chatView.findViewById<ImageView>(R.id.sc_top_banner_icon).performClick()
+            }
+        }
 
     @Test
     fun secureMessaging() {
@@ -243,6 +245,7 @@ internal class ChatViewSnapshotTest : SnapshotTest(), SnapshotChatView, Snapshot
             ).root
         )
     }
+
     private val defaultMediaTypesForTopBanner = listOf(
         EntryWidgetContract.ItemType.VideoCall,
         EntryWidgetContract.ItemType.AudioCall,

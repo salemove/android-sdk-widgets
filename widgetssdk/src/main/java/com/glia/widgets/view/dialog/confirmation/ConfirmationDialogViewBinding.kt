@@ -49,7 +49,8 @@ internal class ConfirmationDialogViewBinding(layoutInflater: LayoutInflater) : D
         get() = binding.dialogMessageView
 }
 
-internal class VerticalConfirmationDialogViewBinding(layoutInflater: LayoutInflater) : DefaultConfirmationDialogViewBinding<ConfirmationDialogVerticalBinding> {
+internal class VerticalConfirmationDialogViewBinding(layoutInflater: LayoutInflater) :
+    DefaultConfirmationDialogViewBinding<ConfirmationDialogVerticalBinding> {
     override val binding: ConfirmationDialogVerticalBinding = ConfirmationDialogVerticalBinding.inflate(layoutInflater)
     override val root: View
         get() = binding.root

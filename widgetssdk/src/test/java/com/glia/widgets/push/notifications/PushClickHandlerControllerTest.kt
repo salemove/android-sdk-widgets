@@ -182,7 +182,7 @@ class PushClickHandlerControllerTest {
         pushClickHandlerController.handlePushClick(queueId, "anotherVisitorId")
         pushClickHandlerController.onAuthenticationAttempt()
 
-        verify { gliaCore.getCurrentVisitor( any()) }
+        verify { gliaCore.getCurrentVisitor(any()) }
 
         verify {
             Logger.i(
@@ -195,7 +195,7 @@ class PushClickHandlerControllerTest {
         pushClickHandlerController.onAuthenticationAttempt()
         pushClickHandlerController.onAuthenticationAttempt()
         pushClickHandlerController.onAuthenticationAttempt()
-        verify(exactly = 1) { gliaCore.getCurrentVisitor( any()) }
+        verify(exactly = 1) { gliaCore.getCurrentVisitor(any()) }
 
         verify(exactly = 0) { configurationManager.setQueueIds(any()) }
         verify(exactly = 0) { uiComponentsDispatcher.launchChatScreen(any()) }

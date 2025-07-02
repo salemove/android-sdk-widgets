@@ -1,5 +1,6 @@
 package com.glia.widgets.internal.fileupload.domain
 
+import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 import com.glia.widgets.internal.engagement.exception.EngagementMissingException
 import com.glia.widgets.internal.fileupload.FileAttachmentRepository
 import com.glia.widgets.internal.fileupload.exception.RemoveBeforeReUploadingException
@@ -7,7 +8,6 @@ import com.glia.widgets.internal.fileupload.exception.SupportedFileCountExceeded
 import com.glia.widgets.internal.fileupload.exception.SupportedFileSizeExceededException
 import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.glia.widgets.internal.secureconversations.domain.ManageSecureMessagingStatusUseCase
-import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify

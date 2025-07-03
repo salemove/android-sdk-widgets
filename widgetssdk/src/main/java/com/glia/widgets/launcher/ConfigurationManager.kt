@@ -7,8 +7,6 @@ import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.processors.BehaviorProcessor
 
 internal interface ConfigurationManager {
-    val screenSharingMode: ScreenSharing.Mode
-
     val enableBubbleOutsideApp: Boolean
     val enableBubbleInsideApp: Boolean
     val suppressPushNotificationsPermissionRequestDuringAuthentication: Boolean
@@ -36,10 +34,6 @@ internal interface ConfigurationManager {
 }
 
 internal class ConfigurationManagerImpl : ConfigurationManager {
-    private var _screenSharingMode: ScreenSharing.Mode = ScreenSharing.Mode.APP_BOUNDED
-    override val screenSharingMode: ScreenSharing.Mode
-        get() = _screenSharingMode
-
     private var _enableBubbleOutsideApp: Boolean = true
     override val enableBubbleOutsideApp: Boolean
         get() = _enableBubbleOutsideApp
@@ -60,7 +54,6 @@ internal class ConfigurationManagerImpl : ConfigurationManager {
         get() = _suppressPushNotificationsPermissionRequestDuringAuthentication
 
     override fun applyConfiguration(config: GliaWidgetsConfig) {
-        config.screenSharingMode?.also { _screenSharingMode = it }
         config.enableBubbleInsideApp?.also { _enableBubbleInsideApp = it }
         config.enableBubbleOutsideApp?.also { _enableBubbleOutsideApp = it }
         config.suppressPushNotificationsPermissionRequestDuringAuthentication?.also {

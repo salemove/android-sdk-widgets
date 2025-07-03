@@ -2,7 +2,6 @@ package com.glia.widgets.view.head
 
 import com.glia.widgets.R
 import com.glia.widgets.SnapshotTest
-import com.glia.widgets.internal.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase
 import com.glia.widgets.di.ControllerFactory
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.di.UseCaseFactory
@@ -181,44 +180,6 @@ internal class ChatHeadViewSnapshotTest : SnapshotTest(
         )
     }
 
-    // MARK: ScreenSharing
-
-    private fun showScreenSharingView(
-        unifiedTheme: UnifiedTheme? = null
-    ) = showPlaceholderView(
-        unifiedTheme = unifiedTheme
-    ).also {
-        it.showScreenSharing()
-    }
-
-    @Test
-    fun showScreenSharing() {
-        snapshot(
-            showScreenSharingView()
-        )
-    }
-
-    @Test
-    fun showScreenSharingWithGlobalColors() {
-        snapshot(
-            showScreenSharingView(unifiedTheme = unifiedThemeWithGlobalColors())
-        )
-    }
-
-    @Test
-    fun showScreenSharingWithUnifiedTheme() {
-        snapshot(
-            showScreenSharingView(unifiedTheme = unifiedTheme())
-        )
-    }
-
-    @Test
-    fun showScreenSharingWithUnifiedThemeWithoutChat() {
-        snapshot(
-            showScreenSharingView(unifiedTheme = unifiedThemeWithoutChat())
-        )
-    }
-
     // MARK: OnHold
 
     private fun showOnHoldView(
@@ -299,8 +260,7 @@ internal class ChatHeadViewSnapshotTest : SnapshotTest(
 
     private fun setupView(
         unifiedTheme: UnifiedTheme? = null,
-        executor: Executor? = Executor(Runnable::run),
-        isCallVisualizerScreenSharingUseCase: Boolean = false
+        executor: Executor? = Executor(Runnable::run)
     ): ChatHeadView {
         lottieMock()
         localeProviderMock()
@@ -313,9 +273,6 @@ internal class ChatHeadViewSnapshotTest : SnapshotTest(
         Dependencies.controllerFactory = controllerFactoryMock
 
         val useCaseFactoryMock = mock<UseCaseFactory>()
-        val isCallVisualizerScreenSharingUseCaseMock = mock<IsCallVisualizerScreenSharingUseCase>()
-        whenever(isCallVisualizerScreenSharingUseCaseMock.invoke()).thenReturn(isCallVisualizerScreenSharingUseCase)
-        whenever(useCaseFactoryMock.createIsCallVisualizerScreenSharingUseCase()).thenReturn(isCallVisualizerScreenSharingUseCaseMock)
         val isCurrentEngagementCallVisualizerUseCaseMock = mock<IsCurrentEngagementCallVisualizerUseCase>()
         whenever(useCaseFactoryMock.isCurrentEngagementCallVisualizer).thenReturn(isCurrentEngagementCallVisualizerUseCaseMock)
         Dependencies.useCaseFactory = useCaseFactoryMock

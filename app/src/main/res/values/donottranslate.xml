@@ -71,8 +71,6 @@
     <string name="font_size_small">small</string>
     <string name="font_size_medium">medium</string>
     <string name="font_size_large">large</string>
-    <string name="screen_sharing_mode_unbounded">unbounded</string>
-    <string name="screen_sharing_mode_app_bounded">app_bounded</string>
     <string name="authentication_behavior_forbidden_during_engagement">forbidden_during_engagement</string>
     <string name="authentication_behavior_allowed_during_engagement">allowed_during_engagement</string>
     <array name="colors">
@@ -114,10 +112,6 @@
         <item>@string/font_delius_value</item>
         <item>@string/font_expletus_value</item>
         <item>@string/font_tangerine_value</item>
-    </array>
-    <array name="screen_sharing_mode_values">
-        <item>@string/screen_sharing_mode_unbounded</item>
-        <item>@string/screen_sharing_mode_app_bounded</item>
     </array>
     <array name="authentication_behavior_keys">
         <item>@string/settings_authentication_behavior_forbidden_during_engagement</item>

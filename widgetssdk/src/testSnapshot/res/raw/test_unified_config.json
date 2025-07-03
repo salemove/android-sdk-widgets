@@ -151,48 +151,6 @@
           "value": ["#ff00c4"]
         }
       },
-      "endScreenSharingButton": {
-        "background": {
-          "color": {
-            "type": "gradient",
-            "value": ["#49ff8d", "#541f52"]
-          },
-          "border": {
-            "type": "fill",
-            "value": ["#3e7653"]
-          },
-          "borderWidth": 2,
-          "cornerRadius": 1
-        },
-        "shadow": {
-          "color": {
-            "type": "fill",
-            "value": ["#f4ff54"]
-          },
-          "offset": 6,
-          "opacity": 2,
-          "radius": 3
-        },
-        "text": {
-          "alignment": "leading",
-          "background": {
-            "type": "gradient",
-            "value": ["#49ff8d", "#ff794f"]
-          },
-          "font": {
-            "size": 12,
-            "style": "bold"
-          },
-          "foreground": {
-            "type": "gradient",
-            "value": ["#946433", "#42c283"]
-          }
-        },
-        "tintColor": {
-          "type": "fill",
-          "value": ["#6d5563"]
-        }
-      },
       "text": {
         "alignment": "leading",
         "background": {
@@ -2094,48 +2052,6 @@
           "value": ["#9fff56"]
         }
       },
-      "endScreenSharingButton": {
-        "background": {
-          "color": {
-            "type": "gradient",
-            "value": ["#71ffdb", "#315434"]
-          },
-          "border": {
-            "type": "fill",
-            "value": ["#766e00"]
-          },
-          "borderWidth": 7,
-          "cornerRadius": 4
-        },
-        "shadow": {
-          "color": {
-            "type": "fill",
-            "value": ["#ff6bf5"]
-          },
-          "offset": 4,
-          "opacity": 5,
-          "radius": 2
-        },
-        "text": {
-          "alignment": "leading",
-          "background": {
-            "type": "gradient",
-            "value": ["#ff523e", "#52ffc3"]
-          },
-          "font": {
-            "size": 10,
-            "style": "italic"
-          },
-          "foreground": {
-            "type": "gradient",
-            "value": ["#946433", "#42c283"]
-          }
-        },
-        "tintColor": {
-          "type": "fill",
-          "value": ["#31076d"]
-        }
-      },
       "text": {
         "alignment": "leading",
         "background": {
@@ -2879,48 +2795,6 @@
         "tintColor": {
           "type": "fill",
           "value": ["#d52505"]
-        }
-      },
-      "endScreenSharingButton": {
-        "background": {
-          "color": {
-            "type": "gradient",
-            "value": ["#89c655", "#b4055"]
-          },
-          "border": {
-            "type": "fill",
-            "value": ["#f59be2"]
-          },
-          "borderWidth": 4,
-          "cornerRadius": 2
-        },
-        "shadow": {
-          "color": {
-            "type": "fill",
-            "value": ["#e84789"]
-          },
-          "offset": 6,
-          "opacity": 2,
-          "radius": 3
-        },
-        "text": {
-          "alignment": "leading",
-          "background": {
-            "type": "gradient",
-            "value": ["#68aa32", "#697050"]
-          },
-          "font": {
-            "size": 16,
-            "style": "bold"
-          },
-          "foreground": {
-            "type": "gradient",
-            "value": ["#5dd656", "#2f93f3"]
-          }
-        },
-        "tintColor": {
-          "type": "fill",
-          "value": ["#7892fb"]
         }
       },
       "text": {
@@ -3673,48 +3547,6 @@
           "value": ["#c3e6f8"]
         }
       },
-      "endScreenSharingButton": {
-        "background": {
-          "color": {
-            "type": "gradient",
-            "value": ["#ccc24f", "#4e1bb1"]
-          },
-          "border": {
-            "type": "fill",
-            "value": ["#b4afab"]
-          },
-          "borderWidth": 8,
-          "cornerRadius": 6
-        },
-        "shadow": {
-          "color": {
-            "type": "fill",
-            "value": ["#738e51"]
-          },
-          "offset": 8,
-          "opacity": 3,
-          "radius": 9
-        },
-        "text": {
-          "alignment": "leading",
-          "background": {
-            "type": "gradient",
-            "value": ["#0f0f05", "#01a26b"]
-          },
-          "font": {
-            "size": 12,
-            "style": "bold"
-          },
-          "foreground": {
-            "type": "gradient",
-            "value": ["#2386e8", "#05685e"]
-          }
-        },
-        "tintColor": {
-          "type": "fill",
-          "value": ["#c9bd79"]
-        }
-      },
       "text": {
         "alignment": "trailing",
         "background": {
@@ -3950,48 +3782,6 @@
         "tintColor": {
           "type": "fill",
           "value": ["#52553c"]
-        }
-      },
-      "endScreenSharingButton": {
-        "background": {
-          "color": {
-            "type": "gradient",
-            "value": ["#b9b5c1", "#a668a"]
-          },
-          "border": {
-            "type": "fill",
-            "value": ["#86d22d"]
-          },
-          "borderWidth": 4,
-          "cornerRadius": 2
-        },
-        "shadow": {
-          "color": {
-            "type": "fill",
-            "value": ["#2a928"]
-          },
-          "offset": 6,
-          "opacity": 2,
-          "radius": 3
-        },
-        "text": {
-          "alignment": "leading",
-          "background": {
-            "type": "gradient",
-            "value": ["#9ac0a6", "#51218b"]
-          },
-          "font": {
-            "size": 16,
-            "style": "bold"
-          },
-          "foreground": {
-            "type": "gradient",
-            "value": ["#a53ef0", "#4b04e"]
-          }
-        },
-        "tintColor": {
-          "type": "fill",
-          "value": ["#7892fb"]
         }
       },
       "text": {

@@ -1345,60 +1345,6 @@
           ]
         }
       },
-      "endScreenSharingButton": {
-        "background": {
-          "border": {
-            "type": "fill",
-            "value": [
-              "#FFFFFF"
-            ]
-          },
-          "borderWidth": 2,
-          "color": {
-            "type": "fill",
-            "value": [
-              "#FFFFFF"
-            ]
-          },
-          "cornerRadius": 8
-        },
-        "shadow": {
-          "color": {
-            "type": "fill",
-            "value": [
-              "#FFFFFF"
-            ]
-          },
-          "offset": 0,
-          "opacity": 1,
-          "radius": 5
-        },
-        "text": {
-          "alignment": "center",
-          "background": {
-            "type": "fill",
-            "value": [
-              "#FFFFFF"
-            ]
-          },
-          "font": {
-            "size": 16,
-            "style": "regular"
-          },
-          "foreground": {
-            "type": "fill",
-            "value": [
-              "#FFFFFF"
-            ]
-          }
-        },
-        "tintColor": {
-          "type": "fill",
-          "value": [
-            "#FFFFFF"
-          ]
-        }
-      },
       "text": {
         "alignment": "center",
         "background": {
@@ -2093,60 +2039,6 @@
             "type": "fill",
             "value": [
               "#04728c"
-            ]
-          },
-          "cornerRadius": 8
-        },
-        "shadow": {
-          "color": {
-            "type": "fill",
-            "value": [
-              "#FFFFFF"
-            ]
-          },
-          "offset": 0,
-          "opacity": 1,
-          "radius": 5
-        },
-        "text": {
-          "alignment": "center",
-          "background": {
-            "type": "fill",
-            "value": [
-              "#FFFFFF"
-            ]
-          },
-          "font": {
-            "size": 16,
-            "style": "regular"
-          },
-          "foreground": {
-            "type": "fill",
-            "value": [
-              "#FFFFFF"
-            ]
-          }
-        },
-        "tintColor": {
-          "type": "fill",
-          "value": [
-            "#2596be"
-          ]
-        }
-      },
-      "endScreenSharingButton": {
-        "background": {
-          "border": {
-            "type": "fill",
-            "value": [
-              "#FFFFFF"
-            ]
-          },
-          "borderWidth": 2,
-          "color": {
-            "type": "fill",
-            "value": [
-              "#FFFFFF"
             ]
           },
           "cornerRadius": 8
@@ -4285,60 +4177,6 @@
             ]
           }
         },
-        "endScreenSharingButton": {
-          "background": {
-            "border": {
-              "type": "fill",
-              "value": [
-                "#FFFFFF"
-              ]
-            },
-            "borderWidth": 2,
-            "color": {
-              "type": "fill",
-              "value": [
-                "#FFFFFF"
-              ]
-            },
-            "cornerRadius": 8
-          },
-          "shadow": {
-            "color": {
-              "type": "fill",
-              "value": [
-                "#FFFFFF"
-              ]
-            },
-            "offset": 0,
-            "opacity": 1,
-            "radius": 5
-          },
-          "text": {
-            "alignment": "center",
-            "background": {
-              "type": "fill",
-              "value": [
-                "#FFFFFF"
-              ]
-            },
-            "font": {
-              "size": 16,
-              "style": "regular"
-            },
-            "foreground": {
-              "type": "fill",
-              "value": [
-                "#FFFFFF"
-              ]
-            }
-          },
-          "tintColor": {
-            "type": "fill",
-            "value": [
-              "#2596be"
-            ]
-          }
-        },
         "text": {
           "alignment": "center",
           "background": {
@@ -4761,60 +4599,6 @@
           ]
         }
       },
-      "endScreenSharingButton": {
-        "background": {
-          "border": {
-            "type": "fill",
-            "value": [
-              "#FFFFFF"
-            ]
-          },
-          "borderWidth": 2,
-          "color": {
-            "type": "fill",
-            "value": [
-              "#FFFFFF"
-            ]
-          },
-          "cornerRadius": 8
-        },
-        "shadow": {
-          "color": {
-            "type": "fill",
-            "value": [
-              "#FFFFFF"
-            ]
-          },
-          "offset": 0,
-          "opacity": 1,
-          "radius": 5
-        },
-        "text": {
-          "alignment": "center",
-          "background": {
-            "type": "fill",
-            "value": [
-              "#FFFFFF"
-            ]
-          },
-          "font": {
-            "size": 16,
-            "style": "regular"
-          },
-          "foreground": {
-            "type": "fill",
-            "value": [
-              "#FFFFFF"
-            ]
-          }
-        },
-        "tintColor": {
-          "type": "fill",
-          "value": [
-            "#FFFFFF"
-          ]
-        }
-      },
       "text": {
         "alignment": "center",
         "background": {
@@ -5135,60 +4919,6 @@
           "type": "fill",
           "value": [
             "#3e95a6"
-          ]
-        }
-      },
-      "endScreenSharingButton": {
-        "background": {
-          "border": {
-            "type": "fill",
-            "value": [
-              "#FFFFFF"
-            ]
-          },
-          "borderWidth": 2,
-          "color": {
-            "type": "fill",
-            "value": [
-              "#FFFFFF"
-            ]
-          },
-          "cornerRadius": 8
-        },
-        "shadow": {
-          "color": {
-            "type": "fill",
-            "value": [
-              "#FFFFFF"
-            ]
-          },
-          "offset": 0,
-          "opacity": 1,
-          "radius": 5
-        },
-        "text": {
-          "alignment": "center",
-          "background": {
-            "type": "fill",
-            "value": [
-              "#FFFFFF"
-            ]
-          },
-          "font": {
-            "size": 16,
-            "style": "regular"
-          },
-          "foreground": {
-            "type": "fill",
-            "value": [
-              "#FFFFFF"
-            ]
-          }
-        },
-        "tintColor": {
-          "type": "fill",
-          "value": [
-            "#FFFFFF"
           ]
         }
       },

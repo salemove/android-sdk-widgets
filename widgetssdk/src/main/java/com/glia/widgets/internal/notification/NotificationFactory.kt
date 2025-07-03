@@ -79,7 +79,6 @@ internal object NotificationFactory {
             .setSmallIcon(icon)
             .setContentTitle(title)
             .setContentText(message)
-            //Based on priority level description, audio/video notification will always be below screen-sharing notification in a list
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setCategory(NotificationCompat.CATEGORY_CALL)
             .setOngoing(true)

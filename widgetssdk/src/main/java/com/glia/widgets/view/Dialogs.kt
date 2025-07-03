@@ -211,29 +211,6 @@ internal object Dialogs {
         return dialogService.showDialog(context, theme, DialogType.Upgrade(payload))
     }
 
-    fun showScreenSharingDialog(
-        context: Context,
-        theme: UiTheme,
-        operatorName: String?,
-        positiveButtonClickListener: View.OnClickListener,
-        negativeButtonClickListener: View.OnClickListener
-    ): AlertDialog {
-        val payload = DialogPayload.ScreenSharing(
-            title = LocaleString(R.string.alert_screen_sharing_start_header),
-            message = LocaleString(
-                R.string.alert_screen_sharing_start_message,
-                StringKeyPair(StringKey.OPERATOR_NAME, (operatorName ?: localeProvider.getString(backingOperatorName)))
-            ),
-            positiveButtonText = accept,
-            negativeButtonText = decline,
-            poweredByText = poweredByText,
-            positiveButtonClickListener = positiveButtonClickListener,
-            negativeButtonClickListener = negativeButtonClickListener
-        )
-
-        return dialogService.showDialog(context, theme, DialogType.ScreenSharing(payload))
-    }
-
     fun showMessageCenterUnavailableDialog(
         context: Context,
         theme: UiTheme,

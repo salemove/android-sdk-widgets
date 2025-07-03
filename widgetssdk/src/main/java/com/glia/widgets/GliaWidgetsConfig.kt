@@ -1,7 +1,6 @@
 package com.glia.widgets
 
 import android.content.Context
-import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 
@@ -34,9 +33,6 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
     val companyName: String?
 
     @JvmField
-    val screenSharingMode: ScreenSharing.Mode?
-
-    @JvmField
     val enableBubbleOutsideApp: Boolean?
 
     @JvmField
@@ -62,7 +58,6 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
         requestCode = builder.requestCode
         uiJsonRemoteConfig = builder.uiJsonRemoteConfig
         companyName = builder.companyName
-        screenSharingMode = builder.screenSharingMode
         enableBubbleOutsideApp = builder.enableBubbleOutsideApp
         enableBubbleInsideApp = builder.enableBubbleInsideApp
         manualLocaleOverride = builder.manualLocaleOverride
@@ -131,8 +126,6 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
         var uiJsonRemoteConfig: String? = null
             private set
         var companyName: String? = null
-            private set
-        var screenSharingMode: ScreenSharing.Mode? = null
             private set
         var enableBubbleOutsideApp: Boolean? = null
             private set
@@ -214,19 +207,6 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
          */
         fun setCompanyName(companyName: String?): Builder {
             this.companyName = companyName
-            return this
-        }
-
-        /**
-         * Screen sharing is deprecated. Please use Live Observation instead:
-         * https://docs.glia.com/glia-mobile/docs/android-live-observation
-         *
-         * @param screenSharingMode - Screen sharing mode, either UNBOUND(default) or APP_BOUND
-         * @return Builder instance
-         */
-        @Deprecated("Please use Live Observation instead")
-        fun setScreenSharingMode(screenSharingMode: ScreenSharing.Mode?): Builder {
-            this.screenSharingMode = screenSharingMode
             return this
         }
 

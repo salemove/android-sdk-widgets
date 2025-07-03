@@ -279,7 +279,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         android:focusable="true"
         android:clickable="true"
-        android:background="@color/glia_black_color_transparency_2"
+        android:background="@color/glia_black_color_opacity_60"
         android:visibility="gone" />
 
     <com.glia.widgets.entrywidget.EntryWidgetView

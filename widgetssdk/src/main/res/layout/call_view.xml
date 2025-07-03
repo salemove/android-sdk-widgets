@@ -8,7 +8,7 @@
         android:id="@+id/top_app_bar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/glia_black_color_transparency"
+        android:backgroundTint="@color/glia_black_color_opacity_0"
         app:elevation="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -18,8 +18,6 @@ internal data class HeaderRemoteConfig(
 
     @SerializedName("endButton")
     val endButtonRemoteConfig: ButtonRemoteConfig?
-
-    // TODO add endScreenSharingButton configuration param
 ) {
     fun toHeaderTheme(): HeaderTheme = HeaderTheme(
         text = textRemoteConfig?.toTextTheme(),

@@ -1,6 +1,5 @@
 package com.glia.widgets.launcher
 
-import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.GliaWidgetsConfig
 import io.reactivex.rxjava3.core.Flowable

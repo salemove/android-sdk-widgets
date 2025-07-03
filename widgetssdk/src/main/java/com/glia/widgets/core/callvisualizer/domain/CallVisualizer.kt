@@ -7,7 +7,7 @@ import android.view.View
  * Provides controls related to Call Visualizer module
  *
  * Some interactions between operators and visitors start as regular phone calls with no Glia engagement.
- * Screen sharing and video engagements are available for such calls via Call Visualizer.
+ * Video engagements are available for such calls via Call Visualizer.
  *
  * For more information, see the [Call Visualizer guide](https://docs.glia.com/glia-mobile/docs/android-widgets-call-visualizer).
  */

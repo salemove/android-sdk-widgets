@@ -32,16 +32,6 @@ internal sealed interface DialogPayload {
         val link2ClickListener: View.OnClickListener,
     ) : DialogPayload
 
-    data class ScreenSharing(
-        override val title: LocaleString,
-        val message: LocaleString,
-        val positiveButtonText: LocaleString,
-        val negativeButtonText: LocaleString,
-        val poweredByText: LocaleString,
-        val positiveButtonClickListener: View.OnClickListener,
-        val negativeButtonClickListener: View.OnClickListener,
-    ) : DialogPayload
-
     data class Upgrade(
         override val title: LocaleString,
         val positiveButtonText: LocaleString,

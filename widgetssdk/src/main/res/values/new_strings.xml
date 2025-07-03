@@ -3,9 +3,6 @@
     <!-- Notifications -->
     <string name="android_notification_audio_call_message">@string/glia_notification_audio_call_message</string>
     <string name="android_notification_audio_call_title">@string/glia_notification_audio_call_title</string>
-    <string name="android_notification_screen_sharing_title">@string/glia_notification_screen_sharing_title</string>
-    <string name="android_notification_screen_sharing_message">@string/glia_notification_screen_sharing_message</string>
-    <string name="android_notification_end_screen_sharing_title">@string/glia_notification_action_end_sharing</string>
     <string name="android_notification_two_way_video_title">@string/glia_notification_two_way_video_call_title</string>
     <string name="android_notification_two_way_video_message">@string/glia_notification_two_way_video_call_message</string>
     <string name="android_notification_two_way_video_no_audio_message">@string/glia_notification_two_way_video_call_message_no_audio</string>
@@ -16,9 +13,6 @@
     <!-- Call Visualizer -->
     <string name="call_visualizer_visitor_code_title">@string/glia_visitor_code_view_title</string>
     <string name="visitor_code_failed">@string/glia_visitor_code_error_title</string>
-    <string name="call_visualizer_screen_sharing_header_title">@string/call_visualizer_screen_sharing_title</string>
-    <string name="call_visualizer_screen_sharing_message">@string/call_visualizer_label</string>
-    <string name="screen_sharing_visitor_screen_end_title">@string/call_visualizer_button</string>
     <string name="android_visitor_code_loading">@string/glia_visitor_code_loading</string>
     <string name="call_visualizer_visitor_code_title_accessibility_hint">@string/glia_visitor_code_content_description</string>
     <string name="call_visualizer_visitor_code_refresh_accessibility_hint">Generates a new visitor code</string>
@@ -37,8 +31,6 @@
     <string name="android_notification_allow_notifications_message">@string/glia_dialog_allow_notifications_message</string>
     <string name="android_notification_allow_notifications_title">@string/glia_dialog_allow_notifications_title</string>
     <string name="android_overlay_permission_title">@string/glia_dialog_overlay_permissions_title</string>
-    <string name="android_screen_sharing_offer_with_notifications_title">@string/glia_dialog_screen_sharing_offer_enable_notifications_title</string>
-    <string name="android_screen_sharing_offer_with_notifications_message">@string/glia_dialog_screen_sharing_offer_enable_notifications_message</string>
     <string name="android_overlay_permission_message">@string/glia_dialog_overlay_permissions_message</string>
     <string name="android_permissions_title">@string/glia_dialog_permission_error_title</string>
     <string name="android_permissions_message">@string/glia_dialog_permission_error_message</string>
@@ -56,8 +48,6 @@
     <string name="message_center_unavailable_title">@string/glia_dialog_message_center_unavailable_title</string>
     <string name="message_center_unavailable_message">@string/glia_dialog_message_center_unavailable_message</string>
     <string name="message_center_not_authenticated_message">@string/glia_dialog_message_center_unauthorized_message</string>
-    <string name="alert_screen_sharing_start_header">@string/glia_dialog_screen_sharing_offer_title</string>
-    <string name="alert_screen_sharing_start_message">@string/glia_dialog_screen_sharing_offer_message</string>
     <string name="media_upgrade_audio_title">@string/glia_dialog_upgrade_audio_title</string>
     <string name="media_upgrade_video_one_way_title">@string/glia_dialog_upgrade_video_1_way_title</string>
     <string name="media_upgrade_video_two_way_title">@string/glia_dialog_upgrade_video_2_way_title</string>

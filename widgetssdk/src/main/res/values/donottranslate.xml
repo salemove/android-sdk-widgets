@@ -4,7 +4,6 @@
     <string name="glia_file_preview_transition_name">image_preview_transition</string>
 
     <string name="android_notification_audio_call_channel_name" translatable="false">@string/glia_notification_call_channel_name</string>
-    <string name="android_notification_screen_sharing_channel_name" translatable="false">@string/glia_notification_screen_sharing_channel_name</string>
     <string name="android_notification_secure_messaging_channel_name" translatable="false">New secure messages</string>
 
     <!-- Survey -->

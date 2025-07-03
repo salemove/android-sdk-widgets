@@ -79,7 +79,7 @@ public class InputQuestionConfiguration implements Parcelable {
         @SuppressLint("ResourceType")
         private OptionButtonConfiguration prepareDefaultButtonConfiguration(ResourceProvider resourceProvider) {
             int borderWidth = resourceProvider.getDimensionPixelSize(R.dimen.glia_survey_default_border_width);
-            String normalColor = resourceProvider.getString(R.color.glia_stroke_gray);
+            String normalColor = resourceProvider.getString(R.color.glia_normal_color_opacity_30);
             LayerConfiguration normalLayer = new LayerConfiguration.Builder()
                     .borderColor(normalColor)
                     .borderWidth(borderWidth)

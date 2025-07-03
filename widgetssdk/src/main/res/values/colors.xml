@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--  Glia Mobile Color Tokens  -->
     <color name="glia_black_color">#000000</color>
-    <color name="glia_black_color_transparency">#00000000</color>
-    <color name="glia_black_color_transparency_1">#DC000000</color>
-    <color name="glia_black_color_transparency_2">#99000000</color>
-
+    <color name="glia_black_color_opacity_0">#00000000</color>
+    <color name="glia_black_color_opacity_60">#99000000</color>
+    <color name="glia_black_color_opacity_86">#DC000000</color>
     <color name="glia_primary_color">#0F6BFF</color>
     <color name="glia_dark_color">#2C0735</color>
     <color name="glia_light_color">#FFFFFF</color>
     <color name="glia_normal_color">#616A75</color>
+    <color name="glia_normal_color_opacity_30">#4D616A75</color>
     <color name="glia_shade_color">#B6BBC1</color>
     <color name="glia_negative_color">#BC0F42</color>
     <color name="glia_neutral_color">#F7F7F7</color>
@@ -17,7 +18,7 @@
     colors to prevent customisation.  -->
     <color name="glia_branding_color">#B6BBC1</color>
 
-    <color name="glia_call_view_background_color">@color/glia_black_color_transparency_1</color>
+    <color name="glia_call_view_background_color">@color/glia_black_color_opacity_86</color>
     <color name="glia_call_control_buttons_color">@color/glia_black_color</color>
 
     <color name="glia_stroke_light">@color/glia_shade_color</color>
@@ -25,7 +26,7 @@
     <color name="glia_separator_gray">@color/glia_shade_color</color>
     <color name="glia_attachment_menu_bg">@color/glia_neutral_color</color>
     <color name="glia_chat_background_color">@color/glia_light_color</color>
-    <color name="glia_dark_transparent_bg">@color/glia_black_color_transparency_2</color>
+    <color name="glia_dark_transparent_bg">@color/glia_black_color_opacity_60</color>
 
     <color name="glia_disable_button_bg">@color/glia_neutral_color</color>
     <color name="glia_disable_button_border">@color/glia_shade_color</color>

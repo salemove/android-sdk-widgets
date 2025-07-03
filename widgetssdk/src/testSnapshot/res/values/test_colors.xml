@@ -32,6 +32,5 @@
     <color name="gvaQuickReplyBackgroundColor">#3C27B0</color>
     <color name="gvaQuickReplyStrokeColor">#536D9E</color>
     <color name="gvaQuickReplyTextColor">#FFFFFF</color>
-    <color name="endScreenShareTintColor">#6FD740</color>
 </resources>
 

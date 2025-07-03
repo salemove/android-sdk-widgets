@@ -1,6 +1,5 @@
 package com.glia.widgets.engagement
 
-import android.app.Activity
 import android.content.Intent
 import com.glia.androidsdk.EngagementRequest.Outcome
 import com.glia.androidsdk.IncomingEngagementRequest
@@ -8,7 +7,6 @@ import com.glia.androidsdk.Operator
 import com.glia.androidsdk.comms.CameraDevice
 import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.comms.MediaUpgradeOffer
-import com.glia.androidsdk.screensharing.ScreenSharing.Mode
 import com.glia.widgets.helper.Data
 import io.reactivex.rxjava3.core.Flowable
 

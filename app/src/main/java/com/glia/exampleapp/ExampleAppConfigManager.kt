@@ -5,7 +5,6 @@ import android.content.SharedPreferences
 import android.net.Uri
 import androidx.preference.PreferenceManager
 import com.glia.androidsdk.SiteApiKey
-import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.widgets.GliaWidgetsConfig
 import androidx.core.content.edit
 

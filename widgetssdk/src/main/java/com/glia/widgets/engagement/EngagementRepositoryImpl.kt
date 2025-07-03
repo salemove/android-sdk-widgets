@@ -1,7 +1,6 @@
 package com.glia.widgets.engagement
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Intent
 import androidx.annotation.VisibleForTesting
 import com.glia.androidsdk.Engagement
@@ -24,10 +23,6 @@ import com.glia.androidsdk.omnibrowse.Omnibrowse
 import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement
 import com.glia.androidsdk.omnicore.OmnicoreEngagement
 import com.glia.androidsdk.queuing.QueueTicket
-import com.glia.androidsdk.screensharing.LocalScreen
-import com.glia.androidsdk.screensharing.ScreenSharing
-import com.glia.androidsdk.screensharing.ScreenSharingRequest
-import com.glia.androidsdk.screensharing.VisitorScreenSharingState
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.Data
 import com.glia.widgets.helper.Logger
@@ -53,9 +48,6 @@ private const val TAG = "EngagementRepository"
 
 @VisibleForTesting
 internal const val MEDIA_PERMISSION_REQUEST_CODE = 0x3E9
-
-@VisibleForTesting
-internal const val SKIP_ASKING_SCREEN_SHARING_PERMISSION_RESULT_CODE = 0x1995
 
 internal class EngagementRepositoryImpl(
     private val core: GliaCore,
@@ -124,9 +116,6 @@ internal class EngagementRepositoryImpl(
     private val _operatorTypingStatus: PublishProcessor<Boolean> = PublishProcessor.create()
     override val operatorTypingStatus: Flowable<Boolean> = _operatorTypingStatus.distinctUntilChanged()
 
-    private val readyToShareScreenProcessor: PublishProcessor<Unit> = PublishProcessor.create()
-    private val mediaProjectionActivityResultProcessor: PublishProcessor<Pair<Int, Intent?>> = PublishProcessor.create()
-
     private val queueIngDisposable = CompositeDisposable()
 
     override val hasOngoingLiveEngagement: Boolean
@@ -168,13 +157,6 @@ internal class EngagementRepositoryImpl(
         core.on(Glia.Events.QUEUE_TICKET, queueTicketCallback)
         core.callVisualizer.on(Omnibrowse.Events.ENGAGEMENT, callVisualizerEngagementCallback)
         core.callVisualizer.on(Omnibrowse.Events.ENGAGEMENT_REQUEST, engagementRequestCallback)
-        Flowable.zip(mediaProjectionActivityResultProcessor, readyToShareScreenProcessor) { result, _ ->
-            /**
-             * This function must be called only when both processors have emitted a value, in other words,
-             * when the [onReadyToShareScreen] and the [onReadyToShareScreen] functions have been called
-             */
-            onActivityResult(SKIP_ASKING_SCREEN_SHARING_PERMISSION_RESULT_CODE, result.first, result.second)
-        }.subscribe()
     }
 
     override fun reset() {

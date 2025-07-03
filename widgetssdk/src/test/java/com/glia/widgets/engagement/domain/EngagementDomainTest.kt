@@ -2,15 +2,11 @@ package com.glia.widgets.engagement.domain
 
 import android.COMMON_EXTENSIONS_CLASS_PATH
 import android.Manifest
-import android.app.Activity
-import android.content.Context
-import android.content.Intent
 import com.glia.androidsdk.Operator
 import com.glia.androidsdk.comms.Media
 import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.androidsdk.comms.Video
-import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.MediaType
@@ -22,7 +18,6 @@ import com.glia.widgets.internal.fileupload.FileAttachmentRepository
 import com.glia.widgets.internal.notification.domain.CallNotificationUseCase
 import com.glia.widgets.internal.permissions.PermissionManager
 import com.glia.widgets.internal.secureconversations.SecureConversationsRepository
-import com.glia.widgets.launcher.ConfigurationManager
 import com.glia.widgets.permissions.Permissions
 import com.glia.widgets.permissions.PermissionsGrantedCallback
 import io.mockk.Runs
@@ -31,7 +26,6 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.mockkStatic
-import io.mockk.slot
 import io.mockk.unmockkStatic
 import io.mockk.verify
 import io.mockk.verifyOrder

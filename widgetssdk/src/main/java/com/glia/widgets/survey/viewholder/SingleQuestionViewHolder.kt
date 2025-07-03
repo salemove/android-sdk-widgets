@@ -22,6 +22,7 @@ import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.survey.SurveySingleQuestionTheme
 import java.util.Optional
 import kotlin.jvm.optionals.getOrNull
+import androidx.core.graphics.toColorInt
 
 internal class SingleQuestionViewHolder(
     private val binding: SurveySingleQuestionItemBinding,
@@ -73,7 +74,7 @@ internal class SingleQuestionViewHolder(
                 // Set color for the center dot
                 val centerDot = drawable.findDrawableByLayerId(R.id.center_item)
                 val radiobuttonColor = singleTheme?.tintColor?.primaryColor
-                    ?: Color.parseColor(style.singleQuestion.tintColor)
+                    ?: style.singleQuestion.tintColor.toColorInt()
                 val colorStateList = getRadioButtonColors(radiobuttonColor)
                 centerDot.setTintList(colorStateList)
 
@@ -81,7 +82,7 @@ internal class SingleQuestionViewHolder(
                 val border =
                     drawable.findDrawableByLayerId(R.id.border_item) as GradientDrawable
                 val strokeColor =
-                    ContextCompat.getColorStateList(context, R.color.glia_shade_color)
+                    ContextCompat.getColorStateList(context, R.color.glia_normal_color_opacity_30)
                 val width = context.resources.getDimensionPixelSize(R.dimen.glia_px)
                 border.setStroke(width, strokeColor)
             }

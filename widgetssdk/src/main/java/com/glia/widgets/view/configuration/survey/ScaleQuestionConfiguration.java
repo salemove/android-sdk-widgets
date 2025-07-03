@@ -96,7 +96,7 @@ public class ScaleQuestionConfiguration implements Parcelable {
 
             LayerConfiguration normalLayer = new LayerConfiguration.Builder()
                     .backgroundColor(resourceProvider.getString(R.color.glia_light_color))
-                    .borderColor(resourceProvider.getString(R.color.glia_stroke_gray))
+                    .borderColor(resourceProvider.getString(R.color.glia_normal_color_opacity_30))
                     .cornerRadius(resourceProvider.getDimension(R.dimen.glia_survey_default_corner_radius))
                     .borderWidth(borderWidth)
                     .build();

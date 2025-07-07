@@ -21,7 +21,7 @@
 
     <com.glia.widgets.view.OperatorStatusView
         android:id="@+id/chat_head_view"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/glia_small"
         android:layout_marginEnd="@dimen/glia_small"

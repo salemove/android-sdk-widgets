@@ -5,11 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="@dimen/glia_large_x_large">
+    android:paddingTop="@dimen/glia_x_large"
+    android:paddingHorizontal="@dimen/glia_x_large"
+    android:paddingBottom="@dimen/glia_large_x_large">
 
     <TextView
         android:id="@+id/dialog_title_view"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:gravity="center"
@@ -19,13 +21,14 @@
 
     <TextView
         android:id="@+id/dialog_message_view"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="@dimen/glia_medium"
+        android:layout_marginTop="@dimen/glia_large"
+        android:layout_marginBottom="@dimen/glia_medium"
         android:gravity="center"
         android:textAppearance="?attr/textAppearanceBody1"
-        tools:text="message skjsdksdksdkdsslsldssldskdlskdsldksldksldksldskdl"
+        tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
         tools:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
 
     <ImageButton
@@ -33,7 +36,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        android:layout_marginTop="@dimen/glia_small"
+        android:layout_marginTop="@dimen/glia_medium"
         android:background="?attr/selectableItemBackground"
         android:src="?attr/gliaIconLeaveQueue"
         app:tint="?attr/gliaBaseNormalColor"

@@ -10,20 +10,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_begin="@dimen/glia_large_x_large" />
+        app:layout_constraintGuide_begin="@dimen/glia_x_large" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/end_guideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_end="@dimen/glia_large_x_large" />
+        app:layout_constraintGuide_end="@dimen/glia_x_large" />
 
     <ImageView
         android:id="@+id/chat_title_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/glia_large"
+        android:layout_marginTop="@dimen/glia_x_large"
         android:contentDescription="@string/glia_chat_audio_icon_content_description"
         android:src="?attr/gliaIconUpgradeAudioDialog"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
@@ -35,7 +35,7 @@
         android:id="@+id/dialog_title_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/glia_small"
+        android:layout_marginTop="@dimen/glia_medium"
         android:gravity="center"
         android:textAppearance="?attr/textAppearanceHeadline2"
         app:layout_constraintEnd_toStartOf="@id/end_guideline"
@@ -48,6 +48,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/glia_large_x_large"
         android:layout_marginEnd="@dimen/glia_small"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
         app:layout_constraintEnd_toStartOf="@id/accept_button"
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
@@ -60,6 +62,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/glia_small"
         android:layout_marginTop="@dimen/glia_large_x_large"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
         app:layout_constraintStart_toEndOf="@id/decline_button"
         app:layout_constraintTop_toBottomOf="@id/dialog_title_view"
@@ -69,38 +73,38 @@
         android:id="@+id/logo_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="@dimen/glia_large_x_large"
+        app:layout_constraintTop_toBottomOf="@+id/accept_button"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/accept_button">
+        app:layout_constraintEnd_toEndOf="parent">
 
         <TextView
             android:id="@+id/powered_by_text"
-            style="@style/Application.Glia.Caption"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/glia_medium"
-            android:importantForAccessibility="no"
+            tools:text="@string/general_powered"
+            style="@style/Application.Glia.Caption"
             android:textColor="@color/glia_branding_color"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/logo_view"
+            android:layout_marginEnd="@dimen/glia_small"
+            android:paddingBottom="@dimen/glia_small"
+            android:importantForAccessibility="no"
             app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintEnd_toStartOf="@id/logo_view"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="@string/general_powered" />
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
         <ImageView
             android:id="@+id/logo_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/glia_pre_x_large"
-            android:layout_marginBottom="@dimen/glia_pre_x_large"
             android:importantForAccessibility="no"
             android:src="@drawable/ic_glia_logo"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/powered_by_text"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -108,11 +112,12 @@
         android:id="@+id/space"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/glia_large_x_large"
+        android:layout_marginTop="@dimen/glia_large_x_large"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/logo_container"
-        app:layout_constraintVertical_bias="0" />
+        app:layout_constraintVertical_bias="0"
+        app:layout_goneMarginTop="@dimen/glia_x_large" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -6,7 +6,9 @@ import com.glia.widgets.view.dialog.base.DialogPayload
 import com.glia.widgets.view.dialog.base.DialogType
 import org.junit.Test
 
-internal class AlertDialogTest : SnapshotTest(), SnapshotDialog {
+internal class AlertDialogTest : SnapshotTest(
+    renderingMode = fullWidthRenderMode
+), SnapshotDialog {
     private val payloadWithButton: DialogPayload.AlertDialog = DialogPayload.AlertDialog(
         title = title,
         message = message,

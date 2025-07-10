@@ -11,7 +11,7 @@ import com.glia.widgets.chat.domain.GliaSendMessagePreviewUseCase
 import com.glia.widgets.chat.domain.GliaSendMessageUseCase
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
-import com.glia.widgets.chat.domain.IsShowSendButtonUseCase
+import com.glia.widgets.chat.domain.IsSendButtonEnableUseCase
 import com.glia.widgets.chat.domain.SetChatScreenOpenUseCase
 import com.glia.widgets.chat.domain.SiteInfoUseCase
 import com.glia.widgets.chat.domain.TakePictureUseCase
@@ -96,7 +96,7 @@ class ChatControllerTest {
     private lateinit var getFileAttachmentsUseCase: GetFileAttachmentsUseCase
     private lateinit var removeFileAttachmentUseCase: RemoveFileAttachmentUseCase
     private lateinit var fileUploadLimitNotExceededObservableUseCase: FileUploadLimitNotExceededObservableUseCase
-    private lateinit var isShowSendButtonUseCase: IsShowSendButtonUseCase
+    private lateinit var isSendButtonEnableUseCase: IsSendButtonEnableUseCase
     private lateinit var isShowOverlayPermissionRequestDialogUseCase: IsShowOverlayPermissionRequestDialogUseCase
     private lateinit var downloadFileUseCase: DownloadFileUseCase
     private lateinit var siteInfoUseCase: SiteInfoUseCase
@@ -155,7 +155,7 @@ class ChatControllerTest {
         getFileAttachmentsUseCase = mock()
         removeFileAttachmentUseCase = mock()
         fileUploadLimitNotExceededObservableUseCase = mock()
-        isShowSendButtonUseCase = mock()
+        isSendButtonEnableUseCase = mock()
         isShowOverlayPermissionRequestDialogUseCase = mock()
         downloadFileUseCase = mock()
         siteInfoUseCase = mock()
@@ -218,7 +218,7 @@ class ChatControllerTest {
             getFileAttachmentsUseCase = getFileAttachmentsUseCase,
             removeFileAttachmentUseCase = removeFileAttachmentUseCase,
             fileUploadLimitNotExceededObservableUseCase = fileUploadLimitNotExceededObservableUseCase,
-            isShowSendButtonUseCase = isShowSendButtonUseCase,
+            isSendButtonEnableUseCase = isSendButtonEnableUseCase,
             isShowOverlayPermissionRequestDialogUseCase = isShowOverlayPermissionRequestDialogUseCase,
             downloadFileUseCase = downloadFileUseCase,
             siteInfoUseCase = siteInfoUseCase,
@@ -267,9 +267,10 @@ class ChatControllerTest {
         state.apply {
             // Init chat
             assertTrue(isVisible)
-            assertFalse(isSendButtonVisible)
-            assertTrue(isSendButtonEnabled)
+            assertTrue(isSendButtonVisible)
+            assertFalse(isSendButtonEnabled)
             assertTrue(isAttachmentAllowed)
+            assertFalse(isAttachmentButtonEnabled)
             // Live chat state
             assertFalse(isSecureMessaging)
             assertFalse(isSecureConversationsUnavailableLabelVisible)
@@ -282,9 +283,11 @@ class ChatControllerTest {
         state.apply {
             // Init chat
             assertTrue(isVisible)
-            assertFalse(isSendButtonVisible)
-            assertTrue(isSendButtonEnabled)
+            assertTrue(isSendButtonVisible)
+            assertFalse(isSendButtonEnabled)
             assertTrue(isAttachmentAllowed)
+            assertTrue(isAttachmentButtonNeeded)
+            assertFalse(isAttachmentButtonEnabled)
             // Secure Messaging state
             assertTrue(isSecureMessaging)
             assertTrue(isAttachmentButtonNeeded)
@@ -352,6 +355,7 @@ class ChatControllerTest {
         verify(chatView).emitState(stateKArgumentCaptor.capture())
 
         assertLiveChatState(stateKArgumentCaptor.lastValue)
+        assertTrue(stateKArgumentCaptor.lastValue.isAttachmentButtonNeeded)
     }
 
     @Test
@@ -367,6 +371,7 @@ class ChatControllerTest {
         verify(chatView).emitState(stateKArgumentCaptor.capture())
 
         assertLiveChatState(stateKArgumentCaptor.lastValue)
+        assertTrue(stateKArgumentCaptor.lastValue.isAttachmentButtonNeeded)
     }
 
     @Test
@@ -548,9 +553,9 @@ class ChatControllerTest {
         verify(isMessagingAvailableUseCase, times(2)).invoke()
         verify(fileUploadLimitNotExceededObservableUseCase).invoke()
         verify(manageSecureMessagingStatusUseCase).shouldBehaveAsSecureMessaging
-        verify(chatView, times(3)).emitState(stateKArgumentCaptor.capture())
+        verify(chatView, times(2)).emitState(stateKArgumentCaptor.capture())
 
-        assertTrue(stateKArgumentCaptor.lastValue.isAttachmentButtonEnabled)
+        assertFalse(stateKArgumentCaptor.lastValue.isAttachmentButtonEnabled)
     }
 
     @Test
@@ -671,6 +676,7 @@ class ChatControllerTest {
         assertLiveChatState(stateKArgumentCaptor.lastValue)
 
         verify(chatManager).onChatAction(eq(ChatManager.Action.QueuingStarted))
+        assertFalse(stateKArgumentCaptor.lastValue.isAttachmentButtonNeeded)
     }
 
     @Test

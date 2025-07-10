@@ -11,12 +11,12 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-class IsShowSendButtonUseCaseTest {
+class IsSendButtonEnableUseCaseTest {
     private lateinit var isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase
     private lateinit var fileAttachmentRepository: FileAttachmentRepository
     private lateinit var manageSecureMessagingStatusUseCase: ManageSecureMessagingStatusUseCase
 
-    private lateinit var useCase: IsShowSendButtonUseCase
+    private lateinit var useCase: IsSendButtonEnableUseCase
 
     @Before
     fun setUp() {
@@ -24,7 +24,7 @@ class IsShowSendButtonUseCaseTest {
         fileAttachmentRepository = mock()
         manageSecureMessagingStatusUseCase = mock()
 
-        useCase = IsShowSendButtonUseCase(
+        useCase = IsSendButtonEnableUseCase(
             isQueueingOrLiveEngagementUseCase,
             fileAttachmentRepository,
             manageSecureMessagingStatusUseCase

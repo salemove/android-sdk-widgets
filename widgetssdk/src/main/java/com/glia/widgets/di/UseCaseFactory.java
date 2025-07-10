@@ -36,7 +36,7 @@ import com.glia.widgets.chat.domain.GliaSendMessageUseCase;
 import com.glia.widgets.chat.domain.HandleCustomCardClickUseCase;
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase;
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase;
-import com.glia.widgets.chat.domain.IsShowSendButtonUseCase;
+import com.glia.widgets.chat.domain.IsSendButtonEnableUseCase;
 import com.glia.widgets.chat.domain.MapOperatorAttachmentUseCase;
 import com.glia.widgets.chat.domain.MapOperatorPlainTextUseCase;
 import com.glia.widgets.chat.domain.MapResponseCardUseCase;
@@ -386,8 +386,8 @@ public class UseCaseFactory {
     }
 
     @NonNull
-    public IsShowSendButtonUseCase createIsShowSendButtonUseCase() {
-        return new IsShowSendButtonUseCase(
+    public IsSendButtonEnableUseCase createIsShowSendButtonUseCase() {
+        return new IsSendButtonEnableUseCase(
             getIsQueueingOrEngagementUseCase(),
             repositoryFactory.getGliaFileAttachmentRepository(),
             createManageSecureMessagingStatusUseCase()

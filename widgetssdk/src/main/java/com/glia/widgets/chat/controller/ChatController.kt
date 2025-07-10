@@ -23,7 +23,7 @@ import com.glia.widgets.chat.domain.GliaSendMessagePreviewUseCase
 import com.glia.widgets.chat.domain.GliaSendMessageUseCase
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
-import com.glia.widgets.chat.domain.IsShowSendButtonUseCase
+import com.glia.widgets.chat.domain.IsSendButtonEnableUseCase
 import com.glia.widgets.chat.domain.SetChatScreenOpenUseCase
 import com.glia.widgets.chat.domain.SiteInfoUseCase
 import com.glia.widgets.chat.domain.TakePictureUseCase
@@ -109,7 +109,7 @@ internal class ChatController(
     private val getFileAttachmentsUseCase: GetFileAttachmentsUseCase,
     private val removeFileAttachmentUseCase: RemoveFileAttachmentUseCase,
     private val fileUploadLimitNotExceededObservableUseCase: FileUploadLimitNotExceededObservableUseCase,
-    private val isShowSendButtonUseCase: IsShowSendButtonUseCase,
+    private val isSendButtonEnableUseCase: IsSendButtonEnableUseCase,
     private val isShowOverlayPermissionRequestDialogUseCase: IsShowOverlayPermissionRequestDialogUseCase,
     private val downloadFileUseCase: DownloadFileUseCase,
     private val siteInfoUseCase: SiteInfoUseCase,
@@ -158,7 +158,7 @@ internal class ChatController(
 
         override fun onMessageValidated() {
             view?.clearMessageInput()
-            emitViewState { chatState.setLastTypedText("").setShowSendButton(isShowSendButtonUseCase("")) }
+            emitViewState { chatState.setLastTypedText("").setSendButtonEnabled(isSendButtonEnableUseCase("")) }
         }
 
         override fun errorOperatorOffline(messageId: String) {
@@ -190,7 +190,7 @@ internal class ChatController(
         view?.apply {
             emitViewState {
                 emitUploadAttachments(attachments)
-                chatState.setShowSendButton(isShowSendButtonUseCase(chatState.lastTypedText))
+                chatState.setSendButtonEnabled(isSendButtonEnableUseCase(chatState.lastTypedText))
             }
         }
     }
@@ -291,7 +291,7 @@ internal class ChatController(
         attachmentButtonState.subscribe { (limitNotExceeded, isMessagingAvailable) ->
             val isEnabled = when {
                 manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging -> isMessagingAvailable && limitNotExceeded
-                else -> limitNotExceeded
+                else -> limitNotExceeded && isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement
             }
             emitViewState { chatState.setIsAttachmentButtonEnabled(isEnabled) }
         }.also(disposable::add)
@@ -392,7 +392,7 @@ internal class ChatController(
     }
 
     override fun onMessageTextChanged(message: String) {
-        emitViewState { chatState.setLastTypedText(message).setShowSendButton(isShowSendButtonUseCase(message)) }
+        emitViewState { chatState.setLastTypedText(message).setSendButtonEnabled(isSendButtonEnableUseCase(message)) }
         sendMessagePreview(message)
     }
 
@@ -993,7 +993,11 @@ internal class ChatController(
 
     private fun leaveCurrentConversationAndStartEnqueueing() {
         manageSecureMessagingStatusUseCase.updateSecureMessagingStatus(false)
-        emitViewState { chatState.setLiveChatState() }
+        emitViewState {
+            chatState
+                .setLiveChatState()
+                .setIsAttachmentButtonEnabled(false)
+        }
         viewInitPreQueueing()
     }
 

@@ -41,11 +41,11 @@ public class FileUploadLimitNotExceededObservableUseCaseTest {
     }
 
     @Test
-    public void execute_returnsTrue_whenSupportedFileAttachmentsCount() {
+    public void execute_returnsFalse_whenSupportedFileAttachmentsCount() {
         List<LocalAttachment> attachments = Collections.nCopies(FILE_UPLOAD_LIMIT, mock(LocalAttachment.class));
         when(repository.getObservable()).thenReturn(Observable.just(attachments));
 
-        subjectUnderTest.invoke().test().assertValue(true);
+        subjectUnderTest.invoke().test().assertValue(false);
     }
 
     @Test

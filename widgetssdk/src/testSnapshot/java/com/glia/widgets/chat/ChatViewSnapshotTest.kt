@@ -33,7 +33,7 @@ internal class ChatViewSnapshotTest : SnapshotTest(), SnapshotChatView, Snapshot
             .changeVisibility(true)
             .engagementStarted()
             .operatorConnected("Snap Test", null)
-            .setShowSendButton(true)
+            .setSendButtonEnabled(true)
             .setIsAttachmentButtonEnabled(true),
         fileAttachments = listOf(
             fileAttachment(
@@ -106,7 +106,7 @@ internal class ChatViewSnapshotTest : SnapshotTest(), SnapshotChatView, Snapshot
             .changeVisibility(true)
             .engagementStarted()
             .setIsAttachmentButtonEnabled(false)
-            .setShowSendButton(false),
+            .setSendButtonEnabled(false),
         fileAttachments = listOf(
             fileAttachment(
                 displayName = "test.doc",

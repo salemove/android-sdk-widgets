@@ -36,9 +36,11 @@ internal data class ChatState(
 
     fun initChat(): ChatState = copy(
         isVisible = true,
-        isSendButtonVisible = false,
-        isSendButtonEnabled = true,
+        isSendButtonVisible = true,
+        isSendButtonEnabled = false,
         isAttachmentAllowed = true,
+        isAttachmentButtonNeeded = true,
+        isAttachmentButtonEnabled = false,
         isInitialized = true
     )
 
@@ -59,8 +61,9 @@ internal data class ChatState(
     )
 
     fun setLiveChatState(): ChatState = copy(
+        isSendButtonVisible = true,
+        isSendButtonEnabled = false,
         isSecureMessaging = false,
-        isSendButtonEnabled = true,
         chatInputMode = ChatInputMode.ENABLED_NO_ENGAGEMENT,
         isSecureConversationsUnavailableLabelVisible = false,
         isSecureConversationsTopBannerVisible = false
@@ -80,8 +83,10 @@ internal data class ChatState(
         engagementRequested = false,
         operatorStatusItem = OperatorStatusItem.Transferring,
         chatInputMode = ChatInputMode.DISABLED,
-        isSendButtonVisible = false,
-        isAttachmentButtonNeeded = false
+        isSendButtonVisible = true,
+        isSendButtonEnabled = false,
+        isAttachmentButtonNeeded = true,
+        isAttachmentButtonEnabled = false
     )
 
     fun operatorConnected(
@@ -91,12 +96,13 @@ internal data class ChatState(
         formattedOperatorName = formattedOperatorName,
         operatorProfileImgUrl = operatorProfileImgUrl,
         chatInputMode = ChatInputMode.ENABLED,
-        isAttachmentButtonNeeded = true
+        isAttachmentButtonEnabled = true
     )
 
     fun liveChatHistoryLoaded(): ChatState = copy(
         chatInputMode = ChatInputMode.ENABLED_NO_ENGAGEMENT,
-        isAttachmentButtonNeeded = false
+        isAttachmentButtonNeeded = true,
+        isAttachmentButtonEnabled = false
     )
 
     fun upgradeMedia(isVideo: Boolean?): ChatState = copy(isMediaUpgradeVide = isVideo)
@@ -109,7 +115,7 @@ internal data class ChatState(
 
     fun messagesNotSeenChanged(messagesNotSeen: Int): ChatState = copy(messagesNotSeen = messagesNotSeen)
 
-    fun setShowSendButton(isShow: Boolean): ChatState = copy(isSendButtonVisible = isShow)
+    fun setSendButtonEnabled(isShow: Boolean): ChatState = copy(isSendButtonEnabled = isShow)
 
     fun setSecureMessagingUnavailable(): ChatState = copy(
         isSecureConversationsUnavailableLabelVisible = true,

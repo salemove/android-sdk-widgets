@@ -236,6 +236,34 @@ internal class EngagementRepositoryImpl(
         }
     }
 
+    override fun queueForEngagement(type: String?) {
+        if (isQueueingOrLiveEngagement) return
+
+        _engagementState.onNext(State.PreQueuing(MediaType.TEXT))
+
+        Logger.i(TAG, "Start queueing for media engagement")
+
+        queueIngDisposable.add(
+            queueRepository.relevantQueueIds.subscribe { ids ->
+                if (ids.isNotEmpty()) {
+                    core.queueForEngagement(
+                        queueIds = ids,
+                        mediaType = MediaType.TEXT,
+                        visitorContextAssetId = configurationManager.visitorContextAssetId,
+                        engagementOptions = null,
+                        mediaPermissionRequestCode = MEDIA_PERMISSION_REQUEST_CODE,
+                        replaceExisting = false,
+                        type
+                    ) {
+                        handleQueueingResponse(it)
+                    }
+                } else {
+                    handleQueueingResponse(GliaException("relevant queues are empty", GliaException.Cause.INVALID_INPUT))
+                }
+            }
+        )
+    }
+
     override fun queueForEngagement(mediaType: MediaType, replaceExisting: Boolean) {
         if (isQueueingOrLiveEngagement) return
 
@@ -252,7 +280,8 @@ internal class EngagementRepositoryImpl(
                         visitorContextAssetId = configurationManager.visitorContextAssetId,
                         engagementOptions = null,
                         mediaPermissionRequestCode = MEDIA_PERMISSION_REQUEST_CODE,
-                        replaceExisting = replaceExisting
+                        replaceExisting = replaceExisting,
+                        null
                     ) {
                         handleQueueingResponse(it)
                     }

@@ -27,7 +27,7 @@ javaRxAndroid3Version = "3.0.2"
 javaRxJava3Version = "3.1.10"
 javaNavVersion = "2.9.0"
 dataGsonVersion = "2.13.0"
-firebaseBomVersion = "33.14.0"
+firebaseBomVersion = "34.0.0"
 mediaAudioswitch = "1.2.0"
 mediaCoilCoreVersion = "3.2.0"
 mediaCoilNetworkVersion = "3.2.0"
@@ -47,6 +47,7 @@ testJsonVersion = "20250107"
 android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "agpVersion" }
 
 data-gson = { module = "com.google.code.gson:gson", version.ref = "dataGsonVersion" }
+firebase-ai = { module = "com.google.firebase:firebase-ai" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBomVersion" }
 firebase-messaging = { module = "com.google.firebase:firebase-messaging" }
 java-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "javaAppCompatVersion" }

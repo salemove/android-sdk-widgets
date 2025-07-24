@@ -53,6 +53,7 @@ internal interface GliaCore {
         engagementOptions: EngagementOptions?,
         mediaPermissionRequestCode: Int,
         replaceExisting: Boolean,
+        aiScreenSummary: String?,
         callback: Consumer<GliaException?>
     )
 

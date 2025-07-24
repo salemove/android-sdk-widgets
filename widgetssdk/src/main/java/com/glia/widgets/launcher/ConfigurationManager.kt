@@ -1,9 +1,13 @@
 package com.glia.widgets.launcher
 
+import android.content.Context
+import com.glia.androidsdk.Glia
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.GliaWidgetsConfig
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.processors.BehaviorProcessor
+import io.reactivex.rxjava3.subjects.SingleSubject
+import org.json.JSONObject
 
 internal interface ConfigurationManager {
     val enableBubbleOutsideApp: Boolean
@@ -11,6 +15,10 @@ internal interface ConfigurationManager {
     val suppressPushNotificationsPermissionRequestDuringAuthentication: Boolean
     val queueIdsObservable: Flowable<List<String>>
     val visitorContextAssetId: String?
+
+    fun requestCurrentScreenContext(context: Context)
+    fun setScreenType(type: String)
+    fun getCurrentScreenContextType(callback: (JSONObject?) -> Unit)
 
     /**
      * Applies [GliaWidgetsConfig] from the [GliaWidgets.init] configuration step
@@ -51,6 +59,28 @@ internal class ConfigurationManagerImpl : ConfigurationManager {
     private var _suppressPushNotificationsPermissionRequestDuringAuthentication: Boolean = false
     override val suppressPushNotificationsPermissionRequestDuringAuthentication: Boolean
         get() = _suppressPushNotificationsPermissionRequestDuringAuthentication
+
+    private var currentScreenContext = SingleSubject.create<JSONObject>()
+
+    override fun requestCurrentScreenContext(context: Context) {
+        println("**************************** requesting")
+        Glia.aiRecognizeCurrentScreen(context) {
+            println("**************************** response-: $it")
+            currentScreenContext.onSuccess(it)
+        }
+    }
+
+    override fun setScreenType(type: String) {
+        val value = JSONObject().put("type", type)
+        currentScreenContext.onSuccess(value)
+    }
+
+    override fun getCurrentScreenContextType(callback: (JSONObject?) -> Unit) {
+        currentScreenContext.subscribe {
+            callback(it)
+            currentScreenContext = SingleSubject.create()
+        }
+    }
 
     override fun applyConfiguration(config: GliaWidgetsConfig) {
         config.enableBubbleInsideApp?.also { _enableBubbleInsideApp = it }

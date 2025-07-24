@@ -13,7 +13,7 @@ android {
   compileSdk 35
   namespace 'com.glia.widgets'
   defaultConfig {
-    minSdkVersion 24
+    minSdkVersion 26
     versionCode widgetsVersionCode
     versionName widgetsVersionName
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -134,6 +134,7 @@ dependencies {
 
   implementation platform(libs.firebase.bom)
   implementation libs.firebase.messaging
+  implementation(libs.firebase.ai)
 
   testImplementation libs.test.junit
   testImplementation libs.test.mockito.kotlin

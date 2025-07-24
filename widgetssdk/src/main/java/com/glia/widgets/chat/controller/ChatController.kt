@@ -335,7 +335,12 @@ internal class ChatController(
     }
 
     private fun enqueueForEngagement() {
-        requestNotificationPermissionIfPushNotificationsSetUpUseCase(enqueueForEngagementUseCase::invoke)
+        Dependencies.configurationManager.getCurrentScreenContextType {
+            println("**************************** -: $it")
+            requestNotificationPermissionIfPushNotificationsSetUpUseCase {
+                enqueueForEngagementUseCase.withContext(it?.optString("type"))
+            }
+        }
     }
 
     @Synchronized

@@ -4,6 +4,7 @@ import android.content.Context
 import com.glia.androidsdk.Engagement
 import com.glia.widgets.R
 import com.glia.widgets.chat.Intention
+import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.domain.EngagementTypeUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 import com.glia.widgets.internal.secureconversations.domain.HasOngoingSecureConversationUseCase
@@ -21,6 +22,10 @@ interface EngagementLauncher {
      * @param context Activity or Context used to launch the chat screen
      */
     fun startChat(context: Context)
+
+    fun startChatWithAiContext(context: Context)
+
+    fun startChatWithPredefinedContext(context: Context, screenType: String)
 
     /**
      * Starts a chat engagement.
@@ -123,6 +128,16 @@ internal class EngagementLauncherImpl(
                 }
             )
         }
+    }
+
+    override fun startChatWithAiContext(context: Context) {
+        configurationManager.requestCurrentScreenContext(context)
+        activityLauncher.launchChat(context, Intention.LIVE_CHAT)
+    }
+
+    override fun startChatWithPredefinedContext(context: Context, screenType: String) {
+        configurationManager.setScreenType(screenType)
+        activityLauncher.launchChat(context, Intention.LIVE_CHAT)
     }
 
     override fun startChat(context: Context, visitorContextAssetId: String) {

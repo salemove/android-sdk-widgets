@@ -118,10 +118,11 @@ class MainFragment : Fragment() {
         val visitorContextAssetId = getContextAssetIdFromPrefs(sharedPreferences)
         view.findViewById<View>(R.id.chat_activity_button)
             .setOnClickListener {
-                runCatching {
-                    visitorContextAssetId?.run { engagementLauncher.startChat(requireActivity(), this) }
-                        ?: engagementLauncher.startChat(requireActivity())
-                }.onFailure { error -> showToast("Error: ${error.message}") }
+                engagementLauncher.startChatWithPredefinedContext(requireContext(), "loan")
+//                runCatching {
+//                    visitorContextAssetId?.run { engagementLauncher.startChat(requireActivity(), this) }
+//                        ?: engagementLauncher.startChat(requireActivity())
+//                }.onFailure { error -> showToast("Error: ${error.message}") }
             }
         view.findViewById<View>(R.id.audio_call_button)
             .setOnClickListener {

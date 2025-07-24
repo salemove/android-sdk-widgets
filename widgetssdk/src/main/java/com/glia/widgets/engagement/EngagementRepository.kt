@@ -49,6 +49,7 @@ internal interface EngagementRepository {
     //used for ending engagement after integrator ends the engagement for example [GliaWidgets.endEngagement]
     fun terminateEngagement()
     fun queueForEngagement(mediaType: MediaType, replaceExisting: Boolean)
+    fun queueForEngagement(type: String?)
     fun cancelQueuing()
     fun acceptCurrentEngagementRequest(visitorContextAssetId: String)
     fun declineCurrentEngagementRequest()

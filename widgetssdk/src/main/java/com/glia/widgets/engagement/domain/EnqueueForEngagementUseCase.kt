@@ -6,6 +6,8 @@ import com.glia.widgets.internal.secureconversations.SecureConversationsReposito
 
 internal interface EnqueueForEngagementUseCase {
     operator fun invoke(mediaType: MediaType = MediaType.TEXT)
+
+    fun withContext(type: String?)
 }
 
 internal class EnqueueForEngagementUseCaseImpl(
@@ -15,5 +17,9 @@ internal class EnqueueForEngagementUseCaseImpl(
     override fun invoke(mediaType: MediaType) {
         val replaceExisting = secureConversationsRepository.hasPendingSecureConversations || engagementRepository.isTransferredSecureConversation
         engagementRepository.queueForEngagement(mediaType, replaceExisting)
+    }
+
+    override fun withContext(type: String?) {
+        engagementRepository.queueForEngagement(type)
     }
 }

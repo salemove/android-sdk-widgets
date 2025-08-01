@@ -26,7 +26,7 @@ import com.google.firebase.messaging.RemoteMessage
  * </manifest>
  * ```
  */
-class GliaFcmService : FirebaseMessagingService() {
+open class GliaFcmService : FirebaseMessagingService() {
     private val pushNotifications by lazy { Dependencies.pushNotifications }
 
     @CallSuper

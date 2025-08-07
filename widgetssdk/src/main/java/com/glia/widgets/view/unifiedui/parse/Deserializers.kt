@@ -60,7 +60,7 @@ internal class ColorDeserializer : JsonDeserializer<ColorRemoteConfig?> {
         typeOfT: Type,
         context: JsonDeserializationContext
     ): ColorRemoteConfig? = tryOrNull(onError = {
-        Logger.e(TAG, "ColorDeserializer", IllegalArgumentException("${it.message}: -> $json"))
+        Logger.w(TAG, "ColorDeserializer IllegalArgumentException(${it.message}: -> $json)")
     }) {
         ColorRemoteConfig(SystemColor.parseColor(json.asString))
     }

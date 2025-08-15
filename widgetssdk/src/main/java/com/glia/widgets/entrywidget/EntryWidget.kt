@@ -3,6 +3,8 @@ package com.glia.widgets.entrywidget
 import android.app.Activity
 import android.content.Context
 import android.view.View
+import com.glia.telemetry_lib.GliaLogger
+import com.glia.telemetry_lib.SDK_TYPE
 import com.glia.widgets.chat.Intention
 import com.glia.widgets.entrywidget.adapter.EntryWidgetAdapter
 import com.glia.widgets.helper.wrapWithTheme
@@ -42,6 +44,7 @@ internal class EntryWidgetImpl(
 ) : EntryWidget {
 
     override fun show(activity: Activity) {
+        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, EntryWidget::class, "show")
         hasOngoingSecureConversationUseCase(
             onHasOngoingSecureConversation = { activityLauncher.launchChat(activity, Intention.SC_CHAT) },
             onNoOngoingSecureConversation = { activityLauncher.launchEntryWidget(activity) }
@@ -49,6 +52,7 @@ internal class EntryWidgetImpl(
     }
 
     override fun getView(context: Context): View {
+        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, EntryWidget::class, "getView")
         val unifiedTheme = themeManager.theme
         val adapter = EntryWidgetAdapter(EntryWidgetContract.ViewType.EMBEDDED_VIEW, unifiedTheme?.entryWidgetTheme)
 
@@ -61,6 +65,7 @@ internal class EntryWidgetImpl(
     }
 
     override fun hide() {
+        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, EntryWidget::class, "hide")
         entryWidgetHideController.hide()
     }
 }

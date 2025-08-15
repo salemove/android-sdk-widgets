@@ -1,5 +1,8 @@
 package com.glia.widgets.internal.dialog
 
+import com.glia.telemetry_lib.GliaLogger
+import com.glia.telemetry_lib.GliaTelemetry
+import com.glia.telemetry_lib.SDK_TYPE
 import com.glia.widgets.engagement.domain.MediaUpgradeOfferData
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.internal.dialog.model.DialogState
@@ -128,6 +131,7 @@ internal class DialogController : DialogContract.Controller {
     }
 
     override fun showEngagementConfirmationDialog() {
+        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, DialogController::class, "showEngagementConfirmationDialog")
         Logger.d(TAG, "Show Live Observation Opt In Dialog")
         if (isOverlayDialogShown) {
             dialogManager.add(DialogState.Confirmation)

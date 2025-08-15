@@ -7,6 +7,12 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import com.glia.androidsdk.GliaConfig
 import com.glia.androidsdk.RequestCallback
+import com.glia.androidsdk.internal.logger.LoggerHelper
+import com.glia.telemetry_lib.Attributes
+import com.glia.telemetry_lib.GliaLogger
+import com.glia.telemetry_lib.GliaTelemetry
+import com.glia.telemetry_lib.LogEvents
+import com.glia.widgets.BuildConfig
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.GliaWidgetsConfig
 import com.glia.widgets.authentication.Authentication
@@ -261,16 +267,19 @@ internal object Dependencies {
     @JvmStatic
     fun onSdkInit(gliaWidgetsConfig: GliaWidgetsConfig) {
         val gliaConfig = createGliaConfig(gliaWidgetsConfig)
+        initLogger(gliaConfig)
         gliaCore.init(gliaConfig)
         controllerFactory.init()
         repositoryFactory.initialize()
         configurationManager.applyConfiguration(gliaWidgetsConfig)
         localeProvider.setCompanyName(gliaWidgetsConfig.companyName)
+        GliaLogger.i(LogEvents.WIDGETS_SDK_STARTED)
     }
 
     @JvmStatic
     fun onSdkInit(gliaWidgetsConfig: GliaWidgetsConfig, callback: RequestCallback<Boolean?>? = null) {
         val gliaConfig = createGliaConfig(gliaWidgetsConfig)
+        initLogger(gliaConfig)
         gliaCore.init(gliaConfig) { success, error ->
             if (error == null) {
                 controllerFactory.init()
@@ -279,6 +288,19 @@ internal object Dependencies {
                 localeProvider.setCompanyName(gliaWidgetsConfig.companyName)
             }
             callback?.onResult(success, error)
+            GliaLogger.i(LogEvents.WIDGETS_SDK_STARTED)
+        }
+    }
+
+    private fun initLogger(
+        gliaConfig: GliaConfig
+    ) {
+        LoggerHelper.init(gliaConfig)
+        GliaTelemetry.setGlobalAttribute(Attributes.SDK_WIDGETS_VERSION, BuildConfig.GLIA_WIDGETS_SDK_VERSION)
+        GliaLogger.i(LogEvents.WIDGETS_SDK_STARTING, null) { map ->
+            map.put(Attributes.API_KEY_ID, gliaConfig.siteApiKey?.id ?: "N/A")
+            map.put(Attributes.ENVIRONMENT, gliaConfig.region ?: "N/A")
+            map.put(Attributes.LOCALE_CODE, gliaConfig.manualLocaleOverride ?: "N/A")
         }
     }
 

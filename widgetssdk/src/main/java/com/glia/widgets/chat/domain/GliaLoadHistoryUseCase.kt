@@ -1,5 +1,8 @@
 package com.glia.widgets.chat.domain
 
+import com.glia.telemetry_lib.Attributes
+import com.glia.telemetry_lib.GliaLogger
+import com.glia.telemetry_lib.LogEvents
 import com.glia.widgets.chat.data.GliaChatRepository
 import com.glia.widgets.internal.engagement.domain.MapOperatorUseCase
 import com.glia.widgets.internal.engagement.domain.model.ChatHistoryResponse
@@ -18,10 +21,19 @@ internal class GliaLoadHistoryUseCase(
 
     private val isSecureEngagement get() = shouldUseSecureMessagingApis.shouldUseSecureMessagingEndpoints
 
-    operator fun invoke(): Single<ChatHistoryResponse> = if (isSecureEngagement) {
-        loadHistoryWithNewMessagesCount()
-    } else {
-        loadHistoryAndMapOperator().map { ChatHistoryResponse(it) }
+    operator fun invoke(): Single<ChatHistoryResponse> {
+        GliaLogger.i(LogEvents.CHAT_SCREEN_HISTORY_LOADING, null)
+        val single = if (isSecureEngagement) {
+            loadHistoryWithNewMessagesCount()
+        } else {
+            loadHistoryAndMapOperator().map { ChatHistoryResponse(it) }
+        }
+        return single
+            .doOnSuccess {
+                GliaLogger.i(LogEvents.CHAT_SCREEN_HISTORY_LOADED, null) {
+                    put(Attributes.MESSAGE_COUNT, it.items.size.toString())
+                }
+            }
     }
 
     private fun loadHistoryWithNewMessagesCount() = Single.zip(

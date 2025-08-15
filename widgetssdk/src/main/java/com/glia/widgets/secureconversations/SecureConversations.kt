@@ -1,6 +1,8 @@
 package com.glia.widgets.secureconversations
 
 import com.glia.androidsdk.RequestCallback
+import com.glia.telemetry_lib.GliaLogger
+import com.glia.telemetry_lib.SDK_TYPE
 import com.glia.widgets.callbacks.OnResult
 
 /**
@@ -47,6 +49,7 @@ class SecureConversationsImpl(
     internal val subscribedCallbacks: MutableMap<Int, RequestCallback<Int>> = mutableMapOf()
 
     override fun subscribeToUnreadMessageCount(callback: OnResult<Int>) {
+        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, SecureConversations::class, "subscribeToUnreadMessageCount")
         if (subscribedCallbacks.containsKey(callback.hashCode())) {
             // Already subscribed
             return
@@ -61,6 +64,7 @@ class SecureConversationsImpl(
     }
 
     override fun unSubscribeFromUnreadMessageCount(callback: OnResult<Int>) {
+        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, SecureConversations::class, "unSubscribeFromUnreadMessageCount")
         subscribedCallbacks[callback.hashCode()]?.let { secureConversations.unSubscribeFromUnreadMessageCount(it) }
         subscribedCallbacks.remove(callback.hashCode())
     }

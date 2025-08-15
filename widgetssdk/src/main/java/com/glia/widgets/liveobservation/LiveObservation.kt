@@ -1,5 +1,8 @@
 package com.glia.widgets.liveobservation
 
+import com.glia.telemetry_lib.GliaLogger
+import com.glia.telemetry_lib.SDK_TYPE
+
 /**
  * Class responsible for handling Live Observation.
  *
@@ -32,10 +35,12 @@ class LiveObservationImpl(
 ) : LiveObservation {
 
     override fun pause() {
+        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, LiveObservation::class, "pause")
         liveObservation.pause()
     }
 
     override fun resume() {
+        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, LiveObservation::class, "resume")
         liveObservation.resume()
     }
 

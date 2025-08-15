@@ -1,6 +1,8 @@
 package com.glia.widgets.fcm
 
 import android.content.Context
+import com.glia.telemetry_lib.GliaLogger
+import com.glia.telemetry_lib.SDK_TYPE
 import com.glia.widgets.push.notifications.SecureMessagingPushController
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -98,22 +100,27 @@ internal class PushNotificationsImpl(
     private val secureMessagingPushController: SecureMessagingPushController
 ) : PushNotifications {
     override fun subscribeTo(events: Collection<PushNotificationEvent>) {
+        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, PushNotifications::class, "subscribeTo", "eventsList")
         corePushNotifications.subscribeTo(events.toCoreType())
     }
 
     override fun subscribeTo(context: Context, types: Collection<PushNotificationType>) {
+        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, PushNotifications::class, "subscribeTo", "context", "typeList")
         corePushNotifications.subscribeTo(context, types.toCoreType())
     }
 
     override fun getPushEvents(): Set<PushNotificationEvent> {
+        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, PushNotifications::class, "getPushEvents")
         return corePushNotifications.pushEvents.toWidgetsType().toSet()
     }
 
     override fun updateFcmToken(newFcmToken: String?) {
+        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, PushNotifications::class, "updateFcmToken")
         corePushNotifications.updateFcmToken(newFcmToken)
     }
 
     override fun onNewMessage(service: FirebaseMessagingService, remoteMessage: RemoteMessage) = with(remoteMessage) {
+        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, PushNotifications::class, "onNewMessage")
         if (data[EVENT_TYPE_KEY] == SECURE_MESSAGING_TYPE) {
             // This message must be handled internally, so we don't need to pass it to the core's push notifications
             secureMessagingPushController.handleSecureMessage(

@@ -84,7 +84,9 @@ class VisitorInfoFragment : Fragment() {
     }
 
     private fun showError(exception: GliaWidgetsException) {
-        Toast.makeText(context, exception.message ?: exception.debugMessage, Toast.LENGTH_LONG).show()
+        activity?.runOnUiThread {
+            Toast.makeText(context, exception.message ?: exception.debugMessage, Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun obtainVisitorInfoUpdateRequest(): VisitorInfoUpdateRequest {

@@ -5,11 +5,13 @@ import android.os.Build
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
+import com.glia.androidsdk.BuildConfig
 import com.glia.androidsdk.GliaConfig
 import com.glia.androidsdk.RequestCallback
 import com.glia.androidsdk.internal.logger.LoggerHelper
 import com.glia.telemetry_lib.Attributes
 import com.glia.telemetry_lib.GliaLogger
+import com.glia.telemetry_lib.GliaTelemetry
 import com.glia.telemetry_lib.LogEvents
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.GliaWidgetsConfig
@@ -294,6 +296,7 @@ internal object Dependencies {
         gliaConfig: GliaConfig
     ) {
         LoggerHelper.init(gliaConfig)
+        GliaTelemetry.setGlobalAttribute(Attributes.SDK_WIDGETS_VERSION, BuildConfig.VERSION_NAME)
         GliaLogger.i(LogEvents.WIDGETS_SDK_STARTING, null) { map ->
             map.put(Attributes.API_KEY_ID, gliaConfig.siteApiKey?.id ?: "N/A")
             map.put(Attributes.ENVIRONMENT, gliaConfig.region ?: "N/A")

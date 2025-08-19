@@ -3,9 +3,14 @@ package com.glia.widgets.chat
 import android.text.format.DateUtils
 import androidx.annotation.VisibleForTesting
 import com.glia.androidsdk.chat.FilesAttachment
+import com.glia.androidsdk.chat.OperatorMessage
 import com.glia.androidsdk.chat.SendMessagePayload
 import com.glia.androidsdk.chat.SingleChoiceAttachment
+import com.glia.androidsdk.chat.SystemMessage
 import com.glia.androidsdk.chat.VisitorMessage
+import com.glia.telemetry_lib.Attributes
+import com.glia.telemetry_lib.GliaLogger
+import com.glia.telemetry_lib.LogEvents
 import com.glia.widgets.chat.domain.AddNewMessagesDividerUseCase
 import com.glia.widgets.chat.domain.AppendHistoryChatMessageUseCase
 import com.glia.widgets.chat.domain.AppendNewChatMessageUseCase
@@ -201,6 +206,18 @@ internal class ChatManager(
                 checkUnsentMessages(messagesState)
             } else if (shouldMarkMessagesReadUseCase()) {
                 markMessagesReadWithDelay()
+            }
+
+            GliaLogger.i(LogEvents.CHAT_SCREEN_MESSAGE_SHOWN, null) {
+                put(Attributes.MESSAGE_ID, chatMessage.chatMessage.id)
+                put(Attributes.MESSAGE_SENDER, chatMessage.chatMessage.senderType.toString())
+                val messageType = when (chatMessage.chatMessage) {
+                    is VisitorMessage -> "visitor"
+                    is OperatorMessage -> "operator"
+                    is SystemMessage -> "system"
+                    else -> "unknown"
+                }
+                put(Attributes.MESSAGE_TYPE, messageType)
             }
         }
 

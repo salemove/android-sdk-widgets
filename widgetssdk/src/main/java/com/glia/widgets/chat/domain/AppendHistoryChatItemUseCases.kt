@@ -6,6 +6,9 @@ import com.glia.androidsdk.chat.OperatorMessage
 import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.androidsdk.chat.SystemMessage
 import com.glia.androidsdk.chat.VisitorMessage
+import com.glia.telemetry_lib.Attributes
+import com.glia.telemetry_lib.GliaLogger
+import com.glia.telemetry_lib.LogEvents
 import com.glia.widgets.chat.domain.gva.IsGvaUseCase
 import com.glia.widgets.chat.domain.gva.MapGvaUseCase
 import com.glia.widgets.chat.model.ChatItem
@@ -124,6 +127,9 @@ internal class AppendHistoryCustomCardItemUseCase(
         val customCardType = customCardTypeUseCase(viewType) ?: return
         if (customCardShouldShowUseCase.execute(message, customCardType, true)) {
             chatItems.add(message.run { CustomCardChatItem(message, viewType) })
+            GliaLogger.i(LogEvents.CHAT_SCREEN_CUSTOM_CARD_SHOWN, null) {
+                put(Attributes.MESSAGE_ID, message.id)
+            }
         }
 
         message.attachment?.asSingleChoice()?.selectedOptionText?.takeIf {

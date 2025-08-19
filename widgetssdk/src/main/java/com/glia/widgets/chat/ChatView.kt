@@ -31,6 +31,10 @@ import androidx.transition.TransitionManager
 import androidx.transition.TransitionSet
 import com.glia.androidsdk.Engagement.MediaType
 import com.glia.androidsdk.chat.AttachmentFile
+import com.glia.telemetry_lib.Attributes
+import com.glia.telemetry_lib.ButtonNames
+import com.glia.telemetry_lib.GliaLogger
+import com.glia.telemetry_lib.LogEvents
 import com.glia.widgets.Constants
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.R
@@ -719,11 +723,23 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
 
     private fun setupAddAttachmentButton() {
         binding.addAttachmentButton.setOnClickListener {
+            GliaLogger.i(LogEvents.CHAT_SCREEN_BUTTON_CLICKED, null) {
+                put(Attributes.BUTTON_NAME, ButtonNames.ADD_ATTACHMENT)
+            }
             attachmentPopup.show(binding.addAttachmentButton, {
+                GliaLogger.i(LogEvents.CHAT_SCREEN_BUTTON_CLICKED, null) {
+                    put(Attributes.BUTTON_NAME, ButtonNames.SELECT_FROM_LIBRARY)
+                }
                 getContentLauncher?.launch(arrayOf(Constants.MIME_TYPE_IMAGES))
             }, {
+                GliaLogger.i(LogEvents.CHAT_SCREEN_BUTTON_CLICKED, null) {
+                    put(Attributes.BUTTON_NAME, ButtonNames.TAKE_PHOTO)
+                }
                 controller?.onTakePhotoClicked()
             }, {
+                GliaLogger.i(LogEvents.CHAT_SCREEN_BUTTON_CLICKED, null) {
+                    put(Attributes.BUTTON_NAME, ButtonNames.BROSE_FILES)
+                }
                 openDocumentLauncher?.launch(arrayOf(Constants.MIME_TYPE_ALL))
             })
         }
@@ -932,6 +948,10 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     }
 
     private fun onNeedSupportButtonClicked(ignored: View?) {
+        GliaLogger.i(LogEvents.CHAT_SCREEN_BUTTON_CLICKED, null) {
+            put(Attributes.BUTTON_NAME, ButtonNames.SC_TOP_BANNER)
+        }
+
         val animationRules = createSecureConversationAnimationRules()
 
         TransitionManager.beginDelayedTransition(rootConstraintLayout, animationRules)

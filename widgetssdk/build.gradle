@@ -10,7 +10,7 @@ java {
 }
 
 android {
-  compileSdk 35
+  compileSdkVersion 35
   namespace 'com.glia.widgets'
   defaultConfig {
     minSdkVersion 24
@@ -50,12 +50,12 @@ android {
     viewBinding true
     buildConfig true
   }
-
   packagingOptions {
-    //After adding `Mockk` dependency to the instrumentation tests it started to fail builds with message that
-    // there are 6 files in project with these two Licences. Since all of them were related to Junit, it is safe to merge them.
-    merges += ['META-INF/LICENSE.md', 'META-INF/LICENSE-notice.md']
+    resources {
+      merges += ['META-INF/LICENSE.md', 'META-INF/LICENSE-notice.md']
+    }
   }
+
 
   testOptions {
     unitTests {
@@ -63,6 +63,10 @@ android {
       unitTests.all {
         jvmArgs '-Xmx4g'
       }
+    }
+
+    packaging {
+      resources.excludes += ['META-INF/COPYRIGHT']
     }
   }
   sourceSets {

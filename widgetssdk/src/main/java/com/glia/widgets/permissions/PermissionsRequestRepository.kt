@@ -2,6 +2,10 @@ package com.glia.widgets.permissions
 
 import androidx.annotation.VisibleForTesting
 import com.glia.androidsdk.GliaException
+import com.glia.telemetry_lib.Attributes
+import com.glia.telemetry_lib.DialogNames
+import com.glia.telemetry_lib.GliaLogger
+import com.glia.telemetry_lib.LogEvents
 
 internal class PermissionsRequestRepository {
     var launcher: Launcher? = null
@@ -17,7 +21,24 @@ internal class PermissionsRequestRepository {
         }
     }
 
+    fun onRequestDialogShown(permissions: List<String>) {
+        permissions.forEach { permission ->
+            GliaLogger.i(LogEvents.DIALOG_SHOWN) {
+                put(Attributes.DIALOG_NAME, DialogNames.PERMISSIONS_REQUEST)
+                put(Attributes.PERMISSION, permission.removePrefix("android.permission."))
+            }
+        }
+    }
+
     fun onRequestResult(results: Map<String, Boolean>?, exception: GliaException?) {
+        requests.firstOrNull()?.first?.forEach { permission ->
+            GliaLogger.i(LogEvents.DIALOG_CLOSED) {
+                put(Attributes.DIALOG_NAME, DialogNames.PERMISSIONS_REQUEST)
+                put(Attributes.PERMISSION, permission.removePrefix("android.permission."))
+                put(Attributes.PERMISSION_RESULT, if (results?.get(permission) == true) "granted" else "denied")
+            }
+        }
+
         // remove request from the permissions queue
         // and return result to the request callback
         requests.removeFirstOrNull()?.second?.let { it(results, exception) }

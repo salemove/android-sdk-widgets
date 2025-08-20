@@ -208,7 +208,7 @@ internal class ChatManager(
                 markMessagesReadWithDelay()
             }
 
-            GliaLogger.i(LogEvents.CHAT_SCREEN_MESSAGE_SHOWN, null) {
+            GliaLogger.i(LogEvents.CHAT_SCREEN_MESSAGE_SHOWN) {
                 put(Attributes.MESSAGE_ID, chatMessage.chatMessage.id)
                 put(Attributes.MESSAGE_SENDER, chatMessage.chatMessage.senderType.toString())
                 val messageType = when (chatMessage.chatMessage) {

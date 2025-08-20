@@ -116,7 +116,7 @@ internal class AppendSystemMessageItemUseCase {
 internal class AppendGvaMessageItemUseCase(private val mapGvaUseCase: MapGvaUseCase) {
     operator fun invoke(chatItems: MutableList<ChatItem>, message: ChatMessageInternal, showChatHead: Boolean = true) {
         chatItems += mapGvaUseCase(message, showChatHead)
-        GliaLogger.i(LogEvents.CHAT_SCREEN_GVA_MESSAGE_SHOWN, null) {
+        GliaLogger.i(LogEvents.CHAT_SCREEN_GVA_MESSAGE_SHOWN) {
             put(Attributes.MESSAGE_ID, message.chatMessage.id)
         }
     }
@@ -130,7 +130,7 @@ internal class AppendHistoryCustomCardItemUseCase(
         val customCardType = customCardTypeUseCase(viewType) ?: return
         if (customCardShouldShowUseCase.execute(message, customCardType, true)) {
             chatItems.add(message.run { CustomCardChatItem(message, viewType) })
-            GliaLogger.i(LogEvents.CHAT_SCREEN_CUSTOM_CARD_SHOWN, null) {
+            GliaLogger.i(LogEvents.CHAT_SCREEN_CUSTOM_CARD_SHOWN) {
                 put(Attributes.MESSAGE_ID, message.id)
             }
         }

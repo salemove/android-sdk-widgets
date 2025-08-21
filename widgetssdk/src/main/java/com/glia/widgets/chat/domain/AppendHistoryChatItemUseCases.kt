@@ -116,6 +116,9 @@ internal class AppendSystemMessageItemUseCase {
 internal class AppendGvaMessageItemUseCase(private val mapGvaUseCase: MapGvaUseCase) {
     operator fun invoke(chatItems: MutableList<ChatItem>, message: ChatMessageInternal, showChatHead: Boolean = true) {
         chatItems += mapGvaUseCase(message, showChatHead)
+        GliaLogger.i(LogEvents.CHAT_SCREEN_GVA_MESSAGE_SHOWN, null) {
+            put(Attributes.MESSAGE_ID, message.chatMessage.id)
+        }
     }
 }
 

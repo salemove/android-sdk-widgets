@@ -141,7 +141,7 @@ internal class AppendNewResponseCardOrTextItemUseCase(
         message: ChatMessageInternal
     ) {
         chatItems += mapResponseCardUseCase(attachment, message, true)
-        GliaLogger.i(LogEvents.CHAT_SCREEN_SINGLE_CHOICE_SHOWN, null) {
+        GliaLogger.i(LogEvents.CHAT_SCREEN_SINGLE_CHOICE_SHOWN) {
             put(Attributes.MESSAGE_ID, message.chatMessage.id)
         }
     }

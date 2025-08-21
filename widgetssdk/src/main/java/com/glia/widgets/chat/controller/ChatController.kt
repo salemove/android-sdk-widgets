@@ -16,6 +16,7 @@ import com.glia.androidsdk.site.SiteInfo
 import com.glia.telemetry_lib.Attributes
 import com.glia.telemetry_lib.ButtonNames
 import com.glia.telemetry_lib.GliaLogger
+import com.glia.telemetry_lib.GvaActionTypes
 import com.glia.telemetry_lib.LogEvents
 import com.glia.widgets.Constants
 import com.glia.widgets.chat.ChatContract
@@ -966,11 +967,36 @@ internal class ChatController(
             put(Attributes.BUTTON_NAME, ButtonNames.GVA)
         }
         when (val buttonType: Gva.ButtonType = determineGvaButtonTypeUseCase(button)) {
-            Gva.ButtonType.BroadcastEvent -> view?.showBroadcastNotSupportedToast()
-            is Gva.ButtonType.Email -> view?.requestOpenEmailClient(buttonType.uri)
-            is Gva.ButtonType.Phone -> view?.requestOpenDialer(buttonType.uri)
-            is Gva.ButtonType.PostBack -> sendGvaResponse(buttonType.singleChoiceAttachment)
-            is Gva.ButtonType.Url -> view?.requestOpenUri(buttonType.uri)
+            Gva.ButtonType.BroadcastEvent -> {
+                view?.showBroadcastNotSupportedToast()
+                GliaLogger.i(LogEvents.CHAT_SCREEN_GVA_MESSAGE_ACTION, null) {
+                    put(Attributes.ACTION_TYPE, GvaActionTypes.BROADCAST_EVENT)
+                }
+            }
+            is Gva.ButtonType.Email -> {
+                view?.requestOpenEmailClient(buttonType.uri)
+                GliaLogger.i(LogEvents.CHAT_SCREEN_GVA_MESSAGE_ACTION, null) {
+                    put(Attributes.ACTION_TYPE, GvaActionTypes.EMAIL)
+                }
+            }
+            is Gva.ButtonType.Phone -> {
+                view?.requestOpenDialer(buttonType.uri)
+                GliaLogger.i(LogEvents.CHAT_SCREEN_GVA_MESSAGE_ACTION, null) {
+                    put(Attributes.ACTION_TYPE, GvaActionTypes.PHONE)
+                }
+            }
+            is Gva.ButtonType.PostBack -> {
+                sendGvaResponse(buttonType.singleChoiceAttachment)
+                GliaLogger.i(LogEvents.CHAT_SCREEN_GVA_MESSAGE_ACTION, null) {
+                    put(Attributes.ACTION_TYPE, GvaActionTypes.POST_BACK)
+                }
+            }
+            is Gva.ButtonType.Url -> {
+                view?.requestOpenUri(buttonType.uri)
+                GliaLogger.i(LogEvents.CHAT_SCREEN_GVA_MESSAGE_ACTION, null) {
+                    put(Attributes.ACTION_TYPE, GvaActionTypes.URL)
+                }
+            }
         }
     }
 

@@ -279,7 +279,7 @@ internal object Dependencies {
     @JvmStatic
     fun onSdkInit(gliaWidgetsConfig: GliaWidgetsConfig, callback: RequestCallback<Boolean?>? = null) {
         val gliaConfig = createGliaConfig(gliaWidgetsConfig)
-        initLogger(gliaConfig)
+//        initLogger(gliaConfig)
         gliaCore.init(gliaConfig) { success, error ->
             if (error == null) {
                 controllerFactory.init()
@@ -297,10 +297,10 @@ internal object Dependencies {
     ) {
         LoggerHelper.init(gliaConfig)
         GliaTelemetry.setGlobalAttribute(Attributes.SDK_WIDGETS_VERSION, BuildConfig.GLIA_WIDGETS_SDK_VERSION)
-        GliaLogger.i(LogEvents.WIDGETS_SDK_STARTING, null) { map ->
-            map.put(Attributes.API_KEY_ID, gliaConfig.siteApiKey?.id ?: "N/A")
-            map.put(Attributes.ENVIRONMENT, gliaConfig.region ?: "N/A")
-            map.put(Attributes.LOCALE_CODE, gliaConfig.manualLocaleOverride ?: "N/A")
+        GliaLogger.i(LogEvents.WIDGETS_SDK_STARTING) {
+            put(Attributes.API_KEY_ID, gliaConfig.siteApiKey?.id ?: "N/A")
+            put(Attributes.ENVIRONMENT, gliaConfig.region ?: "N/A")
+            put(Attributes.LOCALE_CODE, gliaConfig.manualLocaleOverride ?: "N/A")
         }
     }
 

@@ -350,30 +350,26 @@ internal object Dialogs {
 
     fun showMessageCenterUnavailableDialog(
         context: Context,
-        theme: UiTheme,
-        onShow: ((AlertDialog) -> Unit)? = null
+        theme: UiTheme
     ): AlertDialog {
         val payload = DialogPayload.AlertDialog(
             title = LocaleString(R.string.message_center_unavailable_title),
             message = LocaleString(R.string.message_center_unavailable_message)
         )
 
-        return dialogService.showDialog(context, theme, DialogType.AlertDialog(payload), onShow = { dialog ->
-            GliaLogger.i(LogEvents.DIALOG_SHOWN, null) {
-                put(Attributes.DIALOG_NAME, DialogNames.SECURE_CONVERSATION_UNAVAILABLE_ERROR)
-            }
-        }) {
-            window?.apply {
-                setGravity(Gravity.BOTTOM)
-                allowOutsideTouch()
-            }
-        }.apply {
-            setOnDismissListener {
-                GliaLogger.i(LogEvents.DIALOG_CLOSED, null) {
-                    put(Attributes.DIALOG_NAME, DialogNames.SECURE_CONVERSATION_UNAVAILABLE_ERROR)
+        return dialogService.showDialog(
+            context = context,
+            theme = theme,
+            type = DialogType.AlertDialog(payload),
+            onShow = logDialogShown(DialogNames.SECURE_CONVERSATION_UNAVAILABLE_ERROR),
+            onDismiss = logDialogDismissed(DialogNames.SECURE_CONVERSATION_UNAVAILABLE_ERROR),
+            onLayout = {
+                window?.apply {
+                    setGravity(Gravity.BOTTOM)
+                    allowOutsideTouch()
                 }
             }
-        }
+        )
     }
 
     fun showVisitorCodeDialog(
@@ -467,7 +463,7 @@ internal object Dialogs {
     }
 
     private fun logDialogShown(dialogName: String, mediaUpgradeOffer: MediaUpgradeOffer? = null): (DialogInterface) -> Unit = {
-        GliaLogger.i(LogEvents.DIALOG_SHOWN, null) {
+        GliaLogger.i(LogEvents.DIALOG_SHOWN) {
             put(Attributes.DIALOG_NAME, dialogName)
             mediaUpgradeOffer?.run {
                 put(Attributes.MEDIA_UPGRADE_OFFER, attributeValue())
@@ -476,7 +472,7 @@ internal object Dialogs {
     }
 
     private fun logDialogDismissed(dialogName: String, mediaUpgradeOffer: MediaUpgradeOffer? = null): (DialogInterface) -> Unit = {
-        GliaLogger.i(LogEvents.DIALOG_CLOSED, null) {
+        GliaLogger.i(LogEvents.DIALOG_CLOSED) {
             put(Attributes.DIALOG_NAME, dialogName)
             mediaUpgradeOffer?.run {
                 put(Attributes.MEDIA_UPGRADE_OFFER, attributeValue())

@@ -375,7 +375,7 @@ internal class ChatController(
     }
 
     override fun onPause() {
-        GliaLogger.i(LogEvents.CHAT_SCREEN_CLOSED, null)
+        GliaLogger.i(LogEvents.CHAT_SCREEN_CLOSED)
         setChatScreenOpenUseCase(false)
         mediaUpgradeDisposable.clear()
         isChatViewPaused = true
@@ -550,7 +550,7 @@ internal class ChatController(
     }
 
     override fun onResume() {
-        GliaLogger.i(LogEvents.CHAT_SCREEN_SHOWN, null)
+        GliaLogger.i(LogEvents.CHAT_SCREEN_SHOWN)
         Logger.d(TAG, "onResume")
         onResumeSetup()
     }

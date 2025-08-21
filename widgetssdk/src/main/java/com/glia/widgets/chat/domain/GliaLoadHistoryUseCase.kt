@@ -22,7 +22,7 @@ internal class GliaLoadHistoryUseCase(
     private val isSecureEngagement get() = shouldUseSecureMessagingApis.shouldUseSecureMessagingEndpoints
 
     operator fun invoke(): Single<ChatHistoryResponse> {
-        GliaLogger.i(LogEvents.CHAT_SCREEN_HISTORY_LOADING, null)
+        GliaLogger.i(LogEvents.CHAT_SCREEN_HISTORY_LOADING)
         val single = if (isSecureEngagement) {
             loadHistoryWithNewMessagesCount()
         } else {
@@ -30,7 +30,7 @@ internal class GliaLoadHistoryUseCase(
         }
         return single
             .doOnSuccess {
-                GliaLogger.i(LogEvents.CHAT_SCREEN_HISTORY_LOADED, null) {
+                GliaLogger.i(LogEvents.CHAT_SCREEN_HISTORY_LOADED) {
                     put(Attributes.MESSAGE_COUNT, it.items.size.toString())
                 }
             }

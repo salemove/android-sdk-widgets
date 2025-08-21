@@ -2,6 +2,10 @@ package com.glia.widgets.permissions.controller
 
 import androidx.annotation.VisibleForTesting
 import com.glia.androidsdk.GliaException
+import com.glia.telemetry_lib.Attributes
+import com.glia.telemetry_lib.DialogNames
+import com.glia.telemetry_lib.GliaLogger
+import com.glia.telemetry_lib.LogEvents
 import com.glia.widgets.permissions.PermissionsRequestContract
 import com.glia.widgets.permissions.PermissionsRequestRepository
 
@@ -39,6 +43,7 @@ internal class PermissionsRequestController(
         if (watcher.currentActivityIsComponentActivity()) {
             watcher.requestPermissions(permissions)?.let { hashCode ->
                 requestHashCode = hashCode
+                permissionsRequestRepository.onRequestDialogShown(permissions.toList())
             } ?: run {
                 permissionsRequest = permissions
             }

@@ -1,11 +1,13 @@
 package com.glia.widgets.view
 
 import android.content.Context
+import android.content.DialogInterface
 import android.view.Gravity
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
+import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.telemetry_lib.Attributes
 import com.glia.telemetry_lib.ButtonNames
 import com.glia.telemetry_lib.DialogNames
@@ -57,17 +59,13 @@ internal object Dialogs {
             )
         )
 
-        return dialogService.showDialog(context, uiTheme, DialogType.AlertDialog(payload), onShow = { dialog ->
-            GliaLogger.i(LogEvents.DIALOG_SHOWN, null) {
-                put(Attributes.DIALOG_NAME, DialogNames.QUEUE_IS_CLOSED)
-            }
-        }).apply {
-            setOnDismissListener {
-                GliaLogger.i(LogEvents.DIALOG_CLOSED, null) {
-                    put(Attributes.DIALOG_NAME, DialogNames.QUEUE_IS_CLOSED)
-                }
-            }
-        }
+        return dialogService.showDialog(
+            context = context,
+            theme = uiTheme,
+            type = DialogType.AlertDialog(payload),
+            onShow = logDialogShown(DialogNames.QUEUE_IS_CLOSED),
+            onDismiss = logDialogDismissed(DialogNames.QUEUE_IS_CLOSED)
+        )
     }
 
     fun showUnexpectedErrorDialog(context: Context, uiTheme: UiTheme, buttonClickListener: View.OnClickListener): AlertDialog {
@@ -82,17 +80,13 @@ internal object Dialogs {
                 clickListener = buttonClickListener
             )
         )
-        return dialogService.showDialog(context, uiTheme, DialogType.AlertDialog(payload), onShow = { dialog ->
-            GliaLogger.i(LogEvents.DIALOG_SHOWN, null) {
-                put(Attributes.DIALOG_NAME, DialogNames.UNEXPECTED_ERROR)
-            }
-        }).apply {
-            setOnDismissListener {
-                GliaLogger.i(LogEvents.DIALOG_CLOSED, null) {
-                    put(Attributes.DIALOG_NAME, DialogNames.UNEXPECTED_ERROR)
-                }
-            }
-        }
+        return dialogService.showDialog(
+            context = context,
+            theme = uiTheme,
+            type = DialogType.AlertDialog(payload),
+            onShow = logDialogShown(DialogNames.UNEXPECTED_ERROR),
+            onDismiss = logDialogDismissed(DialogNames.UNEXPECTED_ERROR)
+        )
     }
 
     fun showMissingPermissionsDialog(context: Context, uiTheme: UiTheme, buttonClickListener: View.OnClickListener): AlertDialog {
@@ -107,17 +101,13 @@ internal object Dialogs {
                 clickListener = buttonClickListener
             )
         )
-        return dialogService.showDialog(context, uiTheme, DialogType.AlertDialog(payload), onShow = { dialog ->
-            GliaLogger.i(LogEvents.DIALOG_SHOWN, null) {
-                put(Attributes.DIALOG_NAME, DialogNames.ADDITIONAL_PERMISSIONS_REQUEST)
-            }
-        }).apply {
-            setOnDismissListener {
-                GliaLogger.i(LogEvents.DIALOG_CLOSED, null) {
-                    put(Attributes.DIALOG_NAME, DialogNames.ADDITIONAL_PERMISSIONS_REQUEST)
-                }
-            }
-        }
+        return dialogService.showDialog(
+            context = context,
+            theme = uiTheme,
+            type = DialogType.AlertDialog(payload),
+            onShow = logDialogShown(DialogNames.ADDITIONAL_PERMISSIONS_REQUEST),
+            onDismiss = logDialogDismissed(DialogNames.ADDITIONAL_PERMISSIONS_REQUEST)
+        )
     }
 
     fun showOverlayPermissionsDialog(
@@ -144,17 +134,13 @@ internal object Dialogs {
             )
         )
 
-        return dialogService.showDialog(context, uiTheme, DialogType.Option(payload), onShow = { dialog ->
-            GliaLogger.i(LogEvents.DIALOG_SHOWN, null) {
-                put(Attributes.DIALOG_NAME, DialogNames.SCREEN_OVERLAY_PERMISSION_REQUEST)
-            }
-        }).apply {
-            setOnDismissListener {
-                GliaLogger.i(LogEvents.DIALOG_CLOSED, null) {
-                    put(Attributes.DIALOG_NAME, DialogNames.SCREEN_OVERLAY_PERMISSION_REQUEST)
-                }
-            }
-        }
+        return dialogService.showDialog(
+            context = context,
+            theme = uiTheme,
+            type = DialogType.Option(payload),
+            onShow = logDialogShown(DialogNames.SCREEN_OVERLAY_PERMISSION_REQUEST),
+            onDismiss = logDialogDismissed(DialogNames.SCREEN_OVERLAY_PERMISSION_REQUEST)
+        )
     }
 
     fun showEndEngagementDialog(
@@ -181,17 +167,13 @@ internal object Dialogs {
             )
         )
 
-        return dialogService.showDialog(context, uiTheme, DialogType.ReversedOption(payload), onShow = { dialog ->
-            GliaLogger.i(LogEvents.DIALOG_SHOWN, null) {
-                put(Attributes.DIALOG_NAME, DialogNames.LEAVE_ENGAGEMENT_CONFIRMATION)
-            }
-        }).apply {
-            setOnDismissListener {
-                GliaLogger.i(LogEvents.DIALOG_CLOSED, null) {
-                    put(Attributes.DIALOG_NAME, DialogNames.LEAVE_ENGAGEMENT_CONFIRMATION)
-                }
-            }
-        }
+        return dialogService.showDialog(
+            context = context,
+            theme = uiTheme,
+            type = DialogType.ReversedOption(payload),
+            onShow = logDialogShown(DialogNames.LEAVE_ENGAGEMENT_CONFIRMATION),
+            onDismiss = logDialogDismissed(DialogNames.LEAVE_ENGAGEMENT_CONFIRMATION)
+        )
     }
 
     fun showExitQueueDialog(
@@ -219,17 +201,13 @@ internal object Dialogs {
 
         )
 
-        return dialogService.showDialog(context, uiTheme, DialogType.ReversedOption(payload), onShow = { dialog ->
-            GliaLogger.i(LogEvents.DIALOG_SHOWN, null) {
-                put(Attributes.DIALOG_NAME, DialogNames.LEAVE_QUEUE_CONFIRMATION)
-            }
-        }).apply {
-            setOnDismissListener {
-                GliaLogger.i(LogEvents.DIALOG_CLOSED, null) {
-                    put(Attributes.DIALOG_NAME, DialogNames.LEAVE_QUEUE_CONFIRMATION)
-                }
-            }
-        }
+        return dialogService.showDialog(
+            context = context,
+            theme = uiTheme,
+            type = DialogType.ReversedOption(payload),
+            onShow = logDialogShown(DialogNames.LEAVE_QUEUE_CONFIRMATION),
+            onDismiss = logDialogDismissed(DialogNames.LEAVE_QUEUE_CONFIRMATION)
+        )
     }
 
     fun showUnAuthenticatedDialog(context: Context, uiTheme: UiTheme, buttonClickListener: View.OnClickListener): AlertDialog {
@@ -244,17 +222,13 @@ internal object Dialogs {
                 clickListener = buttonClickListener
             )
         )
-        return dialogService.showDialog(context, uiTheme, DialogType.AlertDialog(payload), onShow = { dialog ->
-            GliaLogger.i(LogEvents.DIALOG_SHOWN, null) {
-                put(Attributes.DIALOG_NAME, DialogNames.UNAUTHENTICATED_ERROR)
-            }
-        }).apply {
-            setOnDismissListener {
-                GliaLogger.i(LogEvents.DIALOG_CLOSED, null) {
-                    put(Attributes.DIALOG_NAME, DialogNames.UNAUTHENTICATED_ERROR)
-                }
-            }
-        }
+        return dialogService.showDialog(
+            context = context,
+            theme = uiTheme,
+            type = DialogType.AlertDialog(payload),
+            onShow = logDialogShown(DialogNames.UNAUTHENTICATED_ERROR),
+            onDismiss = logDialogDismissed(DialogNames.UNAUTHENTICATED_ERROR)
+        )
     }
 
     fun showEngagementConfirmationDialog(
@@ -295,17 +269,13 @@ internal object Dialogs {
             )
         )
 
-        return dialogService.showDialog(context, theme, DialogType.Confirmation(payload), onShow = { dialog ->
-            GliaLogger.i(LogEvents.DIALOG_SHOWN, null) {
-                put(Attributes.DIALOG_NAME, DialogNames.LIVE_OBSERVATION_CONFIRMATION)
-            }
-        }).apply {
-            setOnDismissListener {
-                GliaLogger.i(LogEvents.DIALOG_CLOSED, null) {
-                    put(Attributes.DIALOG_NAME, DialogNames.LIVE_OBSERVATION_CONFIRMATION)
-                }
-            }
-        }
+        return dialogService.showDialog(
+            context = context,
+            theme = theme,
+            type = DialogType.Confirmation(payload),
+            onShow = logDialogShown(DialogNames.LIVE_OBSERVATION_CONFIRMATION),
+            onDismiss = logDialogDismissed(DialogNames.LIVE_OBSERVATION_CONFIRMATION)
+        )
     }
 
     fun showOperatorEndedEngagementDialog(context: Context, theme: UiTheme, buttonClickListener: View.OnClickListener): AlertDialog {
@@ -320,17 +290,13 @@ internal object Dialogs {
             )
         )
 
-        return dialogService.showDialog(context, theme, DialogType.OperatorEndedEngagement(payload), onShow = { dialog ->
-            GliaLogger.i(LogEvents.DIALOG_SHOWN, null) {
-                put(Attributes.DIALOG_NAME, DialogNames.ENGAGEMENT_ENDED)
-            }
-        }).apply {
-            setOnDismissListener {
-                GliaLogger.i(LogEvents.DIALOG_CLOSED, null) {
-                    put(Attributes.DIALOG_NAME, DialogNames.ENGAGEMENT_ENDED)
-                }
-            }
-        }
+        return dialogService.showDialog(
+            context = context,
+            theme = theme,
+            type = DialogType.OperatorEndedEngagement(payload),
+            onShow = logDialogShown(DialogNames.ENGAGEMENT_ENDED),
+            onDismiss = logDialogDismissed(DialogNames.ENGAGEMENT_ENDED)
+        )
     }
 
     fun showUpgradeDialog(
@@ -362,34 +328,24 @@ internal object Dialogs {
             positiveButtonClickListener = handleDialogButtonClick(
                 dialogName = DialogNames.MEDIA_UPGRADE_CONFIRMATION,
                 buttonName = ButtonNames.POSITIVE,
+                mediaUpgradeOffer = data.offer,
                 clickListener = onAcceptOfferClickListener
             ),
             negativeButtonClickListener = handleDialogButtonClick(
                 dialogName = DialogNames.MEDIA_UPGRADE_CONFIRMATION,
                 buttonName = ButtonNames.NEGATIVE,
-                clickListener = onCloseClickListener
+                mediaUpgradeOffer = data.offer,
+                clickListener = onCloseClickListener,
             )
         )
 
-        return dialogService.showDialog(context, theme, DialogType.Upgrade(payload), onShow = { dialog ->
-            GliaLogger.i(LogEvents.DIALOG_SHOWN, null) {
-                put(Attributes.DIALOG_NAME, DialogNames.MEDIA_UPGRADE_CONFIRMATION)
-                data.offer.run {
-                    val offer = when {
-                        isOneWayVideo -> "ONE_WAY_VIDEO"
-                        isTwoWayVideo -> "TWO_WAY_VIDEO"
-                        else -> "AUDIO"
-                    }
-                    put(Attributes.MEDIA_UPGRADE_OFFER, offer)
-                }
-            }
-        }).apply {
-            setOnDismissListener {
-                GliaLogger.i(LogEvents.DIALOG_CLOSED, null) {
-                    put(Attributes.DIALOG_NAME, DialogNames.MEDIA_UPGRADE_CONFIRMATION)
-                }
-            }
-        }
+        return dialogService.showDialog(
+            context = context,
+            theme = theme,
+            type = DialogType.Upgrade(payload),
+            onShow = logDialogShown(DialogNames.MEDIA_UPGRADE_CONFIRMATION, data.offer),
+            onDismiss = logDialogDismissed(DialogNames.MEDIA_UPGRADE_CONFIRMATION, data.offer)
+        )
     }
 
     fun showMessageCenterUnavailableDialog(
@@ -431,17 +387,9 @@ internal object Dialogs {
             .setBackgroundInsetEnd(0)
             .setCancelable(true)
             .setOnCancelListener { Dependencies.controllerFactory.callVisualizerController.dismissVisitorCodeDialog() }
-            .setOnDismissListener {
-                GliaLogger.i(LogEvents.DIALOG_CLOSED, null) {
-                    put(Attributes.DIALOG_NAME, DialogNames.VISITOR_CODE)
-                }
-            }
+            .setOnDismissListener(logDialogDismissed(DialogNames.VISITOR_CODE))
             .show()
-            .also {
-                GliaLogger.i(LogEvents.DIALOG_CLOSED, null) {
-                    put(Attributes.DIALOG_NAME, DialogNames.VISITOR_CODE)
-                }
-            }
+            .also(logDialogShown(DialogNames.VISITOR_CODE))
     }
 
     fun showLeaveCurrentConversationDialog(
@@ -468,17 +416,13 @@ internal object Dialogs {
             )
         )
 
-        return dialogService.showDialog(context, theme, DialogType.OptionWithNegativeNeutral(payload), onShow = { dialog ->
-            GliaLogger.i(LogEvents.DIALOG_SHOWN, null) {
-                put(Attributes.DIALOG_NAME, DialogNames.LEAVE_SECURE_CONVERSATIONS_CONFIRMATION)
-            }
-        }).apply {
-            setOnDismissListener {
-                GliaLogger.i(LogEvents.DIALOG_CLOSED, null) {
-                    put(Attributes.DIALOG_NAME, DialogNames.LEAVE_SECURE_CONVERSATIONS_CONFIRMATION)
-                }
-            }
-        }
+        return dialogService.showDialog(
+            context = context,
+            theme = theme,
+            type = DialogType.OptionWithNegativeNeutral(payload),
+            onShow = logDialogShown(DialogNames.LEAVE_SECURE_CONVERSATIONS_CONFIRMATION),
+            onDismiss = logDialogDismissed(DialogNames.LEAVE_SECURE_CONVERSATIONS_CONFIRMATION)
+        )
     }
 
     fun showPushNotificationsPermissionDialog(
@@ -505,17 +449,13 @@ internal object Dialogs {
             )
         )
 
-        return dialogService.showDialog(context, uiTheme, DialogType.Option(payload), onShow = { dialog ->
-            GliaLogger.i(LogEvents.DIALOG_SHOWN, null) {
-                put(Attributes.DIALOG_NAME, DialogNames.ALLOW_PUSH_NOTIFICATION)
-            }
-        }).apply {
-            setOnDismissListener {
-                GliaLogger.i(LogEvents.DIALOG_CLOSED, null) {
-                    put(Attributes.DIALOG_NAME, DialogNames.ALLOW_PUSH_NOTIFICATION)
-                }
-            }
-        }
+        return dialogService.showDialog(
+            context = context,
+            theme = uiTheme,
+            type = DialogType.Option(payload),
+            onShow = logDialogShown(DialogNames.ALLOW_PUSH_NOTIFICATION),
+            onDismiss = logDialogDismissed(DialogNames.ALLOW_PUSH_NOTIFICATION)
+        )
     }
 
     private fun Window.allowOutsideTouch() {
@@ -526,15 +466,45 @@ internal object Dialogs {
         clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
     }
 
+    private fun logDialogShown(dialogName: String, mediaUpgradeOffer: MediaUpgradeOffer? = null): (DialogInterface) -> Unit = {
+        GliaLogger.i(LogEvents.DIALOG_SHOWN, null) {
+            put(Attributes.DIALOG_NAME, dialogName)
+            mediaUpgradeOffer?.run {
+                put(Attributes.MEDIA_UPGRADE_OFFER, attributeValue())
+            }
+        }
+    }
+
+    private fun logDialogDismissed(dialogName: String, mediaUpgradeOffer: MediaUpgradeOffer? = null): (DialogInterface) -> Unit = {
+        GliaLogger.i(LogEvents.DIALOG_CLOSED, null) {
+            put(Attributes.DIALOG_NAME, dialogName)
+            mediaUpgradeOffer?.run {
+                put(Attributes.MEDIA_UPGRADE_OFFER, attributeValue())
+            }
+        }
+    }
+
+    private fun MediaUpgradeOffer.attributeValue(): String {
+        return when {
+            isOneWayVideo -> "ONE_WAY_VIDEO"
+            isTwoWayVideo -> "TWO_WAY_VIDEO"
+            else -> "AUDIO"
+        }
+    }
+
     private fun handleDialogButtonClick(
         dialogName: String,
         buttonName: String,
+        mediaUpgradeOffer: MediaUpgradeOffer? = null,
         clickListener: View.OnClickListener
     ): View.OnClickListener {
         return View.OnClickListener {
             GliaLogger.i(LogEvents.DIALOG_BUTTON_CLICKED, buttonName) {
                 put(Attributes.DIALOG_NAME, dialogName)
                 put(Attributes.BUTTON_NAME, buttonName)
+                mediaUpgradeOffer?.run {
+                    put(Attributes.MEDIA_UPGRADE_OFFER, attributeValue())
+                }
             }
             clickListener.onClick(it)
         }

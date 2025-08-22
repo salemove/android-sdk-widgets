@@ -22,14 +22,21 @@ internal class PermissionsRequestRepository {
     }
 
     fun onRequestDialogShown(permissions: List<String>) {
-        GliaLogger.i(LogEvents.DIALOG_SHOWN) {
-            put(Attributes.DIALOG_NAME, DialogNames.PERMISSIONS_REQUEST)
+        permissions.forEach { permission ->
+            GliaLogger.i(LogEvents.DIALOG_SHOWN) {
+                put(Attributes.DIALOG_NAME, DialogNames.PERMISSIONS_REQUEST)
+                put(Attributes.PERMISSION, permission.removePrefix("android.permission."))
+            }
         }
     }
 
     fun onRequestResult(results: Map<String, Boolean>?, exception: GliaException?) {
-        GliaLogger.i(LogEvents.DIALOG_CLOSED) {
-            put(Attributes.DIALOG_NAME, DialogNames.PERMISSIONS_REQUEST)
+        requests.firstOrNull()?.first?.forEach { permission ->
+            GliaLogger.i(LogEvents.DIALOG_CLOSED) {
+                put(Attributes.DIALOG_NAME, DialogNames.PERMISSIONS_REQUEST)
+                put(Attributes.PERMISSION, permission.removePrefix("android.permission."))
+                put(Attributes.PERMISSION_RESULT, if (results?.get(permission) == true) "granted" else "denied")
+            }
         }
 
         // remove request from the permissions queue

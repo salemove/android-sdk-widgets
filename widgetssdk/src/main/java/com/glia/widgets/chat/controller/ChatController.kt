@@ -93,6 +93,7 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.schedulers.Schedulers
+import org.json.JSONArray
 
 internal class ChatController(
     private val callTimer: TimeCounter,
@@ -336,8 +337,28 @@ internal class ChatController(
 
     private fun enqueueForEngagement() {
         Dependencies.configurationManager.getCurrentScreenContextType {
+            val quickReplies = mutableListOf<GvaButton>()
+            it?.optJSONArray("quick_replies")?.let { arr ->
+                for (i in 0 until arr.length()) {
+                    val string = arr.getString(i)
+                    quickReplies.add(GvaButton(string, string))
+                }
+                if (quickReplies.isNotEmpty()) {
+                    addQuickReplyButtons(quickReplies)
+                }
+            }
+
             println("**************************** -: $it")
             requestNotificationPermissionIfPushNotificationsSetUpUseCase {
+                it?.optString("type")?.let { type ->
+                    sendMessage("Ai resolved context is $type")
+                }
+                it?.optString("details")?.let { details ->
+                    sendMessage(details)
+                }
+                if (quickReplies.isNotEmpty()) {
+                    addQuickReplyButtons(quickReplies)
+                }
                 enqueueForEngagementUseCase.withContext(it?.optString("type"))
             }
         }

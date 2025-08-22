@@ -126,6 +126,8 @@ dependencies {
   // includeBuild doesn't work with custom build types, use local maven version instead
   snapshotApi "com.glia:android-sdk:${coreSdkSnapshotVersion(gliaSdkVersion)}"
 
+  implementation "com.glia:telemetry_lib:0.0.1"
+
   implementation libs.media.audioswitch
   implementation libs.media.lottie
   implementation libs.data.gson

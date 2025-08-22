@@ -279,7 +279,7 @@ internal object Dependencies {
     @JvmStatic
     fun onSdkInit(gliaWidgetsConfig: GliaWidgetsConfig, callback: RequestCallback<Boolean?>? = null) {
         val gliaConfig = createGliaConfig(gliaWidgetsConfig)
-//        initLogger(gliaConfig)
+        initLogger(gliaConfig)
         gliaCore.init(gliaConfig) { success, error ->
             if (error == null) {
                 controllerFactory.init()

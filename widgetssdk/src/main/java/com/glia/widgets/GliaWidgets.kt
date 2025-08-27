@@ -173,10 +173,32 @@ object GliaWidgets {
                         onComplete.onComplete()
                     } else {
                         Logger.i(TAG, "Glia Widgets SDK initialization failed")
-                        val invalidInputError = GliaWidgetsException(
-                            "Failed to initialise Glia Widgets SDK. Please check credentials.",
-                            GliaWidgetsException.Cause.INVALID_INPUT
-                        )
+                        val invalidInputError = when (exception.cause) {
+                            GliaException.Cause.NETWORK_TIMEOUT -> {
+                                GliaWidgetsException(
+                                    "Network timeout. Please check the Internet connection.",
+                                    GliaWidgetsException.Cause.NETWORK_TIMEOUT
+                                )
+                            }
+                            GliaException.Cause.INVALID_INPUT -> {
+                                GliaWidgetsException(
+                                    "Failed to initialise Glia Widgets SDK. Invalid input. Please check credentials.",
+                                    GliaWidgetsException.Cause.INVALID_INPUT
+                                )
+                            }
+                            GliaException.Cause.FORBIDDEN -> {
+                                GliaWidgetsException(
+                                    "Failed to initialise Glia Widgets SDK. Forbidden. Please check credentials.",
+                                    GliaWidgetsException.Cause.INVALID_INPUT
+                                )
+                            }
+                            else -> {
+                                GliaWidgetsException(
+                                    "Failed to initialise Glia Widgets SDK. Please check logs.",
+                                    GliaWidgetsException.Cause.INVALID_INPUT
+                                )
+                            }
+                        }
                         onError.onError(invalidInputError)
                     }
                 }

@@ -155,7 +155,34 @@ class GliaWidgetsTest {
     }
 
     @Test
-    fun `init should invoke onError with specific exception when initialization fails`() {
+    fun `init should invoke onError with specific exception when initialization fails with NETWORK_TIMEOUT error`() {
+        val siteApiKey = SiteApiKey("SiteApiId", "SiteApiSecret")
+        val gliaWidgetsConfig = GliaWidgetsConfig.Builder()
+            .setSiteApiKey(siteApiKey)
+            .setSiteId("SiteId")
+            .setRegion("Region")
+            .setContext(mock())
+            .build()
+        val onComplete = mock<OnComplete>()
+        val onError = mock<OnError>()
+        val callbackCaptor = argumentCaptor<RequestCallback<Boolean?>>()
+        whenever(gliaCore.init(any(), callbackCaptor.capture())).thenAnswer {
+            // Simulate error by invoking the captured callback
+            callbackCaptor.firstValue.onResult(null, GliaException("Glia Core SDK exception", GliaException.Cause.NETWORK_TIMEOUT))
+        }
+
+        GliaWidgets.init(gliaWidgetsConfig, onComplete, onError)
+
+        verify(onComplete, never()).onComplete()
+        argumentCaptor<GliaWidgetsException>().apply {
+            verify(onError).onError(capture())
+            Assert.assertEquals(GliaWidgetsException.Cause.NETWORK_TIMEOUT, firstValue.gliaCause)
+            Assert.assertEquals("Network timeout. Please check the Internet connection.", firstValue.debugMessage)
+        }
+    }
+
+    @Test
+    fun `init should invoke onError with specific exception when initialization fails with INVALID_INPUT error`() {
         val siteApiKey = SiteApiKey("SiteApiId", "SiteApiSecret")
         val gliaWidgetsConfig = GliaWidgetsConfig.Builder()
             .setSiteApiKey(siteApiKey)
@@ -177,7 +204,34 @@ class GliaWidgetsTest {
         argumentCaptor<GliaWidgetsException>().apply {
             verify(onError).onError(capture())
             Assert.assertEquals(GliaWidgetsException.Cause.INVALID_INPUT, firstValue.gliaCause)
-            Assert.assertEquals("Failed to initialise Glia Widgets SDK. Please check credentials.", firstValue.debugMessage)
+            Assert.assertEquals("Failed to initialise Glia Widgets SDK. Invalid input. Please check credentials.", firstValue.debugMessage)
+        }
+    }
+
+    @Test
+    fun `init should invoke onError with specific exception when initialization fails with FORBIDDEN error`() {
+        val siteApiKey = SiteApiKey("SiteApiId", "SiteApiSecret")
+        val gliaWidgetsConfig = GliaWidgetsConfig.Builder()
+            .setSiteApiKey(siteApiKey)
+            .setSiteId("SiteId")
+            .setRegion("Region")
+            .setContext(mock())
+            .build()
+        val onComplete = mock<OnComplete>()
+        val onError = mock<OnError>()
+        val callbackCaptor = argumentCaptor<RequestCallback<Boolean?>>()
+        whenever(gliaCore.init(any(), callbackCaptor.capture())).thenAnswer {
+            // Simulate error by invoking the captured callback
+            callbackCaptor.firstValue.onResult(null, GliaException("Glia Core SDK exception", GliaException.Cause.FORBIDDEN))
+        }
+
+        GliaWidgets.init(gliaWidgetsConfig, onComplete, onError)
+
+        verify(onComplete, never()).onComplete()
+        argumentCaptor<GliaWidgetsException>().apply {
+            verify(onError).onError(capture())
+            Assert.assertEquals(GliaWidgetsException.Cause.INVALID_INPUT, firstValue.gliaCause)
+            Assert.assertEquals("Failed to initialise Glia Widgets SDK. Forbidden. Please check credentials.", firstValue.debugMessage)
         }
     }
 

@@ -11,7 +11,7 @@
         app:cardElevation="8dp"
         android:layout_marginTop="32dp">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:id="@+id/content_view"
             android:orientation="vertical"
             android:layout_width="match_parent"
@@ -25,41 +25,33 @@
                 android:layout_marginTop="@dimen/glia_large_x_large"
                 android:layout_marginEnd="24dp"
                 android:gravity="center"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/survey_list"/>
+                android:paddingBottom="@dimen/glia_large_x_large" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/survey_list"
+            <androidx.core.widget.NestedScrollView
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:scrollbars="horizontal"
                 android:layout_weight="1"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:listitem="@layout/survey_scale_question_item"
-                app:layout_constraintTop_toBottomOf="@+id/survey_title"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toTopOf="@+id/button_panel"/>
+                android:fillViewport="true">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/survey_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scrollbars="horizontal"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:listitem="@layout/survey_scale_question_item" />
+            </androidx.core.widget.NestedScrollView>
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="8dp"
-                android:background="@drawable/shadow_up_bg"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toTopOf="@+id/button_panel" />
+                android:background="@drawable/shadow_up_bg" />
 
             <LinearLayout
                 android:id="@+id/button_panel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                app:layout_constraintTop_toBottomOf="@+id/survey_list"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent">
+                android:orientation="horizontal" >
 
                 <com.glia.widgets.view.button.GliaNegativeButton
                     android:id="@+id/btn_cancel"
@@ -88,7 +80,7 @@
 
             </LinearLayout>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
 
     </androidx.cardview.widget.CardView>
 

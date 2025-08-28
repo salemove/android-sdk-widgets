@@ -595,6 +595,8 @@ class MainFragment : Fragment() {
     }
 
     private fun clearSession() {
+        ensureInitialized()
+
         GliaWidgets.clearVisitorSession()
         setupAuthButtonsVisibility()
     }

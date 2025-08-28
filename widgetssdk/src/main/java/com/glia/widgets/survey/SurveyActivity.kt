@@ -4,6 +4,7 @@ import android.graphics.Rect
 import android.os.Build
 import android.os.Bundle
 import android.view.MotionEvent
+import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.activity.OnBackPressedCallback
@@ -14,7 +15,7 @@ import com.glia.androidsdk.engagement.Survey
 import com.glia.widgets.R
 import com.glia.widgets.di.Dependencies.controllerFactory
 import com.glia.widgets.helper.ExtraKeys
-import com.glia.widgets.helper.Logger.i
+import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.getParcelableExtraCompat
 import com.glia.widgets.helper.hideKeyboard
@@ -40,7 +41,7 @@ internal class SurveyActivity : AppCompatActivity(), SurveyView.OnFinishListener
         overrideEnterAnimation()
         super.onCreate(savedInstanceState)
 
-        i(TAG, "Create Survey screen")
+        Logger.i(TAG, "Create Survey screen")
         setContentView(R.layout.survey_activity)
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
@@ -53,7 +54,7 @@ internal class SurveyActivity : AppCompatActivity(), SurveyView.OnFinishListener
     }
 
     override fun onDestroy() {
-        i(TAG, "Destroy Survey screen")
+        Logger.i(TAG, "Destroy Survey screen")
         hideSoftKeyboard()
         surveyView.onDestroyView()
         super.onDestroy()
@@ -67,25 +68,55 @@ internal class SurveyActivity : AppCompatActivity(), SurveyView.OnFinishListener
         finishAndRemoveTask()
     }
 
-    // Override the default dispatchTouchEvent to remove focus when tapping outside of an EditText
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
+        // Override the default dispatchTouchEvent
         if (event.action == MotionEvent.ACTION_DOWN) {
-            (currentFocus as? EditText)?.let { editText ->
-                val outRect = Rect()
-                editText.getGlobalVisibleRect(outRect)
-                if (!outRect.contains(event.rawX.toInt(), event.rawY.toInt())) {
-                    editText.clearFocus()
-                    (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager)
-                        .hideSoftInputFromWindow(editText.windowToken, 0)
-                }
-            }
+            if (finishActivityWithAnimationWhenTappedOutsideSurveyView(event)) return true
+            removeFocusWhenTappedOutsideSurveyEditText(event)
         }
         return super.dispatchTouchEvent(event)
     }
 
-    override fun finishAndRemoveTask() {
-        overrideExitAnimation()
-        super.finishAndRemoveTask()
+    fun finishActivityWithAnimationWhenTappedOutsideSurveyView(event: MotionEvent): Boolean {
+        val surveyView: View? = findViewById(R.id.survey_view)
+        if (surveyView != null) {
+            val location = IntArray(2)
+            surveyView.getLocationOnScreen(location)
+            val x: Float = event.rawX
+            val y: Float = event.rawY
+            val isTappedOutsideSurveyView =
+                x < location[0] || x > location[0] + surveyView.width || y < location[1] || y > location[1] + surveyView.height
+            if (isTappedOutsideSurveyView) {
+                // Hide with fade out animation
+                finishActivityWithAnimation(surveyView)
+                return true // consume the event
+            }
+        }
+        return false
+    }
+
+    private fun finishActivityWithAnimation(surveyView: View) {
+        surveyView.animate()
+            .alpha(0f)
+            .setDuration(300)
+            .withEndAction {
+                surveyView.visibility = View.GONE
+                surveyView.alpha = 1f // Reset for future use
+                finishAndRemoveTask() // Close Activity
+            }
+            .start()
+    }
+
+    fun removeFocusWhenTappedOutsideSurveyEditText(event: MotionEvent) {
+        (currentFocus as? EditText)?.let { editText ->
+            val outRect = Rect()
+            editText.getGlobalVisibleRect(outRect)
+            if (!outRect.contains(event.rawX.toInt(), event.rawY.toInt())) {
+                editText.clearFocus()
+                (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager)
+                    .hideSoftInputFromWindow(editText.windowToken, 0)
+            }
+        }
     }
 
     private fun hideSoftKeyboard() {
@@ -114,8 +145,7 @@ internal class SurveyActivity : AppCompatActivity(), SurveyView.OnFinishListener
 
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     private fun overrideAnimations() {
-        overrideActivityTransition(OVERRIDE_TRANSITION_OPEN, R.anim.slide_up, 0)
-        overrideActivityTransition(OVERRIDE_TRANSITION_CLOSE, 0, R.anim.slide_down)
+        overrideActivityTransition(OVERRIDE_TRANSITION_OPEN, android.R.anim.fade_in, 0)
     }
 
     private fun overrideEnterAnimation() {
@@ -124,13 +154,6 @@ internal class SurveyActivity : AppCompatActivity(), SurveyView.OnFinishListener
             return
         }
 
-        overridePendingTransition(R.anim.slide_up, 0)
-    }
-
-    @Suppress("DEPRECATION")
-    private fun overrideExitAnimation() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            overridePendingTransition(0, R.anim.slide_down)
-        }
+        overridePendingTransition(android.R.anim.fade_in, 0)
     }
 }

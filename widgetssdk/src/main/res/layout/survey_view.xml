@@ -27,25 +27,41 @@
                 android:gravity="center"
                 android:paddingBottom="@dimen/glia_large_x_large" />
 
-            <androidx.core.widget.NestedScrollView
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1"
-                android:fillViewport="true">
+                android:layout_weight="1">
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/survey_list"
+                <androidx.core.widget.NestedScrollView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:scrollbars="horizontal"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    tools:listitem="@layout/survey_scale_question_item" />
-            </androidx.core.widget.NestedScrollView>
+                    android:fillViewport="true">
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="8dp"
-                android:background="@drawable/shadow_up_bg" />
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/survey_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scrollbars="horizontal"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        tools:listitem="@layout/survey_scale_question_item"
+                        android:clipToPadding="false"
+                        android:paddingTop="8dp" />
+                </androidx.core.widget.NestedScrollView>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="4dp"
+                    android:layout_gravity="top"
+                    android:background="@drawable/shadow_up_bg"
+                    android:elevation="4dp"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="4dp"
+                    android:layout_gravity="bottom"
+                    android:background="@drawable/shadow_up_bg"
+                    android:elevation="4dp"/>
+            </FrameLayout>
 
             <LinearLayout
                 android:id="@+id/button_panel"

@@ -52,7 +52,6 @@ open class FadeTransitionActivity : AppCompatActivity() {
     override fun finishAndRemoveTask() {
         super.finishAndRemoveTask()
         overrideAnimationApi33()
-        disposable?.dispose()
     }
 
     override fun startActivity(intent: Intent) {
@@ -80,6 +79,11 @@ open class FadeTransitionActivity : AppCompatActivity() {
                 { super.setTitle(it) },
                 { /* no-op */ }
             )
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        disposable?.dispose()
     }
 
 }

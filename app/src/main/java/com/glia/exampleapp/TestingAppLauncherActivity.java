@@ -10,7 +10,7 @@ import androidx.navigation.Navigation;
 import com.glia.androidsdk.Glia;
 import com.glia.widgets.GliaWidgets;
 
-public class Activity extends AppCompatActivity {
+public class TestingAppLauncherActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

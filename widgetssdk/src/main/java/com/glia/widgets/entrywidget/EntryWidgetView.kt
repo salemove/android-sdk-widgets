@@ -30,7 +30,7 @@ internal class EntryWidgetView : RecyclerView, EntryWidgetContract.View {
 
     var onDismissListener: (() -> Unit)? = null
 
-    private var controller: EntryWidgetContract.Controller
+    private var controller: EntryWidgetContract.Controller? = null
     private var _viewAdapter: EntryWidgetAdapter? = null
     private val viewAdapter: EntryWidgetAdapter
         get() = _viewAdapter ?: throw IllegalStateException("Make sure adapter is set up before attempting to show any items")
@@ -50,7 +50,7 @@ internal class EntryWidgetView : RecyclerView, EntryWidgetContract.View {
     }
 
     init {
-        controller = Dependencies.controllerFactory.entryWidgetController
+        initController()
         itemAnimator = null
         setupDefaultViewAppearance()
     }
@@ -61,6 +61,28 @@ internal class EntryWidgetView : RecyclerView, EntryWidgetContract.View {
 
     constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(context.wrapWithMaterialThemeOverlay(), attrs, defStyle)
 
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+
+        initController()
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+
+        destroyController()
+    }
+
+    private fun initController() {
+        if (controller == null) {
+            controller = Dependencies.controllerFactory.entryWidgetController
+        }
+    }
+
+    private fun destroyController() {
+        controller?.onDestroy()
+        controller = null
+    }
 
     private fun setupDefaultViewAppearance() {
         val value = TypedValue()
@@ -69,7 +91,8 @@ internal class EntryWidgetView : RecyclerView, EntryWidgetContract.View {
     }
 
     override fun setController(controller: EntryWidgetContract.Controller) {
-        this.controller = controller
+        //This function is not used, so throwing exception will prevent confusion in the future.
+        throw IllegalAccessException("External controller assignment is not allowed. The view manages its own controller lifecycle.")
     }
 
     fun setAdapter(viewAdapter: EntryWidgetAdapter) {
@@ -81,7 +104,7 @@ internal class EntryWidgetView : RecyclerView, EntryWidgetContract.View {
         //For Chat screen we need to handle Item click inside ChatController
         if (viewAdapter.viewType != EntryWidgetContract.ViewType.MESSAGING_LIVE_SUPPORT) {
             viewAdapter.onItemClickListener = {
-                controller.onItemClicked(it, context.requireActivity())
+                controller?.onItemClicked(it, context.requireActivity())
             }
         }
 
@@ -92,7 +115,7 @@ internal class EntryWidgetView : RecyclerView, EntryWidgetContract.View {
         enableScrolling(isBottomSheet)
 
         applyTheme(null, null)
-        controller.setView(this, viewAdapter.viewType)
+        controller?.setView(this, viewAdapter.viewType)
     }
 
     fun setEntryWidgetTheme(entryWidgetTheme: EntryWidgetTheme?) {

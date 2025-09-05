@@ -2,7 +2,7 @@ package com.glia.widgets.permissions.controller
 
 import androidx.annotation.VisibleForTesting
 import com.glia.androidsdk.GliaException
-import com.glia.telemetry_lib.Attributes
+import com.glia.telemetry_lib.EventAttribute
 import com.glia.telemetry_lib.DialogNames
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.telemetry_lib.LogEvents

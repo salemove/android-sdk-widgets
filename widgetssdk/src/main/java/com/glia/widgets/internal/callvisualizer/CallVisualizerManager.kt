@@ -15,29 +15,29 @@ internal class CallVisualizerManager(
 ) : CallVisualizer {
 
     override fun createVisitorCodeView(context: Context): View {
-        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, CallVisualizer::class, "createVisitorCodeView")
+        GliaLogger.logMethodUse(CallVisualizer::class, "createVisitorCodeView")
         return buildVisitorCodeUseCase(context, false)
     }
 
     override fun showVisitorCodeDialog() {
-        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, CallVisualizer::class, "showVisitorCodeDialog")
+        GliaLogger.logMethodUse(CallVisualizer::class, "showVisitorCodeDialog")
         callVisualizerController.showVisitorCodeDialog()
     }
 
     override fun addVisitorContext(visitorContextAssetId: String) {
-        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, CallVisualizer::class, "addVisitorContext")
+        GliaLogger.logMethodUse(CallVisualizer::class, "addVisitorContext")
         callVisualizerController.saveVisitorContextAssetId(visitorContextAssetId)
     }
 
     @SuppressLint("CheckResult")
     override fun onEngagementStart(runnable: Runnable) {
-        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, CallVisualizer::class, "onEngagementStart")
+        GliaLogger.logMethodUse(CallVisualizer::class, "onEngagementStart")
         callVisualizerController.engagementStartFlow.subscribe { runnable.run() }
     }
 
     @SuppressLint("CheckResult")
     override fun onEngagementEnd(runnable: Runnable) {
-        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, CallVisualizer::class, "onEngagementEnd")
+        GliaLogger.logMethodUse(CallVisualizer::class, "onEngagementEnd")
         callVisualizerController.engagementEndFlow.subscribe { runnable.run() }
     }
 }

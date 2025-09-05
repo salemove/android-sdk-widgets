@@ -6,7 +6,7 @@ import com.glia.androidsdk.chat.OperatorMessage
 import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.androidsdk.chat.SystemMessage
 import com.glia.androidsdk.chat.VisitorMessage
-import com.glia.telemetry_lib.Attributes
+import com.glia.telemetry_lib.EventAttribute
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.telemetry_lib.LogEvents
 import com.glia.widgets.chat.ChatManager
@@ -142,7 +142,7 @@ internal class AppendNewResponseCardOrTextItemUseCase(
     ) {
         chatItems += mapResponseCardUseCase(attachment, message, true)
         GliaLogger.i(LogEvents.CHAT_SCREEN_SINGLE_CHOICE_SHOWN) {
-            put(Attributes.MESSAGE_ID, message.chatMessage.id)
+            put(EventAttribute.MessageId, message.chatMessage.id)
         }
     }
 }

@@ -23,31 +23,31 @@ internal class VisitorCodeController(
 
     private val defaultRefreshDurationMilliseconds: Long = 30 * 60 * 1000L
 
-    private lateinit var view: VisitorCodeContract.View
+    private var view: VisitorCodeContract.View? = null
 
     override fun setView(view: VisitorCodeContract.View) {
         this.view = view
-        this.view.notifySetupComplete()
+        this.view?.notifySetupComplete()
         this.autoCloseOnEngagement()
     }
 
     override fun onCloseButtonClicked() {
         callVisualizerController.dismissVisitorCodeDialog()
-        view.destroyTimer()
+        view?.destroyTimer()
     }
 
     override fun onLoadVisitorCode() {
-        view.startLoading()
+        view?.startLoading()
         disposable = visitorCodeRepository.getVisitorCode()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 { visitorCode ->
-                    view.showVisitorCode(visitorCode)
-                    view.setTimer(failGuardDuration(visitorCode))
+                    view?.showVisitorCode(visitorCode)
+                    view?.setTimer(failGuardDuration(visitorCode))
                 },
                 { error ->
-                    view.showError(error)
+                    view?.showError(error)
                 }
             )
     }
@@ -70,12 +70,13 @@ internal class VisitorCodeController(
         }
         engagementStateDisposable?.dispose()
         engagementStateDisposable = engagementStateUseCase().filter { it is State.EngagementStarted && it.isCallVisualizer }.subscribe {
-            view.destroyTimer()
+            view?.destroyTimer()
         }
     }
 
     override fun onDestroy() {
         engagementStateDisposable?.dispose()
-        view.destroyTimer()
+        view?.destroyTimer()
+        view = null
     }
 }

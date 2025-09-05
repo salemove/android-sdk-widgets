@@ -2,7 +2,7 @@ package com.glia.widgets.permissions
 
 import androidx.annotation.VisibleForTesting
 import com.glia.androidsdk.GliaException
-import com.glia.telemetry_lib.Attributes
+import com.glia.telemetry_lib.EventAttribute
 import com.glia.telemetry_lib.DialogNames
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.telemetry_lib.LogEvents
@@ -24,8 +24,8 @@ internal class PermissionsRequestRepository {
     fun onRequestDialogShown(permissions: List<String>) {
         permissions.forEach { permission ->
             GliaLogger.i(LogEvents.DIALOG_SHOWN) {
-                put(Attributes.DIALOG_NAME, DialogNames.PERMISSIONS_REQUEST)
-                put(Attributes.PERMISSION, permission.removePrefix("android.permission."))
+                put(EventAttribute.DialogName, DialogNames.PERMISSIONS_REQUEST)
+                put(EventAttribute.Permission, permission.removePrefix("android.permission."))
             }
         }
     }
@@ -33,9 +33,9 @@ internal class PermissionsRequestRepository {
     fun onRequestResult(results: Map<String, Boolean>?, exception: GliaException?) {
         requests.firstOrNull()?.first?.forEach { permission ->
             GliaLogger.i(LogEvents.DIALOG_CLOSED) {
-                put(Attributes.DIALOG_NAME, DialogNames.PERMISSIONS_REQUEST)
-                put(Attributes.PERMISSION, permission.removePrefix("android.permission."))
-                put(Attributes.PERMISSION_RESULT, if (results?.get(permission) == true) "granted" else "denied")
+                put(EventAttribute.DialogName, DialogNames.PERMISSIONS_REQUEST)
+                put(EventAttribute.Permission, permission.removePrefix("android.permission."))
+                put(EventAttribute.PermissionResult, if (results?.get(permission) == true) "granted" else "denied")
             }
         }
 

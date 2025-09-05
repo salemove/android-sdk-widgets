@@ -6,7 +6,7 @@ import com.glia.androidsdk.chat.OperatorMessage
 import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.androidsdk.chat.SystemMessage
 import com.glia.androidsdk.chat.VisitorMessage
-import com.glia.telemetry_lib.Attributes
+import com.glia.telemetry_lib.EventAttribute
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.telemetry_lib.LogEvents
 import com.glia.widgets.chat.domain.gva.IsGvaUseCase
@@ -117,7 +117,7 @@ internal class AppendGvaMessageItemUseCase(private val mapGvaUseCase: MapGvaUseC
     operator fun invoke(chatItems: MutableList<ChatItem>, message: ChatMessageInternal, showChatHead: Boolean = true) {
         chatItems += mapGvaUseCase(message, showChatHead)
         GliaLogger.i(LogEvents.CHAT_SCREEN_GVA_MESSAGE_SHOWN) {
-            put(Attributes.MESSAGE_ID, message.chatMessage.id)
+            put(EventAttribute.MessageId, message.chatMessage.id)
         }
     }
 }
@@ -131,7 +131,7 @@ internal class AppendHistoryCustomCardItemUseCase(
         if (customCardShouldShowUseCase.execute(message, customCardType, true)) {
             chatItems.add(message.run { CustomCardChatItem(message, viewType) })
             GliaLogger.i(LogEvents.CHAT_SCREEN_CUSTOM_CARD_SHOWN) {
-                put(Attributes.MESSAGE_ID, message.id)
+                put(EventAttribute.MessageId, message.id)
             }
         }
 

@@ -1,7 +1,6 @@
 package com.glia.widgets.survey
 
 import android.graphics.Rect
-import android.os.Build
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
@@ -9,10 +8,9 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
-import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
 import com.glia.androidsdk.engagement.Survey
 import com.glia.widgets.R
+import com.glia.widgets.base.FadeTransitionActivity
 import com.glia.widgets.di.Dependencies.controllerFactory
 import com.glia.widgets.helper.ExtraKeys
 import com.glia.widgets.helper.Logger
@@ -31,14 +29,13 @@ import com.glia.widgets.helper.insetsControllerCompat
  *
  * This activity is used to display post-engagement surveys.
  */
-internal class SurveyActivity : AppCompatActivity(), SurveyView.OnFinishListener {
+internal class SurveyActivity : FadeTransitionActivity(), SurveyView.OnFinishListener {
     private val surveyView: SurveyView by lazy { findViewById(R.id.survey_view) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         this.enableEdgeToEdge()
         window.insetsControllerCompat.isAppearanceLightStatusBars = false
 
-        overrideEnterAnimation()
         super.onCreate(savedInstanceState)
 
         Logger.i(TAG, "Create Survey screen")
@@ -87,24 +84,11 @@ internal class SurveyActivity : AppCompatActivity(), SurveyView.OnFinishListener
             val isTappedOutsideSurveyView =
                 x < location[0] || x > location[0] + surveyView.width || y < location[1] || y > location[1] + surveyView.height
             if (isTappedOutsideSurveyView) {
-                // Hide with fade out animation
-                finishActivityWithAnimation(surveyView)
+                finishAndRemoveTask()
                 return true // consume the event
             }
         }
         return false
-    }
-
-    private fun finishActivityWithAnimation(surveyView: View) {
-        surveyView.animate()
-            .alpha(0f)
-            .setDuration(300)
-            .withEndAction {
-                surveyView.visibility = View.GONE
-                surveyView.alpha = 1f // Reset for future use
-                finishAndRemoveTask() // Close Activity
-            }
-            .start()
     }
 
     fun removeFocusWhenTappedOutsideSurveyEditText(event: MotionEvent) {
@@ -141,19 +125,5 @@ internal class SurveyActivity : AppCompatActivity(), SurveyView.OnFinishListener
 
     private fun updateTitle(title: String?) {
         this.title = title
-    }
-
-    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
-    private fun overrideAnimations() {
-        overrideActivityTransition(OVERRIDE_TRANSITION_OPEN, android.R.anim.fade_in, 0)
-    }
-
-    private fun overrideEnterAnimation() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            overrideAnimations()
-            return
-        }
-
-        overridePendingTransition(android.R.anim.fade_in, 0)
     }
 }

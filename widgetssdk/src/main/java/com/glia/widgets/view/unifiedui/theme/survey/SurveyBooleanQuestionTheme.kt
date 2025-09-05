@@ -6,10 +6,10 @@ import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 
 internal data class SurveyBooleanQuestionTheme(
     val title: TextTheme? = null,
-    val optionButton: OptionButtonTheme? = null
+    val surveyOption: SurveyOptionTheme? = null
 ) : Mergeable<SurveyBooleanQuestionTheme> {
     override fun merge(other: SurveyBooleanQuestionTheme): SurveyBooleanQuestionTheme = SurveyBooleanQuestionTheme(
         title = title merge other.title,
-        optionButton = optionButton merge other.optionButton
+        surveyOption = surveyOption merge other.surveyOption
     )
 }

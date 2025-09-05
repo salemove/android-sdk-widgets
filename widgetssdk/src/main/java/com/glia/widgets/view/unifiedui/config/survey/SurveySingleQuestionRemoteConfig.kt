@@ -14,11 +14,15 @@ internal data class SurveySingleQuestionRemoteConfig(
     val tintColor: ColorLayerRemoteConfig?,
 
     @SerializedName("option")
-    val option: TextRemoteConfig?
+    val option: TextRemoteConfig?,
+
+    @SerializedName("error")
+    val errorRemoteConfig: TextRemoteConfig?
 ) {
     fun toSurveySingleQuestionTheme(): SurveySingleQuestionTheme = SurveySingleQuestionTheme(
         title = title?.toTextTheme(),
         tintColor = tintColor?.toColorTheme(),
-        option = option?.toTextTheme()
+        option = option?.toTextTheme(),
+        error = errorRemoteConfig?.toTextTheme()
     )
 }

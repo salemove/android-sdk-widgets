@@ -9,15 +9,12 @@ internal data class SurveyInputQuestionRemoteConfig(
     @SerializedName("title")
     val title: TextRemoteConfig?,
 
-    @SerializedName("option")
-    val option: OptionButtonRemoteConfig?,
+    @SerializedName("inputField")
+    val inputField: SurveyOptionRemoteConfig?,
 
-    @SerializedName("text")
-    val textRemoteConfig: TextRemoteConfig?
 ) {
     fun toSurveyInputQuestionTheme(): SurveyInputQuestionTheme = SurveyInputQuestionTheme(
         title = title?.toTextTheme(),
-        text = textRemoteConfig?.toTextTheme(),
-        option = option?.toOptionButtonTheme()
+        inputField = inputField?.toSurveyOptionTheme()
     )
 }

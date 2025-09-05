@@ -6,7 +6,7 @@ import android.graphics.Color
 import com.glia.widgets.view.unifiedui.composeIfAtLeastOneNotNull
 import com.glia.widgets.view.unifiedui.theme.ColorPallet
 import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
-import com.glia.widgets.view.unifiedui.theme.survey.OptionButtonTheme
+import com.glia.widgets.view.unifiedui.theme.survey.SurveyOptionTheme
 import com.glia.widgets.view.unifiedui.theme.survey.SurveyBooleanQuestionTheme
 import com.glia.widgets.view.unifiedui.theme.survey.SurveyInputQuestionTheme
 import com.glia.widgets.view.unifiedui.theme.survey.SurveyScaleQuestionTheme
@@ -24,11 +24,11 @@ internal fun SurveyTheme(pallet: ColorPallet): SurveyTheme =
         cancelButton = NegativeDefaultButtonTheme(pallet),
         booleanQuestion = SurveyBooleanQuestionTheme(
             title = BaseDarkColorTextTheme(pallet),
-            SurveyOptionButtonTheme(pallet)
+            SurveyOptionTheme(pallet)
         ),
         scaleQuestion = SurveyScaleQuestionTheme(
             title = BaseDarkColorTextTheme(pallet),
-            SurveyOptionButtonTheme(pallet)
+            SurveyOptionTheme(pallet)
         ),
         singleQuestion = SurveySingleQuestionTheme(
             title = BaseDarkColorTextTheme(pallet),
@@ -37,15 +37,14 @@ internal fun SurveyTheme(pallet: ColorPallet): SurveyTheme =
         ),
         inputQuestion = SurveyInputQuestionTheme(
             title = BaseDarkColorTextTheme(pallet),
-            option = SurveyOptionButtonTheme(pallet),
-            text = BaseDarkColorTextTheme(pallet)
+            inputField = SurveyInputOptionTheme(pallet),
         )
     )
 
 /**
- * Default theme for Survey option button
+ * Default theme for Survey option
  */
-internal fun SurveyOptionButtonTheme(pallet: ColorPallet): OptionButtonTheme? = pallet.run {
+internal fun SurveyOptionTheme(pallet: ColorPallet): SurveyOptionTheme? = pallet.run {
     composeIfAtLeastOneNotNull(
         darkColorTheme,
         normalColorTheme,
@@ -53,7 +52,7 @@ internal fun SurveyOptionButtonTheme(pallet: ColorPallet): OptionButtonTheme? = 
         lightColorTheme,
         negativeColorTheme
     ) {
-        OptionButtonTheme(
+        SurveyOptionTheme(
             normalText = BaseDarkColorTextTheme(this),
             normalLayer = LayerTheme(
                 fill = lightColorTheme,
@@ -61,6 +60,34 @@ internal fun SurveyOptionButtonTheme(pallet: ColorPallet): OptionButtonTheme? = 
             ),
             selectedText = BaseLightColorTextTheme(this),
             selectedLayer = LayerTheme(fill = primaryColorTheme, stroke = Color.TRANSPARENT),
+            highlightedText = BaseNegativeColorTextTheme(this),
+            highlightedLayer = LayerTheme(
+                fill = lightColorTheme,
+                stroke = negativeColorTheme?.primaryColor
+            )
+        )
+    }
+}
+
+/**
+ * Default theme for Survey input option
+ */
+internal fun SurveyInputOptionTheme(pallet: ColorPallet): SurveyOptionTheme? = pallet.run {
+    composeIfAtLeastOneNotNull(
+        darkColorTheme,
+        normalColorTheme,
+        primaryColorTheme,
+        lightColorTheme,
+        negativeColorTheme
+    ) {
+        SurveyOptionTheme(
+            normalText = BaseDarkColorTextTheme(this),
+            normalLayer = LayerTheme(
+                fill = lightColorTheme,
+                stroke = normalColorTheme?.primaryColor
+            ),
+            selectedText = BaseDarkColorTextTheme(this),
+            selectedLayer = LayerTheme(fill = lightColorTheme, stroke = normalColorTheme?.primaryColor),
             highlightedText = BaseNegativeColorTextTheme(this),
             highlightedLayer = LayerTheme(
                 fill = lightColorTheme,

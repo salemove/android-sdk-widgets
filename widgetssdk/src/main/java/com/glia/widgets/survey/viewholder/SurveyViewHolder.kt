@@ -18,7 +18,7 @@ import com.glia.widgets.survey.SurveyController
 internal abstract class SurveyViewHolder(
     itemView: View,
     val title: TextView,
-    private val requiredError: View
+    val requiredError: TextView
 ) : RecyclerView.ViewHolder(itemView),
     SurveyController.AnswerCallback {
     var questionItem: QuestionItem? = null
@@ -26,9 +26,7 @@ internal abstract class SurveyViewHolder(
     private val localeProvider = Dependencies.localeProvider
 
     init {
-        (requiredError as? TextView)?.setLocaleText(
-            R.string.survey_action_validation_error
-        )
+        requiredError.setLocaleText(R.string.survey_action_validation_error)
     }
 
     open fun onBind(questionItem: QuestionItem, listener: SurveyAdapter.SurveyAdapterListener?) {

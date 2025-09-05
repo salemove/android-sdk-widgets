@@ -81,11 +81,18 @@ internal class BooleanQuestionViewHolder(
         super.showRequiredError(error)
         yesButton.isError = error
         noButton.isError = error
+        if (error) applyBooleanThemeWithError() else applyBooleanTheme()
+    }
+
+    private fun applyBooleanThemeWithError() {
         applyBooleanTheme()
+        booleanTheme?.surveyOption?.also {
+            requiredError.applyTextTheme(it.error)
+        }
     }
 
     private fun applyBooleanTheme() {
-        booleanTheme?.optionButton?.also {
+        booleanTheme?.surveyOption?.also {
             yesButton.applyOptionButtonTheme(it)
             noButton.applyOptionButtonTheme(it)
         }

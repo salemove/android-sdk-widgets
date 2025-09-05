@@ -237,6 +237,7 @@ internal class MessageCenterController(
     }
 
     override fun onDestroy() {
+        view = null
         disposables.dispose()
     }
 

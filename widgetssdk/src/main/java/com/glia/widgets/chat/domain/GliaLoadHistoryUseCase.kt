@@ -1,6 +1,6 @@
 package com.glia.widgets.chat.domain
 
-import com.glia.telemetry_lib.Attributes
+import com.glia.telemetry_lib.EventAttribute
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.telemetry_lib.LogEvents
 import com.glia.widgets.chat.data.GliaChatRepository
@@ -31,7 +31,7 @@ internal class GliaLoadHistoryUseCase(
         return single
             .doOnSuccess {
                 GliaLogger.i(LogEvents.CHAT_SCREEN_HISTORY_LOADED) {
-                    put(Attributes.MESSAGE_COUNT, it.items.size.toString())
+                    put(EventAttribute.MessageCount, it.items.size.toString())
                 }
             }
     }

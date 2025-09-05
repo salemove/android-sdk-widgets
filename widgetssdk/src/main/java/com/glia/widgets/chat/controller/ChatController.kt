@@ -13,8 +13,8 @@ import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.engagement.EngagementFile
 import com.glia.androidsdk.site.SiteInfo
-import com.glia.telemetry_lib.Attributes
 import com.glia.telemetry_lib.ButtonNames
+import com.glia.telemetry_lib.EventAttribute
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.telemetry_lib.GvaActionTypes
 import com.glia.telemetry_lib.LogEvents
@@ -405,7 +405,7 @@ internal class ChatController(
 
     override fun sendMessage(message: String) {
         GliaLogger.i(LogEvents.CHAT_SCREEN_BUTTON_CLICKED) {
-            put(Attributes.BUTTON_NAME, ButtonNames.SEND)
+            put(EventAttribute.ButtonName, ButtonNames.SEND)
         }
         Logger.d(TAG, "Send MESSAGE: $message")
         clearMessagePreview()
@@ -461,7 +461,7 @@ internal class ChatController(
 
     override fun onBackArrowClicked() {
         GliaLogger.i(LogEvents.CHAT_SCREEN_BUTTON_CLICKED) {
-            put(Attributes.BUTTON_NAME, ButtonNames.BACK)
+            put(EventAttribute.ButtonName, ButtonNames.BACK)
         }
         Logger.d(TAG, "onBackArrowClicked")
         if (isQueueingOrOngoingEngagement) {
@@ -508,7 +508,7 @@ internal class ChatController(
 
     override fun leaveChatClicked() {
         GliaLogger.i(LogEvents.CHAT_SCREEN_BUTTON_CLICKED) {
-            put(Attributes.BUTTON_NAME, ButtonNames.END)
+            put(EventAttribute.ButtonName, ButtonNames.END)
         }
         Logger.d(TAG, "leaveChatClicked")
         if (chatState.isOperatorOnline) dialogController.showExitChatDialog()
@@ -516,7 +516,7 @@ internal class ChatController(
 
     override fun onXButtonClicked() {
         GliaLogger.i(LogEvents.CHAT_SCREEN_BUTTON_CLICKED) {
-            put(Attributes.BUTTON_NAME, ButtonNames.CLOSE)
+            put(EventAttribute.ButtonName, ButtonNames.CLOSE)
         }
         Logger.d(TAG, "onXButtonClicked")
         if (isQueueingOrOngoingEngagement) {
@@ -749,7 +749,7 @@ internal class ChatController(
 
     override fun singleChoiceOptionClicked(item: OperatorMessageItem.ResponseCard, selectedOption: SingleChoiceOption) {
         GliaLogger.i(LogEvents.CHAT_SCREEN_SINGLE_CHOICE_ANSWERED) {
-            put(Attributes.MESSAGE_ID, item.id)
+            put(EventAttribute.MessageId, item.id)
         }
         Logger.d(TAG, "singleChoiceOptionClicked, id: ${item.id}")
         sendMessageUseCase.execute(selectedOption.asSingleChoiceResponse(), sendMessageCallback)
@@ -758,7 +758,7 @@ internal class ChatController(
 
     override fun sendCustomCardResponse(customCard: CustomCardChatItem, text: String, value: String) {
         GliaLogger.i(LogEvents.CHAT_SCREEN_CUSTOM_CARD_ACTION) {
-            put(Attributes.MESSAGE_ID, customCard.id)
+            put(EventAttribute.MessageId, customCard.id)
         }
         val attachment = SingleChoiceAttachment.from(value, text)
         sendMessageUseCase.execute(attachment, sendMessageCallback)
@@ -783,7 +783,7 @@ internal class ChatController(
 
     override fun newMessagesIndicatorClicked() {
         GliaLogger.i(LogEvents.CHAT_SCREEN_BUTTON_CLICKED) {
-            put(Attributes.BUTTON_NAME, ButtonNames.NEW_MESSAGES_INDICATOR)
+            put(EventAttribute.ButtonName, ButtonNames.NEW_MESSAGES_INDICATOR)
         }
         Logger.d(TAG, "newMessagesIndicatorClicked")
         view?.smoothScrollToBottom()
@@ -875,8 +875,8 @@ internal class ChatController(
 
     override fun onRemoveAttachment(attachment: LocalAttachment) {
         GliaLogger.i(LogEvents.CHAT_SCREEN_BUTTON_CLICKED) {
-            put(Attributes.BUTTON_NAME, ButtonNames.REMOVE_ATTACHMENT)
-            put(Attributes.FILE_ID, attachment.id)
+            put(EventAttribute.ButtonName, ButtonNames.REMOVE_ATTACHMENT)
+            put(EventAttribute.FileId, attachment.id)
         }
         removeFileAttachmentUseCase(attachment)
     }
@@ -885,7 +885,7 @@ internal class ChatController(
         addFileToAttachmentAndUploadUseCase(file, object : AddFileToAttachmentAndUploadUseCase.Listener {
             override fun onFinished() {
                 GliaLogger.i(LogEvents.CHAT_SCREEN_FILE_UPLOADED) {
-                    put(Attributes.FILE_ID, file.id)
+                    put(EventAttribute.FileId, file.id)
                 }
                 Logger.d(TAG, "fileUploadFinished")
                 //We need this file locally, so clearing only file uri reference
@@ -894,7 +894,7 @@ internal class ChatController(
 
             override fun onStarted() {
                 GliaLogger.i(LogEvents.CHAT_SCREEN_FILE_UPLOADING) {
-                    put(Attributes.FILE_ID, file.id)
+                    put(EventAttribute.FileId, file.id)
                 }
                 Logger.d(TAG, "fileUploadStarted")
             }
@@ -906,7 +906,7 @@ internal class ChatController(
 
             override fun onSecurityCheckStarted() {
                 GliaLogger.i(LogEvents.CHAT_SCREEN_FILE_SCANNING) {
-                    put(Attributes.FILE_ID, file.id)
+                    put(EventAttribute.FileId, file.id)
                 }
                 Logger.d(TAG, "fileUploadSecurityCheckStarted")
             }
@@ -919,20 +919,20 @@ internal class ChatController(
 
     override fun onFileDownloadClicked(attachmentFile: AttachmentFile) {
         GliaLogger.i(LogEvents.CHAT_SCREEN_BUTTON_CLICKED) {
-            put(Attributes.BUTTON_NAME, ButtonNames.DOWNLOAD_FILE)
+            put(EventAttribute.ButtonName, ButtonNames.DOWNLOAD_FILE)
         }
         withReadWritePermissionsUseCase {
             chatManager.onChatAction(ChatManager.Action.OnFileDownloadStarted(attachmentFile.id))
 
             GliaLogger.i(LogEvents.CHAT_SCREEN_FILE_DOWNLOADING) {
-                put(Attributes.FILE_ID, attachmentFile.id)
+                put(EventAttribute.FileId, attachmentFile.id)
             }
             val downloadDisposable = downloadFileUseCase(attachmentFile)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     GliaLogger.i(LogEvents.CHAT_SCREEN_FILE_DOWNLOADED) {
-                        put(Attributes.FILE_ID, attachmentFile.id)
+                        put(EventAttribute.FileId, attachmentFile.id)
                     }
                     fileDownloadSuccess(attachmentFile)
                 }) {
@@ -968,37 +968,37 @@ internal class ChatController(
 
     override fun onGvaButtonClicked(button: GvaButton) {
         GliaLogger.i(LogEvents.CHAT_SCREEN_BUTTON_CLICKED) {
-            put(Attributes.BUTTON_NAME, ButtonNames.GVA)
+            put(EventAttribute.ButtonName, ButtonNames.GVA)
         }
         when (val buttonType: Gva.ButtonType = determineGvaButtonTypeUseCase(button)) {
             Gva.ButtonType.BroadcastEvent -> {
                 view?.showBroadcastNotSupportedToast()
                 GliaLogger.i(LogEvents.CHAT_SCREEN_GVA_MESSAGE_ACTION) {
-                    put(Attributes.ACTION_TYPE, GvaActionTypes.BROADCAST_EVENT)
+                    put(EventAttribute.ActionType, GvaActionTypes.BROADCAST_EVENT)
                 }
             }
             is Gva.ButtonType.Email -> {
                 view?.requestOpenEmailClient(buttonType.uri)
                 GliaLogger.i(LogEvents.CHAT_SCREEN_GVA_MESSAGE_ACTION) {
-                    put(Attributes.ACTION_TYPE, GvaActionTypes.EMAIL)
+                    put(EventAttribute.ActionType, GvaActionTypes.EMAIL)
                 }
             }
             is Gva.ButtonType.Phone -> {
                 view?.requestOpenDialer(buttonType.uri)
                 GliaLogger.i(LogEvents.CHAT_SCREEN_GVA_MESSAGE_ACTION) {
-                    put(Attributes.ACTION_TYPE, GvaActionTypes.PHONE)
+                    put(EventAttribute.ActionType, GvaActionTypes.PHONE)
                 }
             }
             is Gva.ButtonType.PostBack -> {
                 sendGvaResponse(buttonType.singleChoiceAttachment)
                 GliaLogger.i(LogEvents.CHAT_SCREEN_GVA_MESSAGE_ACTION) {
-                    put(Attributes.ACTION_TYPE, GvaActionTypes.POST_BACK)
+                    put(EventAttribute.ActionType, GvaActionTypes.POST_BACK)
                 }
             }
             is Gva.ButtonType.Url -> {
                 view?.requestOpenUri(buttonType.uri)
                 GliaLogger.i(LogEvents.CHAT_SCREEN_GVA_MESSAGE_ACTION) {
-                    put(Attributes.ACTION_TYPE, GvaActionTypes.URL)
+                    put(EventAttribute.ActionType, GvaActionTypes.URL)
                 }
             }
         }
@@ -1006,7 +1006,7 @@ internal class ChatController(
 
     override fun onRetryClicked(messageId: String) {
         GliaLogger.i(LogEvents.CHAT_SCREEN_BUTTON_CLICKED) {
-            put(Attributes.BUTTON_NAME, ButtonNames.RETRY)
+            put(EventAttribute.ButtonName, ButtonNames.RETRY)
         }
         chatManager.onChatAction(ChatManager.Action.OnRetryClicked(messageId))
     }
@@ -1052,7 +1052,7 @@ internal class ChatController(
             else -> ButtonNames.SC_TOP_BANNER_UNKNOWN
         }
         GliaLogger.i(LogEvents.CHAT_SCREEN_BUTTON_CLICKED) {
-            put(Attributes.BUTTON_NAME, buttonName)
+            put(EventAttribute.ButtonName, buttonName)
         }
         hasOngoingSecureConversationUseCase(
             onHasOngoingSecureConversation = { onScTopBannerItemClickedHasOngoingSC(itemType) },

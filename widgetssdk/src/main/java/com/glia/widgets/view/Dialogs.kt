@@ -8,7 +8,7 @@ import android.view.Window
 import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
 import com.glia.androidsdk.comms.MediaUpgradeOffer
-import com.glia.telemetry_lib.Attributes
+import com.glia.telemetry_lib.EventAttribute
 import com.glia.telemetry_lib.ButtonNames
 import com.glia.telemetry_lib.DialogNames
 import com.glia.telemetry_lib.GliaLogger
@@ -464,18 +464,18 @@ internal object Dialogs {
 
     private fun logDialogShown(dialogName: String, mediaUpgradeOffer: MediaUpgradeOffer? = null): (DialogInterface) -> Unit = {
         GliaLogger.i(LogEvents.DIALOG_SHOWN) {
-            put(Attributes.DIALOG_NAME, dialogName)
+            put(EventAttribute.DialogName, dialogName)
             mediaUpgradeOffer?.run {
-                put(Attributes.MEDIA_UPGRADE_OFFER, attributeValue())
+                put(EventAttribute.MediaUpgradeOffer, attributeValue())
             }
         }
     }
 
     private fun logDialogDismissed(dialogName: String, mediaUpgradeOffer: MediaUpgradeOffer? = null): (DialogInterface) -> Unit = {
         GliaLogger.i(LogEvents.DIALOG_CLOSED) {
-            put(Attributes.DIALOG_NAME, dialogName)
+            put(EventAttribute.DialogName, dialogName)
             mediaUpgradeOffer?.run {
-                put(Attributes.MEDIA_UPGRADE_OFFER, attributeValue())
+                put(EventAttribute.MediaUpgradeOffer, attributeValue())
             }
         }
     }
@@ -496,10 +496,10 @@ internal object Dialogs {
     ): View.OnClickListener {
         return View.OnClickListener {
             GliaLogger.i(LogEvents.DIALOG_BUTTON_CLICKED, buttonName) {
-                put(Attributes.DIALOG_NAME, dialogName)
-                put(Attributes.BUTTON_NAME, buttonName)
+                put(EventAttribute.DialogName, dialogName)
+                put(EventAttribute.ButtonName, buttonName)
                 mediaUpgradeOffer?.run {
-                    put(Attributes.MEDIA_UPGRADE_OFFER, attributeValue())
+                    put(EventAttribute.MediaUpgradeOffer, attributeValue())
                 }
             }
             clickListener.onClick(it)

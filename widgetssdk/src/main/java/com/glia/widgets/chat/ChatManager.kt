@@ -8,7 +8,7 @@ import com.glia.androidsdk.chat.SendMessagePayload
 import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.androidsdk.chat.SystemMessage
 import com.glia.androidsdk.chat.VisitorMessage
-import com.glia.telemetry_lib.Attributes
+import com.glia.telemetry_lib.EventAttribute
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.telemetry_lib.LogEvents
 import com.glia.widgets.chat.domain.AddNewMessagesDividerUseCase
@@ -209,15 +209,15 @@ internal class ChatManager(
             }
 
             GliaLogger.i(LogEvents.CHAT_SCREEN_MESSAGE_SHOWN) {
-                put(Attributes.MESSAGE_ID, chatMessage.chatMessage.id)
-                put(Attributes.MESSAGE_SENDER, chatMessage.chatMessage.senderType.toString())
+                put(EventAttribute.MessageId, chatMessage.chatMessage.id)
+                put(EventAttribute.MessageSender, chatMessage.chatMessage.senderType.toString())
                 val messageType = when (chatMessage.chatMessage) {
                     is VisitorMessage -> "visitor"
                     is OperatorMessage -> "operator"
                     is SystemMessage -> "system"
                     else -> "unknown"
                 }
-                put(Attributes.MESSAGE_TYPE, messageType)
+                put(EventAttribute.MessageType, messageType)
             }
         }
 

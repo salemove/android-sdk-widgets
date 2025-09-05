@@ -30,12 +30,12 @@ internal class AuthenticationManager(
         get() = authentication.isAuthenticated
 
     override fun setBehavior(behavior: Authentication.Behavior) {
-        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, Authentication::class, "setBehavior", "behavior")
+        GliaLogger.logMethodUse(Authentication::class, "setBehavior", "behavior")
         authentication.setBehavior(behavior.toCoreType())
     }
 
     override fun authenticate(jwtToken: String, externalAccessToken: String?, onComplete: OnComplete, onError: OnError) {
-        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, Authentication::class, "authenticate")
+        GliaLogger.logMethodUse(Authentication::class, "authenticate")
 
         onAuthenticationRequestedCallback()
         Dependencies.destroyControllersAndResetQueueing()
@@ -56,7 +56,7 @@ internal class AuthenticationManager(
     }
 
     override fun deauthenticate(stopPushNotifications: Boolean, onComplete: OnComplete, onError: OnError) {
-        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, Authentication::class, "deauthenticate")
+        GliaLogger.logMethodUse(Authentication::class, "deauthenticate")
         Logger.i(TAG, "Unauthenticate")
 
         //Need to cancel queueing before de-authentication, because it uses current visitor id, so after de-authentication will be impossible.
@@ -79,7 +79,7 @@ internal class AuthenticationManager(
     }
 
     override fun refresh(jwtToken: String, externalAccessToken: String?, onComplete: OnComplete, onError: OnError) {
-        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, Authentication::class, "refresh")
+        GliaLogger.logMethodUse(Authentication::class, "refresh")
         Logger.i(TAG, "Refresh authentication")
         authentication.refresh(jwtToken, externalAccessToken) { _, gliaException ->
             if (gliaException != null) {

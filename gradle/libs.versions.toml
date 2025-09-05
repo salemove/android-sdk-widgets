@@ -1,9 +1,9 @@
 [versions]
 javaVersion = "17"
 
-kotlinVersion = "2.0.21" # Kotlin and Dokka versions should have the same minor version to support the same kotlin version
+kotlinVersion = "2.1.21" # Kotlin and Dokka versions should have the same minor version to support the same kotlin version
 dokkaVersion = "2.0.0" # Kotlin and Dokka versions should have the same minor version to support the same kotlin version
-agpVersion = "8.10.0"
+agpVersion = "8.12.1"
 ktlintVersion = "12.2.0"
 #Publishing
 mavenPublish = "0.32.0"

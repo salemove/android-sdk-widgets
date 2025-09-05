@@ -32,6 +32,12 @@ internal class ChatActivity : FadeTransitionActivity() {
 
     private var chatView: ChatView by Delegates.notNull()
 
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            chatView.onBackPressed()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         this.enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -39,11 +45,7 @@ internal class ChatActivity : FadeTransitionActivity() {
         setContentView(R.layout.chat_activity)
         chatView = findViewById(R.id.chat_view)
 
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                chatView.onBackPressed()
-            }
-        })
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
         chatView.setOnTitleUpdatedListener(this::setTitle)
 
@@ -84,9 +86,10 @@ internal class ChatActivity : FadeTransitionActivity() {
     }
 
     override fun onDestroy() {
-        chatView.onDestroyView()
-        Logger.i(TAG, "Destroy Chat screen")
         super.onDestroy()
+        chatView.onDestroyView()
+        onBackPressedCallback.remove()
+        Logger.i(TAG, "Destroy Chat screen")
     }
 
     private fun backToCallScreen() {

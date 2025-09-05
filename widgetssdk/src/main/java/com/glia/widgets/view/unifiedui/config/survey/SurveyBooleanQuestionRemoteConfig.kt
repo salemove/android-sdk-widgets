@@ -10,10 +10,10 @@ internal data class SurveyBooleanQuestionRemoteConfig(
     val title: TextRemoteConfig?,
 
     @SerializedName("optionButton")
-    val optionButtonRemoteConfig: OptionButtonRemoteConfig?
+    val surveyOptionRemoteConfig: SurveyOptionRemoteConfig?
 ) {
     fun toSurveyBooleanQuestionTheme(): SurveyBooleanQuestionTheme = SurveyBooleanQuestionTheme(
         title = title?.toTextTheme(),
-        optionButton = optionButtonRemoteConfig?.toOptionButtonTheme()
+        surveyOption = surveyOptionRemoteConfig?.toSurveyOptionTheme()
     )
 }

@@ -38,7 +38,7 @@ internal class ScaleQuestionViewHolder(
 
         buttons.forEach {
             it.setStyle(style.scaleQuestion.optionButton)
-            it.applyOptionButtonTheme(questionTheme?.optionButton)
+            it.applyOptionButtonTheme(questionTheme?.surveyOption)
         }
     }
 
@@ -67,7 +67,7 @@ internal class ScaleQuestionViewHolder(
             val button: GliaSurveyOptionButton = buttons[i]
             val isSelected = i + 1 == value
             button.isSelected = isSelected
-            button.applyOptionButtonTheme(questionTheme?.optionButton)
+            button.applyOptionButtonTheme(questionTheme?.surveyOption)
         }
     }
 
@@ -79,7 +79,8 @@ internal class ScaleQuestionViewHolder(
         super.showRequiredError(error)
         buttons.forEach {
             it.isError = error
-            it.applyOptionButtonTheme(questionTheme?.optionButton)
+            it.applyOptionButtonTheme(questionTheme?.surveyOption)
         }
+        if (error) requiredError.applyTextTheme(questionTheme?.surveyOption?.error)
     }
 }

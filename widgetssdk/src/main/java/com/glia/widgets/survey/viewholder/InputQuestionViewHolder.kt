@@ -21,9 +21,10 @@ import com.glia.widgets.view.unifiedui.nullSafeMerge
 import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
 import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
 import com.glia.widgets.view.unifiedui.theme.base.TextTheme
-import com.glia.widgets.view.unifiedui.theme.survey.OptionButtonTheme
+import com.glia.widgets.view.unifiedui.theme.survey.SurveyOptionTheme
 import com.glia.widgets.view.unifiedui.theme.survey.SurveyInputQuestionTheme
 import androidx.core.graphics.toColorInt
+import com.glia.widgets.view.unifiedui.applyHintTheme
 
 internal class InputQuestionViewHolder(
     val binding: SurveyInputQuestionItemBinding,
@@ -34,7 +35,7 @@ internal class InputQuestionViewHolder(
     }
     private val comment: EditText get() = binding.etComment
 
-    private val optionButtonTheme: OptionButtonTheme by lazy {
+    private val surveyOptionTheme: SurveyOptionTheme by lazy {
         createOptionButtonTheme(style.inputQuestion.optionButton)
     }
 
@@ -68,20 +69,19 @@ internal class InputQuestionViewHolder(
         super.showRequiredError(error)
 
         if (error) {
-            comment.applyLayerTheme(optionButtonTheme.highlightedLayer)
-        } else {
-            comment.applyLayerTheme(optionButtonTheme.normalLayer)
+            comment.applyLayerTheme(surveyOptionTheme.highlightedLayer)
+            requiredError.applyTextTheme(surveyOptionTheme.error)
         }
     }
 
-    private fun createOptionButtonTheme(optionButtonConfiguration: OptionButtonConfiguration): OptionButtonTheme {
+    private fun createOptionButtonTheme(optionButtonConfiguration: OptionButtonConfiguration): SurveyOptionTheme {
         val strokeWidth = optionButtonConfiguration.normalLayer.borderWidth.toFloat()
         val normalStrokeColor = optionButtonConfiguration.normalLayer.borderColor.toColorInt()
         val selectedStrokeColor = optionButtonConfiguration.selectedLayer.borderColor.toColorInt()
         val highlightedStrokeColor = optionButtonConfiguration.highlightedLayer.borderColor.toColorInt()
         val backgroundColor = ColorTheme(optionButtonConfiguration.normalLayer.backgroundColor.toColorInt())
 
-        return OptionButtonTheme(
+        return SurveyOptionTheme(
             normalText = TextTheme(),
             normalLayer = LayerTheme(fill = backgroundColor, stroke = normalStrokeColor, borderWidth = strokeWidth),
             selectedText = TextTheme(),
@@ -90,7 +90,7 @@ internal class InputQuestionViewHolder(
             highlightedLayer = LayerTheme(fill = backgroundColor, stroke = highlightedStrokeColor, borderWidth = strokeWidth),
             fontSize = null,
             fontStyle = null
-        ) nullSafeMerge inputTheme?.option
+        ) nullSafeMerge inputTheme?.inputField
 
     }
 
@@ -115,16 +115,17 @@ internal class InputQuestionViewHolder(
             setAnswer(comment.text.toString())
 
             if (hasFocus) {
-                comment.applyTextTheme(inputTheme?.text)
-                comment.applyLayerTheme(optionButtonTheme.selectedLayer)
+                comment.applyTextTheme(inputTheme?.inputField?.selectedText)
+                comment.applyLayerTheme(surveyOptionTheme.selectedLayer)
             } else {
-                comment.applyTextTheme(inputTheme?.text)
-                comment.applyLayerTheme(optionButtonTheme.normalLayer)
+                comment.applyTextTheme(inputTheme?.inputField?.normalText)
+                comment.applyLayerTheme(surveyOptionTheme.normalLayer)
             }
         }
         comment.doAfterTextChanged { setAnswer(it.toString()) }
 
-        comment.applyTextTheme(inputTheme?.text)
-        comment.applyLayerTheme(optionButtonTheme.normalLayer)
+        comment.applyTextTheme(inputTheme?.inputField?.normalText)
+        comment.applyLayerTheme(surveyOptionTheme.normalLayer)
+        surveyOptionTheme.placeholder?.let { comment.applyHintTheme(it) }
     }
 }

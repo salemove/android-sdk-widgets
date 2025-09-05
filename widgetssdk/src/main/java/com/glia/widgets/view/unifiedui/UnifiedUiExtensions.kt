@@ -29,7 +29,7 @@ import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
 import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 import com.glia.widgets.view.unifiedui.theme.call.BarButtonStatesTheme
 import com.glia.widgets.view.unifiedui.theme.call.BarButtonStyleTheme
-import com.glia.widgets.view.unifiedui.theme.survey.OptionButtonTheme
+import com.glia.widgets.view.unifiedui.theme.survey.SurveyOptionTheme
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -441,7 +441,7 @@ private fun ImageButton.applyBarButtonStyleTheme(
     colors.clear()
 }
 
-internal fun GliaSurveyOptionButton.applyOptionButtonTheme(theme: OptionButtonTheme?) {
+internal fun GliaSurveyOptionButton.applyOptionButtonTheme(theme: SurveyOptionTheme?) {
     val textTheme: TextTheme?
     val layerTheme: LayerTheme?
     when {

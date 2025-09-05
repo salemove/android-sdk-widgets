@@ -43,7 +43,7 @@ internal class SurveyActivity : FadeTransitionActivity(), SurveyView.OnFinishLis
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                finishAndRemoveTask()
+                finish()
             }
         })
 
@@ -58,11 +58,7 @@ internal class SurveyActivity : FadeTransitionActivity(), SurveyView.OnFinishLis
     }
 
     override fun onFinish() {
-        // In case the engagement ends, Activity is removed from the device's Recents menu
-        // to avoid app users to accidentally start queueing for another call when they resume
-        // the app from the Recents menu and the app's backstack was empty.
-
-        finishAndRemoveTask()
+        finish()
     }
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {

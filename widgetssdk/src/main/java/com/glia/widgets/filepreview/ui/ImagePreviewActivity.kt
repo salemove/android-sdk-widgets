@@ -129,9 +129,9 @@ internal class ImagePreviewActivity : AppCompatActivity(), ImagePreviewContract.
     }
 
     override fun onDestroy() {
+        super.onDestroy()
         Logger.i(TAG, "Destroy Image Preview screen")
         imagePreviewController?.onDestroy()
-        super.onDestroy()
     }
 
     override fun onRequestPermissionsResult(

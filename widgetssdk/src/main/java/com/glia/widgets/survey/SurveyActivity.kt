@@ -34,6 +34,12 @@ import com.glia.widgets.helper.insetsControllerCompat
 internal class SurveyActivity : AppCompatActivity(), SurveyView.OnFinishListener {
     private val surveyView: SurveyView by lazy { findViewById(R.id.survey_view) }
 
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            finish()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         this.enableEdgeToEdge()
         window.insetsControllerCompat.isAppearanceLightStatusBars = false
@@ -44,20 +50,17 @@ internal class SurveyActivity : AppCompatActivity(), SurveyView.OnFinishListener
         Logger.i(TAG, "Create Survey screen")
         setContentView(R.layout.survey_activity)
 
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                finish()
-            }
-        })
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
         prepareSurveyView()
     }
 
     override fun onDestroy() {
-        Logger.i(TAG, "Destroy Survey screen")
+        super.onDestroy()
         hideSoftKeyboard()
         surveyView.onDestroyView()
-        super.onDestroy()
+        onBackPressedCallback.remove()
+        Logger.i(TAG, "Destroy Survey screen")
     }
 
     override fun onFinish() {

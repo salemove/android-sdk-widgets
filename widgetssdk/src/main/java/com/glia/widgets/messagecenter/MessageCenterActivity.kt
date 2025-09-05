@@ -51,6 +51,13 @@ internal class MessageCenterActivity : FadeTransitionActivity(),
         }
     }
 
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            messageCenterView.onSystemBack()
+            finishAfterTransition()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Logger.i(TAG, "Create Message Center screen")
@@ -62,12 +69,7 @@ internal class MessageCenterActivity : FadeTransitionActivity(),
         messageCenterView.onAttachFileListener = this
 
         messageCenterView.setController(controller)
-        onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                messageCenterView.onSystemBack()
-                finishAfterTransition()
-            }
-        })
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
         messageCenterView.initialize()
     }
@@ -86,6 +88,7 @@ internal class MessageCenterActivity : FadeTransitionActivity(),
 
     override fun onDestroy() {
         super.onDestroy()
+        onBackPressedCallback.remove()
         Logger.i(TAG, "Destroy Message Center screen")
     }
 

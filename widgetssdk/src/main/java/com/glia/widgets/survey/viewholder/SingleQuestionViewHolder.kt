@@ -1,7 +1,6 @@
 package com.glia.widgets.survey.viewholder
 
 import android.content.res.ColorStateList
-import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.LayerDrawable
@@ -47,6 +46,11 @@ internal class SingleQuestionViewHolder(
     override fun onBind(questionItem: QuestionItem, listener: SurveyAdapter.SurveyAdapterListener?) {
         super.onBind(questionItem, listener)
         singleChoice(questionItem)
+    }
+
+    override fun showRequiredError(error: Boolean) {
+        super.showRequiredError(error)
+        if (error) requiredError.applyTextTheme(singleTheme?.error)
     }
 
     private fun singleChoice(item: QuestionItem) {

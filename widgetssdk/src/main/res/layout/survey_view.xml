@@ -52,7 +52,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="4dp"
                     android:layout_gravity="top"
-                    android:background="@drawable/shadow_up_bg"
+                    android:background="@drawable/shadow_down_bg"
                     android:elevation="4dp"/>
 
                 <View

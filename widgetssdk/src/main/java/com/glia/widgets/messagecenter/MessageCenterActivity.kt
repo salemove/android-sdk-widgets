@@ -89,6 +89,7 @@ internal class MessageCenterActivity : FadeTransitionActivity(),
     override fun onDestroy() {
         super.onDestroy()
         onBackPressedCallback.remove()
+        controller.onDestroy()
         Logger.i(TAG, "Destroy Message Center screen")
     }
 

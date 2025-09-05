@@ -49,19 +49,19 @@ open class FadeTransitionActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
     }
 
-    override fun finishAndRemoveTask() {
-        super.finishAndRemoveTask()
+    override fun finishAfterTransition() {
         overrideAnimationApi33()
+        super.finishAfterTransition()
     }
 
     override fun startActivity(intent: Intent) {
-        super.startActivity(intent)
         overrideAnimationApi33()
+        super.startActivity(intent)
     }
 
     override fun startActivity(intent: Intent, options: Bundle?) {
-        super.startActivity(intent, options)
         overrideAnimationApi33()
+        super.startActivity(intent, options)
     }
 
     fun setTitle(locale: LocaleString?) {

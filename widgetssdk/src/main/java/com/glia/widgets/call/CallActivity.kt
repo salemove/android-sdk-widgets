@@ -33,10 +33,10 @@ internal class CallActivity : FadeTransitionActivity() {
     private val activityLauncher: ActivityLauncher by lazy { Dependencies.activityLauncher }
     private var callView: CallView by Delegates.notNull()
 
-    private var onBackClickedListener: CallView.OnBackClickedListener? = CallView.OnBackClickedListener { this.finish() }
+    private var onBackClickedListener: CallView.OnBackClickedListener? = CallView.OnBackClickedListener { this.finishAfterTransition() }
     private var onNavigateToChatListener: OnNavigateToChatListener? = OnNavigateToChatListener {
         navigateToChat()
-        finish()
+        finishAfterTransition()
     }
     private val onNavigateToWebBrowserListener = OnNavigateToWebBrowserListener(this::navigateToWebBrowser)
 
@@ -49,19 +49,16 @@ internal class CallActivity : FadeTransitionActivity() {
         val isUpgradeToCall = intent.getBooleanExtra(ExtraKeys.IS_UPGRADE_TO_CALL, false)
 
         if (!callView.shouldShowMediaEngagementView(isUpgradeToCall)) {
-            finishAndRemoveTask()
+            finishAfterTransition()
             return
         }
 
         callView.setOnTitleUpdatedListener(this::setTitle)
         onBackClickedListener?.also(callView::setOnBackClickedListener)
 
-        // In case the engagement ends, Activity is removed from the device's Recent menu
-        // to avoid app users to accidentally start queueing for another call when they resume
-        // the app from the Recent menu and the app's backstack was empty.
-        callView.setOnEndListener { this.finishAndRemoveTask() }
+        callView.setOnEndListener { this.finishAfterTransition() }
 
-        callView.setOnMinimizeListener { this.finish() }
+        callView.setOnMinimizeListener { this.finishAfterTransition() }
         onNavigateToChatListener?.also(callView::setOnNavigateToChatListener)
         callView.setOnNavigateToWebBrowserListener(onNavigateToWebBrowserListener)
 

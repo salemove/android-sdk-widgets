@@ -1,14 +1,14 @@
 package com.glia.widgets.entrywidget
 
 import android.os.Bundle
-import com.glia.widgets.base.FadeTransitionActivity
+import androidx.appcompat.app.AppCompatActivity
 import com.glia.widgets.di.Dependencies
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 /**
  * EntryWidgetActivity provides a way to display the EntryWidget bottom sheet.
  */
-internal class EntryWidgetActivity : FadeTransitionActivity(), EntryWidgetFragment.OnDismissListener {
+internal class EntryWidgetActivity : AppCompatActivity(), EntryWidgetFragment.OnDismissListener {
 
     private var disposable: CompositeDisposable = CompositeDisposable()
 

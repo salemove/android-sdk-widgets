@@ -65,7 +65,7 @@ internal class MessageCenterActivity : FadeTransitionActivity(),
         onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 messageCenterView.onSystemBack()
-                finishAndRemoveTask()
+                finishAfterTransition()
             }
         })
 
@@ -103,12 +103,12 @@ internal class MessageCenterActivity : FadeTransitionActivity(),
 
     override fun navigateToMessaging() {
         Dependencies.activityLauncher.launchChat(this, Intention.SC_CHAT)
-        finish()
+        finishAfterTransition()
     }
 
     override fun returnToLiveChat() {
         Dependencies.activityLauncher.launchChat(this, Intention.RETURN_TO_CHAT)
-        finish()
+        finishAfterTransition()
     }
 
 }

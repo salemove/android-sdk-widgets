@@ -48,19 +48,19 @@ internal class ChatActivity : FadeTransitionActivity() {
         chatView.setOnTitleUpdatedListener(this::setTitle)
 
         if (!chatView.shouldShow()) {
-            finishAndRemoveTask()
+            finishAfterTransition()
             return
         }
 
-        chatView.setOnBackClickedListener(::finish)
+        chatView.setOnBackClickedListener(::finishAfterTransition)
         chatView.setOnBackToCallListener(::backToCallScreen)
 
         // In case the engagement ends, Activity is removed from the device's Recents menu
         // to avoid app users to accidentally start queueing for another call when they resume
         // the app from the Recents menu and the app's backstack was empty.
-        chatView.setOnEndListener(::finishAndRemoveTask)
+        chatView.setOnEndListener(::finishAfterTransition)
 
-        chatView.setOnMinimizeListener(::finish)
+        chatView.setOnMinimizeListener(::finishAfterTransition)
 
         val intention = intent.getEnumExtra<Intention>(ExtraKeys.OPEN_CHAT_INTENTION)
 
@@ -91,6 +91,6 @@ internal class ChatActivity : FadeTransitionActivity() {
 
     private fun backToCallScreen() {
         activityLauncher.launchCall(this, null, false)
-        finish()
+        finishAfterTransition()
     }
 }

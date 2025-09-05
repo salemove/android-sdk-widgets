@@ -5,6 +5,8 @@ import android.content.ContentProvider
 import android.content.ContentValues
 import android.database.Cursor
 import android.net.Uri
+import com.glia.telemetry_lib.GliaTelemetry
+import com.glia.telemetry_lib.OtelConfig
 import com.glia.widgets.di.Dependencies
 
 /**
@@ -12,6 +14,7 @@ import com.glia.widgets.di.Dependencies
  */
 open class InitializationProvider : ContentProvider() {
     override fun onCreate(): Boolean {
+        GliaTelemetry.init(this.context, OtelConfig("aleksandr-chatsky.dev.samo.io"))
         (context as? Application)?.let {
             Dependencies.onAppCreate(it)
             GliaWidgets.setupRxErrorHandler()

@@ -4,9 +4,7 @@ import android.app.Application
 import android.content.Intent
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
-import com.glia.telemetry_lib.Attributes
 import com.glia.telemetry_lib.GliaLogger
-import com.glia.telemetry_lib.LogEvents
 import com.glia.telemetry_lib.SDK_TYPE
 import com.glia.widgets.authentication.Authentication
 import com.glia.widgets.callbacks.OnComplete
@@ -62,7 +60,7 @@ object GliaWidgets {
     @JvmStatic
     val widgetsSdkVersion: String
         get() {
-            GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, GliaWidgets::class, "widgetsSdkVersion")
+            GliaLogger.logMethodUse(GliaWidgets::class, "widgetsSdkVersion")
             return BuildConfig.GLIA_WIDGETS_SDK_VERSION
         }
 
@@ -72,7 +70,7 @@ object GliaWidgets {
     @JvmStatic
     val widgetsCoreSdkVersion: String
         get() {
-            GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, GliaWidgets::class, "widgetsCoreSdkVersion")
+            GliaLogger.logMethodUse(GliaWidgets::class, "widgetsCoreSdkVersion")
             return BuildConfig.GLIA_CORE_SDK_VERSION
         }
 
@@ -85,7 +83,7 @@ object GliaWidgets {
      */
     @JvmStatic
     fun getCallVisualizer(): CallVisualizer {
-        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, GliaWidgets::class, "getCallVisualizer")
+        GliaLogger.logMethodUse(GliaWidgets::class, "getCallVisualizer")
         return callVisualizerManager
     }
 
@@ -99,7 +97,7 @@ object GliaWidgets {
      */
     @JvmStatic
     fun setCustomCardAdapter(adapter: CustomCardAdapter?) {
-        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, GliaWidgets::class, "setCustomCardAdapter")
+        GliaLogger.logMethodUse(GliaWidgets::class, "setCustomCardAdapter")
         _customCardAdapter = adapter
     }
 
@@ -117,7 +115,7 @@ object GliaWidgets {
      */
     @JvmStatic
     fun getCustomCardAdapter(): CustomCardAdapter? {
-        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, GliaWidgets::class, "getCustomCardAdapter")
+        GliaLogger.logMethodUse(GliaWidgets::class, "getCustomCardAdapter")
         return _customCardAdapter
     }
 
@@ -152,7 +150,7 @@ object GliaWidgets {
     @JvmStatic
     @Synchronized
     fun init(gliaWidgetsConfig: GliaWidgetsConfig) {
-        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, GliaWidgets::class, "init")
+        GliaLogger.logMethodUse(GliaWidgets::class, "init")
         Logger.i(TAG, "Initialize Glia Widgets SDK")
         try {
             onSdkInit(gliaWidgetsConfig)
@@ -179,7 +177,7 @@ object GliaWidgets {
         onComplete: OnComplete,
         onError: OnError
     ) {
-        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, GliaWidgets::class, "init", "onComplete", "onError")
+        GliaLogger.logMethodUse(GliaWidgets::class, "init", "onComplete", "onError")
         Logger.i(TAG, "Initialize Glia Widgets SDK")
         try {
             val callback: RequestCallback<Boolean?> =
@@ -248,7 +246,7 @@ object GliaWidgets {
      */
     @JvmStatic
     fun isInitialized(): Boolean {
-        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, GliaWidgets::class, "isInitialized")
+        GliaLogger.logMethodUse(GliaWidgets::class, "isInitialized")
         return isInitialized
     }
 
@@ -265,7 +263,7 @@ object GliaWidgets {
         onResult: OnResult<Collection<Queue>>,
         onError: OnError? = null
     ) {
-        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, GliaWidgets::class, "getQueues")
+        GliaLogger.logMethodUse(GliaWidgets::class, "getQueues")
         gliaCore().getQueues(
             onResult = { queues ->
                 onResult.onResult(queues.toWidgetsType())
@@ -287,7 +285,7 @@ object GliaWidgets {
     @Synchronized
     @JvmStatic
     fun getEngagementLauncher(queueIds: List<String>): EngagementLauncher {
-        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, GliaWidgets::class, "getEngagementLauncher")
+        GliaLogger.logMethodUse(GliaWidgets::class, "getEngagementLauncher")
         Logger.i(TAG, "Returning an Engagement Launcher")
         try {
             setupQueueIds(queueIds)
@@ -308,7 +306,7 @@ object GliaWidgets {
     @Synchronized
     @JvmStatic
     fun getEntryWidget(queueIds: List<String>): EntryWidget {
-        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, GliaWidgets::class, "getEntryWidget")
+        GliaLogger.logMethodUse(GliaWidgets::class, "getEntryWidget")
         if (!gliaCore().isInitialized) {
             Logger.e(TAG, "Attempt to get EntryWidget before SDK initialization")
         }
@@ -382,7 +380,7 @@ object GliaWidgets {
         onResult: OnResult<VisitorInfo>,
         onError: OnError? = null
     ) {
-        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, GliaWidgets::class, "getVisitorInfo")
+        GliaLogger.logMethodUse(GliaWidgets::class, "getVisitorInfo")
         val callback =
             RequestCallback { visitorInfo: com.glia.androidsdk.visitor.VisitorInfo?,
                               error: GliaException? ->
@@ -414,7 +412,7 @@ object GliaWidgets {
         onComplete: OnComplete,
         onError: OnError
     ) {
-        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, GliaWidgets::class, "updateVisitorInfo")
+        GliaLogger.logMethodUse(GliaWidgets::class, "updateVisitorInfo")
         val updateCallback =
             Consumer { error: GliaException? ->
                 if (error == null) {
@@ -432,7 +430,7 @@ object GliaWidgets {
      */
     @JvmStatic
     fun clearVisitorSession() {
-        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, GliaWidgets::class, "clearVisitorSession")
+        GliaLogger.logMethodUse(GliaWidgets::class, "clearVisitorSession")
         Logger.i(TAG, "Clear visitor session")
         try {
             destroyControllersAndResetEngagementData()
@@ -457,7 +455,7 @@ object GliaWidgets {
      */
     @JvmStatic
     fun endEngagement() {
-        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, GliaWidgets::class, "endEngagement")
+        GliaLogger.logMethodUse(GliaWidgets::class, "endEngagement")
         Logger.i(TAG, "End engagement by integrator")
         try {
             useCaseFactory.endEngagementUseCase.silently()
@@ -497,7 +495,7 @@ object GliaWidgets {
      */
     @JvmStatic
     fun getAuthentication(behavior: Authentication.Behavior): Authentication {
-        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, GliaWidgets::class, "getAuthentication")
+        GliaLogger.logMethodUse(GliaWidgets::class, "getAuthentication")
         try {
             return getAuthenticationManager(behavior)
         } catch (gliaException: GliaException) {
@@ -515,7 +513,7 @@ object GliaWidgets {
     @Suppress("unused")
     @JvmStatic
     fun getSecureConversations(): SecureConversations {
-        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, GliaWidgets::class, "getSecureConversations")
+        GliaLogger.logMethodUse(GliaWidgets::class, "getSecureConversations")
         try {
             return secureConversations
         } catch (gliaException: GliaException) {
@@ -533,7 +531,7 @@ object GliaWidgets {
     @Suppress("unused")
     @JvmStatic
     fun getLiveObservation(): LiveObservation {
-        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, GliaWidgets::class, "getLiveObservation")
+        GliaLogger.logMethodUse(GliaWidgets::class, "getLiveObservation")
         try {
             return liveObservation
         } catch (gliaException: GliaException) {
@@ -548,7 +546,7 @@ object GliaWidgets {
      */
     @JvmStatic
     fun getPushNotifications(): PushNotifications {
-        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, GliaWidgets::class, "getPushNotifications")
+        GliaLogger.logMethodUse(GliaWidgets::class, "getPushNotifications")
         return pushNotifications
     }
 

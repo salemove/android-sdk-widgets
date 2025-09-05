@@ -106,7 +106,7 @@ internal class EngagementLauncherImpl(
         get() = engagementTypeUseCase.isChatEngagement || isQueueingOrLiveEngagementUseCase.isQueueingForLiveChat
 
     override fun startChat(context: Context) {
-        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, EngagementLauncher::class, "startChat", "context")
+        GliaLogger.logMethodUse(EngagementLauncher::class, "startChat", "context")
         when {
             engagementTypeUseCase.isCallVisualizer -> uiComponentsDispatcher.showSnackBar(R.string.entry_widget_call_visualizer_description)
             isMediaEngagementOrMediaQueueing -> uiComponentsDispatcher.showSnackBar(R.string.entry_widget_call_visualizer_description)
@@ -129,13 +129,13 @@ internal class EngagementLauncherImpl(
     }
 
     override fun startChat(context: Context, visitorContextAssetId: String) {
-        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, EngagementLauncher::class, "startChat", "context", "visitorContextAssetId")
+        GliaLogger.logMethodUse(EngagementLauncher::class, "startChat", "context", "visitorContextAssetId")
         configurationManager.setVisitorContextAssetId(visitorContextAssetId)
         startChat(context)
     }
 
     override fun startAudioCall(context: Context) {
-        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, EngagementLauncher::class, "startAudioCall", "context")
+        GliaLogger.logMethodUse(EngagementLauncher::class, "startAudioCall", "context")
         when {
             engagementTypeUseCase.isCallVisualizer -> uiComponentsDispatcher.showSnackBar(R.string.entry_widget_call_visualizer_description)
             isMediaEngagementOrMediaQueueing -> activityLauncher.launchCall(context, null, false)
@@ -159,13 +159,13 @@ internal class EngagementLauncherImpl(
     }
 
     override fun startAudioCall(context: Context, visitorContextAssetId: String) {
-        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, EngagementLauncher::class, "startAudioCall", "context", "visitorContextAssetId")
+        GliaLogger.logMethodUse(EngagementLauncher::class, "startAudioCall", "context", "visitorContextAssetId")
         configurationManager.setVisitorContextAssetId(visitorContextAssetId)
         startAudioCall(context)
     }
 
     override fun startVideoCall(context: Context) {
-        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, EngagementLauncher::class, "startVideoCall", "context")
+        GliaLogger.logMethodUse(EngagementLauncher::class, "startVideoCall", "context")
         when {
             engagementTypeUseCase.isCallVisualizer && !engagementTypeUseCase.hasVideo -> uiComponentsDispatcher.showSnackBar(R.string.entry_widget_call_visualizer_description)
             isMediaEngagementOrMediaQueueing -> activityLauncher.launchCall(context, null, false)
@@ -189,13 +189,13 @@ internal class EngagementLauncherImpl(
     }
 
     override fun startVideoCall(context: Context, visitorContextAssetId: String) {
-        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, EngagementLauncher::class, "startVideoCall", "context", "visitorContextAssetId")
+        GliaLogger.logMethodUse(EngagementLauncher::class, "startVideoCall", "context", "visitorContextAssetId")
         configurationManager.setVisitorContextAssetId(visitorContextAssetId)
         startVideoCall(context)
     }
 
     override fun startSecureMessaging(context: Context) {
-        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, EngagementLauncher::class, "startSecureMessaging", "context")
+        GliaLogger.logMethodUse(EngagementLauncher::class, "startSecureMessaging", "context")
         when {
             engagementTypeUseCase.isCallVisualizer -> uiComponentsDispatcher.showSnackBar(R.string.entry_widget_call_visualizer_description)
             isChatEngagementOrChatQueueing -> activityLauncher.launchChat(
@@ -221,7 +221,7 @@ internal class EngagementLauncherImpl(
     }
 
     override fun startSecureMessaging(context: Context, visitorContextAssetId: String) {
-        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, EngagementLauncher::class, "startSecureMessaging", "context", "visitorContextAssetId")
+        GliaLogger.logMethodUse(EngagementLauncher::class, "startSecureMessaging", "context", "visitorContextAssetId")
         configurationManager.setVisitorContextAssetId(visitorContextAssetId)
         startSecureMessaging(context)
     }

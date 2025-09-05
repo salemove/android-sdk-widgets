@@ -35,12 +35,12 @@ class LiveObservationImpl(
 ) : LiveObservation {
 
     override fun pause() {
-        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, LiveObservation::class, "pause")
+        GliaLogger.logMethodUse(LiveObservation::class, "pause")
         liveObservation.pause()
     }
 
     override fun resume() {
-        GliaLogger.logMethodUse(SDK_TYPE.WIDGETS_SDK, LiveObservation::class, "resume")
+        GliaLogger.logMethodUse(LiveObservation::class, "resume")
         liveObservation.resume()
     }
 

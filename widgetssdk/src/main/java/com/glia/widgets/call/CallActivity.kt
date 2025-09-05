@@ -79,11 +79,11 @@ internal class CallActivity : FadeTransitionActivity() {
     }
 
     override fun onDestroy() {
+        super.onDestroy()
         Logger.i(TAG, "Destroy Call screen")
         onBackClickedListener = null
         onNavigateToChatListener = null
         callView.onDestroy()
-        super.onDestroy()
     }
 
     override fun onUserInteraction() {

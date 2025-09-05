@@ -78,6 +78,7 @@ internal class ImagePreviewController @JvmOverloads constructor(
     }
 
     override fun onDestroy() {
+        view = null
         disposables.clear()
         state = State()
     }

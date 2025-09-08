@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -52,6 +53,12 @@ internal class ImagePreviewActivity : AppCompatActivity(), ImagePreviewContract.
 
     private var imagePreviewController: ImagePreviewContract.Controller? = null
 
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            finishAfterTransition()
+        }
+    }
+
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(newBase)
 
@@ -72,6 +79,7 @@ internal class ImagePreviewActivity : AppCompatActivity(), ImagePreviewContract.
         setSupportActionBar(binding.toolbar)
         binding.toolbar.setLocaleContentDescription(R.string.android_preview_title)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
     }
 
     private fun onImageDataReceived(intent: Intent) {
@@ -113,7 +121,7 @@ internal class ImagePreviewActivity : AppCompatActivity(), ImagePreviewContract.
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        onBackPressedDispatcher.onBackPressed()
+        finishAfterTransition()
         return true
     }
 
@@ -132,6 +140,7 @@ internal class ImagePreviewActivity : AppCompatActivity(), ImagePreviewContract.
         super.onDestroy()
         Logger.i(TAG, "Destroy Image Preview screen")
         imagePreviewController?.onDestroy()
+        onBackPressedCallback.remove()
     }
 
     override fun onRequestPermissionsResult(
@@ -206,7 +215,4 @@ internal class ImagePreviewActivity : AppCompatActivity(), ImagePreviewContract.
         showToast(localeProvider.getString(R.string.android_image_preview_fetch_error))
     }
 
-    override fun engagementEnded() {
-        finishAfterTransition()
-    }
 }

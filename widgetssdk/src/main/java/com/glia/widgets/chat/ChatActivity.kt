@@ -2,7 +2,6 @@ package com.glia.widgets.chat
 
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.enableEdgeToEdge
 import com.glia.widgets.R
 import com.glia.widgets.base.FadeTransitionActivity
 import com.glia.widgets.di.Dependencies
@@ -39,7 +38,6 @@ internal class ChatActivity : FadeTransitionActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        this.enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         Logger.i(TAG, "Create Chat screen")
         setContentView(R.layout.chat_activity)
@@ -57,9 +55,6 @@ internal class ChatActivity : FadeTransitionActivity() {
         chatView.setOnBackClickedListener(::finishAfterTransition)
         chatView.setOnBackToCallListener(::backToCallScreen)
 
-        // In case the engagement ends, Activity is removed from the device's Recents menu
-        // to avoid app users to accidentally start queueing for another call when they resume
-        // the app from the Recents menu and the app's backstack was empty.
         chatView.setOnEndListener(::finishAfterTransition)
 
         chatView.setOnMinimizeListener(::finishAfterTransition)

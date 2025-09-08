@@ -43,6 +43,8 @@ testRobolectricVersion = "4.14.1"
 testJunitVersion = "4.13.2"
 testJsonVersion = "20250107"
 
+debugLeakcanaryVersion = "3.0-alpha-8"
+
 [libraries]
 android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "agpVersion" }
 
@@ -79,6 +81,8 @@ test-json = { module = "org.json:json", version.ref = "testJsonVersion" }
 test-mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "testMockitoKotlinVersion" }
 test-robolectric = { module = "org.robolectric:robolectric", version.ref = "testRobolectricVersion" }
 test-mockk-android = { module = "io.mockk:mockk-android", version.ref = "testMockkVersion" }
+
+debug-leakcanary = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "debugLeakcanaryVersion" }
 
 [plugins]
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokkaVersion" }

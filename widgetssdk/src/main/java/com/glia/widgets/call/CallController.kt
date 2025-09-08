@@ -43,6 +43,7 @@ import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.TimeCounter
 import com.glia.widgets.helper.TimeCounter.FormattedTimerStatusListener
 import com.glia.widgets.helper.TimeCounter.RawTimerStatusListener
+import com.glia.widgets.helper.formattedName
 import com.glia.widgets.helper.imageUrl
 import com.glia.widgets.helper.unSafeSubscribe
 import com.glia.widgets.view.MessagesNotSeenHandler
@@ -552,13 +553,13 @@ internal class CallController(
     }
 
     private fun onOperatorConnected(operator: Operator) {
-        val name = operator.name
+        val name = operator.formattedName
         val imageUrl = operator.imageUrl
         operatorConnected(name, imageUrl)
     }
 
     private fun onOperatorChanged(operator: Operator) {
-        val name = operator.name
+        val name = operator.formattedName
         val imageUrl = operator.imageUrl
         operatorChanged(name, imageUrl)
     }

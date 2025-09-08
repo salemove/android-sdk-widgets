@@ -150,6 +150,7 @@ dependencies {
   testImplementation libs.test.json
 
   lintChecks project(':lint_checker')
+  debugImplementation libs.debug.leakcanary
 }
 
 apply from: "${rootProject.projectDir}/scripts/publish-module.gradle"

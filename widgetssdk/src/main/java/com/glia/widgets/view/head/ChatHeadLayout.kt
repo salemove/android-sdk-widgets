@@ -121,8 +121,8 @@ internal class ChatHeadLayout @JvmOverloads constructor(
     }
 
     override fun onDetachedFromWindow() {
-        chatHeadController.onDestroy()
         super.onDetachedFromWindow()
+        chatHeadController.onDestroy()
     }
 
     /**

@@ -20,7 +20,6 @@ internal interface ImagePreviewContract {
         fun showOnImageSaveSuccess()
         fun showOnImageSaveFailed()
         fun showOnImageLoadingFailed()
-        fun engagementEnded()
         fun shareImageFile(uri: Uri)
     }
 }

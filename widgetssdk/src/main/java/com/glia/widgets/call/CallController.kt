@@ -268,6 +268,7 @@ internal class CallController(
             messagesNotSeenHandler.removeListener(messagesNotSeenHandlerListener)
             messagesNotSeenHandlerListener = null
             mediaUpgradeDisposable.clear()
+            callState = CallState.initial(callState.isCallVisualizer)
         }
     }
 
@@ -408,6 +409,7 @@ internal class CallController(
 
     override fun onBackClicked() {
         updateFromCallScreenUseCase(false)
+        onDestroy(true)
     }
 
     @Synchronized
@@ -609,5 +611,6 @@ internal class CallController(
 
     private fun minimizeView() {
         view?.minimizeView()
+        onDestroy(true)
     }
 }

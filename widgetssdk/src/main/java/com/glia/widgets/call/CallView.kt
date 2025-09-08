@@ -7,7 +7,6 @@ import android.util.AttributeSet
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.OnClickListener
 import android.widget.FrameLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -315,10 +314,10 @@ internal class CallView(
     }
 
     private fun handleOperatorVideoState(state: CallState) {
-        if (state.showOperatorVideo() && operatorVideoContainer.visibility == GONE) {
+        if (state.showOperatorVideo() && operatorVideoContainer.isGone) {
             operatorVideoContainer.visibility = VISIBLE
             showOperatorVideo(state.callStatus.operatorMediaState)
-        } else if (!state.showOperatorVideo() && operatorVideoContainer.visibility == VISIBLE) {
+        } else if (!state.showOperatorVideo() && operatorVideoContainer.isVisible) {
             operatorVideoContainer.visibility = GONE
             hideOperatorVideo()
         }

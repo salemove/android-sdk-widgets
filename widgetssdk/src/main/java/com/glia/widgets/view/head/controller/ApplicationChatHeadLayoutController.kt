@@ -1,15 +1,14 @@
 package com.glia.widgets.view.head.controller
 
 import com.glia.androidsdk.Operator
-import com.glia.widgets.internal.chathead.domain.IsDisplayBubbleInsideAppUseCase
-import com.glia.widgets.internal.chathead.domain.ResolveChatHeadNavigationUseCase
-import com.glia.widgets.internal.chathead.domain.ResolveChatHeadNavigationUseCase.Destinations
 import com.glia.widgets.engagement.domain.CurrentOperatorUseCase
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
-import com.glia.widgets.engagement.domain.EngagementTypeUseCase
 import com.glia.widgets.engagement.domain.VisitorMediaUseCase
 import com.glia.widgets.helper.imageUrl
 import com.glia.widgets.helper.unSafeSubscribe
+import com.glia.widgets.internal.chathead.domain.IsDisplayBubbleInsideAppUseCase
+import com.glia.widgets.internal.chathead.domain.ResolveChatHeadNavigationUseCase
+import com.glia.widgets.internal.chathead.domain.ResolveChatHeadNavigationUseCase.Destinations
 import com.glia.widgets.view.MessagesNotSeenHandler
 import com.glia.widgets.view.head.ChatHeadLayoutContract
 import com.glia.widgets.engagement.State as EngagementState
@@ -20,8 +19,7 @@ internal class ApplicationChatHeadLayoutController(
     private val messagesNotSeenHandler: MessagesNotSeenHandler,
     private val engagementStateUseCase: EngagementStateUseCase,
     private val currentOperatorUseCase: CurrentOperatorUseCase,
-    private val visitorMediaUseCase: VisitorMediaUseCase,
-    private val engagementTypeUseCase: EngagementTypeUseCase
+    private val visitorMediaUseCase: VisitorMediaUseCase
 ) : ChatHeadLayoutContract.Controller {
     private var chatHeadLayout: ChatHeadLayoutContract.View? = null
     private var state = State.ENDED
@@ -38,12 +36,15 @@ internal class ApplicationChatHeadLayoutController(
      */
     private var resumedViewName: String? = null
 
+    private val onUnreadMessagesCountListener: MessagesNotSeenHandler.MessagesNotSeenHandlerListener =
+        MessagesNotSeenHandler.MessagesNotSeenHandlerListener(::onUnreadMessageCountChange)
+
     init {
         subscribeToEvents()
     }
 
     private fun subscribeToEvents() {
-        messagesNotSeenHandler.addListener(::onUnreadMessageCountChange)
+        messagesNotSeenHandler.addListener(onUnreadMessagesCountListener)
         engagementStateUseCase().unSafeSubscribe {
             when (it) {
                 is EngagementState.EngagementEnded,
@@ -74,7 +75,7 @@ internal class ApplicationChatHeadLayoutController(
     }
 
     override fun onChatHeadClicked() {
-        val destination = navigationDestinationUseCase.execute() ?: return
+        val destination = navigationDestinationUseCase.execute()
         when (destination) {
             Destinations.CALL_VIEW -> chatHeadLayout?.navigateToCall()
             Destinations.CHAT_VIEW -> chatHeadLayout?.navigateToChat()
@@ -88,7 +89,8 @@ internal class ApplicationChatHeadLayoutController(
 
     override fun onDestroy() {
         chatHeadLayout?.hide()
-        messagesNotSeenHandler.removeListener(::onUnreadMessageCountChange)
+        chatHeadLayout = null
+        messagesNotSeenHandler.removeListener(onUnreadMessagesCountListener)
     }
 
     private fun onHoldChanged(isOnHold: Boolean) {

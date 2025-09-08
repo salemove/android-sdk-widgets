@@ -48,6 +48,7 @@ internal class FloatingVisitorVideoView @JvmOverloads constructor(
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
+        removeView(videoView)
         releaseVideoStream()
     }
 

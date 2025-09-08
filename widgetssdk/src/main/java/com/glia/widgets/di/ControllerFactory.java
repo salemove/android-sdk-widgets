@@ -277,8 +277,7 @@ public class ControllerFactory {
                 messagesNotSeenHandler,
                 useCaseFactory.getEngagementStateUseCase(),
                 useCaseFactory.getCurrentOperatorUseCase(),
-                useCaseFactory.getVisitorMediaUseCase(),
-                useCaseFactory.getEngagementTypeUseCase()
+                useCaseFactory.getVisitorMediaUseCase()
             );
         }
         return applicationChatHeadController;

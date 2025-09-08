@@ -104,6 +104,7 @@ public class MessagesNotSeenHandler {
     /**
      * @hide
      */
+    @FunctionalInterface
     public interface MessagesNotSeenHandlerListener {
         void onNewCount(int count);
     }

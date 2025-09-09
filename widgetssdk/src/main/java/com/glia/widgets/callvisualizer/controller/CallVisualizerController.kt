@@ -1,5 +1,6 @@
 package com.glia.widgets.callvisualizer.controller
 
+import android.annotation.SuppressLint
 import com.glia.widgets.engagement.EndAction
 import com.glia.widgets.engagement.domain.EngagementRequestUseCase
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
@@ -8,7 +9,6 @@ import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.OneTimeEvent
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.asOneTimeStateFlowable
-import com.glia.widgets.helper.unSafeSubscribe
 import com.glia.widgets.internal.dialog.DialogContract
 import com.glia.widgets.internal.dialog.domain.ConfirmationDialogLinksUseCase
 import com.glia.widgets.internal.dialog.model.ConfirmationDialogLinks
@@ -68,11 +68,12 @@ internal class CallVisualizerController(
         registerCallVisualizerListeners()
     }
 
+    @SuppressLint("CheckResult")
     private fun registerCallVisualizerListeners() {
-        engagementRequestUseCase().unSafeSubscribe { onEngagementRequested() }
-        onIncomingEngagementRequestTimeoutUseCase().unSafeSubscribe { onIncomingEngagementRequestTimeout() }
+        engagementRequestUseCase().subscribe { onEngagementRequested() }
+        onIncomingEngagementRequestTimeoutUseCase().subscribe { onIncomingEngagementRequestTimeout() }
         dialogController.addCallback(::handleDialogState)
-        engagementStartFlow.unSafeSubscribe { dismissVisitorCodeDialog() }
+        engagementStartFlow.subscribe { dismissVisitorCodeDialog() }
     }
 
     private fun handleDialogState(dialogState: DialogState) {

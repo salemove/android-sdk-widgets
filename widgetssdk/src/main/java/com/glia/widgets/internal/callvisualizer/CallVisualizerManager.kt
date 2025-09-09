@@ -5,7 +5,6 @@ import android.content.Context
 import android.view.View
 import com.glia.widgets.callvisualizer.controller.CallVisualizerContract
 import com.glia.widgets.core.callvisualizer.domain.CallVisualizer
-import com.glia.widgets.helper.unSafeSubscribe
 import com.glia.widgets.internal.callvisualizer.domain.VisitorCodeViewBuilderUseCase
 
 internal class CallVisualizerManager(
@@ -27,11 +26,11 @@ internal class CallVisualizerManager(
 
     @SuppressLint("CheckResult")
     override fun onEngagementStart(runnable: Runnable) {
-        callVisualizerController.engagementStartFlow.unSafeSubscribe { runnable.run() }
+        callVisualizerController.engagementStartFlow.subscribe { runnable.run() }
     }
 
     @SuppressLint("CheckResult")
     override fun onEngagementEnd(runnable: Runnable) {
-        callVisualizerController.engagementEndFlow.unSafeSubscribe { runnable.run() }
+        callVisualizerController.engagementEndFlow.subscribe { runnable.run() }
     }
 }

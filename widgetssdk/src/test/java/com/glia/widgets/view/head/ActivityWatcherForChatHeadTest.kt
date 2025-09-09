@@ -10,7 +10,6 @@ import com.glia.widgets.engagement.EndAction
 import com.glia.widgets.engagement.MediaType
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
-import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
 import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadContract
 import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadController
 import com.glia.widgets.view.head.controller.ApplicationChatHeadLayoutController
@@ -42,7 +41,6 @@ internal class ActivityWatcherForChatHeadTest {
         Mockito.mock(ApplicationChatHeadLayoutController::class.java)
     private val isFromCallScreenUseCase = Mockito.mock(IsFromCallScreenUseCase::class.java)
     private val updateFromCallScreenUseCase = Mockito.mock(UpdateFromCallScreenUseCase::class.java)
-    private val isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase = mock()
     private val engagementStateUseCase: EngagementStateUseCase = mock {
         on { invoke() } doReturn engagementStateFlowable
     }
@@ -52,8 +50,7 @@ internal class ActivityWatcherForChatHeadTest {
         applicationChatHeadController,
         engagementStateUseCase,
         isFromCallScreenUseCase,
-        updateFromCallScreenUseCase,
-        isCurrentEngagementCallVisualizerUseCase
+        updateFromCallScreenUseCase
     )
     private val activity = Mockito.mock(Activity::class.java)
     private val view = Mockito.mock(View::class.java)
@@ -150,7 +147,6 @@ internal class ActivityWatcherForChatHeadTest {
     private fun mockShouldShowChatHead() {
         val mockView: ChatView = mock()
         whenever(watcher.fetchGliaOrRootView()) doReturn mockView
-        whenever(isCurrentEngagementCallVisualizerUseCase()) doReturn true
         whenever(applicationChatHeadController.shouldShow(any())) doReturn true
     }
 

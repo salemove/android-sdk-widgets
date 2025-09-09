@@ -1,11 +1,11 @@
 package com.glia.widgets.view.head.controller
 
+import android.annotation.SuppressLint
 import com.glia.androidsdk.Operator
 import com.glia.widgets.engagement.domain.CurrentOperatorUseCase
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import com.glia.widgets.engagement.domain.VisitorMediaUseCase
 import com.glia.widgets.helper.imageUrl
-import com.glia.widgets.helper.unSafeSubscribe
 import com.glia.widgets.internal.chathead.domain.IsDisplayBubbleInsideAppUseCase
 import com.glia.widgets.internal.chathead.domain.ResolveChatHeadNavigationUseCase
 import com.glia.widgets.internal.chathead.domain.ResolveChatHeadNavigationUseCase.Destinations
@@ -43,9 +43,10 @@ internal class ApplicationChatHeadLayoutController(
         subscribeToEvents()
     }
 
+    @SuppressLint("CheckResult")
     private fun subscribeToEvents() {
         messagesNotSeenHandler.addListener(onUnreadMessagesCountListener)
-        engagementStateUseCase().unSafeSubscribe {
+        engagementStateUseCase().subscribe {
             when (it) {
                 is EngagementState.EngagementEnded,
                 is EngagementState.QueueUnstaffed,
@@ -64,8 +65,8 @@ internal class ApplicationChatHeadLayoutController(
                 }
             }
         }
-        visitorMediaUseCase.onHoldState.unSafeSubscribe(::onHoldChanged)
-        currentOperatorUseCase().unSafeSubscribe(::operatorDataLoaded)
+        visitorMediaUseCase.onHoldState.subscribe(::onHoldChanged)
+        currentOperatorUseCase().subscribe(::operatorDataLoaded)
     }
 
     private fun onEngagementUpdated() {
@@ -90,7 +91,7 @@ internal class ApplicationChatHeadLayoutController(
     override fun onDestroy() {
         chatHeadLayout?.hide()
         chatHeadLayout = null
-        messagesNotSeenHandler.removeListener(onUnreadMessagesCountListener)
+        //The class is singleton, so we need to keep subscription to the `onUnreadMessagesCountListener`
     }
 
     private fun onHoldChanged(isOnHold: Boolean) {

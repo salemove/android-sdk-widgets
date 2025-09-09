@@ -38,14 +38,12 @@ import com.glia.widgets.engagement.domain.ToggleVisitorAudioMediaStateUseCase
 import com.glia.widgets.engagement.domain.ToggleVisitorVideoMediaStateUseCase
 import com.glia.widgets.engagement.domain.VisitorMediaUseCase
 import com.glia.widgets.helper.Logger
-import com.glia.widgets.helper.Logger.d
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.TimeCounter
 import com.glia.widgets.helper.TimeCounter.FormattedTimerStatusListener
 import com.glia.widgets.helper.TimeCounter.RawTimerStatusListener
 import com.glia.widgets.helper.formattedName
 import com.glia.widgets.helper.imageUrl
-import com.glia.widgets.helper.unSafeSubscribe
 import com.glia.widgets.view.MessagesNotSeenHandler
 import com.glia.widgets.view.MessagesNotSeenHandler.MessagesNotSeenHandlerListener
 import com.glia.widgets.view.MinimizeHandler
@@ -103,21 +101,22 @@ internal class CallController(
     private var view: CallContract.View? = null
 
     init {
-        d(TAG, "constructor")
+        Logger.d(TAG, "constructor")
 
         if (isCurrentEngagementCallVisualizerUseCase()) {
             shouldShowMediaEngagementView(true)
         }
 
         subscribeToEngagement()
-        decideOnQueueingUseCase().unSafeSubscribe { enqueueForEngagement() }
+        disposable.add(decideOnQueueingUseCase().subscribe { enqueueForEngagement() })
+
     }
 
     private fun subscribeToEngagement() {
-        engagementStateUseCase().unSafeSubscribe(::onEngagementStateChanged)
+        engagementStateUseCase().subscribe(::onEngagementStateChanged).also(disposable::add)
         subscribeToMediaState()
-        visitorMediaUseCase.onHoldState.unSafeSubscribe(::onHoldChanged)
-        flipCameraButtonStateUseCase().unSafeSubscribe(::onNewFlipCameraButtonState)
+        visitorMediaUseCase.onHoldState.subscribe(::onHoldChanged).also(disposable::add)
+        flipCameraButtonStateUseCase().subscribe(::onNewFlipCameraButtonState).also(disposable::add)
     }
 
     // This method combines both visitor and operator media state updates so that they would be fired one after another.
@@ -135,13 +134,13 @@ internal class CallController(
         ) { visitorState, operatorState ->
             Pair(visitorState, operatorState)
         }.debounce(200, TimeUnit.MILLISECONDS)
-            .unSafeSubscribe {
+            .subscribe {
                 val visitorMedia = it.first.orElse(null)
                 val operatorMedia = it.second.orElse(null)
                 onNewVisitorMediaState(visitorMedia)
                 onNewOperatorMediaState(operatorMedia)
                 callNotificationUseCase(visitorMedia, operatorMedia)
-            }
+            }.also(disposable::add)
     }
 
     private fun onNewVisitorMediaState(visitorMediaState: MediaState?) {
@@ -222,7 +221,7 @@ internal class CallController(
         get() = confirmationDialogLinksUseCase.invoke()
 
     override fun onLinkClicked(link: Link) {
-        d(TAG, "onLinkClicked")
+        Logger.d(TAG, "onLinkClicked")
         getUrlFromLinkUseCase(link)?.let {
             view?.navigateToWebBrowserActivity(link.title, it)
         } ?: run {
@@ -231,13 +230,13 @@ internal class CallController(
     }
 
     override fun onLiveObservationDialogAllowed() {
-        d(TAG, "onLiveObservationDialogAllowed")
+        Logger.d(TAG, "onLiveObservationDialogAllowed")
         dialogController.dismissCurrentDialog()
         decideOnQueueingUseCase.onQueueingRequested()
     }
 
     override fun onLiveObservationDialogRejected() {
-        d(TAG, "onLiveObservationDialogRejected")
+        Logger.d(TAG, "onLiveObservationDialogRejected")
         stop()
         dialogController.dismissDialogs()
     }
@@ -247,9 +246,9 @@ internal class CallController(
     }
 
     override fun onDestroy(retained: Boolean) {
-        d(TAG, "onDestroy, retain: $retained")
+        Logger.d(TAG, "onDestroy, retain: $retained")
         view?.also {
-            d(TAG, "destroyingView")
+            Logger.d(TAG, "destroyingView")
             it.destroyView()
             view = null
         }
@@ -281,52 +280,52 @@ internal class CallController(
     }
 
     override fun leaveChatClicked() {
-        d(TAG, "leaveChatClicked")
+        Logger.d(TAG, "leaveChatClicked")
         showExitChatDialog()
     }
 
     override fun setView(view: CallContract.View) {
-        d(TAG, "setViewCallback")
+        Logger.d(TAG, "setViewCallback")
         this.view = view
         view.emitState(callState)
     }
 
     override fun endEngagementDialogYesClicked() {
-        d(TAG, "endEngagementDialogYesClicked")
+        Logger.d(TAG, "endEngagementDialogYesClicked")
         stop()
         dialogController.dismissDialogs()
     }
 
     override fun endEngagementDialogDismissed() {
-        d(TAG, "endEngagementDialogDismissed")
+        Logger.d(TAG, "endEngagementDialogDismissed")
         dialogController.dismissCurrentDialog()
     }
 
     override fun noMoreOperatorsAvailableDismissed() {
-        d(TAG, "noMoreOperatorsAvailableDismissed")
+        Logger.d(TAG, "noMoreOperatorsAvailableDismissed")
         stop()
         dialogController.dismissDialogs()
     }
 
     override fun unexpectedErrorDialogDismissed() {
-        d(TAG, "unexpectedErrorDialogDismissed")
+        Logger.d(TAG, "unexpectedErrorDialogDismissed")
         stop()
         dialogController.dismissDialogs()
     }
 
     override fun overlayPermissionsDialogDismissed() {
-        d(TAG, "overlayPermissionsDialogDismissed")
+        Logger.d(TAG, "overlayPermissionsDialogDismissed")
         decideOnQueueingUseCase.onOverlayDialogShown()
         dialogController.dismissCurrentDialog()
     }
 
     override fun leaveChatQueueClicked() {
-        d(TAG, "leaveChatQueueClicked")
+        Logger.d(TAG, "leaveChatQueueClicked")
         dialogController.showExitQueueDialog()
     }
 
     override fun onResume() {
-        d(TAG, "onResume\n")
+        Logger.d(TAG, "onResume\n")
         onResumeSetup()
     }
 
@@ -340,7 +339,7 @@ internal class CallController(
     }
 
     private fun handleMediaUpgradeAcceptResult(it: MediaUpgradeOffer) {
-        d(TAG, "upgradeOfferChoiceSubmitSuccess")
+        Logger.d(TAG, "upgradeOfferChoiceSubmitSuccess")
         val mediaType: MediaType = if (it.video != null && it.video != MediaDirection.NONE) {
             MediaType.VIDEO
         } else {
@@ -350,7 +349,7 @@ internal class CallController(
     }
 
     override fun chatButtonClicked() {
-        d(TAG, "chatButtonClicked")
+        Logger.d(TAG, "chatButtonClicked")
         updateFromCallScreenUseCase(true)
         view?.navigateToChat()
         onDestroy(true)
@@ -365,7 +364,7 @@ internal class CallController(
     }
 
     override fun minimizeButtonClicked() {
-        d(TAG, "minimizeButtonClicked")
+        Logger.d(TAG, "minimizeButtonClicked")
         minimizeHandler.minimize()
     }
 
@@ -383,7 +382,7 @@ internal class CallController(
 
     private fun onNewOperatorMediaState(operatorMediaState: MediaState) {
         if (!isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement) return
-        d(TAG, "newOperatorMediaState: $operatorMediaState, timer task running: ${callTimer.isRunning}")
+        Logger.d(TAG, "newOperatorMediaState: $operatorMediaState, timer task running: ${callTimer.isRunning}")
         if (operatorMediaState.video != null) {
             onOperatorMediaStateVideo(operatorMediaState)
         } else if (operatorMediaState.audio != null) {
@@ -398,7 +397,7 @@ internal class CallController(
 
     override fun onSpeakerButtonPressed() {
         val newValue = !callState.isSpeakerOn
-        d(TAG, "onSpeakerButtonPressed, new value: $newValue")
+        Logger.d(TAG, "onSpeakerButtonPressed, new value: $newValue")
         emitViewState(callState.speakerValueChanged(newValue))
         turnSpeakerphoneUseCase.invoke(newValue)
     }
@@ -415,7 +414,7 @@ internal class CallController(
     @Synchronized
     private fun emitViewState(state: CallState) {
         if (setState(state) && view != null) {
-            d(TAG, "Emit state:\n$state")
+            Logger.d(TAG, "Emit state:\n$state")
             view?.emitState(callState)
         }
     }
@@ -431,7 +430,7 @@ internal class CallController(
         return object : RawTimerStatusListener {
             override fun onNewRawTimerValue(timerValue: Int) {
                 if (callState.isVideoCall) {
-                    d(TAG, "inactivityTimer onNewTimerValue: $timerValue")
+                    Logger.d(TAG, "inactivityTimer onNewTimerValue: $timerValue")
                     emitViewState(callState.landscapeControlsVisibleChanged(timerValue < MAX_IDLE_TIME))
                 }
                 if (timerValue >= MAX_IDLE_TIME) {
@@ -490,14 +489,14 @@ internal class CallController(
     }
 
     private fun stop() {
-        d(TAG, "Stop, engagement ended")
+        Logger.d(TAG, "Stop, engagement ended")
         endEngagementUseCase()
         mediaUpgradeDisposable.clear()
         emitViewState(callState.stop())
     }
 
     private fun onOperatorMediaStateVideo(operatorMediaState: MediaState) {
-        d(TAG, "newOperatorMediaState: video")
+        Logger.d(TAG, "newOperatorMediaState: video")
         var formattedTime = DateUtils.formatElapsedTime(0)
         if (callState.isCallOngoingAndOperatorConnected) {
             formattedTime = callState.callStatus.time
@@ -507,7 +506,7 @@ internal class CallController(
     }
 
     private fun onOperatorMediaStateAudio(operatorMediaState: MediaState) {
-        d(TAG, "newOperatorMediaState: audio")
+        Logger.d(TAG, "newOperatorMediaState: audio")
         var formattedTime = DateUtils.formatElapsedTime(0)
         if (callState.isCallOngoingAndOperatorConnected) formattedTime = callState.callStatus.time
         emitViewState(callState.audioCallStarted(operatorMediaState, formattedTime))
@@ -515,7 +514,7 @@ internal class CallController(
     }
 
     private fun onOperatorMediaStateUnknown() {
-        d(TAG, "newOperatorMediaState: null")
+        Logger.d(TAG, "newOperatorMediaState: null")
         if (callState.isMediaEngagementStarted) {
             emitViewState(callState.backToOngoing())
         }

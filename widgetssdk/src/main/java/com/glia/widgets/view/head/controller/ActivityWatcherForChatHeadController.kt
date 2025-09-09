@@ -1,14 +1,13 @@
 package com.glia.widgets.view.head.controller
 
+import android.annotation.SuppressLint
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
-import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
-import com.glia.widgets.helper.unSafeSubscribe
 import com.glia.widgets.view.head.ChatHeadContract
 import com.glia.widgets.view.head.ChatHeadLayoutContract
 
@@ -17,8 +16,7 @@ internal class ActivityWatcherForChatHeadController(
     private var applicationChatHeadController: ChatHeadLayoutContract.Controller,
     private val engagementStateUseCase: EngagementStateUseCase,
     private val isFromCallScreenUseCase: IsFromCallScreenUseCase,
-    private val updateFromCallScreenUseCase: UpdateFromCallScreenUseCase,
-    private val isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase
+    private val updateFromCallScreenUseCase: UpdateFromCallScreenUseCase
 ) : ActivityWatcherForChatHeadContract.Controller {
 
     private lateinit var watcher: ActivityWatcherForChatHeadContract.Watcher
@@ -27,8 +25,9 @@ internal class ActivityWatcherForChatHeadController(
         this.watcher = watcher
     }
 
+    @SuppressLint("CheckResult")
     override fun init() {
-        engagementStateUseCase().unSafeSubscribe(::handleEngagementState)
+        engagementStateUseCase().subscribe(::handleEngagementState)
     }
 
     private fun handleEngagementState(state: State) {

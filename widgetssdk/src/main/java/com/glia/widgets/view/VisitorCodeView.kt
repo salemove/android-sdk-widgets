@@ -55,7 +55,7 @@ internal class VisitorCodeView internal constructor(
     context: Context,
     private val uiThreadExecutor: Executor? = null
 ) : FrameLayout(context.wrapWithMaterialThemeOverlay(), null, 0), VisitorCodeContract.View {
-    private lateinit var controller: VisitorCodeContract.Controller
+    private var controller: VisitorCodeContract.Controller? = null
 
     private var timer: CountDownTimer? = null
 
@@ -81,21 +81,29 @@ internal class VisitorCodeView internal constructor(
         charCodeView = findViewById(R.id.codeView)
         progressBar = findViewById(R.id.progress_bar)
         refreshButton = findViewById(R.id.failure_refresh_button)
-        refreshButton.setOnClickListener { controller.onLoadVisitorCode() }
+        refreshButton.setOnClickListener { controller?.onLoadVisitorCode() }
         closeButton = findViewById(R.id.close_button)
-        closeButton.setOnClickListener { controller.onCloseButtonClicked() }
+        closeButton.setOnClickListener { controller?.onCloseButtonClicked() }
         logoContainer = findViewById(R.id.logo_container)
         logoText = findViewById(R.id.powered_by_text)
         logoText.setLocaleText(R.string.general_powered)
         logoView = findViewById(R.id.logo_view)
         readTypedArray()
         applyRemoteThemeConfig(Dependencies.gliaThemeManager.theme)
+    }
 
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
         setController(Dependencies.controllerFactory.visitorCodeController)
     }
 
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        controller?.onDestroy() ?: destroyTimer()
+    }
+
     override fun notifySetupComplete() {
-        controller.onLoadVisitorCode()
+        controller?.onLoadVisitorCode()
     }
 
     internal fun setClosable(isClosable: Boolean) {
@@ -121,7 +129,7 @@ internal class VisitorCodeView internal constructor(
 
             override fun onFinish() {
                 Logger.d(TAG, "Reloading Visitor Code")
-                controller.onLoadVisitorCode()
+                controller?.onLoadVisitorCode()
             }
         }.start()
     }
@@ -134,7 +142,7 @@ internal class VisitorCodeView internal constructor(
 
     override fun setController(controller: VisitorCodeContract.Controller) {
         this.controller = controller
-        this.controller.setView(this)
+        this.controller?.setView(this)
     }
 
     private fun setDefaultTheme(typedArray: TypedArray) {
@@ -186,9 +194,9 @@ internal class VisitorCodeView internal constructor(
     private fun showProgressBar(show: Boolean) {
         if (show) {
             charCodeView.alpha = 0f
-            progressBar.visibility = View.VISIBLE
+            progressBar.visibility = VISIBLE
         } else {
-            progressBar.visibility = View.GONE
+            progressBar.visibility = GONE
             charCodeView.animate().apply {
                 alpha(1f)
                 duration = 200

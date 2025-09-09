@@ -19,7 +19,6 @@ internal interface DialogContract {
         fun dismissVisitorCodeDialog()
         fun showUnexpectedErrorDialog()
         fun showOverlayPermissionsDialog()
-        fun showCVOverlayPermissionDialog()
         fun dismissOverlayPermissionsDialog()
         fun dismissMessageCenterUnavailableDialog()
         fun dismissCVEngagementConfirmationDialog()
@@ -95,11 +94,6 @@ internal class DialogController : DialogContract.Controller {
     override fun showOverlayPermissionsDialog() {
         Logger.i(TAG, "Show Overlay permissions Dialog")
         dialogManager.addAndEmit(DialogState.OverlayPermission)
-    }
-
-    override fun showCVOverlayPermissionDialog() {
-        Logger.i(TAG, "Show CV Overlay permissions Dialog")
-        dialogManager.addAndEmit(DialogState.CVOverlayPermission)
     }
 
     override fun dismissOverlayPermissionsDialog() {

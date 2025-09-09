@@ -1,5 +1,6 @@
 package com.glia.widgets.internal.secureconversations
 
+import android.annotation.SuppressLint
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
 import com.glia.androidsdk.chat.SendMessagePayload
@@ -9,7 +10,6 @@ import com.glia.widgets.chat.data.GliaChatRepository
 import com.glia.widgets.chat.domain.GliaSendMessageUseCase
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.asStateFlowable
-import com.glia.widgets.helper.unSafeSubscribe
 import com.glia.widgets.internal.queue.QueueRepository
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Observable
@@ -67,9 +67,10 @@ internal class SecureConversationsRepository(private val core: GliaCore, private
         }
     }
 
+    @SuppressLint("CheckResult")
     fun send(payload: SendMessagePayload, callback: RequestCallback<VisitorMessage?>) {
         _messageSendingObservable.onNext(true)
-        queueRepository.relevantQueueIds.unSafeSubscribe { queueIds ->
+        queueRepository.relevantQueueIds.subscribe { queueIds ->
             if (queueIds.isNotEmpty()) {
                 secureConversations.send(payload, queueIds.toTypedArray(), handleResult(callback))
             } else {

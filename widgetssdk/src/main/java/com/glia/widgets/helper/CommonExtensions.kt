@@ -1,6 +1,5 @@
 package com.glia.widgets.helper
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
@@ -27,10 +26,7 @@ import com.glia.widgets.UiTheme
 import com.glia.widgets.engagement.MediaType
 import com.glia.widgets.queue.Queue
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.functions.Action
 import io.reactivex.rxjava3.processors.FlowableProcessor
 import java.io.File
 import kotlin.io.path.createTempFile
@@ -96,21 +92,6 @@ internal val ActionOnEnd?.isShowEndDialog: Boolean get() = this == ActionOnEnd.E
 internal val ActionOnEnd?.isUnknown: Boolean get() = this == ActionOnEnd.UNKNOWN
 
 internal val Engagement.isCallVisualizer: Boolean get() = this is OmnibrowseEngagement
-
-@SuppressLint("CheckResult")
-internal fun <T : Any> Flowable<out T>.unSafeSubscribe(onNextCallback: (T) -> Unit) {
-    subscribe({ onNextCallback(it) }) { Logger.e("Observable<T>.unSafeSubscribe", "Unexpected local exception happened", it) }
-}
-
-@SuppressLint("CheckResult")
-internal fun <T : Any> Single<out T>.unSafeSubscribe(onNextCallback: (T) -> Unit) {
-    subscribe({ onNextCallback(it) }) { Logger.e("Single<T>.unSafeSubscribe", "Unexpected local exception happened", it) }
-}
-
-@SuppressLint("CheckResult")
-internal fun Completable.unSafeSubscribe(onComplete: Action) {
-    subscribe(onComplete) { Logger.e("Single<T>.unSafeSubscribe", "Unexpected local exception happened", it) }
-}
 
 internal fun <T : Any> FlowableProcessor<T>.asStateFlowable(): Flowable<T> = onBackpressureBuffer().observeOn(AndroidSchedulers.mainThread())
 internal fun <T : Any> FlowableProcessor<T>.asOneTimeStateFlowable(): Flowable<OneTimeEvent<T>> =

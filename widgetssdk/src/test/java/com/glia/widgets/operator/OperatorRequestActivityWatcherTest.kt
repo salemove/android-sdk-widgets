@@ -5,13 +5,7 @@ import android.CONTEXT_EXTENSIONS_CLASS_PATH
 import android.LOGGER_PATH
 import android.app.Activity
 import android.content.Context
-import android.content.Intent
-import android.targetActivityName
 import android.view.View
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.ActivityResultCallback
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import com.glia.androidsdk.Engagement.MediaType
 import com.glia.androidsdk.comms.MediaUpgradeOffer
@@ -19,7 +13,6 @@ import com.glia.widgets.UiTheme
 import com.glia.widgets.call.CallActivity
 import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.engagement.domain.MediaUpgradeOfferData
-import com.glia.widgets.helper.DialogHolderActivity
 import com.glia.widgets.helper.GliaActivityManager
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.OneTimeEvent
@@ -43,7 +36,6 @@ import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
 import io.reactivex.rxjava3.processors.PublishProcessor
 import io.reactivex.rxjava3.schedulers.Schedulers
 import org.junit.After
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 
@@ -320,58 +312,6 @@ class OperatorRequestActivityWatcherTest {
             verify { controller.failedToOpenOverlayPermissionScreen() }
             confirmVerified(activityLauncher)
         }
-    }
-
-    @Test
-    fun `showOverlayDialog will call onOverlayPermissionRequestAccepted when dialog is accepted`() {
-        mockkObject(Dialogs)
-        fireState<ChatActivity>(
-            controllerState,
-            watcher,
-            OperatorRequestContract.State.ShowOverlayDialog
-        ) { state, activity ->
-            val onAcceptSlot = slot<View.OnClickListener>()
-            val onDeclineSlot = slot<View.OnClickListener>()
-            verify {
-                Dialogs.showOverlayPermissionsDialog(
-                    activity,
-                    any(),
-                    capture(onAcceptSlot),
-                    capture(onDeclineSlot)
-                )
-            }
-            onAcceptSlot.captured.onClick(mockk())
-
-            verify { state.markConsumed() }
-            verify { controller.onOverlayPermissionRequestAccepted(activity) }
-        }
-        unmockkObject(Dialogs)
-    }
-
-    @Test
-    fun `showOverlayDialog will call onOverlayPermissionRequestDeclined when dialog is declined`() {
-        mockkObject(Dialogs)
-        fireState<ChatActivity>(
-            controllerState,
-            watcher,
-            OperatorRequestContract.State.ShowOverlayDialog
-        ) { state, activity ->
-            val onAcceptSlot = slot<View.OnClickListener>()
-            val onDeclineSlot = slot<View.OnClickListener>()
-            verify {
-                Dialogs.showOverlayPermissionsDialog(
-                    activity,
-                    any(),
-                    capture(onAcceptSlot),
-                    capture(onDeclineSlot)
-                )
-            }
-            onDeclineSlot.captured.onClick(mockk())
-
-            verify { state.markConsumed() }
-            verify { controller.onOverlayPermissionRequestDeclined(activity) }
-        }
-        unmockkObject(Dialogs)
     }
 
     private fun mockLogger() {

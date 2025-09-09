@@ -1,23 +1,24 @@
 package com.glia.widgets.view.head.controller
 
+import android.annotation.SuppressLint
 import android.view.View
 import com.glia.androidsdk.Operator
+import com.glia.widgets.engagement.domain.CurrentOperatorUseCase
+import com.glia.widgets.engagement.domain.EngagementStateUseCase
+import com.glia.widgets.engagement.domain.VisitorMediaUseCase
+import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.TAG
+import com.glia.widgets.helper.imageUrl
 import com.glia.widgets.internal.chathead.domain.IsDisplayBubbleOutsideAppUseCase
 import com.glia.widgets.internal.chathead.domain.ResolveChatHeadNavigationUseCase
 import com.glia.widgets.internal.chathead.domain.ResolveChatHeadNavigationUseCase.Destinations
-import com.glia.widgets.engagement.domain.CurrentOperatorUseCase
-import com.glia.widgets.engagement.domain.EngagementStateUseCase
-import com.glia.widgets.engagement.domain.EngagementTypeUseCase
-import com.glia.widgets.engagement.domain.VisitorMediaUseCase
-import com.glia.widgets.helper.Logger.d
-import com.glia.widgets.helper.TAG
-import com.glia.widgets.helper.imageUrl
-import com.glia.widgets.helper.unSafeSubscribe
 import com.glia.widgets.view.MessagesNotSeenHandler
 import com.glia.widgets.view.head.ChatHeadContract
 import com.glia.widgets.view.head.ChatHeadPosition
 import com.glia.widgets.engagement.State as EngagementState
 
+//This is in fact a singleton
+@SuppressLint("CheckResult")
 internal class ServiceChatHeadController(
     private val isDisplayBubbleOutsideAppUseCase: IsDisplayBubbleOutsideAppUseCase,
     private val resolveChatHeadNavigationUseCase: ResolveChatHeadNavigationUseCase,
@@ -25,8 +26,7 @@ internal class ServiceChatHeadController(
     private var _chatHeadPosition: ChatHeadPosition,
     engagementStateUseCase: EngagementStateUseCase,
     currentOperatorUseCase: CurrentOperatorUseCase,
-    visitorMediaUseCase: VisitorMediaUseCase,
-    private val engagementTypeUseCase: EngagementTypeUseCase
+    visitorMediaUseCase: VisitorMediaUseCase
 ) : ChatHeadContract.Controller {
     private var chatHeadView: ChatHeadContract.View? = null
     private var state = State.ENDED
@@ -46,10 +46,10 @@ internal class ServiceChatHeadController(
     override val chatHeadPosition: ChatHeadPosition get() = _chatHeadPosition
 
     init {
-        engagementStateUseCase().unSafeSubscribe(::handleEngagementState)
-        currentOperatorUseCase().unSafeSubscribe(::operatorDataLoaded)
+        engagementStateUseCase().subscribe(::handleEngagementState)
+        currentOperatorUseCase().subscribe(::operatorDataLoaded)
         messagesNotSeenHandler.addListener(::onUnreadMessageCountChange)
-        visitorMediaUseCase.onHoldState.unSafeSubscribe(::onHoldChanged)
+        visitorMediaUseCase.onHoldState.subscribe(::onHoldChanged)
     }
 
     override fun onResume(view: View?) {
@@ -69,7 +69,7 @@ internal class ServiceChatHeadController(
     }
 
     override fun onApplicationStop() {
-        d(TAG, "onApplicationStop()")
+        Logger.d(TAG, "onApplicationStop()")
         isDisplayBubbleOutsideAppUseCase(null)
     }
 

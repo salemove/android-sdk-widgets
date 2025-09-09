@@ -205,6 +205,7 @@ public class SurveyController implements SurveyContract.Controller {
     @Override
     public void onDestroy() {
         this.view = null;
+        resetController();
     }
 
     private void resetController() {

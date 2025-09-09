@@ -62,7 +62,6 @@ import com.glia.widgets.helper.exists
 import com.glia.widgets.helper.formattedName
 import com.glia.widgets.helper.imageUrl
 import com.glia.widgets.helper.isValid
-import com.glia.widgets.helper.unSafeSubscribe
 import com.glia.widgets.internal.dialog.DialogContract
 import com.glia.widgets.internal.dialog.domain.ConfirmationDialogLinksUseCase
 import com.glia.widgets.internal.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
@@ -211,7 +210,7 @@ internal class ChatController(
         Logger.d(TAG, "constructor")
         chatState = ChatState()
         subscribeToEngagement()
-        decideOnQueueingUseCase().unSafeSubscribe { enqueueForEngagement() }
+        decideOnQueueingUseCase().subscribe { enqueueForEngagement() }.also(disposable::add)
     }
 
     override fun initChat(intention: Intention) {
@@ -268,9 +267,11 @@ internal class ChatController(
     }
 
     private fun subscribeToEngagement() {
-        engagementStateUseCase().unSafeSubscribe(::onEngagementStateChanged)
-        operatorMediaUseCase().unSafeSubscribe(::onNewOperatorMediaState)
-        onOperatorTypingUseCase().unSafeSubscribe(::onOperatorTyping)
+        disposable.addAll(
+            engagementStateUseCase().subscribe(::onEngagementStateChanged),
+            operatorMediaUseCase().subscribe(::onNewOperatorMediaState),
+            onOperatorTypingUseCase().subscribe(::onOperatorTyping),
+        )
     }
 
     private fun ensureSecureMessagingAvailable() {

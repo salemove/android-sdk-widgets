@@ -1,18 +1,12 @@
 package com.glia.widgets.operator
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.comms.MediaUpgradeOffer
-import com.glia.widgets.internal.dialog.DialogContract
-import com.glia.widgets.internal.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
-import com.glia.widgets.internal.dialog.domain.SetOverlayPermissionRequestDialogShownUseCase
-import com.glia.widgets.internal.dialog.model.DialogState
-import com.glia.widgets.internal.permissions.domain.WithNotificationPermissionUseCase
 import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCase
 import com.glia.widgets.engagement.domain.CheckMediaUpgradePermissionsUseCase
-import com.glia.widgets.engagement.domain.CurrentOperatorUseCase
 import com.glia.widgets.engagement.domain.DeclineMediaUpgradeOfferUseCase
-import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
 import com.glia.widgets.engagement.domain.MediaUpgradeOfferData
 import com.glia.widgets.engagement.domain.OperatorMediaUpgradeOfferUseCase
 import com.glia.widgets.helper.DialogHolderActivity
@@ -21,40 +15,33 @@ import com.glia.widgets.helper.OneTimeEvent
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.asOneTimeStateFlowable
 import com.glia.widgets.helper.isAudio
-import com.glia.widgets.helper.unSafeSubscribe
+import com.glia.widgets.internal.dialog.DialogContract
+import com.glia.widgets.internal.dialog.domain.SetOverlayPermissionRequestDialogShownUseCase
+import com.glia.widgets.internal.dialog.model.DialogState
 import com.glia.widgets.operator.OperatorRequestContract.State
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.processors.PublishProcessor
 
+//This is in fact singleton
+@SuppressLint("CheckResult")
 internal class OperatorRequestController(
     operatorMediaUpgradeOfferUseCase: OperatorMediaUpgradeOfferUseCase,
     private val acceptMediaUpgradeOfferUseCase: AcceptMediaUpgradeOfferUseCase,
     private val declineMediaUpgradeOfferUseCase: DeclineMediaUpgradeOfferUseCase,
     private val checkMediaUpgradePermissionsUseCase: CheckMediaUpgradePermissionsUseCase,
-    private val currentOperatorUseCase: CurrentOperatorUseCase,
-    private val isShowOverlayPermissionRequestDialogUseCase: IsShowOverlayPermissionRequestDialogUseCase,
-    private val isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase,
     private val setOverlayPermissionRequestDialogShownUseCase: SetOverlayPermissionRequestDialogShownUseCase,
     private val dialogController: DialogContract.Controller,
-    private val withNotificationPermissionUseCase: WithNotificationPermissionUseCase,
 ) : OperatorRequestContract.Controller {
 
     private val _state: PublishProcessor<State> = PublishProcessor.create()
     override val state: Flowable<OneTimeEvent<State>> = _state.asOneTimeStateFlowable()
     private val dialogCallback: DialogContract.Controller.Callback = DialogContract.Controller.Callback(::handleDialogCallback)
 
-    init {
-        operatorMediaUpgradeOfferUseCase().unSafeSubscribe(::handleMediaUpgradeOffer)
-        acceptMediaUpgradeOfferUseCase.result.unSafeSubscribe(::handleMediaUpgradeOfferAcceptResult)
-        dialogController.addCallback(dialogCallback)
-    }
 
-    private fun showCvDialogIfRequired(activity: Activity) {
-        if (isCurrentEngagementCallVisualizerUseCase() && isShowOverlayPermissionRequestDialogUseCase()) {
-            dialogController.showCVOverlayPermissionDialog()
-        } else {
-            finishIfDialogHolderActivity(activity)
-        }
+    init {
+        operatorMediaUpgradeOfferUseCase().subscribe(::handleMediaUpgradeOffer)
+        acceptMediaUpgradeOfferUseCase.result.subscribe(::handleMediaUpgradeOfferAcceptResult)
+        dialogController.addCallback(dialogCallback)
     }
 
     private fun handleMediaUpgradeOfferAcceptResult(mediaUpgradeOffer: MediaUpgradeOffer) {
@@ -70,7 +57,6 @@ internal class OperatorRequestController(
         when (dialogState) {
             is DialogState.MediaUpgrade -> _state.onNext(State.RequestMediaUpgrade(dialogState.data))
             is DialogState.None -> _state.onNext(State.DismissAlertDialog)
-            is DialogState.CVOverlayPermission -> _state.onNext(State.ShowOverlayDialog)
             else -> {
                 //no-op
             }

@@ -1,12 +1,12 @@
 package com.glia.widgets.engagement.completion
 
+import android.annotation.SuppressLint
 import com.glia.widgets.engagement.EndAction
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import com.glia.widgets.engagement.domain.ReleaseResourcesUseCase
 import com.glia.widgets.helper.OneTimeEvent
 import com.glia.widgets.helper.asOneTimeStateFlowable
-import com.glia.widgets.helper.unSafeSubscribe
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.processors.BehaviorProcessor
 
@@ -26,7 +26,8 @@ internal class EngagementCompletionController(
     override val state: Flowable<OneTimeEvent<EngagementCompletionState>> = _state.asOneTimeStateFlowable()
 
     init {
-        engagementStateUseCase().unSafeSubscribe(::handleEngagementState)
+        @SuppressLint("CheckResult")
+        engagementStateUseCase().subscribe(::handleEngagementState)
     }
 
     private fun handleEngagementState(state: State) {

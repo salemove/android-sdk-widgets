@@ -3,27 +3,21 @@ package com.glia.widgets.operator
 import android.COMMON_EXTENSIONS_CLASS_PATH
 import android.LOGGER_PATH
 import android.app.Activity
-import android.content.Intent
-import androidx.activity.result.ActivityResult
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.widgets.chat.ChatActivity
-import com.glia.widgets.internal.dialog.DialogContract
-import com.glia.widgets.internal.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
-import com.glia.widgets.internal.dialog.domain.SetOverlayPermissionRequestDialogShownUseCase
-import com.glia.widgets.internal.dialog.model.DialogState
-import com.glia.widgets.internal.permissions.domain.WithNotificationPermissionUseCase
 import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCase
 import com.glia.widgets.engagement.domain.CheckMediaUpgradePermissionsUseCase
-import com.glia.widgets.engagement.domain.CurrentOperatorUseCase
 import com.glia.widgets.engagement.domain.DeclineMediaUpgradeOfferUseCase
-import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
 import com.glia.widgets.engagement.domain.MediaUpgradeOfferData
 import com.glia.widgets.engagement.domain.OperatorMediaUpgradeOfferUseCase
 import com.glia.widgets.helper.DialogHolderActivity
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.OneTimeEvent
 import com.glia.widgets.helper.isAudio
+import com.glia.widgets.internal.dialog.DialogContract
+import com.glia.widgets.internal.dialog.domain.SetOverlayPermissionRequestDialogShownUseCase
+import com.glia.widgets.internal.dialog.model.DialogState
 import io.mockk.CapturingSlot
 import io.mockk.Runs
 import io.mockk.confirmVerified
@@ -49,13 +43,9 @@ class OperatorRequestControllerTest {
     private lateinit var acceptMediaUpgradeOfferUseCase: AcceptMediaUpgradeOfferUseCase
     private lateinit var declineMediaUpgradeOfferUseCase: DeclineMediaUpgradeOfferUseCase
     private lateinit var checkMediaUpgradePermissionsUseCase: CheckMediaUpgradePermissionsUseCase
-    private lateinit var currentOperatorUseCase: CurrentOperatorUseCase
-    private lateinit var isShowOverlayPermissionRequestDialogUseCase: IsShowOverlayPermissionRequestDialogUseCase
-    private lateinit var isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase
     private lateinit var setOverlayPermissionRequestDialogShownUseCase: SetOverlayPermissionRequestDialogShownUseCase
     private lateinit var dialogController: DialogContract.Controller
     private lateinit var dialogCallbackSlot: CapturingSlot<DialogContract.Controller.Callback>
-    private lateinit var withNotificationPermissionUseCase: WithNotificationPermissionUseCase
 
     private lateinit var controller: OperatorRequestContract.Controller
 
@@ -70,11 +60,7 @@ class OperatorRequestControllerTest {
         }
         declineMediaUpgradeOfferUseCase = mockk(relaxUnitFun = true)
         checkMediaUpgradePermissionsUseCase = mockk(relaxUnitFun = true)
-        currentOperatorUseCase = mockk(relaxUnitFun = true)
-        isShowOverlayPermissionRequestDialogUseCase = mockk(relaxUnitFun = true)
-        isCurrentEngagementCallVisualizerUseCase = mockk(relaxUnitFun = true)
         setOverlayPermissionRequestDialogShownUseCase = mockk(relaxUnitFun = true)
-        withNotificationPermissionUseCase = mockk(relaxUnitFun = true)
         dialogController = mockk(relaxUnitFun = true)
 
         dialogCallbackSlot = slot()
@@ -84,12 +70,8 @@ class OperatorRequestControllerTest {
             acceptMediaUpgradeOfferUseCase,
             declineMediaUpgradeOfferUseCase,
             checkMediaUpgradePermissionsUseCase,
-            currentOperatorUseCase,
-            isShowOverlayPermissionRequestDialogUseCase,
-            isCurrentEngagementCallVisualizerUseCase,
             setOverlayPermissionRequestDialogShownUseCase,
-            dialogController,
-            withNotificationPermissionUseCase
+            dialogController
         )
 
         verify { operatorMediaUpgradeOfferUseCase() }
@@ -169,15 +151,6 @@ class OperatorRequestControllerTest {
         dialogCallbackSlot.captured.emitDialogState(DialogState.None)
 
         state.assertNotComplete().assertValue(OneTimeEvent(OperatorRequestContract.State.DismissAlertDialog))
-    }
-
-    @Test
-    fun `handleDialogCallback will produce ShowOverlayDialog state when CVOverlayPermission dialog state is triggered`() {
-        val state = controller.state.test()
-
-        dialogCallbackSlot.captured.emitDialogState(DialogState.CVOverlayPermission)
-
-        state.assertNotComplete().assertValue(OneTimeEvent(OperatorRequestContract.State.ShowOverlayDialog))
     }
 
     @Test

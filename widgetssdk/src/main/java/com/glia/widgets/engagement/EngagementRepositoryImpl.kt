@@ -26,14 +26,12 @@ import com.glia.androidsdk.queuing.QueueTicket
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.Data
 import com.glia.widgets.helper.Logger
-import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.isAudioOrVideo
 import com.glia.widgets.helper.isCallVisualizer
 import com.glia.widgets.helper.isQueueUnavailable
 import com.glia.widgets.helper.isRetain
 import com.glia.widgets.helper.isShowEndDialog
 import com.glia.widgets.helper.isSurvey
-import com.glia.widgets.helper.unSafeSubscribe
 import com.glia.widgets.internal.engagement.GliaOperatorRepository
 import com.glia.widgets.internal.queue.QueueRepository
 import com.glia.widgets.launcher.ConfigurationManager
@@ -287,9 +285,15 @@ internal class EngagementRepositoryImpl(
         }
     }
 
+
+    @SuppressLint("CheckResult")
     override fun acceptCurrentEngagementRequest(visitorContextAssetId: String) {
-        _engagementRequest.firstOrError().flatMapCompletable { accept(it, visitorContextAssetId) }.unSafeSubscribe {
-            Logger.i(TAG, "Incoming Call Visualizer engagement was accepted")
+        _engagementRequest.firstOrError().flatMapCompletable { accept(it, visitorContextAssetId) }.subscribe(
+            {
+                Logger.i(TAG, "Incoming Call Visualizer engagement was accepted")
+            }
+        ) {
+            Logger.w(TAG, "Error during accepting engagement request, reason: ${it.message}")
         }
     }
 
@@ -349,9 +353,10 @@ internal class EngagementRepositoryImpl(
         _engagementRequest.onNext(engagementRequest)
     }
 
+    @SuppressLint("CheckResult")
     private fun handleEngagementOutcome(outcome: Outcome) {
         _engagementOutcome.onNext(outcome)
-        _engagementRequest.firstOrError().unSafeSubscribe { request ->
+        _engagementRequest.firstOrError().subscribe { request ->
             request.off(EngagementRequest.Events.OUTCOME, engagementOutcomeCallback)
         }
     }

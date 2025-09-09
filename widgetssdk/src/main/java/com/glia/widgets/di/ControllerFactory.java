@@ -262,8 +262,7 @@ public class ControllerFactory {
                 new ChatHeadPosition(),
                 useCaseFactory.getEngagementStateUseCase(),
                 useCaseFactory.getCurrentOperatorUseCase(),
-                useCaseFactory.getVisitorMediaUseCase(),
-                useCaseFactory.getEngagementTypeUseCase()
+                useCaseFactory.getVisitorMediaUseCase()
             );
         }
         return serviceChatHeadController;
@@ -341,12 +340,12 @@ public class ControllerFactory {
     public ActivityWatcherForChatHeadContract.Controller getActivityWatcherForChatHeadController() {
         if (activityWatcherForChatHeadController == null) {
             activityWatcherForChatHeadController = new ActivityWatcherForChatHeadController(
-                serviceChatHeadController,
+                getChatHeadController(),
                 getChatHeadLayoutController(),
                 useCaseFactory.getEngagementStateUseCase(),
                 useCaseFactory.createIsFromCallScreenUseCase(),
-                useCaseFactory.createUpdateFromCallScreenUseCase(),
-                useCaseFactory.getIsCurrentEngagementCallVisualizer());
+                useCaseFactory.createUpdateFromCallScreenUseCase()
+            );
         }
         return activityWatcherForChatHeadController;
     }
@@ -385,12 +384,8 @@ public class ControllerFactory {
             useCaseFactory.getAcceptMediaUpgradeOfferUseCase(),
             useCaseFactory.getDeclineMediaUpgradeOfferUseCase(),
             useCaseFactory.getCheckMediaUpgradePermissionsUseCase(),
-            useCaseFactory.getCurrentOperatorUseCase(),
-            useCaseFactory.createIsShowOverlayPermissionRequestDialogUseCase(),
-            useCaseFactory.getIsCurrentEngagementCallVisualizer(),
             useCaseFactory.createSetOverlayPermissionRequestDialogShownUseCase(),
-            dialogController,
-            useCaseFactory.getWithNotificationPermissionUseCase()
+            dialogController
         );
     }
 

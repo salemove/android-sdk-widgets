@@ -1,5 +1,6 @@
 package com.glia.widgets.internal.queue
 
+import android.annotation.SuppressLint
 import com.glia.androidsdk.GliaException
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.DeviceMonitor
@@ -7,7 +8,6 @@ import com.glia.widgets.helper.DeviceState
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.NetworkState
 import com.glia.widgets.helper.TAG
-import com.glia.widgets.helper.unSafeSubscribe
 import com.glia.widgets.launcher.ConfigurationManager
 import com.glia.widgets.queue.Queue
 import com.glia.widgets.queue.toWidgetsType
@@ -68,6 +68,7 @@ internal class QueueRepositoryImpl(
     override val relevantQueueIds: Single<List<String>>
         get() = _relevantQueueIds.firstOrError()
 
+    @SuppressLint("CheckResult")
     override fun initialize() {
         fetchQueues()
 
@@ -76,7 +77,7 @@ internal class QueueRepositoryImpl(
             .skip(1) // Skip the initial value
             .debounce(500, TimeUnit.MILLISECONDS) // Sometimes the `Connected` event is fired right after device is unlocked
             .filter { it }
-            .unSafeSubscribe {
+            .subscribe {
                 // We're forcing this update, because when there is no internet connection,
                 // or the device is locked for a while, the queues won't update by the socket
                 forceFetchQueues()
@@ -115,17 +116,19 @@ internal class QueueRepositoryImpl(
         _queuesState.onNext(QueuesState.Error(ex))
     }
 
+    @SuppressLint("CheckResult")
     private fun subscribeToQueueUpdates() {
         _relevantQueueIds
             .filter { it.isNotEmpty() }
             .distinctUntilChanged()
-            .unSafeSubscribe { gliaCore.subscribeToQueueStateUpdates(it, {}, queueUpdateCallback) }
+            .subscribe { gliaCore.subscribeToQueueStateUpdates(it, {}, queueUpdateCallback) }
     }
 
+    @SuppressLint("CheckResult")
     private fun subscribeToQueues() {
         Flowable.combineLatest(configurationManager.queueIdsObservable, siteQueues, ::Pair)
             .distinctUntilChanged()
-            .unSafeSubscribe { (integratorQueueIds, siteQueues) ->
+            .subscribe { (integratorQueueIds, siteQueues) ->
                 Logger.d(TAG, "Setting up queues. Site has ${siteQueues.count()} queues.")
                 onQueuesReceived(integratorQueueIds, siteQueues)
             }

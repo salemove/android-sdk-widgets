@@ -50,8 +50,13 @@ open class FadeTransitionActivity : AppCompatActivity() {
     }
 
     override fun finishAfterTransition() {
-        overrideAnimationApi33()
         super.finishAfterTransition()
+        overrideAnimationApi33()
+    }
+
+    override fun finish() {
+        super.finish()
+        overrideAnimationApi33()
     }
 
     override fun startActivity(intent: Intent) {

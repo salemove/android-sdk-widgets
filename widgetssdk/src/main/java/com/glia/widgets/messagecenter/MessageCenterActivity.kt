@@ -54,7 +54,7 @@ internal class MessageCenterActivity : FadeTransitionActivity(),
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             messageCenterView.onSystemBack()
-            finishAfterTransition()
+            finish()
         }
     }
 
@@ -107,12 +107,12 @@ internal class MessageCenterActivity : FadeTransitionActivity(),
 
     override fun navigateToMessaging() {
         Dependencies.activityLauncher.launchChat(this, Intention.SC_CHAT)
-        finishAfterTransition()
+        finish()
     }
 
     override fun returnToLiveChat() {
         Dependencies.activityLauncher.launchChat(this, Intention.RETURN_TO_CHAT)
-        finishAfterTransition()
+        finish()
     }
 
 }

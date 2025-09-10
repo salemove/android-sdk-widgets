@@ -33,10 +33,10 @@ internal class CallActivity : FadeTransitionActivity() {
     private val activityLauncher: ActivityLauncher by lazy { Dependencies.activityLauncher }
     private var callView: CallView by Delegates.notNull()
 
-    private var onBackClickedListener: CallView.OnBackClickedListener? = CallView.OnBackClickedListener { this.finishAfterTransition() }
+    private var onBackClickedListener: CallView.OnBackClickedListener? = CallView.OnBackClickedListener { this.finish() }
     private var onNavigateToChatListener: OnNavigateToChatListener? = OnNavigateToChatListener {
         navigateToChat()
-        finishAfterTransition()
+        finish()
     }
     private val onNavigateToWebBrowserListener = OnNavigateToWebBrowserListener(this::navigateToWebBrowser)
 
@@ -49,16 +49,16 @@ internal class CallActivity : FadeTransitionActivity() {
         val isUpgradeToCall = intent.getBooleanExtra(ExtraKeys.IS_UPGRADE_TO_CALL, false)
 
         if (!callView.shouldShowMediaEngagementView(isUpgradeToCall)) {
-            finishAfterTransition()
+            finish()
             return
         }
 
         callView.setOnTitleUpdatedListener(this::setTitle)
         onBackClickedListener?.also(callView::setOnBackClickedListener)
 
-        callView.setOnEndListener { this.finishAfterTransition() }
+        callView.setOnEndListener { this.finish() }
 
-        callView.setOnMinimizeListener { this.finishAfterTransition() }
+        callView.setOnMinimizeListener { this.finish() }
         onNavigateToChatListener?.also(callView::setOnNavigateToChatListener)
         callView.setOnNavigateToWebBrowserListener(onNavigateToWebBrowserListener)
 

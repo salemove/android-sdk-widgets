@@ -4,6 +4,7 @@ import android.graphics.Rect
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
+import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.activity.OnBackPressedCallback
@@ -50,6 +51,8 @@ internal class SurveyActivity : FadeTransitionActivity(), SurveyView.OnFinishLis
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
         prepareSurveyView()
+        val slideUpAnim = AnimationUtils.loadAnimation(this, R.anim.slide_up)
+        surveyView.startAnimation(slideUpAnim)
     }
 
     override fun onDestroy() {
@@ -62,6 +65,12 @@ internal class SurveyActivity : FadeTransitionActivity(), SurveyView.OnFinishLis
 
     override fun onFinish() {
         finish()
+    }
+
+    override fun finish() {
+        super.finish()
+        val slideDownAnim = AnimationUtils.loadAnimation(this, R.anim.slide_down)
+        surveyView.startAnimation(slideDownAnim)
     }
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
@@ -83,7 +92,7 @@ internal class SurveyActivity : FadeTransitionActivity(), SurveyView.OnFinishLis
             val isTappedOutsideSurveyView =
                 x < location[0] || x > location[0] + surveyView.width || y < location[1] || y > location[1] + surveyView.height
             if (isTappedOutsideSurveyView) {
-                finishAndRemoveTask()
+                finish()
                 return true // consume the event
             }
         }

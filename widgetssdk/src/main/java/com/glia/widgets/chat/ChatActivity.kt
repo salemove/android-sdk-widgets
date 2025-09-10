@@ -48,16 +48,16 @@ internal class ChatActivity : FadeTransitionActivity() {
         chatView.setOnTitleUpdatedListener(this::setTitle)
 
         if (!chatView.shouldShow()) {
-            finishAfterTransition()
+            finish()
             return
         }
 
-        chatView.setOnBackClickedListener(::finishAfterTransition)
+        chatView.setOnBackClickedListener(::finish)
         chatView.setOnBackToCallListener(::backToCallScreen)
 
-        chatView.setOnEndListener(::finishAfterTransition)
+        chatView.setOnEndListener(::finish)
 
-        chatView.setOnMinimizeListener(::finishAfterTransition)
+        chatView.setOnMinimizeListener(::finish)
 
         val intention = intent.getEnumExtra<Intention>(ExtraKeys.OPEN_CHAT_INTENTION)
 
@@ -89,6 +89,6 @@ internal class ChatActivity : FadeTransitionActivity() {
 
     private fun backToCallScreen() {
         activityLauncher.launchCall(this, null, false)
-        finishAfterTransition()
+        finish()
     }
 }

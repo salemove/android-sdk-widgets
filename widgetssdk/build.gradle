@@ -50,12 +50,14 @@ android {
     viewBinding true
     buildConfig true
   }
+
+  //After adding `Mockk` dependency to the instrumentation tests it started to fail builds with message that
+  // there are 6 files in project with these two Licences. Since all of them were related to Junit, it is safe to merge them.
   packagingOptions {
     resources {
       merges += ['META-INF/LICENSE.md', 'META-INF/LICENSE-notice.md']
     }
   }
-
 
   testOptions {
     unitTests {

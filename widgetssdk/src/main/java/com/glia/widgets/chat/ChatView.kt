@@ -8,7 +8,6 @@ import android.text.TextWatcher
 import android.util.AttributeSet
 import android.view.View
 import android.view.accessibility.AccessibilityEvent
-import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
@@ -537,11 +536,11 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             showToolbar(LocaleString(R.string.message_center_header))
             binding.appBarView.hideBackButton()
             binding.appBarView.showXButton()
-            binding.secureConversationsBottomBanner.visibility = View.VISIBLE
+            binding.secureConversationsBottomBanner.visibility = VISIBLE
         } else {
             showToolbar(LocaleString(R.string.engagement_chat_title))
             binding.appBarView.showBackButton()
-            binding.secureConversationsBottomBanner.visibility = View.GONE
+            binding.secureConversationsBottomBanner.visibility = GONE
         }
     }
 
@@ -608,6 +607,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         binding.chatRecyclerView.layoutManager = LinearLayoutManager(this.context)
         adapter.registerAdapterDataObserver(dataObserver)
         binding.chatRecyclerView.adapter = adapter
+        binding.chatRecyclerView.itemAnimator = null
         binding.chatRecyclerView.addOnScrollListener(onScrollListener)
         uploadAttachmentAdapter = UploadAttachmentAdapter()
         uploadAttachmentAdapter.setItemCallback { controller?.onRemoveAttachment(it) }
@@ -963,7 +963,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
                 override fun onTransitionEnd(transition: Transition) {
                     binding.blockingCurtain.apply {
                         if (isInvisible) {
-                            visibility = FrameLayout.GONE
+                            visibility = GONE
                         }
                     }
                 }
@@ -976,7 +976,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             if (shouldShowDropDown) {
                 clear(R.id.sc_top_banner_options, ConstraintSet.BOTTOM)
                 setVisibility(R.id.blocking_curtain, VISIBLE)
-                setVisibility(R.id.sc_top_banner_divider, View.INVISIBLE)
+                setVisibility(R.id.sc_top_banner_divider, INVISIBLE)
                 setRotation(R.id.sc_top_banner_icon, 180f)
             } else {
                 connect(R.id.sc_top_banner_options, ConstraintSet.BOTTOM, R.id.header_barrier, ConstraintSet.BOTTOM)

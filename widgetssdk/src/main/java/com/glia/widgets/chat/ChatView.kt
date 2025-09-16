@@ -348,6 +348,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     }
 
     override fun emitItems(items: List<ChatItem>) {
+        binding.chatRecyclerView.itemAnimator?.endAnimations()
         adapter.submitList(items)
     }
 
@@ -607,7 +608,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         binding.chatRecyclerView.layoutManager = LinearLayoutManager(this.context)
         adapter.registerAdapterDataObserver(dataObserver)
         binding.chatRecyclerView.adapter = adapter
-        binding.chatRecyclerView.itemAnimator = null
         binding.chatRecyclerView.addOnScrollListener(onScrollListener)
         uploadAttachmentAdapter = UploadAttachmentAdapter()
         uploadAttachmentAdapter.setItemCallback { controller?.onRemoveAttachment(it) }

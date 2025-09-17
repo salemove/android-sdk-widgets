@@ -3,10 +3,11 @@ include ':widgetssdk'
 include ':app'
 include ':lint_checker'
 
+ext.directCorePrintDetails = true
 apply from: "${rootProject.projectDir}/scripts/direct-core.gradle"
 
-if (gliaCoreSdkUseDirect) {
-  includeBuild(coreSdkPath) {
+if (gliaCoreSdkUseDirect && gliaCoreSdkPathExists) {
+  includeBuild(gliaCoreSdkPath) {
     name = 'gliaCore'
     dependencySubstitution {
       substitute module("com.glia:android-sdk:$gliaCoreSdkDirectPathVersion") using project(':androidSdk')

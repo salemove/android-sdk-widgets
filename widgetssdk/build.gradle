@@ -108,6 +108,22 @@ tasks.register("publishCoreSdkToLocalMaven") {
 
 apply from: "${rootProject.projectDir}/scripts/direct-core.gradle"
 
+tasks.register('cloneCoreSdkRepositoryIfUseDirect') {
+  group = 'custom'
+  description = 'Clones the Telemetry SDK from the remote repository.'
+  doLast {
+    cloneCoreSdkRepositoryIfUseDirect()
+  }
+}
+
+tasks.register('isGliaCoreSdkUseDirect') {
+  group = 'custom'
+  description = 'Prints if the Telemetry SDK is configured to be used directly.'
+  doLast {
+    println(gliaCoreSdkUseDirect ? 'true' : 'false')
+  }
+}
+
 dependencies {
   implementation libs.java.appcompat
   implementation libs.java.material
@@ -126,7 +142,7 @@ dependencies {
   // includeBuild doesn't work with custom build types, use local maven version instead
   snapshotApi "com.glia:android-sdk:${coreSdkSnapshotVersion(gliaSdkVersion)}"
 
-  implementation "com.glia:telemetry_lib:0.0.1"
+  implementation "com.glia:telemetry_lib:${telemetrySdkVersion("0.0.1")}"
 
   implementation libs.media.audioswitch
   implementation libs.media.lottie

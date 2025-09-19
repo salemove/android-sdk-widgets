@@ -271,6 +271,34 @@ workflows:
           is_always_run: true
           inputs:
             - set_java_version: "17"
+      - script:
+          title: Getting Core SDK source code if needed
+          is_always_run: true
+          inputs:
+            - content: |-
+                # Temp script for Bitrise to fix CI failing since it does not detect telemetry lib
+                #!/usr/bin/env bash
+                set -exuo pipefail
+
+                git ls-remote $CORE_SDK_REPO
+                
+                git clone --depth 1 $CORE_SDK_REPO $CORE_SDK_PATH
+
+                # Clone the telemetry lib
+                ./gradlew cloneCoreSdkRepositoryIfUseDirect
+      - script:
+          title: Getting Telemetry-lib source code if needed
+          inputs:
+            - content: |-
+                # Temp script for Bitrise to fix CI failing since it does not detect telemetry lib
+                #!/usr/bin/env bash
+                set -exuo pipefail
+
+                # Try to clone the telemetry lib if Core SDK is used
+                RESULT=$(./gradlew -q isGliaCoreSdkUseDirect)
+                if [ "$RESULT" = "true" ]; then
+                  ./gradlew :gliaCore:androidSdk:cloneTelemetrySdkRepositoryIfUseDirect
+                fi
       - install-missing-android-tools@3:
           inputs:
             - gradlew_path: $PROJECT_LOCATION/gradlew
@@ -338,6 +366,24 @@ workflows:
             - use_verbose_log: true
             - test_devices: MediumPhone.arm,26,en,portrait
       - deploy-to-bitrise-io@2: { }
+      - script:
+          title: Checking if Core SDK source was used
+          is_always_run: true
+          inputs:
+            - content: |-
+                # Temp script for Bitrise to fix CI failing since it does not detect telemetry lib
+                #!/usr/bin/env bash
+                set -exuo pipefail
+
+                # Check if direct source usage is configured
+                RESULT=$(./gradlew -q isGliaCoreSdkUseDirect)
+                if [ "$RESULT" = "true" ]; then
+                  # Check if destination branch is development
+                  if [ "$BITRISEIO_GIT_BRANCH_DEST" == "development" || [ "$BITRISEIO_GIT_BRANCH_DEST" == "master" ]; then
+                    echo "Error: Direct source usage of Core SDK is not allowed to merge to the master or development branches."
+                    exit 1
+                  fi
+                fi
       - cache-push@2: { }
   upgrade_dependencies:
     steps:
@@ -434,6 +480,12 @@ app:
     - opts:
         is_expand: false
       GIT_AUTHOR_EMAIL: bitrise@glia.com
+    - opts:
+        is_expand: false
+      CORE_SDK_PATH: android-adk
+    - opts:
+        is_expand: false
+      TELEMETRY_SDK_PATH: ../android-telemetry
 trigger_map:
   - push_branch: development
     workflow: development

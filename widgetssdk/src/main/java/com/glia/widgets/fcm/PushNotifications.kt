@@ -2,7 +2,6 @@ package com.glia.widgets.fcm
 
 import android.content.Context
 import com.glia.telemetry_lib.GliaLogger
-import com.glia.telemetry_lib.SDK_TYPE
 import com.glia.widgets.push.notifications.SecureMessagingPushController
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage

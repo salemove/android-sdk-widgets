@@ -1,7 +1,6 @@
 package com.glia.widgets.liveobservation
 
 import com.glia.telemetry_lib.GliaLogger
-import com.glia.telemetry_lib.SDK_TYPE
 
 /**
  * Class responsible for handling Live Observation.

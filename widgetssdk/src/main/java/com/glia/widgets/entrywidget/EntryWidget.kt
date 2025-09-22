@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Context
 import android.view.View
 import com.glia.telemetry_lib.GliaLogger
-import com.glia.telemetry_lib.SDK_TYPE
 import com.glia.widgets.chat.Intention
 import com.glia.widgets.entrywidget.adapter.EntryWidgetAdapter
 import com.glia.widgets.helper.wrapWithTheme

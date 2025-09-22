@@ -11,6 +11,7 @@ import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.telemetry_lib.EventAttribute
 import com.glia.telemetry_lib.ButtonNames
 import com.glia.telemetry_lib.DialogNames
+import com.glia.telemetry_lib.EngagementType
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.telemetry_lib.LogEvents
 import com.glia.widgets.R
@@ -96,7 +97,7 @@ internal object Dialogs {
             buttonVisible = true,
             buttonDescription = closeBtnAccessibility,
             buttonClickListener = handleDialogButtonClick(
-                dialogName = DialogNames.ADDITIONAL_PERMISSIONS_REQUEST,
+                dialogName = DialogNames.MISSING_PERMISSION,
                 buttonName = ButtonNames.CLOSE,
                 clickListener = buttonClickListener
             )
@@ -105,8 +106,8 @@ internal object Dialogs {
             context = context,
             theme = uiTheme,
             type = DialogType.AlertDialog(payload),
-            onShow = logDialogShown(DialogNames.ADDITIONAL_PERMISSIONS_REQUEST),
-            onDismiss = logDialogDismissed(DialogNames.ADDITIONAL_PERMISSIONS_REQUEST)
+            onShow = logDialogShown(DialogNames.MISSING_PERMISSION),
+            onDismiss = logDialogDismissed(DialogNames.MISSING_PERMISSION)
         )
     }
 
@@ -259,12 +260,12 @@ internal object Dialogs {
             ),
             link1ClickListener = handleDialogButtonClick(
                 dialogName = DialogNames.LIVE_OBSERVATION_CONFIRMATION,
-                buttonName = ButtonNames.LIVE_OBSERVATION_LINK_1,
+                buttonName = ButtonNames.ENGAGEMENT_CONFIRMATION_LINK_1,
                 clickListener = { linkClickListener(links.link1) }
             ),
             link2ClickListener = handleDialogButtonClick(
                 dialogName = DialogNames.LIVE_OBSERVATION_CONFIRMATION,
-                buttonName = ButtonNames.LIVE_OBSERVATION_LINK_2,
+                buttonName = ButtonNames.ENGAGEMENT_CONFIRMATION_LINK_2,
                 clickListener = { linkClickListener(links.link2) }
             )
         )
@@ -466,7 +467,7 @@ internal object Dialogs {
         GliaLogger.i(LogEvents.DIALOG_SHOWN) {
             put(EventAttribute.DialogName, dialogName)
             mediaUpgradeOffer?.run {
-                put(EventAttribute.MediaUpgradeOffer, attributeValue())
+                put(EventAttribute.EngagementType, attributeValue())
             }
         }
     }
@@ -475,16 +476,16 @@ internal object Dialogs {
         GliaLogger.i(LogEvents.DIALOG_CLOSED) {
             put(EventAttribute.DialogName, dialogName)
             mediaUpgradeOffer?.run {
-                put(EventAttribute.MediaUpgradeOffer, attributeValue())
+                put(EventAttribute.EngagementType, attributeValue())
             }
         }
     }
 
     private fun MediaUpgradeOffer.attributeValue(): String {
         return when {
-            isOneWayVideo -> "ONE_WAY_VIDEO"
-            isTwoWayVideo -> "TWO_WAY_VIDEO"
-            else -> "AUDIO"
+            isOneWayVideo -> EngagementType.ONE_WAY_VIDEO
+            isTwoWayVideo -> EngagementType.TWO_WAY_VIDEO
+            else -> EngagementType.AUDIO
         }
     }
 
@@ -499,7 +500,7 @@ internal object Dialogs {
                 put(EventAttribute.DialogName, dialogName)
                 put(EventAttribute.ButtonName, buttonName)
                 mediaUpgradeOffer?.run {
-                    put(EventAttribute.MediaUpgradeOffer, attributeValue())
+                    put(EventAttribute.EngagementType, attributeValue())
                 }
             }
             clickListener.onClick(it)

@@ -769,7 +769,7 @@ class PermissionManagerTest {
     private fun mockMediaUpgradeOffer(audio: MediaDirection? = null, video: MediaDirection? = null): MediaUpgradeOffer =
         TestMediaUpgradeOffer(audio, video)
 
-    private class TestMediaUpgradeOffer(audio: MediaDirection? = null, video: MediaDirection? = null) : MediaUpgradeOffer(audio, video) {
+    private class TestMediaUpgradeOffer(audio: MediaDirection? = null, video: MediaDirection? = null) : MediaUpgradeOffer("offer_id", audio, video) {
         override fun accept(callback: Consumer<GliaException>?) {}
 
         override fun decline(callback: Consumer<GliaException>?) {}

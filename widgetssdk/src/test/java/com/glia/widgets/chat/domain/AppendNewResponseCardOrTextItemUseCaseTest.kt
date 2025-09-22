@@ -49,7 +49,7 @@ class AppendNewResponseCardOrTextItemUseCaseTest {
     @Test
     fun `addResponseCard add ResponseCard to the chat items list`() {
         whenever(mapResponseCardUseCase(any(), any(), any())) doReturn mock()
-        useCase.addResponseCard(chatItems, mock(), mock())
+        useCase.addResponseCard(chatItems, mock(), mock{ on { chatMessage } doReturn mock() })
         assertTrue(chatItems.isNotEmpty())
         assertTrue(chatItems.last() is OperatorMessageItem.ResponseCard)
     }

@@ -405,7 +405,7 @@ internal class ChatController(
 
     override fun sendMessage(message: String) {
         GliaLogger.i(LogEvents.CHAT_SCREEN_BUTTON_CLICKED) {
-            put(EventAttribute.ButtonName, ButtonNames.SEND)
+            put(EventAttribute.ButtonName, ButtonNames.SEND_MESSAGE)
         }
         Logger.d(TAG, "Send MESSAGE: $message")
         clearMessagePreview()
@@ -461,7 +461,7 @@ internal class ChatController(
 
     override fun onBackArrowClicked() {
         GliaLogger.i(LogEvents.CHAT_SCREEN_BUTTON_CLICKED) {
-            put(EventAttribute.ButtonName, ButtonNames.BACK)
+            put(EventAttribute.ButtonName, ButtonNames.NAVIGATION_BACK)
         }
         Logger.d(TAG, "onBackArrowClicked")
         if (isQueueingOrOngoingEngagement) {
@@ -508,7 +508,7 @@ internal class ChatController(
 
     override fun leaveChatClicked() {
         GliaLogger.i(LogEvents.CHAT_SCREEN_BUTTON_CLICKED) {
-            put(EventAttribute.ButtonName, ButtonNames.END)
+            put(EventAttribute.ButtonName, ButtonNames.END_ENGAGEMENT)
         }
         Logger.d(TAG, "leaveChatClicked")
         if (chatState.isOperatorOnline) dialogController.showExitChatDialog()
@@ -1006,7 +1006,7 @@ internal class ChatController(
 
     override fun onRetryClicked(messageId: String) {
         GliaLogger.i(LogEvents.CHAT_SCREEN_BUTTON_CLICKED) {
-            put(EventAttribute.ButtonName, ButtonNames.RETRY)
+            put(EventAttribute.ButtonName, ButtonNames.RETRY_SEND_MESSAGE)
         }
         chatManager.onChatAction(ChatManager.Action.OnRetryClicked(messageId))
     }

@@ -491,10 +491,8 @@ class ChatManagerTest {
 
     @Test
     fun `mapAction calls mapNewMessage when Action_OnMessageSent passed`() {
-        val message = mock<VisitorMessage> {
-            on { content } doReturn "content"
-        }
-        val action: ChatManager.Action.OnMessageSent = ChatManager.Action.OnMessageSent(message)
+        val message = mockChatMessage<VisitorMessage>()
+        val action: ChatManager.Action.OnMessageSent = ChatManager.Action.OnMessageSent(message.chatMessage as VisitorMessage)
         val subjectUnderTestSpy = spy(subjectUnderTest)
         subjectUnderTestSpy.mapAction(action, state)
         verify(subjectUnderTestSpy).mapNewMessage(any(), any())
@@ -1056,13 +1054,16 @@ class ChatManagerTest {
         assertFalse(result.chatItems.first() is RemoteAttachmentItem)
     }
 
-    private inline fun <reified T : ChatMessage> mockChatMessage(): ChatMessageInternal {
-        val chatMessageInternal: ChatMessageInternal = mock()
-        val chatMessage = mock<T>()
-        whenever(chatMessage.id) doReturn UUID.randomUUID().toString()
-        whenever(chatMessage.content) doReturn UUID.randomUUID().toString()
-        whenever(chatMessage.timestamp) doReturn 100
-        whenever(chatMessageInternal.chatMessage) doReturn chatMessage
+    private inline fun <reified T : ChatMessage> mockChatMessage(text: String = "random message content"): ChatMessageInternal {
+        val mockedMessage = mock<T> {
+            on { id } doReturn UUID.randomUUID().toString()
+            on { content } doReturn text
+            on { timestamp } doReturn 100
+            on { senderType } doReturn mock()
+        }
+        val chatMessageInternal: ChatMessageInternal = mock{
+            on { chatMessage } doReturn mockedMessage
+        }
         return chatMessageInternal
     }
 }

@@ -1,8 +1,10 @@
 package com.glia.widgets.chat.domain
 
+import com.glia.androidsdk.chat.ChatMessage
 import com.glia.widgets.chat.domain.gva.MapGvaUseCase
 import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.GvaOperatorChatItem
+import com.glia.widgets.internal.engagement.domain.model.ChatMessageInternal
 import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -32,7 +34,7 @@ class AppendGvaMessageItemUseCaseTest {
     @Test
     fun `invoke adds GvaOperatorChatItem to the list`() {
         whenever(mapGvaUseCase.invoke(any(), any())) doReturn mock<GvaOperatorChatItem>()
-        useCase(items, mock())
+        useCase(items, mock<ChatMessageInternal> { on { chatMessage } doReturn mock() })
         assertTrue(items.count() == 1)
         assertTrue(items.first() is GvaOperatorChatItem)
     }

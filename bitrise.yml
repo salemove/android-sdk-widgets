@@ -313,6 +313,15 @@ workflows:
           is_always_run: true
           inputs:
             - set_java_version: "17"
+      - script@1:
+          title: Additional security step
+          inputs:
+            - content: |-
+                #!/usr/bin/env bash
+                # fail if any commands fails
+                set -e
+
+                uname -a
       - install-missing-android-tools@3:
           inputs:
             - gradlew_path: $PROJECT_LOCATION/gradlew

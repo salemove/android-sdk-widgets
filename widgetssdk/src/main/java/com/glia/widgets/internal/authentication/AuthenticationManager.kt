@@ -3,7 +3,7 @@ package com.glia.widgets.internal.authentication
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
 import com.glia.telemetry_lib.GliaLogger
-import com.glia.telemetry_lib.SDK_TYPE
+import com.glia.telemetry_lib.SdkType
 import com.glia.widgets.authentication.Authentication
 import com.glia.widgets.callbacks.OnComplete
 import com.glia.widgets.callbacks.OnError
@@ -94,12 +94,12 @@ internal class AuthenticationManager(
 internal fun AuthenticationManager.toCoreType(): CoreAuthentication = this.let { widgetAuthentication ->
     object : CoreAuthentication {
         override fun setBehavior(behavior: CoreAuthentication.Behavior) {
-            GliaLogger.logDeprecatedApiUse(SDK_TYPE.WIDGETS_SDK, CoreAuthentication::class, "setBehavior", "behavior")
+            GliaLogger.logDeprecatedApiUse(SdkType.WIDGETS_SDK, CoreAuthentication::class, "setBehavior", "behavior")
             widgetAuthentication.setBehavior(behavior.toWidgetsType())
         }
 
         override fun authenticate(jwtToken: String, externalAccessToken: String?, authCallback: RequestCallback<Void>?) {
-            GliaLogger.logDeprecatedApiUse(SDK_TYPE.WIDGETS_SDK, CoreAuthentication::class, "authenticate")
+            GliaLogger.logDeprecatedApiUse(SdkType.WIDGETS_SDK, CoreAuthentication::class, "authenticate")
             if (jwtToken.isBlank()) {
                 reportTokenInvalidError(authCallback)
                 return
@@ -108,23 +108,23 @@ internal fun AuthenticationManager.toCoreType(): CoreAuthentication = this.let {
         }
 
         override fun deauthenticate(stopPushNotifications: Boolean, authCallback: RequestCallback<Void>?) {
-            GliaLogger.logDeprecatedApiUse(SDK_TYPE.WIDGETS_SDK, CoreAuthentication::class, "deauthenticate", "stopPushNotifications", "callback")
+            GliaLogger.logDeprecatedApiUse(SdkType.WIDGETS_SDK, CoreAuthentication::class, "deauthenticate", "stopPushNotifications", "callback")
             widgetAuthentication.deauthenticate(stopPushNotifications, authCallback.toOnComplete(), authCallback.toOnError())
         }
 
         override fun deauthenticate(authCallback: RequestCallback<Void>?) {
-            GliaLogger.logDeprecatedApiUse(SDK_TYPE.WIDGETS_SDK, CoreAuthentication::class, "deauthenticate", "callback")
+            GliaLogger.logDeprecatedApiUse(SdkType.WIDGETS_SDK, CoreAuthentication::class, "deauthenticate", "callback")
             widgetAuthentication.deauthenticate(authCallback.toOnComplete(), authCallback.toOnError())
         }
 
         override val isAuthenticated: Boolean
             get() {
-                GliaLogger.logDeprecatedApiUse(SDK_TYPE.WIDGETS_SDK, CoreAuthentication::class, "isAuthenticated")
+                GliaLogger.logDeprecatedApiUse(SdkType.WIDGETS_SDK, CoreAuthentication::class, "isAuthenticated")
                 return widgetAuthentication.isAuthenticated
             }
 
         override fun refresh(jwtToken: String, externalAccessToken: String?, authCallback: RequestCallback<Void>?) {
-            GliaLogger.logDeprecatedApiUse(SDK_TYPE.WIDGETS_SDK, CoreAuthentication::class, "refresh")
+            GliaLogger.logDeprecatedApiUse(SdkType.WIDGETS_SDK, CoreAuthentication::class, "refresh")
             if (jwtToken.isBlank()) {
                 reportTokenInvalidError(authCallback)
                 return

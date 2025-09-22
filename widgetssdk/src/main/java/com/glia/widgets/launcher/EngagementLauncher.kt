@@ -3,7 +3,6 @@ package com.glia.widgets.launcher
 import android.content.Context
 import com.glia.androidsdk.Engagement
 import com.glia.telemetry_lib.GliaLogger
-import com.glia.telemetry_lib.SDK_TYPE
 import com.glia.widgets.R
 import com.glia.widgets.chat.Intention
 import com.glia.widgets.engagement.domain.EngagementTypeUseCase

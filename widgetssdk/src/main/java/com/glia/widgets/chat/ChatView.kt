@@ -728,17 +728,17 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             }
             attachmentPopup.show(binding.addAttachmentButton, {
                 GliaLogger.i(LogEvents.CHAT_SCREEN_BUTTON_CLICKED) {
-                    put(EventAttribute.ButtonName, ButtonNames.SELECT_FROM_LIBRARY)
+                    put(EventAttribute.ButtonName, ButtonNames.ADD_ATTACHMENT_PHOTO_LIBRARY_OPTION)
                 }
                 getContentLauncher?.launch(arrayOf(Constants.MIME_TYPE_IMAGES))
             }, {
                 GliaLogger.i(LogEvents.CHAT_SCREEN_BUTTON_CLICKED) {
-                    put(EventAttribute.ButtonName, ButtonNames.TAKE_PHOTO)
+                    put(EventAttribute.ButtonName, ButtonNames.ADD_ATTACHMENT_CAMERA_OPTION)
                 }
                 controller?.onTakePhotoClicked()
             }, {
                 GliaLogger.i(LogEvents.CHAT_SCREEN_BUTTON_CLICKED) {
-                    put(EventAttribute.ButtonName, ButtonNames.BROWSE_FILES)
+                    put(EventAttribute.ButtonName, ButtonNames.ADD_ATTACHMENT_FILES_OPTION)
                 }
                 openDocumentLauncher?.launch(arrayOf(Constants.MIME_TYPE_ALL))
             })

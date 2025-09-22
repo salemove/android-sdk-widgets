@@ -5,7 +5,7 @@ import android.content.Intent
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
 import com.glia.telemetry_lib.GliaLogger
-import com.glia.telemetry_lib.SDK_TYPE
+import com.glia.telemetry_lib.SdkType
 import com.glia.widgets.authentication.Authentication
 import com.glia.widgets.callbacks.OnComplete
 import com.glia.widgets.callbacks.OnError
@@ -130,7 +130,7 @@ object GliaWidgets {
     @JvmStatic
     @Synchronized
     fun onAppCreate(application: Application) {
-        GliaLogger.logDeprecatedApiUse(SDK_TYPE.WIDGETS_SDK, GliaWidgets::class, "onAppCreate")
+        GliaLogger.logDeprecatedApiUse(SdkType.WIDGETS_SDK, GliaWidgets::class, "onAppCreate")
         try {
             Dependencies.onAppCreate(application)
         } catch (gliaException: GliaException) {
@@ -335,7 +335,7 @@ object GliaWidgets {
     @Deprecated("This method is no longer required, as all the required permissions are now managed internally.")
     @JvmStatic
     fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        GliaLogger.logDeprecatedApiUse(SDK_TYPE.WIDGETS_SDK, GliaWidgets::class, "onRequestPermissionsResult")
+        GliaLogger.logDeprecatedApiUse(SdkType.WIDGETS_SDK, GliaWidgets::class, "onRequestPermissionsResult")
         Logger.d(TAG, "onRequestPermissionsResult")
         try {
             gliaCore().onRequestPermissionsResult(requestCode, permissions, grantResults)
@@ -358,7 +358,7 @@ object GliaWidgets {
     @Deprecated("This method is no longer required, as required activity results are now managed internally.")
     @JvmStatic
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        GliaLogger.logDeprecatedApiUse(SDK_TYPE.WIDGETS_SDK, GliaWidgets::class, "onActivityResult")
+        GliaLogger.logDeprecatedApiUse(SdkType.WIDGETS_SDK, GliaWidgets::class, "onActivityResult")
         Logger.d(TAG, "onActivityResult")
         try {
             repositoryFactory.engagementRepository.onActivityResult(requestCode, resultCode, data)
@@ -477,7 +477,7 @@ object GliaWidgets {
     @Deprecated("Please use getAuthentication(behavior: com.glia.widgets.authentication.Authentication.Behavior)")
     @JvmStatic
     fun getAuthentication(behavior: com.glia.androidsdk.visitor.Authentication.Behavior): com.glia.androidsdk.visitor.Authentication {
-        GliaLogger.logDeprecatedApiUse(SDK_TYPE.WIDGETS_SDK, GliaWidgets::class, "getAuthentication")
+        GliaLogger.logDeprecatedApiUse(SdkType.WIDGETS_SDK, GliaWidgets::class, "getAuthentication")
         try {
             return getAuthenticationManager(behavior.toWidgetsType()).toCoreType()
         } catch (gliaException: GliaException) {

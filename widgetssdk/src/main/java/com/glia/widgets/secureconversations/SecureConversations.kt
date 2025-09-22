@@ -2,7 +2,6 @@ package com.glia.widgets.secureconversations
 
 import com.glia.androidsdk.RequestCallback
 import com.glia.telemetry_lib.GliaLogger
-import com.glia.telemetry_lib.SDK_TYPE
 import com.glia.widgets.callbacks.OnResult
 
 /**

@@ -7,7 +7,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import com.glia.androidsdk.GliaConfig
 import com.glia.androidsdk.RequestCallback
-import com.glia.androidsdk.internal.logger.LoggerHelper
+import com.glia.androidsdk.internal.logger.TelemetryHelper
 import com.glia.telemetry_lib.EventAttribute
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.telemetry_lib.GliaTelemetry
@@ -274,7 +274,7 @@ internal object Dependencies {
         repositoryFactory.initialize()
         configurationManager.applyConfiguration(gliaWidgetsConfig)
         localeProvider.setCompanyName(gliaWidgetsConfig.companyName)
-        GliaLogger.i(LogEvents.WIDGETS_SDK_STARTED)
+        GliaLogger.i(LogEvents.WIDGETS_SDK_CONFIGURED)
     }
 
     @JvmStatic
@@ -289,16 +289,16 @@ internal object Dependencies {
                 localeProvider.setCompanyName(gliaWidgetsConfig.companyName)
             }
             callback?.onResult(success, error)
-            GliaLogger.i(LogEvents.WIDGETS_SDK_STARTED)
+            GliaLogger.i(LogEvents.WIDGETS_SDK_CONFIGURED)
         }
     }
 
     private fun initLogger(
         gliaConfig: GliaConfig
     ) {
-        LoggerHelper.init(gliaConfig)
+        TelemetryHelper.init(gliaConfig)
         GliaTelemetry.setGlobalAttribute(GlobalAttribute.SdkWidgetsVersion, BuildConfig.GLIA_WIDGETS_SDK_VERSION)
-        GliaLogger.i(LogEvents.WIDGETS_SDK_STARTING) {
+        GliaLogger.i(LogEvents.WIDGETS_SDK_CONFIGURING) {
             put(EventAttribute.ApiKeyId, gliaConfig.siteApiKey?.id ?: "N/A")
             put(EventAttribute.Environment, gliaConfig.region ?: "N/A")
             put(EventAttribute.LocaleCode, gliaConfig.manualLocaleOverride ?: "N/A")

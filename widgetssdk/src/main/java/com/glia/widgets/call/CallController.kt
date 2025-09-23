@@ -7,23 +7,18 @@ import com.glia.androidsdk.comms.MediaDirection
 import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.androidsdk.comms.Video
+import com.glia.telemetry_lib.ButtonNames
+import com.glia.telemetry_lib.EventAttribute
+import com.glia.telemetry_lib.GliaLogger
+import com.glia.telemetry_lib.LogEvents
 import com.glia.widgets.Constants
 import com.glia.widgets.call.CallStatus.EngagementOngoingAudioCallStarted
 import com.glia.widgets.call.CallStatus.EngagementOngoingVideoCallStarted
 import com.glia.widgets.call.domain.HandleCallPermissionsUseCase
 import com.glia.widgets.chat.domain.DecideOnQueueingUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
-import com.glia.widgets.internal.audio.domain.TurnSpeakerphoneUseCase
-import com.glia.widgets.internal.dialog.DialogContract
-import com.glia.widgets.internal.dialog.domain.ConfirmationDialogLinksUseCase
-import com.glia.widgets.internal.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
-import com.glia.widgets.internal.dialog.model.ConfirmationDialogLinks
-import com.glia.widgets.internal.dialog.model.Link
-import com.glia.widgets.engagement.MediaType
-import com.glia.widgets.internal.engagement.domain.ConfirmationDialogUseCase
-import com.glia.widgets.internal.engagement.domain.ShouldShowMediaEngagementViewUseCase
-import com.glia.widgets.internal.notification.domain.CallNotificationUseCase
 import com.glia.widgets.engagement.EngagementUpdateState
+import com.glia.widgets.engagement.MediaType
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCase
 import com.glia.widgets.engagement.domain.EndEngagementUseCase
@@ -44,6 +39,16 @@ import com.glia.widgets.helper.TimeCounter.FormattedTimerStatusListener
 import com.glia.widgets.helper.TimeCounter.RawTimerStatusListener
 import com.glia.widgets.helper.formattedName
 import com.glia.widgets.helper.imageUrl
+import com.glia.widgets.helper.logCallScreenButtonClicked
+import com.glia.widgets.internal.audio.domain.TurnSpeakerphoneUseCase
+import com.glia.widgets.internal.dialog.DialogContract
+import com.glia.widgets.internal.dialog.domain.ConfirmationDialogLinksUseCase
+import com.glia.widgets.internal.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
+import com.glia.widgets.internal.dialog.model.ConfirmationDialogLinks
+import com.glia.widgets.internal.dialog.model.Link
+import com.glia.widgets.internal.engagement.domain.ConfirmationDialogUseCase
+import com.glia.widgets.internal.engagement.domain.ShouldShowMediaEngagementViewUseCase
+import com.glia.widgets.internal.notification.domain.CallNotificationUseCase
 import com.glia.widgets.view.MessagesNotSeenHandler
 import com.glia.widgets.view.MessagesNotSeenHandler.MessagesNotSeenHandlerListener
 import com.glia.widgets.view.MinimizeHandler
@@ -279,9 +284,9 @@ internal class CallController(
         mediaUpgradeDisposable.clear()
     }
 
-    override fun leaveChatClicked() {
-        Logger.d(TAG, "leaveChatClicked")
-        showExitChatDialog()
+    override fun endEngagementClicked() {
+        GliaLogger.logCallScreenButtonClicked(ButtonNames.END_ENGAGEMENT)
+        showEndEngagementDialog()
     }
 
     override fun setView(view: CallContract.View) {
@@ -319,8 +324,8 @@ internal class CallController(
         dialogController.dismissCurrentDialog()
     }
 
-    override fun leaveChatQueueClicked() {
-        Logger.d(TAG, "leaveChatQueueClicked")
+    override fun exitQueueingClicked() {
+        GliaLogger.logCallScreenButtonClicked(ButtonNames.CLOSE)
         dialogController.showExitQueueDialog()
     }
 
@@ -349,7 +354,7 @@ internal class CallController(
     }
 
     override fun chatButtonClicked() {
-        Logger.d(TAG, "chatButtonClicked")
+        GliaLogger.logCallScreenButtonClicked(ButtonNames.CHAT)
         updateFromCallScreenUseCase(true)
         view?.navigateToChat()
         onDestroy(true)
@@ -364,7 +369,7 @@ internal class CallController(
     }
 
     override fun minimizeButtonClicked() {
-        Logger.d(TAG, "minimizeButtonClicked")
+        GliaLogger.logCallScreenButtonClicked(ButtonNames.MINIMIZE)
         minimizeHandler.minimize()
     }
 
@@ -396,10 +401,12 @@ internal class CallController(
     }
 
     override fun onSpeakerButtonPressed() {
-        val newValue = !callState.isSpeakerOn
-        Logger.d(TAG, "onSpeakerButtonPressed, new value: $newValue")
-        emitViewState(callState.speakerValueChanged(newValue))
-        turnSpeakerphoneUseCase.invoke(newValue)
+        val shouldOnSpeaker = !callState.isSpeakerOn
+
+        emitViewState(callState.speakerValueChanged(shouldOnSpeaker))
+        turnSpeakerphoneUseCase(on = shouldOnSpeaker)
+
+        GliaLogger.logCallScreenButtonClicked(if (shouldOnSpeaker) ButtonNames.SPEAKER_ON else ButtonNames.SPEAKER_OFF)
     }
 
     override fun shouldShowMediaEngagementView(upgradeToCall: Boolean): Boolean {
@@ -407,6 +414,7 @@ internal class CallController(
     }
 
     override fun onBackClicked() {
+        GliaLogger.logCallScreenButtonClicked(ButtonNames.NAVIGATION_BACK)
         updateFromCallScreenUseCase(false)
         onDestroy(true)
     }
@@ -460,9 +468,9 @@ internal class CallController(
         }
     }
 
-    private fun showExitChatDialog() {
+    private fun showEndEngagementDialog() {
         if (callState.isMediaEngagementStarted) {
-            dialogController.showExitChatDialog()
+            dialogController.showEndEngagementDialog()
         }
     }
 

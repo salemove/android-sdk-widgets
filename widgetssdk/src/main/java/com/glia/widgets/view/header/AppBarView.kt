@@ -184,8 +184,8 @@ internal class AppBarView @JvmOverloads constructor(
         }
     }
 
-    fun setOnEndChatClickedListener(onEndChatClicked: OnEndChatClicked) {
-        binding.endButton.setOnClickListener { onEndChatClicked() }
+    fun setOnEndClickListener(onEndClicked: OnEndClicked) {
+        binding.endButton.setOnClickListener { onEndClicked() }
     }
 
     fun hideLeaveButtons() {
@@ -228,7 +228,7 @@ internal class AppBarView @JvmOverloads constructor(
         operator fun invoke()
     }
 
-    fun interface OnEndChatClicked {
+    fun interface OnEndClicked {
         operator fun invoke()
     }
 }

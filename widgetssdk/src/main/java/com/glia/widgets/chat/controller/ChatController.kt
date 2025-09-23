@@ -506,12 +506,12 @@ internal class ChatController(
         dialogController.dismissCurrentDialog()
     }
 
-    override fun leaveChatClicked() {
+    override fun endEngagementClicked() {
         GliaLogger.i(LogEvents.CHAT_SCREEN_BUTTON_CLICKED) {
             put(EventAttribute.ButtonName, ButtonNames.END_ENGAGEMENT)
         }
         Logger.d(TAG, "leaveChatClicked")
-        if (chatState.isOperatorOnline) dialogController.showExitChatDialog()
+        if (chatState.isOperatorOnline) dialogController.showEndEngagementDialog()
     }
 
     override fun onXButtonClicked() {

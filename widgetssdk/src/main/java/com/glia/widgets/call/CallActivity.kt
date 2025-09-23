@@ -1,6 +1,8 @@
 package com.glia.widgets.call
 
 import android.os.Bundle
+import com.glia.telemetry_lib.GliaLogger
+import com.glia.telemetry_lib.LogEvents
 import com.glia.widgets.R
 import com.glia.widgets.base.FadeTransitionActivity
 import com.glia.widgets.call.CallView.OnNavigateToChatListener
@@ -71,11 +73,13 @@ internal class CallActivity : FadeTransitionActivity() {
     override fun onResume() {
         callView.onResume()
         super.onResume()
+        GliaLogger.i(LogEvents.CALL_SCREEN_SHOWN)
     }
 
     override fun onPause() {
         callView.onPause()
         super.onPause()
+        GliaLogger.i(LogEvents.CALL_SCREEN_CLOSED)
     }
 
     override fun onDestroy() {

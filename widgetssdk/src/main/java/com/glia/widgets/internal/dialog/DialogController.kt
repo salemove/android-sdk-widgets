@@ -14,7 +14,7 @@ internal interface DialogContract {
         fun dismissCurrentDialog()
         fun dismissDialogs()
         fun showExitQueueDialog()
-        fun showExitChatDialog()
+        fun showEndEngagementDialog()
         fun showVisitorCodeDialog()
         fun dismissVisitorCodeDialog()
         fun showUnexpectedErrorDialog()
@@ -65,7 +65,7 @@ internal class DialogController : DialogContract.Controller {
         dialogManager.addAndEmit(DialogState.ExitQueue)
     }
 
-    override fun showExitChatDialog() {
+    override fun showEndEngagementDialog() {
         Logger.i(TAG, "Show End Engagement Dialog")
         dialogManager.addAndEmit(DialogState.EndEngagement)
     }

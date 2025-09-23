@@ -12,8 +12,8 @@ internal interface CallContract {
         val confirmationDialogLinks: ConfirmationDialogLinks
 
         fun onBackClicked()
-        fun leaveChatClicked()
-        fun leaveChatQueueClicked()
+        fun endEngagementClicked()
+        fun exitQueueingClicked()
         fun chatButtonClicked()
         fun onSpeakerButtonPressed()
         fun minimizeButtonClicked()

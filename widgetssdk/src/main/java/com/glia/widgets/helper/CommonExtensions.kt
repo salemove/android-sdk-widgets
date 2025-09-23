@@ -22,6 +22,9 @@ import com.glia.androidsdk.comms.MediaDirection
 import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement
+import com.glia.telemetry_lib.EventAttribute
+import com.glia.telemetry_lib.GliaLogger
+import com.glia.telemetry_lib.LogEvents
 import com.glia.widgets.UiTheme
 import com.glia.widgets.engagement.MediaType
 import com.glia.widgets.queue.Queue
@@ -107,3 +110,7 @@ internal fun createTempFileCompat(prefix: String, suffix: String? = null, direct
     } else {
         File.createTempFile(prefix, suffix, directory)
     }
+
+internal fun GliaLogger.logCallScreenButtonClicked(buttonName: String) = i(LogEvents.CALL_SCREEN_BUTTON_CLICKED) {
+    put(EventAttribute.ButtonName, buttonName)
+}

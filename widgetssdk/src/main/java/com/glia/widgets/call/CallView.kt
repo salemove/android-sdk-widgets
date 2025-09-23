@@ -20,6 +20,8 @@ import androidx.transition.TransitionManager
 import androidx.transition.TransitionSet
 import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.comms.VideoView
+import com.glia.telemetry_lib.GliaLogger
+import com.glia.telemetry_lib.LogEvents
 import com.glia.widgets.Constants
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
@@ -72,12 +74,7 @@ import kotlin.properties.Delegates
 private const val CONTROLS_ALPHA_SEMI_TRANSPARENT = 0.9f
 private const val CONTROLS_ALPHA = 1f
 
-internal class CallView(
-    context: Context,
-    attrs: AttributeSet?,
-    defStyleAttr: Int,
-    defStyleRes: Int
-) : ConstraintLayout(
+internal class CallView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : ConstraintLayout(
     MaterialThemeOverlay.wrap(context, attrs, defStyleAttr, defStyleRes),
     attrs,
     defStyleAttr,
@@ -159,8 +156,8 @@ internal class CallView(
             callController?.onBackClicked()
             onBackClickedListener?.onBackClicked()
         }
-        appBar.setOnEndChatClickedListener { callController?.leaveChatClicked() }
-        appBar.setOnXClickedListener { callController?.leaveChatQueueClicked() }
+        appBar.setOnEndClickListener { callController?.endEngagementClicked() }
+        appBar.setOnXClickedListener { callController?.exitQueueingClicked() }
         chatButton.setOnClickListener { callController?.chatButtonClicked() }
         speakerButton.setOnClickListener { callController?.onSpeakerButtonPressed() }
         minimizeButton.setOnClickListener { callController?.minimizeButtonClicked() }
@@ -622,6 +619,7 @@ internal class CallView(
                 removeAllViews()
                 addView(operatorVideoView)
                 invalidate()
+                GliaLogger.i(LogEvents.CALL_SCREEN_OPERATOR_VIDEO_SHOWN)
             }
         }
     }

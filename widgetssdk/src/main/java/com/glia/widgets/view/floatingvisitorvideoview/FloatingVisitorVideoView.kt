@@ -10,6 +10,8 @@ import android.widget.TextView
 import androidx.core.view.get
 import androidx.core.view.isVisible
 import com.glia.androidsdk.comms.VideoView
+import com.glia.telemetry_lib.GliaLogger
+import com.glia.telemetry_lib.LogEvents
 import com.glia.widgets.R
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.setLocaleText
@@ -65,14 +67,17 @@ internal class FloatingVisitorVideoView @JvmOverloads constructor(
         newVideoView.setZOrderMediaOverlay(true)
         removeVideoView()
         addView(newVideoView, 0)
+        GliaLogger.i(LogEvents.CALL_SCREEN_VISITOR_VIDEO_SHOWN)
     }
 
     fun showFlipCameraButton(flipButtonState: FlipButtonState) {
         when (flipButtonState) {
             FlipButtonState.HIDE -> flipCameraButtonContainer.isVisible = false
+
             FlipButtonState.SWITCH_TO_FACE_CAMERA -> {
                 setFlipCameraButton(R.string.call_visitor_video_front_camera_button_accessibility_label)
             }
+
             FlipButtonState.SWITCH_TO_BACK_CAMERA -> {
                 setFlipCameraButton(R.string.call_visitor_video_back_camera_button_accessibility_label)
             }

@@ -38,7 +38,7 @@ internal interface ChatContract {
         fun overlayPermissionsDialogDismissed()
         fun setOnBackClickedListener(finishCallback: ChatView.OnBackClickedListener?)
         fun onXButtonClicked()
-        fun leaveChatClicked()
+        fun endEngagementClicked()
         fun endEngagementDialogDismissed()
         fun endEngagementDialogYesClicked()
         fun unexpectedErrorDialogDismissed()

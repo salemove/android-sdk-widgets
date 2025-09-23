@@ -703,7 +703,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         }
         setupAddAttachmentButton()
         binding.appBarView.setOnBackClickedListener { controller?.onBackArrowClicked() }
-        binding.appBarView.setOnEndChatClickedListener { controller?.leaveChatClicked() }
+        binding.appBarView.setOnEndClickListener { controller?.endEngagementClicked() }
         binding.appBarView.setOnXClickedListener { controller?.onXButtonClicked() }
         binding.newMessagesIndicatorCard.setOnClickListener { controller?.newMessagesIndicatorClicked() }
         binding.gvaQuickRepliesLayout.onItemClickedListener = GvaChipGroup.OnItemClickedListener {

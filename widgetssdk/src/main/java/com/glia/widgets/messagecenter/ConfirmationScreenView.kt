@@ -25,12 +25,7 @@ import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.securemessaging.SecureMessagingConfirmationScreenTheme
 import com.google.android.material.transition.MaterialFadeThrough
 
-internal class ConfirmationScreenView(
-    context: Context,
-    attrs: AttributeSet?,
-    defStyleAttr: Int,
-    defStyleRes: Int
-) : LinearLayout(
+internal class ConfirmationScreenView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : LinearLayout(
     context.wrapWithMaterialThemeOverlay(attrs, defStyleAttr, defStyleRes),
     attrs,
     defStyleAttr,
@@ -63,6 +58,14 @@ internal class ConfirmationScreenView(
         setupUnifiedTheme()
     }
 
+    @JvmOverloads
+    constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = R.attr.gliaChatStyle) : this(
+        context,
+        attrs,
+        defStyleAttr,
+        R.style.Application_Glia_Chat
+    )
+
     private fun setupUnifiedTheme() {
         unifiedTheme?.apply {
             applyColorTheme(backgroundTheme)
@@ -72,13 +75,6 @@ internal class ConfirmationScreenView(
             binding.btnCheckMessagesConfirmationScreen.applyButtonTheme(checkMessagesButtonTheme)
         }
     }
-
-    @JvmOverloads
-    constructor(
-        context: Context,
-        attrs: AttributeSet? = null,
-        defStyleAttr: Int = R.attr.gliaChatStyle
-    ) : this(context, attrs, defStyleAttr, R.style.Application_Glia_Chat)
 
     fun setOnCheckMessagesButtonClickListener(listener: OnClickListener) {
         onCheckMessagesButtonClickListener = listener

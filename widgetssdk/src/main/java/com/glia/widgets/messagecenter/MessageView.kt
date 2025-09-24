@@ -18,6 +18,8 @@ import androidx.core.widget.TextViewCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.glia.telemetry_lib.ButtonNames
+import com.glia.telemetry_lib.GliaLogger
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.AttachmentPopup
@@ -28,6 +30,7 @@ import com.glia.widgets.helper.Utils
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getColorStateListCompat
 import com.glia.widgets.helper.layoutInflater
+import com.glia.widgets.helper.logScWelcomeScreenButtonClicked
 import com.glia.widgets.helper.setCompoundDrawableTintListCompat
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.setLocaleHint
@@ -42,12 +45,7 @@ import com.google.android.material.button.MaterialButton
 import java.util.concurrent.Executor
 import kotlin.properties.Delegates
 
-internal class MessageView(
-    context: Context,
-    attrs: AttributeSet?,
-    defStyleAttr: Int,
-    defStyleRes: Int
-) : NestedScrollView(
+internal class MessageView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : NestedScrollView(
     context.wrapWithMaterialThemeOverlay(attrs, defStyleAttr, defStyleRes),
     attrs,
     defStyleAttr
@@ -88,6 +86,9 @@ internal class MessageView(
 
     private var uploadAttachmentAdapter by Delegates.notNull<UploadAttachmentAdapter>()
 
+    @VisibleForTesting
+    internal var executor: Executor? = null
+
     init {
         isFillViewport = true
         isNestedScrollingEnabled = false
@@ -100,11 +101,12 @@ internal class MessageView(
     }
 
     @JvmOverloads
-    constructor(
-        context: Context,
-        attrs: AttributeSet? = null,
-        defStyleAttr: Int = R.attr.gliaChatStyle
-    ) : this(context, attrs, defStyleAttr, R.style.Application_Glia_Chat)
+    constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = R.attr.gliaChatStyle) : this(
+        context,
+        attrs,
+        defStyleAttr,
+        R.style.Application_Glia_Chat
+    )
 
     private fun readTypedArray(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
         messageErrorTextView.setLocaleText(R.string.message_center_welcome_message_length_error)
@@ -208,13 +210,16 @@ internal class MessageView(
     private fun initCallbacks() {
         checkMessagesButton.setOnClickListener {
             checkMessageButtonClickListener?.onClick(it)
+            GliaLogger.logScWelcomeScreenButtonClicked(ButtonNames.CHECK_MESSAGES)
         }
         sendMessageButton.setOnClickListener {
             sendMessageButtonClickListener?.onClick(it)
+            GliaLogger.logScWelcomeScreenButtonClicked(ButtonNames.SEND_MESSAGE)
         }
 
         addAttachmentButton.setOnClickListener {
             attachmentButtonClickListener?.onClick(it)
+            GliaLogger.logScWelcomeScreenButtonClicked(ButtonNames.ADD_ATTACHMENT)
         }
 
         messageEditText.doAfterTextChanged {
@@ -222,17 +227,8 @@ internal class MessageView(
         }
     }
 
-    fun showAttachmentPopup(
-        onGalleryClicked: () -> Unit,
-        onTakePhotoClicked: () -> Unit,
-        onBrowseClicked: () -> Unit
-    ) {
-        attachmentPopup.show(
-            addAttachmentButton,
-            onGalleryClicked,
-            onTakePhotoClicked,
-            onBrowseClicked
-        )
+    fun showAttachmentPopup(onGalleryClicked: () -> Unit, onTakePhotoClicked: () -> Unit, onBrowseClicked: () -> Unit) {
+        attachmentPopup.show(addAttachmentButton, onGalleryClicked, onTakePhotoClicked, onBrowseClicked)
     }
 
     private fun showSendMessageGroup(state: MessageCenterState) {
@@ -317,9 +313,6 @@ internal class MessageView(
             MessageCenterState.ButtonState.DISABLE -> sendMessageButton.isEnabled = false
         }
     }
-
-    @VisibleForTesting
-    internal var executor: Executor? = null
 
     override fun post(action: Runnable?): Boolean {
         return executor?.execute(action)?.let { true } ?: super.post(action)

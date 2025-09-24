@@ -118,3 +118,7 @@ internal fun GliaLogger.logCallScreenButtonClicked(buttonName: String) = i(LogEv
 internal fun GliaLogger.logScWelcomeScreenButtonClicked(buttonName: String) = i(LogEvents.SC_WELCOME_SCREEN_BUTTON_CLICKED) {
     put(EventAttribute.ButtonName, buttonName)
 }
+
+internal fun GliaLogger.logScConfirmationScreenButtonClicked(buttonName: String) = i(LogEvents.SC_CONFIRMATION_SCREEN_BUTTON_CLICKED) {
+    put(EventAttribute.ButtonName, buttonName)
+}

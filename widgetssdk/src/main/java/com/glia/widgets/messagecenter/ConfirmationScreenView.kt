@@ -11,10 +11,13 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.transition.TransitionManager
+import com.glia.telemetry_lib.ButtonNames
+import com.glia.telemetry_lib.GliaLogger
 import com.glia.widgets.R
 import com.glia.widgets.databinding.MessageCenterConfirmationViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.layoutInflater
+import com.glia.widgets.helper.logScConfirmationScreenButtonClicked
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.helper.wrapWithMaterialThemeOverlay
@@ -48,7 +51,10 @@ internal class ConfirmationScreenView(context: Context, attrs: AttributeSet?, de
         gravity = Gravity.CENTER
         orientation = VERTICAL
         setBackgroundColor(ContextCompat.getColor(this.context, R.color.glia_chat_background_color))
-        checkMessagesButton.setOnClickListener { onCheckMessagesButtonClickListener?.onClick(it) }
+        checkMessagesButton.setOnClickListener {
+            onCheckMessagesButtonClickListener?.onClick(it)
+            GliaLogger.logScConfirmationScreenButtonClicked(ButtonNames.CHECK_MESSAGES)
+        }
         binding.title.setLocaleText(R.string.general_thank_you)
         binding.subtitle.setLocaleText(R.string.message_center_confirmation_subtitle)
         binding.btnCheckMessagesConfirmationScreen.setLocaleText(R.string.message_center_welcome_check_messages)

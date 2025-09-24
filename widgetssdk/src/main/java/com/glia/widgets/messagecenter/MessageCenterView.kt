@@ -29,6 +29,7 @@ import com.glia.widgets.helper.hideKeyboard
 import com.glia.widgets.helper.insetsController
 import com.glia.widgets.helper.isKeyboardVisible
 import com.glia.widgets.helper.layoutInflater
+import com.glia.widgets.helper.logScConfirmationScreenButtonClicked
 import com.glia.widgets.helper.logScWelcomeScreenButtonClicked
 import com.glia.widgets.helper.rootWindowInsetsCompat
 import com.glia.widgets.internal.dialog.DialogContract
@@ -150,7 +151,7 @@ internal class MessageCenterView(context: Context, attrs: AttributeSet?, defStyl
             if (messageView?.isVisible == true) {
                 GliaLogger.logScWelcomeScreenButtonClicked(ButtonNames.CLOSE)
             } else {
-                //TODO log confirmation screen close button clicked event
+                GliaLogger.logScConfirmationScreenButtonClicked(ButtonNames.CLOSE)
             }
         }
 
@@ -200,7 +201,7 @@ internal class MessageCenterView(context: Context, attrs: AttributeSet?, defStyl
 
         showConfirmationAppBar()
         GliaLogger.i(LogEvents.SC_WELCOME_SCREEN_CLOSED)
-        //TODO log confirmation screen shown event
+        GliaLogger.i(LogEvents.SC_CONFIRMATION_SCREEN_SHOWN)
     }
 
     private fun showConfirmationAppBar() {
@@ -285,7 +286,7 @@ internal class MessageCenterView(context: Context, attrs: AttributeSet?, defStyl
         if (messageView?.isVisible == true) {
             GliaLogger.i(LogEvents.SC_WELCOME_SCREEN_SHOWN)
         } else {
-            //TODO log confirmation screen shown event
+            GliaLogger.i(LogEvents.SC_CONFIRMATION_SCREEN_SHOWN)
         }
     }
 
@@ -295,7 +296,7 @@ internal class MessageCenterView(context: Context, attrs: AttributeSet?, defStyl
         if (messageView?.isVisible == true) {
             GliaLogger.i(LogEvents.SC_WELCOME_SCREEN_CLOSED)
         } else {
-            //TODO log confirmation screen closed event
+            GliaLogger.i(LogEvents.SC_CONFIRMATION_SCREEN_CLOSED)
         }
     }
 

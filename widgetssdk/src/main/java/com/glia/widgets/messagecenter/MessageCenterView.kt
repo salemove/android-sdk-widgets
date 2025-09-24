@@ -14,20 +14,22 @@ import androidx.core.content.withStyledAttributes
 import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.core.view.isVisible
+import com.glia.telemetry_lib.ButtonNames
+import com.glia.telemetry_lib.GliaLogger
+import com.glia.telemetry_lib.LogEvents
 import com.glia.widgets.Constants
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.databinding.MessageCenterViewBinding
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.SimpleWindowInsetsAndAnimationHandler
-import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.hideKeyboard
 import com.glia.widgets.helper.insetsController
 import com.glia.widgets.helper.isKeyboardVisible
 import com.glia.widgets.helper.layoutInflater
+import com.glia.widgets.helper.logScWelcomeScreenButtonClicked
 import com.glia.widgets.helper.rootWindowInsetsCompat
 import com.glia.widgets.internal.dialog.DialogContract
 import com.glia.widgets.internal.dialog.model.DialogState
@@ -47,12 +49,7 @@ import kotlinx.parcelize.Parcelize
 import java.util.concurrent.Executor
 import kotlin.properties.Delegates
 
-internal class MessageCenterView(
-    context: Context,
-    attrs: AttributeSet?,
-    defStyleAttr: Int,
-    defStyleRes: Int
-) : LinearLayout(
+internal class MessageCenterView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : LinearLayout(
     MaterialThemeOverlay.wrap(context, attrs, defStyleAttr, defStyleRes),
     attrs,
     defStyleAttr,
@@ -149,6 +146,12 @@ internal class MessageCenterView(
         appBar?.setOnXClickedListener {
             clearAndDismissDialogs()
             controller?.onCloseButtonClicked()
+
+            if (messageView?.isVisible == true) {
+                GliaLogger.logScWelcomeScreenButtonClicked(ButtonNames.CLOSE)
+            } else {
+                //TODO log confirmation screen close button clicked event
+            }
         }
 
         confirmationView?.setOnCheckMessagesButtonClickListener {
@@ -193,10 +196,11 @@ internal class MessageCenterView(
     }
 
     override fun showConfirmationScreen() {
-        Logger.i(TAG, "Show Message Center Confirmation screen")
         confirmationView?.fadeThrough(messageView!!)
 
         showConfirmationAppBar()
+        GliaLogger.i(LogEvents.SC_WELCOME_SCREEN_CLOSED)
+        //TODO log confirmation screen shown event
     }
 
     private fun showConfirmationAppBar() {
@@ -259,6 +263,8 @@ internal class MessageCenterView(
         } else {
             controller?.onTakePhotoClicked()
         }
+
+        GliaLogger.logScWelcomeScreenButtonClicked(ButtonNames.ADD_ATTACHMENT_CAMERA_OPTION)
     }
 
     private fun onDialogState(state: DialogState) {
@@ -275,10 +281,22 @@ internal class MessageCenterView(
 
     fun onResume() {
         attachDialogController()
+
+        if (messageView?.isVisible == true) {
+            GliaLogger.i(LogEvents.SC_WELCOME_SCREEN_SHOWN)
+        } else {
+            //TODO log confirmation screen shown event
+        }
     }
 
     fun onPause() {
         detachDialogController()
+
+        if (messageView?.isVisible == true) {
+            GliaLogger.i(LogEvents.SC_WELCOME_SCREEN_CLOSED)
+        } else {
+            //TODO log confirmation screen closed event
+        }
     }
 
     private fun attachDialogController() {

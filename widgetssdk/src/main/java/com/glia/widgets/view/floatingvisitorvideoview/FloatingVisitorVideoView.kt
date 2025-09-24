@@ -10,9 +10,11 @@ import android.widget.TextView
 import androidx.core.view.get
 import androidx.core.view.isVisible
 import com.glia.androidsdk.comms.VideoView
+import com.glia.telemetry_lib.ButtonNames
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.telemetry_lib.LogEvents
 import com.glia.widgets.R
+import com.glia.widgets.helper.logCallScreenButtonClicked
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContract.FlipButtonState
@@ -45,6 +47,7 @@ internal class FloatingVisitorVideoView @JvmOverloads constructor(
         flipCameraButtonContainer.setOnClickListener {
             sendFlipButtonAccessibilityEvent = true
             onFlipButtonClickListener?.onClick(it)
+            GliaLogger.logCallScreenButtonClicked(ButtonNames.FLIP_CAMERA)
         }
     }
 

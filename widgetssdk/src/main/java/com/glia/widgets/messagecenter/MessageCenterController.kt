@@ -6,6 +6,8 @@ import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.androidsdk.engagement.EngagementFile
 import com.glia.androidsdk.site.SiteInfo
+import com.glia.telemetry_lib.ButtonNames
+import com.glia.telemetry_lib.GliaLogger
 import com.glia.widgets.Constants
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.chat.domain.SiteInfoUseCase
@@ -14,6 +16,7 @@ import com.glia.widgets.chat.domain.UriToFileAttachmentUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
+import com.glia.widgets.helper.logScWelcomeScreenButtonClicked
 import com.glia.widgets.internal.dialog.DialogContract
 import com.glia.widgets.internal.fileupload.domain.AddFileAttachmentsObserverUseCase
 import com.glia.widgets.internal.fileupload.domain.AddFileToAttachmentAndUploadUseCase
@@ -176,10 +179,12 @@ internal class MessageCenterController(
 
     override fun onGalleryClicked() {
         view?.selectAttachmentFile(Constants.MIME_TYPE_IMAGES)
+        GliaLogger.logScWelcomeScreenButtonClicked(ButtonNames.ADD_ATTACHMENT_PHOTO_LIBRARY_OPTION)
     }
 
     override fun onBrowseClicked() {
         view?.selectAttachmentFile(Constants.MIME_TYPE_ALL)
+        GliaLogger.logScWelcomeScreenButtonClicked(ButtonNames.ADD_ATTACHMENT_FILES_OPTION)
     }
 
     override fun onTakePhotoClicked() {

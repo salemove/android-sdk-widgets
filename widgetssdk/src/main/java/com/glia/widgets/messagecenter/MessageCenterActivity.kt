@@ -11,8 +11,6 @@ import com.glia.widgets.base.FadeTransitionActivity
 import com.glia.widgets.chat.Intention
 import com.glia.widgets.databinding.MessageCenterActivityBinding
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.helper.Logger
-import com.glia.widgets.helper.TAG
 
 /**
  * This activity is used for displaying the welcome screen for secure messaging.
@@ -60,7 +58,6 @@ internal class MessageCenterActivity : FadeTransitionActivity(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Logger.i(TAG, "Create Message Center screen")
         binding = MessageCenterActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -90,7 +87,6 @@ internal class MessageCenterActivity : FadeTransitionActivity(),
         super.onDestroy()
         onBackPressedCallback.remove()
         controller.onDestroy()
-        Logger.i(TAG, "Destroy Message Center screen")
     }
 
     override fun selectAttachmentFile(type: String) {

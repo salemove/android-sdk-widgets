@@ -114,3 +114,7 @@ internal fun createTempFileCompat(prefix: String, suffix: String? = null, direct
 internal fun GliaLogger.logCallScreenButtonClicked(buttonName: String) = i(LogEvents.CALL_SCREEN_BUTTON_CLICKED) {
     put(EventAttribute.ButtonName, buttonName)
 }
+
+internal fun GliaLogger.logScWelcomeScreenButtonClicked(buttonName: String) = i(LogEvents.SC_WELCOME_SCREEN_BUTTON_CLICKED) {
+    put(EventAttribute.ButtonName, buttonName)
+}

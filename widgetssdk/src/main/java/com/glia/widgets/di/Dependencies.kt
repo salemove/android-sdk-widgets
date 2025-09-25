@@ -7,7 +7,6 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import com.glia.androidsdk.GliaConfig
 import com.glia.androidsdk.RequestCallback
-import com.glia.androidsdk.internal.logger.TelemetryHelper
 import com.glia.telemetry_lib.EventAttribute
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.telemetry_lib.GliaTelemetry
@@ -296,7 +295,7 @@ internal object Dependencies {
     private fun initLogger(
         gliaConfig: GliaConfig
     ) {
-        TelemetryHelper.init(gliaConfig)
+//        TelemetryHelper.init(gliaConfig) // TODO: improve telemetry initialization strategy
         GliaTelemetry.setGlobalAttribute(GlobalAttribute.SdkWidgetsVersion, BuildConfig.GLIA_WIDGETS_SDK_VERSION)
         GliaLogger.i(LogEvents.WIDGETS_SDK_CONFIGURING) {
             put(EventAttribute.ApiKeyId, gliaConfig.siteApiKey?.id ?: "N/A")

@@ -1,6 +1,5 @@
 package com.glia.widgets.survey
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -11,8 +10,14 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.cardview.widget.CardView
+import androidx.core.content.withStyledAttributes
+import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.androidsdk.engagement.Survey
+import com.glia.telemetry_lib.ButtonNames
+import com.glia.telemetry_lib.EventAttribute
+import com.glia.telemetry_lib.GliaLogger
+import com.glia.telemetry_lib.LogEvents
 import com.glia.widgets.R
 import com.glia.widgets.databinding.SurveyViewBinding
 import com.glia.widgets.di.Dependencies
@@ -136,7 +141,7 @@ internal class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: 
         } ?: run {
             val backgroundColor = surveyStyle?.layer?.backgroundColor
                 ?: SurveyStyle.Builder().build().layer.backgroundColor // default value
-            setupCardView(cornerRadius, Color.parseColor(backgroundColor))
+            setupCardView(cornerRadius, backgroundColor.toColorInt())
         }
     }
 
@@ -182,24 +187,17 @@ internal class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: 
     }
 
     private fun readTypedArray(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
-        @SuppressLint("CustomViewStyleable")
-        val typedArray = this.context.obtainStyledAttributes(
-            attrs,
-            R.styleable.GliaView,
-            defStyleAttr,
-            defStyleRes
-        )
-        setDefaultTheme(attrs, defStyleAttr, defStyleRes)
-        typedArray.recycle()
+        this.context.withStyledAttributes(attrs, R.styleable.GliaView, defStyleAttr, defStyleRes) {
+            setDefaultTheme(attrs, defStyleAttr, defStyleRes)
+        }
     }
 
     private fun setDefaultTheme(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
-        @SuppressLint("CustomViewStyleable")
-        val typedArray = context.obtainStyledAttributes(attrs, R.styleable.GliaView, defStyleAttr, defStyleRes)
-        val surveyStyle = Utils.getThemeFromTypedArray(typedArray, this.context).surveyStyle
-        initAdapter(surveyStyle)
-        applyStyle(surveyStyle)
-        typedArray.recycle()
+        this.context.withStyledAttributes(attrs, R.styleable.GliaView, defStyleAttr, defStyleRes) {
+            val surveyStyle = Utils.getThemeFromTypedArray(this, this@SurveyView.context).surveyStyle
+            initAdapter(surveyStyle)
+            applyStyle(surveyStyle)
+        }
     }
 
     private fun initAdapter(surveyStyle: SurveyStyle?) {
@@ -218,9 +216,13 @@ internal class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: 
     private fun initCallbacks() {
         submitButton.setOnClickListener {
             controller?.onSubmitClicked()
+
+            GliaLogger.i(LogEvents.SURVEY_SCREEN_BUTTON_CLICKED, null, mapOf(EventAttribute.ButtonName to ButtonNames.SUBMIT))
         }
         cancelButton.setOnClickListener {
             controller?.onCancelClicked()
+
+            GliaLogger.i(LogEvents.SURVEY_SCREEN_BUTTON_CLICKED, null, mapOf(EventAttribute.ButtonName to ButtonNames.CANCEL))
         }
     }
 

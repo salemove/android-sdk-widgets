@@ -10,6 +10,8 @@ import android.widget.EditText
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import com.glia.androidsdk.engagement.Survey
+import com.glia.telemetry_lib.GliaLogger
+import com.glia.telemetry_lib.LogEvents
 import com.glia.widgets.R
 import com.glia.widgets.base.FadeTransitionActivity
 import com.glia.widgets.di.Dependencies.controllerFactory
@@ -45,7 +47,6 @@ internal class SurveyActivity : FadeTransitionActivity(), SurveyView.OnFinishLis
 
         super.onCreate(savedInstanceState)
 
-        Logger.i(TAG, "Create Survey screen")
         setContentView(R.layout.survey_activity)
 
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
@@ -53,6 +54,8 @@ internal class SurveyActivity : FadeTransitionActivity(), SurveyView.OnFinishLis
         prepareSurveyView()
         val slideUpAnim = AnimationUtils.loadAnimation(this, R.anim.slide_up)
         surveyView.startAnimation(slideUpAnim)
+
+        GliaLogger.i(LogEvents.SURVEY_SCREEN_SHOWN)
     }
 
     override fun onDestroy() {
@@ -60,7 +63,7 @@ internal class SurveyActivity : FadeTransitionActivity(), SurveyView.OnFinishLis
         hideSoftKeyboard()
         surveyView.onDestroyView()
         onBackPressedCallback.remove()
-        Logger.i(TAG, "Destroy Survey screen")
+        GliaLogger.i(LogEvents.SURVEY_SCREEN_CLOSED)
     }
 
     override fun onFinish() {

@@ -2,6 +2,13 @@ package com.glia.widgets.entrywidget
 
 import android.app.Activity
 import androidx.annotation.VisibleForTesting
+import com.glia.telemetry_lib.ButtonNames
+import com.glia.telemetry_lib.EngagementType
+import com.glia.telemetry_lib.EntryWidgetState
+import com.glia.telemetry_lib.EventAttribute
+import com.glia.telemetry_lib.GliaLogger
+import com.glia.telemetry_lib.LogEvents
+import com.glia.telemetry_lib.ViewType
 import com.glia.widgets.chat.Intention
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.di.GliaCore
@@ -69,12 +76,14 @@ internal class EntryWidgetController @JvmOverloads constructor(
             unreadMessagesCountObservable,
             hasOngoingSCObservable,
             ::mapToEntryWidgetItems
-        )
+        ).distinctUntilChanged()
 
     private lateinit var view: EntryWidgetContract.View
+    private var viewType: EntryWidgetContract.ViewType? = null
 
     override fun setView(view: EntryWidgetContract.View, type: EntryWidgetContract.ViewType) {
         this.view = view
+        this.viewType = type
 
         if (!gliaCore.isInitialized) {
             showSdkNotInitializedState(type == EntryWidgetContract.ViewType.MESSAGING_LIVE_SUPPORT)
@@ -82,8 +91,21 @@ internal class EntryWidgetController @JvmOverloads constructor(
 
         itemsObservableBasedOnType(type)
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(view::showItems)
+            .subscribe(::showItems)
             .let(compositeDisposable::add)
+
+        when (viewType) {
+            EntryWidgetContract.ViewType.BOTTOM_SHEET,
+            EntryWidgetContract.ViewType.EMBEDDED_VIEW -> {
+                GliaLogger.i(LogEvents.ENTRY_WIDGET_SHOWN) {
+                    put(EventAttribute.ViewType, viewType.toTelemetryViewType() ?: "N/A")
+                }
+            }
+            EntryWidgetContract.ViewType.MESSAGING_LIVE_SUPPORT -> {
+                // TODO: Add LogEvent for Messaging Live Support
+            }
+            null -> { /* no-op */ }
+        }
     }
 
     @VisibleForTesting
@@ -134,7 +156,7 @@ internal class EntryWidgetController @JvmOverloads constructor(
         } else {
             listOf(EntryWidgetContract.ItemType.SdkNotInitializedState, EntryWidgetContract.ItemType.PoweredBy)
         }
-        view.showItems(items)
+        showItems(items)
     }
 
     @VisibleForTesting
@@ -202,6 +224,22 @@ internal class EntryWidgetController @JvmOverloads constructor(
     override fun onItemClicked(itemType: EntryWidgetContract.ItemType, activity: Activity) {
         Logger.d(TAG, "Item clicked: $itemType")
 
+        val entryWidgetItem = itemType.toTelemetryEntryWidgetItem()
+        if (entryWidgetItem != null) {
+            GliaLogger.i(LogEvents.ENTRY_WIDGET_ITEM_CLICKED) {
+                put(EventAttribute.ViewType, viewType.toTelemetryViewType() ?: "N/A")
+                put(EventAttribute.ButtonName, entryWidgetItem)
+            }
+        } else {
+            val buttonName = itemType.toTelemetryButtonName()
+            if (buttonName != null) {
+                GliaLogger.i(LogEvents.ENTRY_WIDGET_BUTTON_CLICKED) {
+                    put(EventAttribute.ViewType, viewType.toTelemetryViewType() ?: "N/A")
+                    put(EventAttribute.ButtonName, buttonName)
+                }
+            }
+        }
+
         when (itemType) {
             EntryWidgetContract.ItemType.VideoCall -> engagementLauncher.startVideoCall(activity)
             EntryWidgetContract.ItemType.VideoCallOngoing -> activityLauncher.launchCall(activity, null, false)
@@ -232,5 +270,98 @@ internal class EntryWidgetController @JvmOverloads constructor(
 
     override fun onDestroy() {
         compositeDisposable.dispose()
+
+        when (viewType) {
+            EntryWidgetContract.ViewType.BOTTOM_SHEET,
+            EntryWidgetContract.ViewType.EMBEDDED_VIEW -> {
+                GliaLogger.i(LogEvents.ENTRY_WIDGET_DISMISSED) {
+                    put(EventAttribute.ViewType, viewType.toTelemetryViewType() ?: "N/A")
+                }
+            }
+            else -> { /* no-op */ }
+        }
+    }
+
+    private fun showItems(items: List<EntryWidgetContract.ItemType>) {
+        view.showItems(items)
+
+        when (viewType) {
+            EntryWidgetContract.ViewType.BOTTOM_SHEET,
+            EntryWidgetContract.ViewType.EMBEDDED_VIEW -> {
+                GliaLogger.i(LogEvents.ENTRY_WIDGET_STATE_CHANGED) {
+                    put(EventAttribute.ViewType, viewType.toTelemetryViewType() ?: "N/A")
+                    val state = items.toTelemetryEntryWidgetState()
+                    put(EventAttribute.EntryWidgetState, state)
+                    if (state == EntryWidgetState.ITEMS) {
+                        put(EventAttribute.EntryWidgetItems, items.toTelemetryEngagementTypes().joinToString(", "))
+                    } else if(state == EntryWidgetState.ONGOING_ENGAGEMENT) {
+                        put(EventAttribute.EngagementType, items.toTelemetryEngagementTypes().firstOrNull() ?: "N/A")
+                    }
+                }
+            }
+            else -> { /* no-op */ }
+        }
+    }
+
+    private fun EntryWidgetContract.ViewType?.toTelemetryViewType(): String? = when (this) {
+        EntryWidgetContract.ViewType.BOTTOM_SHEET -> ViewType.BOTTOM_SHEET
+        EntryWidgetContract.ViewType.EMBEDDED_VIEW -> ViewType.EMBEDDED
+        else -> null
+    }
+
+    private fun Collection<EntryWidgetContract.ItemType>.toTelemetryEntryWidgetState(): String {
+        return when {
+            this.contains(EntryWidgetContract.ItemType.SdkNotInitializedState) -> EntryWidgetState.SDK_NOT_INITIALIZED
+            this.contains(EntryWidgetContract.ItemType.ErrorState) -> EntryWidgetState.ERROR
+            this.contains(EntryWidgetContract.ItemType.EmptyState) -> EntryWidgetState.EMPTY
+            this.contains(EntryWidgetContract.ItemType.LoadingState) -> EntryWidgetState.LOADING
+            this.isOngoingEngagement() -> EntryWidgetState.ONGOING_ENGAGEMENT
+            else -> EntryWidgetState.ITEMS
+        }
+    }
+
+    private fun Collection<EntryWidgetContract.ItemType>.toTelemetryEngagementTypes(): Set<String> {
+        return this.mapNotNull { it.toTelemetryEntryWidgetItem() }.toSet()
+    }
+
+    private fun EntryWidgetContract.ItemType.toTelemetryEntryWidgetItem(): String ? {
+        return when (this) {
+            EntryWidgetContract.ItemType.VideoCall,
+            EntryWidgetContract.ItemType.VideoCallOngoing -> EngagementType.TWO_WAY_VIDEO
+
+            EntryWidgetContract.ItemType.AudioCall,
+            EntryWidgetContract.ItemType.AudioCallOngoing -> EngagementType.AUDIO
+
+            EntryWidgetContract.ItemType.Chat,
+            EntryWidgetContract.ItemType.ChatOngoing -> EngagementType.CHAT
+
+            is EntryWidgetContract.ItemType.Messaging,
+            is EntryWidgetContract.ItemType.MessagingOngoing -> EngagementType.SECURE_MESSAGING
+
+            EntryWidgetContract.ItemType.CallVisualizerOngoing -> EngagementType.CALL_VISUALIZER
+
+            else -> null
+        }
+    }
+
+    private fun EntryWidgetContract.ItemType.toTelemetryButtonName(): String? {
+        return when (this) {
+            EntryWidgetContract.ItemType.ErrorState -> ButtonNames.RETRY_LOAD_ENTRY_WIDGET_ITEMS
+            else -> null
+        }
+    }
+
+    private fun Collection<EntryWidgetContract.ItemType>.isOngoingEngagement(): Boolean {
+        return this.any {
+            when (it) {
+                EntryWidgetContract.ItemType.VideoCallOngoing,
+                EntryWidgetContract.ItemType.AudioCallOngoing,
+                EntryWidgetContract.ItemType.ChatOngoing,
+                is EntryWidgetContract.ItemType.MessagingOngoing,
+                EntryWidgetContract.ItemType.CallVisualizerOngoing -> true
+
+                else -> false
+            }
+        }
     }
 }

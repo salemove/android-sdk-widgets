@@ -6,8 +6,9 @@ import com.glia.widgets.base.BaseView
 
 internal interface VisitorCodeContract {
     interface Controller : BaseController {
-        fun setView(view: View)
+        fun setView(view: View, isClosable: Boolean)
         fun onCloseButtonClicked()
+        fun onRefreshButtonClicked()
         fun onLoadVisitorCode()
     }
 

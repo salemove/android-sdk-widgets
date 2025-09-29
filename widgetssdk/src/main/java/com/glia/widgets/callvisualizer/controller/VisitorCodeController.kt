@@ -1,6 +1,12 @@
 package com.glia.widgets.callvisualizer.controller
 
 import com.glia.androidsdk.omnibrowse.VisitorCode
+import com.glia.telemetry_lib.ButtonNames
+import com.glia.telemetry_lib.EventAttribute
+import com.glia.telemetry_lib.GliaLogger
+import com.glia.telemetry_lib.LogEvents
+import com.glia.telemetry_lib.ViewType
+import com.glia.telemetry_lib.VisitorCodeState
 import com.glia.widgets.callvisualizer.VisitorCodeContract
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
@@ -25,18 +31,41 @@ internal class VisitorCodeController(
 
     private var view: VisitorCodeContract.View? = null
 
-    override fun setView(view: VisitorCodeContract.View) {
+    private var isClosable: Boolean? = null
+
+    override fun setView(view: VisitorCodeContract.View, isClosable: Boolean) {
         this.view = view
+        this.isClosable = isClosable
         this.view?.notifySetupComplete()
         this.autoCloseOnEngagement()
+
+        GliaLogger.i(LogEvents.VISITOR_CODE_SHOWN) {
+            put(EventAttribute.ViewType, telemetryViewType() ?: "N/A")
+        }
     }
 
     override fun onCloseButtonClicked() {
+        GliaLogger.i(LogEvents.VISITOR_CODE_BUTTON_CLICKED) {
+            put(EventAttribute.ViewType, telemetryViewType() ?: "N/A")
+            put(EventAttribute.ButtonName, ButtonNames.CLOSE_VISITOR_CODE)
+        }
         callVisualizerController.dismissVisitorCodeDialog()
         view?.destroyTimer()
     }
 
+    override fun onRefreshButtonClicked() {
+        GliaLogger.i(LogEvents.VISITOR_CODE_BUTTON_CLICKED) {
+            put(EventAttribute.ViewType, telemetryViewType() ?: "N/A")
+            put(EventAttribute.ButtonName, ButtonNames.REFRESH_VISITOR_CODE)
+        }
+        onLoadVisitorCode()
+    }
+
     override fun onLoadVisitorCode() {
+        GliaLogger.i(LogEvents.VISITOR_CODE_STATE_CHANGED) {
+            put(EventAttribute.ViewType, telemetryViewType() ?: "N/A")
+            put(EventAttribute.VisitorCodeState, VisitorCodeState.LOADING)
+        }
         view?.startLoading()
         disposable = visitorCodeRepository.getVisitorCode()
             .subscribeOn(Schedulers.io())
@@ -45,9 +74,17 @@ internal class VisitorCodeController(
                 { visitorCode ->
                     view?.showVisitorCode(visitorCode)
                     view?.setTimer(failGuardDuration(visitorCode))
+                    GliaLogger.i(LogEvents.VISITOR_CODE_STATE_CHANGED) {
+                        put(EventAttribute.ViewType, telemetryViewType() ?: "N/A")
+                        put(EventAttribute.VisitorCodeState, VisitorCodeState.CODE_SHOWN)
+                    }
                 },
                 { error ->
                     view?.showError(error)
+                    GliaLogger.i(LogEvents.VISITOR_CODE_STATE_CHANGED) {
+                        put(EventAttribute.ViewType, telemetryViewType() ?: "N/A")
+                        put(EventAttribute.VisitorCodeState, VisitorCodeState.ERROR)
+                    }
                 }
             )
     }
@@ -78,5 +115,15 @@ internal class VisitorCodeController(
         engagementStateDisposable?.dispose()
         view?.destroyTimer()
         view = null
+
+        GliaLogger.i(LogEvents.VISITOR_CODE_CLOSED) {
+            put(EventAttribute.ViewType, telemetryViewType() ?: "N/A")
+        }
+    }
+
+    private fun telemetryViewType(): String? = when (isClosable) {
+        true -> ViewType.DIALOG
+        false -> ViewType.EMBEDDED
+        else -> null
     }
 }

@@ -81,7 +81,7 @@ internal class VisitorCodeView internal constructor(
         charCodeView = findViewById(R.id.codeView)
         progressBar = findViewById(R.id.progress_bar)
         refreshButton = findViewById(R.id.failure_refresh_button)
-        refreshButton.setOnClickListener { controller?.onLoadVisitorCode() }
+        refreshButton.setOnClickListener { controller?.onRefreshButtonClicked() }
         closeButton = findViewById(R.id.close_button)
         closeButton.setOnClickListener { controller?.onCloseButtonClicked() }
         logoContainer = findViewById(R.id.logo_container)
@@ -142,7 +142,7 @@ internal class VisitorCodeView internal constructor(
 
     override fun setController(controller: VisitorCodeContract.Controller) {
         this.controller = controller
-        this.controller?.setView(this)
+        this.controller?.setView(this, closeButton.isVisible)
     }
 
     private fun setDefaultTheme(typedArray: TypedArray) {

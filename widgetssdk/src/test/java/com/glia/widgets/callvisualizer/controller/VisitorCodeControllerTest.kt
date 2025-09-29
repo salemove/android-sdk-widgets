@@ -37,7 +37,7 @@ internal class VisitorCodeControllerTest {
 
     @Before
     fun setView() {
-        controller.setView(view)
+        controller.setView(view, false)
         verify(view).notifySetupComplete()
         verifyNoMoreInteractions(view)
         verifyNoInteractions(callVisualizerController, visitorCodeRepository)

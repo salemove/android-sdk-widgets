@@ -1,6 +1,10 @@
 package com.glia.widgets.push.notifications
 
 import com.glia.androidsdk.visitor.Visitor
+import com.glia.telemetry_lib.EventAttribute
+import com.glia.telemetry_lib.GliaLogger
+import com.glia.telemetry_lib.LogEvents
+import com.glia.telemetry_lib.PushType
 import com.glia.widgets.chat.Intention
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.di.GliaCore
@@ -40,6 +44,10 @@ internal class PushClickHandlerControllerImpl(
             handlePendingPushNotification(PendingPn(queueId, visitorId))
         } else {
             pendingPn = PendingPn(queueId, visitorId)
+        }
+
+        GliaLogger.i(LogEvents.PUSH_NOTIFICATIONS_CLICKED) {
+            put(EventAttribute.PushType, PushType.SECURE_MESSAGE)
         }
     }
 

@@ -1,7 +1,10 @@
 package com.glia.widgets.fcm
 
 import android.content.Context
+import com.glia.telemetry_lib.EventAttribute
 import com.glia.telemetry_lib.GliaLogger
+import com.glia.telemetry_lib.LogEvents
+import com.glia.telemetry_lib.PushType
 import com.glia.widgets.push.notifications.SecureMessagingPushController
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -128,6 +131,10 @@ internal class PushNotificationsImpl(
                 data[BODY_KEY].orEmpty(),
                 data[VISITOR_ID_KEY] ?: return@with // Visitor ID is required, otherwise it is unclear if the message is for the current user
             )
+
+            GliaLogger.i(LogEvents.PUSH_NOTIFICATIONS_RECEIVED) {
+                put(EventAttribute.PushType, PushType.SECURE_MESSAGE)
+            }
         } else {
             corePushNotifications.onNewMessage(this)
         }

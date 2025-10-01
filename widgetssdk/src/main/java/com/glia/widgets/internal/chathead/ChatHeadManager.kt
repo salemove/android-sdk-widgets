@@ -5,9 +5,7 @@ import com.glia.widgets.core.chathead.ChatHeadService.Companion.getIntent
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 
-internal class ChatHeadManager(
-    private val applicationContext: Context
-) {
+internal class ChatHeadManager(private val applicationContext: Context) {
     private val chatHeadServiceIntent = getIntent(applicationContext)
 
     private var isServiceStarted = false
@@ -17,7 +15,7 @@ internal class ChatHeadManager(
             isServiceStarted = true
             try {
                 applicationContext.startService(chatHeadServiceIntent)
-            } catch (exception: IllegalStateException) {
+            } catch (_: IllegalStateException) {
                 isServiceStarted = false
                 Logger.w(TAG, "Application is in a state where the service can not be started" +
                     " (such as not in the foreground in a state when services are allowed)")

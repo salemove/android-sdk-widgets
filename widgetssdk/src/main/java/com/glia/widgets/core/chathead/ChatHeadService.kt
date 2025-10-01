@@ -5,6 +5,7 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.graphics.PixelFormat
+import android.graphics.Point
 import android.os.Build
 import android.os.IBinder
 import android.util.DisplayMetrics
@@ -14,13 +15,14 @@ import android.view.Gravity
 import android.view.WindowInsets
 import android.view.WindowManager
 import androidx.core.content.getSystemService
-import androidx.core.util.Pair
+import androidx.core.graphics.toPointF
 import com.glia.widgets.R
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
-import com.glia.widgets.view.ViewHelpers
+import com.glia.widgets.view.SimpleTouchListener
 import com.glia.widgets.view.head.ChatHeadContract
+import com.glia.widgets.view.head.ChatHeadLogger
 import com.glia.widgets.view.head.ChatHeadPosition
 import com.glia.widgets.view.head.ChatHeadView
 import com.glia.widgets.view.head.ChatHeadView.Companion.getInstance
@@ -98,34 +100,29 @@ internal class ChatHeadService : Service() {
     override fun onDestroy() {
         super.onDestroy()
 
-        chatHeadView?.also(windowManager::removeView)
         Logger.d(TAG, "onDestroy")
+
+        chatHeadView?.also(windowManager::removeView)
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private fun initChatHeadView(
-        controller: ChatHeadContract.Controller,
-        windowManager: WindowManager,
-        layoutParams: WindowManager.LayoutParams
-    ) {
+    private fun initChatHeadView(controller: ChatHeadContract.Controller, windowManager: WindowManager, layoutParams: WindowManager.LayoutParams) {
         chatHeadView = getInstance(this)
-        chatHeadView!!.setOnTouchListener(
-            ViewHelpers.OnTouchListener(
-                { Pair(layoutParams.x, layoutParams.y) },
-                { x: Float, y: Float ->
+        chatHeadView?.setOnTouchListener(
+            SimpleTouchListener(
+                retrieveInitialCoordinates = { Point(layoutParams.x, layoutParams.y).toPointF() },
+                onMove = { x, y ->
                     layoutParams.x = x.roundToInt()
                     layoutParams.y = y.roundToInt()
                     windowManager.updateViewLayout(chatHeadView, layoutParams)
                     controller.onChatHeadPositionChanged(layoutParams.x, layoutParams.y)
-                }
-            ) { controller.onChatHeadClicked() }
-        )
+                },
+                onRelease = { ChatHeadLogger.logPositionChanged() }
+            ))
+        chatHeadView?.setOnClickListener { controller.onChatHeadClicked() }
     }
 
-    private fun initChatHeadPosition(
-        params: WindowManager.LayoutParams,
-        chatHeadPosition: ChatHeadPosition
-    ) {
+    private fun initChatHeadPosition(params: WindowManager.LayoutParams, chatHeadPosition: ChatHeadPosition) {
         val display = displaySize
         params.x = chatHeadPosition.posX ?: getDefaultXPosition(display.width)
         params.y = chatHeadPosition.posY ?: getDefaultYPosition(display.height)

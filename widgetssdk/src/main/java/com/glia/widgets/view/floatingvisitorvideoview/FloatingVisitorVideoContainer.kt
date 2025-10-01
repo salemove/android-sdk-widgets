@@ -2,16 +2,15 @@ package com.glia.widgets.view.floatingvisitorvideoview
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.PointF
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.util.Pair
 import com.glia.androidsdk.comms.MediaState
 import com.glia.widgets.R
 import com.glia.widgets.helper.asActivity
 import com.glia.widgets.helper.setLocaleContentDescription
-import com.glia.widgets.view.ViewHelpers
+import com.glia.widgets.view.SimpleTouchListener
 import com.glia.widgets.view.unifiedui.theme.call.VisitorVideoTheme
 
 /**
@@ -80,7 +79,7 @@ internal class FloatingVisitorVideoContainer @JvmOverloads constructor(
     @SuppressLint("ClickableViewAccessibility")
     private fun setVisitorVideoContainerTouchListener() {
         floatingVisitorVideoView.setOnTouchListener(
-            ViewHelpers.OnTouchListener(
+            SimpleTouchListener(
                 { viewLocation },
                 { newPositionX: Float, newPositionY: Float ->
                     onViewDragged(
@@ -88,15 +87,11 @@ internal class FloatingVisitorVideoContainer @JvmOverloads constructor(
                         newPositionY
                     )
                 }
-            ) { _: View? -> }
-        )
+            ))
     }
 
-    private val viewLocation: Pair<Int?, Int?>
-        get() = Pair(
-            java.lang.Float.valueOf(floatingVisitorVideoView.x).toInt(),
-            java.lang.Float.valueOf(floatingVisitorVideoView.y).toInt()
-        )
+    private val viewLocation: PointF
+        get() = PointF(floatingVisitorVideoView.x, floatingVisitorVideoView.y)
 
     private fun onViewDragged(positionX: Float, positionY: Float) {
         var newPositionX = positionX

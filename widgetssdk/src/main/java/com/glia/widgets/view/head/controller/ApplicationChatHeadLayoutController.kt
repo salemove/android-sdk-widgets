@@ -11,6 +11,7 @@ import com.glia.widgets.internal.chathead.domain.ResolveChatHeadNavigationUseCas
 import com.glia.widgets.internal.chathead.domain.ResolveChatHeadNavigationUseCase.Destinations
 import com.glia.widgets.view.MessagesNotSeenHandler
 import com.glia.widgets.view.head.ChatHeadLayoutContract
+import com.glia.widgets.view.head.ChatHeadLogger
 import com.glia.widgets.engagement.State as EngagementState
 
 internal class ApplicationChatHeadLayoutController(
@@ -23,7 +24,7 @@ internal class ApplicationChatHeadLayoutController(
 ) : ChatHeadLayoutContract.Controller {
     private var chatHeadLayout: ChatHeadLayoutContract.View? = null
     private var state = State.ENDED
-    private var operatorProfileImgUrl: String? = null
+    private var operator: Operator? = null
     private var unreadMessagesCount = 0
     private var isOnHold = false
 
@@ -81,6 +82,8 @@ internal class ApplicationChatHeadLayoutController(
             Destinations.CALL_VIEW -> chatHeadLayout?.navigateToCall()
             Destinations.CHAT_VIEW -> chatHeadLayout?.navigateToChat()
         }
+
+        ChatHeadLogger.logChatHeadClicked()
     }
 
     override fun setView(view: ChatHeadLayoutContract.View) {
@@ -137,9 +140,10 @@ internal class ApplicationChatHeadLayoutController(
     private fun engagementEnded() {
         isOnHold = false
         state = State.ENDED
-        operatorProfileImgUrl = null
+        operator = null
         unreadMessagesCount = 0
         updateChatHeadView()
+        ChatHeadLogger.reset()
     }
 
     private fun onUnreadMessageCountChange(count: Int) {
@@ -148,7 +152,7 @@ internal class ApplicationChatHeadLayoutController(
     }
 
     private fun operatorDataLoaded(operator: Operator) {
-        operatorProfileImgUrl = operator.imageUrl
+        this.operator = operator
         updateChatHeadView()
     }
 
@@ -161,7 +165,11 @@ internal class ApplicationChatHeadLayoutController(
     }
 
     private fun decideOnEngagementBubbleDesign(view: ChatHeadLayoutContract.View) {
-        operatorProfileImgUrl?.also(view::showOperatorImage) ?: view.showPlaceholder()
+        operator?.imageUrl?.also(view::showOperatorImage) ?: view.showPlaceholder()
+        // Here we draw operator image if we have it, otherwise we show placeholder
+        // This is the only place where we show operator image inside bubble, so this is an indicator that the operator is connected
+        // This function is called multiple times during engagement, but we're filtering out duplicate logs inside ChatHeadLogger
+        ChatHeadLogger.logOperatorConnected(operator ?: return)
     }
 
     private fun updateOnHold() {

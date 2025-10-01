@@ -1,7 +1,9 @@
 package com.glia.widgets.internal.chathead.domain
 
+import com.glia.telemetry_lib.BubbleType
 import com.glia.widgets.internal.permissions.PermissionManager
 import com.glia.widgets.launcher.ConfigurationManager
+import com.glia.widgets.view.head.ChatHeadLogger
 
 internal class IsDisplayBubbleInsideAppUseCase(
     private val permissionManager: PermissionManager,
@@ -9,7 +11,7 @@ internal class IsDisplayBubbleInsideAppUseCase(
     private val isBubbleNeededUseCase: IsBubbleNeededUseCase
 ) {
 
-    private val isBubbleAllowedOutsideApp: Boolean
+    val isBubbleAllowedOutsideApp: Boolean
         get() = configurationManager.enableBubbleInsideApp && permissionManager.hasOverlayPermission()
 
     operator fun invoke(viewName: String?): Boolean {
@@ -23,7 +25,7 @@ internal class IsDisplayBubbleInsideAppUseCase(
             // Clicking it takes you back to Call Screen.
             // This should be before the configurationManager.enableBubbleInsideApp check!
             isBubbleNeededUseCase.isBubbleNeededByChatScreenDuringMediaEngagement(viewName) -> {
-                // Show in app bubble
+                ChatHeadLogger.logChatHeadShown(BubbleType.IN_APP)
                 true
             }
 
@@ -31,12 +33,12 @@ internal class IsDisplayBubbleInsideAppUseCase(
             !configurationManager.enableBubbleInsideApp -> false
 
             isBubbleNeededUseCase(viewName) -> {
-                // Show in app bubble
+                ChatHeadLogger.logChatHeadShown(BubbleType.IN_APP)
                 true
             }
 
             else -> {
-                // Do not show in app bubble
+                ChatHeadLogger.logChatHeadHidden(BubbleType.IN_APP)
                 false
             }
         }

@@ -2,11 +2,11 @@ package com.glia.widgets.view.head
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.graphics.PointF
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.util.Pair
 import androidx.core.view.contains
 import com.glia.widgets.R
 import com.glia.widgets.base.BaseActivityStackWatcher
@@ -44,7 +44,7 @@ internal class ActivityWatcherForChatHead(
     private var resumedActivity: Activity? by WeakReferenceDelegate()
     private var chatHeadLayout: ChatHeadLayout? by WeakReferenceDelegate()
     private var screenOrientation: Int? = null
-    private var chatHeadViewPosition: Pair<Int, Int>? = null
+    private var chatHeadViewPosition: PointF? = null
 
     override fun onActivityResumed(activity: Activity) {
         super.onActivityResumed(activity)
@@ -66,10 +66,7 @@ internal class ActivityWatcherForChatHead(
 
     private fun createChatHeadLayout(activity: Activity) {
         val chatHeadLayout = ChatHeadLayout(activity)
-        chatHeadLayout.layoutParams = ConstraintLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT
-        )
+        chatHeadLayout.layoutParams = ConstraintLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
         chatHeadLayout.setNavigationCallback(
             object : ChatHeadLayout.NavigationCallback {
                 override fun onNavigateToChat() {
@@ -127,8 +124,7 @@ internal class ActivityWatcherForChatHead(
 
     private fun saveBubblePosition() {
         chatHeadLayout?.position?.let {
-            if (it.first == null || it.second == null) return
-            chatHeadViewPosition = Pair(it.first, it.second)
+            chatHeadViewPosition = it
         }
     }
 
@@ -137,7 +133,7 @@ internal class ActivityWatcherForChatHead(
 
     private fun restoreBubblePosition() {
         chatHeadViewPosition?.let {
-            chatHeadLayout?.setPosition(it.first.toFloat(), it.second.toFloat())
+            chatHeadLayout?.setPosition(it.x, it.y)
         }
     }
 

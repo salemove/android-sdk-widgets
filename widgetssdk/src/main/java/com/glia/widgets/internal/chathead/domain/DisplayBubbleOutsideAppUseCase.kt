@@ -1,10 +1,13 @@
 package com.glia.widgets.internal.chathead.domain
 
+import com.glia.telemetry_lib.BubbleType
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.internal.chathead.ChatHeadManager
 import com.glia.widgets.internal.permissions.PermissionManager
 import com.glia.widgets.launcher.ConfigurationManager
+import com.glia.widgets.view.head.ChatHeadLogger
+
 /**
  * This use case:
  * 1) determines whether the chat head (bubble) should be displayed
@@ -47,11 +50,13 @@ internal class DisplayBubbleOutsideAppUseCase(
     private fun showBubble() {
         chatHeadManager.startChatHeadService()
         Logger.i(TAG, "Bubble: show device bubble")
+        ChatHeadLogger.logChatHeadShown(BubbleType.SERVICE)
     }
 
     private fun hideBubble() {
         chatHeadManager.stopChatHeadService()
         Logger.d(TAG, "Bubble: hide device bubble")
+        ChatHeadLogger.logChatHeadHidden(BubbleType.SERVICE)
     }
 
     fun onDestroy() {

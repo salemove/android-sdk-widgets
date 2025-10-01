@@ -6,6 +6,8 @@ ext {
   gradlePropertiesFilePath = "${rootProject.projectDir}/version.properties"
   gliaCoreSdkVersionTagInProperties = 'dependency.coreSdk.version'
   gliaCoreSdkVersionTag = 'gliaSdkVersion'
+  telemetryLibVersionTagInProperties = 'dependency.telemetryLib.version'
+  telemetryLibVersionTag = 'telemetryLibVersion'
   widgetsVersionNameTagInProperties = 'widgets.versionName'
   widgetsVersionNameTag = 'widgetsVersionName'
   widgetsVersionCodeTagInProperties = 'widgets.versionCode'
@@ -29,6 +31,7 @@ exposeGradlePropertiesToBuildScripts()
 def exposeGradlePropertiesToBuildScripts() {
   Properties gradleProperties = PropertiesIO.readProperties(gradlePropertiesFilePath)
   ext[gliaCoreSdkVersionTag] = gradleProperties.getProperty(gliaCoreSdkVersionTagInProperties)
+  ext[telemetryLibVersionTag] = gradleProperties.getProperty(telemetryLibVersionTagInProperties)
   ext[widgetsVersionNameTag] = gradleProperties.getProperty(widgetsVersionNameTagInProperties)
   ext[widgetsVersionCodeTag] = Integer.parseInt(gradleProperties.getProperty(widgetsVersionCodeTagInProperties))
 }
@@ -51,22 +54,44 @@ class PropertiesIO {
 }
 
 /**
- * A task class for editing the Core SDK version in version.properties
+ * A task class for editing the Core SDK version or Telemetry Lib version in version.properties
  * Example of usage from terminal:
- * ./gradlew saveCoreSdkVersion --coreSdkVersion=0.77.2
+ * ./gradlew saveCoreSdkVersion --sdkVersion=0.77.2
+ * ./gradlew saveTelemetryLibVersion --sdkVersion=1.0.2
  */
-class UpdateCoreSdkVersion extends DefaultTask {
-  private String newCoreSdkVersion
+class UpdateVersionProperty extends DefaultTask {
+  private String newVersion
+  private String propertyKey
 
-  @Option(option = "coreSdkVersion", description = "Core SDK version that should be overriden in configuration files")
+  @Deprecated // backward compatibility for the old command: ./gradlew saveCoreSdkVersion --coreSdkVersion=0.77.2
+  @Option(option = "coreSdkVersion", description = "Core SDK version that should be overridden in configuration files")
   void setCoreSdkVersion(String coreSdkVersion) {
-    this.newCoreSdkVersion = coreSdkVersion
+    this.newVersion = coreSdkVersion
+  }
+
+  @Option(option = "sdkVersion", description = "Version that should be overridden in configuration files")
+  void setSdkVersion(String sdkVersion) {
+    this.newVersion = sdkVersion
+  }
+
+  void setPropertyKey(String propertyKey) {
+    this.propertyKey = propertyKey
   }
 
   @TaskAction
   void write() {
-    getProject().saveProperty(getProject().gliaCoreSdkVersionTagInProperties, newCoreSdkVersion)
+    if (!propertyKey) {
+      throw new Exception("propertyKey parameter is required but was not provided for UpdateVersionProperty task")
+    }
+    getProject().saveProperty(propertyKey, newVersion)
   }
+}
+
+tasks.register('saveCoreSdkVersion', UpdateVersionProperty) {
+  it.setPropertyKey(gliaCoreSdkVersionTagInProperties)
+}
+tasks.register('saveTelemetryLibVersion', UpdateVersionProperty) {
+  it.setPropertyKey(telemetryLibVersionTagInProperties)
 }
 
 /**
@@ -130,7 +155,6 @@ class UpdateProjectVersion extends DefaultTask {
   }
 }
 
-tasks.register('saveCoreSdkVersion', UpdateCoreSdkVersion)
 tasks.register('saveWidgetsVersion', UpdateProjectVersion)
 
 /**

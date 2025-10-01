@@ -1,7 +1,6 @@
 package com.glia.widgets.engagement
 
 import android.LOGGER_PATH
-import android.app.Activity
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.Engagement.ActionOnEnd
 import com.glia.androidsdk.EngagementRequest
@@ -507,7 +506,8 @@ class EngagementRepositoryTest {
 
         omniCoreEngagementCallbackSlot.captured.accept(engagement as OmnicoreEngagement)
         repository.engagementState.test().assertValue(State.TransferredToSecureConversation).assertValueCount(1).assertNotComplete()
-        verify { operatorRepository.emit(any()) }
+        //we return when the state is transferred to SC, so operator is not emitted
+        verify(exactly = 0) { operatorRepository.emit(any()) }
     }
 
     @Test
@@ -530,7 +530,8 @@ class EngagementRepositoryTest {
 
         omniCoreEngagementCallbackSlot.captured.accept(engagement as OmnicoreEngagement)
         repository.engagementState.test().assertValue(State.TransferredToSecureConversation).assertValueCount(1).assertNotComplete()
-        verify { operatorRepository.emit(any()) }
+        //we return when the state is transferred to SC, so operator is not emitted
+        verify(exactly = 0) { operatorRepository.emit(any()) }
 
         repository.terminateEngagement()
         verify(exactly = 0) { engagement.end(any()) }
@@ -557,7 +558,8 @@ class EngagementRepositoryTest {
 
         omniCoreEngagementCallbackSlot.captured.accept(engagement as OmnicoreEngagement)
         repository.engagementState.test().assertValue(State.TransferredToSecureConversation).assertValueCount(1).assertNotComplete()
-        verify { operatorRepository.emit(any()) }
+        //we return when the state is transferred to SC, so operator is not emitted
+        verify(exactly = 0) { operatorRepository.emit(any()) }
 
         repository.terminateEngagement()
         verify(exactly = 0) { engagement.end(any()) }
@@ -585,7 +587,8 @@ class EngagementRepositoryTest {
         operatorTypingCallbackSlot.captured.accept(OperatorTypingStatus { true })
         repository.terminateEngagement()
 
-        operatorTypingStatusTestObserver.assertNotComplete().assertValues(true, false)
+        // We reset internal state when the new engagement received, so the operator typing status is reset to false
+        operatorTypingStatusTestObserver.assertNotComplete().assertValues(false, true, false)
         verify { engagement.end(any()) }
         verify(exactly = 0) { engagement.getSurvey(any()) }
         verifyEngagementEnd()
@@ -601,7 +604,8 @@ class EngagementRepositoryTest {
         operatorTypingCallbackSlot.captured.accept(OperatorTypingStatus { true })
         repository.endEngagement()
         verify { engagement.state }
-        operatorTypingStatusTestObserver.assertNotComplete().assertValues(true, false)
+        // We reset internal state when the new engagement received, so the operator typing status is reset to false
+        operatorTypingStatusTestObserver.assertNotComplete().assertValues(false, true, false)
 
         verify { engagement.end(any()) }
         verify(exactly = 0) { engagement.getSurvey(any()) }
@@ -800,7 +804,8 @@ class EngagementRepositoryTest {
         }
 
         verify(exactly = 2) { operatorRepository.emit(operator1) }
-        verify(exactly = 3) { operatorRepository.emit(operator2) }
+        // the last emit is skipped as the engagement state indicates that the conversation is transferred to secure conversation
+        verify(exactly = 2) { operatorRepository.emit(operator2) }
 
         operatorTypingStatusTestObserver
             .assertNotComplete()

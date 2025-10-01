@@ -329,10 +329,7 @@ internal object Dependencies {
             authenticationManagerProvider.authenticationManager = this
         }
 
-    private fun initApplicationLifecycleObserver(
-        lifecycleManager: ApplicationLifecycleManager,
-        chatBubbleController: ChatHeadContract.Controller
-    ) {
+    private fun initApplicationLifecycleObserver(lifecycleManager: ApplicationLifecycleManager, chatBubbleController: ChatHeadContract.Controller) {
         lifecycleManager.addObserver { _, event: Lifecycle.Event ->
             when (event) {
                 Lifecycle.Event.ON_PAUSE -> {

@@ -256,7 +256,7 @@ public class ControllerFactory {
     public ChatHeadContract.Controller getChatHeadController() {
         if (serviceChatHeadController == null) {
             serviceChatHeadController = new ServiceChatHeadController(
-                useCaseFactory.getToggleChatHeadServiceUseCase(),
+                useCaseFactory.getDisplayBubbleOutsideAppUseCase(),
                 useCaseFactory.getResolveChatHeadNavigationUseCase(),
                 messagesNotSeenHandler,
                 new ChatHeadPosition(),
@@ -271,7 +271,7 @@ public class ControllerFactory {
     public ChatHeadLayoutContract.Controller getChatHeadLayoutController() {
         if (applicationChatHeadController == null) {
             applicationChatHeadController = new ApplicationChatHeadLayoutController(
-                useCaseFactory.getIsDisplayApplicationChatHeadUseCase(),
+                useCaseFactory.getIsDisplayBubbleInsideAppUseCase(),
                 useCaseFactory.getResolveChatHeadNavigationUseCase(),
                 messagesNotSeenHandler,
                 useCaseFactory.getEngagementStateUseCase(),

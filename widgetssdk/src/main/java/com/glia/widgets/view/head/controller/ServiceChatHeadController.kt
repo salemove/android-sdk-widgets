@@ -9,7 +9,7 @@ import com.glia.widgets.engagement.domain.VisitorMediaUseCase
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.imageUrl
-import com.glia.widgets.internal.chathead.domain.IsDisplayBubbleOutsideAppUseCase
+import com.glia.widgets.internal.chathead.domain.DisplayBubbleOutsideAppUseCase
 import com.glia.widgets.internal.chathead.domain.ResolveChatHeadNavigationUseCase
 import com.glia.widgets.internal.chathead.domain.ResolveChatHeadNavigationUseCase.Destinations
 import com.glia.widgets.view.MessagesNotSeenHandler
@@ -20,7 +20,7 @@ import com.glia.widgets.engagement.State as EngagementState
 //This is in fact a singleton
 @SuppressLint("CheckResult")
 internal class ServiceChatHeadController(
-    private val isDisplayBubbleOutsideAppUseCase: IsDisplayBubbleOutsideAppUseCase,
+    private val displayBubbleOutsideAppUseCase: DisplayBubbleOutsideAppUseCase,
     private val resolveChatHeadNavigationUseCase: ResolveChatHeadNavigationUseCase,
     messagesNotSeenHandler: MessagesNotSeenHandler,
     private var _chatHeadPosition: ChatHeadPosition,
@@ -57,7 +57,7 @@ internal class ServiceChatHeadController(
 
         // see the comment on the resumedViewName field declaration above
         if (!isResumedView(view)) return
-        isDisplayBubbleOutsideAppUseCase(view?.javaClass?.simpleName)
+        displayBubbleOutsideAppUseCase(view?.javaClass?.simpleName)
     }
 
     override fun onPause(gliaOrRootView: View?) {
@@ -70,7 +70,7 @@ internal class ServiceChatHeadController(
 
     override fun onApplicationStop() {
         Logger.d(TAG, "onApplicationStop()")
-        isDisplayBubbleOutsideAppUseCase(null)
+        displayBubbleOutsideAppUseCase(null)
     }
 
     override fun onChatHeadPositionChanged(x: Int, y: Int) {
@@ -118,7 +118,7 @@ internal class ServiceChatHeadController(
 
     private fun toggleChatHead() {
         state = State.ENGAGEMENT
-        isDisplayBubbleOutsideAppUseCase(resumedViewName)
+        displayBubbleOutsideAppUseCase(resumedViewName)
         updateChatHeadView()
     }
 
@@ -131,7 +131,7 @@ internal class ServiceChatHeadController(
     }
 
     private fun engagementEnded() {
-        isDisplayBubbleOutsideAppUseCase.onDestroy()
+        displayBubbleOutsideAppUseCase.onDestroy()
         isOnHold = false
         state = State.ENDED
         operatorProfileImgUrl = null
@@ -143,13 +143,13 @@ internal class ServiceChatHeadController(
     private fun newEngagementLoaded() {
         isOnHold = false
         state = State.ENGAGEMENT
-        isDisplayBubbleOutsideAppUseCase(resumedViewName)
+        displayBubbleOutsideAppUseCase(resumedViewName)
         updateChatHeadView()
     }
 
     private fun queueingStarted() {
         state = State.QUEUEING
-        isDisplayBubbleOutsideAppUseCase(resumedViewName)
+        displayBubbleOutsideAppUseCase(resumedViewName)
         updateChatHeadView()
     }
 

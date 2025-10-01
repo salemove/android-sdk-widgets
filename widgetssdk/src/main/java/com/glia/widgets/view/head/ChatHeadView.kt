@@ -87,6 +87,7 @@ internal class ChatHeadView @JvmOverloads constructor(
                 binding.chatBubbleBadge.apply {
                     text = count.toString()
                     isVisible = isDisplayUnreadMessageBadge(count)
+                    ChatHeadLogger.logUnreadMessageCountChanged(count.toString())
                 }
             }
         }
@@ -127,10 +128,12 @@ internal class ChatHeadView @JvmOverloads constructor(
                 queueingLottieAnimation.visibility = VISIBLE
             }
         }
+        ChatHeadLogger.logEnqueueingStarted()
     }
 
     override fun showOnHold() {
         post { binding.onHoldIcon.visibility = VISIBLE }
+        ChatHeadLogger.logOnHold()
     }
 
     override fun hideOnHold() {
@@ -238,8 +241,7 @@ internal class ChatHeadView @JvmOverloads constructor(
         invalidate()
     }
 
-    private fun isDisplayUnreadMessageBadge(unreadMessageCount: Int): Boolean =
-        unreadMessageCount > 0
+    private fun isDisplayUnreadMessageBadge(unreadMessageCount: Int): Boolean = unreadMessageCount > 0
 
     @VisibleForTesting
     internal var executor: Executor? = null

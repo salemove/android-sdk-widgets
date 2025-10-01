@@ -14,6 +14,7 @@ import com.glia.widgets.internal.chathead.domain.ResolveChatHeadNavigationUseCas
 import com.glia.widgets.internal.chathead.domain.ResolveChatHeadNavigationUseCase.Destinations
 import com.glia.widgets.view.MessagesNotSeenHandler
 import com.glia.widgets.view.head.ChatHeadContract
+import com.glia.widgets.view.head.ChatHeadLogger
 import com.glia.widgets.view.head.ChatHeadPosition
 import com.glia.widgets.engagement.State as EngagementState
 
@@ -30,7 +31,7 @@ internal class ServiceChatHeadController(
 ) : ChatHeadContract.Controller {
     private var chatHeadView: ChatHeadContract.View? = null
     private var state = State.ENDED
-    private var operatorProfileImgUrl: String? = null
+    private var operator: Operator? = null
     private var unreadMessagesCount = 0
     private var isOnHold = false
 
@@ -82,6 +83,7 @@ internal class ServiceChatHeadController(
             Destinations.CALL_VIEW -> chatHeadView?.navigateToCall()
             Destinations.CHAT_VIEW -> chatHeadView?.navigateToChat()
         }
+        ChatHeadLogger.logChatHeadClicked()
     }
 
     private fun onHoldChanged(isOnHold: Boolean) {
@@ -134,10 +136,11 @@ internal class ServiceChatHeadController(
         displayBubbleOutsideAppUseCase.onDestroy()
         isOnHold = false
         state = State.ENDED
-        operatorProfileImgUrl = null
+        operator = null
         unreadMessagesCount = 0
         resumedViewName = null
         updateChatHeadView()
+        ChatHeadLogger.reset()
     }
 
     private fun newEngagementLoaded() {
@@ -159,7 +162,7 @@ internal class ServiceChatHeadController(
     }
 
     private fun operatorDataLoaded(operator: Operator) {
-        operatorProfileImgUrl = operator.imageUrl
+        this.operator = operator
         updateChatHeadView()
     }
 
@@ -173,7 +176,11 @@ internal class ServiceChatHeadController(
 
     private fun decideOnBubbleDesign() {
         val view = chatHeadView ?: return
-        operatorProfileImgUrl?.also(view::showOperatorImage) ?: view.showPlaceholder()
+        operator?.imageUrl?.also(view::showOperatorImage) ?: view.showPlaceholder()
+        // Here we draw operator image if we have it, otherwise we show placeholder
+        // This is the only place where we show operator image inside bubble, so this is an indicator that the operator is connected
+        // This function is called multiple times during engagement, but we're filtering out duplicate logs inside ChatHeadLogger
+        ChatHeadLogger.logOperatorConnected(operator ?: return)
     }
 
     private fun setResumedViewName(view: View?) {

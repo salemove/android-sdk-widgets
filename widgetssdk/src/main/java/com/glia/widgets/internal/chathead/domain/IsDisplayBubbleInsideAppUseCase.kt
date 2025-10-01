@@ -1,28 +1,45 @@
 package com.glia.widgets.internal.chathead.domain
 
 import com.glia.widgets.internal.permissions.PermissionManager
-import com.glia.widgets.engagement.domain.EngagementTypeUseCase
-import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 import com.glia.widgets.launcher.ConfigurationManager
 
 internal class IsDisplayBubbleInsideAppUseCase(
-    isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase,
-    permissionManager: PermissionManager,
-    configurationManager: ConfigurationManager,
-    engagementTypeUseCase: EngagementTypeUseCase
-) : IsDisplayBubbleUseCase(
-    isQueueingOrLiveEngagementUseCase,
-    permissionManager,
-    configurationManager,
-    engagementTypeUseCase
+    private val permissionManager: PermissionManager,
+    private val configurationManager: ConfigurationManager,
+    private val isBubbleNeededUseCase: IsBubbleNeededUseCase
 ) {
-    override fun isBubbleEnabled(): Boolean {
-        return configurationManager.enableBubbleInsideApp
+
+    private val isBubbleAllowedOutsideApp: Boolean
+        get() = configurationManager.enableBubbleInsideApp && permissionManager.hasOverlayPermission()
+
+    operator fun invoke(viewName: String?): Boolean {
+
+        return when {
+            // Use only ChatHeadService instead of ChatHeadService + app bubble if bubble is enabled outside and inside
+            isBubbleAllowedOutsideApp -> false
+
+            // The exception to all of the above is: If we’re looking at the chat screen during an Audio/Video engagement,
+            // show the Bubble always irrespective of integrator settings.
+            // Clicking it takes you back to Call Screen.
+            // This should be before the configurationManager.enableBubbleInsideApp check!
+            isBubbleNeededUseCase.isBubbleNeededByChatScreenDuringMediaEngagement(viewName) -> {
+                // Show in app bubble
+                true
+            }
+
+            // If bubble is disabled inside app, return immediately, no need to check anything else
+            !configurationManager.enableBubbleInsideApp -> false
+
+            isBubbleNeededUseCase(viewName) -> {
+                // Show in app bubble
+                true
+            }
+
+            else -> {
+                // Do not show in app bubble
+                false
+            }
+        }
     }
 
-    override fun isShowBasedOnForegroundBackground(viewName: String?): Boolean {
-        return viewName != null && // App is in foreground
-            // Use only ChatHeadService instead of ChatHeadService + app bubble if bubble is enabled outside and inside
-            (!configurationManager.enableBubbleOutsideApp || !configurationManager.enableBubbleInsideApp || !permissionManager.hasOverlayPermission())
-    }
 }

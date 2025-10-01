@@ -5,6 +5,7 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 
 import com.glia.widgets.GliaWidgets;
+import com.glia.widgets.authentication.Authentication;
 import com.glia.widgets.call.domain.HandleCallPermissionsUseCase;
 import com.glia.widgets.chat.domain.AddNewMessagesDividerUseCase;
 import com.glia.widgets.chat.domain.AppendGvaMessageItemUseCase;
@@ -60,60 +61,6 @@ import com.glia.widgets.chat.domain.gva.MapGvaResponseTextUseCase;
 import com.glia.widgets.chat.domain.gva.MapGvaUseCase;
 import com.glia.widgets.chat.domain.gva.ParseGvaButtonsUseCase;
 import com.glia.widgets.chat.domain.gva.ParseGvaGalleryCardsUseCase;
-import com.glia.widgets.authentication.Authentication;
-import com.glia.widgets.internal.audio.AudioControlManager;
-import com.glia.widgets.internal.audio.domain.OnAudioStartedUseCase;
-import com.glia.widgets.internal.audio.domain.TurnSpeakerphoneUseCase;
-import com.glia.widgets.internal.callvisualizer.domain.VisitorCodeViewBuilderUseCase;
-import com.glia.widgets.internal.chathead.ChatHeadManager;
-import com.glia.widgets.internal.chathead.domain.IsDisplayBubbleInsideAppUseCase;
-import com.glia.widgets.internal.chathead.domain.IsDisplayBubbleOutsideAppUseCase;
-import com.glia.widgets.internal.chathead.domain.ResolveChatHeadNavigationUseCase;
-import com.glia.widgets.internal.dialog.DialogContract;
-import com.glia.widgets.internal.dialog.PermissionDialogManager;
-import com.glia.widgets.internal.dialog.domain.ConfirmationDialogLinksUseCase;
-import com.glia.widgets.internal.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase;
-import com.glia.widgets.internal.dialog.domain.IsShowOverlayPermissionRequestDialogUseCaseImpl;
-import com.glia.widgets.internal.dialog.domain.SetOverlayPermissionRequestDialogShownUseCase;
-import com.glia.widgets.internal.dialog.domain.SetOverlayPermissionRequestDialogShownUseCaseImpl;
-import com.glia.widgets.internal.engagement.domain.ConfirmationDialogUseCase;
-import com.glia.widgets.internal.engagement.domain.GetOperatorUseCase;
-import com.glia.widgets.internal.engagement.domain.MapOperatorUseCase;
-import com.glia.widgets.internal.engagement.domain.ShouldShowMediaEngagementViewUseCase;
-import com.glia.widgets.internal.engagement.domain.UpdateOperatorDefaultImageUrlUseCase;
-import com.glia.widgets.internal.fileupload.domain.AddFileAttachmentsObserverUseCase;
-import com.glia.widgets.internal.fileupload.domain.AddFileToAttachmentAndUploadUseCase;
-import com.glia.widgets.internal.fileupload.domain.FileUploadLimitNotExceededObservableUseCase;
-import com.glia.widgets.internal.fileupload.domain.GetFileAttachmentsUseCase;
-import com.glia.widgets.internal.fileupload.domain.RemoveFileAttachmentUseCase;
-import com.glia.widgets.internal.notification.device.INotificationManager;
-import com.glia.widgets.internal.notification.domain.CallNotificationUseCase;
-import com.glia.widgets.internal.permissions.PermissionManager;
-import com.glia.widgets.internal.permissions.domain.IsNotificationPermissionGrantedUseCase;
-import com.glia.widgets.internal.permissions.domain.IsNotificationPermissionGrantedUseCaseImpl;
-import com.glia.widgets.internal.permissions.domain.RequestNotificationPermissionIfPushNotificationsSetUpUseCase;
-import com.glia.widgets.internal.permissions.domain.RequestNotificationPermissionIfPushNotificationsSetUpUseCaseImpl;
-import com.glia.widgets.internal.permissions.domain.WithCameraPermissionUseCase;
-import com.glia.widgets.internal.permissions.domain.WithCameraPermissionUseCaseImpl;
-import com.glia.widgets.internal.permissions.domain.WithNotificationPermissionUseCase;
-import com.glia.widgets.internal.permissions.domain.WithNotificationPermissionUseCaseImpl;
-import com.glia.widgets.internal.permissions.domain.WithReadWritePermissionsUseCase;
-import com.glia.widgets.internal.permissions.domain.WithReadWritePermissionsUseCaseImpl;
-import com.glia.widgets.internal.secureconversations.domain.AddSecureFileToAttachmentAndUploadUseCase;
-import com.glia.widgets.internal.secureconversations.domain.HasOngoingSecureConversationUseCase;
-import com.glia.widgets.internal.secureconversations.domain.IsMessagingAvailableUseCase;
-import com.glia.widgets.internal.secureconversations.domain.ManageSecureMessagingStatusUseCase;
-import com.glia.widgets.internal.secureconversations.domain.MarkMessagesReadWithDelayUseCase;
-import com.glia.widgets.internal.secureconversations.domain.OnNextMessageUseCase;
-import com.glia.widgets.internal.secureconversations.domain.ResetMessageCenterUseCase;
-import com.glia.widgets.internal.secureconversations.domain.SecureConversationTopBannerVisibilityUseCase;
-import com.glia.widgets.internal.secureconversations.domain.SendMessageButtonStateUseCase;
-import com.glia.widgets.internal.secureconversations.domain.SendSecureMessageUseCase;
-import com.glia.widgets.internal.secureconversations.domain.SetLeaveSecureConversationDialogVisibleUseCase;
-import com.glia.widgets.internal.secureconversations.domain.SetLeaveSecureConversationDialogVisibleUseCaseImpl;
-import com.glia.widgets.internal.secureconversations.domain.ShouldMarkMessagesReadUseCase;
-import com.glia.widgets.internal.secureconversations.domain.ShowMessageLimitErrorUseCase;
-import com.glia.widgets.internal.survey.domain.GliaSurveyAnswerUseCase;
 import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCase;
 import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCaseImpl;
 import com.glia.widgets.engagement.domain.CheckMediaUpgradePermissionsUseCase;
@@ -165,6 +112,60 @@ import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromNetworkUseCas
 import com.glia.widgets.filepreview.domain.usecase.IsFileReadyForPreviewUseCase;
 import com.glia.widgets.filepreview.domain.usecase.PutImageFileToDownloadsUseCase;
 import com.glia.widgets.helper.rx.Schedulers;
+import com.glia.widgets.internal.audio.AudioControlManager;
+import com.glia.widgets.internal.audio.domain.OnAudioStartedUseCase;
+import com.glia.widgets.internal.audio.domain.TurnSpeakerphoneUseCase;
+import com.glia.widgets.internal.callvisualizer.domain.VisitorCodeViewBuilderUseCase;
+import com.glia.widgets.internal.chathead.ChatHeadManager;
+import com.glia.widgets.internal.chathead.domain.DisplayBubbleOutsideAppUseCase;
+import com.glia.widgets.internal.chathead.domain.IsBubbleNeededUseCase;
+import com.glia.widgets.internal.chathead.domain.IsDisplayBubbleInsideAppUseCase;
+import com.glia.widgets.internal.chathead.domain.ResolveChatHeadNavigationUseCase;
+import com.glia.widgets.internal.dialog.DialogContract;
+import com.glia.widgets.internal.dialog.PermissionDialogManager;
+import com.glia.widgets.internal.dialog.domain.ConfirmationDialogLinksUseCase;
+import com.glia.widgets.internal.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase;
+import com.glia.widgets.internal.dialog.domain.IsShowOverlayPermissionRequestDialogUseCaseImpl;
+import com.glia.widgets.internal.dialog.domain.SetOverlayPermissionRequestDialogShownUseCase;
+import com.glia.widgets.internal.dialog.domain.SetOverlayPermissionRequestDialogShownUseCaseImpl;
+import com.glia.widgets.internal.engagement.domain.ConfirmationDialogUseCase;
+import com.glia.widgets.internal.engagement.domain.GetOperatorUseCase;
+import com.glia.widgets.internal.engagement.domain.MapOperatorUseCase;
+import com.glia.widgets.internal.engagement.domain.ShouldShowMediaEngagementViewUseCase;
+import com.glia.widgets.internal.engagement.domain.UpdateOperatorDefaultImageUrlUseCase;
+import com.glia.widgets.internal.fileupload.domain.AddFileAttachmentsObserverUseCase;
+import com.glia.widgets.internal.fileupload.domain.AddFileToAttachmentAndUploadUseCase;
+import com.glia.widgets.internal.fileupload.domain.FileUploadLimitNotExceededObservableUseCase;
+import com.glia.widgets.internal.fileupload.domain.GetFileAttachmentsUseCase;
+import com.glia.widgets.internal.fileupload.domain.RemoveFileAttachmentUseCase;
+import com.glia.widgets.internal.notification.device.INotificationManager;
+import com.glia.widgets.internal.notification.domain.CallNotificationUseCase;
+import com.glia.widgets.internal.permissions.PermissionManager;
+import com.glia.widgets.internal.permissions.domain.IsNotificationPermissionGrantedUseCase;
+import com.glia.widgets.internal.permissions.domain.IsNotificationPermissionGrantedUseCaseImpl;
+import com.glia.widgets.internal.permissions.domain.RequestNotificationPermissionIfPushNotificationsSetUpUseCase;
+import com.glia.widgets.internal.permissions.domain.RequestNotificationPermissionIfPushNotificationsSetUpUseCaseImpl;
+import com.glia.widgets.internal.permissions.domain.WithCameraPermissionUseCase;
+import com.glia.widgets.internal.permissions.domain.WithCameraPermissionUseCaseImpl;
+import com.glia.widgets.internal.permissions.domain.WithNotificationPermissionUseCase;
+import com.glia.widgets.internal.permissions.domain.WithNotificationPermissionUseCaseImpl;
+import com.glia.widgets.internal.permissions.domain.WithReadWritePermissionsUseCase;
+import com.glia.widgets.internal.permissions.domain.WithReadWritePermissionsUseCaseImpl;
+import com.glia.widgets.internal.secureconversations.domain.AddSecureFileToAttachmentAndUploadUseCase;
+import com.glia.widgets.internal.secureconversations.domain.HasOngoingSecureConversationUseCase;
+import com.glia.widgets.internal.secureconversations.domain.IsMessagingAvailableUseCase;
+import com.glia.widgets.internal.secureconversations.domain.ManageSecureMessagingStatusUseCase;
+import com.glia.widgets.internal.secureconversations.domain.MarkMessagesReadWithDelayUseCase;
+import com.glia.widgets.internal.secureconversations.domain.OnNextMessageUseCase;
+import com.glia.widgets.internal.secureconversations.domain.ResetMessageCenterUseCase;
+import com.glia.widgets.internal.secureconversations.domain.SecureConversationTopBannerVisibilityUseCase;
+import com.glia.widgets.internal.secureconversations.domain.SendMessageButtonStateUseCase;
+import com.glia.widgets.internal.secureconversations.domain.SendSecureMessageUseCase;
+import com.glia.widgets.internal.secureconversations.domain.SetLeaveSecureConversationDialogVisibleUseCase;
+import com.glia.widgets.internal.secureconversations.domain.SetLeaveSecureConversationDialogVisibleUseCaseImpl;
+import com.glia.widgets.internal.secureconversations.domain.ShouldMarkMessagesReadUseCase;
+import com.glia.widgets.internal.secureconversations.domain.ShowMessageLimitErrorUseCase;
+import com.glia.widgets.internal.survey.domain.GliaSurveyAnswerUseCase;
 import com.glia.widgets.launcher.ConfigurationManager;
 import com.glia.widgets.locale.LocaleProvider;
 import com.glia.widgets.push.notifications.IsPushNotificationsSetUpUseCase;
@@ -185,7 +186,7 @@ import java.util.Optional;
  */
 public class UseCaseFactory {
     private static CallNotificationUseCase callNotificationUseCase;
-    private static IsDisplayBubbleOutsideAppUseCase isDisplayBubbleOutsideAppUseCase;
+    private static DisplayBubbleOutsideAppUseCase displayBubbleOutsideAppUseCase;
     private static IsDisplayBubbleInsideAppUseCase isDisplayBubbleInsideAppUseCase;
     private static ResolveChatHeadNavigationUseCase resolveChatHeadNavigationUseCase;
     private static VisitorCodeViewBuilderUseCase visitorCodeViewBuilderUseCase;
@@ -254,30 +255,36 @@ public class UseCaseFactory {
     }
 
     @NonNull
-    public IsDisplayBubbleOutsideAppUseCase getToggleChatHeadServiceUseCase() {
-        if (isDisplayBubbleOutsideAppUseCase == null) {
-            isDisplayBubbleOutsideAppUseCase = new IsDisplayBubbleOutsideAppUseCase(
-                getIsQueueingOrEngagementUseCase(),
+    public DisplayBubbleOutsideAppUseCase getDisplayBubbleOutsideAppUseCase() {
+        if (displayBubbleOutsideAppUseCase == null) {
+            displayBubbleOutsideAppUseCase = new DisplayBubbleOutsideAppUseCase(
                 chatHeadManager,
                 permissionManager,
                 configurationManager,
-                getEngagementTypeUseCase()
+                getIsBubbleNeededUseCase()
             );
         }
-        return isDisplayBubbleOutsideAppUseCase;
+        return displayBubbleOutsideAppUseCase;
     }
 
     @NonNull
-    public IsDisplayBubbleInsideAppUseCase getIsDisplayApplicationChatHeadUseCase() {
+    public IsDisplayBubbleInsideAppUseCase getIsDisplayBubbleInsideAppUseCase() {
         if (isDisplayBubbleInsideAppUseCase == null) {
             isDisplayBubbleInsideAppUseCase = new IsDisplayBubbleInsideAppUseCase(
-                getIsQueueingOrEngagementUseCase(),
                 permissionManager,
                 configurationManager,
-                getEngagementTypeUseCase()
+                getIsBubbleNeededUseCase()
             );
         }
         return isDisplayBubbleInsideAppUseCase;
+    }
+
+    @NonNull
+    public IsBubbleNeededUseCase getIsBubbleNeededUseCase() {
+        return new IsBubbleNeededUseCase(
+            getIsQueueingOrEngagementUseCase(),
+            getEngagementTypeUseCase()
+        );
     }
 
     @NonNull

@@ -403,43 +403,48 @@ internal class EngagementRepositoryImpl(
     private fun handleOmniCoreEngagement(engagement: OmnicoreEngagement) {
         Logger.i(TAG, "Omnicore Engagement started")
 
-        when {
-            currentEngagement != null -> {
-                unsubscribeFromEvents(currentEngagement!!)
-                currentEngagement = null
-                resetState()
-            }
-
-            engagement.state.isLiveEngagementTransferredToSecureConversation -> _engagementState.onNext(State.TransferredToSecureConversation)
-
-            else -> _engagementState.onNext(State.EngagementStarted(false))
-        }
-
+        val oldEngagement = currentEngagement
+        // Since we heavily rely on current engagement instance for different states and actions
+        // we need to always update it first-before emitting new state
         currentEngagement = engagement
-        handleEngagementState(engagement.state)
 
+        resetState() // Always reset state when new engagement comes in
+
+        // Unsubscribe from old engagement events
+        oldEngagement?.also(::unsubscribeFromEvents)
+
+        // Update state based on Engagement's initial state
+        handleEngagementState(engagement.state, engagement)
+
+        // Subscribe to received events
         subscribeToEngagementEvents(engagement)
         subscribeToEngagementMediaEvents(engagement.media)
         subscribeToEngagementChatEvents(engagement.chat)
         handleVisitorCamera(engagement.media)
+
     }
 
     private fun handleCallVisualizerEngagement(engagement: OmnibrowseEngagement) {
         Logger.i(TAG, "Call Visualizer Engagement started")
 
-        currentEngagement?.also {
-            unsubscribeFromEvents(it)
-            currentEngagement = null
-            resetState()
-        } ?: _engagementState.onNext(State.EngagementStarted(true))
-
+        val oldEngagement = currentEngagement
+        // Since we heavily rely on current engagement instance for different states and actions
+        // we need to always update it first-before emitting new state
         currentEngagement = engagement
-        handleEngagementState(engagement.state)
 
+        resetState() // Always reset state when new engagement comes in
+
+        // Unsubscribe from old engagement events
+        oldEngagement?.also(::unsubscribeFromEvents)
+
+        // Update state based on Engagement's initial state
+        handleEngagementState(engagement.state, engagement)
+
+        // Subscribe to received events
         subscribeToEngagementEvents(engagement)
         subscribeToEngagementMediaEvents(engagement.media)
         handleVisitorCamera(engagement.media)
-        //No need for chat events here
+        // No need for chat events here
     }
 
     private fun handleVisitorCamera(media: Media) {
@@ -484,47 +489,48 @@ internal class EngagementRepositoryImpl(
         unsubscribeFromEngagementChatEvents(engagement.chat)
     }
 
-    private fun handleEngagementState(state: EngagementState) {
+    private fun handleEngagementState(state: EngagementState, newEngagement: Engagement? = null) {
+
+        if (state.isLiveEngagementTransferredToSecureConversation) {
+            resetState() // reset state to avoid any side effects like operator typing during SC etc.
+            Logger.i(TAG, "Transfer to Secure Conversation")
+            _engagementState.onNext(State.TransferredToSecureConversation)
+
+            // since there is no need to update operator data in case of transferred SC just return
+            return
+        }
+
         // keeping the current operator value, to use inside this function,
         // because in some cases we need to globally have up to date operator before emitting new state
         val currentOperator: Operator? = currentOperatorValue
 
         operatorRepository.emit(state.operator)
-        //since there is no need to update operator data in case of transferred SC, we postpone it to do inside the when branches
-        val updateCurrentOperator = { _currentOperator.onNext(Data.Value(state.operator)) }
+        _currentOperator.onNext(Data.Value(state.operator))
+
+        newEngagement?.let { _engagementState.onNext(State.EngagementStarted(it.isCallVisualizer)) }
 
         when {
-            state.isLiveEngagementTransferredToSecureConversation -> {
-                resetState() // reset state to avoid any side effects like operator typing during SC etc.
-                Logger.i(TAG, "Transfer to Secure Conversation")
-                _engagementState.onNext(State.TransferredToSecureConversation)
-            }
 
             state.visitorStatus == EngagementState.VisitorStatus.TRANSFERRING -> {
-                updateCurrentOperator()
-
                 Logger.i(TAG, "Transfer engagement")
                 _engagementState.onNext(State.Update(state, EngagementUpdateState.Transferring))
             }
 
             currentOperator == null -> {
-                updateCurrentOperator()
-
                 Logger.i(TAG, "Operator connected")
                 _engagementState.onNext(State.Update(state, EngagementUpdateState.OperatorConnected(state.operator)))
             }
 
             currentOperator.id != state.operator.id -> {
-                updateCurrentOperator()
 
                 Logger.i(TAG, "Operator changed")
                 _engagementState.onNext(State.Update(state, EngagementUpdateState.OperatorChanged(state.operator)))
             }
 
             currentOperator != state.operator -> {
-                updateCurrentOperator()
                 _engagementState.onNext(State.Update(state, EngagementUpdateState.Ongoing(state.operator)))
             }
+
         }
     }
 

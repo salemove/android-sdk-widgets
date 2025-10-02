@@ -82,6 +82,9 @@ test-mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.re
 test-robolectric = { module = "org.robolectric:robolectric", version.ref = "testRobolectricVersion" }
 test-mockk-android = { module = "io.mockk:mockk-android", version.ref = "testMockkVersion" }
 
+glia-core = { module = "com.glia:android-sdk" }
+glia-telemetry = { module = "com.glia:android-telemetry" }
+
 debug-leakcanary = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "debugLeakcanaryVersion" }
 
 [plugins]

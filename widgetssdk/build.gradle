@@ -126,13 +126,24 @@ dependencies {
   implementation libs.java.rxandroid
   implementation libs.java.rxjava
 
-  releaseApi "com.glia:android-sdk:$gliaSdkVersion"
-  debugApi "com.glia:android-sdk:${coreSdkDebugVersion(gliaSdkVersion)}"
+  releaseApi "${libs.glia.core.get().module}:$gliaSdkVersion"
+
+  def coreDebugVersion = coreSdkDebugVersion(gliaSdkVersion)
+  debugApi ("${libs.glia.core.get().module}:$coreDebugVersion") {
+    if (coreDebugVersion.endsWith("-SNAPSHOT")) {
+      changing = true
+    }
+  }
 
   // includeBuild doesn't work with custom build types, use local maven version instead
-  snapshotApi "com.glia:android-sdk:${coreSdkSnapshotVersion(gliaSdkVersion)}"
+  snapshotApi "${libs.glia.core.get().module}:${coreSdkSnapshotVersion(gliaSdkVersion)}"
 
-  implementation "com.glia:android-telemetry:${telemetrySdkVersion(telemetryLibVersion)}"
+  def telemetryVersion = telemetrySdkVersion(telemetryLibVersion)
+  implementation ("${libs.glia.telemetry.get().module}:$telemetryVersion") {
+    if (telemetryVersion.endsWith("-SNAPSHOT")) {
+      changing = true
+    }
+  }
 
   implementation libs.media.audioswitch
   implementation libs.media.lottie
@@ -159,6 +170,11 @@ dependencies {
 
   lintChecks project(':lint_checker')
   debugImplementation libs.debug.leakcanary
+}
+
+configurations.configureEach {
+  // Always check remote repo for changing modules (SNAPSHOTs)
+  resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
 apply from: "${rootProject.projectDir}/scripts/publish-module.gradle"

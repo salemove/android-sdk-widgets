@@ -9,6 +9,8 @@ import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import androidx.core.content.getSystemService
+import com.glia.telemetry_lib.GliaLogger
+import com.glia.telemetry_lib.LogEvents
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.processors.BehaviorProcessor
 
@@ -56,6 +58,7 @@ internal class DeviceMonitor(context: Context) : ConnectivityManager.NetworkCall
     private val screenOnReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.action == Intent.ACTION_SCREEN_ON) {
+                GliaLogger.i(LogEvents.DEVICE_SCREEN_ON)
                 _deviceState.onNext(DeviceState.INTERACTIVE)
             }
         }
@@ -64,6 +67,7 @@ internal class DeviceMonitor(context: Context) : ConnectivityManager.NetworkCall
     private val screenOffReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.action == Intent.ACTION_SCREEN_OFF) {
+                GliaLogger.i(LogEvents.DEVICE_SCREEN_OFF)
                 _deviceState.onNext(DeviceState.NON_INTERACTIVE)
             }
         }

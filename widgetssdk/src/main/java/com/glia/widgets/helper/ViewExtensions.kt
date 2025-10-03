@@ -31,6 +31,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat
 import androidx.core.view.children
+import androidx.core.view.isVisible
 import androidx.core.widget.TextViewCompat
 import coil3.SingletonImageLoader
 import coil3.request.ErrorResult
@@ -253,4 +254,20 @@ private fun View.registerLocaleListener(@StringRes stringKey: Int, vararg values
             removeOnAttachStateChangeListener(this)
         }
     })
+}
+
+/**
+ * Ensures the view's visibility is set to the desired state.
+ * The [then] action is only executed if the visibility actually changes,
+ * and it receives the newly applied visibility state.
+ */
+internal fun View.ensureVisibility(isVisible: Boolean, then: (appliedState: Boolean) -> Unit = {}) {
+    // If the state is already correct, do nothing.
+    if (this.isVisible == isVisible) return
+
+    // Apply the new state.
+    this.isVisible = isVisible
+
+    // Execute the callback, passing the new state.
+    then(isVisible)
 }

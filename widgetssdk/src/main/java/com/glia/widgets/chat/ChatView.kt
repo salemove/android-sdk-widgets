@@ -34,6 +34,7 @@ import com.glia.telemetry_lib.ButtonNames
 import com.glia.telemetry_lib.EventAttribute
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.telemetry_lib.LogEvents
+import com.glia.telemetry_lib.ScBannerTypes
 import com.glia.widgets.Constants
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.R
@@ -59,6 +60,7 @@ import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.helper.addColorFilter
 import com.glia.widgets.helper.asActivity
+import com.glia.widgets.helper.ensureVisibility
 import com.glia.widgets.helper.fileName
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getColorStateListCompat
@@ -541,11 +543,15 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             showToolbar(LocaleString(R.string.message_center_header))
             binding.appBarView.hideBackButton()
             binding.appBarView.showXButton()
-            binding.secureConversationsBottomBanner.visibility = VISIBLE
         } else {
             showToolbar(LocaleString(R.string.engagement_chat_title))
             binding.appBarView.showBackButton()
-            binding.secureConversationsBottomBanner.visibility = GONE
+        }
+        binding.secureConversationsBottomBanner.ensureVisibility(chatState.isSecureMessaging) {
+            GliaLogger.i(LogEvents.CHAT_SCREEN_SC_BANNER_VISIBILITY_CHANGED) {
+                put(EventAttribute.ScBannerType, ScBannerTypes.BOTTOM)
+                put(EventAttribute.IsVisible, it.toString())
+            }
         }
     }
 
@@ -904,12 +910,22 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
                 .addTarget(binding.scTopBannerBackground)
                 .addTarget(binding.scTopBannerDivider)
         )
-        binding.scErrorLabel.isVisible = state.isSecureConversationsUnavailableLabelVisible
+        binding.scErrorLabel.ensureVisibility(state.isSecureConversationsUnavailableLabelVisible) {
+            GliaLogger.i(LogEvents.CHAT_SCREEN_SC_BANNER_VISIBILITY_CHANGED) {
+                put(EventAttribute.ScBannerType, ScBannerTypes.UNAVAILABLE)
+                put(EventAttribute.IsVisible, it.toString())
+            }
+        }
         if (state.isSecureConversationsTopBannerVisible.not() && isNeedSupportDropDownShown()) {
             onNeedSupportButtonClicked(null)
         }
-        binding.scTopBannerGroup.isVisible = state.isSecureConversationsTopBannerVisible
-        binding.scTopBannerDivider.isVisible = state.isSecureConversationsTopBannerVisible
+        binding.scTopBannerGroup.ensureVisibility(state.isSecureConversationsTopBannerVisible) {
+            GliaLogger.i(LogEvents.CHAT_SCREEN_SC_BANNER_VISIBILITY_CHANGED) {
+                put(EventAttribute.ScBannerType, ScBannerTypes.TOP)
+                put(EventAttribute.IsVisible, it.toString())
+            }
+        }
+        binding.scTopBannerDivider.ensureVisibility(state.isSecureConversationsTopBannerVisible)
     }
 
     @VisibleForTesting

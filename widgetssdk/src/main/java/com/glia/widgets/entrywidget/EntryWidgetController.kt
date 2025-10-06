@@ -228,7 +228,7 @@ internal class EntryWidgetController @JvmOverloads constructor(
         if (entryWidgetItem != null) {
             GliaLogger.i(LogEvents.ENTRY_WIDGET_ITEM_CLICKED) {
                 put(EventAttribute.ViewType, viewType.toTelemetryViewType() ?: "N/A")
-                put(EventAttribute.ButtonName, entryWidgetItem)
+                put(EventAttribute.EngagementType, entryWidgetItem)
             }
         } else {
             val buttonName = itemType.toTelemetryButtonName()

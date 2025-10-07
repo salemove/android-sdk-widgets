@@ -14,7 +14,7 @@ import com.glia.widgets.di.Dependencies
  */
 open class InitializationProvider : ContentProvider() {
     override fun onCreate(): Boolean {
-        GliaTelemetry.init(this.context, OtelConfig("https://watchtower.beta.glia.com:4318"))
+        GliaTelemetry.init(OtelConfig("https://watchtower.beta.glia.com:4318", this.context))
         (context as? Application)?.let {
             Dependencies.onAppCreate(it)
             GliaWidgets.setupRxErrorHandler()

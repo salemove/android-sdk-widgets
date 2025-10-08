@@ -103,6 +103,11 @@
         </provider>
 
         <provider
+            android:name="com.glia.androidsdk.InitializationProvider"
+            android:authorities="${applicationId}.InitializationProvider"
+            tools:node="remove" /> <!-- Overrides/extends this provider in Widgets, so unregistering it -->
+
+        <provider
             android:name=".InitializationProvider"
             android:authorities="${applicationId}.InitializationProvider"
             android:exported="false" />

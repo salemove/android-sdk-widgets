@@ -1,20 +1,18 @@
 package com.glia.widgets
 
 import android.app.Application
-import android.content.ContentProvider
 import android.content.ContentValues
 import android.database.Cursor
 import android.net.Uri
-import com.glia.telemetry_lib.GliaTelemetry
-import com.glia.telemetry_lib.OtelConfig
+import com.glia.androidsdk.InitializationProvider
 import com.glia.widgets.di.Dependencies
 
 /**
  * @hide
  */
-open class InitializationProvider : ContentProvider() {
+open class InitializationProvider : InitializationProvider() {
     override fun onCreate(): Boolean {
-        GliaTelemetry.init(OtelConfig("https://watchtower.beta.glia.com:4318", this.context))
+        super.onCreate()
         (context as? Application)?.let {
             Dependencies.onAppCreate(it)
             GliaWidgets.setupRxErrorHandler()

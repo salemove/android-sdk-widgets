@@ -9,8 +9,9 @@ buildscript {
 }
 
 plugins {
-  alias libs.plugins.maven.publish
   alias libs.plugins.dokka
+  alias libs.plugins.dokkaJavadoc
+  alias libs.plugins.maven.publish
   alias libs.plugins.kt.lint
   alias libs.plugins.kotlin.android apply false
   alias libs.plugins.paparazzi apply false
@@ -19,15 +20,6 @@ plugins {
 apply from: "${rootDir}/scripts/version-updater.gradle"
 
 allprojects {
-
-  project.ext {
-    PUBLISH_GROUP_ID = 'com.glia'
-    PUBLISH_VERSION = widgetsVersionName
-    PUBLISH_ARTIFACT_ID = 'android-widgets'
-    PUBLISH_MODULE_DESCRIPTION = 'Glia Android Widgets SDK'
-    PUBLISH_ORGANISATION_NAME = 'Glia'
-    PUBLISH_ORGANISATION_URL = 'https://www.glia.com/'
-  }
 
   repositories {
     google()
@@ -109,5 +101,3 @@ dokka {
     dokkaPlugin(libs.java.dokka)
   }
 }
-
-apply from: "${rootDir}/scripts/publish-module.gradle"

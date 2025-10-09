@@ -1,6 +1,10 @@
+import com.vanniktech.maven.publish.AndroidSingleVariantLibrary
+
 apply plugin: 'com.android.library'
 apply plugin: 'org.jetbrains.kotlin.android'
 apply plugin: 'kotlin-parcelize'
+apply plugin: 'com.vanniktech.maven.publish'
+apply plugin: 'org.jetbrains.dokka-javadoc'
 
 //Detailed information about advantages of Java toolchain https://developer.android.com/build/jdks#toolchain
 java {
@@ -85,6 +89,40 @@ android {
   }
 }
 
+group = 'com.glia'
+
+mavenPublishing {
+  def isSnapshot = findProperty("snapshot")?.toString() == "yes"
+  //Plugin automatically publishes snapshot to the Maven Central when the version name ends with `-SNAPSHOT`
+  //To publish snapshot release simply call the publishing command with gradle property `-Psnapshot=yes`
+  //for example `./gradlew androidSdk:publishMavenPublicationToMavenLocal -Psnapshot=yes`
+
+  version = isSnapshot ? widgetsVersionName + "-SNAPSHOT" : widgetsVersionName
+  coordinates(group, 'android-widgets', version)
+  configure(new AndroidSingleVariantLibrary('release', true, false/* enable javadoc generation */))
+
+  pom {
+    excludeOptionalDependencies(it)
+  }
+}
+
+//Excludes the Firebase Messaging from the .aar dependencies to avoid requiring integrators to include them in their applications.
+def excludeOptionalDependencies(mavenPom) {
+  mavenPom.withXml {
+    final pomNode = asNode()
+    pomNode.dependencyManagement.dependencies.'*'.findAll() {
+      it.artifactId.text() == 'firebase-bom'
+    }.each() {
+      it.parent().remove(it)
+    }
+    pomNode.dependencies.'*'.findAll() {
+      it.artifactId.text() == 'firebase-messaging'
+    }.each() {
+      it.parent().remove(it)
+    }
+  }
+}
+
 tasks.register('publishSnapshotPublicationToMavenLocal', GradleBuild) {
   description = 'Publishes the Snapshot publication to Maven Local with -SNAPSHOT suffix'
   group = 'publishing'
@@ -109,6 +147,25 @@ tasks.register("publishCoreSdkToLocalMaven") {
   } else {
     println("Cannot publish Core SDK to local maven repository!")
     println("Core SDK is not configured to be used directly.")
+  }
+}
+
+// For generating Javadoc jar using Dokka
+tasks.register('dokkaJavadocJar', Jar.class) {
+  dependsOn(dokkaGeneratePublicationJavadoc)
+  from(dokkaGeneratePublicationJavadoc)
+  archiveClassifier.set("javadoc")
+}
+
+// CRITICAL: Ensure the Dokka JAR is included in the published artifacts.
+afterEvaluate {
+  publishing {
+    publications {
+      maven(MavenPublication) {
+        // CRITICAL: Add the generated Javadoc jar to the published artifacts.
+        artifact dokkaJavadocJar
+      }
+    }
   }
 }
 
@@ -176,5 +233,3 @@ configurations.configureEach {
   // Always check remote repo for changing modules (SNAPSHOTs)
   resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
-
-apply from: "${rootProject.projectDir}/scripts/publish-module.gradle"

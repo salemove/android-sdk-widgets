@@ -12,12 +12,10 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
 import androidx.core.content.withStyledAttributes
 import androidx.core.graphics.Insets
-import androidx.core.view.ViewCompat
 import androidx.core.view.isVisible
 import com.glia.telemetry_lib.ButtonNames
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.telemetry_lib.LogEvents
-import com.glia.widgets.Constants
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.databinding.MessageCenterViewBinding
@@ -79,8 +77,6 @@ internal class MessageCenterView(context: Context, attrs: AttributeSet?, defStyl
     init {
         isSaveEnabled = true
         orientation = VERTICAL
-        // Is needed to overlap existing app bar in existing view with this view's app bar.
-        ViewCompat.setElevation(this, Constants.WIDGETS_SDK_LAYER_ELEVATION)
         readTypedArray(attrs, defStyleAttr, defStyleRes)
     }
 

@@ -3,11 +3,10 @@ package com.glia.widgets.view.head
 import android.app.Service
 import android.content.Context
 import android.content.res.TypedArray
-import android.graphics.PorterDuff
 import android.util.AttributeSet
 import android.view.View
+import android.widget.FrameLayout
 import androidx.annotation.VisibleForTesting
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.withStyledAttributes
 import androidx.core.view.AccessibilityDelegateCompat
 import androidx.core.view.ViewCompat
@@ -41,11 +40,10 @@ internal class ChatHeadView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = R.attr.gliaChatStyle,
     defStyleRes: Int = R.style.Application_Glia_Chat
-) : ConstraintLayout(
+) : FrameLayout(
     MaterialThemeOverlay.wrap(context, attrs, defStyleAttr, defStyleRes),
     attrs,
-    defStyleAttr,
-    defStyleRes
+    defStyleAttr
 ), ChatHeadContract.View {
     private val activityLauncher: ActivityLauncher by lazy { Dependencies.activityLauncher }
     private val binding by lazy { ChatHeadViewBinding.inflate(layoutInflater, this) }
@@ -101,6 +99,7 @@ internal class ChatHeadView @JvmOverloads constructor(
         post {
             binding.apply {
                 queueingLottieAnimation.visibility = GONE
+                queueingLottieAnimationPlaceholder.visibility = GONE
                 placeholderView.visibility = GONE
                 profilePictureView.load(operatorImgUrl)
             }
@@ -111,6 +110,7 @@ internal class ChatHeadView @JvmOverloads constructor(
         post {
             binding.apply {
                 queueingLottieAnimation.visibility = GONE
+                queueingLottieAnimationPlaceholder.visibility = GONE
                 profilePictureView.setImageDrawable(null)
                 profilePictureView.backgroundTintList = getColorStateListCompat(configuration.backgroundColorRes)
                 placeholderView.setImageResource(configuration.operatorPlaceholderIcon)
@@ -126,6 +126,7 @@ internal class ChatHeadView @JvmOverloads constructor(
                 profilePictureView.setImageDrawable(null)
                 profilePictureView.backgroundTintList = getColorStateListCompat(configuration.badgeTextColor)
                 queueingLottieAnimation.visibility = VISIBLE
+                queueingLottieAnimationPlaceholder.visibility = VISIBLE
             }
         }
         ChatHeadLogger.logEnqueueingStarted()
@@ -153,7 +154,9 @@ internal class ChatHeadView @JvmOverloads constructor(
     private fun applyUserImageTheme(userImageTheme: UserImageTheme?) {
         userImageTheme?.imageBackgroundColor.also(binding.profilePictureView::applyColorTheme)
         userImageTheme?.placeholderBackgroundColor.also(binding.placeholderView::applyColorTheme)
+        userImageTheme?.placeholderBackgroundColor.also(binding.queueingLottieAnimationPlaceholder::applyColorTheme)
         userImageTheme?.placeholderColor.also(binding.placeholderView::applyImageColorTheme)
+        userImageTheme?.placeholderColor.also(binding.queueingLottieAnimationPlaceholder::applyImageColorTheme)
     }
 
     override fun navigateToChat() {
@@ -203,6 +206,11 @@ internal class ChatHeadView @JvmOverloads constructor(
             setBackgroundColor(getColorCompat(configuration.operatorPlaceholderBackgroundColor))
             imageTintList = getColorStateListCompat(configuration.operatorPlaceholderIconTintList)
         }
+        binding.queueingLottieAnimationPlaceholder.apply {
+            setImageResource(configuration.operatorPlaceholderIcon)
+            setBackgroundColor(getColorCompat(configuration.operatorPlaceholderBackgroundColor))
+            imageTintList = getColorStateListCompat(configuration.operatorPlaceholderIconTintList)
+        }
     }
 
     private fun updateOnHoldImageView() {
@@ -224,10 +232,7 @@ internal class ChatHeadView @JvmOverloads constructor(
     }
 
     private fun updateQueueingAnimationView() {
-        binding.queueingLottieAnimation.addColorFilter(
-            color = getColorCompat(configuration.backgroundColorRes),
-            mode = PorterDuff.Mode.SRC_OVER
-        )
+        binding.queueingLottieAnimation.addColorFilter(color = getColorCompat(configuration.backgroundColorRes))
     }
 
     private fun updateView() {

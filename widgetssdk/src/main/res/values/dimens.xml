@@ -53,10 +53,11 @@
 
     <dimen name="glia_chat_head_size">64dp</dimen>
     <dimen name="glia_chat_head_placeholder_size">32dp</dimen>
-    <dimen name="glia_chat_head_content_padding">16dp</dimen>
+    <dimen name="glia_chat_head_content_padding">12dp</dimen>
+    <dimen name="glia_chat_head_elevation">2dp</dimen>
+    <dimen name="glia_chat_head_badge_elevation">3dp</dimen>
 
     <dimen name="glia_chat_head_badge_size">18sp</dimen>
-    <dimen name="glia_chat_head_badge_elevation">6dp</dimen>
 
     <dimen name="glia_chat_gva_gallery_card_width">234dp</dimen>
 
@@ -66,6 +67,8 @@
     <dimen name="glia_call_operator_status_image_size">124dp</dimen>
     <dimen name="glia_call_operator_name_gone_margin_top">66dp</dimen>
     <dimen name="glia_call_video_height">250dp</dimen>
+    <dimen name="glia_call_button_elevation">1dp</dimen>
+    <dimen name="glia_call_badge_elevation">2dp</dimen>
 
     <dimen name="glia_survey_question_title_size">16sp</dimen>
     <dimen name="glia_survey_option_button_height">52dp</dimen>

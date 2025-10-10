@@ -15,7 +15,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.withStyledAttributes
-import androidx.core.view.ViewCompat
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -592,8 +591,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
 
     private fun initConfigurations() {
         isInvisible = true
-        // needed to overlap existing app bar in existing view with this view's app bar.
-        ViewCompat.setElevation(this, Constants.WIDGETS_SDK_LAYER_ELEVATION)
     }
 
     private fun bindViews() {

@@ -7,11 +7,9 @@ import androidx.annotation.ColorRes
 import androidx.annotation.IdRes
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
-import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updateMargins
-import com.glia.widgets.Constants
 import com.glia.widgets.R
 import com.glia.widgets.call.CallActivity
 import com.glia.widgets.chat.ChatActivity
@@ -60,7 +58,6 @@ internal abstract class SnackBarDelegate(
         return Snackbar.make(view, message, Snackbar.LENGTH_SHORT)
             .setBackgroundTint(bgColor)
             .setTextColor(textColor)
-            .also { ViewCompat.setElevation(it.view, Constants.WIDGETS_SDK_LAYER_ELEVATION.plus(1)) }
             .apply { anchorViewId?.also { setAnchorView(it) } }
             .apply { marginBottom?.also { updateBottomMargin(this, it) } }
     }

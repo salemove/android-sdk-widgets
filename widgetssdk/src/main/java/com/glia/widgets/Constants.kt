@@ -12,11 +12,6 @@ internal object Constants {
     const val CALL_TIMER_INTERVAL_VALUE = 1000
 
     /**
-     * Needed to overlap existing app bar in existing view with this view's app bar.
-     */
-    const val WIDGETS_SDK_LAYER_ELEVATION = 100f
-
-    /**
      * MIME type for ActivityResultLauncher to show only images
      */
     const val MIME_TYPE_IMAGES = "image/*"

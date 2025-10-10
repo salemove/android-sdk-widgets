@@ -31,7 +31,6 @@ internal class BadgeTextView @JvmOverloads constructor(context: Context, attrs: 
         setBackgroundResource(R.drawable.bg_badge)
 
         importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
-        elevation = resources.getDimension(R.dimen.glia_chat_head_badge_elevation)
 
         setTextAppearance(
             getAttr(

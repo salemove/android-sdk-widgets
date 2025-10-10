@@ -9,7 +9,6 @@ import android.widget.FrameLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
-import com.glia.widgets.Constants
 import com.glia.widgets.R
 import com.glia.widgets.databinding.ChatHeadLayoutBinding
 import com.glia.widgets.di.Dependencies
@@ -50,6 +49,7 @@ internal class ChatHeadLayout @JvmOverloads constructor(
 
     init {
         initialize()
+        z = 100f // Make sure chat head is on top of other views
     }
 
     override fun showOperatorImage(operatorImgUrl: String) {
@@ -190,7 +190,6 @@ internal class ChatHeadLayout @JvmOverloads constructor(
     private fun initConfigurations() {
         isClickable = false
         isFocusable = false
-        ViewCompat.setElevation(this, Constants.WIDGETS_SDK_LAYER_ELEVATION)
     }
 
     @SuppressLint("ClickableViewAccessibility")

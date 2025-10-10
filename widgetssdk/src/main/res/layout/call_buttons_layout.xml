@@ -20,22 +20,21 @@
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/chat_button"
+        style="@style/Application.Glia.Call.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/glia_small"
         android:src="?attr/gliaIconCallChat"
-        app:backgroundTint="@color/call_fab_bg_color_states"
         app:layout_constraintBottom_toTopOf="@id/chat_button_label"
         app:layout_constraintEnd_toStartOf="@id/video_button"
         app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintStart_toStartOf="parent"
-        app:rippleColor="@color/call_fab_ripple_color_states"
-        app:tint="@color/call_fab_icon_color_states" />
+        app:layout_constraintStart_toStartOf="parent"/>
 
     <com.glia.widgets.view.head.BadgeTextView
         android:id="@+id/chat_button_badge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:elevation="@dimen/glia_call_badge_elevation"
         app:layout_constraintEnd_toEndOf="@id/chat_button"
         app:layout_constraintTop_toTopOf="@id/chat_button" />
 
@@ -54,16 +53,14 @@
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/video_button"
+        style="@style/Application.Glia.Call.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/glia_small"
         android:src="?attr/gliaIconCallVideoOn"
-        app:backgroundTint="@color/call_fab_bg_color_states"
         app:layout_constraintBottom_toTopOf="@id/video_button_label"
         app:layout_constraintEnd_toStartOf="@id/mute_button"
-        app:layout_constraintStart_toEndOf="@id/chat_button"
-        app:rippleColor="@color/call_fab_ripple_color_states"
-        app:tint="@color/call_fab_icon_color_states" />
+        app:layout_constraintStart_toEndOf="@id/chat_button" />
 
     <com.glia.widgets.call.CallButtonLabelView
         android:id="@+id/mute_button_label"
@@ -80,16 +77,14 @@
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/mute_button"
+        style="@style/Application.Glia.Call.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/glia_small"
         android:src="?attr/gliaIconCallAudioOn"
-        app:backgroundTint="@color/call_fab_bg_color_states"
         app:layout_constraintBottom_toTopOf="@id/mute_button_label"
         app:layout_constraintEnd_toStartOf="@id/speaker_button"
-        app:layout_constraintStart_toEndOf="@id/video_button"
-        app:rippleColor="@color/call_fab_ripple_color_states"
-        app:tint="@color/call_fab_icon_color_states" />
+        app:layout_constraintStart_toEndOf="@id/video_button" />
 
     <com.glia.widgets.call.CallButtonLabelView
         android:id="@+id/speaker_button_label"
@@ -106,16 +101,14 @@
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/speaker_button"
+        style="@style/Application.Glia.Call.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/glia_small"
         android:src="?attr/gliaIconCallSpeakerOff"
-        app:backgroundTint="@color/call_fab_bg_color_states"
         app:layout_constraintBottom_toTopOf="@id/speaker_button_label"
         app:layout_constraintEnd_toStartOf="@id/minimize_button"
-        app:layout_constraintStart_toEndOf="@id/mute_button"
-        app:rippleColor="@color/call_fab_ripple_color_states"
-        app:tint="@color/call_fab_icon_color_states" />
+        app:layout_constraintStart_toEndOf="@id/mute_button" />
 
     <com.glia.widgets.call.CallButtonLabelView
         android:id="@+id/minimize_button_label"
@@ -131,15 +124,13 @@
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/minimize_button"
+        style="@style/Application.Glia.Call.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/glia_small"
         android:src="?attr/gliaIconCallMinimize"
-        app:backgroundTint="@color/call_fab_bg_color_states"
         app:layout_constraintBottom_toTopOf="@id/minimize_button_label"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/speaker_button"
-        app:rippleColor="@color/call_fab_ripple_color_states"
-        app:tint="@color/call_fab_icon_color_states" />
+        app:layout_constraintStart_toEndOf="@id/speaker_button" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -2,86 +2,88 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
+    android:gravity="center"
+    tools:layout_height="@dimen/glia_chat_head_size"
+    tools:layout_width="@dimen/glia_chat_head_size"
+    tools:parentTag="android.widget.FrameLayout">
 
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/profile_picture_view"
-        android:layout_width="@dimen/glia_chat_head_size"
-        android:layout_height="@dimen/glia_chat_head_size"
-        android:layout_marginHorizontal="@dimen/glia_small"
-        android:layout_marginVertical="@dimen/glia_medium"
-        android:elevation="@dimen/glia_small"
-        android:outlineProvider="bounds"
-        android:scaleType="centerCrop"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:shapeAppearance="@style/Application.Glia.Chat.CircleImageView" />
-
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/placeholder_view"
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="@dimen/glia_chat_head_size"
         android:layout_height="@dimen/glia_chat_head_size"
         android:layout_gravity="center"
-        android:elevation="@dimen/glia_small"
-        android:scaleType="fitCenter"
-        app:contentPadding="18dp"
-        android:visibility="gone"
-        tools:visibility="visible"
-        tools:srcCompat="@drawable/ic_person"
-        app:layout_constraintBottom_toBottomOf="@id/profile_picture_view"
-        app:layout_constraintEnd_toEndOf="@id/profile_picture_view"
-        app:layout_constraintStart_toStartOf="@id/profile_picture_view"
-        app:layout_constraintTop_toTopOf="@id/profile_picture_view"
         app:shapeAppearance="@style/Application.Glia.Chat.CircleImageView"
-        app:srcCompat="?attr/gliaIconPlaceholder" />
+        app:strokeWidth="0dp"
+        app:cardElevation="@dimen/glia_chat_head_elevation"
+        android:layout_margin="@dimen/glia_small">
 
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/on_hold_icon"
-        android:layout_width="@dimen/glia_chat_head_size"
-        android:layout_height="@dimen/glia_chat_head_size"
-        android:layout_gravity="center"
-        android:layout_marginHorizontal="@dimen/glia_small"
-        android:layout_marginVertical="@dimen/glia_medium"
-        android:background="@color/glia_dark_transparent_bg"
-        android:elevation="@dimen/glia_small"
-        android:scaleType="fitCenter"
-        app:contentPadding="@dimen/glia_chat_head_content_padding"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/profile_picture_view"
-        app:layout_constraintEnd_toEndOf="@id/profile_picture_view"
-        app:layout_constraintStart_toStartOf="@id/profile_picture_view"
-        app:layout_constraintTop_toTopOf="@id/profile_picture_view"
-        app:shapeAppearance="@style/Application.Glia.Chat.CircleImageView"
-        app:srcCompat="?attr/gliaIconOnHold"
-        tools:srcCompat="@drawable/ic_pause_circle" />
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/profile_picture_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            app:shapeAppearance="@style/Application.Glia.Chat.CircleImageView" />
 
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/queueing_lottie_animation"
-        android:layout_width="@dimen/glia_chat_head_placeholder_size"
-        android:layout_height="@dimen/glia_chat_head_placeholder_size"
-        android:layout_gravity="center"
-        android:elevation="@dimen/glia_small"
-        android:scaleType="fitCenter"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/profile_picture_view"
-        app:layout_constraintEnd_toEndOf="@id/profile_picture_view"
-        app:layout_constraintStart_toStartOf="@id/profile_picture_view"
-        app:layout_constraintTop_toTopOf="@id/profile_picture_view"
-        app:lottie_autoPlay="true"
-        app:lottie_loop="true"
-        app:lottie_rawRes="@raw/chat_typing_indicator"
-        tools:visibility="visible" />
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/placeholder_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerInside"
+            android:visibility="gone"
+            app:contentPadding="@dimen/glia_large"
+            app:shapeAppearance="@style/Application.Glia.Chat.CircleImageView"
+            app:srcCompat="?attr/gliaIconPlaceholder"
+            tools:srcCompat="@drawable/ic_person"
+            tools:visibility="visible" />
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/on_hold_icon"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/glia_dark_transparent_bg"
+            android:scaleType="centerInside"
+            android:visibility="gone"
+            app:contentPadding="@dimen/glia_chat_head_content_padding"
+            app:shapeAppearance="@style/Application.Glia.Chat.CircleImageView"
+            app:srcCompat="?attr/gliaIconOnHold"
+            tools:srcCompat="@drawable/ic_pause_circle" />
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/queueing_lottie_animation"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter"
+            android:visibility="gone"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true"
+            app:lottie_rawRes="@raw/pulsation_lottie_animation"
+            app:lottie_speed="0.75"
+            tools:visibility="visible" />
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/queueing_lottie_animation_placeholder"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="@dimen/glia_large"
+            android:scaleType="centerInside"
+            app:contentPadding="@dimen/glia_medium"
+            android:visibility="gone"
+            app:shapeAppearance="@style/Application.Glia.Chat.CircleImageView"
+            app:srcCompat="?attr/gliaIconPlaceholder"
+            tools:background="@color/glia_black_color"
+            tools:srcCompat="@drawable/ic_person"
+            tools:visibility="visible" />
+
+    </com.google.android.material.card.MaterialCardView>
 
     <com.glia.widgets.view.head.BadgeTextView
         android:id="@+id/chat_bubble_badge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
         android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="@id/profile_picture_view"
-        app:layout_constraintTop_toTopOf="@id/profile_picture_view"
+        android:elevation="@dimen/glia_chat_head_badge_elevation"
         tools:ignore="TouchTargetSizeCheck"
+        android:layout_margin="@dimen/glia_small"
         tools:text="1"
         tools:visibility="visible" />
 

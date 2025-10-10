@@ -22,7 +22,6 @@ import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.comms.VideoView
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.telemetry_lib.LogEvents
-import com.glia.widgets.Constants
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.UiTheme.UiThemeBuilder
@@ -489,8 +488,6 @@ internal class CallView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     private fun initConfigurations() {
         visibility = INVISIBLE
         setBackgroundColor(getColorCompat(R.color.glia_call_view_background_color))
-        // needed to overlap existing app bar in existing view with this view's app bar.
-        elevation = Constants.WIDGETS_SDK_LAYER_ELEVATION
     }
 
     private fun readTypedArray(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {

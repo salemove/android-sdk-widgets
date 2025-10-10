@@ -98,7 +98,7 @@ internal class SimpleWindowInsetsAndAnimationHandler(
             }
         }
 
-        return WindowInsetsCompat.CONSUMED
+        return insets
     }
 
     private fun getCombinedInsets(insets: WindowInsetsCompat): Insets = insets.run {

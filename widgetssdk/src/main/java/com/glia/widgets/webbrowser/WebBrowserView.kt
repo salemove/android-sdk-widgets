@@ -10,8 +10,6 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.LinearLayout
 import androidx.core.content.withStyledAttributes
-import androidx.core.view.ViewCompat
-import com.glia.widgets.Constants
 import com.glia.widgets.R
 import com.glia.widgets.databinding.WebBrowserViewBinding
 import com.glia.widgets.di.Dependencies
@@ -49,8 +47,6 @@ internal class WebBrowserView(
     init {
         isSaveEnabled = true
         orientation = VERTICAL
-        // Is needed to overlap existing app bar in existing view with this view's app bar.
-        ViewCompat.setElevation(this, Constants.WIDGETS_SDK_LAYER_ELEVATION)
         readTypedArray(attrs, defStyleAttr, defStyleRes)
 
         setupViewAppearance()

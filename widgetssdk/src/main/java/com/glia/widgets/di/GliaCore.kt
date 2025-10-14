@@ -51,7 +51,6 @@ internal interface GliaCore {
         mediaType: MediaType,
         visitorContextAssetId: String?,
         engagementOptions: EngagementOptions?,
-        mediaPermissionRequestCode: Int,
         replaceExisting: Boolean,
         callback: Consumer<GliaException?>
     )
@@ -59,7 +58,6 @@ internal interface GliaCore {
     fun cancelQueueTicket(queueTicketId: String, callback: Consumer<GliaException?>)
 
     fun subscribeToQueueTicketUpdates(ticketId: String, callback: RequestCallback<QueueTicket?>)
-    fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray)
 
     fun submitSurveyAnswers(answers: List<Survey.Answer>, surveyId: String, engagementId: String, callback: Consumer<GliaException?>)
     fun clearVisitorSession()

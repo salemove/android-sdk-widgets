@@ -18,6 +18,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 
 @get:ClassRule
 val rule: TestRule = InstantTaskExecutorRule()
@@ -45,6 +46,9 @@ class DependenciesTest {
         val siteApiKey = SiteApiKey("SiteApiId", "SiteApiSecret")
         val widgetsConfig = GliaWidgetsConfig.Builder()
             .setSiteApiKey(siteApiKey)
+            .setSiteId("SiteId")
+            .setRegion("Region")
+            .setContext(RuntimeEnvironment.getApplication())
             .build()
 
         Dependencies.onSdkInit(widgetsConfig)
@@ -59,6 +63,9 @@ class DependenciesTest {
         val siteApiKey = SiteApiKey("SiteApiId", "SiteApiSecret")
         val widgetsConfig = GliaWidgetsConfig.Builder()
             .setSiteApiKey(siteApiKey)
+            .setSiteId("SiteId")
+            .setRegion("Region")
+            .setContext(RuntimeEnvironment.getApplication())
             .build()
         val callback = mock<RequestCallback<Boolean?>>()
 
@@ -74,6 +81,9 @@ class DependenciesTest {
         val siteApiKey = SiteApiKey("SiteApiId", "SiteApiSecret")
         val widgetsConfig = GliaWidgetsConfig.Builder()
             .setSiteApiKey(siteApiKey)
+            .setSiteId("SiteId")
+            .setRegion("Region")
+            .setContext(RuntimeEnvironment.getApplication())
             .build()
         val callback = mock<RequestCallback<Boolean?>>()
         val callbackCaptor = argumentCaptor<RequestCallback<Boolean?>>()
@@ -95,6 +105,9 @@ class DependenciesTest {
         val siteApiKey = SiteApiKey("SiteApiId", "SiteApiSecret")
         val widgetsConfig = GliaWidgetsConfig.Builder()
             .setSiteApiKey(siteApiKey)
+            .setSiteId("SiteId")
+            .setRegion("Region")
+            .setContext(RuntimeEnvironment.getApplication())
             .build()
         val callback = mock<RequestCallback<Boolean?>>()
         val callbackCaptor = argumentCaptor<RequestCallback<Boolean?>>()

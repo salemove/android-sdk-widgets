@@ -2,7 +2,6 @@ package com.glia.widgets.engagement
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import androidx.annotation.VisibleForTesting
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.EngagementRequest
 import com.glia.androidsdk.EngagementRequest.Outcome
@@ -43,9 +42,6 @@ import io.reactivex.rxjava3.processors.PublishProcessor
 import java.util.function.Consumer
 
 private const val TAG = "EngagementRepository"
-
-@VisibleForTesting
-internal const val MEDIA_PERMISSION_REQUEST_CODE = 0x3E9
 
 internal class EngagementRepositoryImpl(
     private val core: GliaCore,
@@ -249,7 +245,6 @@ internal class EngagementRepositoryImpl(
                         mediaType = mediaType,
                         visitorContextAssetId = configurationManager.visitorContextAssetId,
                         engagementOptions = null,
-                        mediaPermissionRequestCode = MEDIA_PERMISSION_REQUEST_CODE,
                         replaceExisting = replaceExisting
                     ) {
                         handleQueueingResponse(it)

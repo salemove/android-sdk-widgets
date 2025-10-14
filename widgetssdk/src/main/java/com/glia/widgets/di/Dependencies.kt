@@ -292,9 +292,7 @@ internal object Dependencies {
         }
     }
 
-    private fun initLogger(
-        gliaConfig: GliaConfig
-    ) {
+    private fun initLogger(gliaConfig: GliaConfig) {
 //        TelemetryHelper.init(gliaConfig) // TODO: improve telemetry initialization strategy
         GliaTelemetry.setGlobalAttribute(GlobalAttribute.SdkWidgetsVersion, BuildConfig.GLIA_WIDGETS_SDK_VERSION)
         GliaLogger.i(LogEvents.WIDGETS_SDK_CONFIGURING) {
@@ -304,19 +302,14 @@ internal object Dependencies {
         }
     }
 
-    private fun createGliaConfig(gliaWidgetsConfig: GliaWidgetsConfig): GliaConfig {
-        val builder = GliaConfig.Builder()
-        gliaWidgetsConfig.siteApiKey?.let {
-            builder.setSiteApiKey(it.toCoreType())
-        } ?: throw RuntimeException("Site key or app token is missing")
-        return builder
-            .setSiteId(gliaWidgetsConfig.siteId)
-            .setRegion(gliaWidgetsConfig.region)
-            .setBaseDomain(gliaWidgetsConfig.baseDomain)
-            .setContext(gliaWidgetsConfig.context)
-            .setManualLocaleOverride(gliaWidgetsConfig.manualLocaleOverride)
-            .build()
-    }
+    private fun createGliaConfig(gliaWidgetsConfig: GliaWidgetsConfig): GliaConfig = GliaConfig.Builder()
+        .setSiteApiKey(gliaWidgetsConfig.siteApiKey.toCoreType())
+        .setSiteId(gliaWidgetsConfig.siteId)
+        .setRegion(gliaWidgetsConfig.region)
+        .setBaseDomain(gliaWidgetsConfig.baseDomain)
+        .setContext(gliaWidgetsConfig.context)
+        .setManualLocaleOverride(gliaWidgetsConfig.manualLocaleOverride)
+        .build()
 
     @JvmStatic
     fun gliaCore(): GliaCore {

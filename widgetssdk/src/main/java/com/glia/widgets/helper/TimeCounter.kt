@@ -59,14 +59,12 @@ internal class TimeCounter {
 
             @Synchronized
             override fun run() {
-                Logger.d(TAG, "Timer value: $value")
                 for (listener in rawListeners) {
                     listener.onNewRawTimerValue(value)
                 }
 
                 if (formattedListeners.isNotEmpty()) {
                     val time = formatElapsedTime(value.toLong())
-                    Logger.d(TAG, "Formatted timer: $time")
                     for (listener in formattedListeners) {
                         listener.onNewFormattedTimerValue(time)
                     }

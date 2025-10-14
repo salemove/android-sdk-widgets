@@ -30,6 +30,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 import com.glia.androidsdk.SiteApiKey as CoreSiteApiKey
 
 @get:ClassRule
@@ -137,7 +138,7 @@ class GliaWidgetsTest {
             .setSiteApiKey(siteApiKey)
             .setSiteId("SiteId")
             .setRegion("Region")
-            .setContext(mock())
+            .setContext(RuntimeEnvironment.getApplication())
             .build()
         val onComplete = mock<OnComplete>()
         val onError = mock<OnError>()
@@ -161,7 +162,7 @@ class GliaWidgetsTest {
             .setSiteApiKey(siteApiKey)
             .setSiteId("SiteId")
             .setRegion("Region")
-            .setContext(mock())
+            .setContext(RuntimeEnvironment.getApplication())
             .build()
         val onComplete = mock<OnComplete>()
         val onError = mock<OnError>()
@@ -188,7 +189,7 @@ class GliaWidgetsTest {
             .setSiteApiKey(siteApiKey)
             .setSiteId("SiteId")
             .setRegion("Region")
-            .setContext(mock())
+            .setContext(RuntimeEnvironment.getApplication())
             .build()
         val onComplete = mock<OnComplete>()
         val onError = mock<OnError>()
@@ -215,7 +216,7 @@ class GliaWidgetsTest {
             .setSiteApiKey(siteApiKey)
             .setSiteId("SiteId")
             .setRegion("Region")
-            .setContext(mock())
+            .setContext(RuntimeEnvironment.getApplication())
             .build()
         val onComplete = mock<OnComplete>()
         val onError = mock<OnError>()
@@ -246,6 +247,9 @@ class GliaWidgetsTest {
         val siteApiKey = SiteApiKey("SiteApiId", "SiteApiSecret")
         val widgetsConfig = GliaWidgetsConfig.Builder()
             .setSiteApiKey(siteApiKey)
+            .setSiteId("SiteId")
+            .setRegion("Region")
+            .setContext(RuntimeEnvironment.getApplication())
             .build()
         whenever(Dependencies.onSdkInit(widgetsConfig)).thenThrow(RuntimeException("Initialization failed"))
 
@@ -264,6 +268,9 @@ class GliaWidgetsTest {
         val siteApiKey = SiteApiKey("SiteApiId", "SiteApiSecret")
         val widgetsConfig = GliaWidgetsConfig.Builder()
             .setSiteApiKey(siteApiKey)
+            .setSiteId("SiteId")
+            .setRegion("Region")
+            .setContext(RuntimeEnvironment.getApplication())
             .build()
         whenever(Dependencies.onSdkInit(widgetsConfig)).thenThrow(RuntimeException("Initialization failed"))
 

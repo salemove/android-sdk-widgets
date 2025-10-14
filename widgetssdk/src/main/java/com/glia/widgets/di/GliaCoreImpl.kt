@@ -101,7 +101,6 @@ internal class GliaCoreImpl : GliaCore {
         mediaType: MediaType,
         visitorContextAssetId: String?,
         engagementOptions: EngagementOptions?,
-        mediaPermissionRequestCode: Int,
         replaceExisting: Boolean,
         callback: Consumer<GliaException?>
     ) {
@@ -110,7 +109,6 @@ internal class GliaCoreImpl : GliaCore {
             mediaType.toCoreType(),
             visitorContextAssetId,
             engagementOptions,
-            mediaPermissionRequestCode,
             replaceExisting,
             callback
         )
@@ -122,10 +120,6 @@ internal class GliaCoreImpl : GliaCore {
 
     override fun subscribeToQueueTicketUpdates(ticketId: String, callback: RequestCallback<QueueTicket?>) {
         Glia.subscribeToQueueTicketUpdates(ticketId, callback)
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        Glia.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
     override fun submitSurveyAnswers(answers: List<Survey.Answer>, surveyId: String, engagementId: String, callback: Consumer<GliaException?>) {

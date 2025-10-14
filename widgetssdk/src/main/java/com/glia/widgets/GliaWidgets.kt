@@ -335,13 +335,7 @@ object GliaWidgets {
     @Deprecated("This method is no longer required, as all the required permissions are now managed internally.")
     @JvmStatic
     fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        GliaLogger.logDeprecatedApiUse(SdkType.WIDGETS_SDK, GliaWidgets::class, "onRequestPermissionsResult")
-        Logger.d(TAG, "onRequestPermissionsResult")
-        try {
-            gliaCore().onRequestPermissionsResult(requestCode, permissions, grantResults)
-        } catch (gliaException: GliaException) {
-            throw gliaException.toWidgetsType()
-        }
+       // no op
     }
 
     /**
@@ -376,10 +370,7 @@ object GliaWidgets {
      *                Provides a [GliaWidgetsException] describing the error.
      */
     @JvmStatic
-    fun getVisitorInfo(
-        onResult: OnResult<VisitorInfo>,
-        onError: OnError? = null
-    ) {
+    fun getVisitorInfo(onResult: OnResult<VisitorInfo>, onError: OnError? = null) {
         GliaLogger.logMethodUse(GliaWidgets::class, "getVisitorInfo")
         val callback =
             RequestCallback { visitorInfo: com.glia.androidsdk.visitor.VisitorInfo?,
@@ -407,11 +398,7 @@ object GliaWidgets {
      *                Provides a [GliaWidgetsException] describing the error.
      */
     @JvmStatic
-    fun updateVisitorInfo(
-        visitorInfoUpdateRequest: VisitorInfoUpdateRequest,
-        onComplete: OnComplete,
-        onError: OnError
-    ) {
+    fun updateVisitorInfo(visitorInfoUpdateRequest: VisitorInfoUpdateRequest, onComplete: OnComplete, onError: OnError) {
         GliaLogger.logMethodUse(GliaWidgets::class, "updateVisitorInfo")
         val updateCallback =
             Consumer { error: GliaException? ->
@@ -557,12 +544,7 @@ object GliaWidgets {
     }
 
     private fun setupLoggingMetadata(gliaWidgetsConfig: GliaWidgetsConfig) {
-        addGlobalMetadata(
-            Collections.singletonMap<String, String?>(
-                SITE_ID_KEY,
-                gliaWidgetsConfig.siteId
-            )
-        )
+        addGlobalMetadata(mapOf(SITE_ID_KEY to gliaWidgetsConfig.siteId))
     }
 
     // More info about global Rx error handler:

@@ -940,7 +940,6 @@ class EngagementRepositoryTest {
                 MediaType.TEXT,
                 null,
                 any(),
-                any(),
                 eq(true),
                 capture(queueForEngagementCallbackSlot)
             )
@@ -961,7 +960,6 @@ class EngagementRepositoryTest {
                 MediaType.TEXT,
                 "url",
                 any(),
-                any(),
                 eq(false),
                 capture(queueForEngagementCallbackSlot)
             )
@@ -976,7 +974,7 @@ class EngagementRepositoryTest {
         repository.queueForEngagement(MediaType.TEXT, true)
 
         verify { queueRepository.relevantQueueIds }
-        verify(exactly = 0) { core.queueForEngagement(any(), MediaType.TEXT, null, any(), any(), eq(true), any()) }
+        verify(exactly = 0) { core.queueForEngagement(any(), MediaType.TEXT, null, any(), eq(true), any()) }
 
         assertFalse(repository.isQueueing)
         assertFalse(repository.isQueueingForMedia)
@@ -1005,7 +1003,6 @@ class EngagementRepositoryTest {
                 mediaType,
                 null,
                 any(),
-                any(),
                 eq(false),
                 capture(queueForEngagementCallbackSlot)
             )
@@ -1025,7 +1022,6 @@ class EngagementRepositoryTest {
                 MediaType.VIDEO,
                 null,
                 any(),
-                any(),
                 eq(false),
                 capture(queueForEngagementCallbackSlot)
             )
@@ -1042,7 +1038,7 @@ class EngagementRepositoryTest {
         repository.queueForEngagement(mediaType, true)
 
         verify { queueRepository.relevantQueueIds }
-        verify { core.queueForEngagement(listOf(queueId), mediaType, null, any(), any(), eq(true), capture(queueForEngagementCallbackSlot)) }
+        verify { core.queueForEngagement(listOf(queueId), mediaType, null, any(), eq(true), capture(queueForEngagementCallbackSlot)) }
         queueForEngagementCallbackSlot.captured.accept(GliaException("message", GliaException.Cause.QUEUE_CLOSED))
 
         testSubscriber.assertNotComplete().assertValuesOnly(
@@ -1063,7 +1059,7 @@ class EngagementRepositoryTest {
         repository.queueForEngagement(mediaType, true)
 
         verify { queueRepository.relevantQueueIds }
-        verify { core.queueForEngagement(listOf(queueId), mediaType, null, any(), any(), eq(true), capture(queueForEngagementCallbackSlot)) }
+        verify { core.queueForEngagement(listOf(queueId), mediaType, null, any(), eq(true), capture(queueForEngagementCallbackSlot)) }
         queueForEngagementCallbackSlot.captured.accept(GliaException("message", GliaException.Cause.NETWORK_TIMEOUT))
 
         testSubscriber.assertNotComplete().assertValuesOnly(
@@ -1093,7 +1089,6 @@ class EngagementRepositoryTest {
                 listOf(queueId),
                 mediaType,
                 null,
-                any(),
                 any(),
                 eq(true),
                 capture(queueForEngagementCallbackSlot)
@@ -1145,7 +1140,6 @@ class EngagementRepositoryTest {
                 mediaType,
                 null,
                 any(),
-                any(),
                 eq(true),
                 capture(queueForEngagementCallbackSlot)
             )
@@ -1195,7 +1189,6 @@ class EngagementRepositoryTest {
                 mediaType,
                 null,
                 any(),
-                any(),
                 eq(true),
                 capture(queueForEngagementCallbackSlot)
             )
@@ -1243,7 +1236,6 @@ class EngagementRepositoryTest {
                 listOf(queueId),
                 mediaType,
                 null,
-                any(),
                 any(),
                 eq(true),
                 capture(queueForEngagementCallbackSlot)
@@ -1508,7 +1500,6 @@ class EngagementRepositoryTest {
                 MediaType.TEXT,
                 visitorContextAssetId,
                 any(),
-                any(),
                 eq(false),
                 capture(queueForEngagementCallbackSlot)
             )
@@ -1526,7 +1517,6 @@ class EngagementRepositoryTest {
                 listOf(queueId),
                 MediaType.TEXT,
                 visitorContextAssetId,
-                any(),
                 any(),
                 eq(false),
                 capture(queueForEngagementCallbackSlot)
@@ -1549,7 +1539,6 @@ class EngagementRepositoryTest {
                 MediaType.TEXT,
                 null,
                 any(),
-                any(),
                 eq(false),
                 capture(queueForEngagementCallbackSlot)
             )
@@ -1566,7 +1555,6 @@ class EngagementRepositoryTest {
                 listOf(queueId),
                 MediaType.TEXT,
                 null,
-                any(),
                 any(),
                 eq(false),
                 capture(queueForEngagementCallbackSlot)

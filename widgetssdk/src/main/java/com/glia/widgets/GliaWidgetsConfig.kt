@@ -11,16 +11,16 @@ import com.glia.widgets.helper.TAG
  */
 class GliaWidgetsConfig private constructor(builder: Builder) {
     @JvmField
-    val siteId: String?
+    val siteId: String
 
     @JvmField
-    val siteApiKey: SiteApiKey?
+    val siteApiKey: SiteApiKey
 
     @JvmField
-    val context: Context?
+    val context: Context
 
     @JvmField
-    val region: String?
+    val region: String
 
     @JvmField
     val baseDomain: String?
@@ -50,10 +50,10 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
         // An Application object lives all the time when the application is active, so it is safe to store it.
         val applicationContext = builder.context?.applicationContext
 
-        siteApiKey = builder.siteApiKey
-        siteId = builder.siteId
-        context = applicationContext
-        region = builder.region
+        siteApiKey = requireNotNull(builder.siteApiKey) { "Site Api Key is required" }
+        siteId = requireNotNull(builder.siteId) { "Site ID is required" }
+        context = requireNotNull(applicationContext) { "Context is required" }
+        region = requireNotNull(builder.region) { "Region is required" }
         baseDomain = builder.baseDomain
         requestCode = builder.requestCode
         uiJsonRemoteConfig = builder.uiJsonRemoteConfig

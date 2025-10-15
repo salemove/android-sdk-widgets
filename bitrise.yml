@@ -435,6 +435,60 @@ workflows:
                   https://api.github.com/repos/salemove/android-sdk-widgets/pulls/$PULL_REQUEST_NUMBER/requested_reviewers \
                   -d "{\"team_reviewers\":[\"tm-mobile-android\"]}"
       - cache-push@2: { }
+  upgrade_telemetry_dependency:
+    steps:
+      - activate-ssh-key@4: { }
+      - git-clone@6: { }
+      - cache-pull@2: { }
+      - set-java-version@1.1:
+          is_always_run: true
+          inputs:
+            - set_java_version: "17"
+      - install-missing-android-tools@3:
+          inputs:
+            - gradlew_path: $PROJECT_LOCATION/gradlew
+      - gradle-runner@3:
+          title: Upgrade Telemetry lib version
+          inputs:
+            - gradlew_path: $PROJECT_LOCATION/gradlew
+            - gradle_file: $PROJECT_LOCATION/build.gradle
+            - gradle_task: saveTelemetryLibVersion --sdkVersion=$NEW_VERSION
+      - script@1:
+          title: Create PR
+          inputs:
+            - content: |-
+                #!/usr/bin/env bash
+                # fail if any commands fails
+                set -e
+                # make pipelines' return status equal the last command to exit with a non-zero status, or zero if all commands exit successfully
+                set -o pipefail
+                # debug log
+                set -x
+                
+                NEW_BRANCH_NAME="telemetry-lib-version-increment/${NEW_VERSION}"
+                BASE_BRANCH_NAME="development"
+                MESSAGE="Increment Telemetry lib version to ${NEW_VERSION}"
+                
+                git fetch origin $BASE_BRANCH_NAME
+                git checkout -b $NEW_BRANCH_NAME origin/$BASE_BRANCH_NAME
+                git add -A
+                git commit -m "$MESSAGE"
+                git push origin "$NEW_BRANCH_NAME":"$NEW_BRANCH_NAME"
+                
+                PULL_REQUEST_NUMBER=$(curl \
+                  -X POST \
+                  -H "Accept: application/vnd.github+json" \
+                  -H "Authorization: Bearer $GITHUB_API_TOKEN" \
+                  https://api.github.com/repos/salemove/android-sdk-widgets/pulls \
+                  -d "{\"title\":\"${MESSAGE}\",\"head\":\"${NEW_BRANCH_NAME}\",\"base\":\"development\"}" | jq --raw-output '.number')
+                
+                curl \
+                  -X POST \
+                  -H "Accept: application/vnd.github+json" \
+                  -H "Authorization: Bearer $GITHUB_API_TOKEN" \
+                  https://api.github.com/repos/salemove/android-sdk-widgets/pulls/$PULL_REQUEST_NUMBER/requested_reviewers \
+                  -d "{\"team_reviewers\":[\"tm-mobile-android\"]}"
+      - cache-push@2: { }
 app:
   envs:
     - opts:

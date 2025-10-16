@@ -23,6 +23,11 @@ internal class CallVisualizerManager(
         callVisualizerController.showVisitorCodeDialog()
     }
 
+    override fun hideVisitorCodeDialog() {
+        GliaLogger.logMethodUse(CallVisualizer::class, "hideVisitorCodeDialog")
+        callVisualizerController.dismissVisitorCodeDialog()
+    }
+
     override fun addVisitorContext(visitorContextAssetId: String) {
         GliaLogger.logMethodUse(CallVisualizer::class, "addVisitorContext")
         callVisualizerController.saveVisitorContextAssetId(visitorContextAssetId)

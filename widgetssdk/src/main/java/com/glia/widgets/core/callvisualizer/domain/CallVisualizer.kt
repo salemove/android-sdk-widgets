@@ -46,6 +46,11 @@ interface CallVisualizer {
     fun showVisitorCodeDialog()
 
     /**
+     * Closes the visitor code dialog if it is currently visible.
+     */
+    fun hideVisitorCodeDialog()
+
+    /**
      * Sets visitor context to the upcoming Call Visualizer engagement
      *
      * @param visitorContextAssetId is a visitor context asset ID

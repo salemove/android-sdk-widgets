@@ -21,7 +21,7 @@
             app:useSimpleSummaryProvider="true" />
 
         <EditTextPreference
-            app:defaultValue="@string/environment"
+            app:defaultValue="@string/glia_region"
             app:key="@string/pref_environment"
             app:title="@string/settings_environment"
             app:useSimpleSummaryProvider="true" />

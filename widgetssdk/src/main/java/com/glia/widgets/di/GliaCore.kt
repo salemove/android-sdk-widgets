@@ -1,8 +1,8 @@
 package com.glia.widgets.di
 
+import com.glia.androidsdk.CoreConfiguration
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.Glia.OmnicoreEvent
-import com.glia.androidsdk.GliaConfig
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.Operator
 import com.glia.androidsdk.RequestCallback
@@ -35,8 +35,8 @@ internal interface GliaCore {
     val liveObservation: LiveObservation
 
     @Throws(GliaException::class)
-    fun init(config: GliaConfig)
-    fun init(config: GliaConfig, callback: RequestCallback<Boolean?>)
+    fun init(config: CoreConfiguration)
+    fun init(config: CoreConfiguration, callback: RequestCallback<Boolean?>)
     fun getVisitorInfo(visitorCallback: RequestCallback<VisitorInfo?>)
     fun updateVisitorInfo(visitorInfoUpdateRequest: VisitorInfoUpdateRequest, visitorCallback: Consumer<GliaException?>)
     fun <T> on(event: OmnicoreEvent<T>, listener: Consumer<T>)

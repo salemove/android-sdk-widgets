@@ -1,9 +1,9 @@
 package com.glia.widgets.di
 
+import com.glia.androidsdk.CoreConfiguration
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.Glia
 import com.glia.androidsdk.Glia.OmnicoreEvent
-import com.glia.androidsdk.GliaConfig
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.Operator
 import com.glia.androidsdk.RequestCallback
@@ -52,13 +52,13 @@ internal class GliaCoreImpl : GliaCore {
 
     @Synchronized
     @Throws(GliaException::class)
-    override fun init(config: GliaConfig) {
+    override fun init(config: CoreConfiguration) {
         Glia.init(config)
     }
 
     @Synchronized
     @Throws(GliaException::class)
-    override fun init(config: GliaConfig, callback: RequestCallback<Boolean?>) {
+    override fun init(config: CoreConfiguration, callback: RequestCallback<Boolean?>) {
         Glia.init(config, callback)
     }
 

@@ -19,6 +19,7 @@ import com.glia.widgets.engagement.domain.EngagementTypeUseCase
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.mediaTypes
+import com.glia.widgets.helper.orNotApplicable
 import com.glia.widgets.internal.queue.QueueRepository
 import com.glia.widgets.internal.queue.QueuesState
 import com.glia.widgets.internal.secureconversations.SecureConversationsRepository
@@ -98,7 +99,7 @@ internal class EntryWidgetController @JvmOverloads constructor(
             EntryWidgetContract.ViewType.BOTTOM_SHEET,
             EntryWidgetContract.ViewType.EMBEDDED_VIEW -> {
                 GliaLogger.i(LogEvents.ENTRY_WIDGET_SHOWN) {
-                    put(EventAttribute.ViewType, viewType.toTelemetryViewType() ?: "N/A")
+                    put(EventAttribute.ViewType, viewType.toTelemetryViewType().orNotApplicable)
                 }
             }
             EntryWidgetContract.ViewType.MESSAGING_LIVE_SUPPORT -> {
@@ -227,14 +228,14 @@ internal class EntryWidgetController @JvmOverloads constructor(
         val entryWidgetItem = itemType.toTelemetryEntryWidgetItem()
         if (entryWidgetItem != null) {
             GliaLogger.i(LogEvents.ENTRY_WIDGET_ITEM_CLICKED) {
-                put(EventAttribute.ViewType, viewType.toTelemetryViewType() ?: "N/A")
+                put(EventAttribute.ViewType, viewType.toTelemetryViewType().orNotApplicable)
                 put(EventAttribute.EngagementType, entryWidgetItem)
             }
         } else {
             val buttonName = itemType.toTelemetryButtonName()
             if (buttonName != null) {
                 GliaLogger.i(LogEvents.ENTRY_WIDGET_BUTTON_CLICKED) {
-                    put(EventAttribute.ViewType, viewType.toTelemetryViewType() ?: "N/A")
+                    put(EventAttribute.ViewType, viewType.toTelemetryViewType().orNotApplicable)
                     put(EventAttribute.ButtonName, buttonName)
                 }
             }
@@ -275,7 +276,7 @@ internal class EntryWidgetController @JvmOverloads constructor(
             EntryWidgetContract.ViewType.BOTTOM_SHEET,
             EntryWidgetContract.ViewType.EMBEDDED_VIEW -> {
                 GliaLogger.i(LogEvents.ENTRY_WIDGET_DISMISSED) {
-                    put(EventAttribute.ViewType, viewType.toTelemetryViewType() ?: "N/A")
+                    put(EventAttribute.ViewType, viewType.toTelemetryViewType().orNotApplicable)
                 }
             }
             else -> { /* no-op */ }
@@ -289,13 +290,13 @@ internal class EntryWidgetController @JvmOverloads constructor(
             EntryWidgetContract.ViewType.BOTTOM_SHEET,
             EntryWidgetContract.ViewType.EMBEDDED_VIEW -> {
                 GliaLogger.i(LogEvents.ENTRY_WIDGET_STATE_CHANGED) {
-                    put(EventAttribute.ViewType, viewType.toTelemetryViewType() ?: "N/A")
+                    put(EventAttribute.ViewType, viewType.toTelemetryViewType().orNotApplicable)
                     val state = items.toTelemetryEntryWidgetState()
                     put(EventAttribute.EntryWidgetState, state)
                     if (state == EntryWidgetState.ITEMS) {
                         put(EventAttribute.EntryWidgetItems, items.toTelemetryEngagementTypes().joinToString(", "))
                     } else if(state == EntryWidgetState.ONGOING_ENGAGEMENT) {
-                        put(EventAttribute.EngagementType, items.toTelemetryEngagementTypes().firstOrNull() ?: "N/A")
+                        put(EventAttribute.EngagementType, items.toTelemetryEngagementTypes().firstOrNull().orNotApplicable)
                     }
                 }
             }

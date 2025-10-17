@@ -1,9 +1,10 @@
 package com.glia.widgets
 
+import android.app.Application
 import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.glia.androidsdk.CoreConfiguration
 import com.glia.androidsdk.Glia
-import com.glia.androidsdk.GliaConfig
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
 import com.glia.androidsdk.omnibrowse.Omnibrowse
@@ -15,6 +16,7 @@ import com.glia.widgets.di.Dependencies
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.di.RepositoryFactory
 import com.glia.widgets.engagement.EngagementRepository
+import com.glia.widgets.helper.toCoreType
 import com.glia.widgets.internal.queue.QueueRepository
 import org.junit.Assert
 import org.junit.Before
@@ -64,11 +66,9 @@ class GliaWidgetsTest {
     fun `init sets config to glia core when called`() {
         val siteApiKey = SiteApiKey("SiteApiId", "SiteApiSecret")
         val siteId = "SiteId"
-        val region = "Region"
-        val applicationContext = mock<Context>()
-        whenever(applicationContext.applicationContext).thenReturn(applicationContext)
-        val context = mock<Context>()
-        whenever(context.applicationContext).thenReturn(applicationContext)
+        val region = Region.Beta
+        val (context, applicationContext) = mockContext()
+
         val widgetsConfig = GliaWidgetsConfig.Builder()
             .setSiteApiKey(siteApiKey)
             .setSiteId(siteId)
@@ -86,15 +86,15 @@ class GliaWidgetsTest {
 
         GliaWidgets.init(widgetsConfig)
 
-        val captor = argumentCaptor<GliaConfig>()
+        val captor = argumentCaptor<CoreConfiguration>()
         verify(gliaCore).init(captor.capture())
         verify(repositoryFactory).initialize()
         val gliaConfig = captor.lastValue
         Assert.assertEquals(siteApiKey.id, gliaConfig.siteApiKey.id)
         Assert.assertEquals(siteApiKey.secret, gliaConfig.siteApiKey.secret)
         Assert.assertEquals(siteId, gliaConfig.siteId)
-        Assert.assertEquals(region, gliaConfig.region)
-        Assert.assertEquals(applicationContext, gliaConfig.context)
+        Assert.assertEquals(region.toCoreType(), gliaConfig.region)
+        Assert.assertEquals(applicationContext, gliaConfig.applicationContext)
         Assert.assertTrue(GliaWidgets.isInitialized())
     }
 
@@ -102,11 +102,8 @@ class GliaWidgetsTest {
     fun `onSdkInit sets ApiKey when deprecated setSiteApiKey is used`() {
         val siteApiKey = CoreSiteApiKey("SiteApiId", "SiteApiSecret")
         val siteId = "SiteId"
-        val region = "Region"
-        val applicationContext = mock<Context>()
-        whenever(applicationContext.applicationContext).thenReturn(applicationContext)
-        val context = mock<Context>()
-        whenever(context.applicationContext).thenReturn(applicationContext)
+        val region = GliaWidgetsConfig.Regions.US
+        val (context, _) = mockContext()
         val widgetsConfig = GliaWidgetsConfig.Builder()
             .setSiteApiKey(siteApiKey)
             .setSiteId(siteId)
@@ -124,11 +121,12 @@ class GliaWidgetsTest {
 
         GliaWidgets.init(widgetsConfig)
 
-        val captor = argumentCaptor<GliaConfig>()
+        val captor = argumentCaptor<CoreConfiguration>()
         verify(gliaCore).init(captor.capture())
         val gliaConfig = captor.lastValue
         Assert.assertEquals(siteApiKey.id, gliaConfig.siteApiKey.id)
         Assert.assertEquals(siteApiKey.secret, gliaConfig.siteApiKey.secret)
+        Assert.assertEquals(Region.US.toCoreType(), gliaConfig.region)
     }
 
     @Test
@@ -137,7 +135,7 @@ class GliaWidgetsTest {
         val gliaWidgetsConfig = GliaWidgetsConfig.Builder()
             .setSiteApiKey(siteApiKey)
             .setSiteId("SiteId")
-            .setRegion("Region")
+            .setRegion(GliaWidgetsConfig.Regions.EU)
             .setContext(RuntimeEnvironment.getApplication())
             .build()
         val onComplete = mock<OnComplete>()
@@ -161,7 +159,7 @@ class GliaWidgetsTest {
         val gliaWidgetsConfig = GliaWidgetsConfig.Builder()
             .setSiteApiKey(siteApiKey)
             .setSiteId("SiteId")
-            .setRegion("Region")
+            .setRegion(Region.Beta)
             .setContext(RuntimeEnvironment.getApplication())
             .build()
         val onComplete = mock<OnComplete>()
@@ -188,7 +186,7 @@ class GliaWidgetsTest {
         val gliaWidgetsConfig = GliaWidgetsConfig.Builder()
             .setSiteApiKey(siteApiKey)
             .setSiteId("SiteId")
-            .setRegion("Region")
+            .setRegion(Region.Beta)
             .setContext(RuntimeEnvironment.getApplication())
             .build()
         val onComplete = mock<OnComplete>()
@@ -215,7 +213,7 @@ class GliaWidgetsTest {
         val gliaWidgetsConfig = GliaWidgetsConfig.Builder()
             .setSiteApiKey(siteApiKey)
             .setSiteId("SiteId")
-            .setRegion("Region")
+            .setRegion(Region.Beta)
             .setContext(RuntimeEnvironment.getApplication())
             .build()
         val onComplete = mock<OnComplete>()
@@ -248,7 +246,7 @@ class GliaWidgetsTest {
         val widgetsConfig = GliaWidgetsConfig.Builder()
             .setSiteApiKey(siteApiKey)
             .setSiteId("SiteId")
-            .setRegion("Region")
+            .setRegion(GliaWidgetsConfig.Regions.EU)
             .setContext(RuntimeEnvironment.getApplication())
             .build()
         whenever(Dependencies.onSdkInit(widgetsConfig)).thenThrow(RuntimeException("Initialization failed"))
@@ -269,7 +267,7 @@ class GliaWidgetsTest {
         val widgetsConfig = GliaWidgetsConfig.Builder()
             .setSiteApiKey(siteApiKey)
             .setSiteId("SiteId")
-            .setRegion("Region")
+            .setRegion(GliaWidgetsConfig.Regions.EU)
             .setContext(RuntimeEnvironment.getApplication())
             .build()
         whenever(Dependencies.onSdkInit(widgetsConfig)).thenThrow(RuntimeException("Initialization failed"))
@@ -282,5 +280,13 @@ class GliaWidgetsTest {
 
         Assert.assertFalse(Glia.isInitialized())
         Assert.assertFalse(GliaWidgets.isInitialized())
+    }
+
+    private fun mockContext(): Pair<Context, Application> {
+        val applicationContext = mock<Application>()
+        whenever(applicationContext.applicationContext).thenReturn(applicationContext)
+        val context = mock<Context>()
+        whenever(context.applicationContext).thenReturn(applicationContext)
+        return context to applicationContext
     }
 }

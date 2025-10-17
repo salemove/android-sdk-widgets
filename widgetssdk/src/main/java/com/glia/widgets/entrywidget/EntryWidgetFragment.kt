@@ -32,29 +32,18 @@ internal class EntryWidgetFragment : BottomSheetDialogFragment() {
 
     private var onDismissListener: (() -> Unit)? = null
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val layoutInflater = LayoutInflater.from(requireContext().wrapWithMaterialThemeOverlay())
         val binding = EntryWidgetFragmentBinding.inflate(layoutInflater, container, false)
         val unifiedTheme = Dependencies.gliaThemeManager.theme
 
-        setupView(
-            requireContext(),
-            binding,
-            unifiedTheme
-        )
+        setupView(requireContext(), binding, unifiedTheme)
 
         return binding.root
     }
 
     @VisibleForTesting
-    fun setupView(
-        context: Context,
-        binding: EntryWidgetFragmentBinding,
-        unifiedTheme: UnifiedTheme?
-    ) {
+    fun setupView(context: Context, binding: EntryWidgetFragmentBinding, unifiedTheme: UnifiedTheme?) {
         val entryWidgetAdapter = EntryWidgetAdapter(
             EntryWidgetContract.ViewType.BOTTOM_SHEET,
             unifiedTheme?.entryWidgetTheme
@@ -76,7 +65,7 @@ internal class EntryWidgetFragment : BottomSheetDialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        setStyle(DialogFragment.STYLE_NO_FRAME, R.style.ThemeOverlay_Glia_BottomSheetDialog)
+        setStyle(STYLE_NO_FRAME, R.style.ThemeOverlay_Glia_BottomSheetDialog)
         val dialog = super.onCreateDialog(savedInstanceState)
         (dialog as? BottomSheetDialog)?.behavior?.state = BottomSheetBehavior.STATE_EXPANDED
         return dialog
@@ -94,10 +83,11 @@ internal class EntryWidgetFragment : BottomSheetDialogFragment() {
         super.onDismiss(dialog)
 
         onDismissListener?.invoke()
+        onDismissListener = null
     }
 
     fun show(parentFragmentManager: FragmentManager) {
-        show(parentFragmentManager, tag)
+        show(parentFragmentManager, this.javaClass.simpleName)
     }
 
 }

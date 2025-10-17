@@ -536,7 +536,7 @@ class MainFragment : Fragment() {
             createDefaultConfig(
                 context = requireActivity().applicationContext,
 //                uiJsonRemoteConfig = UnifiedUiConfigurationLoader.fetchLocalConfigSample(requireContext()),
-//                region = "beta"
+//                region = Region.Beta
             ),
             onComplete = {
                 prepareAuthentication()

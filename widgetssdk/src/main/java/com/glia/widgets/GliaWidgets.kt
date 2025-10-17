@@ -5,6 +5,7 @@ import android.content.Intent
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
 import com.glia.telemetry_lib.GliaLogger
+import com.glia.telemetry_lib.LogEvents
 import com.glia.telemetry_lib.SdkType
 import com.glia.widgets.authentication.Authentication
 import com.glia.widgets.callbacks.OnComplete
@@ -23,7 +24,6 @@ import com.glia.widgets.di.Dependencies.getAuthenticationManager
 import com.glia.widgets.di.Dependencies.gliaCore
 import com.glia.widgets.di.Dependencies.gliaThemeManager
 import com.glia.widgets.di.Dependencies.liveObservation
-import com.glia.widgets.di.Dependencies.onSdkInit
 import com.glia.widgets.di.Dependencies.pushNotifications
 import com.glia.widgets.di.Dependencies.repositoryFactory
 import com.glia.widgets.di.Dependencies.secureConversations
@@ -33,6 +33,7 @@ import com.glia.widgets.fcm.PushNotifications
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.Logger.SITE_ID_KEY
 import com.glia.widgets.helper.Logger.addGlobalMetadata
+import com.glia.widgets.helper.orNotApplicable
 import com.glia.widgets.internal.authentication.toCoreType
 import com.glia.widgets.internal.authentication.toWidgetsType
 import com.glia.widgets.launcher.EngagementLauncher
@@ -45,7 +46,6 @@ import com.glia.widgets.visitor.VisitorInfoUpdateRequest
 import io.reactivex.rxjava3.exceptions.UndeliverableException
 import io.reactivex.rxjava3.plugins.RxJavaPlugins
 import java.io.IOException
-import java.util.Collections
 import java.util.function.Consumer
 
 /**
@@ -153,13 +153,12 @@ object GliaWidgets {
         GliaLogger.logMethodUse(GliaWidgets::class, "init")
         Logger.i(TAG, "Initialize Glia Widgets SDK")
         try {
-            onSdkInit(gliaWidgetsConfig)
+            Dependencies.onSdkInit(gliaWidgetsConfig)
             setupLoggingMetadata(gliaWidgetsConfig)
             gliaThemeManager.applyJsonConfig(gliaWidgetsConfig.uiJsonRemoteConfig)
             isInitialized = true
         } catch (gliaException: GliaException) {
-            val gliaWidgetsException = gliaException.toWidgetsType()
-            throw gliaWidgetsException
+            throw gliaException.toWidgetsType()
         }
     }
 
@@ -172,67 +171,70 @@ object GliaWidgets {
      */
     @JvmStatic
     @Synchronized
-    fun init(
-        gliaWidgetsConfig: GliaWidgetsConfig,
-        onComplete: OnComplete,
-        onError: OnError
-    ) {
+    fun init(gliaWidgetsConfig: GliaWidgetsConfig, onComplete: OnComplete, onError: OnError) {
         GliaLogger.logMethodUse(GliaWidgets::class, "init", "onComplete", "onError")
         Logger.i(TAG, "Initialize Glia Widgets SDK")
         try {
-            val callback: RequestCallback<Boolean?> =
-                RequestCallback { _, exception ->
-                    if (exception == null) {
-                        isInitialized = true
-                        onComplete.onComplete()
-                    } else {
-                        Logger.i(TAG, "Glia Widgets SDK initialization failed")
-                        val invalidInputError = when (exception.cause) {
-                            GliaException.Cause.NETWORK_TIMEOUT -> {
-                                GliaWidgetsException(
-                                    "Network timeout. Please check the Internet connection.",
-                                    GliaWidgetsException.Cause.NETWORK_TIMEOUT
-                                )
-                            }
-                            GliaException.Cause.INVALID_INPUT -> {
-                                GliaWidgetsException(
-                                    "Failed to initialise Glia Widgets SDK. Invalid input. Please check credentials.",
-                                    GliaWidgetsException.Cause.INVALID_INPUT
-                                )
-                            }
-                            GliaException.Cause.FORBIDDEN -> {
-                                GliaWidgetsException(
-                                    "Failed to initialise Glia Widgets SDK. Forbidden. Please check credentials.",
-                                    GliaWidgetsException.Cause.INVALID_INPUT
-                                )
-                            }
-                            else -> {
-                                GliaWidgetsException(
-                                    "Failed to initialise Glia Widgets SDK. Please check logs.",
-                                    GliaWidgetsException.Cause.INVALID_INPUT
-                                )
-                            }
+            val callback: RequestCallback<Boolean?> = RequestCallback { _, exception ->
+                if (exception == null) {
+                    isInitialized = true
+                    onComplete.onComplete()
+                } else {
+                    val invalidInputError = when (exception.cause) {
+                        GliaException.Cause.NETWORK_TIMEOUT -> {
+                            GliaWidgetsException(
+                                "Network timeout. Please check the Internet connection.",
+                                GliaWidgetsException.Cause.NETWORK_TIMEOUT
+                            )
                         }
-                        onError.onError(invalidInputError)
-                    }
-                }
 
-            onSdkInit(gliaWidgetsConfig, callback)
-            setupLoggingMetadata(gliaWidgetsConfig)
-            gliaThemeManager.applyJsonConfig(gliaWidgetsConfig.uiJsonRemoteConfig)
-        } catch (exception: Exception) {
-            if (exception is GliaException) {
-                val mappedException = exception.toWidgetsType()
-                onError.onError(mappedException)
-                return
+                        GliaException.Cause.INVALID_INPUT -> {
+                            GliaWidgetsException(
+                                "Failed to initialise Glia Widgets SDK. Invalid input. Please check credentials.",
+                                GliaWidgetsException.Cause.INVALID_INPUT
+                            )
+                        }
+
+                        GliaException.Cause.FORBIDDEN -> {
+                            GliaWidgetsException(
+                                "Failed to initialise Glia Widgets SDK. Forbidden. Please check credentials.",
+                                GliaWidgetsException.Cause.INVALID_INPUT
+                            )
+                        }
+
+                        else -> {
+                            GliaWidgetsException(
+                                "Failed to initialise Glia Widgets SDK. Please check logs.",
+                                GliaWidgetsException.Cause.INVALID_INPUT
+                            )
+                        }
+                    }
+                    onError.onError(invalidInputError)
+
+                    Logger.e(TAG, "Glia Widgets SDK initialization failed", invalidInputError)
+                    GliaLogger.e(LogEvents.WIDGETS_SDK_UNCATEGORIZED, "Glia Widgets SDK initialization failed", invalidInputError)
+                }
             }
 
-            Logger.e(TAG, "Glia Widgets SDK initialization failed")
-            val internalError = GliaWidgetsException(
-                "Internal SDK error",
-                GliaWidgetsException.Cause.INTERNAL_ERROR
-            )
+            Dependencies.onSdkInit(gliaWidgetsConfig, callback)
+            setupLoggingMetadata(gliaWidgetsConfig)
+            gliaThemeManager.applyJsonConfig(gliaWidgetsConfig.uiJsonRemoteConfig)
+        } catch (gliaWidgetsException: GliaWidgetsException) {
+            onError.onError(gliaWidgetsException)
+
+            Logger.e(TAG, "Glia Widgets SDK initialization failed", gliaWidgetsException)
+            GliaLogger.e(LogEvents.WIDGETS_SDK_UNCATEGORIZED, "Glia Widgets SDK initialization failed", gliaWidgetsException)
+        } catch (gliaException: GliaException) {
+            onError.onError(gliaException.toWidgetsType())
+
+            Logger.e(TAG, "Glia Widgets SDK initialization failed", gliaException)
+            GliaLogger.e(LogEvents.WIDGETS_SDK_UNCATEGORIZED, "Glia Widgets SDK initialization failed", gliaException)
+        } catch (ex: Exception) {
+            val internalError = GliaWidgetsException("Internal SDK error", GliaWidgetsException.Cause.INTERNAL_ERROR)
             onError.onError(internalError)
+
+            Logger.e(TAG, "Glia Widgets SDK initialization failed", ex)
+            GliaLogger.e(LogEvents.WIDGETS_SDK_UNCATEGORIZED, "Glia Widgets SDK initialization failed", ex)
         }
     }
 
@@ -335,7 +337,7 @@ object GliaWidgets {
     @Deprecated("This method is no longer required, as all the required permissions are now managed internally.")
     @JvmStatic
     fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-       // no op
+        // no op
     }
 
     /**
@@ -544,7 +546,7 @@ object GliaWidgets {
     }
 
     private fun setupLoggingMetadata(gliaWidgetsConfig: GliaWidgetsConfig) {
-        addGlobalMetadata(mapOf(SITE_ID_KEY to gliaWidgetsConfig.siteId))
+        addGlobalMetadata(mapOf(Pair(SITE_ID_KEY, gliaWidgetsConfig.siteId.orNotApplicable)))
     }
 
     // More info about global Rx error handler:

@@ -11,6 +11,7 @@ import com.glia.widgets.callvisualizer.VisitorCodeContract
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
+import com.glia.widgets.helper.orNotApplicable
 import com.glia.widgets.internal.callvisualizer.domain.VisitorCodeRepository
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.Disposable
@@ -40,13 +41,13 @@ internal class VisitorCodeController(
         this.autoCloseOnEngagement()
 
         GliaLogger.i(LogEvents.VISITOR_CODE_SHOWN) {
-            put(EventAttribute.ViewType, telemetryViewType() ?: "N/A")
+            put(EventAttribute.ViewType, telemetryViewType().orNotApplicable)
         }
     }
 
     override fun onCloseButtonClicked() {
         GliaLogger.i(LogEvents.VISITOR_CODE_BUTTON_CLICKED) {
-            put(EventAttribute.ViewType, telemetryViewType() ?: "N/A")
+            put(EventAttribute.ViewType, telemetryViewType().orNotApplicable)
             put(EventAttribute.ButtonName, ButtonNames.CLOSE_VISITOR_CODE)
         }
         callVisualizerController.dismissVisitorCodeDialog()
@@ -55,7 +56,7 @@ internal class VisitorCodeController(
 
     override fun onRefreshButtonClicked() {
         GliaLogger.i(LogEvents.VISITOR_CODE_BUTTON_CLICKED) {
-            put(EventAttribute.ViewType, telemetryViewType() ?: "N/A")
+            put(EventAttribute.ViewType, telemetryViewType().orNotApplicable)
             put(EventAttribute.ButtonName, ButtonNames.REFRESH_VISITOR_CODE)
         }
         onLoadVisitorCode()
@@ -63,7 +64,7 @@ internal class VisitorCodeController(
 
     override fun onLoadVisitorCode() {
         GliaLogger.i(LogEvents.VISITOR_CODE_STATE_CHANGED) {
-            put(EventAttribute.ViewType, telemetryViewType() ?: "N/A")
+            put(EventAttribute.ViewType, telemetryViewType().orNotApplicable)
             put(EventAttribute.VisitorCodeState, VisitorCodeState.LOADING)
         }
         view?.startLoading()
@@ -75,14 +76,14 @@ internal class VisitorCodeController(
                     view?.showVisitorCode(visitorCode)
                     view?.setTimer(failGuardDuration(visitorCode))
                     GliaLogger.i(LogEvents.VISITOR_CODE_STATE_CHANGED) {
-                        put(EventAttribute.ViewType, telemetryViewType() ?: "N/A")
+                        put(EventAttribute.ViewType, telemetryViewType().orNotApplicable)
                         put(EventAttribute.VisitorCodeState, VisitorCodeState.CODE_SHOWN)
                     }
                 },
                 { error ->
                     view?.showError(error)
                     GliaLogger.i(LogEvents.VISITOR_CODE_STATE_CHANGED) {
-                        put(EventAttribute.ViewType, telemetryViewType() ?: "N/A")
+                        put(EventAttribute.ViewType, telemetryViewType().orNotApplicable)
                         put(EventAttribute.VisitorCodeState, VisitorCodeState.ERROR)
                     }
                 }
@@ -117,7 +118,7 @@ internal class VisitorCodeController(
         view = null
 
         GliaLogger.i(LogEvents.VISITOR_CODE_CLOSED) {
-            put(EventAttribute.ViewType, telemetryViewType() ?: "N/A")
+            put(EventAttribute.ViewType, telemetryViewType().orNotApplicable)
         }
     }
 

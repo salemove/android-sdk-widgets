@@ -8,12 +8,7 @@ import com.glia.androidsdk.GliaException as GliaCoreException
  * Glia Widgets SDK exception that contains a message for debugging and
  * a {@link Cause} enum value for handling some of the errors programmatically.
  */
-class GliaWidgetsException internal constructor(
-    val debugMessage: String,
-    val gliaCause: Cause
-) : RuntimeException(
-    debugMessage
-) {
+class GliaWidgetsException internal constructor(val debugMessage: String, val gliaCause: Cause) : RuntimeException(debugMessage) {
 
     /**
      * Possible exception causes
@@ -41,17 +36,9 @@ class GliaWidgetsException internal constructor(
     }
 }
 
-internal fun GliaCoreException.toWidgetsType(): GliaWidgetsException = this.let {
-    GliaWidgetsException(
-        it.debugMessage,
-        it.cause.toWidgetsType()
-    )
-}
+internal fun GliaCoreException.toWidgetsType(): GliaWidgetsException = GliaWidgetsException(debugMessage, cause.toWidgetsType())
 
-internal fun GliaCoreException?.toWidgetsType(
-    defaultMessage: String,
-    defaultCause: Cause = Cause.INTERNAL_ERROR
-): GliaWidgetsException =
+internal fun GliaCoreException?.toWidgetsType(defaultMessage: String, defaultCause: Cause = Cause.INTERNAL_ERROR): GliaWidgetsException =
     this?.toWidgetsType() ?: let {
         val exception = GliaWidgetsException(defaultMessage, defaultCause)
         Logger.e("GliaWidgetsException", "The Core GliaException is null, using the default error message and cause.", exception)
@@ -77,12 +64,7 @@ private fun GliaCoreException.Cause.toWidgetsType(): Cause =
         GliaCoreException.Cause.QUEUE_FULL -> Cause.QUEUE_FULL
     }
 
-internal fun GliaWidgetsException.toCoreType(): GliaCoreException = this.let {
-    GliaCoreException(
-        it.debugMessage,
-        it.gliaCause.toCoreType()
-    )
-}
+internal fun GliaWidgetsException.toCoreType(): GliaCoreException = GliaCoreException(debugMessage, gliaCause.toCoreType())
 
 private fun Cause.toCoreType(): GliaCoreException.Cause =
     when (this) {

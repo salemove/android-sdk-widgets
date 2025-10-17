@@ -1,6 +1,8 @@
 package android
 
 import android.content.Intent
+import com.glia.telemetry_lib.GliaLogger
+import com.glia.telemetry_lib.GliaTelemetry
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.OneTimeEvent
@@ -22,6 +24,8 @@ internal const val CONTEXT_EXTENSIONS_CLASS_PATH = "com.glia.widgets.helper.Cont
 internal const val FILE_HELPER_EXTENSIONS_CLASS_PATH = "com.glia.widgets.helper.FileHelper"
 internal const val LOGGER_PATH = "com.glia.widgets.helper.Logger"
 internal const val DEPS_PATH = "com.glia.widgets.di.Dependencies"
+internal const val GLIA_TELEMETRY_PATH = "com.glia.telemetry_lib.GliaTelemetry"
+internal const val GLIA_LOGGER_PATH = "com.glia.telemetry_lib.GliaLogger"
 
 fun <T> Class<T>.readRawResource(resName: String): String = classLoader?.getResourceAsStream(resName)?.run {
     bufferedReader(StandardCharsets.UTF_8).use { it.readText() }
@@ -79,3 +83,21 @@ internal fun <T : Any> mockkOneTimeEvent(value: T, isConsumed: Boolean = false):
             firstArg<T.() -> Unit>().invoke(value)
         }
     }
+
+// Extension functions to mock and unMock GliaTelemetry
+internal fun GliaTelemetry.mockk() {
+    mockkStatic(GLIA_TELEMETRY_PATH)
+}
+
+internal fun GliaTelemetry.unMockk() {
+    unmockkStatic(GLIA_TELEMETRY_PATH)
+}
+
+// Extension functions to mock and unMock GliaLogger
+internal fun GliaLogger.mockk() {
+    mockkStatic(GLIA_LOGGER_PATH)
+}
+
+internal fun GliaLogger.unMockk() {
+    unmockkStatic(GLIA_LOGGER_PATH)
+}

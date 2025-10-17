@@ -10,6 +10,7 @@ import android.text.Spanned
 import android.text.format.DateUtils
 import androidx.annotation.ColorInt
 import androidx.core.graphics.drawable.DrawableCompat
+import com.glia.androidsdk.CoreConfiguration
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.Engagement.ActionOnEnd
 import com.glia.androidsdk.GliaException
@@ -25,15 +26,23 @@ import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement
 import com.glia.telemetry_lib.EventAttribute
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.telemetry_lib.LogEvents
+import com.glia.widgets.GliaWidgetsConfig
+import com.glia.widgets.GliaWidgetsConfig.Regions
+import com.glia.widgets.GliaWidgetsException
+import com.glia.widgets.Region
 import com.glia.widgets.UiTheme
 import com.glia.widgets.engagement.MediaType
 import com.glia.widgets.queue.Queue
+import com.glia.widgets.toCoreType
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.processors.FlowableProcessor
 import java.io.File
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 import kotlin.io.path.createTempFile
 import kotlin.jvm.optionals.getOrNull
+import com.glia.androidsdk.Region as CoreRegion
 
 internal fun Drawable.setTintCompat(@ColorInt color: Int) = DrawableCompat.setTint(this, color)
 
@@ -121,4 +130,82 @@ internal fun GliaLogger.logScWelcomeScreenButtonClicked(buttonName: String) = i(
 
 internal fun GliaLogger.logScConfirmationScreenButtonClicked(buttonName: String) = i(LogEvents.SC_CONFIRMATION_SCREEN_BUTTON_CLICKED) {
     put(EventAttribute.ButtonName, buttonName)
+}
+
+private const val NOT_APPLICABLE = "N/A"
+
+internal val String?.orNotApplicable: String
+    get() = this ?: NOT_APPLICABLE
+
+@Throws(GliaWidgetsException::class, GliaException::class)
+internal fun GliaWidgetsConfig.toCoreType(): CoreConfiguration {
+    val siteApiKey = siteApiKey.requireNotNull { "Site API Key is required" }
+    val siteId = siteId.requireNotNull { "Site ID is required" }
+    context.requireNotNull { "Context is required" }
+    val region = requireRegion(region, regionString)
+
+    return CoreConfiguration(
+        siteApiKey = siteApiKey.toCoreType(),
+        siteId = siteId,
+        region = region.toCoreType(),
+        applicationContext = context,
+        manualLocaleOverride = manualLocaleOverride
+    )
+}
+
+/**
+ * Takes either region enum or region string and returns region enum.
+ * Validates that only one of the parameters is provided, and if it is the String one, it is one of the known regions.
+ * This is to support both new and deprecated way of setting region in the builder, but to deal only with enum internally.
+ */
+private fun requireRegion(region: Region?, regionString: String?): Region = when {
+    // Both parameters are provided
+    region != null && regionString != null -> throwGliaException(GliaWidgetsException.Cause.INVALID_INPUT) {
+        "`setRegion(region: Region)` and `setRegion(region: String)` are mutually exclusive"
+    }
+    // Enum parameter is provided
+    region != null -> region
+    // None of the parameters is provided
+    regionString == null -> throwGliaException(GliaWidgetsException.Cause.INVALID_INPUT) {
+        "`setRegion(region: Region)` or `setRegion(region: String)` is required"
+    }
+
+    Regions.US.equals(regionString, ignoreCase = true) -> Region.US
+    Regions.EU.equals(regionString, ignoreCase = true) -> Region.EU
+
+    // Unknown region string provided
+    else -> throwGliaException(GliaWidgetsException.Cause.INVALID_INPUT) { "Unknown region: $regionString" }
+}
+
+internal fun Region.toCoreType(): CoreRegion = when (this) {
+    Region.US -> CoreRegion.US
+    Region.EU -> CoreRegion.EU
+    Region.Beta -> CoreRegion.Beta
+    is Region.Custom -> CoreRegion.Custom(domain)
+}
+
+// For logging only!!
+internal val Region.stringValue: String
+    get() = when (this) {
+        Region.US -> Regions.US
+        Region.EU -> Regions.EU
+        Region.Beta -> "beta"
+        is Region.Custom -> "region: custom, domain: $domain"
+    }
+
+@OptIn(ExperimentalContracts::class)
+internal inline fun <T : Any> T?.requireNotNull(lazyMessage: () -> Any): T {
+    contract {
+        returns() implies (this@requireNotNull != null)
+    }
+
+    if (this == null) {
+        throw GliaWidgetsException(lazyMessage().toString(), GliaWidgetsException.Cause.INVALID_INPUT)
+    } else {
+        return this
+    }
+}
+
+internal fun throwGliaException(cause: GliaWidgetsException.Cause, lazyMessage: () -> Any): Nothing {
+    throw GliaWidgetsException(lazyMessage().toString(), cause)
 }

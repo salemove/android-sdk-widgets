@@ -11,20 +11,19 @@ import com.glia.widgets.helper.TAG
  */
 class GliaWidgetsConfig private constructor(builder: Builder) {
     @JvmField
-    val siteId: String
+    val siteId: String?
 
     @JvmField
-    val siteApiKey: SiteApiKey
+    val siteApiKey: SiteApiKey?
 
     @JvmField
-    val context: Context
+    val context: Context?
 
     @JvmField
-    val region: String
+    val region: Region?
 
     @JvmField
-    val baseDomain: String?
-    val requestCode: Int
+    val regionString: String?
 
     @JvmField
     val uiJsonRemoteConfig: String?
@@ -50,12 +49,11 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
         // An Application object lives all the time when the application is active, so it is safe to store it.
         val applicationContext = builder.context?.applicationContext
 
-        siteApiKey = requireNotNull(builder.siteApiKey) { "Site Api Key is required" }
-        siteId = requireNotNull(builder.siteId) { "Site ID is required" }
-        context = requireNotNull(applicationContext) { "Context is required" }
-        region = requireNotNull(builder.region) { "Region is required" }
-        baseDomain = builder.baseDomain
-        requestCode = builder.requestCode
+        siteApiKey = builder.siteApiKey
+        siteId = builder.siteId
+        context = applicationContext
+        region = builder.region
+        regionString = builder.regionString
         uiJsonRemoteConfig = builder.uiJsonRemoteConfig
         companyName = builder.companyName
         enableBubbleOutsideApp = builder.enableBubbleOutsideApp
@@ -68,8 +66,8 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
      * Defines regions that can be applied to [GliaWidgetsConfig].
      */
     object Regions {
-        var US = "us"
-        var EU = "eu"
+        const val US = "us"
+        const val EU = "eu"
     }
 
     /**
@@ -117,11 +115,11 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
             private set
         var context: Context? = null
             private set
-        var region: String? = null
+        var region: Region? = null
+            private set
+        var regionString: String? = null
             private set
         var baseDomain: String? = null
-            private set
-        var requestCode = 45554442
             private set
         var uiJsonRemoteConfig: String? = null
             private set
@@ -140,7 +138,7 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
          * @param siteId - your site ID
          * @return Builder instance
          */
-        fun setSiteId(siteId: String?): Builder {
+        fun setSiteId(siteId: String): Builder {
             this.siteId = siteId
             return this
         }
@@ -149,8 +147,13 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
          * @param context - your application context
          * @return Builder instance
          */
-        fun setContext(context: Context?): Builder {
+        fun setContext(context: Context): Builder {
             this.context = context
+            return this
+        }
+
+        fun setRegion(region: Region): Builder {
+            this.region = region
             return this
         }
 
@@ -158,9 +161,11 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
          * @param region Region in which the site is created.
          * One of [Regions].
          * @return Builder instance
+         * @deprecated Will be removed in 4.0.0 version.
          */
-        fun setRegion(region: String?): Builder {
-            this.region = region
+        @Deprecated("Use {@link #setRegion(Region)}")
+        fun setRegion(region: String): Builder {
+            this.regionString = region
             return this
         }
 
@@ -168,8 +173,10 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
          * @hidden
          * @param baseDomain Base domain to be used.
          * @return Builder instance
+         * @deprecated Will be removed in 4.0.0 version.
          */
-        fun setBaseDomain(baseDomain: String?): Builder {
+        @Deprecated("Use {@link #setRegion(Region)}")
+        fun setBaseDomain(baseDomain: String): Builder {
             this.baseDomain = baseDomain
             return this
         }
@@ -181,8 +188,8 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
                 "com.glia.widgets.SiteApiKey"
             )
         )
-        fun setSiteApiKey(siteApiKey: com.glia.androidsdk.SiteApiKey?): Builder {
-            return siteApiKey?.toWidgetType()?.let { setSiteApiKey(it) } ?: this
+        fun setSiteApiKey(siteApiKey: com.glia.androidsdk.SiteApiKey): Builder {
+            return setSiteApiKey(siteApiKey.toWidgetType())
         }
 
         fun setSiteApiKey(siteApiKey: SiteApiKey): Builder {
@@ -190,8 +197,8 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
             return this
         }
 
+        @Deprecated("All the permissions are requested automatically by the SDK when needed.")
         fun setRequestCode(requestCode: Int): Builder {
-            this.requestCode = requestCode
             return this
         }
 

@@ -9,7 +9,7 @@ java {
 }
 
 android {
-  compileSdk 36
+  compileSdkVersion 36
   defaultConfig {
     applicationId "com.glia.exampleapp"
     minSdkVersion 24
@@ -53,7 +53,7 @@ android {
 
   buildTypes {
     configureEach {
-      resValue("string", "environment", GLIA_REGION)
+      resValue("string", "glia_region", GLIA_REGION)
       resValue("string", "site_id", GLIA_SITE_ID)
       resValue("string", "glia_api_key_id", GLIA_API_KEY_ID)
       resValue("string", "glia_api_key_secret", GLIA_API_KEY_SECRET)

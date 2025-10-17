@@ -5,7 +5,6 @@ import android.os.Build
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
-import com.glia.androidsdk.GliaConfig
 import com.glia.androidsdk.RequestCallback
 import com.glia.telemetry_lib.EventAttribute
 import com.glia.telemetry_lib.GliaLogger
@@ -28,8 +27,11 @@ import com.glia.widgets.helper.DeviceMonitor
 import com.glia.widgets.helper.GliaActivityManagerImpl
 import com.glia.widgets.helper.IntentHelperImpl
 import com.glia.widgets.helper.ResourceProvider
+import com.glia.widgets.helper.orNotApplicable
 import com.glia.widgets.helper.rx.GliaWidgetsSchedulers
 import com.glia.widgets.helper.rx.Schedulers
+import com.glia.widgets.helper.stringValue
+import com.glia.widgets.helper.toCoreType
 import com.glia.widgets.internal.audio.AudioControlManager
 import com.glia.widgets.internal.audio.domain.OnAudioStartedUseCase
 import com.glia.widgets.internal.authentication.AuthenticationManager
@@ -53,7 +55,6 @@ import com.glia.widgets.operator.OperatorRequestActivityWatcher
 import com.glia.widgets.permissions.ActivityWatcherForPermissionsRequest
 import com.glia.widgets.secureconversations.SecureConversations
 import com.glia.widgets.secureconversations.SecureConversationsImpl
-import com.glia.widgets.toCoreType
 import com.glia.widgets.view.dialog.UiComponentsActivityWatcher
 import com.glia.widgets.view.dialog.UiComponentsDispatcher
 import com.glia.widgets.view.dialog.UiComponentsDispatcherImpl
@@ -95,7 +96,8 @@ internal object Dependencies {
         @VisibleForTesting set
 
     @JvmStatic
-    val configurationManager: ConfigurationManager by lazy { ConfigurationManagerImpl() }
+    var configurationManager: ConfigurationManager = ConfigurationManagerImpl()
+        @VisibleForTesting set
 
     @JvmStatic
     val activityLauncher: ActivityLauncher by lazy {
@@ -266,9 +268,9 @@ internal object Dependencies {
 
     @JvmStatic
     fun onSdkInit(gliaWidgetsConfig: GliaWidgetsConfig) {
-        val gliaConfig = createGliaConfig(gliaWidgetsConfig)
-        initLogger(gliaConfig)
-        gliaCore.init(gliaConfig)
+        initLogger(gliaWidgetsConfig)
+
+        gliaCore.init(gliaWidgetsConfig.toCoreType())
         controllerFactory.init()
         repositoryFactory.initialize()
         configurationManager.applyConfiguration(gliaWidgetsConfig)
@@ -278,9 +280,9 @@ internal object Dependencies {
 
     @JvmStatic
     fun onSdkInit(gliaWidgetsConfig: GliaWidgetsConfig, callback: RequestCallback<Boolean?>? = null) {
-        val gliaConfig = createGliaConfig(gliaWidgetsConfig)
-        initLogger(gliaConfig)
-        gliaCore.init(gliaConfig) { success, error ->
+        initLogger(gliaWidgetsConfig)
+
+        gliaCore.init(gliaWidgetsConfig.toCoreType()) { success, error ->
             if (error == null) {
                 controllerFactory.init()
                 repositoryFactory.initialize()
@@ -292,24 +294,15 @@ internal object Dependencies {
         }
     }
 
-    private fun initLogger(gliaConfig: GliaConfig) {
+    private fun initLogger(gliaWidgetsConfig: GliaWidgetsConfig) {
 //        TelemetryHelper.init(gliaConfig) // TODO: improve telemetry initialization strategy
         GliaTelemetry.setGlobalAttribute(GlobalAttribute.SdkWidgetsVersion, BuildConfig.GLIA_WIDGETS_SDK_VERSION)
         GliaLogger.i(LogEvents.WIDGETS_SDK_CONFIGURING) {
-            put(EventAttribute.ApiKeyId, gliaConfig.siteApiKey?.id ?: "N/A")
-            put(EventAttribute.Environment, gliaConfig.region ?: "N/A")
-            put(EventAttribute.LocaleCode, gliaConfig.manualLocaleOverride ?: "N/A")
+            put(EventAttribute.ApiKeyId, gliaWidgetsConfig.siteApiKey?.id.orNotApplicable)
+            put(EventAttribute.Environment, gliaWidgetsConfig.region?.stringValue ?: gliaWidgetsConfig.regionString.orNotApplicable)
+            put(EventAttribute.LocaleCode, gliaWidgetsConfig.manualLocaleOverride)
         }
     }
-
-    private fun createGliaConfig(gliaWidgetsConfig: GliaWidgetsConfig): GliaConfig = GliaConfig.Builder()
-        .setSiteApiKey(gliaWidgetsConfig.siteApiKey.toCoreType())
-        .setSiteId(gliaWidgetsConfig.siteId)
-        .setRegion(gliaWidgetsConfig.region)
-        .setBaseDomain(gliaWidgetsConfig.baseDomain)
-        .setContext(gliaWidgetsConfig.context)
-        .setManualLocaleOverride(gliaWidgetsConfig.manualLocaleOverride)
-        .build()
 
     @JvmStatic
     fun gliaCore(): GliaCore {

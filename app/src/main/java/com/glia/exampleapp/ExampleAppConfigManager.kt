@@ -8,6 +8,7 @@ import androidx.preference.PreferenceManager
 import com.glia.widgets.GliaWidgetsConfig
 import com.glia.widgets.Region
 import com.glia.widgets.SiteApiKey
+import com.glia.widgets.toRegion
 
 /**
  * Helper class to obtain Glia Config params from deep-link or preferences.
@@ -114,12 +115,11 @@ object ExampleAppConfigManager {
         region: Region? = null,
         preferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
     ): GliaWidgetsConfig {
-        val siteRegion = region ?: obtainRegion(
-            preferences.requireString(
-                context.getString(R.string.pref_environment),
-                context.getString(R.string.glia_region)
-            )
-        )
+        val siteRegion = region ?: preferences.requireString(
+            context.getString(R.string.pref_environment),
+            context.getString(R.string.glia_region)
+        ).toRegion()
+
         val apiKeyId = preferences.getString(
             context.getString(R.string.pref_api_key_id),
             context.getString(R.string.glia_api_key_id)
@@ -162,16 +162,6 @@ object ExampleAppConfigManager {
             .setManualLocaleOverride(manualLocaleOverride)
             .setSuppressPushNotificationsPermissionRequestDuringAuthentication(suppressPushNotificationDialogDuringAuthentication)
             .build()
-    }
-
-    @JvmStatic
-    fun obtainRegion(regionStr: String): Region {
-        return when (regionStr.lowercase()) {
-            GliaWidgetsConfig.Regions.EU -> Region.EU
-            GliaWidgetsConfig.Regions.US -> Region.US
-            "beta" -> Region.Beta
-            else -> Region.Custom(regionStr)
-        }
     }
 
     private fun SharedPreferences.requireString(key: String, defaultValue: String): String = getString(key, defaultValue)!!

@@ -181,7 +181,7 @@ internal fun Region.toCoreType(): CoreRegion = when (this) {
     Region.US -> CoreRegion.US
     Region.EU -> CoreRegion.EU
     Region.Beta -> CoreRegion.Beta
-    is Region.Custom -> CoreRegion.Custom(domain)
+    is Region.Custom -> CoreRegion.Custom(host)
 }
 
 // For logging only!!
@@ -190,7 +190,7 @@ internal val Region.stringValue: String
         Region.US -> Regions.US
         Region.EU -> Regions.EU
         Region.Beta -> "beta"
-        is Region.Custom -> "region: custom, domain: $domain"
+        is Region.Custom -> "region: custom, host: $host"
     }
 
 @OptIn(ExperimentalContracts::class)

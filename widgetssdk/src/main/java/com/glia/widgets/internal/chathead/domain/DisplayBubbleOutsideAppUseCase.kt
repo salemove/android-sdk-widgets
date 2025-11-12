@@ -37,9 +37,6 @@ internal class DisplayBubbleOutsideAppUseCase(
             Logger.d(TAG, "Bubble: not allowed to show device bubble")
         }
 
-        // App is in background, that means the bubble is needed
-        viewName == null -> showBubble()
-
         // App is in foreground and bubble is needed based on engagement and screen
         isBubbleNeededUseCase(viewName) -> showBubble()
 

@@ -61,20 +61,6 @@ class DisplayBubbleOutsideAppUseCaseTest {
     }
 
     @Test
-    fun `invoke shows bubble when app is in background`() {
-        // Given
-        every { configurationManager.enableBubbleOutsideApp } returns true
-        every { permissionManager.hasOverlayPermission() } returns true
-
-        // When
-        useCase(viewName = null)
-
-        // Then
-        verify(exactly = 1) { chatHeadManager.startChatHeadService() }
-        verify(exactly = 0) { chatHeadManager.stopChatHeadService() }
-    }
-
-    @Test
     fun `invoke shows bubble when bubble is needed by current view`() {
         // Given
         val viewName = "SomeView"

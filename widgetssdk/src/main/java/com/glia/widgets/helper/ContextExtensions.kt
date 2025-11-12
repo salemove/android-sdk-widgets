@@ -24,7 +24,6 @@ import com.glia.widgets.BuildConfig
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
-import java.io.Serializable
 
 internal fun Context.asActivity(): Activity? = (this as? ContextWrapper)?.let {
     it as? Activity ?: it.baseContext.asActivity()
@@ -89,14 +88,6 @@ internal fun Context.safeStartActivity(intent: Intent, onFailure: () -> Unit, on
 }
 
 internal fun Intent.setSafeFlags(context: Context): Intent = context.asActivity()?.let { this } ?: addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-
-internal inline fun <reified T : Serializable> Intent.getSerializableExtraCompat(key: String): T? =
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        getSerializableExtra(key, T::class.java)
-    } else {
-        @Suppress("DEPRECATION")
-        getSerializableExtra(key) as? T
-    }
 
 internal inline fun <reified T : Parcelable> Intent.getParcelableExtraCompat(key: String): T? =
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

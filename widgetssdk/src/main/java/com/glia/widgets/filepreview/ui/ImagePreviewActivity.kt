@@ -19,6 +19,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import com.glia.widgets.R
+import com.glia.widgets.base.GliaActivity
 import com.glia.widgets.databinding.ImagePreviewActivityBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.ExtraKeys
@@ -39,7 +40,7 @@ private const val WRITE_PERMISSION_REQUEST_CODE = 110011
  *
  * This activity is used to preview images shared in chat in full-screen.
  */
-internal class ImagePreviewActivity : AppCompatActivity(), ImagePreviewContract.View {
+internal class ImagePreviewActivity : GliaActivity<ImagePreviewView>, AppCompatActivity(), ImagePreviewContract.View {
     private val activityLauncher: ActivityLauncher by lazy { Dependencies.activityLauncher }
     private val localeProvider = Dependencies.localeProvider
 
@@ -58,6 +59,9 @@ internal class ImagePreviewActivity : AppCompatActivity(), ImagePreviewContract.
             finishAfterTransition()
         }
     }
+
+    override val gliaView: ImagePreviewView
+        get() = binding.previewView
 
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(newBase)

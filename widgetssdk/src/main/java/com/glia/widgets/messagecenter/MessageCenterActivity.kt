@@ -8,6 +8,7 @@ import androidx.activity.result.contract.ActivityResultContracts.OpenDocument
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.activity.result.contract.ActivityResultContracts.TakePicture
 import com.glia.widgets.base.FadeTransitionActivity
+import com.glia.widgets.base.GliaActivity
 import com.glia.widgets.chat.Intention
 import com.glia.widgets.databinding.MessageCenterActivityBinding
 import com.glia.widgets.di.Dependencies
@@ -22,7 +23,7 @@ import com.glia.widgets.di.Dependencies
  *
  * Before this activity is launched, make sure that Glia Widgets SDK is set up correctly.
  */
-internal class MessageCenterActivity : FadeTransitionActivity(),
+internal class MessageCenterActivity : GliaActivity<MessageCenterView>, FadeTransitionActivity(),
     MessageCenterView.OnFinishListener,
     MessageCenterView.OnNavigateToMessagingListener,
     MessageCenterView.OnAttachFileListener {
@@ -55,6 +56,9 @@ internal class MessageCenterActivity : FadeTransitionActivity(),
             finish()
         }
     }
+
+    override val gliaView: MessageCenterView
+        get() = messageCenterView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -7,7 +7,9 @@ import android.os.Bundle
 import android.view.View
 import com.glia.widgets.R
 import com.glia.widgets.base.FadeTransitionActivity
+import com.glia.widgets.base.GliaActivity
 import com.glia.widgets.view.head.ActivityWatcherForChatHead
+import kotlin.properties.Delegates
 
 /**
  * Glia internal class.
@@ -18,11 +20,17 @@ import com.glia.widgets.view.head.ActivityWatcherForChatHead
  * has no Material Design (`AppCompatActivity`) support required for Glia dialogs and to request permissions in case
  * the current activity does not support ActivityResultLauncher requests.
  */
-internal class DialogHolderActivity : FadeTransitionActivity() {
+internal class DialogHolderActivity : GliaActivity<DialogHolderView>, FadeTransitionActivity() {
+
+    private var view: DialogHolderView by Delegates.notNull()
+
+    override val gliaView: DialogHolderView
+        get() = view
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(DialogHolderView(this))
+        view = DialogHolderView(this)
+        setContentView(view)
     }
 
     companion object {

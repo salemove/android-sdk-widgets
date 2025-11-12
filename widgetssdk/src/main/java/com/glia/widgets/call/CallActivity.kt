@@ -5,6 +5,7 @@ import com.glia.telemetry_lib.GliaLogger
 import com.glia.telemetry_lib.LogEvents
 import com.glia.widgets.R
 import com.glia.widgets.base.FadeTransitionActivity
+import com.glia.widgets.base.GliaActivity
 import com.glia.widgets.call.CallView.OnNavigateToChatListener
 import com.glia.widgets.call.CallView.OnNavigateToWebBrowserListener
 import com.glia.widgets.chat.Intention
@@ -31,7 +32,7 @@ import kotlin.properties.Delegates
  *
  * Before this activity is launched, make sure that Glia Widgets SDK is set up correctly.
  */
-internal class CallActivity : FadeTransitionActivity() {
+internal class CallActivity : GliaActivity<CallView>, FadeTransitionActivity() {
     private val activityLauncher: ActivityLauncher by lazy { Dependencies.activityLauncher }
     private var callView: CallView by Delegates.notNull()
 
@@ -41,6 +42,9 @@ internal class CallActivity : FadeTransitionActivity() {
         finish()
     }
     private val onNavigateToWebBrowserListener = OnNavigateToWebBrowserListener(this::navigateToWebBrowser)
+
+    override val gliaView: CallView
+        get() = callView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

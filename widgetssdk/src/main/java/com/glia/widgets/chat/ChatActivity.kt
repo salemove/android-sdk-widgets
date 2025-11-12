@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import com.glia.widgets.R
 import com.glia.widgets.base.FadeTransitionActivity
+import com.glia.widgets.base.GliaActivity
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.ExtraKeys
 import com.glia.widgets.helper.Logger
@@ -26,7 +27,7 @@ import kotlin.properties.Delegates
  *
  * Before this activity is launched, make sure that Glia Widgets SDK is set up correctly.
  */
-internal class ChatActivity : FadeTransitionActivity() {
+internal class ChatActivity : GliaActivity<ChatView>, FadeTransitionActivity() {
     private val activityLauncher: ActivityLauncher by lazy { Dependencies.activityLauncher }
 
     private var chatView: ChatView by Delegates.notNull()
@@ -36,6 +37,9 @@ internal class ChatActivity : FadeTransitionActivity() {
             chatView.onBackPressed()
         }
     }
+
+    override val gliaView: ChatView
+        get() = chatView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

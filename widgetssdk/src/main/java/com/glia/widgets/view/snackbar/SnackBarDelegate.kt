@@ -24,7 +24,7 @@ import com.google.android.material.snackbar.Snackbar
 
 internal abstract class SnackBarDelegate(
     private val view: View,
-    @StringRes
+    @param:StringRes
     private val titleStringKey: Int,
     private val localeProvider: LocaleProvider,
     private val snackBarTheme: SnackBarTheme?

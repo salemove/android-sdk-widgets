@@ -8,18 +8,17 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.contains
-import com.glia.widgets.R
 import com.glia.widgets.base.BaseActivityStackWatcher
-import com.glia.widgets.chat.ChatView
+import com.glia.widgets.base.GliaActivity
+import com.glia.widgets.call.CallActivity
 import com.glia.widgets.chat.Intention
-import com.glia.widgets.filepreview.ui.ImagePreviewView
-import com.glia.widgets.helper.DialogHolderView
+import com.glia.widgets.filepreview.ui.ImagePreviewActivity
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.WeakReferenceDelegate
 import com.glia.widgets.helper.hasChildOfType
+import com.glia.widgets.helper.rootView
 import com.glia.widgets.launcher.ActivityLauncher
-import com.glia.widgets.messagecenter.MessageCenterView
 import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadContract
 
 @SuppressLint("CheckResult")
@@ -90,7 +89,7 @@ internal class ActivityWatcherForChatHead(
     override fun addChatHeadLayoutIfAbsent() {
         val activity = resumedActivity ?: return
         val viewName = fetchGliaOrRootView()?.javaClass?.simpleName
-        if (hasGliaView(activity) || !controller.shouldShowBubble(viewName)) return
+        if (isCallOrImagePreviewScreen(activity) || !controller.shouldShowBubble(viewName)) return
         val viewGroup = (fetchGliaOrRootView() as? ViewGroup) ?: return
         if (viewGroup.hasChildOfType(ChatHeadLayout::class.java)) return
 
@@ -137,24 +136,14 @@ internal class ActivityWatcherForChatHead(
         }
     }
 
-    private fun hasGliaView(activity: Activity?): Boolean {
-        var gliaView: View? = null
-        activity?.let {
-            gliaView = it.findViewById(R.id.call_view)
-                ?: it.findViewById<ImagePreviewView>(R.id.preview_view)
-        }
-        return gliaView != null
-    }
+    private fun isCallOrImagePreviewScreen(activity: Activity?): Boolean = activity is CallActivity || activity is ImagePreviewActivity
 
     override fun fetchGliaOrRootView(): View? {
-        return resumedActivity?.let {
-            return it.findViewById(R.id.call_view)
-                ?: it.findViewById<ImagePreviewView>(R.id.preview_view)
-                ?: it.findViewById<ChatView>(R.id.chat_view)
-                ?: it.findViewById<MessageCenterView>(R.id.message_center_view)
-                ?: it.findViewById<DialogHolderView>(R.id.dialog_holder_activity_view_id)
-                ?: it.findViewById(android.R.id.content)
-                ?: it.window.decorView.findViewById(android.R.id.content)
+        val currentActivity = resumedActivity ?: return null
+
+        return when (currentActivity) {
+            is GliaActivity<*> -> currentActivity.gliaView
+            else -> currentActivity.rootView
         }
     }
 

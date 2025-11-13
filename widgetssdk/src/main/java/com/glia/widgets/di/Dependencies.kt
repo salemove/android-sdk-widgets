@@ -26,6 +26,7 @@ import com.glia.widgets.helper.ApplicationLifecycleManager
 import com.glia.widgets.helper.DeviceMonitor
 import com.glia.widgets.helper.GliaActivityManagerImpl
 import com.glia.widgets.helper.IntentHelperImpl
+import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.ResourceProvider
 import com.glia.widgets.helper.orNotApplicable
 import com.glia.widgets.helper.rx.GliaWidgetsSchedulers
@@ -62,6 +63,7 @@ import com.glia.widgets.view.head.ActivityWatcherForChatHead
 import com.glia.widgets.view.head.ChatHeadContract
 import com.glia.widgets.view.snackbar.liveobservation.ActivityWatcherForLiveObservation
 import com.glia.widgets.view.unifiedui.theme.UnifiedThemeManager
+import com.glia.widgets.screentextcollector.TextCollector
 
 
 internal object Dependencies {
@@ -264,6 +266,15 @@ internal object Dependencies {
                 activityLauncher
             )
         )
+
+        val textCollector = TextCollector(useCaseFactory.engagementStateUseCase)
+        textCollector.initialize(application)
+
+        textCollector.setOnScreenTextCollectedListener { _ ->
+            val history = textCollector.getScreenHistory() // TODO: remove
+            Logger.d("TextCollectorResult", "====== New texts for ${history.size} screens. ======") // TODO: remove
+            history.forEach { Logger.d("TextCollectorResult","${it.screenName} ${it.texts}") } // TODO: remove
+        }
     }
 
     @JvmStatic

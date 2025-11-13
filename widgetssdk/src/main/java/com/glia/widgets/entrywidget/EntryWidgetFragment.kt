@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.VisibleForTesting
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import com.glia.widgets.R
 import com.glia.widgets.databinding.EntryWidgetFragmentBinding

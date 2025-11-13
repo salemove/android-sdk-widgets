@@ -62,6 +62,7 @@ import com.glia.widgets.view.head.ActivityWatcherForChatHead
 import com.glia.widgets.view.head.ChatHeadContract
 import com.glia.widgets.view.snackbar.liveobservation.ActivityWatcherForLiveObservation
 import com.glia.widgets.view.unifiedui.theme.UnifiedThemeManager
+import com.glia.widgets.screentextcollector.TextCollector
 
 
 internal object Dependencies {
@@ -264,6 +265,9 @@ internal object Dependencies {
                 activityLauncher
             )
         )
+
+        val textCollector = TextCollector(useCaseFactory.engagementStateUseCase)
+        textCollector.initialize(application)
     }
 
     @JvmStatic

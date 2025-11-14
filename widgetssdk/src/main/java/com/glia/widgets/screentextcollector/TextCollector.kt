@@ -123,29 +123,32 @@ internal class TextCollector(
         screenType: ScreenType,
         forceCollection: Boolean = false
     ) {
-        val currentTime = System.currentTimeMillis()
-        val texts = collectTextFromActivity(activity)
-        val contentHash = calculateHash(texts)
-        val hasDialog = textCollectorDialogDetector.hasDialog(
-            getAllRootViews(),
-        )
-        val finalScreenType = if (hasDialog) ScreenType.DIALOG else screenType
-        val lastEntry = history.getMostRecent()
-        if (lastEntry != null && (currentTime - lastEntry.timestamp) < settings.minCollectionIntervalMs && !forceCollection) {
-            // Remove last entry if too soon
-            history.removeMostRecent()
-        }
-        if (lastEntry == null || lastEntry.contentHash != contentHash) {
-            val data = ScreenTextData(
-                screenName = screenName,
-                timestamp = currentTime,
-                texts = texts,
-                screenType = finalScreenType,
-                contentHash = contentHash
+        handler.postDelayed({
+            val currentTime = System.currentTimeMillis()
+            val texts = collectTextFromActivity(activity)
+            val contentHash = calculateHash(texts)
+            val hasDialog = textCollectorDialogDetector.hasDialog(
+                getAllRootViews(),
             )
-            history.add(data)
-            onScreenTextCollectedListener?.invoke(data)
-        }
+            val finalScreenType = if (hasDialog) ScreenType.DIALOG else screenType
+            val lastEntry = history.getMostRecent()
+            if (lastEntry != null && (currentTime - lastEntry.timestamp) < settings.minCollectionIntervalMs && !forceCollection) {
+                // Remove last entry if too soon
+                Logger.d(TAG, "Removing last entry - too short time spent on the screen")
+                history.removeMostRecent()
+            }
+            if (lastEntry == null || lastEntry.contentHash != contentHash) {
+                val data = ScreenTextData(
+                    screenName = screenName,
+                    timestamp = currentTime,
+                    texts = texts,
+                    screenType = finalScreenType,
+                    contentHash = contentHash
+                )
+                history.add(data)
+                onScreenTextCollectedListener?.invoke(data)
+            }
+        }, settings.collectionDelayMs)
     }
 
     private fun calculateHash(texts: List<String>): String {

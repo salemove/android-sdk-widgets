@@ -3,7 +3,7 @@ package com.glia.widgets.screentextcollector
 /**
  * Configuration options for TextCollector.
  */
-data class TextCollectorSettings(
+internal data class TextCollectorSettings(
     // Ensure views are drawn - collect texts from screen after 'collectionDelayMs'.
     val collectionDelayMs: Long = 800L,
 

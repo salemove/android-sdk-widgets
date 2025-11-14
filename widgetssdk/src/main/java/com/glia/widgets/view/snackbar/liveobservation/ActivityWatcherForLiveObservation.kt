@@ -36,12 +36,11 @@ internal class ActivityWatcherForLiveObservation(
         }
     }
 
-    private fun makeSnackBar(activity: Activity): SnackBarDelegate =
-        SnackBarDelegateFactory(
-            activity,
-            R.string.live_observation_indicator_message,
-            localeProvider,
-            themeManager.theme
-        ).createDelegate()
+    private fun makeSnackBar(activity: Activity): SnackBarDelegate = SnackBarDelegateFactory(
+        activity,
+        R.string.live_observation_indicator_message,
+        localeProvider,
+        themeManager.theme,
+    ).createDelegate()
 
 }

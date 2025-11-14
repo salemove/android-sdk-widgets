@@ -8,9 +8,7 @@ import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.androidsdk.comms.Video
 import com.glia.telemetry_lib.ButtonNames
-import com.glia.telemetry_lib.EventAttribute
 import com.glia.telemetry_lib.GliaLogger
-import com.glia.telemetry_lib.LogEvents
 import com.glia.widgets.Constants
 import com.glia.widgets.call.CallStatus.EngagementOngoingAudioCallStarted
 import com.glia.widgets.call.CallStatus.EngagementOngoingVideoCallStarted
@@ -32,7 +30,9 @@ import com.glia.widgets.engagement.domain.OperatorMediaUseCase
 import com.glia.widgets.engagement.domain.ToggleVisitorAudioMediaStateUseCase
 import com.glia.widgets.engagement.domain.ToggleVisitorVideoMediaStateUseCase
 import com.glia.widgets.engagement.domain.VisitorMediaUseCase
+import com.glia.widgets.helper.DeviceMonitor
 import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.NetworkState
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.TimeCounter
 import com.glia.widgets.helper.TimeCounter.FormattedTimerStatusListener
@@ -54,6 +54,7 @@ import com.glia.widgets.view.MessagesNotSeenHandler.MessagesNotSeenHandlerListen
 import com.glia.widgets.view.MinimizeHandler
 import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContract
 import com.glia.widgets.webbrowser.domain.GetUrlFromLinkUseCase
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import java.util.Optional
@@ -91,10 +92,12 @@ internal class CallController(
     private val isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase,
     private val enqueueForEngagementUseCase: EnqueueForEngagementUseCase,
     private val decideOnQueueingUseCase: DecideOnQueueingUseCase,
-    private val getUrlFromLinkUseCase: GetUrlFromLinkUseCase
+    private val getUrlFromLinkUseCase: GetUrlFromLinkUseCase,
+    private val deviceMonitor: DeviceMonitor
 ) : CallContract.Controller {
     private val disposable = CompositeDisposable()
     private val mediaUpgradeDisposable = CompositeDisposable()
+    private val connectionDisposable = CompositeDisposable()
     private var callTimerStatusListener: FormattedTimerStatusListener? = null
     private var inactivityTimerStatusListener: RawTimerStatusListener? = null
     private var connectingTimerStatusListener: RawTimerStatusListener? = null
@@ -114,7 +117,6 @@ internal class CallController(
 
         subscribeToEngagement()
         disposable.add(decideOnQueueingUseCase().subscribe { enqueueForEngagement() })
-
     }
 
     private fun subscribeToEngagement() {
@@ -282,6 +284,7 @@ internal class CallController(
 
     override fun onPause() {
         mediaUpgradeDisposable.clear()
+        connectionDisposable.clear()
     }
 
     override fun endEngagementClicked() {
@@ -334,9 +337,18 @@ internal class CallController(
         onResumeSetup()
     }
 
+    private fun subscribeToConnectionStatus() {
+        connectionDisposable.clear()
+        deviceMonitor.networkState
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(::handleNetworkStateChange)
+            .also(connectionDisposable::add)
+    }
+
     private fun onResumeSetup() {
         showLandscapeControls()
         subscribeToMediaUpgradeEvents()
+        subscribeToConnectionStatus()
     }
 
     private fun subscribeToMediaUpgradeEvents() {
@@ -500,6 +512,7 @@ internal class CallController(
         Logger.d(TAG, "Stop, engagement ended")
         endEngagementUseCase()
         mediaUpgradeDisposable.clear()
+        connectionDisposable.clear()
         emitViewState(callState.stop())
     }
 
@@ -619,5 +632,12 @@ internal class CallController(
     private fun minimizeView() {
         view?.minimizeView()
         onDestroy(true)
+    }
+
+    private fun handleNetworkStateChange(networkState: NetworkState) {
+        when (networkState) {
+            NetworkState.CONNECTED -> view?.dismissConnectionSnackBar()
+            NetworkState.DISCONNECTED -> view?.showConnectionSnackBar()
+        }
     }
 }

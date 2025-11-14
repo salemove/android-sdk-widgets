@@ -4,13 +4,10 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.net.ConnectivityManager
-import android.net.Network
-import android.net.NetworkCapabilities
-import android.net.NetworkRequest
-import androidx.core.content.getSystemService
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.telemetry_lib.LogEvents
+import com.glia.widgets.di.GliaCore
+import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.processors.BehaviorProcessor
 
@@ -35,14 +32,14 @@ internal enum class DeviceState {
     NON_INTERACTIVE
 }
 
-internal class DeviceMonitor(context: Context) : ConnectivityManager.NetworkCallback() {
+internal class DeviceMonitor(context: Context, core: GliaCore) {
 
-    private val connectivityManager = context.getSystemService<ConnectivityManager>()
-    private val networkCapabilities: NetworkCapabilities? get() = connectivityManager?.run { getNetworkCapabilities(activeNetwork) }
-    private val isConnected: Boolean get() = networkCapabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
-
-    private val _networkState: BehaviorProcessor<NetworkState> = BehaviorProcessor.createDefault(NetworkState.from(isConnected))
-    val networkState: Flowable<NetworkState> = _networkState.distinctUntilChanged().hide()
+    val networkState: Flowable<NetworkState> = core.getNetworkTracker(context)
+        .state
+        .toFlowable(BackpressureStrategy.LATEST)
+        .map { NetworkState.from(it.isConnected) }
+        .distinctUntilChanged()
+        .hide()
 
     private val _deviceState: BehaviorProcessor<DeviceState> = BehaviorProcessor.createDefault(DeviceState.USER_PRESENT)
     val deviceState: Flowable<DeviceState> = _deviceState.distinctUntilChanged().hide()
@@ -74,30 +71,8 @@ internal class DeviceMonitor(context: Context) : ConnectivityManager.NetworkCall
     }
 
     init {
-        // Listen for all network changes (Wi-Fi, Cellular, etc.).
-        val networkRequest = NetworkRequest.Builder()
-            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-            .build()
-
-        connectivityManager?.registerNetworkCallback(networkRequest, this)
-
         context.registerReceiver(userPresentReceiver, IntentFilter(Intent.ACTION_USER_PRESENT))
         context.registerReceiver(screenOnReceiver, IntentFilter(Intent.ACTION_SCREEN_ON))
         context.registerReceiver(screenOffReceiver, IntentFilter(Intent.ACTION_SCREEN_OFF))
-    }
-
-    override fun onAvailable(network: Network) {
-        super.onAvailable(network)
-        _networkState.onNext(NetworkState.from(isConnected))
-    }
-
-    override fun onLost(network: Network) {
-        super.onLost(network)
-        _networkState.onNext(NetworkState.from(isConnected))
-    }
-
-    override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
-        super.onCapabilitiesChanged(network, networkCapabilities)
-        _networkState.onNext(NetworkState.from(networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)))
     }
 }

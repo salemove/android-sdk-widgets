@@ -89,5 +89,7 @@ internal interface ChatContract {
         fun navigateToImagePreview(attachmentFile: AttachmentFile, view: android.view.View)
         fun navigateToImagePreview(attachmentFile: LocalAttachment, view: android.view.View)
         fun launchCall(mediaType: Engagement.MediaType)
+        fun showConnectionSnackBar()
+        fun dismissConnectionSnackBar()
     }
 }

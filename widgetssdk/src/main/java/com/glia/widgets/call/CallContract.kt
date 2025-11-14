@@ -48,5 +48,7 @@ internal interface CallContract {
         fun showEngagementConfirmationDialog()
         fun navigateToWebBrowserActivity(title: LocaleString, url: String)
         fun showToast(message: String)
+        fun showConnectionSnackBar()
+        fun dismissConnectionSnackBar()
     }
 }

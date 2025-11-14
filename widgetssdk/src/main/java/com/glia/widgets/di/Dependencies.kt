@@ -166,7 +166,7 @@ internal object Dependencies {
         resourceProvider = ResourceProvider(application.baseContext)
         localeProvider = LocaleProvider(resourceProvider)
         val downloadsFolderDataSource = DownloadsFolderDataSource(application)
-        val deviceMonitor = DeviceMonitor(application)
+        val deviceMonitor = DeviceMonitor(application, gliaCore)
         repositoryFactory = RepositoryFactory(gliaCore, downloadsFolderDataSource, configurationManager, deviceMonitor)
 
         val permissionManager = PermissionManager(
@@ -204,7 +204,8 @@ internal object Dependencies {
             applicationLifecycleManager,
             notificationManager,
             configurationManager,
-            uiComponentsDispatcher
+            uiComponentsDispatcher,
+            deviceMonitor
         )
         initApplicationLifecycleObserver(applicationLifecycleManager, controllerFactory.chatHeadController)
 

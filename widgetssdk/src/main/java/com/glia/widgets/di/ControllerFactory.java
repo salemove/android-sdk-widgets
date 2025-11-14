@@ -18,6 +18,7 @@ import com.glia.widgets.entrywidget.EntryWidgetHideController;
 import com.glia.widgets.filepreview.ui.ImagePreviewContract;
 import com.glia.widgets.filepreview.ui.ImagePreviewController;
 import com.glia.widgets.helper.ApplicationLifecycleManager;
+import com.glia.widgets.helper.DeviceMonitor;
 import com.glia.widgets.helper.IntentHelperImpl;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
@@ -50,6 +51,8 @@ import com.glia.widgets.view.head.controller.ServiceChatHeadController;
 import com.glia.widgets.view.snackbar.liveobservation.ActivityWatcherForLiveObservationContract;
 import com.glia.widgets.view.snackbar.liveobservation.ActivityWatcherForLiveObservationController;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * @hide
  */
@@ -80,6 +83,7 @@ public class ControllerFactory {
     private ActivityWatcherForLiveObservationController activityWatcherForLiveObservationController;
     private EntryWidgetHideController entryWidgetHideController;
     private PushClickHandlerController pushClickHandlerController;
+    private final DeviceMonitor deviceMonitor;
 
     public ControllerFactory(
         RepositoryFactory repositoryFactory,
@@ -89,7 +93,8 @@ public class ControllerFactory {
         ApplicationLifecycleManager applicationLifecycleManager,
         INotificationManager notificationManager,
         ConfigurationManager configurationManager,
-        UiComponentsDispatcher uiComponentsDispatcher
+        UiComponentsDispatcher uiComponentsDispatcher,
+        @NotNull DeviceMonitor deviceMonitor
     ) {
         this.repositoryFactory = repositoryFactory;
         messagesNotSeenHandler = new MessagesNotSeenHandler(
@@ -109,6 +114,7 @@ public class ControllerFactory {
             useCaseFactory.createPutImageFileToDownloadsUseCase()
         );
         this.managerFactory = managerFactory;
+        this.deviceMonitor = deviceMonitor;
     }
 
     public ChatContract.Controller getChatController() {
@@ -161,7 +167,8 @@ public class ControllerFactory {
                 useCaseFactory.createSecureConversationTopBannerVisibilityUseCase(),
                 useCaseFactory.createSetLeaveSecureConversationDialogVisibleUseCase(),
                 useCaseFactory.getSetChatScreenOpenUseCase(),
-                useCaseFactory.getHasOngoingSecureConversationUseCase()
+                useCaseFactory.getHasOngoingSecureConversationUseCase(),
+                deviceMonitor
             );
         }
 
@@ -199,7 +206,8 @@ public class ControllerFactory {
                 useCaseFactory.getIsQueueingOrEngagementUseCase(),
                 useCaseFactory.getQueueForEngagementUseCase(),
                 useCaseFactory.getDecideOnQueueingUseCase(),
-                useCaseFactory.createGetUrlFromLinkUseCase()
+                useCaseFactory.createGetUrlFromLinkUseCase(),
+                deviceMonitor
             );
         }
 

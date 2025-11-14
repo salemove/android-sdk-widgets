@@ -1,9 +1,11 @@
 package com.glia.widgets.di
 
+import android.content.Context
 import com.glia.androidsdk.CoreConfiguration
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.Glia.OmnicoreEvent
 import com.glia.androidsdk.GliaException
+import com.glia.androidsdk.NetworkTracker
 import com.glia.androidsdk.Operator
 import com.glia.androidsdk.RequestCallback
 import com.glia.androidsdk.chat.AttachmentFile
@@ -74,4 +76,6 @@ internal interface GliaCore {
     fun subscribeToQueueStateUpdates(queueIds: List<String>, onError: Consumer<GliaException>, callback: Consumer<Queue>)
     fun unsubscribeFromQueueUpdates(onError: Consumer<GliaException>?, callback: Consumer<Queue>)
     fun getCurrentVisitor(onSuccess: (Visitor) -> Unit)
+
+    fun getNetworkTracker(context: Context): NetworkTracker
 }

@@ -13,6 +13,7 @@ import androidx.core.view.updateMargins
 import com.glia.widgets.R
 import com.glia.widgets.call.CallActivity
 import com.glia.widgets.chat.ChatActivity
+import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.insetsController
 import com.glia.widgets.helper.rootView
@@ -134,3 +135,14 @@ internal class SnackBarDelegateFactory(
         else -> CommonSnackBarDelegate(activity, titleStringKey, localeProvider, unifiedTheme, duration)
     }
 }
+
+/**
+ * Creates a SnackBarDelegate to show a "No Connection" status.
+ */
+internal fun makeNoConnectionSnackBar(activity: Activity): SnackBarDelegate = SnackBarDelegateFactory(
+    activity = activity,
+    titleStringKey = R.string.snackbar_no_connection_message,
+    localeProvider = Dependencies.localeProvider,
+    unifiedTheme = Dependencies.gliaThemeManager.theme,
+    duration = Snackbar.LENGTH_INDEFINITE
+).createDelegate()

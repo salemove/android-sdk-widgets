@@ -25,7 +25,7 @@ internal interface UiComponentsDispatcher {
     sealed interface State {
         data object DismissDialog : State
         data class NotificationPermissionDialog(val onAllow: () -> Unit, val onCancel: () -> Unit) : State
-        data class ShowSnackBar(@StringRes val messageResId: Int) : State
+        data class ShowSnackBar(@param:StringRes val messageResId: Int) : State
         data class LaunchChatScreen(val intention: Intention) : State
     }
 }

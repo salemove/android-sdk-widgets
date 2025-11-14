@@ -84,6 +84,8 @@ import com.glia.widgets.view.animation.SimpleTransitionListener
 import com.glia.widgets.view.dialog.base.DialogDelegate
 import com.glia.widgets.view.dialog.base.DialogDelegateImpl
 import com.glia.widgets.view.head.ChatHeadContract
+import com.glia.widgets.view.snackbar.SnackBarDelegate
+import com.glia.widgets.view.snackbar.makeNoConnectionSnackBar
 import com.glia.widgets.view.unifiedui.applyButtonTheme
 import com.glia.widgets.view.unifiedui.applyColorTheme
 import com.glia.widgets.view.unifiedui.applyHintColor
@@ -203,6 +205,8 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     private val openDocumentLauncher = chatActivity?.registerForActivityResult(ActivityResultContracts.OpenDocument()) {
         it?.apply { controller?.onContentChosen(this) }
     }
+
+    private var snackBarDelegate: SnackBarDelegate? = null
 
     init {
         initConfigurations()
@@ -1020,5 +1024,16 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
                 setRotation(R.id.sc_top_banner_icon, 0f)
             }
         }.applyTo(rootConstraintLayout)
+    }
+
+    override fun showConnectionSnackBar() {
+        snackBarDelegate = makeNoConnectionSnackBar(context.requireActivity()).apply {
+            show()
+        }
+    }
+
+    override fun dismissConnectionSnackBar() {
+        snackBarDelegate?.dismiss()
+        snackBarDelegate = null
     }
 }

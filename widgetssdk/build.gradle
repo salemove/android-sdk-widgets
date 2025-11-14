@@ -208,6 +208,8 @@ dependencies {
   implementation libs.java.core.ktx
   implementation libs.media.exif.interface
 
+  implementation "androidx.compose.ui:ui:1.9.4"
+
   implementation platform(libs.firebase.bom)
   implementation libs.firebase.messaging
 

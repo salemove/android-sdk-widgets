@@ -59,6 +59,8 @@ import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContai
 import com.glia.widgets.view.head.BadgeTextView
 import com.glia.widgets.view.head.ChatHeadContract
 import com.glia.widgets.view.header.AppBarView
+import com.glia.widgets.view.snackbar.SnackBarDelegate
+import com.glia.widgets.view.snackbar.makeNoConnectionSnackBar
 import com.glia.widgets.view.unifiedui.applyBarButtonStatesTheme
 import com.glia.widgets.view.unifiedui.applyColorTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
@@ -133,6 +135,8 @@ internal class CallView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     private var onTitleUpdatedListener: OnTitleUpdatedListener? = null
 
     private var operatorVideoView: VideoView? = null
+
+    private var snackBarDelegate: SnackBarDelegate? = null
 
     @JvmOverloads
     constructor(
@@ -880,5 +884,16 @@ internal class CallView(context: Context, attrs: AttributeSet?, defStyleAttr: In
 
     override fun post(action: Runnable?): Boolean {
         return executor?.execute(action)?.let { true } ?: super.post(action)
+    }
+
+    override fun showConnectionSnackBar() {
+        snackBarDelegate = makeNoConnectionSnackBar(context.requireActivity()).apply {
+            show()
+        }
+    }
+
+    override fun dismissConnectionSnackBar() {
+        snackBarDelegate?.dismiss()
+        snackBarDelegate = null
     }
 }

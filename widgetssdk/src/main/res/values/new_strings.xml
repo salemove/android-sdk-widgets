@@ -241,4 +241,7 @@
     <string name="push_notifications_alert_button_positive">Allow</string>
     <string name="push_notifications_alert_button_negative">Not right now</string>
 
+<!--    Real-Time connection quality-->
+    <string name="snackbar_no_connection_message">No connection. Trying to reconnect.</string>
+
 </resources>

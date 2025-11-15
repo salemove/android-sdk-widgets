@@ -1,10 +1,12 @@
 package com.glia.widgets.di
 
+import android.content.Context
 import com.glia.androidsdk.CoreConfiguration
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.Glia
 import com.glia.androidsdk.Glia.OmnicoreEvent
 import com.glia.androidsdk.GliaException
+import com.glia.androidsdk.NetworkTracker
 import com.glia.androidsdk.Operator
 import com.glia.androidsdk.RequestCallback
 import com.glia.androidsdk.chat.AttachmentFile
@@ -151,4 +153,6 @@ internal class GliaCoreImpl : GliaCore {
     override fun getCurrentVisitor(onSuccess: (Visitor) -> Unit) = Glia.getCurrentVisitor { visitor, _ ->
         onSuccess(visitor ?: return@getCurrentVisitor)
     }
+
+    override fun getNetworkTracker(context: Context): NetworkTracker = Glia.getNetworkTracker(context)
 }

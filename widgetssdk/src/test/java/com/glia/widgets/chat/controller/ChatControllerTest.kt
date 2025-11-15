@@ -22,6 +22,23 @@ import com.glia.widgets.chat.model.ChatInputMode
 import com.glia.widgets.chat.model.ChatState
 import com.glia.widgets.chat.model.Gva
 import com.glia.widgets.chat.model.GvaButton
+import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCase
+import com.glia.widgets.engagement.domain.DeclineMediaUpgradeOfferUseCase
+import com.glia.widgets.engagement.domain.EndEngagementUseCase
+import com.glia.widgets.engagement.domain.EngagementStateUseCase
+import com.glia.widgets.engagement.domain.EnqueueForEngagementUseCase
+import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
+import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
+import com.glia.widgets.engagement.domain.OperatorMediaUseCase
+import com.glia.widgets.engagement.domain.OperatorTypingUseCase
+import com.glia.widgets.engagement.domain.ReleaseResourcesUseCase
+import com.glia.widgets.entrywidget.EntryWidgetContract
+import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase
+import com.glia.widgets.filepreview.domain.usecase.IsFileReadyForPreviewUseCase
+import com.glia.widgets.helper.DeviceMonitor
+import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.NetworkState
+import com.glia.widgets.helper.TimeCounter
 import com.glia.widgets.internal.dialog.DialogContract
 import com.glia.widgets.internal.dialog.domain.ConfirmationDialogLinksUseCase
 import com.glia.widgets.internal.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
@@ -42,27 +59,13 @@ import com.glia.widgets.internal.secureconversations.domain.IsMessagingAvailable
 import com.glia.widgets.internal.secureconversations.domain.ManageSecureMessagingStatusUseCase
 import com.glia.widgets.internal.secureconversations.domain.SecureConversationTopBannerVisibilityUseCase
 import com.glia.widgets.internal.secureconversations.domain.SetLeaveSecureConversationDialogVisibleUseCase
-import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCase
-import com.glia.widgets.engagement.domain.DeclineMediaUpgradeOfferUseCase
-import com.glia.widgets.engagement.domain.EndEngagementUseCase
-import com.glia.widgets.engagement.domain.EngagementStateUseCase
-import com.glia.widgets.engagement.domain.EnqueueForEngagementUseCase
-import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
-import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
-import com.glia.widgets.engagement.domain.OperatorMediaUseCase
-import com.glia.widgets.engagement.domain.OperatorTypingUseCase
-import com.glia.widgets.engagement.domain.ReleaseResourcesUseCase
-import com.glia.widgets.entrywidget.EntryWidgetContract
-import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase
-import com.glia.widgets.filepreview.domain.usecase.IsFileReadyForPreviewUseCase
-import com.glia.widgets.helper.Logger
-import com.glia.widgets.helper.TimeCounter
 import com.glia.widgets.view.MessagesNotSeenHandler
 import com.glia.widgets.view.MinimizeHandler
 import com.glia.widgets.webbrowser.domain.GetUrlFromLinkUseCase
 import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.processors.BehaviorProcessor
 import io.reactivex.rxjava3.schedulers.Schedulers
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
@@ -138,11 +141,15 @@ class ChatControllerTest {
     private lateinit var setLeaveSecureConversationDialogVisibleUseCase: SetLeaveSecureConversationDialogVisibleUseCase
     private lateinit var setChatScreenOpenUseCase: SetChatScreenOpenUseCase
     private lateinit var hasOngoingSecureConversationUseCase: HasOngoingSecureConversationUseCase
+    private lateinit var deviceMonitor: DeviceMonitor
+
+    private lateinit var networkStateProcessor: BehaviorProcessor<NetworkState>
 
     @Before
     fun setUp() {
         Logger.setIsDebug(false)
         RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
+        networkStateProcessor = BehaviorProcessor.createDefault(NetworkState.CONNECTED)
         callTimer = mock()
         minimizeHandler = mock()
         dialogController = mock()
@@ -180,7 +187,9 @@ class ChatControllerTest {
         operatorMediaUseCase = mock {
             on { invoke() } doReturn Flowable.empty()
         }
-        acceptMediaUpgradeOfferUseCase = mock()
+        acceptMediaUpgradeOfferUseCase = mock {
+            on { result } doReturn Flowable.empty()
+        }
         declineMediaUpgradeOfferUseCase = mock()
         isQueueingOrLiveEngagementUseCase = mock()
         enqueueForEngagementUseCase = mock()
@@ -204,6 +213,9 @@ class ChatControllerTest {
         setLeaveSecureConversationDialogVisibleUseCase = mock()
         setChatScreenOpenUseCase = mock()
         hasOngoingSecureConversationUseCase = mock()
+        deviceMonitor = mock {
+            on { networkState } doReturn networkStateProcessor
+        }
 
         chatController = ChatController(
             callTimer = callTimer,
@@ -252,9 +264,12 @@ class ChatControllerTest {
             shouldShowTopBannerUseCase = shouldShowTopBannerVisibilityUseCase,
             setLeaveSecureConversationDialogVisibleUseCase = setLeaveSecureConversationDialogVisibleUseCase,
             setChatScreenOpenUseCase = setChatScreenOpenUseCase,
-            hasOngoingSecureConversationUseCase = hasOngoingSecureConversationUseCase
+            hasOngoingSecureConversationUseCase = hasOngoingSecureConversationUseCase,
+            deviceMonitor = deviceMonitor
         )
         chatController.setView(chatView)
+        verify(chatView, never()).showConnectionSnackBar()
+        verify(chatView, never()).dismissConnectionSnackBar()
         Mockito.clearInvocations(chatView)
     }
 
@@ -759,5 +774,28 @@ class ChatControllerTest {
         verify(dialogController, never()).showLeaveCurrentConversationDialog(eq(LeaveDialogAction.AUDIO))
         verify(dialogController, never()).showLeaveCurrentConversationDialog(eq(LeaveDialogAction.LIVE_CHAT))
         verify(dialogController, never()).showLeaveCurrentConversationDialog(eq(LeaveDialogAction.AUDIO))
+    }
+
+    @Test
+    fun `onResume subscribes to network state`() {
+        chatController.onResume()
+
+        verify(chatView, times(1)).dismissConnectionSnackBar()
+
+        networkStateProcessor.onNext(NetworkState.DISCONNECTED)
+        verify(chatView, times(1)).showConnectionSnackBar()
+    }
+
+    @Test
+    fun `onPause disposes network state subscription`() {
+        `onResume subscribes to network state`()
+
+        chatController.onPause()
+
+        networkStateProcessor.onNext(NetworkState.CONNECTED)
+        verify(chatView, times(1)).dismissConnectionSnackBar()
+
+        networkStateProcessor.onNext(NetworkState.DISCONNECTED)
+        verify(chatView, times(1)).showConnectionSnackBar()
     }
 }

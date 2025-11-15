@@ -59,7 +59,9 @@ import com.glia.widgets.engagement.domain.ReleaseResourcesUseCase
 import com.glia.widgets.entrywidget.EntryWidgetContract
 import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase
 import com.glia.widgets.filepreview.domain.usecase.IsFileReadyForPreviewUseCase
+import com.glia.widgets.helper.DeviceMonitor
 import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.NetworkState
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.TimeCounter
 import com.glia.widgets.helper.TimeCounter.FormattedTimerStatusListener
@@ -145,7 +147,8 @@ internal class ChatController(
     private val shouldShowTopBannerUseCase: SecureConversationTopBannerVisibilityUseCase,
     private val setLeaveSecureConversationDialogVisibleUseCase: SetLeaveSecureConversationDialogVisibleUseCase,
     private val setChatScreenOpenUseCase: SetChatScreenOpenUseCase,
-    private val hasOngoingSecureConversationUseCase: HasOngoingSecureConversationUseCase
+    private val hasOngoingSecureConversationUseCase: HasOngoingSecureConversationUseCase,
+    private val deviceMonitor: DeviceMonitor
 ) : ChatContract.Controller {
     private var backClickedListener: ChatView.OnBackClickedListener? = null
     private var view: ChatContract.View? = null
@@ -153,6 +156,7 @@ internal class ChatController(
 
     private val disposable = CompositeDisposable()
     private val mediaUpgradeDisposable = CompositeDisposable()
+    private val connectionDisposable = CompositeDisposable()
 
     private val sendMessageCallback: GliaSendMessageUseCase.Listener = object : GliaSendMessageUseCase.Listener {
         override fun messageSent(message: VisitorMessage?) {
@@ -380,6 +384,7 @@ internal class ChatController(
         mediaUpgradeDisposable.clear()
         isChatViewPaused = true
         messagesNotSeenHandler.onChatWentBackground()
+        connectionDisposable.clear()
     }
 
     override fun onImageItemClick(item: AttachmentFile, view: View) {
@@ -555,6 +560,14 @@ internal class ChatController(
         onResumeSetup()
     }
 
+    private fun subscribeToConnectionStatus() {
+        connectionDisposable.clear()
+        deviceMonitor.networkState
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(::handleNetworkStateChange)
+            .also(connectionDisposable::add)
+    }
+
     private fun onResumeSetup() {
         setChatScreenOpenUseCase(true)
         subscribeToMediaUpgradeEvents()
@@ -566,6 +579,8 @@ internal class ChatController(
         } else {
             decideOnQueueingUseCase.markOverlayStepCompleted()
         }
+
+        subscribeToConnectionStatus()
     }
 
     private fun subscribeToMediaUpgradeEvents() {
@@ -708,6 +723,7 @@ internal class ChatController(
         endEngagementUseCase()
         chatManager.reset()
         mediaUpgradeDisposable.clear()
+        connectionDisposable.clear()
         emitViewState { chatState.chatUnavailableState() }
     }
 
@@ -977,24 +993,28 @@ internal class ChatController(
                     put(EventAttribute.ActionType, GvaActionTypes.BROADCAST_EVENT)
                 }
             }
+
             is Gva.ButtonType.Email -> {
                 view?.requestOpenEmailClient(buttonType.uri)
                 GliaLogger.i(LogEvents.CHAT_SCREEN_GVA_MESSAGE_ACTION) {
                     put(EventAttribute.ActionType, GvaActionTypes.EMAIL)
                 }
             }
+
             is Gva.ButtonType.Phone -> {
                 view?.requestOpenDialer(buttonType.uri)
                 GliaLogger.i(LogEvents.CHAT_SCREEN_GVA_MESSAGE_ACTION) {
                     put(EventAttribute.ActionType, GvaActionTypes.PHONE)
                 }
             }
+
             is Gva.ButtonType.PostBack -> {
                 sendGvaResponse(buttonType.singleChoiceAttachment)
                 GliaLogger.i(LogEvents.CHAT_SCREEN_GVA_MESSAGE_ACTION) {
                     put(EventAttribute.ActionType, GvaActionTypes.POST_BACK)
                 }
             }
+
             is Gva.ButtonType.Url -> {
                 view?.requestOpenUri(buttonType.uri)
                 GliaLogger.i(LogEvents.CHAT_SCREEN_GVA_MESSAGE_ACTION) {
@@ -1095,5 +1115,12 @@ internal class ChatController(
     override fun leaveCurrentConversationDialogStayClicked() {
         dialogController.dismissCurrentDialog()
         setLeaveSecureConversationDialogVisibleUseCase(false)
+    }
+
+    private fun handleNetworkStateChange(networkState: NetworkState) {
+        when (networkState) {
+            NetworkState.CONNECTED -> view?.dismissConnectionSnackBar()
+            NetworkState.DISCONNECTED -> view?.showConnectionSnackBar()
+        }
     }
 }

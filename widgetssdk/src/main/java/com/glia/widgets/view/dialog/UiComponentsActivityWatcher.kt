@@ -58,12 +58,7 @@ internal class UiComponentsActivityWatcher(
     }
 
     private fun showSnackbar(activity: Activity, messageResId: Int) =
-        SnackBarDelegateFactory(
-            activity,
-            messageResId,
-            localeProvider,
-            themeManager.theme
-        ).createDelegate().show()
+        SnackBarDelegateFactory(activity, messageResId, localeProvider, themeManager.theme).createDelegate().show()
 
     private fun showPermissionsDialog(activity: Activity, consumeCallback: () -> Unit, onAllow: () -> Unit, onCancel: () -> Unit) {
         showAlertDialogWithStyledContext(activity) { context, uiTheme ->

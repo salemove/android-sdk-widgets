@@ -3,7 +3,6 @@
 package com.glia.widgets.helper
 
 import android.view.View
-import android.view.ViewGroup
 import android.view.Window
 import androidx.core.graphics.Insets
 import androidx.core.view.OnApplyWindowInsetsListener
@@ -12,8 +11,6 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsAnimationCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.updateLayoutParams
-import androidx.core.view.updateMargins
 import androidx.core.view.updatePadding
 
 @get:JvmName("insetsControllerCompat")
@@ -80,9 +77,7 @@ internal class SimpleWindowInsetsAndAnimationHandler(
     override fun onProgress(insets: WindowInsetsCompat, runningAnimations: MutableList<WindowInsetsAnimationCompat>): WindowInsetsCompat {
         val combinedInsets = getCombinedInsets(insets)
 
-        target.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-            updateMargins(bottom = combinedInsets.bottom)
-        }
+        target.updatePadding(bottom = combinedInsets.bottom)
         callback?.invoke(combinedInsets)
 
         return WindowInsetsCompat.CONSUMED
@@ -91,9 +86,7 @@ internal class SimpleWindowInsetsAndAnimationHandler(
     override fun onApplyWindowInsets(v: View, insets: WindowInsetsCompat): WindowInsetsCompat {
         if (!keyboardAnimationInProgress) {
             getCombinedInsets(insets).apply {
-                v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                    updateMargins(left, appBarOrToolBar?.let { 0 } ?: top, right, bottom)
-                }
+                v.updatePadding(left, appBarOrToolBar?.let { 0 } ?: top, right, bottom)
                 appBarOrToolBar?.updatePadding(top = top)
             }
         }

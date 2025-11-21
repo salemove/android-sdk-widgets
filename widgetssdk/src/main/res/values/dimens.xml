@@ -52,6 +52,8 @@
     <dimen name="glia_chat_attachment_menu_min_height">48dp</dimen>
 
     <dimen name="glia_chat_head_size">64dp</dimen>
+    <!--    This always should be the half of glia_chat_head_size to make it round-->
+    <dimen name="glia_chat_head_corner_radius">32dp</dimen>
     <dimen name="glia_chat_head_placeholder_size">32dp</dimen>
     <dimen name="glia_chat_head_content_padding">12dp</dimen>
     <dimen name="glia_chat_head_elevation">2dp</dimen>

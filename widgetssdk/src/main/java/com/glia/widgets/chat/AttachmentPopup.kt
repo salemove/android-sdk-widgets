@@ -46,8 +46,8 @@ internal class AttachmentPopup(
             popupWindow.dismiss()
             onGalleryClicked()
         }
-        binding.photoOrVideoTitle.setLocaleText(R.string.chat_attachment_take_photo)
-        binding.photoOrVideoItem.setOnClickListener {
+        binding.photoTitle.setLocaleText(R.string.chat_attachment_take_photo_only)
+        binding.photoItem.setOnClickListener {
             popupWindow.dismiss()
             onTakePhotoClicked()
         }
@@ -91,8 +91,8 @@ internal class AttachmentPopup(
                 browse.iconColor?.also(binding.browseIcon::applyImageColorTheme)
             }
             theme.takePhoto?.also { takePhoto ->
-                takePhoto.text?.also(binding.photoOrVideoTitle::applyTextTheme)
-                takePhoto.iconColor?.also(binding.photoOrVideoIcon::applyImageColorTheme)
+                takePhoto.text?.also(binding.photoTitle::applyTextTheme)
+                takePhoto.iconColor?.also(binding.photoIcon::applyImageColorTheme)
             }
         }
         binding.rootLayout.background = background

@@ -66,7 +66,7 @@
     <string name="android_file_view_error">@string/glia_view_file_error_message</string>
     <string name="android_app_bar_end_engagement_accessibility_label">@string/glia_top_app_bar_chat_end_content_description</string>
     <string name="chat_attachment_photo_library">@string/glia_chat_attachment_upload_menu_gallery</string>
-    <string name="chat_attachment_take_photo">@string/glia_chat_attachment_upload_menu_take_photo</string>
+    <string name="chat_attachment_take_photo_only">@string/glia_chat_attachment_upload_menu_take_photo_only</string>
     <string name="chat_operator_joined_system_message">@string/glia_chat_operator_has_joined</string>
     <string name="engagement_queue_transferring">@string/glia_chat_visitor_status_transferring</string>
     <string name="android_chat_visitor_message_accessibility">@string/glia_chat_visitor_message_content_description</string>

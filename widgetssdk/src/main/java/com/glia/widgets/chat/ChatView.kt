@@ -736,7 +736,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
                 getContentLauncher?.launch(arrayOf(Constants.MIME_TYPE_IMAGES))
             }, {
                 GliaLogger.i(LogEvents.CHAT_SCREEN_BUTTON_CLICKED) {
-                    put(EventAttribute.ButtonName, ButtonNames.ADD_ATTACHMENT_CAMERA_OPTION)
+                    put(EventAttribute.ButtonName, ButtonNames.ADD_ATTACHMENT_CAMERA_PHOTO_OPTION)
                 }
                 controller?.onTakePhotoClicked()
             }, {

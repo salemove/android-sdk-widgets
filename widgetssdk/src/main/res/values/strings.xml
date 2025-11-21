@@ -128,7 +128,7 @@
     <string name="glia_call_speaker_on_content_description">Turn off the speaker</string>
     <string name="glia_call_speaker_off_content_description">Turn on the speaker</string>
     <string name="glia_call_operator_status_on_hold_description">Your call is on hold</string>
-    <string name="glia_chat_attachment_upload_menu_take_photo">Take Photo or Video</string>
+    <string name="glia_chat_attachment_upload_menu_take_photo_only">Take Photo</string>
     <string name="glia_chat_attachment_upload_failed_upload">Could not upload the file.</string>
     <string name="glia_chat_attachment_upload_error_network_time_out">Connection timed out.</string>
     <string name="glia_chat_attachment_upload_error_invalid_input">Invalid input</string>

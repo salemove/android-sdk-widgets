@@ -43,7 +43,7 @@
     </androidx.appcompat.widget.LinearLayoutCompat>
 
     <androidx.appcompat.widget.LinearLayoutCompat
-        android:id="@+id/photo_or_video_item"
+        android:id="@+id/photo_item"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="?android:attr/selectableItemBackground"
@@ -53,7 +53,7 @@
         android:paddingTop="12dp">
 
         <TextView
-            android:id="@+id/photo_or_video_title"
+            android:id="@+id/photo_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -61,12 +61,12 @@
             android:layout_marginBottom="12dp"
             android:layout_weight="1"
             android:maxLines="1"
-            tools:text="@string/glia_chat_attachment_upload_menu_take_photo"
+            tools:text="@string/glia_chat_attachment_upload_menu_take_photo_only"
             android:textAppearance="?attr/textAppearanceBody1"
             android:textColor="?attr/gliaBaseDarkColor" />
 
         <ImageView
-            android:id="@+id/photo_or_video_icon"
+            android:id="@+id/photo_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"

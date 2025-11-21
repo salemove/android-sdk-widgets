@@ -5,12 +5,10 @@ import androidx.annotation.VisibleForTesting
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.androidsdk.engagement.EngagementFile
-import com.glia.androidsdk.site.SiteInfo
 import com.glia.telemetry_lib.ButtonNames
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.widgets.Constants
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
-import com.glia.widgets.chat.domain.SiteInfoUseCase
 import com.glia.widgets.chat.domain.TakePictureUseCase
 import com.glia.widgets.chat.domain.UriToFileAttachmentUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
@@ -22,6 +20,7 @@ import com.glia.widgets.internal.fileupload.domain.AddFileAttachmentsObserverUse
 import com.glia.widgets.internal.fileupload.domain.AddFileToAttachmentAndUploadUseCase
 import com.glia.widgets.internal.fileupload.domain.GetFileAttachmentsUseCase
 import com.glia.widgets.internal.fileupload.domain.RemoveFileAttachmentUseCase
+import com.glia.widgets.internal.fileupload.domain.SupportedUploadFileTypesUseCase
 import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.glia.widgets.internal.permissions.domain.RequestNotificationPermissionIfPushNotificationsSetUpUseCase
 import com.glia.widgets.internal.secureconversations.domain.AddSecureFileToAttachmentAndUploadUseCase
@@ -41,7 +40,7 @@ internal class MessageCenterController(
     private val getFileAttachmentsUseCase: GetFileAttachmentsUseCase,
     private val removeFileAttachmentUseCase: RemoveFileAttachmentUseCase,
     private val isAuthenticatedUseCase: IsAuthenticatedUseCase,
-    private val siteInfoUseCase: SiteInfoUseCase,
+    private val supportedUploadFileTypesUseCase: SupportedUploadFileTypesUseCase,
     private val onNextMessageUseCase: OnNextMessageUseCase,
     private val sendMessageButtonStateUseCase: SendMessageButtonStateUseCase,
     private val showMessageLimitErrorUseCase: ShowMessageLimitErrorUseCase,
@@ -55,6 +54,9 @@ internal class MessageCenterController(
 ) : MessageCenterContract.Controller {
     private var view: MessageCenterContract.View? = null
     private val disposables = CompositeDisposable()
+
+    private var allowedFileTypes: List<String> = listOf(Constants.MIME_TYPE_ALL)
+    private var allowedMediaTypes: List<String> = listOf(Constants.MIME_TYPE_IMAGES)
 
     @Volatile
     private var state = MessageCenterState()
@@ -98,12 +100,18 @@ internal class MessageCenterController(
     }
 
     private fun updateAllowFileSendState() {
-        siteInfoUseCase { siteInfo: SiteInfo?, _ -> onSiteInfoReceived(siteInfo) }
-    }
-
-    private fun onSiteInfoReceived(siteInfo: SiteInfo?) {
-        val attachmentAllowed = siteInfo?.allowedFileSenders?.isVisitorAllowed ?: false
-        setState(state.copy(addAttachmentButtonVisible = attachmentAllowed))
+        supportedUploadFileTypesUseCase { result ->
+            this.allowedFileTypes = result.allowedFileTypes
+            this.allowedMediaTypes = result.allowedMediaTypes
+            setState(
+                state.copy(
+                    addAttachmentButtonVisible = result.isSendFilesAllowed,
+                    isLibraryAttachmentVisible = result.isLibraryAttachmentAllowed,
+                    isTakePhotoAttachmentVisible = result.isTakePhotoAttachmentAllowed,
+                    isBrowseAttachmentVisible = result.isBrowseAttachmentAllowed
+                )
+            )
+        }
     }
 
     override fun onCheckMessagesClicked() {
@@ -178,12 +186,12 @@ internal class MessageCenterController(
     }
 
     override fun onGalleryClicked() {
-        view?.selectAttachmentFile(Constants.MIME_TYPE_IMAGES)
+        view?.selectMediaAttachmentFile(allowedMediaTypes)
         GliaLogger.logScWelcomeScreenButtonClicked(ButtonNames.ADD_ATTACHMENT_PHOTO_LIBRARY_OPTION)
     }
 
     override fun onBrowseClicked() {
-        view?.selectAttachmentFile(Constants.MIME_TYPE_ALL)
+        view?.selectAttachmentFile(allowedFileTypes)
         GliaLogger.logScWelcomeScreenButtonClicked(ButtonNames.ADD_ATTACHMENT_FILES_OPTION)
     }
 

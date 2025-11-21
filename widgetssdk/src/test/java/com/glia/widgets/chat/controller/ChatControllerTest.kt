@@ -13,7 +13,6 @@ import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
 import com.glia.widgets.chat.domain.IsSendButtonEnableUseCase
 import com.glia.widgets.chat.domain.SetChatScreenOpenUseCase
-import com.glia.widgets.chat.domain.SiteInfoUseCase
 import com.glia.widgets.chat.domain.TakePictureUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
 import com.glia.widgets.chat.domain.UriToFileAttachmentUseCase
@@ -50,6 +49,7 @@ import com.glia.widgets.internal.fileupload.domain.AddFileToAttachmentAndUploadU
 import com.glia.widgets.internal.fileupload.domain.FileUploadLimitNotExceededObservableUseCase
 import com.glia.widgets.internal.fileupload.domain.GetFileAttachmentsUseCase
 import com.glia.widgets.internal.fileupload.domain.RemoveFileAttachmentUseCase
+import com.glia.widgets.internal.fileupload.domain.SupportedUploadFileTypesUseCase
 import com.glia.widgets.internal.notification.domain.CallNotificationUseCase
 import com.glia.widgets.internal.permissions.domain.RequestNotificationPermissionIfPushNotificationsSetUpUseCase
 import com.glia.widgets.internal.permissions.domain.WithCameraPermissionUseCase
@@ -102,7 +102,7 @@ class ChatControllerTest {
     private lateinit var isSendButtonEnableUseCase: IsSendButtonEnableUseCase
     private lateinit var isShowOverlayPermissionRequestDialogUseCase: IsShowOverlayPermissionRequestDialogUseCase
     private lateinit var downloadFileUseCase: DownloadFileUseCase
-    private lateinit var siteInfoUseCase: SiteInfoUseCase
+    private lateinit var supportedUploadFileTypesUseCase: SupportedUploadFileTypesUseCase
     private lateinit var isFromCallScreenUseCase: IsFromCallScreenUseCase
     private lateinit var updateFromCallScreenUseCase: UpdateFromCallScreenUseCase
     private lateinit var isSecureEngagementUseCase: ManageSecureMessagingStatusUseCase
@@ -165,7 +165,7 @@ class ChatControllerTest {
         isSendButtonEnableUseCase = mock()
         isShowOverlayPermissionRequestDialogUseCase = mock()
         downloadFileUseCase = mock()
-        siteInfoUseCase = mock()
+        supportedUploadFileTypesUseCase = mock()
         isFromCallScreenUseCase = mock()
         updateFromCallScreenUseCase = mock()
         isSecureEngagementUseCase = mock()
@@ -233,7 +233,7 @@ class ChatControllerTest {
             isSendButtonEnableUseCase = isSendButtonEnableUseCase,
             isShowOverlayPermissionRequestDialogUseCase = isShowOverlayPermissionRequestDialogUseCase,
             downloadFileUseCase = downloadFileUseCase,
-            siteInfoUseCase = siteInfoUseCase,
+            supportedUploadFileTypesUseCase = supportedUploadFileTypesUseCase,
             isFromCallScreenUseCase = isFromCallScreenUseCase,
             updateFromCallScreenUseCase = updateFromCallScreenUseCase,
             isFileReadyForPreviewUseCase = isFileReadyForPreviewUseCase,

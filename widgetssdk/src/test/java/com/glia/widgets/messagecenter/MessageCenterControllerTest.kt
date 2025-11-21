@@ -2,7 +2,6 @@ package com.glia.widgets.messagecenter
 
 import com.glia.androidsdk.GliaException
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
-import com.glia.widgets.chat.domain.SiteInfoUseCase
 import com.glia.widgets.chat.domain.TakePictureUseCase
 import com.glia.widgets.chat.domain.UriToFileAttachmentUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
@@ -11,6 +10,7 @@ import com.glia.widgets.internal.dialog.DialogContract
 import com.glia.widgets.internal.fileupload.domain.AddFileAttachmentsObserverUseCase
 import com.glia.widgets.internal.fileupload.domain.GetFileAttachmentsUseCase
 import com.glia.widgets.internal.fileupload.domain.RemoveFileAttachmentUseCase
+import com.glia.widgets.internal.fileupload.domain.SupportedUploadFileTypesUseCase
 import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.glia.widgets.internal.permissions.domain.RequestNotificationPermissionIfPushNotificationsSetUpUseCase
 import com.glia.widgets.internal.secureconversations.domain.AddSecureFileToAttachmentAndUploadUseCase
@@ -41,7 +41,7 @@ internal class MessageCenterControllerTest {
     private lateinit var addFileToAttachmentAndUploadUseCase: AddSecureFileToAttachmentAndUploadUseCase
     private lateinit var getFileAttachmentsUseCase: GetFileAttachmentsUseCase
     private lateinit var removeFileAttachmentUseCase: RemoveFileAttachmentUseCase
-    private lateinit var siteInfoUseCase: SiteInfoUseCase
+    private lateinit var supportedUploadFileTypesUseCase: SupportedUploadFileTypesUseCase
     private lateinit var isAuthenticatedUseCase: IsAuthenticatedUseCase
     private lateinit var viewContract: MessageCenterContract.View
     private lateinit var onNextMessageUseCase: OnNextMessageUseCase
@@ -63,7 +63,7 @@ internal class MessageCenterControllerTest {
         addFileToAttachmentAndUploadUseCase = mock()
         getFileAttachmentsUseCase = mock()
         removeFileAttachmentUseCase = mock()
-        siteInfoUseCase = mock()
+        supportedUploadFileTypesUseCase = mock()
         viewContract = mock()
         isAuthenticatedUseCase = mock()
         onNextMessageUseCase = mock()
@@ -83,7 +83,7 @@ internal class MessageCenterControllerTest {
             getFileAttachmentsUseCase = getFileAttachmentsUseCase,
             removeFileAttachmentUseCase = removeFileAttachmentUseCase,
             isAuthenticatedUseCase = isAuthenticatedUseCase,
-            siteInfoUseCase = siteInfoUseCase,
+            supportedUploadFileTypesUseCase = supportedUploadFileTypesUseCase,
             onNextMessageUseCase = onNextMessageUseCase,
             sendMessageButtonStateUseCase = sendMessageButtonStateUseCase,
             showMessageLimitErrorUseCase = showMessageLimitErrorUseCase,

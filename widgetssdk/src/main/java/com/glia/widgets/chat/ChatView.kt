@@ -9,6 +9,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.accessibility.AccessibilityEvent
 import android.widget.Toast
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -75,6 +76,7 @@ import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.internal.dialog.DialogContract
 import com.glia.widgets.internal.dialog.model.DialogState
 import com.glia.widgets.internal.dialog.model.LeaveDialogAction
+import com.glia.widgets.internal.fileupload.PickVisualMediaMultipleMimeTypes
 import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.glia.widgets.launcher.ActivityLauncher
 import com.glia.widgets.locale.LocaleString
@@ -199,7 +201,8 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         controller?.onImageCaptured(it)
     }
 
-    private val getContentLauncher = chatActivity?.registerForActivityResult(ActivityResultContracts.OpenDocument()) {
+    val pickContentLauncherMimeTypes = PickVisualMediaMultipleMimeTypes()
+    private val getContentLauncher = chatActivity?.registerForActivityResult(pickContentLauncherMimeTypes) {
         it?.apply { controller?.onContentChosen(this) }
     }
 
@@ -508,6 +511,9 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     private fun updateAttachmentButton(chatState: ChatState) {
         binding.addAttachmentButton.isEnabled = chatState.isAttachmentButtonEnabled
         binding.addAttachmentButton.isVisible = chatState.isAttachmentButtonVisible
+        attachmentPopup.setupPhotoLibraryOptionVisible(chatState.isLibraryAttachmentVisible)
+        attachmentPopup.setupTakePhotoOptionVisible(chatState.isTakePhotoAttachmentVisible)
+        attachmentPopup.setupBrowseOptionVisible(chatState.isBrowseAttachmentVisible)
     }
 
     private fun updateSendButtonState(chatState: ChatState) {
@@ -741,23 +747,32 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
                 GliaLogger.i(LogEvents.CHAT_SCREEN_BUTTON_CLICKED) {
                     put(EventAttribute.ButtonName, ButtonNames.ADD_ATTACHMENT_PHOTO_LIBRARY_OPTION)
                 }
-                getContentLauncher?.launch(arrayOf(Constants.MIME_TYPE_IMAGES))
+                controller?.onPhotoLibraryClicked()
             }, {
                 GliaLogger.i(LogEvents.CHAT_SCREEN_BUTTON_CLICKED) {
-                    put(EventAttribute.ButtonName, ButtonNames.ADD_ATTACHMENT_CAMERA_OPTION)
+                    put(EventAttribute.ButtonName, ButtonNames.ADD_ATTACHMENT_CAMERA_PHOTO_OPTION)
                 }
                 controller?.onTakePhotoClicked()
             }, {
                 GliaLogger.i(LogEvents.CHAT_SCREEN_BUTTON_CLICKED) {
                     put(EventAttribute.ButtonName, ButtonNames.ADD_ATTACHMENT_FILES_OPTION)
                 }
-                openDocumentLauncher?.launch(arrayOf(Constants.MIME_TYPE_ALL))
+                controller?.onBrowseFilesClicked()
             })
         }
     }
 
+    override fun dispatchChooseImageFromGallery(types: List<String>) {
+        pickContentLauncherMimeTypes.mimeTypes = types
+        getContentLauncher?.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
+    }
+
     override fun dispatchImageCapture(uri: Uri) {
         takePictureLauncher?.launch(uri)
+    }
+
+    override fun dispatchChooseFileFromStorage(types: List<String>) {
+        openDocumentLauncher?.launch(types.toTypedArray())
     }
 
     private fun showExitQueueDialog() = showDialog {

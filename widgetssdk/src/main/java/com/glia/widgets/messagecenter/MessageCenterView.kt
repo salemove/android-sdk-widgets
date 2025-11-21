@@ -243,9 +243,14 @@ internal class MessageCenterView(context: Context, attrs: AttributeSet?, defStyl
         messageView?.emitUploadAttachments(attachments)
     }
 
-    override fun selectAttachmentFile(type: String) {
+    override fun selectMediaAttachmentFile(types: List<String>) {
         insetsController?.hideKeyboard()
-        onAttachFileListener?.selectAttachmentFile(type)
+        onAttachFileListener?.selectMediaAttachmentFile(types)
+    }
+
+    override fun selectAttachmentFile(types: List<String>) {
+        insetsController?.hideKeyboard()
+        onAttachFileListener?.selectAttachmentFile(types)
     }
 
     override fun takePhoto(uri: Uri) {
@@ -261,7 +266,7 @@ internal class MessageCenterView(context: Context, attrs: AttributeSet?, defStyl
             controller?.onTakePhotoClicked()
         }
 
-        GliaLogger.logScWelcomeScreenButtonClicked(ButtonNames.ADD_ATTACHMENT_CAMERA_OPTION)
+        GliaLogger.logScWelcomeScreenButtonClicked(ButtonNames.ADD_ATTACHMENT_CAMERA_PHOTO_OPTION)
     }
 
     private fun onDialogState(state: DialogState) {
@@ -319,7 +324,8 @@ internal class MessageCenterView(context: Context, attrs: AttributeSet?, defStyl
     }
 
     interface OnAttachFileListener {
-        fun selectAttachmentFile(type: String)
+        fun selectMediaAttachmentFile(types: List<String>)
+        fun selectAttachmentFile(types: List<String>)
         fun takePhoto(uri: Uri)
         fun requestCameraPermission()
     }

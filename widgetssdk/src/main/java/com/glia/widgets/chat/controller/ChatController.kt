@@ -12,7 +12,6 @@ import com.glia.androidsdk.chat.SingleChoiceOption
 import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.engagement.EngagementFile
-import com.glia.androidsdk.site.SiteInfo
 import com.glia.telemetry_lib.ButtonNames
 import com.glia.telemetry_lib.EventAttribute
 import com.glia.telemetry_lib.GliaLogger
@@ -30,7 +29,6 @@ import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
 import com.glia.widgets.chat.domain.IsSendButtonEnableUseCase
 import com.glia.widgets.chat.domain.SetChatScreenOpenUseCase
-import com.glia.widgets.chat.domain.SiteInfoUseCase
 import com.glia.widgets.chat.domain.TakePictureUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
 import com.glia.widgets.chat.domain.UriToFileAttachmentUseCase
@@ -81,6 +79,7 @@ import com.glia.widgets.internal.fileupload.domain.AddFileToAttachmentAndUploadU
 import com.glia.widgets.internal.fileupload.domain.FileUploadLimitNotExceededObservableUseCase
 import com.glia.widgets.internal.fileupload.domain.GetFileAttachmentsUseCase
 import com.glia.widgets.internal.fileupload.domain.RemoveFileAttachmentUseCase
+import com.glia.widgets.internal.fileupload.domain.SupportedUploadFileTypesUseCase
 import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.glia.widgets.internal.notification.domain.CallNotificationUseCase
 import com.glia.widgets.internal.permissions.domain.RequestNotificationPermissionIfPushNotificationsSetUpUseCase
@@ -118,7 +117,7 @@ internal class ChatController(
     private val isSendButtonEnableUseCase: IsSendButtonEnableUseCase,
     private val isShowOverlayPermissionRequestDialogUseCase: IsShowOverlayPermissionRequestDialogUseCase,
     private val downloadFileUseCase: DownloadFileUseCase,
-    private val siteInfoUseCase: SiteInfoUseCase,
+    private val supportedUploadFileTypesUseCase: SupportedUploadFileTypesUseCase,
     private val isFromCallScreenUseCase: IsFromCallScreenUseCase,
     private val updateFromCallScreenUseCase: UpdateFromCallScreenUseCase,
     private val manageSecureMessagingStatusUseCase: ManageSecureMessagingStatusUseCase,
@@ -157,6 +156,9 @@ internal class ChatController(
     private val disposable = CompositeDisposable()
     private val mediaUpgradeDisposable = CompositeDisposable()
     private val connectionDisposable = CompositeDisposable()
+
+    private var allowedFileTypes: List<String> = listOf(Constants.MIME_TYPE_ALL)
+    private var allowedMediaTypes: List<String> = listOf(Constants.MIME_TYPE_IMAGES)
 
     private val sendMessageCallback: GliaSendMessageUseCase.Listener = object : GliaSendMessageUseCase.Listener {
         override fun messageSent(message: VisitorMessage?) {
@@ -969,12 +971,16 @@ internal class ChatController(
     }
 
     private fun updateAllowFileSendState() {
-        siteInfoUseCase { siteInfo: SiteInfo?, _ -> onSiteInfoReceived(siteInfo) }
-    }
-
-    private fun onSiteInfoReceived(siteInfo: SiteInfo?) {
-        emitViewState {
-            chatState.allowSendAttachmentStateChanged(siteInfo == null || siteInfo.allowedFileSenders.isVisitorAllowed)
+        supportedUploadFileTypesUseCase { result ->
+            this.allowedFileTypes = result.allowedFileTypes
+            this.allowedMediaTypes = result.allowedMediaTypes
+            emitViewState {
+                chatState
+                    .allowSendAttachmentStateChanged(result.isSendFilesAllowed)
+                    .setIsLibraryAttachmentVisible(result.isLibraryAttachmentAllowed)
+                    .setIsTakePhotoAttachmentVisible(result.isTakePhotoAttachmentAllowed)
+                    .setIsBrowseAttachmentVisible(result.isBrowseAttachmentAllowed)
+            }
         }
     }
 
@@ -1036,12 +1042,20 @@ internal class ChatController(
         view?.smoothScrollToBottom()
     }
 
+    override fun onPhotoLibraryClicked() {
+        view?.dispatchChooseImageFromGallery(allowedMediaTypes)
+    }
+
     override fun onTakePhotoClicked() {
         withCameraPermissionUseCase {
             takePictureUseCase.prepare {
                 view?.dispatchImageCapture(it)
             }
         }
+    }
+
+    override fun onBrowseFilesClicked() {
+        view?.dispatchChooseFileFromStorage(allowedFileTypes)
     }
 
     override fun onImageCaptured(result: Boolean) {

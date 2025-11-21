@@ -7,11 +7,11 @@
     tools:layout_width="@dimen/glia_chat_head_size"
     tools:parentTag="android.widget.FrameLayout">
 
-    <com.google.android.material.card.MaterialCardView
+    <androidx.cardview.widget.CardView
         android:layout_width="@dimen/glia_chat_head_size"
         android:layout_height="@dimen/glia_chat_head_size"
         android:layout_gravity="center"
-        app:shapeAppearance="@style/Application.Glia.Chat.CircleImageView"
+        app:cardCornerRadius="@dimen/glia_chat_head_corner_radius"
         app:strokeWidth="0dp"
         app:cardElevation="@dimen/glia_chat_head_elevation"
         android:layout_margin="@dimen/glia_small">
@@ -73,7 +73,7 @@
             tools:srcCompat="@drawable/ic_person"
             tools:visibility="visible" />
 
-    </com.google.android.material.card.MaterialCardView>
+    </androidx.cardview.widget.CardView>
 
     <com.glia.widgets.view.head.BadgeTextView
         android:id="@+id/chat_bubble_badge"

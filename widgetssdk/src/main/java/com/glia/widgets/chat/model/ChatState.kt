@@ -19,6 +19,9 @@ internal data class ChatState(
     val isAttachmentButtonNeeded: Boolean = false,
     val isOperatorTyping: Boolean = false,
     val isAttachmentAllowed: Boolean = true,
+    val isLibraryAttachmentVisible: Boolean = true,
+    val isTakePhotoAttachmentVisible: Boolean = true,
+    val isBrowseAttachmentVisible: Boolean = true,
     val isSecureMessaging: Boolean = false,
     val gvaQuickReplies: List<GvaButton> = emptyList(),
     val isInitialized: Boolean = false
@@ -70,6 +73,12 @@ internal data class ChatState(
     )
 
     fun allowSendAttachmentStateChanged(isAttachmentAllowed: Boolean): ChatState = copy(isAttachmentAllowed = isAttachmentAllowed)
+
+    fun setIsLibraryAttachmentVisible(isAllowed: Boolean): ChatState = copy(isLibraryAttachmentVisible = isAllowed)
+
+    fun setIsTakePhotoAttachmentVisible(isAllowed: Boolean): ChatState = copy(isTakePhotoAttachmentVisible = isAllowed)
+
+    fun setIsBrowseAttachmentVisible(isAllowed: Boolean): ChatState = copy(isBrowseAttachmentVisible = isAllowed)
 
     fun engagementStarted(): ChatState = copy(
         chatInputMode = ChatInputMode.ENABLED,

@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.PopupWindow
+import androidx.core.view.isVisible
 import com.glia.widgets.R
 import com.glia.widgets.databinding.ChatAttachmentPopupBinding
 import com.glia.widgets.helper.getColorCompat
@@ -46,8 +47,8 @@ internal class AttachmentPopup(
             popupWindow.dismiss()
             onGalleryClicked()
         }
-        binding.photoOrVideoTitle.setLocaleText(R.string.chat_attachment_take_photo)
-        binding.photoOrVideoItem.setOnClickListener {
+        binding.photoTitle.setLocaleText(R.string.chat_attachment_take_photo_only)
+        binding.photoItem.setOnClickListener {
             popupWindow.dismiss()
             onTakePhotoClicked()
         }
@@ -57,6 +58,18 @@ internal class AttachmentPopup(
             onBrowseClicked()
         }
         popupWindow.showAsDropDown(anchor, -margin, -margin, Gravity.END)
+    }
+
+    fun setupPhotoLibraryOptionVisible(isVisible: Boolean) {
+        binding.photoLibraryItem.isVisible = isVisible
+    }
+
+    fun setupTakePhotoOptionVisible(isVisible: Boolean) {
+        binding.photoItem.isVisible = isVisible
+    }
+
+    fun setupBrowseOptionVisible(isVisible: Boolean) {
+        binding.browseItem.isVisible = isVisible
     }
 
     private fun bindLayout(context: Context): ChatAttachmentPopupBinding {
@@ -91,8 +104,8 @@ internal class AttachmentPopup(
                 browse.iconColor?.also(binding.browseIcon::applyImageColorTheme)
             }
             theme.takePhoto?.also { takePhoto ->
-                takePhoto.text?.also(binding.photoOrVideoTitle::applyTextTheme)
-                takePhoto.iconColor?.also(binding.photoOrVideoIcon::applyImageColorTheme)
+                takePhoto.text?.also(binding.photoTitle::applyTextTheme)
+                takePhoto.iconColor?.also(binding.photoIcon::applyImageColorTheme)
             }
         }
         binding.rootLayout.background = background
@@ -103,8 +116,13 @@ internal class AttachmentPopup(
         private fun popupWindow(view: LinearLayout) = PopupWindow(
             view,
             view.measuredWidth,
-            view.measuredHeight,
+            measurePopupHeight(view),
             true
         )
+
+        private fun measurePopupHeight(view: LinearLayout): Int = (0 until view.childCount)
+            .map { view.getChildAt(it) }
+            .filter { it.isVisible }
+            .sumOf { it.measuredHeight }
     }
 }

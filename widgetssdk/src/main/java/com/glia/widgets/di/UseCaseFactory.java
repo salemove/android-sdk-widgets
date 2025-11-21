@@ -140,6 +140,7 @@ import com.glia.widgets.internal.fileupload.domain.AddFileToAttachmentAndUploadU
 import com.glia.widgets.internal.fileupload.domain.FileUploadLimitNotExceededObservableUseCase;
 import com.glia.widgets.internal.fileupload.domain.GetFileAttachmentsUseCase;
 import com.glia.widgets.internal.fileupload.domain.RemoveFileAttachmentUseCase;
+import com.glia.widgets.internal.fileupload.domain.SupportedUploadFileTypesUseCase;
 import com.glia.widgets.internal.notification.device.INotificationManager;
 import com.glia.widgets.internal.notification.domain.CallNotificationUseCase;
 import com.glia.widgets.internal.permissions.PermissionManager;
@@ -522,6 +523,10 @@ public class UseCaseFactory {
             repositoryFactory.getGliaMessageRepository(),
             getIsQueueingOrEngagementUseCase()
         );
+    }
+
+    public SupportedUploadFileTypesUseCase createSupportedUploadFileTypesUseCase() {
+        return new SupportedUploadFileTypesUseCase(createSiteInfoUseCase());
     }
 
     @NonNull

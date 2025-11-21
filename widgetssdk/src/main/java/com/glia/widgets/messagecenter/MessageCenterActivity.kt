@@ -4,6 +4,8 @@ import android.Manifest
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.OpenDocument
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.activity.result.contract.ActivityResultContracts.TakePicture
@@ -12,6 +14,7 @@ import com.glia.widgets.base.GliaActivity
 import com.glia.widgets.chat.Intention
 import com.glia.widgets.databinding.MessageCenterActivityBinding
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.internal.fileupload.PickVisualMediaMultipleMimeTypes
 
 /**
  * This activity is used for displaying the welcome screen for secure messaging.
@@ -33,6 +36,11 @@ internal class MessageCenterActivity : GliaActivity<MessageCenterView>, FadeTran
 
     private val controller: MessageCenterContract.Controller by lazy {
         Dependencies.controllerFactory.messageCenterController
+    }
+
+    val pickContentMimeTypes = PickVisualMediaMultipleMimeTypes()
+    private val getMediaContent = registerForActivityResult(pickContentMimeTypes) { uri: Uri? ->
+        uri?.also(controller::onContentChosen)
     }
 
     private val getContent = registerForActivityResult(OpenDocument()) { uri: Uri? ->
@@ -93,8 +101,13 @@ internal class MessageCenterActivity : GliaActivity<MessageCenterView>, FadeTran
         controller.onDestroy()
     }
 
-    override fun selectAttachmentFile(type: String) {
-        getContent.launch(arrayOf(type))
+    override fun selectMediaAttachmentFile(types: List<String>) {
+        pickContentMimeTypes.mimeTypes = types
+        getMediaContent.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
+    }
+
+    override fun selectAttachmentFile(types: List<String>) {
+        getContent.launch(types.toTypedArray())
     }
 
     override fun takePhoto(uri: Uri) {

@@ -6,7 +6,7 @@ dokkaVersion = "2.0.0" # Kotlin and Dokka versions should have the same minor ve
 agpVersion = "8.13.0"
 ktlintVersion = "13.1.0"
 #Publishing
-mavenPublish = "0.34.0"
+mavenPublish = "0.35.0"
 
 # be carefully with updating this plugin, it may upgrade kotlin version for the entire project
 # check the release notes and set the version similar with the project kotlin version

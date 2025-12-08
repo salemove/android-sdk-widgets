@@ -20,6 +20,7 @@ import com.glia.androidsdk.chat.ChatMessage
 import com.glia.androidsdk.chat.MessageAttachment
 import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.androidsdk.comms.MediaDirection
+import com.glia.androidsdk.comms.MediaQuality
 import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement
@@ -95,6 +96,8 @@ internal val MediaState.hasMedia: Boolean get() = hasAudio || hasVideo
 internal val MediaUpgradeOffer.isAudio: Boolean get() = video == MediaDirection.NONE && audio == MediaDirection.TWO_WAY
 internal val MediaUpgradeOffer.isTwoWayVideo: Boolean get() = video == MediaDirection.TWO_WAY
 internal val MediaUpgradeOffer.isOneWayVideo: Boolean get() = video == MediaDirection.ONE_WAY
+
+internal val MediaQuality.isPoor: Boolean get() = this == MediaQuality.POOR
 
 internal val GliaException.isQueueUnavailable: Boolean
     get() = cause == GliaException.Cause.QUEUE_CLOSED || cause == GliaException.Cause.QUEUE_FULL

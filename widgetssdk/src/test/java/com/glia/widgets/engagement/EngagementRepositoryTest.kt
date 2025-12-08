@@ -14,6 +14,7 @@ import com.glia.androidsdk.chat.OperatorTypingStatus
 import com.glia.androidsdk.comms.Audio
 import com.glia.androidsdk.comms.CameraDevice
 import com.glia.androidsdk.comms.Media
+import com.glia.androidsdk.comms.MediaQuality
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.androidsdk.comms.OperatorMediaState
 import com.glia.androidsdk.comms.Video
@@ -74,6 +75,7 @@ class EngagementRepositoryTest {
     private lateinit var mediaUpgradeOfferCallbackSlot: CapturingSlot<Consumer<MediaUpgradeOffer>>
     private lateinit var operatorMediaStateUpdateCallbackSlot: CapturingSlot<Consumer<OperatorMediaState>>
     private lateinit var visitorMediaStateUpdateCallbackSlot: CapturingSlot<Consumer<VisitorMediaState>>
+    private lateinit var mediaQualityUpdateCallbackSlot: CapturingSlot<Consumer<MediaQuality>>
     private lateinit var operatorTypingCallbackSlot: CapturingSlot<Consumer<OperatorTypingStatus>>
 
     private lateinit var engagement: Engagement
@@ -104,6 +106,7 @@ class EngagementRepositoryTest {
         mediaUpgradeOfferCallbackSlot = slot()
         operatorMediaStateUpdateCallbackSlot = slot()
         visitorMediaStateUpdateCallbackSlot = slot()
+        mediaQualityUpdateCallbackSlot = slot()
         operatorTypingCallbackSlot = slot()
 
         every { core.callVisualizer } returns callVisualizer
@@ -229,6 +232,7 @@ class EngagementRepositoryTest {
         verify { media.on(Media.Events.MEDIA_UPGRADE_OFFER, capture(mediaUpgradeOfferCallbackSlot)) }
         verify { media.on(Media.Events.OPERATOR_STATE_UPDATE, capture(operatorMediaStateUpdateCallbackSlot)) }
         verify { media.on(Media.Events.VISITOR_STATE_UPDATE, capture(visitorMediaStateUpdateCallbackSlot)) }
+        verify { media.on(Media.Events.MEDIA_QUALITY_UPDATE, capture(mediaQualityUpdateCallbackSlot)) }
         verify { media.currentCameraDevice }
 
         verify { engagement.state }
@@ -360,6 +364,7 @@ class EngagementRepositoryTest {
         verify { media.off(Media.Events.MEDIA_UPGRADE_OFFER, any()) }
         verify { media.off(Media.Events.OPERATOR_STATE_UPDATE, any()) }
         verify { media.off(Media.Events.VISITOR_STATE_UPDATE, any()) }
+        verify { media.off(Media.Events.MEDIA_QUALITY_UPDATE, any()) }
 
         verify { engagement.media }
         verify { chat.off(Chat.Events.OPERATOR_TYPING_STATUS, any()) }
@@ -844,6 +849,26 @@ class EngagementRepositoryTest {
         repository.endEngagement()
         verify { state5.isLiveEngagementTransferredToSecureConversation }
         verify(exactly = 0) { engagement.end(any()) }
+    }
+
+    @Test
+    fun `media Quality updates are emitted correctly`() {
+        mockEngagementAndStart()
+
+        val mediaQualityTestObserver = repository.mediaQuality.test()
+
+        mediaQualityUpdateCallbackSlot.captured.accept(MediaQuality.GOOD)
+        mediaQualityUpdateCallbackSlot.captured.accept(MediaQuality.POOR)
+        mediaQualityUpdateCallbackSlot.captured.accept(MediaQuality.GOOD)
+
+        mediaQualityTestObserver
+            .assertNotComplete()
+            .assertValueCount(3)
+            .assertValuesOnly(
+                MediaQuality.GOOD,
+                MediaQuality.POOR,
+                MediaQuality.GOOD
+            )
     }
 
     @Test
@@ -1385,6 +1410,7 @@ class EngagementRepositoryTest {
         verify { newMedia.on(Media.Events.MEDIA_UPGRADE_OFFER, any()) }
         verify { newMedia.on(Media.Events.OPERATOR_STATE_UPDATE, any()) }
         verify { newMedia.on(Media.Events.VISITOR_STATE_UPDATE, any()) }
+        verify { newMedia.on(Media.Events.MEDIA_QUALITY_UPDATE, any()) }
         verify { newMedia.currentCameraDevice }
 
         verify { newChat.on(Chat.Events.OPERATOR_TYPING_STATUS, any()) }
@@ -1450,6 +1476,7 @@ class EngagementRepositoryTest {
         verify { newMedia.on(Media.Events.MEDIA_UPGRADE_OFFER, any()) }
         verify { newMedia.on(Media.Events.OPERATOR_STATE_UPDATE, any()) }
         verify { newMedia.on(Media.Events.VISITOR_STATE_UPDATE, any()) }
+        verify { newMedia.on(Media.Events.MEDIA_QUALITY_UPDATE, any()) }
         verify { newMedia.currentCameraDevice }
 
         verify(exactly = 0) { newChat.on(Chat.Events.OPERATOR_TYPING_STATUS, any()) }

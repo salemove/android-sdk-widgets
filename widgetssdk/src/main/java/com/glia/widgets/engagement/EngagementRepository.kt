@@ -5,6 +5,7 @@ import com.glia.androidsdk.EngagementRequest.Outcome
 import com.glia.androidsdk.IncomingEngagementRequest
 import com.glia.androidsdk.Operator
 import com.glia.androidsdk.comms.CameraDevice
+import com.glia.androidsdk.comms.MediaQuality
 import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.widgets.helper.Data
@@ -16,6 +17,7 @@ internal interface EngagementRepository {
     val engagementState: Flowable<State>
     val currentOperator: Flowable<Data<Operator>>
     val operatorTypingStatus: Flowable<Boolean>
+    val mediaQuality: Flowable<MediaQuality>
     val mediaUpgradeOffer: Flowable<MediaUpgradeOffer>
     val mediaUpgradeOfferAcceptResult: Flowable<Result<MediaUpgradeOffer>>
     val visitorMediaState: Flowable<Data<MediaState>>

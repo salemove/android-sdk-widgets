@@ -85,6 +85,8 @@ import com.glia.widgets.engagement.domain.FlipVisitorCameraUseCase;
 import com.glia.widgets.engagement.domain.FlipVisitorCameraUseCaseImpl;
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase;
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCaseImpl;
+import com.glia.widgets.engagement.domain.IsMediaQualityPoorUseCase;
+import com.glia.widgets.engagement.domain.IsMediaQualityPoorUseCaseImpl;
 import com.glia.widgets.engagement.domain.IsOperatorPresentUseCase;
 import com.glia.widgets.engagement.domain.IsOperatorPresentUseCaseImpl;
 import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase;
@@ -1011,5 +1013,10 @@ public class UseCaseFactory {
             permissionManager,
             configurationManager
         );
+    }
+
+    @NonNull
+    public IsMediaQualityPoorUseCase getIsMediaQualityPoorUseCase() {
+        return new IsMediaQualityPoorUseCaseImpl(repositoryFactory.getEngagementRepository());
     }
 }

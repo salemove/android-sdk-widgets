@@ -25,6 +25,7 @@ import com.glia.widgets.engagement.domain.EnqueueForEngagementUseCase
 import com.glia.widgets.engagement.domain.FlipCameraButtonStateUseCase
 import com.glia.widgets.engagement.domain.FlipVisitorCameraUseCase
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
+import com.glia.widgets.engagement.domain.IsMediaQualityPoorUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
 import com.glia.widgets.engagement.domain.OperatorMediaUseCase
 import com.glia.widgets.engagement.domain.ToggleVisitorAudioMediaStateUseCase
@@ -93,7 +94,8 @@ internal class CallController(
     private val enqueueForEngagementUseCase: EnqueueForEngagementUseCase,
     private val decideOnQueueingUseCase: DecideOnQueueingUseCase,
     private val getUrlFromLinkUseCase: GetUrlFromLinkUseCase,
-    private val deviceMonitor: DeviceMonitor
+    private val deviceMonitor: DeviceMonitor,
+    isMediaQualityPoorUseCase: IsMediaQualityPoorUseCase
 ) : CallContract.Controller {
     private val disposable = CompositeDisposable()
     private val mediaUpgradeDisposable = CompositeDisposable()
@@ -117,6 +119,9 @@ internal class CallController(
 
         subscribeToEngagement()
         disposable.add(decideOnQueueingUseCase().subscribe { enqueueForEngagement() })
+        disposable.add(isMediaQualityPoorUseCase().subscribe { isPoor ->
+            emitViewState(callState.setIsMediaQualityPoor(isPoor))
+        })
     }
 
     private fun subscribeToEngagement() {

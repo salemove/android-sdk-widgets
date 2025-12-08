@@ -137,6 +137,7 @@
     <string name="general_you">@string/glia_call_visitor_video_on_hold_text</string>
     <string name="call_visitor_video_back_camera_button_accessibility_label">Switch to back camera</string>
     <string name="call_visitor_video_front_camera_button_accessibility_label">Switch to front camera</string>
+    <string name="call_poor_connection_banner">Poor internet connection</string>
 
     <!-- Survey -->
     <string name="android_survey_error_network">@string/glia_survey_network_unavailable</string>

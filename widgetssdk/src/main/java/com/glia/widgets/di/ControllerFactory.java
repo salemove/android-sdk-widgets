@@ -207,7 +207,8 @@ public class ControllerFactory {
                 useCaseFactory.getQueueForEngagementUseCase(),
                 useCaseFactory.getDecideOnQueueingUseCase(),
                 useCaseFactory.createGetUrlFromLinkUseCase(),
-                deviceMonitor
+                deviceMonitor,
+                useCaseFactory.getIsMediaQualityPoorUseCase()
             );
         }
 

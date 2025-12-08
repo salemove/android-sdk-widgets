@@ -31,6 +31,7 @@ class CallState {
     public final boolean isCallVisualizer;
 
     public final FlipButtonState flipButtonState;
+    public final boolean isMediaQualityPoor;
 
     private CallState(Builder builder) {
         this.integratorCallStarted = builder.integratorCallStarted;
@@ -46,6 +47,7 @@ class CallState {
         this.isOnlyTimeChanged = builder.isOnlyTimeChanged;
         this.isCallVisualizer = builder.isCallVisualizer;
         this.flipButtonState = builder.flipButtonState;
+        this.isMediaQualityPoor = builder.isMediaQualityPoor;
     }
 
     public static CallState initial(Boolean isCallVisualizer) {
@@ -165,7 +167,6 @@ class CallState {
             .setIntegratorCallStarted(false)
             .setVisible(false)
             .setIsOnHold(false)
-            .setIsSharingScreen(false)
             .setCallStatus(new CallStatus.EngagementNotOngoing(callStatus.getVisitorMediaState()))
             .createCallState();
     }
@@ -374,6 +375,13 @@ class CallState {
             .createCallState();
     }
 
+    public CallState setIsMediaQualityPoor(boolean isMediaQualityPoor) {
+        return new Builder()
+            .copyFrom(this)
+            .setIsMediaQualityPoor(isMediaQualityPoor)
+            .createCallState();
+    }
+
     public ViewState getMuteButtonViewState() {
         if (isCallVisualizer) {
             return ViewState.HIDE;
@@ -490,8 +498,8 @@ class CallState {
         //Maybe helpful when converting to Kotlin, as an android studio makes fields nullable.
         private boolean isOnlyTimeChanged = false;
         private boolean isCallVisualizer;
-        private boolean isSharingScreen;
         private FlipButtonState flipButtonState = FlipButtonState.HIDE;
+        public boolean isMediaQualityPoor;
 
         public Builder setIntegratorCallStarted(boolean integratorCallStarted) {
             this.integratorCallStarted = integratorCallStarted;
@@ -553,13 +561,13 @@ class CallState {
             return this;
         }
 
-        public Builder setIsSharingScreen(Boolean isSharingScreen) {
-            this.isSharingScreen = isSharingScreen;
+        public Builder setFlipButtonState(FlipButtonState flipButtonState) {
+            this.flipButtonState = flipButtonState;
             return this;
         }
 
-        public Builder setFlipButtonState(FlipButtonState flipButtonState) {
-            this.flipButtonState = flipButtonState;
+        public Builder setIsMediaQualityPoor(boolean isMediaQualityPoor) {
+            this.isMediaQualityPoor = isMediaQualityPoor;
             return this;
         }
 
@@ -578,6 +586,7 @@ class CallState {
             isOnlyTimeChanged = false;
             isCallVisualizer = callState.isCallVisualizer;
             flipButtonState = callState.flipButtonState;
+            isMediaQualityPoor = callState.isMediaQualityPoor;
             return this;
         }
 

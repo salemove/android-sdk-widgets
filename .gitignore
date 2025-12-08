@@ -106,3 +106,14 @@ output.json
 proguard/
 vcs.xml
 /.idea/deploymentTargetDropDown.xml
+/.idea/AndroidProjectSystem.xml
+/.idea/appInsightsSettings.xml
+/.idea/copilot.data.migration.agent.xml
+/.idea/copilot.data.migration.ask.xml
+/.idea/copilot.data.migration.ask2agent.xml
+/.idea/copilot.data.migration.edit.xml
+/.idea/kotlinc.xml
+/.idea/migrations.xml
+/.idea/runConfigurations.xml
+/.idea/studiobot.xml
+/.idea/deploymentTargetSelector.xml

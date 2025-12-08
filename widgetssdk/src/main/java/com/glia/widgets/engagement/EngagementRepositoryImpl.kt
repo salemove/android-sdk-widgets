@@ -13,6 +13,7 @@ import com.glia.androidsdk.chat.Chat
 import com.glia.androidsdk.chat.OperatorTypingStatus
 import com.glia.androidsdk.comms.CameraDevice
 import com.glia.androidsdk.comms.Media
+import com.glia.androidsdk.comms.MediaQuality
 import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.androidsdk.comms.OperatorMediaState
@@ -80,6 +81,10 @@ internal class EngagementRepositoryImpl(
     private val mediaUpgradeOfferCallback: Consumer<MediaUpgradeOffer> = Consumer(::handleMediaUpgradeOffer)
     private val operatorMediaStateUpdateCallback: Consumer<OperatorMediaState> = Consumer(::handleOperatorMediaStateUpdate)
     private val visitorMediaStateUpdateCallback: Consumer<VisitorMediaState> = Consumer(::handleVisitorMediaStateUpdate)
+    private val mediaQualityUpdateCallback: Consumer<MediaQuality> = Consumer(::handleMediaQualityUpdate)
+
+    private val _mediaQuality: PublishProcessor<MediaQuality> = PublishProcessor.create()
+    override val mediaQuality: Flowable<MediaQuality> = _mediaQuality.onBackpressureLatest()
 
     private val _mediaUpgradeOffer: PublishProcessor<MediaUpgradeOffer> = PublishProcessor.create()
     override val mediaUpgradeOffer: Flowable<MediaUpgradeOffer> = _mediaUpgradeOffer.onBackpressureLatest()
@@ -462,12 +467,14 @@ internal class EngagementRepositoryImpl(
         media.on(Media.Events.MEDIA_UPGRADE_OFFER, mediaUpgradeOfferCallback)
         media.on(Media.Events.OPERATOR_STATE_UPDATE, operatorMediaStateUpdateCallback)
         media.on(Media.Events.VISITOR_STATE_UPDATE, visitorMediaStateUpdateCallback)
+        media.on(Media.Events.MEDIA_QUALITY_UPDATE, mediaQualityUpdateCallback)
     }
 
     private fun unsubscribeFromEngagementMediaEvents(media: Media) {
         media.off(Media.Events.MEDIA_UPGRADE_OFFER, mediaUpgradeOfferCallback)
         media.off(Media.Events.OPERATOR_STATE_UPDATE, operatorMediaStateUpdateCallback)
         media.off(Media.Events.VISITOR_STATE_UPDATE, visitorMediaStateUpdateCallback)
+        media.off(Media.Events.MEDIA_QUALITY_UPDATE, mediaQualityUpdateCallback)
     }
 
     private fun subscribeToEngagementChatEvents(chat: Chat) {
@@ -575,6 +582,8 @@ internal class EngagementRepositoryImpl(
         subscribeToOnHoldChanges(visitorMediaState)
         currentEngagement?.also { handleVisitorCamera(it.media) }
     }
+
+    private fun handleMediaQualityUpdate(mediaQuality: MediaQuality) = _mediaQuality.onNext(mediaQuality)
 
     private fun subscribeToOnHoldChanges(mediaState: MediaState) {
         mediaState.audio?.setOnHoldHandler(::onAudioHoldStateChanged)

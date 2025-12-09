@@ -18,7 +18,8 @@ internal data class CallTheme(
     val topText: TextTheme? = null,
     val connect: EngagementStatesTheme? = null,
     val snackBar: SnackBarTheme? = null,
-    val visitorVideo: VisitorVideoTheme? = null
+    val visitorVideo: VisitorVideoTheme? = null,
+    val mediaQualityIndicator: TextTheme? = null
 ) : Mergeable<CallTheme> {
     override fun merge(other: CallTheme): CallTheme = CallTheme(
         background = background merge other.background,
@@ -30,6 +31,7 @@ internal data class CallTheme(
         topText = topText merge other.topText,
         connect = connect merge other.connect,
         snackBar = snackBar merge other.snackBar,
-        visitorVideo = visitorVideo merge other.visitorVideo
+        visitorVideo = visitorVideo merge other.visitorVideo,
+        mediaQualityIndicator = mediaQualityIndicator merge other.mediaQualityIndicator
     )
 }

@@ -59,18 +59,13 @@
         app:layout_constraintTop_toBottomOf="@id/top_app_bar"
         app:rippleTint="?attr/gliaBaseLightColor" />
 
-<!--    Temp Text, will be configured in next task-->
     <com.glia.widgets.call.ThemedStateText
         android:id="@+id/poor_connection_view"
+        style="@style/Application.Glia.Call.Quality.Button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/glia_medium"
         android:accessibilityLiveRegion="polite"
-        android:gravity="center"
         android:text="@string/call_poor_connection_banner"
-        android:lineSpacingExtra="@dimen/glia_medium"
-        android:textColor="@android:color/holo_red_dark"
-        android:background="@android:color/white"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

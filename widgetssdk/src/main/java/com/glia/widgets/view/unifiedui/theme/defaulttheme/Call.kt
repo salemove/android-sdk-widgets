@@ -4,6 +4,7 @@ package com.glia.widgets.view.unifiedui.theme.defaulttheme
 
 import com.glia.widgets.view.unifiedui.composeIfAtLeastOneNotNull
 import com.glia.widgets.view.unifiedui.theme.ColorPallet
+import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 import com.glia.widgets.view.unifiedui.theme.call.BarButtonStatesTheme
 import com.glia.widgets.view.unifiedui.theme.call.BarButtonStyleTheme
 import com.glia.widgets.view.unifiedui.theme.call.ButtonBarTheme
@@ -26,7 +27,8 @@ internal fun CallTheme(pallet: ColorPallet) = pallet.run {
         topText = BaseLightColorTextTheme(this),
         connect = CallEngagementStatesTheme(this),
         snackBar = CallSnackBarTheme(this),
-        visitorVideo = VisitorVideoTheme(this)
+        visitorVideo = VisitorVideoTheme(this),
+        mediaQualityIndicator = MediaQualityIndicatorTheme(this)
     )
 }
 
@@ -74,6 +76,15 @@ private fun VisitorVideoTheme(pallet: ColorPallet) = pallet.run {
                 imageColor = lightColorTheme,
                 title = BaseLightColorTextTheme(this)
             )
+        )
+    }
+}
+
+private fun MediaQualityIndicatorTheme(pallet: ColorPallet) = pallet.run {
+    composeIfAtLeastOneNotNull(lightColorTheme, darkColorTheme) {
+        TextTheme(
+            textColor = darkColorTheme,
+            backgroundColor = lightColorTheme
         )
     }
 }

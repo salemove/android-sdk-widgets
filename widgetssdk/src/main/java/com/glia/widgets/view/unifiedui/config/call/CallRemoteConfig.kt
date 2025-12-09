@@ -37,7 +37,10 @@ internal data class CallRemoteConfig(
     val snackBarRemoteConfig: SnackBarRemoteConfig?,
 
     @SerializedName("visitorVideo")
-    val visitorVideoRemoteConfig: VisitorVideoRemoteConfig?
+    val visitorVideoRemoteConfig: VisitorVideoRemoteConfig?,
+
+    @SerializedName("mediaQualityIndicator")
+    val mediaQualityIndicatorConfig: TextRemoteConfig?
 ) {
     fun toCallTheme(): CallTheme = CallTheme(
         background = background?.toLayerTheme(),
@@ -49,6 +52,7 @@ internal data class CallRemoteConfig(
         topText = topTextRemoteConfig?.toTextTheme(),
         connect = connect?.toEngagementStatesTheme(),
         snackBar = snackBarRemoteConfig?.toSnackBarTheme(),
-        visitorVideo = visitorVideoRemoteConfig?.toVisitorVideoTheme()
+        visitorVideo = visitorVideoRemoteConfig?.toVisitorVideoTheme(),
+        mediaQualityIndicator = mediaQualityIndicatorConfig?.toTextTheme()
     )
 }

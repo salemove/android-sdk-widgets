@@ -119,7 +119,7 @@ internal class CallView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     private val operatorVideoContainer: FrameLayout get() = binding.operatorVideoContainer
     private val onHoldTextView: ThemedStateText get() = binding.onHoldText
     private val floatingVisitorVideoContainer: FloatingVisitorVideoContainer get() = binding.floatingVisitorVideo
-    private val poorConnectionView: ThemedStateText? get() = binding.poorConnectionView
+    private val poorConnectionView: ThemedStateText get() = binding.poorConnectionView
 
     private var theme: UiTheme by Delegates.notNull()
 
@@ -432,6 +432,7 @@ internal class CallView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             muteButtonLabel.typeface = it
             speakerButtonLabel.typeface = it
             minimizeButtonLabel.typeface = it
+            poorConnectionView.typeface = it
         }
 
         // ButtonBar Buttons
@@ -461,6 +462,7 @@ internal class CallView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         callTheme?.duration.also(callTimerView::applyThemeAsDefault)
         callTheme?.operator.also(operatorNameView::applyThemeAsDefault)
         callTheme?.bottomText.also(continueBrowsingView::applyTextTheme)
+        callTheme?.mediaQualityIndicator.also { poorConnectionView.applyTextTheme(it, withBackground = true) }
 
         // Hints and content descriptions
         operatorVideoContainer.setLocaleContentDescription(R.string.call_operator_video_accessibility_label)
@@ -842,7 +844,7 @@ internal class CallView(context: Context, attrs: AttributeSet?, defStyleAttr: In
                 }
             )
             applyTextThemeBasedOnCallState(callState)
-            poorConnectionView?.isVisible = callState.isMediaQualityPoor
+            poorConnectionView.isVisible = callState.isMediaQualityPoor
         }
     }
 

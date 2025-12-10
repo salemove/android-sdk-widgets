@@ -85,6 +85,8 @@ import com.glia.widgets.view.dialog.base.DialogDelegate
 import com.glia.widgets.view.dialog.base.DialogDelegateImpl
 import com.glia.widgets.view.head.ChatHeadContract
 import com.glia.widgets.view.snackbar.SnackBarDelegate
+import com.glia.widgets.view.snackbar.logNoConnectionSnackBarDismissed
+import com.glia.widgets.view.snackbar.logNoConnectionSnackBarShown
 import com.glia.widgets.view.snackbar.makeNoConnectionSnackBar
 import com.glia.widgets.view.unifiedui.applyButtonTheme
 import com.glia.widgets.view.unifiedui.applyColorTheme
@@ -1028,10 +1030,12 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         snackBarDelegate = makeNoConnectionSnackBar(context.requireActivity()).apply {
             show()
         }
+        logNoConnectionSnackBarShown()
     }
 
     override fun dismissConnectionSnackBar() {
         snackBarDelegate?.dismiss()
         snackBarDelegate = null
+        logNoConnectionSnackBarDismissed()
     }
 }

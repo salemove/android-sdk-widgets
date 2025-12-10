@@ -117,3 +117,4 @@ vcs.xml
 /.idea/runConfigurations.xml
 /.idea/studiobot.xml
 /.idea/deploymentTargetSelector.xml
+.kotlin

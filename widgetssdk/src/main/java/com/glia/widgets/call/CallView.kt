@@ -61,6 +61,8 @@ import com.glia.widgets.view.head.BadgeTextView
 import com.glia.widgets.view.head.ChatHeadContract
 import com.glia.widgets.view.header.AppBarView
 import com.glia.widgets.view.snackbar.SnackBarDelegate
+import com.glia.widgets.view.snackbar.logNoConnectionSnackBarDismissed
+import com.glia.widgets.view.snackbar.logNoConnectionSnackBarShown
 import com.glia.widgets.view.snackbar.makeNoConnectionSnackBar
 import com.glia.widgets.view.unifiedui.applyBarButtonStatesTheme
 import com.glia.widgets.view.unifiedui.applyColorTheme
@@ -895,10 +897,14 @@ internal class CallView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         snackBarDelegate = makeNoConnectionSnackBar(context.requireActivity()).apply {
             show()
         }
+        logNoConnectionSnackBarShown()
     }
 
     override fun dismissConnectionSnackBar() {
-        snackBarDelegate?.dismiss()
-        snackBarDelegate = null
+        if (snackBarDelegate != null) {
+            snackBarDelegate?.dismiss()
+            snackBarDelegate = null
+            logNoConnectionSnackBarDismissed()
+        }
     }
 }

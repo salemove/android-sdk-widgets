@@ -10,6 +10,10 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updateMargins
+import com.glia.telemetry_lib.EventAttribute
+import com.glia.telemetry_lib.GliaLogger
+import com.glia.telemetry_lib.LogEvents
+import com.glia.telemetry_lib.SnackBarTypes
 import com.glia.widgets.R
 import com.glia.widgets.call.CallActivity
 import com.glia.widgets.chat.ChatActivity
@@ -24,6 +28,15 @@ import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 
+/**
+ * Abstract class representing a delegate for managing and displaying a Snackbar.
+ *
+ * @property view The view to attach the Snackbar to.
+ * @property titleStringKey The string resource ID for the Snackbar message.
+ * @property localeProvider Provides localized strings.
+ * @property snackBarTheme The unified theme to apply to the Snackbar.
+ * @property duration The duration for which the Snackbar is displayed.
+ */
 internal abstract class SnackBarDelegate(
     private val view: View,
     @param:StringRes
@@ -34,27 +47,51 @@ internal abstract class SnackBarDelegate(
     private val duration: Int
 ) {
 
+    /**
+     * ID of the anchor view for the Snackbar. Can be overridden by subclasses.
+     */
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     @get:IdRes
     open val anchorViewId: Int? = null
 
+    /**
+     * Bottom margin for the Snackbar. Can be overridden by subclasses.
+     */
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     open val marginBottom: Int? = null
 
+    /**
+     * Fallback background color for the Snackbar.
+     */
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     @get:ColorRes
     open val fallbackBackgroundColor: Int = R.color.glia_dark_color
 
+    /**
+     * Fallback text color for the Snackbar.
+     */
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     @get:ColorRes
     open val fallbackTextColor: Int = R.color.glia_light_color
 
+    /**
+     * Lazy initialization of the Snackbar instance.
+     */
     val snackBar: Snackbar by lazy { makeSnackBar() }
 
+    /**
+     * Displays the Snackbar.
+     */
     fun show() = snackBar.show()
 
+    /**
+     * Dismisses the Snackbar.
+     */
     fun dismiss() = snackBar.dismiss()
 
+    /**
+     * Creates and configures the Snackbar instance.
+     */
     private fun makeSnackBar(): Snackbar {
         val bgColor = snackBarTheme?.backgroundColorTheme?.primaryColor ?: view.getColorCompat(fallbackBackgroundColor)
         val textColor = snackBarTheme?.textColorTheme?.primaryColor ?: view.getColorCompat(fallbackTextColor)
@@ -67,6 +104,12 @@ internal abstract class SnackBarDelegate(
             .apply { marginBottom?.also { updateBottomMargin(this, it) } }
     }
 
+    /**
+     * Updates the bottom margin of the Snackbar.
+     *
+     * @param snackBar The Snackbar instance.
+     * @param margin The bottom margin to apply.
+     */
     private fun updateBottomMargin(snackBar: Snackbar, margin: Int) {
         snackBar.view.updateLayoutParams<MarginLayoutParams> {
             updateMargins(bottom = margin)
@@ -74,6 +117,15 @@ internal abstract class SnackBarDelegate(
     }
 }
 
+/**
+ * A Snackbar delegate for common activities.
+ *
+ * @param activity The activity to attach the Snackbar to.
+ * @param titleStringKey The string resource ID for the Snackbar message.
+ * @param localeProvider Provides localized strings.
+ * @param unifiedTheme The unified theme to apply.
+ * @param duration The duration for which the Snackbar is displayed.
+ */
 @VisibleForTesting
 internal class CommonSnackBarDelegate(
     activity: Activity,
@@ -85,6 +137,12 @@ internal class CommonSnackBarDelegate(
 ) : SnackBarDelegate(activity.rootView, titleStringKey, localeProvider, unifiedTheme?.snackBarTheme, duration) {
     override val marginBottom: Int = calculateBottomMargin(activity.rootView)
 
+    /**
+     * Calculates the bottom margin for the Snackbar.
+     *
+     * @param view The root view of the activity.
+     * @return The calculated bottom margin.
+     */
     private fun calculateBottomMargin(view: View): Int {
         val defaultMargin = view.resources.getDimensionPixelSize(R.dimen.glia_snack_bar_bottom_margin)
         val insetBottom = view.takeIf {
@@ -95,6 +153,15 @@ internal class CommonSnackBarDelegate(
     }
 }
 
+/**
+ * A Snackbar delegate for ChatActivity.
+ *
+ * @param activity The ChatActivity to attach the Snackbar to.
+ * @param titleStringKey The string resource ID for the Snackbar message.
+ * @param localeProvider Provides localized strings.
+ * @param unifiedTheme The unified theme to apply.
+ * @param duration The duration for which the Snackbar is displayed.
+ */
 @VisibleForTesting
 internal class ChatActivitySnackBarDelegate(
     activity: ChatActivity,
@@ -107,6 +174,15 @@ internal class ChatActivitySnackBarDelegate(
     override val marginBottom: Int = activity.resources.getDimensionPixelSize(R.dimen.glia_snack_bar_bottom_margin)
 }
 
+/**
+ * A Snackbar delegate for CallActivity.
+ *
+ * @param activity The CallActivity to attach the Snackbar to.
+ * @param titleStringKey The string resource ID for the Snackbar message.
+ * @param localeProvider Provides localized strings.
+ * @param unifiedTheme The unified theme to apply.
+ * @param duration The duration for which the Snackbar is displayed.
+ */
 @VisibleForTesting
 internal class CallActivitySnackBarDelegate(
     activity: CallActivity,
@@ -121,6 +197,15 @@ internal class CallActivitySnackBarDelegate(
     override val fallbackTextColor: Int = R.color.glia_dark_color
 }
 
+/**
+ * Factory class for creating instances of SnackBarDelegate.
+ *
+ * @param activity The activity to attach the Snackbar to.
+ * @param titleStringKey The string resource ID for the Snackbar message.
+ * @param localeProvider Provides localized strings.
+ * @param unifiedTheme The unified theme to apply.
+ * @param duration The duration for which the Snackbar is displayed.
+ */
 internal class SnackBarDelegateFactory(
     private val activity: Activity,
     private val titleStringKey: Int,
@@ -129,6 +214,11 @@ internal class SnackBarDelegateFactory(
     @property:BaseTransientBottomBar.Duration
     private val duration: Int = Snackbar.LENGTH_SHORT
 ) {
+    /**
+     * Creates a SnackBarDelegate instance based on the activity type.
+     *
+     * @return The appropriate SnackBarDelegate instance.
+     */
     fun createDelegate(): SnackBarDelegate = when (activity) {
         is ChatActivity -> ChatActivitySnackBarDelegate(activity, titleStringKey, localeProvider, unifiedTheme, duration)
         is CallActivity -> CallActivitySnackBarDelegate(activity, titleStringKey, localeProvider, unifiedTheme, duration)
@@ -138,6 +228,9 @@ internal class SnackBarDelegateFactory(
 
 /**
  * Creates a SnackBarDelegate to show a "No Connection" status.
+ *
+ * @param activity The activity to attach the Snackbar to.
+ * @return The created SnackBarDelegate instance.
  */
 internal fun makeNoConnectionSnackBar(activity: Activity): SnackBarDelegate = SnackBarDelegateFactory(
     activity = activity,
@@ -146,3 +239,22 @@ internal fun makeNoConnectionSnackBar(activity: Activity): SnackBarDelegate = Sn
     unifiedTheme = Dependencies.gliaThemeManager.theme,
     duration = Snackbar.LENGTH_INDEFINITE
 ).createDelegate()
+
+/**
+ * Logs the event when the "No Connection" Snackbar is shown.
+ */
+internal fun logNoConnectionSnackBarShown() {
+    GliaLogger.i(LogEvents.SNACKBAR_SHOWN) {
+        put(EventAttribute.IsAutoClosable, false.toString())
+        put(EventAttribute.Type, SnackBarTypes.CONNECTION)
+    }
+}
+
+/**
+ * Logs the event when the "No Connection" Snackbar is dismissed.
+ */
+internal fun logNoConnectionSnackBarDismissed() {
+    GliaLogger.i(LogEvents.SNACKBAR_HIDDEN) {
+        put(EventAttribute.Type, SnackBarTypes.CONNECTION)
+    }
+}

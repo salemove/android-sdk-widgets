@@ -83,7 +83,8 @@ internal class EngagementRepositoryImpl(
     private val visitorMediaStateUpdateCallback: Consumer<VisitorMediaState> = Consumer(::handleVisitorMediaStateUpdate)
     private val mediaQualityUpdateCallback: Consumer<MediaQuality> = Consumer(::handleMediaQualityUpdate)
 
-    private val _mediaQuality: PublishProcessor<MediaQuality> = PublishProcessor.create()
+    // We use BehaviorProcessor here to always have the latest media quality available in case the call screen is closed and reopened
+    private val _mediaQuality: BehaviorProcessor<MediaQuality> = BehaviorProcessor.create()
     override val mediaQuality: Flowable<MediaQuality> = _mediaQuality.onBackpressureLatest()
 
     private val _mediaUpgradeOffer: PublishProcessor<MediaUpgradeOffer> = PublishProcessor.create()

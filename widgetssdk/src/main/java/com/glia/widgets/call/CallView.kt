@@ -12,6 +12,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.withStyledAttributes
 import androidx.core.view.isGone
@@ -119,7 +120,7 @@ internal class CallView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     private val operatorVideoContainer: FrameLayout get() = binding.operatorVideoContainer
     private val onHoldTextView: ThemedStateText get() = binding.onHoldText
     private val floatingVisitorVideoContainer: FloatingVisitorVideoContainer get() = binding.floatingVisitorVideo
-    private val poorConnectionView: ThemedStateText get() = binding.poorConnectionView
+    private val poorConnectionView: AppCompatTextView get() = binding.poorConnectionView
 
     private var theme: UiTheme by Delegates.notNull()
 

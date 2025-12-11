@@ -60,18 +60,6 @@
         app:rippleTint="?attr/gliaBaseLightColor" />
 
     <com.glia.widgets.call.ThemedStateText
-        android:id="@+id/poor_connection_view"
-        style="@style/Application.Glia.Call.Quality.Button"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:accessibilityLiveRegion="polite"
-        android:text="@string/call_poor_connection_banner"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/top_app_bar" />
-
-    <com.glia.widgets.call.ThemedStateText
         android:id="@+id/connecting_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -174,6 +162,17 @@
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
         tools:text="@string/glia_call_continue_browsing" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/poor_connection_view"
+        style="@style/Application.Glia.Call.Quality.Banner"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/call_poor_connection_banner"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/top_app_bar" />
 
     <com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContainer
         android:id="@+id/floating_visitor_video"

@@ -190,10 +190,9 @@
         <item name="android:stateListAnimator">@null</item>
     </style>
 
-    <style name="Application.Glia.Call.Quality.Button" parent="Application.Glia.Header3">
+    <style name="Application.Glia.Call.Quality.Banner" parent="Application.Glia.Header3">
         <item name="android:textSize">12sp</item>
         <item name="android:background">?attr/gliaBaseLightColor</item>
-        <item name="android:gravity">center</item>
         <item name="android:paddingLeft">@dimen/glia_large</item>
         <item name="android:paddingRight">@dimen/glia_large</item>
         <item name="android:paddingTop">6dp</item>
@@ -201,6 +200,7 @@
         <item name="lineHeight">16sp</item>
         <item name="android:elegantTextHeight">true</item>
         <item name="android:letterSpacing">0.05</item>
+        <item name="android:gravity">center</item>
     </style>
 
 </resources>

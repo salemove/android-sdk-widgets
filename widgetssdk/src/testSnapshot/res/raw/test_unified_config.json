@@ -2330,6 +2330,21 @@
           }
         }
       }
+    },
+    "mediaQualityIndicator": {
+      "alignment": "trailing",
+      "background": {
+        "type": "gradient",
+        "value": ["#00ffe4", "#76ff75"]
+      },
+      "font": {
+        "size": 14,
+        "style": "bold"
+      },
+      "foreground": {
+        "type": "fill",
+        "value": ["#ff0000"]
+      }
     }
   },
   "alert": {

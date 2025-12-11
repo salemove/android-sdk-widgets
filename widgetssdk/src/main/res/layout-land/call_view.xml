@@ -191,12 +191,11 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintWidth_max="@dimen/glia_call_buttons_max_width" />
 
-    <com.glia.widgets.call.ThemedStateText
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/poor_connection_view"
-        style="@style/Application.Glia.Call.Quality.Button"
+        style="@style/Application.Glia.Call.Quality.Banner"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:accessibilityLiveRegion="polite"
         android:text="@string/call_poor_connection_banner"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"

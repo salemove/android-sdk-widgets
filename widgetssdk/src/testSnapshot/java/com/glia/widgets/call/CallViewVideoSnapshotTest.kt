@@ -2,8 +2,8 @@ package com.glia.widgets.call
 
 import android.graphics.Color
 import com.android.ide.common.rendering.api.SessionParams
-import com.glia.widgets.engagement.MediaType
 import com.glia.widgets.SnapshotTest
+import com.glia.widgets.engagement.MediaType
 import org.junit.Test
 
 internal class CallViewVideoSnapshotTest : SnapshotTest(
@@ -239,6 +239,40 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(
             setupView(
                 callState = video2WayWithFlipButtonState(),
                 unifiedTheme = unifiedThemeWithoutFlipButton()
+            ).root
+        )
+    }
+
+    // MARK: Poor Media Quality
+
+    private fun video2WayWithMediaQualityPoorState(): CallState = video2WayCallStartedState()
+        .setIsMediaQualityPoor(true)
+
+    @Test
+    fun video2WayWithMediaQualityPoor() {
+        snapshot(
+            setupView(
+                callState = video2WayWithMediaQualityPoorState()
+            ).root
+        )
+    }
+
+    @Test
+    fun video2WayWithMediaQualityPoorWithGlobalColors() {
+        snapshot(
+            setupView(
+                callState = video2WayWithMediaQualityPoorState(),
+                unifiedTheme = unifiedThemeWithGlobalColors()
+            ).root
+        )
+    }
+
+    @Test
+    fun video2WayWithMediaQualityPoorWithUnifiedTheme() {
+        snapshot(
+            setupView(
+                callState = video2WayWithMediaQualityPoorState(),
+                unifiedTheme = unifiedTheme()
             ).root
         )
     }

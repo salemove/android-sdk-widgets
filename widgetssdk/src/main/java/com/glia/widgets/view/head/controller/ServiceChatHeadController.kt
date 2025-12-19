@@ -3,6 +3,9 @@ package com.glia.widgets.view.head.controller
 import android.annotation.SuppressLint
 import android.view.View
 import com.glia.androidsdk.Operator
+import com.glia.widgets.callbacks.OnResult
+import com.glia.widgets.di.Dependencies
+import com.glia.widgets.engagement.EndAction
 import com.glia.widgets.engagement.domain.CurrentOperatorUseCase
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import com.glia.widgets.engagement.domain.VisitorMediaUseCase
@@ -34,6 +37,13 @@ internal class ServiceChatHeadController(
     private var operator: Operator? = null
     private var unreadMessagesCount = 0
     private var isOnHold = false
+    private var engagementEndCallback: OnResult<Int> = OnResult { unreadMessageCount ->
+        // Bubble should stay on the screen if there are unread messages to let the visitor know about that
+        if (unreadMessageCount == 0) {
+            updateStateOnEngagementEnded()
+            Dependencies.secureConversations.unSubscribeFromUnreadMessageCount(engagementEndCallback)
+        }
+    }
 
     /*
      * We need to keep track of the currently active (topmost) view. This can be either ChatView
@@ -100,11 +110,11 @@ internal class ServiceChatHeadController(
 
             is EngagementState.Update -> toggleChatHead()
 
-            is EngagementState.EngagementEnded,
+            is EngagementState.EngagementEnded -> engagementEnded(state.endAction)
             is EngagementState.QueueUnstaffed,
             is EngagementState.UnexpectedErrorHappened,
             is EngagementState.QueueingCanceled -> {
-                engagementEnded()
+                engagementEnded(null)
             }
 
             is EngagementState.Queuing,
@@ -132,13 +142,22 @@ internal class ServiceChatHeadController(
         }
     }
 
-    private fun engagementEnded() {
+    private fun engagementEnded(action: EndAction?) {
+        when (action) {
+            EndAction.Retain -> {
+                Dependencies.secureConversations.subscribeToUnreadMessageCount(engagementEndCallback)
+            }
+
+            else -> updateStateOnEngagementEnded()
+        }
+    }
+
+    private fun updateStateOnEngagementEnded() {
         displayBubbleOutsideAppUseCase.onDestroy()
         isOnHold = false
         state = State.ENDED
         operator = null
         unreadMessagesCount = 0
-        resumedViewName = null
         updateChatHeadView()
         ChatHeadLogger.reset()
     }

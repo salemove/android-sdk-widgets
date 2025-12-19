@@ -12,7 +12,7 @@ internal class IsDisplayBubbleInsideAppUseCase(
 ) {
 
     val isBubbleAllowedOutsideApp: Boolean
-        get() = configurationManager.enableBubbleInsideApp && permissionManager.hasOverlayPermission()
+        get() = configurationManager.enableBubbleOutsideApp && permissionManager.hasOverlayPermission()
 
     operator fun invoke(viewName: String?): Boolean {
 

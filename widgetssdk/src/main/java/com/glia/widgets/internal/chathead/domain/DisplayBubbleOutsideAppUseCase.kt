@@ -32,9 +32,15 @@ internal class DisplayBubbleOutsideAppUseCase(
         get() = configurationManager.enableBubbleOutsideApp && permissionManager.hasOverlayPermission()
 
     operator fun invoke(viewName: String?) = when {
-        // If bubble is not allowed outside app, return false immediately to not trigger unnecessary functions
+        // Do not show bubble if it is not allowed outside app
         !isBubbleAllowedOutsideApp -> {
             Logger.d(TAG, "Bubble: not allowed to show device bubble")
+        }
+
+        (viewName != null && // true when app is in foreground
+            (configurationManager.enableBubbleOutsideApp && !configurationManager.enableBubbleInsideApp)) -> {
+                // Do not show bubble inside an app if it is allowed outside app but not allowed inside app
+                hideBubble()
         }
 
         // App is in foreground and bubble is needed based on engagement and screen

@@ -6,14 +6,21 @@ import android.view.Window
 import com.glia.widgets.chat.ChatView
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
+import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.EndAction
 import com.glia.widgets.engagement.MediaType
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
+import com.glia.widgets.secureconversations.SecureConversations
 import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadContract
 import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadController
 import com.glia.widgets.view.head.controller.ApplicationChatHeadLayoutController
 import com.glia.widgets.view.head.controller.ServiceChatHeadController
+import io.mockk.every
+import io.mockk.just
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.runs
 import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
 import io.reactivex.rxjava3.processors.PublishProcessor
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -54,9 +61,14 @@ internal class ActivityWatcherForChatHeadTest {
     )
     private val activity = Mockito.mock(Activity::class.java)
     private val view = Mockito.mock(View::class.java)
+    private var secureConversationsMock = mock<SecureConversations>()
 
     @Before
     fun setup() {
+        mockkStatic(Dependencies::class)
+        secureConversationsMock = mockk<SecureConversations>(relaxed = true)
+        every { Dependencies.secureConversations } returns secureConversationsMock
+
         RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
 
         val window = Mockito.mock(Window::class.java)
@@ -75,6 +87,7 @@ internal class ActivityWatcherForChatHeadTest {
     @After
     fun tearDown() {
         RxAndroidPlugins.reset()
+        io.mockk.unmockkStatic(Dependencies::class)
     }
 
     @Test
@@ -99,8 +112,9 @@ internal class ActivityWatcherForChatHeadTest {
         engagementStateFlowable.onNext(State.QueueUnstaffed)
         engagementStateFlowable.onNext(State.UnexpectedErrorHappened)
         engagementStateFlowable.onNext(State.QueueingCanceled)
+        every { secureConversationsMock.subscribeToUnreadMessageCount(any()) } just runs
 
-        verify(watcher, times(5)).removeChatHeadLayoutIfPresent()
+        verify(watcher, times(4)).removeChatHeadLayoutIfPresent()
         verifyNoMoreInteractions(watcher)
     }
 

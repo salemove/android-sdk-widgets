@@ -61,10 +61,11 @@ class DisplayBubbleOutsideAppUseCaseTest {
     }
 
     @Test
-    fun `invoke shows bubble when bubble is needed by current view`() {
+    fun `invoke shows bubble when bubble is needed by current view and bubble is enabled inside`() {
         // Given
         val viewName = "SomeView"
         every { configurationManager.enableBubbleOutsideApp } returns true
+        every { configurationManager.enableBubbleInsideApp } returns true
         every { permissionManager.hasOverlayPermission() } returns true
         every { isBubbleNeededUseCase(viewName) } returns true
 
@@ -77,10 +78,28 @@ class DisplayBubbleOutsideAppUseCaseTest {
     }
 
     @Test
+    fun `invoke does not show bubble when bubble is needed by current view but bubble is disabled inside`() {
+        // Given
+        val viewName = "SomeView"
+        every { configurationManager.enableBubbleOutsideApp } returns true
+        every { configurationManager.enableBubbleInsideApp } returns false
+        every { permissionManager.hasOverlayPermission() } returns true
+        every { isBubbleNeededUseCase(viewName) } returns true
+
+        // When
+        useCase(viewName)
+
+        // Then
+        verify(exactly = 0) { chatHeadManager.startChatHeadService() }
+        verify(exactly = 1) { chatHeadManager.stopChatHeadService() }
+    }
+
+    @Test
     fun `invoke hides bubble when bubble is not needed by current view`() {
         // Given
         val viewName = "SomeView"
         every { configurationManager.enableBubbleOutsideApp } returns true
+        every { configurationManager.enableBubbleInsideApp } returns true
         every { permissionManager.hasOverlayPermission() } returns true
         every { isBubbleNeededUseCase(viewName) } returns false
 

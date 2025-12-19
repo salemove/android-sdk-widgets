@@ -32,7 +32,7 @@ class IsDisplayBubbleInsideAppUseCaseTest {
     fun `invoke returns false when bubbles are allowed outside app`() {
         // Given
         val viewName = "SomeView"
-        every { configurationManager.enableBubbleInsideApp } returns true
+        every { configurationManager.enableBubbleOutsideApp } returns true
         every { permissionManager.hasOverlayPermission() } returns true
 
         // When
@@ -48,7 +48,7 @@ class IsDisplayBubbleInsideAppUseCaseTest {
         val viewName = "ChatView"
         every { isBubbleNeededUseCase.isBubbleNeededByChatScreenDuringMediaEngagement(viewName) } returns true
         // Even if these are false, we should still show bubble
-        every { configurationManager.enableBubbleInsideApp } returns false
+        every { configurationManager.enableBubbleOutsideApp } returns false
         every { permissionManager.hasOverlayPermission() } returns false
 
         // When
@@ -64,6 +64,7 @@ class IsDisplayBubbleInsideAppUseCaseTest {
         val viewName = "SomeView"
         every { isBubbleNeededUseCase.isBubbleNeededByChatScreenDuringMediaEngagement(viewName) } returns false
         every { configurationManager.enableBubbleInsideApp } returns false
+        every { configurationManager.enableBubbleOutsideApp } returns false
 
         // When
         val result = useCase(viewName)
@@ -78,6 +79,7 @@ class IsDisplayBubbleInsideAppUseCaseTest {
         val viewName = "SomeView"
         every { isBubbleNeededUseCase.isBubbleNeededByChatScreenDuringMediaEngagement(viewName) } returns false
         every { configurationManager.enableBubbleInsideApp } returns true
+        every { configurationManager.enableBubbleOutsideApp } returns true
         every { permissionManager.hasOverlayPermission() } returns false
         every { isBubbleNeededUseCase(viewName) } returns true
 
@@ -94,6 +96,7 @@ class IsDisplayBubbleInsideAppUseCaseTest {
         val viewName = "SomeView"
         every { isBubbleNeededUseCase.isBubbleNeededByChatScreenDuringMediaEngagement(viewName) } returns false
         every { configurationManager.enableBubbleInsideApp } returns true
+        every { configurationManager.enableBubbleOutsideApp } returns true
         every { permissionManager.hasOverlayPermission() } returns false
         every { isBubbleNeededUseCase(viewName) } returns false
 

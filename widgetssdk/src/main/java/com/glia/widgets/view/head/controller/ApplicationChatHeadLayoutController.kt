@@ -2,6 +2,9 @@ package com.glia.widgets.view.head.controller
 
 import android.annotation.SuppressLint
 import com.glia.androidsdk.Operator
+import com.glia.widgets.callbacks.OnResult
+import com.glia.widgets.di.Dependencies
+import com.glia.widgets.engagement.EndAction
 import com.glia.widgets.engagement.domain.CurrentOperatorUseCase
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import com.glia.widgets.engagement.domain.VisitorMediaUseCase
@@ -20,13 +23,20 @@ internal class ApplicationChatHeadLayoutController(
     private val messagesNotSeenHandler: MessagesNotSeenHandler,
     private val engagementStateUseCase: EngagementStateUseCase,
     private val currentOperatorUseCase: CurrentOperatorUseCase,
-    private val visitorMediaUseCase: VisitorMediaUseCase
+    private val visitorMediaUseCase: VisitorMediaUseCase,
 ) : ChatHeadLayoutContract.Controller {
     private var chatHeadLayout: ChatHeadLayoutContract.View? = null
     private var state = State.ENDED
     private var operator: Operator? = null
     private var unreadMessagesCount = 0
     private var isOnHold = false
+    private var engagementEndCallback: OnResult<Int> = OnResult { unreadMessageCount ->
+        // Bubble should stay on the screen if there are unread messages to let the visitor know about that
+        if (unreadMessageCount == 0) {
+            updateStateOnEngagementEnded()
+            Dependencies.secureConversations.unSubscribeFromUnreadMessageCount(engagementEndCallback)
+        }
+    }
 
     /*
      * We need to keep track of the currently active (topmost) view. This can be either ChatView
@@ -49,10 +59,11 @@ internal class ApplicationChatHeadLayoutController(
         messagesNotSeenHandler.addListener(onUnreadMessagesCountListener)
         engagementStateUseCase().subscribe {
             when (it) {
-                is EngagementState.EngagementEnded,
+                is EngagementState.EngagementEnded -> engagementEnded(it.endAction)
+
                 is EngagementState.QueueUnstaffed,
                 is EngagementState.UnexpectedErrorHappened,
-                is EngagementState.QueueingCanceled -> engagementEnded()
+                is EngagementState.QueueingCanceled -> engagementEnded(null)
 
                 is EngagementState.EngagementStarted -> onNewEngagementLoaded()
 
@@ -137,7 +148,17 @@ internal class ApplicationChatHeadLayoutController(
         return resumedViewName != null && resumedViewName == viewName
     }
 
-    private fun engagementEnded() {
+    private fun engagementEnded(action: EndAction?) {
+        when (action) {
+            EndAction.Retain -> {
+                Dependencies.secureConversations.subscribeToUnreadMessageCount(engagementEndCallback)
+            }
+
+            else -> updateStateOnEngagementEnded()
+        }
+    }
+
+    private fun updateStateOnEngagementEnded() {
         isOnHold = false
         state = State.ENDED
         operator = null

@@ -2,8 +2,11 @@ package com.glia.widgets.view.head.controller
 
 import android.annotation.SuppressLint
 import com.glia.widgets.GliaWidgets
+import com.glia.widgets.callbacks.OnResult
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
+import com.glia.widgets.di.Dependencies
+import com.glia.widgets.engagement.EndAction
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import com.glia.widgets.helper.Logger
@@ -20,6 +23,13 @@ internal class ActivityWatcherForChatHeadController(
 ) : ActivityWatcherForChatHeadContract.Controller {
 
     private lateinit var watcher: ActivityWatcherForChatHeadContract.Watcher
+    private var engagementEndCallback: OnResult<Int> = OnResult { unreadMessageCount ->
+        // Bubble should stay on the screen if there are unread messages to let the visitor know about that
+        if (unreadMessageCount == 0) {
+            watcher.removeChatHeadLayoutIfPresent()
+            Dependencies.secureConversations.unSubscribeFromUnreadMessageCount(engagementEndCallback)
+        }
+    }
 
     override fun setWatcher(watcher: ActivityWatcherForChatHeadContract.Watcher) {
         this.watcher = watcher
@@ -38,10 +48,11 @@ internal class ActivityWatcherForChatHeadController(
 
             is State.Update -> updateBubble()
 
-            is State.EngagementEnded,
+            is State.EngagementEnded -> onEngagementOrQueueingEnded(state.endAction)
+
             is State.QueueUnstaffed,
             is State.UnexpectedErrorHappened,
-            is State.QueueingCanceled -> onEngagementOrQueueingEnded()
+            is State.QueueingCanceled -> onEngagementOrQueueingEnded(null)
 
             else -> {
                 //no op
@@ -49,8 +60,14 @@ internal class ActivityWatcherForChatHeadController(
         }
     }
 
-    private fun onEngagementOrQueueingEnded() {
-        watcher.removeChatHeadLayoutIfPresent()
+    private fun onEngagementOrQueueingEnded(action: EndAction?) {
+        when (action) {
+            EndAction.Retain -> {
+                Dependencies.secureConversations.subscribeToUnreadMessageCount(engagementEndCallback)
+            }
+
+            else -> watcher.removeChatHeadLayoutIfPresent()
+        }
     }
 
     private fun onEngagementOrQueueingStarted() {

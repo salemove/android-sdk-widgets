@@ -24,9 +24,7 @@ internal data class ColorTheme(
     val primaryColorStateList: ColorStateList
         get() = ColorStateList.valueOf(primaryColor)
 
-    fun withAlpha(
-        @androidx.annotation.FloatRange(from = 0.0, to = 100.0) alpha: Float
-    ): ColorTheme {
+    fun withAlpha(@androidx.annotation.FloatRange(from = 0.0, to = 100.0) alpha: Float): ColorTheme {
         val realAlpha: Float = alpha * 255 / 100
         val newColors = values.map { ColorUtils.setAlphaComponent(it, realAlpha.roundToInt()) }
 

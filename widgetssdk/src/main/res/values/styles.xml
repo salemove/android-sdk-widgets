@@ -185,6 +185,7 @@
         <item name="rippleColor">@color/call_fab_ripple_color_states</item>
         <item name="tint">@color/call_fab_icon_color_states</item>
         <item name="elevation">@dimen/glia_call_button_elevation</item>
+        <item name="android:elevation">@dimen/glia_call_button_elevation</item>
         <item name="pressedTranslationZ">@dimen/glia_call_button_elevation</item>
         <item name="android:stateListAnimator">@null</item>
     </style>

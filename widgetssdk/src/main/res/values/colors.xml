@@ -4,7 +4,9 @@
     <color name="glia_black_color">#000000</color>
     <color name="glia_black_color_opacity_0">#00000000</color>
     <color name="glia_black_color_opacity_60">#99000000</color>
-    <color name="glia_black_color_opacity_86">#DC000000</color>
+    <!--    Different devices handle the alpha channel differently, `#DC000000` is displaying fully opaque black on some devices.
+    Replacing it with equivalent gray without alpha channel to ensure consistent appearance across devices.-->
+    <color name="glia_dark_gray_color">#232323</color>
     <color name="glia_primary_color">#0F6BFF</color>
     <color name="glia_dark_color">#2C0735</color>
     <color name="glia_light_color">#FFFFFF</color>
@@ -18,7 +20,7 @@
     colors to prevent customisation.  -->
     <color name="glia_branding_color">#B6BBC1</color>
 
-    <color name="glia_call_view_background_color">@color/glia_black_color_opacity_86</color>
+    <color name="glia_call_view_background_color">@color/glia_dark_gray_color</color>
     <color name="glia_call_control_buttons_color">@color/glia_black_color</color>
 
     <color name="glia_stroke_light">@color/glia_shade_color</color>

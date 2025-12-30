@@ -764,6 +764,9 @@ internal class CallView(context: Context, attrs: AttributeSet?, defStyleAttr: In
                 videoButtonLabel.isEnabled = it
             }
 
+            // This should be before setButtonActivated, because FAB is unable to update the drawable when the state is changed
+            // So the next step(setButtonActivated) sets/re-sets the correct drawable that solves the issue.
+            applyViewState(callState.speakerButtonViewState, speakerButton, speakerButtonLabel)
             setButtonActivated(
                 videoButton,
                 theme.iconCallVideoOn,
@@ -772,8 +775,11 @@ internal class CallView(context: Context, attrs: AttributeSet?, defStyleAttr: In
                 R.string.android_call_turn_video_on_button_accessibility,
                 callState.hasVideo
             )
-            videoButton.isActivated = callState.hasVideo
+            videoButtonLabel.isActivated = callState.hasVideo
 
+            // This should be before setButtonActivated, because FAB is unable to update the drawable when the state is changed
+            // So the next step(setButtonActivated) sets/re-sets the correct drawable that solves the issue.
+            applyViewState(callState.muteButtonViewState, muteButton, muteButtonLabel)
             setButtonActivated(
                 muteButton,
                 theme.iconCallAudioOff, // mute (e.g., mic-off) button activated icon
@@ -787,15 +793,6 @@ internal class CallView(context: Context, attrs: AttributeSet?, defStyleAttr: In
                 if (callState.isMuted) R.string.call_unmute_button else R.string.call_mute_button
             )
             onHoldTextView.setLocaleText(R.string.call_on_hold_icon)
-
-            callState.chatButtonViewState.apply {
-                if (this == ViewState.SHOW) {
-                    chatButtonBadgeView.isVisible = callState.messagesNotSeen > 0
-                }
-                applyViewState(this, chatButton, chatButtonLabel)
-            }
-            applyViewState(callState.muteButtonViewState, muteButton, muteButtonLabel)
-            applyViewState(callState.speakerButtonViewState, speakerButton, speakerButtonLabel)
 
             videoButton.isVisible = callState.is2WayVideoCall
             videoButtonLabel.isVisible = callState.is2WayVideoCall
@@ -815,9 +812,14 @@ internal class CallView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             } else {
                 hideUIOnCallEnd()
             }
-            (callState.isAudioCall || callState.isVideoCall || callState.is2WayVideoCall).also {
-                chatButton.isEnabled = it
-                chatButtonLabel.isEnabled = it
+
+            callState.chatButtonViewState.apply {
+                if (this != ViewState.HIDE) {
+                    chatButtonBadgeView.isVisible = callState.messagesNotSeen > 0
+                }
+                applyViewState(this, chatButton, chatButtonLabel)
+                // Re-set the drawable to force FAB to refresh icon
+                theme.iconCallChat?.apply(chatButton::setImageResource)
             }
 
             chatButton.setContentDescription(

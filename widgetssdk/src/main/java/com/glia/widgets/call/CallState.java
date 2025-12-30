@@ -401,8 +401,10 @@ class CallState {
     public ViewState getChatButtonViewState() {
         if (isCallVisualizer) {
             return ViewState.HIDE;
-        } else {
+        } else if (isAudioCall() || isVideoCall() || is2WayVideoCall()) {
             return ViewState.SHOW;
+        } else {
+            return ViewState.DISABLE;
         }
     }
 

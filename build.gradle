@@ -19,6 +19,18 @@ plugins {
 
 apply from: "${rootDir}/scripts/version-updater.gradle"
 
+// Setup git hooks
+def setupGitHooksScript = file("${rootDir}/scripts/setup-git-hooks.sh")
+if (setupGitHooksScript.exists()) {
+  try {
+    def process = "bash ${setupGitHooksScript.absolutePath}".execute(null, rootDir)
+    process.waitFor()
+    logger.info(process.inputStream.text)
+  } catch (Exception e) {
+    logger.warn("Failed to setup git hooks: ${e.message}")
+  }
+}
+
 allprojects {
 
   repositories {

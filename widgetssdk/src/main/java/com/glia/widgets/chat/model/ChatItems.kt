@@ -6,13 +6,21 @@ import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.androidsdk.chat.ChatMessage
 import com.glia.androidsdk.chat.SingleChoiceOption
 import com.glia.widgets.chat.adapter.ChatAdapter
+import com.glia.widgets.helper.asStableId
 import com.glia.widgets.helper.isDownloaded
 import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import java.util.UUID
 
-internal abstract class ChatItem(@ChatAdapter.Type val viewType: Int) {
+internal abstract class ChatItem(@param:ChatAdapter.Type val viewType: Int) {
+
+    /** Unique identifier for this chat item. */
     abstract val id: String
+
+    /** Timestamp for this chat item. */
     abstract val timestamp: Long
+
+    /** Stable Long representation of [id] for use in RecyclerView adapters. */
+    val stableId: Long by lazy { id.asStableId }
 
     open fun areContentsTheSame(newItem: ChatItem): Boolean = this == newItem
 }

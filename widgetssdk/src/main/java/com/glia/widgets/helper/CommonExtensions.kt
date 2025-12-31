@@ -38,6 +38,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.processors.FlowableProcessor
 import java.io.File
+import java.util.UUID
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.io.path.createTempFile
@@ -209,3 +210,24 @@ internal inline fun <T : Any> T?.requireNotNull(lazyMessage: () -> Any): T {
 internal fun throwGliaException(cause: GliaWidgetsException.Cause, lazyMessage: () -> Any): Nothing {
     throw GliaWidgetsException(lazyMessage().toString(), cause)
 }
+
+
+/**
+ * Converts this String into a deterministic 64-bit stable ID.
+ *
+ * * **Primary Logic:** If the string is a valid UUID, it performs an "XOR Fold"
+ * ([UUID.mostSignificantBits] XOR [UUID.leastSignificantBits]). This compresses
+ * 128 bits of data into 64 bits, preserving significantly more entropy/uniqueness
+ * than a standard 32-bit hash.
+ *
+ * * **Fallback Logic:** If the string is **not** a valid UUID, it safely catches the
+ * exception and falls back to [String.hashCode], ensuring the app never crashes
+ * due to malformed IDs.
+ *
+ * * **Purpose:** Ideal for [androidx.recyclerview.widget.RecyclerView.Adapter.getItemId]
+ * where stable, unique 64-bit IDs are required for correct animations and state preservation.
+ */
+internal val String.asStableId: Long
+    get() = runCatching {
+        UUID.fromString(this).run { mostSignificantBits xor leastSignificantBits }
+    }.getOrDefault(hashCode().toLong())

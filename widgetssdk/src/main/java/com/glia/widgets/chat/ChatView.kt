@@ -611,7 +611,9 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             Dependencies.useCaseFactory.createGetImageFileFromCacheUseCase(),
             Dependencies.useCaseFactory.createGetImageFileFromDownloadsUseCase(),
             Dependencies.useCaseFactory.createGetImageFileFromNetworkUseCase()
-        )
+        ).apply {
+            setHasStableIds(true)
+        }
         binding.chatRecyclerView.layoutManager = LinearLayoutManager(this.context)
         adapter.registerAdapterDataObserver(dataObserver)
         binding.chatRecyclerView.adapter = adapter

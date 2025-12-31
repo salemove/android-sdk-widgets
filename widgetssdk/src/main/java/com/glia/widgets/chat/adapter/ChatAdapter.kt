@@ -298,6 +298,8 @@ internal class ChatAdapter(
 
     override fun getItemViewType(position: Int): Int = getItem(position).viewType
 
+    override fun getItemId(position: Int): Long = getItem(position).stableId
+
     override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
         super.onViewRecycled(holder)
         if (holder is ImageAttachmentViewHolder) {

@@ -532,7 +532,7 @@ app:
       GIT_AUTHOR_EMAIL: bitrise@glia.com
     - opts:
         is_expand: false
-        ORG_GRADLE_PROJECT_signAllPublications: true
+      ORG_GRADLE_PROJECT_signAllPublications: true
 trigger_map:
   - push_branch: development
     workflow: development

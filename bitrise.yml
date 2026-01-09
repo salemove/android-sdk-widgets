@@ -415,8 +415,10 @@ workflows:
                 BASE_BRANCH_NAME="development"
                 MESSAGE="Increment Core SDK version to ${NEW_VERSION}"
                 
-                git fetch origin $BASE_BRANCH_NAME
-                git checkout -b $NEW_BRANCH_NAME origin/$BASE_BRANCH_NAME
+                if [[ "$BITRISE_GIT_BRANCH" != $BASE_BRANCH_NAME ]]; then
+                  echo "❌ Error: this workflow must be run on the ${BASE_BRANCH_NAME} branch to prevent merge conflicts."
+                  exit 1
+                fi
                 git add -A
                 git commit -m "$MESSAGE"
                 git push origin "$NEW_BRANCH_NAME":"$NEW_BRANCH_NAME"

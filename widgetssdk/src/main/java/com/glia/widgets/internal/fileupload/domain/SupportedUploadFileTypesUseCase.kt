@@ -39,6 +39,14 @@ internal class SupportedUploadFileTypesUseCase(
     }
 
     private fun allowedFileContentTypes(siteInfo: SiteInfo): List<String> {
+        // Android's ActivityResultContracts.OpenDocument does not check the MOV file extension, only the container type.
+        // Since MOV files often use the MP4 container, we must add "video/mp4" to allowed types if "video/quicktime" is supported.
+        // This ensures users can select MOV files even when only "video/quicktime" is listed by the site.
+        val containsVideoQuickTime = siteInfo.allowedFileContentTypes.any { it.equals("video/quicktime") }
+        val containsVideoMp4 = siteInfo.allowedFileContentTypes.any { it.equals("video/mp4") }
+        if (containsVideoQuickTime && !containsVideoMp4) {
+            return siteInfo.allowedFileContentTypes + "video/mp4"
+        }
         return siteInfo.allowedFileContentTypes
     }
 

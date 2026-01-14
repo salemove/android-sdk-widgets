@@ -307,6 +307,30 @@ class SupportedUploadFileTypesUseCaseTest {
         assertEquals(expectedMediaTypes, result!!.allowedMediaTypes)
     }
 
+    @Test
+    fun `invoke adds video mp4 when only video quicktime is present`() {
+        val fileTypes = listOf(
+            "video/quicktime"
+        )
+        val expectedFileTypes = listOf(
+            "video/quicktime",
+            "video/mp4"
+        )
+        val siteInfo = mockSiteInfo(
+            isVisitorAllowed = true,
+            allowedFileContentTypes = fileTypes
+        )
+        val callbackSlot = slot<RequestCallback<SiteInfo?>>()
+        every { siteInfoUseCase.invoke(capture(callbackSlot)) } answers {
+            callbackSlot.captured.onResult(siteInfo, null)
+        }
+        var result: SupportedUploadFileTypesUseCase.SupportedUploadFilesResult? = null
+
+        subjectUnderTest.invoke { result = it }
+
+        assertEquals(expectedFileTypes, result!!.allowedFileTypes)
+    }
+
     private fun mockSiteInfo(
         isVisitorAllowed: Boolean,
         allowedFileContentTypes: List<String>

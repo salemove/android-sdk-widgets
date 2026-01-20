@@ -3,6 +3,7 @@ package com.glia.widgets
 import android.app.Application
 import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.glia.androidsdk.AuthorizationMethod
 import com.glia.androidsdk.CoreConfiguration
 import com.glia.androidsdk.Glia
 import com.glia.androidsdk.GliaException
@@ -90,8 +91,9 @@ class GliaWidgetsTest {
         verify(gliaCore).init(captor.capture())
         verify(repositoryFactory).initialize()
         val gliaConfig = captor.lastValue
-        Assert.assertEquals(siteApiKey.id, gliaConfig.siteApiKey.id)
-        Assert.assertEquals(siteApiKey.secret, gliaConfig.siteApiKey.secret)
+        val authorizationMethod = gliaConfig.authorizationMethod as AuthorizationMethod.SiteApiKey
+        Assert.assertEquals(siteApiKey.id, authorizationMethod.id)
+        Assert.assertEquals(siteApiKey.secret, authorizationMethod.secret)
         Assert.assertEquals(siteId, gliaConfig.siteId)
         Assert.assertEquals(region.toCoreType(), gliaConfig.region)
         Assert.assertEquals(applicationContext, gliaConfig.applicationContext)
@@ -124,9 +126,43 @@ class GliaWidgetsTest {
         val captor = argumentCaptor<CoreConfiguration>()
         verify(gliaCore).init(captor.capture())
         val gliaConfig = captor.lastValue
-        Assert.assertEquals(siteApiKey.id, gliaConfig.siteApiKey.id)
-        Assert.assertEquals(siteApiKey.secret, gliaConfig.siteApiKey.secret)
+        val authorizationMethod = gliaConfig.authorizationMethod as AuthorizationMethod.SiteApiKey
+        Assert.assertEquals(siteApiKey.id, authorizationMethod.id)
+        Assert.assertEquals(siteApiKey.secret, authorizationMethod.secret)
         Assert.assertEquals(Region.US.toCoreType(), gliaConfig.region)
+    }
+
+    @Test
+    fun `init sets config to glia core with UserApiKey when called`() {
+        val userApiKey = com.glia.widgets.AuthorizationMethod.UserApiKey("UserApiId", "UserApiSecret")
+        val gliaWidgetsConfig = GliaWidgetsConfig.Builder()
+            .setContext(RuntimeEnvironment.getApplication())
+            .setSiteId("SiteId")
+            .setRegion(Region.EU)
+            .setAuthorizationMethod(userApiKey)
+            .build()
+        val callVisualizer = mock<Omnibrowse>()
+        whenever(gliaCore.callVisualizer).thenReturn(callVisualizer)
+        val callVisualizerController = mock<CallVisualizerController>()
+        whenever(controllerFactory.callVisualizerController).thenReturn(callVisualizerController)
+        val engagementRepository = mock<EngagementRepository>()
+        whenever(repositoryFactory.engagementRepository) doReturn engagementRepository
+        val queueRepository = mock<QueueRepository>()
+        whenever(repositoryFactory.queueRepository) doReturn queueRepository
+
+        GliaWidgets.init(gliaWidgetsConfig)
+
+        val captor = argumentCaptor<CoreConfiguration>()
+        verify(gliaCore).init(captor.capture())
+
+        val coreConfig = captor.firstValue
+        Assert.assertTrue(coreConfig.authorizationMethod is AuthorizationMethod.UserApiKey)
+
+        val authMethod = coreConfig.authorizationMethod as AuthorizationMethod.UserApiKey
+        Assert.assertEquals("UserApiId", authMethod.id)
+        Assert.assertEquals("UserApiSecret", authMethod.secret)
+        Assert.assertEquals("SiteId", coreConfig.siteId)
+        Assert.assertEquals(com.glia.androidsdk.Region.EU, coreConfig.region)
     }
 
     @Test

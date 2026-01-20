@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.net.Uri
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
+import com.glia.widgets.AuthorizationMethod
 import com.glia.widgets.GliaWidgetsConfig
 import com.glia.widgets.Region
 import com.glia.widgets.SiteApiKey
@@ -150,8 +151,16 @@ object ExampleAppConfigManager {
         )
 
         val manualLocaleOverride = preferences.getString(context.getString(R.string.pref_manual_locale_override), null)
+
         return GliaWidgetsConfig.Builder()
-            .setSiteApiKey(SiteApiKey(apiKeyId!!, apiKeySecret!!))
+            .also {
+                // Decide authorization method based on the prefix of the apiKeySecret
+                if (apiKeySecret!!.startsWith("gls_")) {
+                    it.setSiteApiKey(SiteApiKey(apiKeyId!!, apiKeySecret))
+                } else {
+                    it.setAuthorizationMethod(AuthorizationMethod.UserApiKey(apiKeyId!!, apiKeySecret))
+                }
+            }
             .setSiteId(siteId)
             .setRegion(siteRegion)
             .setCompanyName(companyName)

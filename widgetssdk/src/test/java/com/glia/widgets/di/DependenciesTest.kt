@@ -7,6 +7,8 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.glia.androidsdk.CoreConfiguration
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
+import com.glia.widgets.AuthorizationMethod as WidgetsAuthorizationMethod
+import com.glia.widgets.Region
 import com.glia.telemetry_lib.EventAttribute
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.telemetry_lib.GliaTelemetry
@@ -15,6 +17,7 @@ import com.glia.telemetry_lib.LogEvents
 import com.glia.telemetry_lib.StringAttribute
 import com.glia.widgets.BuildConfig
 import com.glia.widgets.GliaWidgetsConfig
+import com.glia.widgets.apiKeyId
 import com.glia.widgets.helper.orNotApplicable
 import com.glia.widgets.helper.stringValue
 import com.glia.widgets.helper.toCoreType
@@ -36,6 +39,7 @@ import org.junit.Test
 import org.junit.rules.TestRule
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 
 @get:ClassRule
 val rule: TestRule = InstantTaskExecutorRule()
@@ -162,6 +166,27 @@ class DependenciesTest {
         verifyInitialized(widgetsConfig)
     }
 
+    @Test
+    fun `onSdkInit logs UserApiKey ID in telemetry`() {
+        val userApiKey = WidgetsAuthorizationMethod.UserApiKey("user-api-key-123", "secret")
+        val config = GliaWidgetsConfig.Builder()
+            .setContext(RuntimeEnvironment.getApplication())
+            .setSiteId("test-site-id")
+            .setRegion(Region.EU)
+            .setAuthorizationMethod(userApiKey)
+            .build()
+
+        Dependencies.onSdkInit(config)
+
+        val attributeSlot = slot<Map<StringAttribute, String>>()
+        verify {
+            GliaLogger.i(event = eq(LogEvents.WIDGETS_SDK_CONFIGURING), message = isNull<String>(), attributes = capture(attributeSlot))
+        }
+
+        val attributes = attributeSlot.captured
+        assertEquals("user-api-key-123", attributes[EventAttribute.ApiKeyId])
+    }
+
     private fun mockConfiguration(): GliaWidgetsConfig {
         val widgetsConfig: GliaWidgetsConfig = mockk(relaxed = true)
         val coreConfig: CoreConfiguration = mockk(relaxed = true)
@@ -178,7 +203,7 @@ class DependenciesTest {
 
         val attributes = attributeSlot.captured
 
-        assertEquals(widgetsConfig.siteApiKey?.id.orNotApplicable, attributes[EventAttribute.ApiKeyId])
+        assertEquals(widgetsConfig.authorizationMethod?.apiKeyId.orNotApplicable, attributes[EventAttribute.ApiKeyId])
         assertEquals(widgetsConfig.region?.stringValue ?: widgetsConfig.regionString.orNotApplicable, attributes[EventAttribute.Environment])
         assertEquals(widgetsConfig.manualLocaleOverride, attributes[EventAttribute.LocaleCode])
     }

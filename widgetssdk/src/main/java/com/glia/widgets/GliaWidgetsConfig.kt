@@ -14,7 +14,7 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
     val siteId: String?
 
     @JvmField
-    val siteApiKey: SiteApiKey?
+    val authorizationMethod: AuthorizationMethod?
 
     @JvmField
     val context: Context?
@@ -49,7 +49,7 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
         // An Application object lives all the time when the application is active, so it is safe to store it.
         val applicationContext = builder.context?.applicationContext
 
-        siteApiKey = builder.siteApiKey
+        authorizationMethod = builder.authorizationMethod
         siteId = builder.siteId
         context = applicationContext
         region = builder.region
@@ -111,7 +111,7 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
     class Builder {
         var siteId: String? = null
             private set
-        var siteApiKey: SiteApiKey? = null
+        var authorizationMethod: AuthorizationMethod? = null
             private set
         var context: Context? = null
             private set
@@ -192,8 +192,13 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
             return setSiteApiKey(siteApiKey.toWidgetType())
         }
 
-        fun setSiteApiKey(siteApiKey: SiteApiKey): Builder {
-            this.siteApiKey = siteApiKey
+        fun setSiteApiKey(siteApiKey: AuthorizationMethod.SiteApiKey): Builder {
+            this.authorizationMethod = siteApiKey
+            return this
+        }
+
+        fun setAuthorizationMethod(authorizationMethod: AuthorizationMethod): Builder {
+            this.authorizationMethod = authorizationMethod
             return this
         }
 

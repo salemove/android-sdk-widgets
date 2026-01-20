@@ -14,6 +14,7 @@ import com.glia.telemetry_lib.LogEvents
 import com.glia.widgets.BuildConfig
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.GliaWidgetsConfig
+import com.glia.widgets.apiKeyId
 import com.glia.widgets.authentication.Authentication
 import com.glia.widgets.callvisualizer.CallVisualizerActivityWatcher
 import com.glia.widgets.engagement.completion.EngagementCompletionActivityWatcher
@@ -299,7 +300,7 @@ internal object Dependencies {
 //        TelemetryHelper.init(gliaConfig) // TODO: improve telemetry initialization strategy
         GliaTelemetry.setGlobalAttribute(GlobalAttribute.SdkWidgetsVersion, BuildConfig.GLIA_WIDGETS_SDK_VERSION)
         GliaLogger.i(LogEvents.WIDGETS_SDK_CONFIGURING) {
-            put(EventAttribute.ApiKeyId, gliaWidgetsConfig.siteApiKey?.id.orNotApplicable)
+            put(EventAttribute.ApiKeyId, gliaWidgetsConfig.authorizationMethod?.apiKeyId.orNotApplicable)
             put(EventAttribute.Environment, gliaWidgetsConfig.region?.stringValue ?: gliaWidgetsConfig.regionString.orNotApplicable)
             put(EventAttribute.LocaleCode, gliaWidgetsConfig.manualLocaleOverride)
         }

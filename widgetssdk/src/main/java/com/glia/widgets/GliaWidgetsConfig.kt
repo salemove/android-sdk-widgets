@@ -161,7 +161,7 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
          * @param region Region in which the site is created.
          * One of [Regions].
          * @return Builder instance
-         * @deprecated Will be removed in 4.0.0 version.
+         * @deprecated Will be removed in version 4.0.0.
          */
         @Deprecated("Use {@link #setRegion(Region)}")
         fun setRegion(region: String): Builder {
@@ -173,7 +173,7 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
          * @hidden
          * @param baseDomain Base domain to be used.
          * @return Builder instance
-         * @deprecated Will be removed in 4.0.0 version.
+         * @deprecated Will be removed in version 4.0.0.
          */
         @Deprecated("Use {@link #setRegion(Region)}")
         fun setBaseDomain(baseDomain: String): Builder {
@@ -181,22 +181,50 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
             return this
         }
 
+        /**
+         * @param siteApiKey - your site API key
+         * @return Builder instance
+         * @deprecated Will be removed in version 4.0.0.
+         */
         @Deprecated(
-            "Use {@link #setSiteApiKey(SiteApiKey)}",
+            "Use {@link #setAuthorizationMethod(AuthorizationMethod.UserApiKey)}",
             ReplaceWith(
-                "setSiteApiKey(SiteApiKey(id, secret))",
-                "com.glia.widgets.SiteApiKey"
+                "setAuthorizationMethod(AuthorizationMethod.UserApiKey(id, secret))",
+                "com.glia.widgets.AuthorizationMethod"
             )
         )
         fun setSiteApiKey(siteApiKey: com.glia.androidsdk.SiteApiKey): Builder {
             return setSiteApiKey(siteApiKey.toWidgetType())
         }
 
+        /**
+         * @param siteApiKey - your site API key
+         * @return Builder instance
+         * @deprecated Will be removed in version 4.0.0.
+         */
+        @Deprecated(
+            "Use {@link #setAuthorizationMethod(AuthorizationMethod.UserApiKey)}",
+            ReplaceWith(
+                "setAuthorizationMethod(AuthorizationMethod.UserApiKey(id, secret))",
+                "com.glia.widgets.AuthorizationMethod"
+            )
+        )
         fun setSiteApiKey(siteApiKey: AuthorizationMethod.SiteApiKey): Builder {
             this.authorizationMethod = siteApiKey
             return this
         }
 
+        /**
+         * @param authorizationMethod - your API key
+         * @return Builder instance
+         *
+         * Example:
+         * ```
+         * .setAuthorizationMethod(
+         *     AuthorizationMethod.UserApiKey("API_KEY_ID", "API_KEY_SECRET")
+         * )
+         * ```
+         */
         fun setAuthorizationMethod(authorizationMethod: AuthorizationMethod): Builder {
             this.authorizationMethod = authorizationMethod
             return this

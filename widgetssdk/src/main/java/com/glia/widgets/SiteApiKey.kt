@@ -7,5 +7,14 @@ package com.glia.widgets
  * @param secret The site API Key secret
  *
  * @see GliaWidgetsConfig
+ *
+ * @deprecated Will be removed in version 4.0.0.
  */
+@Deprecated(
+    "Use AuthorizationMethod.SiteApiKey from com.glia.widgets package",
+    ReplaceWith(
+        "AuthorizationMethod.SiteApiKey(id, secret)",
+        "com.glia.widgets.AuthorizationMethod"
+    )
+)
 class SiteApiKey(id: String, secret: String): AuthorizationMethod.SiteApiKey(id, secret)

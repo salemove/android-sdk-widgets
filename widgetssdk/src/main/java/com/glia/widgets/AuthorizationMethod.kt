@@ -24,7 +24,16 @@ sealed interface AuthorizationMethod {
      * @param secret The site API key secret
      *
      * @see GliaWidgetsConfig
+     *
+     * @deprecated Will be removed in version 4.0.0.
      */
+    @Deprecated(
+        "Use AuthorizationMethod.UserApiKey from com.glia.widgets package",
+        ReplaceWith(
+            "AuthorizationMethod.UserApiKey(id, secret)",
+            "com.glia.widgets.AuthorizationMethod"
+        )
+    )
     open class SiteApiKey(val id: String, val secret: String) : AuthorizationMethod
 }
 

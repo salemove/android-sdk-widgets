@@ -1,0 +1,125 @@
+# Build artifacts
+build/
+**/build/
+.gradle/
+**/.gradle/
+app/build/
+androidSdk/build/
+.cxx/
+**/.cxx/
+
+# Android Studio / IntelliJ IDEA
+.idea/
+**/.idea/
+*.iml
+**/*.iml
+local.properties
+*.ipr
+*.iws
+.idea_modules/
+
+# Gradle wrapper (generated)
+!gradle/wrapper/gradle-wrapper.jar
+
+# Generated files
+**/generated/
+gen/
+**/gen/
+out/
+**/out/
+
+# Android build outputs
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+
+# ProGuard/R8 mapping files
+mapping.txt
+seeds.txt
+usage.txt
+
+# Test results and coverage
+test-results/
+**/test-results/
+coverage/
+**/coverage/
+*.exec
+jacoco/
+
+# Lint baseline and reports
+lint-baseline.xml
+**/lint-reports/
+lint-results*.xml
+lint-results*.html
+
+# NDK
+obj/
+**/obj/
+*.so
+**/*.so
+
+# Logs
+*.log
+**/*.log
+
+# macOS system files
+.DS_Store
+**/.DS_Store
+
+# IDE specific (VSCode)
+.vscode/
+**/.vscode/
+
+# Temporary files
+*.swp
+*.swo
+*~
+.tmp/
+tmp/
+
+# Documentation (generated)
+**/docs/
+**/dokka/
+javadoc/
+**/javadoc/
+
+# External libraries (if vendored)
+libs/*.aar
+**/libs/*.aar
+
+# Keystore files (security)
+*.jks
+*.keystore
+keystore.properties
+
+# Local configuration
+local.properties
+
+# Firebase config (may contain sensitive data)
+google-services.json
+**/google-services.json
+
+# Release artifacts
+*.aab
+*.apk
+release/
+**/release/
+
+# Dependency directories (large)
+.m2/
+**/.m2/
+
+# Bitrise/CI artifacts
+bitrise.yml.bak
+**/bitrise-step-*/
+
+# Fastlane (if used)
+fastlane/report.xml
+fastlane/README.md
+fastlane/test_output/
+
+# Version control
+.git/
+.gitignore.bak

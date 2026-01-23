@@ -26,7 +26,7 @@ Claude has access to Atlassian services with **tool selection by service type**:
 
 **Atlassian MCP Server - For Confluence ONLY:**
 - **Use for:** All Confluence operations (searching pages, reading docs, listing spaces)
-- **Pre-configured:** Set up in [.mcp.json](.mcp.json)
+- **Pre-configured:** Uses global MCP configuration (not in local .mcp.json)
 - **Pre-approved tools:** Configured in [.claude/settings.json](.claude/settings.json)
 - **Capabilities:** Search pages, read full content, list spaces, CQL queries
 - **No additional auth needed:** Uses same credentials as CLI
@@ -40,12 +40,12 @@ Claude has access to Atlassian services with **tool selection by service type**:
 
 ### GitHub Integration
 
-Claude has direct access to GitHub repositories via GitHub CLI (`gh`) MCP integration:
+Claude has direct access to GitHub repositories via GitHub CLI (`gh`):
 
 **Setup:**
-- **Pre-configured:** GitHub MCP server is already set up in [.mcp.json](.mcp.json)
-- **Auto-enabled:** Automatically enabled for all team members via [.claude/settings.json](.claude/settings.json)
-- **Uses GitHub CLI:** Leverages `gh` authentication (browser-based OAuth)
+- **Pre-configured:** `gh` CLI commands are pre-approved in [.claude/settings.json](.claude/settings.json)
+- **Uses GitHub CLI:** Direct `gh` command execution (no MCP server needed)
+- **Token-efficient:** Direct CLI is more efficient than MCP for GitHub operations
 
 **Authentication (One-time per machine):**
 
@@ -65,15 +65,6 @@ Claude has direct access to GitHub repositories via GitHub CLI (`gh`) MCP integr
    - How to authenticate: **Login with a web browser**
    - Copy the one-time code → press Enter → browser opens → paste code → authorize
 
-3. **Install gh-mcp extension:**
-   ```bash
-   gh extension install shuymn/gh-mcp
-   ```
-
-4. **Verify it works:**
-   - Run `claude mcp list` to see GitHub server status
-   - Or run `/mcp` in Claude Code
-
 **Usage Examples:**
 - "Review PR #456 and provide feedback"
 - "Create an issue for the bug we just found"
@@ -87,6 +78,7 @@ Claude has direct access to GitHub repositories via GitHub CLI (`gh`) MCP integr
 - ✅ No tokens stored in files (uses `gh` credentials)
 - ✅ Automatic token refresh handled by `gh`
 - ✅ Same authentication used for git operations
+- ✅ Direct CLI execution (more token-efficient)
 - ✅ Easy team onboarding
 
 ### Android Emulator Integration
@@ -265,30 +257,37 @@ Components styled via Unified Theme:
 - PNG snapshots stored in repository
 
 **Unit Testing**
-- **JUnit 4.13.2** - Test framework
-- **Mockito Kotlin 6.0.0** - Mocking framework
-- **MockK 1.14.6** - Kotlin-native mocking
-- **Robolectric 4.16** - Android framework mocking (runs tests on JVM)
+- **JUnit** - Test framework
+- **Mockito Kotlin** - Mocking framework
+- **MockK** - Kotlin-native mocking
+- **Robolectric** - Android framework mocking (runs tests on JVM)
 - Tests in `widgetssdk/src/test/java/` directory
+- **Version reference:** See [gradle/libs.versions.toml](../gradle/libs.versions.toml) for current versions
 
 **Instrumentation Testing**
-- **Espresso 3.7.0** - UI testing framework
+- **Espresso** - UI testing framework
 - **AndroidX Test** - Testing utilities
 - Tests in `app/src/androidTest/` directory (demo app)
+- **Version reference:** See [gradle/libs.versions.toml](../gradle/libs.versions.toml) for current versions
 
 ### Dependencies
-External libraries (via Gradle version catalog):
+External libraries managed via Gradle version catalog:
 - **Glia Core SDK** - Core business logic and networking (API dependency)
 - **Glia Telemetry SDK** - Instrumentation and observability
-- **AndroidX Lifecycle 2.9.3** - Lifecycle-aware components
-- **AndroidX Core KTX 1.16.0** - Kotlin extensions
-- **Material Components 1.12.0** - UI components
+- **AndroidX Lifecycle** - Lifecycle-aware components
+- **AndroidX Core KTX** - Kotlin extensions
+- **Material Components** - UI components
 - **Coil** - Image loading
 - **Lottie** - Animation
 - **GSON** - JSON serialization
 - **AudioSwitch** - Audio device management
 - **Firebase Cloud Messaging (FCM)** - Push notifications (optional dependency)
 - **ExifInterface** - Image metadata
+
+**Version Management:**
+- **Single source of truth:** [gradle/libs.versions.toml](../gradle/libs.versions.toml)
+- All dependency versions are centrally managed in the version catalog
+- See version catalog for current versions of all dependencies
 
 ---
 

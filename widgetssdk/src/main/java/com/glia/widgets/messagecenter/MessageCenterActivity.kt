@@ -1,23 +1,19 @@
 package com.glia.widgets.messagecenter
 
-import android.Manifest
-import android.net.Uri
 import android.os.Bundle
-import androidx.activity.OnBackPressedCallback
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.result.contract.ActivityResultContracts.OpenDocument
-import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
-import androidx.activity.result.contract.ActivityResultContracts.TakePicture
+import com.glia.widgets.R
 import com.glia.widgets.base.FadeTransitionActivity
 import com.glia.widgets.base.GliaActivity
+import com.glia.widgets.base.GliaFragmentContract
 import com.glia.widgets.chat.Intention
-import com.glia.widgets.databinding.MessageCenterActivityBinding
-import com.glia.widgets.di.Dependencies
-import com.glia.widgets.internal.fileupload.PickVisualMediaMultipleMimeTypes
+import com.glia.widgets.locale.LocaleString
 
 /**
- * This activity is used for displaying the welcome screen for secure messaging.
+ * This activity hosts [MessageCenterFragment] and serves as an entry point for secure messaging.
+ *
+ * **Architecture:** This Activity is a thin wrapper that hosts the Fragment. All UI logic
+ * is implemented in [MessageCenterFragment] and [MessageCenterView]. This Activity handles Intent-based
+ * launches for backwards compatibility.
  *
  * Main features:
  * - Returns an error if the visitor is not authenticated or the specified queue does not support secure messaging.
@@ -25,107 +21,33 @@ import com.glia.widgets.internal.fileupload.PickVisualMediaMultipleMimeTypes
  * - Offers the option to access chat history.
  *
  * Before this activity is launched, make sure that Glia Widgets SDK is set up correctly.
+ *
+ * @see MessageCenterFragment
+ * @see MessageCenterView
  */
-internal class MessageCenterActivity : GliaActivity<MessageCenterView>, FadeTransitionActivity(),
-    MessageCenterView.OnFinishListener,
-    MessageCenterView.OnNavigateToMessagingListener,
-    MessageCenterView.OnAttachFileListener {
-
-    private lateinit var binding: MessageCenterActivityBinding
-    private val messageCenterView get() = binding.messageCenterView
-
-    private val controller: MessageCenterContract.Controller by lazy {
-        Dependencies.controllerFactory.messageCenterController
-    }
-
-    val pickContentMimeTypes = PickVisualMediaMultipleMimeTypes()
-    private val getMediaContent = registerForActivityResult(pickContentMimeTypes) { uri: Uri? ->
-        uri?.also(controller::onContentChosen)
-    }
-
-    private val getContent = registerForActivityResult(OpenDocument()) { uri: Uri? ->
-        uri?.also(controller::onContentChosen)
-    }
-
-    private val getImage = registerForActivityResult(TakePicture()) { captured ->
-        controller.onImageCaptured(captured)
-    }
-
-    private val getPermission = registerForActivityResult(RequestPermission()) { isGranted: Boolean ->
-        // Handle the returned Uri
-        if (isGranted) {
-            controller.onTakePhotoClicked()
-        }
-    }
-
-    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-            messageCenterView.onSystemBack()
-            finish()
-        }
-    }
+internal class MessageCenterActivity : GliaActivity<MessageCenterView>, FadeTransitionActivity(), GliaFragmentContract.Host {
+    private var messageCenterFragment: MessageCenterFragment? = null
 
     override val gliaView: MessageCenterView
-        get() = messageCenterView
+        get() = messageCenterFragment?.gliaView as? MessageCenterView ?: error("Fragment not initialized")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = MessageCenterActivityBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        setContentView(R.layout.message_center_activity_host)
 
-        messageCenterView.onFinishListener = this
-        messageCenterView.onNavigateToMessagingListener = this
-        messageCenterView.onAttachFileListener = this
-
-        messageCenterView.setController(controller)
-        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
-
-        messageCenterView.initialize()
+        if (savedInstanceState == null) {
+            messageCenterFragment = MessageCenterFragment()
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, messageCenterFragment!!)
+                .commit()
+        } else {
+            messageCenterFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as? MessageCenterFragment
+        }
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        messageCenterView.onResume()
+    override fun setHostTitle(locale: LocaleString?) {
+        setTitle(locale)
     }
 
-    override fun onPause() {
-        messageCenterView.onPause()
-
-        super.onPause()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        onBackPressedCallback.remove()
-        controller.onDestroy()
-    }
-
-    override fun selectMediaAttachmentFile(types: List<String>) {
-        pickContentMimeTypes.mimeTypes = types
-        getMediaContent.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
-    }
-
-    override fun selectAttachmentFile(types: List<String>) {
-        getContent.launch(types.toTypedArray())
-    }
-
-    override fun takePhoto(uri: Uri) {
-        getImage.launch(uri)
-    }
-
-    override fun requestCameraPermission() {
-        getPermission.launch(Manifest.permission.CAMERA)
-    }
-
-    override fun navigateToMessaging() {
-        Dependencies.activityLauncher.launchChat(this, Intention.SC_CHAT)
-        finish()
-    }
-
-    override fun returnToLiveChat() {
-        Dependencies.activityLauncher.launchChat(this, Intention.RETURN_TO_CHAT)
-        finish()
-    }
-
+    override fun finish() = super.finish()
 }

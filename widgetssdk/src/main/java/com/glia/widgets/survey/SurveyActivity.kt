@@ -1,140 +1,51 @@
 package com.glia.widgets.survey
 
-import android.graphics.Rect
 import android.os.Bundle
-import android.view.MotionEvent
-import android.view.View
-import android.view.animation.AnimationUtils
-import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
-import androidx.activity.OnBackPressedCallback
-import androidx.activity.enableEdgeToEdge
 import com.glia.androidsdk.engagement.Survey
-import com.glia.telemetry_lib.GliaLogger
-import com.glia.telemetry_lib.LogEvents
 import com.glia.widgets.R
 import com.glia.widgets.base.FadeTransitionActivity
-import com.glia.widgets.di.Dependencies.controllerFactory
+import com.glia.widgets.base.GliaFragmentContract
 import com.glia.widgets.helper.ExtraKeys
-import com.glia.widgets.helper.Logger
-import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.getParcelableExtraCompat
-import com.glia.widgets.helper.hideKeyboard
-import com.glia.widgets.helper.insetsController
-import com.glia.widgets.helper.insetsControllerCompat
+import com.glia.widgets.locale.LocaleString
 
 /**
- * Glia internal class.
+ * This activity hosts [SurveyFragment] and serves as an entry point for post-engagement surveys.
  *
+ * **Architecture:** This Activity is a thin wrapper that hosts the Fragment. All UI logic
+ * is implemented in [SurveyFragment] and [SurveyView]. This Activity handles Intent-based
+ * launches for backwards compatibility.
+ *
+ * This activity is used to display post-engagement surveys.
  *
  * It will be automatically added to the integrator's manifest file by the manifest merger during compilation.
  *
- *
- * This activity is used to display post-engagement surveys.
+ * @see SurveyFragment
+ * @see SurveyView
  */
-internal class SurveyActivity : FadeTransitionActivity(), SurveyView.OnFinishListener {
-    private val surveyView: SurveyView by lazy { findViewById(R.id.survey_view) }
-
-    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-            finish()
-        }
-    }
+internal class SurveyActivity : FadeTransitionActivity(), GliaFragmentContract.Host {
+    private var surveyFragment: SurveyFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        this.enableEdgeToEdge()
-        window.insetsControllerCompat.isAppearanceLightStatusBars = false
-
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.survey_activity_host)
 
-        setContentView(R.layout.survey_activity)
+        if (savedInstanceState == null) {
+            val survey = intent.getParcelableExtraCompat<Survey>(ExtraKeys.SURVEY)
+                ?: error("Survey must be provided")
 
-        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
-
-        prepareSurveyView()
-        val slideUpAnim = AnimationUtils.loadAnimation(this, R.anim.slide_up)
-        surveyView.startAnimation(slideUpAnim)
-
-        GliaLogger.i(LogEvents.SURVEY_SCREEN_SHOWN)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        hideSoftKeyboard()
-        surveyView.onDestroyView()
-        onBackPressedCallback.remove()
-        GliaLogger.i(LogEvents.SURVEY_SCREEN_CLOSED)
-    }
-
-    override fun onFinish() {
-        finish()
-    }
-
-    override fun finish() {
-        super.finish()
-        val slideDownAnim = AnimationUtils.loadAnimation(this, R.anim.slide_down)
-        surveyView.startAnimation(slideDownAnim)
-    }
-
-    override fun dispatchTouchEvent(event: MotionEvent): Boolean {
-        // Override the default dispatchTouchEvent
-        if (event.action == MotionEvent.ACTION_DOWN) {
-            if (finishActivityWithAnimationWhenTappedOutsideSurveyView(event)) return true
-            removeFocusWhenTappedOutsideSurveyEditText(event)
-        }
-        return super.dispatchTouchEvent(event)
-    }
-
-    fun finishActivityWithAnimationWhenTappedOutsideSurveyView(event: MotionEvent): Boolean {
-        val surveyView: View? = findViewById(R.id.survey_view)
-        if (surveyView != null) {
-            val location = IntArray(2)
-            surveyView.getLocationOnScreen(location)
-            val x: Float = event.rawX
-            val y: Float = event.rawY
-            val isTappedOutsideSurveyView =
-                x < location[0] || x > location[0] + surveyView.width || y < location[1] || y > location[1] + surveyView.height
-            if (isTappedOutsideSurveyView) {
-                finish()
-                return true // consume the event
-            }
-        }
-        return false
-    }
-
-    fun removeFocusWhenTappedOutsideSurveyEditText(event: MotionEvent) {
-        (currentFocus as? EditText)?.let { editText ->
-            val outRect = Rect()
-            editText.getGlobalVisibleRect(outRect)
-            if (!outRect.contains(event.rawX.toInt(), event.rawY.toInt())) {
-                editText.clearFocus()
-                (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager)
-                    .hideSoftInputFromWindow(editText.windowToken, 0)
-            }
+            surveyFragment = SurveyFragment.newInstance(survey)
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, surveyFragment!!)
+                .commit()
+        } else {
+            surveyFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as? SurveyFragment
         }
     }
 
-    private fun hideSoftKeyboard() {
-        surveyView.insetsController?.hideKeyboard()
+    override fun setHostTitle(locale: LocaleString?) {
+        setTitle(locale)
     }
 
-    private fun prepareSurveyView() {
-        surveyView.setOnTitleUpdatedListener(object : SurveyView.OnTitleUpdatedListener {
-            override fun onTitleUpdated(title: String?) {
-                updateTitle(title)
-            }
-        })
-
-        surveyView.setOnFinishListener(this)
-        val surveyController = controllerFactory.surveyController
-        surveyView.setController(surveyController)
-
-        intent.getParcelableExtraCompat<Survey>(ExtraKeys.SURVEY)?.let {
-            surveyController.init(it)
-        }
-    }
-
-    private fun updateTitle(title: String?) {
-        this.title = title
-    }
+    override fun finish() = super.finish()
 }

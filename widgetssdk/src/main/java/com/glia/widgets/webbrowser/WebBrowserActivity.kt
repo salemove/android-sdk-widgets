@@ -1,48 +1,53 @@
 package com.glia.widgets.webbrowser
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
+import com.glia.widgets.R
 import com.glia.widgets.base.FadeTransitionActivity
-import com.glia.widgets.databinding.WebBrowserAvtivityBinding
+import com.glia.widgets.base.GliaFragmentContract
 import com.glia.widgets.helper.ExtraKeys
 import com.glia.widgets.helper.getParcelable
 import com.glia.widgets.locale.LocaleString
 
 /**
- * Glia internal class.
+ * This activity hosts [WebBrowserFragment] and serves as an entry point for web browsing.
  *
- * It will be automatically added to the integrator's manifest file by the manifest merger during compilation.
+ * **Architecture:** This Activity is a thin wrapper that hosts the Fragment. All UI logic
+ * is implemented in [WebBrowserFragment] and [WebBrowserView]. This Activity handles Intent-based
+ * launches for backwards compatibility.
  *
  * This activity is used to display simple web pages. For example, it can be used to display links to the
  * client's Terms and Conditions or Privacy Policy, which can be part of the engagement confirmation dialog.
+ *
+ * It will be automatically added to the integrator's manifest file by the manifest merger during compilation.
+ *
+ * @see WebBrowserFragment
+ * @see WebBrowserView
  */
-internal class WebBrowserActivity :
-    FadeTransitionActivity(),
-    WebBrowserView.OnFinishListener,
-    WebBrowserView.OnLinkClickListener {
-
-    private val binding: WebBrowserAvtivityBinding by lazy {
-        WebBrowserAvtivityBinding.inflate(
-            layoutInflater
-        )
-    }
-    private val webBrowserView get() = binding.webBrowserView
+internal class WebBrowserActivity : FadeTransitionActivity(), GliaFragmentContract.Host {
+    private var webBrowserFragment: WebBrowserFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(binding.root)
+        setContentView(R.layout.web_browser_activity_host)
 
-        val title = intent.getParcelable<LocaleString>(ExtraKeys.WEB_BROWSER_TITLE)
-        val url = intent.getStringExtra(ExtraKeys.WEB_BROWSER_URL).orEmpty()
+        if (savedInstanceState == null) {
+            val title = intent.getParcelable<LocaleString>(ExtraKeys.WEB_BROWSER_TITLE)
+                ?: error("Title must be provided")
+            val url = intent.getStringExtra(ExtraKeys.WEB_BROWSER_URL)
+                ?: error("URL must be provided")
 
-        webBrowserView.onLinkClickListener = this
-        webBrowserView.onFinishListener = this
-        webBrowserView.setTitle(title)
-        webBrowserView.load(url)
+            webBrowserFragment = WebBrowserFragment.newInstance(url, title)
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, webBrowserFragment!!)
+                .commit()
+        } else {
+            webBrowserFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as? WebBrowserFragment
+        }
     }
 
-    override fun onLinkClick(url: Uri) {
-        startActivity(Intent(Intent.ACTION_VIEW, url))
+    override fun setHostTitle(locale: LocaleString?) {
+        setTitle(locale)
     }
+
+    override fun finish() = super.finish()
 }

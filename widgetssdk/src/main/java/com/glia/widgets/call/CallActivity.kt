@@ -1,27 +1,23 @@
 package com.glia.widgets.call
 
 import android.os.Bundle
-import com.glia.telemetry_lib.GliaLogger
-import com.glia.telemetry_lib.LogEvents
 import com.glia.widgets.R
 import com.glia.widgets.base.FadeTransitionActivity
 import com.glia.widgets.base.GliaActivity
-import com.glia.widgets.call.CallView.OnNavigateToChatListener
-import com.glia.widgets.call.CallView.OnNavigateToWebBrowserListener
-import com.glia.widgets.chat.Intention
-import com.glia.widgets.di.Dependencies
+import com.glia.widgets.base.GliaFragmentContract
 import com.glia.widgets.engagement.MediaType
 import com.glia.widgets.helper.ExtraKeys
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.getEnumExtra
-import com.glia.widgets.launcher.ActivityLauncher
 import com.glia.widgets.locale.LocaleString
-import kotlin.properties.Delegates
 
 /**
- * This activity is used for engagements that include audio and/or video calls.
+ * This activity hosts [CallFragment] and serves as an entry point for call engagements.
  *
+ * **Architecture:** This Activity is a thin wrapper that hosts the Fragment. All UI logic
+ * is implemented in [CallFragment] and [CallView]. This Activity handles Intent-based
+ * launches for backwards compatibility.
  *
  * Main features:
  * - Requests required permissions and enqueues for audio and/or video engagements if no ongoing engagements are found.
@@ -29,84 +25,48 @@ import kotlin.properties.Delegates
  * - Provides controls for managing ongoing engagements, including video and audio.
  * - Allows switching between chat and call activities.
  *
- *
  * Before this activity is launched, make sure that Glia Widgets SDK is set up correctly.
+ *
+ * @see CallFragment
+ * @see CallView
  */
-internal class CallActivity : GliaActivity<CallView>, FadeTransitionActivity() {
-    private val activityLauncher: ActivityLauncher by lazy { Dependencies.activityLauncher }
-    private var callView: CallView by Delegates.notNull()
-
-    private var onBackClickedListener: CallView.OnBackClickedListener? = CallView.OnBackClickedListener { this.finish() }
-    private var onNavigateToChatListener: OnNavigateToChatListener? = OnNavigateToChatListener {
-        navigateToChat()
-        finish()
-    }
-    private val onNavigateToWebBrowserListener = OnNavigateToWebBrowserListener(this::navigateToWebBrowser)
+internal class CallActivity : GliaActivity<CallView>, FadeTransitionActivity(), GliaFragmentContract.Host {
+    private var callFragment: CallFragment? = null
 
     override val gliaView: CallView
-        get() = callView
+        get() = callFragment?.gliaView as? CallView ?: error("Fragment not initialized")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Logger.i(TAG, "Create Call screen")
-        setContentView(R.layout.call_activity)
-        callView = findViewById(R.id.call_view)
-
-        val isUpgradeToCall = intent.getBooleanExtra(ExtraKeys.IS_UPGRADE_TO_CALL, false)
-
-        if (!callView.shouldShowMediaEngagementView(isUpgradeToCall)) {
-            finish()
-            return
-        }
-
-        callView.setOnTitleUpdatedListener(this::setTitle)
-        onBackClickedListener?.also(callView::setOnBackClickedListener)
-
-        callView.setOnEndListener { this.finish() }
-
-        callView.setOnMinimizeListener { this.finish() }
-        onNavigateToChatListener?.also(callView::setOnNavigateToChatListener)
-        callView.setOnNavigateToWebBrowserListener(onNavigateToWebBrowserListener)
+        setContentView(R.layout.call_activity_host)
 
         if (savedInstanceState == null) {
+            val mediaType = intent.getEnumExtra<MediaType>(ExtraKeys.MEDIA_TYPE)
+            val isUpgradeToCall = intent.getBooleanExtra(ExtraKeys.IS_UPGRADE_TO_CALL, false)
 
-            startCall(intent.getEnumExtra<MediaType>(ExtraKeys.MEDIA_TYPE), isUpgradeToCall)
+            callFragment = CallFragment.newInstance(mediaType, isUpgradeToCall)
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, callFragment!!)
+                .commit()
+        } else {
+            callFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as? CallFragment
         }
     }
 
-    override fun onResume() {
-        callView.onResume()
-        super.onResume()
-        GliaLogger.i(LogEvents.CALL_SCREEN_SHOWN)
-    }
-
-    override fun onPause() {
-        callView.onPause()
-        super.onPause()
-        GliaLogger.i(LogEvents.CALL_SCREEN_CLOSED)
+    override fun onUserInteraction() {
+        super.onUserInteraction()
+        callFragment?.onUserInteraction()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         Logger.i(TAG, "Destroy Call screen")
-        onBackClickedListener = null
-        onNavigateToChatListener = null
-        callView.onDestroy()
     }
 
-    override fun onUserInteraction() {
-        super.onUserInteraction()
-        callView.onUserInteraction()
+    override fun setHostTitle(locale: LocaleString?) {
+        setTitle(locale)
     }
 
-    private fun startCall(mediaType: MediaType?, isUpgradeToCall: Boolean) {
-        callView.startCall(isUpgradeToCall, mediaType)
-    }
-
-    private fun navigateToChat() {
-        Logger.d(TAG, "navigateToChat")
-        activityLauncher.launchChat(this, Intention.RETURN_TO_CHAT)
-    }
-
-    private fun navigateToWebBrowser(title: LocaleString, url: String) = activityLauncher.launchWebBrowser(this, title, url)
+    override fun finish() = super.finish()
 }

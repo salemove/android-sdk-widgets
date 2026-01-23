@@ -1,21 +1,22 @@
 package com.glia.widgets.chat
 
 import android.os.Bundle
-import androidx.activity.OnBackPressedCallback
 import com.glia.widgets.R
 import com.glia.widgets.base.FadeTransitionActivity
 import com.glia.widgets.base.GliaActivity
-import com.glia.widgets.di.Dependencies
+import com.glia.widgets.base.GliaFragmentContract
 import com.glia.widgets.helper.ExtraKeys
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.getEnumExtra
-import com.glia.widgets.launcher.ActivityLauncher
-import kotlin.properties.Delegates
+import com.glia.widgets.locale.LocaleString
 
 /**
- * This activity is used to handle chat engagements.
+ * This activity hosts [ChatFragment] and serves as an entry point for chat engagements.
  *
+ * **Architecture:** This Activity is a thin wrapper that hosts the Fragment. All UI logic
+ * is implemented in [ChatFragment] and [ChatView]. This Activity handles Intent-based
+ * launches for backwards compatibility.
  *
  * Main features:
  * - Shows chat history to authenticated visitors before enqueuing for new engagements.
@@ -24,75 +25,43 @@ import kotlin.properties.Delegates
  * - Enables message exchange between the visitor and the operator during ongoing engagements.
  * - Allows the operator to upgrade engagements.
  *
- *
  * Before this activity is launched, make sure that Glia Widgets SDK is set up correctly.
+ *
+ * @see ChatFragment
+ * @see ChatView
  */
-internal class ChatActivity : GliaActivity<ChatView>, FadeTransitionActivity() {
-    private val activityLauncher: ActivityLauncher by lazy { Dependencies.activityLauncher }
-
-    private var chatView: ChatView by Delegates.notNull()
-
-    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-            chatView.onBackPressed()
-        }
-    }
+internal class ChatActivity : GliaActivity<ChatView>, FadeTransitionActivity(), GliaFragmentContract.Host {
+    private var chatFragment: ChatFragment? = null
 
     override val gliaView: ChatView
-        get() = chatView
+        get() = chatFragment?.gliaView as? ChatView ?: error("Fragment not initialized")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Logger.i(TAG, "Create Chat screen")
-        setContentView(R.layout.chat_activity)
-        chatView = findViewById(R.id.chat_view)
-
-        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
-
-        chatView.setOnTitleUpdatedListener(this::setTitle)
-
-        if (!chatView.shouldShow()) {
-            finish()
-            return
-        }
-
-        chatView.setOnBackClickedListener(::finish)
-        chatView.setOnBackToCallListener(::backToCallScreen)
-
-        chatView.setOnEndListener(::finish)
-
-        chatView.setOnMinimizeListener(::finish)
-
-        val intention = intent.getEnumExtra<Intention>(ExtraKeys.OPEN_CHAT_INTENTION)
-
-        check(intention != null) { "Intention must be provided" }
+        setContentView(R.layout.chat_activity_host)
 
         if (savedInstanceState == null) {
-            chatView.startChat(intention)
+            val intention = intent.getEnumExtra<Intention>(ExtraKeys.OPEN_CHAT_INTENTION)
+            checkNotNull(intention) { "Intention must be provided" }
+
+            chatFragment = ChatFragment.newInstance(intention)
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, chatFragment!!)
+                .commit()
         } else {
-            chatView.restoreChat()
+            chatFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as? ChatFragment
         }
-    }
-
-    override fun onResume() {
-        chatView.onResume()
-        super.onResume()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        chatView.onPause()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        chatView.onDestroyView()
-        onBackPressedCallback.remove()
         Logger.i(TAG, "Destroy Chat screen")
     }
 
-    private fun backToCallScreen() {
-        activityLauncher.launchCall(this, null, false)
-        finish()
+    override fun setHostTitle(locale: LocaleString?) {
+        setTitle(locale)
     }
+
+    override fun finish() = super.finish()
 }

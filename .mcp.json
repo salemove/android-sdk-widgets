@@ -9,18 +9,6 @@
         "@mobilenext/mobile-mcp@latest"
       ],
       "env": {}
-    },
-    "atlassian": {
-      "type": "stdio",
-      "command": "npx",
-      "description": "Access Jira issues and Confluence pages via Atlassian Cloud API",
-      "args": ["-y", "mcp-remote", "https://mcp.atlassian.com/v1/sse"]
-    },
-    "github": {
-      "type": "stdio",
-      "command": "gh",
-      "description": "Interact with GitHub repositories, issues, and pull requests",
-      "args": ["mcp"]
     }
   },
   "toolApprovalRules": [
@@ -98,62 +86,6 @@
     },
     {
       "tool": "mcp__mobile-mcp__mobile_uninstall_app",
-      "approvalPolicy": "always-allow"
-    },
-    {
-      "tool": "mcp__atlassian__search",
-      "approvalPolicy": "always-allow"
-    },
-    {
-      "tool": "mcp__atlassian__getConfluencePage",
-      "approvalPolicy": "always-allow"
-    },
-    {
-      "tool": "mcp__atlassian__getPagesInConfluenceSpace",
-      "approvalPolicy": "always-allow"
-    },
-    {
-      "tool": "mcp__atlassian__getConfluenceSpaces",
-      "approvalPolicy": "always-allow"
-    },
-    {
-      "tool": "mcp__atlassian__searchConfluenceUsingCql",
-      "approvalPolicy": "always-allow"
-    },
-    {
-      "tool": "mcp__github__search_code",
-      "approvalPolicy": "always-allow"
-    },
-    {
-      "tool": "mcp__github__search_repositories",
-      "approvalPolicy": "always-allow"
-    },
-    {
-      "tool": "mcp__github__search_issues",
-      "approvalPolicy": "always-allow"
-    },
-    {
-      "tool": "mcp__github__search_pull_requests",
-      "approvalPolicy": "always-allow"
-    },
-    {
-      "tool": "mcp__github__list_pull_requests",
-      "approvalPolicy": "always-allow"
-    },
-    {
-      "tool": "mcp__github__list_issues",
-      "approvalPolicy": "always-allow"
-    },
-    {
-      "tool": "mcp__github__pull_request_read",
-      "approvalPolicy": "always-allow"
-    },
-    {
-      "tool": "mcp__github__issue_read",
-      "approvalPolicy": "always-allow"
-    },
-    {
-      "tool": "mcp__github__get_file_contents",
       "approvalPolicy": "always-allow"
     }
   ]

@@ -4,10 +4,7 @@
     "commit-messages@glia-plugins": true
   },
   "enabledMcpjsonServers": [
-    "ios-simulator",
-    "mobile-mcp",
-    "atlassian",
-    "github"
+    "mobile-mcp"
   ],
   "permissions": {
     "allow": [
@@ -18,20 +15,31 @@
       "Bash(gh pr:*)",
       "Bash(gh issue:*)",
       "Bash(gh release:*)",
+      "Bash(gh search:*)",
       "mcp__atlassian__search",
       "mcp__atlassian__getConfluencePage",
       "mcp__atlassian__getPagesInConfluenceSpace",
       "mcp__atlassian__getConfluenceSpaces",
       "mcp__atlassian__searchConfluenceUsingCql",
-      "mcp__github__search_code",
-      "mcp__github__search_repositories",
-      "mcp__github__search_issues",
-      "mcp__github__search_pull_requests",
-      "mcp__github__list_pull_requests",
-      "mcp__github__list_issues",
-      "mcp__github__pull_request_read",
-      "mcp__github__issue_read",
-      "mcp__github__get_file_contents"
+      "mcp__mobile-mcp__mobile_list_available_devices",
+      "mcp__mobile-mcp__mobile_list_apps",
+      "mcp__mobile-mcp__mobile_launch_app",
+      "mcp__mobile-mcp__mobile_terminate_app",
+      "mcp__mobile-mcp__mobile_take_screenshot",
+      "mcp__mobile-mcp__mobile_list_elements_on_screen",
+      "mcp__mobile-mcp__mobile_click_on_screen_at_coordinates",
+      "mcp__mobile-mcp__mobile_double_tap_on_screen",
+      "mcp__mobile-mcp__mobile_long_press_on_screen_at_coordinates",
+      "mcp__mobile-mcp__mobile_swipe_on_screen",
+      "mcp__mobile-mcp__mobile_type_keys",
+      "mcp__mobile-mcp__mobile_press_button",
+      "mcp__mobile-mcp__mobile_get_screen_size",
+      "mcp__mobile-mcp__mobile_get_orientation",
+      "mcp__mobile-mcp__mobile_set_orientation",
+      "mcp__mobile-mcp__mobile_open_url",
+      "mcp__mobile-mcp__mobile_save_screenshot",
+      "mcp__mobile-mcp__mobile_install_app",
+      "mcp__mobile-mcp__mobile_uninstall_app"
     ]
   }
 }

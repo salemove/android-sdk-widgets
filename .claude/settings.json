@@ -16,6 +16,8 @@
       "Bash(gh issue:*)",
       "Bash(gh release:*)",
       "Bash(gh search:*)",
+      "Bash(test -f .github/PULL_REQUEST_TEMPLATE.md*)",
+      "Read(.github/PULL_REQUEST_TEMPLATE.md)",
       "mcp__atlassian__search",
       "mcp__atlassian__getConfluencePage",
       "mcp__atlassian__getPagesInConfluenceSpace",

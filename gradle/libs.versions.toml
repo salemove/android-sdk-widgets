@@ -42,6 +42,7 @@ testRulesVersion = "1.7.0"
 testRobolectricVersion = "4.16"
 testJunitVersion = "4.13.2"
 testJsonVersion = "20250517"
+testTurbineVersion = "1.2.0"
 
 debugLeakcanaryVersion = "3.0-alpha-8"
 
@@ -67,6 +68,11 @@ java-preference = { module = "androidx.preference:preference", version.ref = "ja
 java-rxandroid = { module = "io.reactivex.rxjava3:rxandroid", version.ref = "javaRxAndroid3Version" }
 java-rxjava = { module = "io.reactivex.rxjava3:rxjava", version.ref = "javaRxJava3Version" }
 lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "javaLifecycleProcessVersion" }
+lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "javaLifecycleProcessVersion" }
+lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "javaLifecycleProcessVersion" }
+java-coroutines-rx3 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-rx3", version.ref = "javaCoroutinesVersion" }
+test-turbine = { module = "app.cash.turbine:turbine", version.ref = "testTurbineVersion" }
+test-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "javaCoroutinesVersion" }
 media-lottie = { module = "com.airbnb.android:lottie", version.ref = "mediaLottieVersion" }
 media-coil-core = { module = "io.coil-kt.coil3:coil", version.ref = "mediaCoilCoreVersion" }
 media-coil-network = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "mediaCoilNetworkVersion" }

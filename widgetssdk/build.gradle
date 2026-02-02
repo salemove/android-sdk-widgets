@@ -178,6 +178,10 @@ dependencies {
   implementation libs.lifecycle.process
   implementation libs.media.coil.core
   implementation libs.media.coil.network
+  implementation libs.java.coroutines
+  implementation libs.lifecycle.viewmodel.ktx
+  implementation libs.lifecycle.runtime.ktx
+  implementation libs.java.coroutines.rx3
 
   // Used for audio and video permissions by CallActivity
   implementation libs.java.rxandroid
@@ -224,6 +228,8 @@ dependencies {
   // Test dependencies to Android native libraries
   // To prevent unit tests firing errors like 'Method length in org.json.JSONObject not mocked'
   testImplementation libs.test.json
+  testImplementation libs.test.turbine
+  testImplementation libs.test.coroutines
 
   lintChecks project(':lint_checker')
   debugImplementation libs.debug.leakcanary

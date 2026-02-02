@@ -5,6 +5,7 @@ import android.os.Build
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
 import com.glia.androidsdk.RequestCallback
 import com.glia.telemetry_lib.EventAttribute
 import com.glia.telemetry_lib.GliaLogger
@@ -83,6 +84,11 @@ internal object Dependencies {
         @VisibleForTesting set
 
     private lateinit var managerFactory: ManagerFactory
+
+    @JvmStatic
+    val viewModelFactory: ViewModelProvider.Factory by lazy {
+        ViewModelFactory(useCaseFactory, repositoryFactory)
+    }
 
     var gliaCore: GliaCore = GliaCoreImpl()
         @VisibleForTesting set

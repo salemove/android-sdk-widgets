@@ -16,8 +16,7 @@
     </style>
 
     <style name="Theme.GliaAndroidSdkWidgetsExample.Chat" parent="Application.Glia.Chat">
-        <item name="materialThemeOverlay">@style/ThemeOverlay.GliaAndroidSDKWidgetsExample.Chat
-        </item>
+        <item name="materialThemeOverlay">@style/ThemeOverlay.GliaAndroidSDKWidgetsExample.Chat</item>
     </style>
 
     <style name="ThemeOverlay.GliaAndroidSDKWidgetsExample.Chat" parent="ThemeOverlay.Glia.Chat">

@@ -58,12 +58,11 @@ internal class Navigator(
     }
 
     fun showWebBrowser(title: String, url: String) {
-        // Phase 6: WebBrowserFragment
-        // val fragment = fragmentFactory.createWebBrowserFragment(title, url)
-        // fragmentManager.beginTransaction()
-        //     .replace(containerId, fragment, TAG_WEB_BROWSER)
-        //     .addToBackStack(null)
-        //     .commit()
+        val fragment = fragmentFactory.createWebBrowserFragment(title, url)
+        fragmentManager.beginTransaction()
+            .replace(containerId, fragment, TAG_WEB_BROWSER)
+            .addToBackStack(null)
+            .commit()
     }
 
     fun showImagePreview(imageId: String?, imageName: String?, localImageUri: String?) {

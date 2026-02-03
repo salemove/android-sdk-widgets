@@ -154,6 +154,14 @@ internal class AppBarView @JvmOverloads constructor(
         binding.title.setText(title)
     }
 
+    /**
+     * Sets the title as a plain string without locale resolution.
+     * Used when the title is already resolved or provided as raw text.
+     */
+    fun setTitleText(title: String?) {
+        binding.title.text = title
+    }
+
     fun setVisibility(visibility: Boolean = true) {
         isVisible = visibility
     }

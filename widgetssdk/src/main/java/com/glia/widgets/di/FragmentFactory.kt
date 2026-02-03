@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import com.glia.androidsdk.engagement.Survey
 import com.glia.widgets.chat.Intention
 import com.glia.widgets.survey.SurveyBottomSheetFragment
+import com.glia.widgets.webbrowser.WebBrowserFragment
 
 /**
  * Factory for creating Fragment instances with proper arguments.
@@ -54,12 +55,14 @@ internal class FragmentFactory {
 
     /**
      * Creates a WebBrowserFragment with the specified title and URL.
-     *
-     * Will be implemented in Phase 6 when WebBrowserFragment is created.
      */
-    fun createWebBrowserFragment(title: String, url: String): Fragment {
-        // TODO: Implement in Phase 6
-        throw NotImplementedError("WebBrowserFragment will be implemented in Phase 6")
+    fun createWebBrowserFragment(title: String, url: String): WebBrowserFragment {
+        return WebBrowserFragment().apply {
+            arguments = Bundle().apply {
+                putString(WebBrowserFragment.ARG_TITLE, title)
+                putString(WebBrowserFragment.ARG_URL, url)
+            }
+        }
     }
 
     // Bottom sheets

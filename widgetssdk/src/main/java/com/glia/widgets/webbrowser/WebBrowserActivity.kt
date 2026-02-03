@@ -16,7 +16,18 @@ import com.glia.widgets.locale.LocaleString
  *
  * This activity is used to display simple web pages. For example, it can be used to display links to the
  * client's Terms and Conditions or Privacy Policy, which can be part of the engagement confirmation dialog.
+ *
+ * @deprecated Use [com.glia.widgets.HostActivity] with [com.glia.widgets.navigation.Destination.WebBrowser] instead.
+ * This Activity is kept for backward compatibility and will be removed in a future version.
  */
+@Deprecated(
+    message = "Use HostActivity with Destination.WebBrowser instead",
+    replaceWith = ReplaceWith(
+        "HostActivity.start(context, Destination.WebBrowser(title, url))",
+        "com.glia.widgets.HostActivity",
+        "com.glia.widgets.navigation.Destination"
+    )
+)
 internal class WebBrowserActivity :
     FadeTransitionActivity(),
     WebBrowserView.OnFinishListener,

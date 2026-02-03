@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 
 /**
  * Base Fragment for SDK screens with MVI architecture.

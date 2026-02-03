@@ -64,6 +64,14 @@ internal class WebBrowserView(
         appBar?.setTitle(title)
     }
 
+    /**
+     * Sets the title as a plain string without locale resolution.
+     * Used by WebBrowserFragment when title is passed as String argument.
+     */
+    fun setTitleText(title: String?) {
+        appBar?.setTitleText(title)
+    }
+
     fun load(url: String) {
         webView?.webViewClient = object : WebViewClient() {
             override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {

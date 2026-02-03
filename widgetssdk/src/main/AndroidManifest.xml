@@ -85,6 +85,13 @@
             android:excludeFromRecents="true"
             android:theme="@style/Application.Glia.Translucent.Activity" />
 
+        <activity
+            android:name=".HostActivity"
+            android:theme="@style/Application.Glia.Translucent.Activity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="false" />
+
         <service
             android:name=".core.chathead.ChatHeadService"
             android:enabled="true"

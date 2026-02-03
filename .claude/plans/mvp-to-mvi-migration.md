@@ -694,8 +694,8 @@ fun launchSurvey(context: Context, survey: Survey) {
 ### Success Criteria:
 
 #### Automated Verification:
-- [ ] Build completes: `./gradlew widgetssdk:assembleDebug`
-- [ ] Unit tests pass: `./gradlew widgetssdk:testDebugUnitTest`
+- [x] Build completes: `./gradlew widgetssdk:assembleDebug`
+- [x] Unit tests pass: `./gradlew widgetssdk:testDebugUnitTest`
 
 #### Manual Verification:
 - [ ] HostActivity launches with transparent background

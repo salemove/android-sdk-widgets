@@ -7,6 +7,7 @@ import com.glia.androidsdk.engagement.Survey
 import com.glia.widgets.chat.Intention
 import com.glia.widgets.filepreview.ui.ImagePreviewDialogFragment
 import com.glia.widgets.survey.SurveyBottomSheetFragment
+import com.glia.widgets.view.dialog.VisitorCodeDialogFragment
 import com.glia.widgets.webbrowser.WebBrowserFragment
 
 /**
@@ -105,11 +106,11 @@ internal class FragmentFactory {
     /**
      * Creates a VisitorCodeDialogFragment.
      *
-     * Will be implemented in Phase 8 when VisitorCodeDialogFragment is created.
+     * This fragment is a thin wrapper around VisitorCodeView which can be used standalone.
+     * The Controller remains the source of truth for business logic.
      */
-    fun createVisitorCodeDialog(): DialogFragment {
-        // TODO: Implement in Phase 8
-        throw NotImplementedError("VisitorCodeDialogFragment will be implemented in Phase 8")
+    fun createVisitorCodeDialog(): VisitorCodeDialogFragment {
+        return VisitorCodeDialogFragment()
     }
 
     // Additional dialog helpers (for internal use by Navigator)

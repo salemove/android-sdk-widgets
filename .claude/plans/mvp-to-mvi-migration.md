@@ -1356,7 +1356,7 @@ Migrate ImagePreview to `DialogFragment` hosted in `HostActivity`.
 
 ---
 
-## Phase 8: VisitorCode Migration (Priority 2)
+## Phase 8: VisitorCode Migration (Priority 2) ✅ COMPLETED
 
 ### Overview
 Create a `DialogFragment` wrapper for VisitorCode to work with `HostActivity`.
@@ -1367,17 +1367,25 @@ Create a `DialogFragment` wrapper for VisitorCode to work with `HostActivity`.
 - **Keep `VisitorCodeController`** - View continues to work standalone without Fragment/Activity wrapper
 - **Create `VisitorCodeDialogFragment`** - Thin wrapper that hosts `VisitorCodeView` for HostActivity usage
 - **No ViewModel migration** - Controller remains the source of truth for business logic
+- **Do NOT deprecate `DialogHolderActivity`** - Still used by other dialogs outside this migration scope
 
-### Changes Required:
-- Create `VisitorCodeDialogFragment` as a thin wrapper around `VisitorCodeView`
-- Fragment delegates all logic to the existing Controller via the View
-- Update `Navigator` to handle VisitorCode destination
-- Mark `DialogHolderActivity` as `@Deprecated`
+### Changes Completed:
+- ✅ Created `VisitorCodeDialogFragment` as a thin wrapper around `VisitorCodeView`
+- ✅ Fragment delegates all logic to the existing Controller via the View
+- ✅ Updated `FragmentFactory.createVisitorCodeDialog()` to create the fragment
+- ✅ Navigator already had `showVisitorCode()` method from Phase 3
 
 ### Success Criteria:
-- [ ] Build completes
+
+#### Automated Verification:
+- [x] Build completes: `./gradlew widgetssdk:assembleDebug`
+- [x] Unit tests pass: `./gradlew widgetssdk:testDebugUnitTest`
+
+#### Manual Verification:
 - [ ] VisitorCode works as dialog through HostActivity
 - [ ] VisitorCodeView continues to work standalone (without Fragment)
+- [ ] Dialog dismissal works properly
+- [ ] CallVisualizerController integration works
 
 ---
 

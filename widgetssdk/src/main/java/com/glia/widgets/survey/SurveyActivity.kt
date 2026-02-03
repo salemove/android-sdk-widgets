@@ -31,7 +31,18 @@ import com.glia.widgets.helper.insetsControllerCompat
  *
  *
  * This activity is used to display post-engagement surveys.
+ *
+ * @deprecated Use [SurveyBottomSheetFragment] via [com.glia.widgets.HostActivity] instead.
+ * This Activity will be removed in a future version as part of the MVI migration.
  */
+@Deprecated(
+    message = "Use SurveyBottomSheetFragment via HostActivity with Destination.SurveyScreen instead",
+    replaceWith = ReplaceWith(
+        "HostActivity.start(context, Destination.SurveyScreen(survey))",
+        "com.glia.widgets.HostActivity",
+        "com.glia.widgets.navigation.Destination"
+    )
+)
 internal class SurveyActivity : FadeTransitionActivity(), SurveyView.OnFinishListener {
     private val surveyView: SurveyView by lazy { findViewById(R.id.survey_view) }
 

@@ -173,6 +173,7 @@ apply from: "${rootProject.projectDir}/scripts/direct-core.gradle"
 
 dependencies {
   implementation libs.java.appcompat
+  implementation libs.java.fragment.ktx
   implementation libs.java.material
   implementation libs.java.constraintlayout
   implementation libs.lifecycle.process

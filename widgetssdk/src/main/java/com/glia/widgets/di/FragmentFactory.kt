@@ -5,6 +5,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import com.glia.androidsdk.engagement.Survey
 import com.glia.widgets.chat.Intention
+import com.glia.widgets.survey.SurveyBottomSheetFragment
 
 /**
  * Factory for creating Fragment instances with proper arguments.
@@ -65,12 +66,13 @@ internal class FragmentFactory {
 
     /**
      * Creates a SurveyBottomSheetFragment with the specified survey.
-     *
-     * Will be implemented in Phase 5 when SurveyBottomSheetFragment is created.
      */
-    fun createSurveyBottomSheet(survey: Survey): DialogFragment {
-        // TODO: Implement in Phase 5
-        throw NotImplementedError("SurveyBottomSheetFragment will be implemented in Phase 5")
+    fun createSurveyBottomSheet(survey: Survey): SurveyBottomSheetFragment {
+        return SurveyBottomSheetFragment().apply {
+            arguments = Bundle().apply {
+                putParcelable(SurveyBottomSheetFragment.ARG_SURVEY, survey)
+            }
+        }
     }
 
     // Dialogs

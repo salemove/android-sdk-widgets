@@ -14,6 +14,7 @@ mavenPublish = "0.35.0"
 paparazziVersion = "1.3.5"
 
 javaAppCompatVersion = "1.7.1"
+javaFragmentKtxVersion = "1.8.5"
 javaConstraintLayoutVersion = "2.2.1"
 javaCoreKtxVersion = "1.16.0" # 1.17.0 requires the project to be compiled with compileSdk 36
 javaKtorVersion = "3.3.1"
@@ -53,6 +54,7 @@ data-gson = { module = "com.google.code.gson:gson", version.ref = "dataGsonVersi
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBomVersion" }
 firebase-messaging = { module = "com.google.firebase:firebase-messaging" }
 java-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "javaAppCompatVersion" }
+java-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "javaFragmentKtxVersion" }
 java-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "javaConstraintLayoutVersion" }
 java-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "javaCoroutinesVersion" }
 java-core-ktx = { module = "androidx.core:core-ktx", version.ref = "javaCoreKtxVersion" }

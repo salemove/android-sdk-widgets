@@ -54,6 +54,11 @@ internal class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: 
     private var onFinishListener: OnFinishListener? = null
     private var controller: SurveyContract.Controller? = null
 
+    // MVI listeners for Fragment integration
+    private var onAnswerListener: ((Survey.Answer) -> Unit)? = null
+    private var onSubmitClickListener: (() -> Unit)? = null
+    private var onCancelClickListener: (() -> Unit)? = null
+
     private val surveyTheme: SurveyTheme? by lazy {
         Dependencies.gliaThemeManager.theme?.surveyTheme
     }
@@ -97,6 +102,28 @@ internal class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: 
 
     fun setOnFinishListener(onFinishListener: OnFinishListener?) {
         this.onFinishListener = onFinishListener
+    }
+
+    /**
+     * Sets listener for answer updates (MVI pattern).
+     * Called when user provides an answer to a question.
+     */
+    fun setOnAnswerListener(listener: ((Survey.Answer) -> Unit)?) {
+        this.onAnswerListener = listener
+    }
+
+    /**
+     * Sets listener for submit button clicks (MVI pattern).
+     */
+    fun setOnSubmitClickListener(listener: (() -> Unit)?) {
+        this.onSubmitClickListener = listener
+    }
+
+    /**
+     * Sets listener for cancel button clicks (MVI pattern).
+     */
+    fun setOnCancelClickListener(listener: (() -> Unit)?) {
+        this.onCancelClickListener = listener
     }
 
     private fun applyStyle(surveyStyle: SurveyStyle?) {
@@ -215,14 +242,24 @@ internal class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: 
 
     private fun initCallbacks() {
         submitButton.setOnClickListener {
-            controller?.onSubmitClicked()
+            // MVI pattern: notify listener (telemetry handled in ViewModel)
+            onSubmitClickListener?.invoke()
 
-            GliaLogger.i(LogEvents.SURVEY_SCREEN_BUTTON_CLICKED, null, mapOf(EventAttribute.ButtonName to ButtonNames.SUBMIT))
+            // Legacy MVP pattern: notify controller with telemetry
+            controller?.let {
+                it.onSubmitClicked()
+                GliaLogger.i(LogEvents.SURVEY_SCREEN_BUTTON_CLICKED, null, mapOf(EventAttribute.ButtonName to ButtonNames.SUBMIT))
+            }
         }
         cancelButton.setOnClickListener {
-            controller?.onCancelClicked()
+            // MVI pattern: notify listener (telemetry handled in ViewModel)
+            onCancelClickListener?.invoke()
 
-            GliaLogger.i(LogEvents.SURVEY_SCREEN_BUTTON_CLICKED, null, mapOf(EventAttribute.ButtonName to ButtonNames.CANCEL))
+            // Legacy MVP pattern: notify controller with telemetry
+            controller?.let {
+                it.onCancelClicked()
+                GliaLogger.i(LogEvents.SURVEY_SCREEN_BUTTON_CLICKED, null, mapOf(EventAttribute.ButtonName to ButtonNames.CANCEL))
+            }
         }
     }
 
@@ -232,10 +269,21 @@ internal class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: 
     }
 
     override fun onAnswer(answer: Survey.Answer) {
+        // MVI pattern: notify listener
+        onAnswerListener?.invoke(answer)
+        // Legacy MVP pattern: notify controller
         controller?.onAnswer(answer)
     }
 
     override fun onStateUpdated(state: SurveyState) {
+        renderState(state)
+    }
+
+    /**
+     * Renders the survey state to the UI.
+     * Called by Fragment when observing state changes (MVI pattern).
+     */
+    fun renderState(state: SurveyState) {
         onTitleUpdatedListener?.onTitleUpdated(state.title)
         title.text = state.title
         surveyAdapter?.submitList(state.questions)

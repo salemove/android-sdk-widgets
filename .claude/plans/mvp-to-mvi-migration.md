@@ -1264,9 +1264,9 @@ Mark as `@Deprecated` - calls now go through `HostActivity` with `Destination.Su
 ### Success Criteria:
 
 #### Automated Verification:
-- [ ] Build completes: `./gradlew widgetssdk:assembleDebug`
-- [ ] Unit tests pass: `./gradlew widgetssdk:testDebugUnitTest`
-- [ ] SurveyViewModel unit tests added and passing
+- [x] Build completes: `./gradlew widgetssdk:assembleDebug`
+- [x] Unit tests pass: `./gradlew widgetssdk:testDebugUnitTest`
+- [x] SurveyViewModel unit tests added and passing
 
 #### Manual Verification:
 - [ ] Survey shows as proper bottom sheet

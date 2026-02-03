@@ -83,6 +83,7 @@ internal class HostActivity : FadeTransitionActivity() {
             is Destination.Call -> navigator.showCall(destination.mediaType)
             is Destination.SurveyScreen -> navigator.showSurvey(destination.survey)
             is Destination.MessageCenter -> navigator.showMessageCenter(destination.queueIds)
+            Destination.MessageCenterConfirmation -> navigator.showMessageCenterConfirmation()
             is Destination.WebBrowser -> navigator.showWebBrowser(destination.title, destination.url)
             is Destination.ImagePreview -> navigator.showImagePreview(
                 destination.imageId,

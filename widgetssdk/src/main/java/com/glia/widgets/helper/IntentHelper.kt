@@ -14,6 +14,7 @@ import androidx.core.net.toUri
 import com.glia.androidsdk.Engagement.MediaType
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.androidsdk.engagement.Survey
+import com.glia.widgets.HostActivity
 import com.glia.widgets.call.CallActivity
 import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.chat.Intention
@@ -22,6 +23,7 @@ import com.glia.widgets.filepreview.ui.ImagePreviewActivity
 import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.messagecenter.MessageCenterActivity
+import com.glia.widgets.navigation.Destination
 import com.glia.widgets.push.notifications.PushClickHandlerActivity
 import com.glia.widgets.survey.SurveyActivity
 import com.glia.widgets.webbrowser.WebBrowserActivity
@@ -85,9 +87,10 @@ internal class IntentHelperImpl : IntentHelper {
         setSafeFlags(context)
     }
 
-    override fun secureMessagingWelcomeScreenIntent(context: Context): Intent = Intent(context, MessageCenterActivity::class.java)
-        .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-        .setSafeFlags(context)
+    override fun secureMessagingWelcomeScreenIntent(context: Context): Intent =
+        HostActivity.createIntent(context, Destination.MessageCenter(null))
+            .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            .setSafeFlags(context)
 
     override fun callIntent(context: Context, mediaType: MediaType?, upgradeToCall: Boolean): Intent = Intent(context, CallActivity::class.java)
         .putEnumExtra(ExtraKeys.MEDIA_TYPE, mediaType)

@@ -178,7 +178,7 @@ These Views can be embedded directly by integrators in their own view hierarchy 
 - **State**: `StateFlow<UiState>` for UI state
 - **Effects**: `Channel<Effect>` for one-time events (navigation, toasts)
 - **Intents**: Sealed interface for user actions
-- **RxJava Bridge**: Use `asFlow()` to consume existing RxJava streams in ViewModels
+- **RxJava-Free ViewModels**: Do NOT subscribe to RxJava in ViewModels. Convert using `useCase().asFlow().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), initialValue)` - see "RxJava to Flow Conversion Rule" section below
 - **Fragment Factory**: Centralized `FragmentFactory` class for creating Fragment instances
 
 ## What We're NOT Doing
@@ -1389,37 +1389,94 @@ Create a `DialogFragment` wrapper for VisitorCode to work with `HostActivity`.
 
 ---
 
-## Phase 9: MessageCenter Screen Migration (Priority 2)
+## Phase 9: MessageCenter Screen Migration (Priority 2) ✅ COMPLETED
 
 ### Overview
-Migrate MessageCenter to a regular Fragment with proper file picker handling.
+Migrate MessageCenter to **two separate Fragments** - one for the welcome/compose screen and one for the confirmation screen - each with its own toolbar and ViewModel.
+
+### Architecture Decision: Two-Fragment Approach
+- **`MessageCenterWelcomeFragment`** - Contains `MessageView` + own `AppBarView` (welcome theme)
+- **`MessageCenterConfirmationFragment`** - Contains `ConfirmationScreenView` + own `AppBarView` (confirmation theme)
+- Navigator replaces welcome fragment with confirmation fragment on successful message send
+- Each fragment has its own ViewModel
+
+**Rationale**: Cleaner separation, each fragment is self-contained with proper theming, follows single-responsibility principle.
 
 ### Logic Distribution
 
-**From MessageCenterController → MessageCenterViewModel:**
+**From MessageCenterController → MessageCenterWelcomeViewModel:**
 - Message composition state
 - Attachment validation
 - Send message orchestration
-- 13 use case coordinations
+- RxJava streams converted to Flow (see RxJava to Flow Conversion Pattern below)
 
-**From MessageCenterView → MessageCenterFragment:**
+**From MessageCenterController → MessageCenterConfirmationViewModel:**
+- Check messages / navigation logic
+- Reset message center state
+
+**From MessageCenterView → MessageCenterWelcomeFragment:**
 - Activity result launchers for file picking (camera, gallery, files)
 - Permission requests
 - Navigation callbacks
+- AppBar setup with welcome theme
 
-**Stays in MessageCenterView:**
+**From MessageCenterView → MessageCenterConfirmationFragment:**
+- AppBar setup with confirmation theme
+- Check messages button handling
+
+**Stays in MessageView:**
 - Theme application, RecyclerView setup, visual state rendering
 
+**Stays in ConfirmationScreenView:**
+- Theme application, button styling
+
 ### Changes Required:
-- Create `MessageCenterFragment`
-- Create `MessageCenterViewModel`
-- Move activity result launchers to Fragment
+
+#### 1. Create MVI Contracts
+- `MessageCenterWelcomeMvi.kt` - State, Intent, Effect for welcome screen
+- `MessageCenterConfirmationMvi.kt` - State, Intent, Effect for confirmation screen
+
+#### 2. Create ViewModels with RxJava-to-Flow Conversion
+- `MessageCenterWelcomeViewModel` - Converts these RxJava streams using `asFlow().stateIn()`:
+  - `addFileAttachmentsObserverUseCase()` → `Observable<List<LocalAttachment>>`
+  - `showMessageLimitErrorUseCase()` → `Observable<Boolean>`
+  - `sendMessageButtonStateUseCase()` → `Observable<ButtonState>`
+  - `isMessagingAvailableUseCase()` → `Flowable<Boolean>`
+- `MessageCenterConfirmationViewModel` - Simple ViewModel for navigation
+
+#### 3. Create Fragment Layouts
+- `fragment_message_center_welcome.xml` - AppBarView + MessageView
+- `fragment_message_center_confirmation.xml` - AppBarView + ConfirmationScreenView
+
+#### 4. Create Fragments
+- `MessageCenterWelcomeFragment` extending `BaseFragment`
+- `MessageCenterConfirmationFragment` extending `BaseFragment`
+- Move activity result launchers to welcome fragment
+
+#### 5. Update Navigation
+- Add `Destination.MessageCenterConfirmation`
+- Update `Navigator.showMessageCenter()` and add `showMessageCenterConfirmation()`
+- Update `FragmentFactory` with creation methods
+- Update `HostActivity` to handle new destination
+
+#### 6. Deprecate Legacy
 - Mark `MessageCenterActivity` as `@Deprecated`
+- Update `ActivityLauncher` to use `HostActivity`
 
 ### Success Criteria:
-- [ ] Build completes
-- [ ] Message sending works
-- [ ] Attachment picking works
+
+#### Automated Verification:
+- [x] Build completes: `./gradlew widgetssdk:assembleDebug`
+- [x] Unit tests pass: `./gradlew widgetssdk:testDebugUnitTest`
+
+#### Manual Verification:
+- [ ] Welcome screen shows with proper AppBar theming
+- [ ] Message composition works (text input, attachments)
+- [ ] File picker works (gallery, camera, files)
+- [ ] Send message transitions to confirmation screen
+- [ ] Confirmation screen shows with different AppBar theme
+- [ ] Check Messages navigates to messaging
+- [ ] Close buttons work on both screens
 
 ---
 
@@ -1586,24 +1643,95 @@ Remove deprecated Activities and clean up.
 
 ---
 
-## RxJava to Flow Bridge Pattern
+## RxJava to Flow Conversion Rule (All ViewModels)
 
-For ViewModels consuming existing RxJava repositories:
+**CRITICAL RULE**: ViewModels must be completely RxJava-free. Do NOT subscribe to RxJava Observable/Flowable directly in ViewModels. Instead, convert them to Kotlin Flow at the ViewModel level using `asFlow()` and `stateIn()`.
+
+### Why This Rule?
+- ViewModels should use pure Coroutines/Flow for consistency
+- Avoids mixing reactive paradigms (RxJava + Coroutines) in the same layer
+- Use cases remain unchanged (can be migrated to Flow in a separate project)
+- `stateIn()` creates hot StateFlow that survives configuration changes
+
+### Conversion Pattern
+
+**For continuous streams (Observable/Flowable) → StateFlow:**
 
 ```kotlin
-// In ViewModel
-private fun observeEngagementState() {
+// ❌ WRONG - Don't subscribe to RxJava in ViewModel
+private val disposables = CompositeDisposable()
+
+init {
+    disposables.add(
+        myUseCase().subscribe { value ->
+            updateState { copy(myValue = value) }
+        }
+    )
+}
+
+// ✅ CORRECT - Convert to StateFlow using asFlow() + stateIn()
+private val myValueFlow: StateFlow<T> = myUseCase()  // Returns Observable<T> or Flowable<T>
+    .asFlow()
+    .stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),  // 5s grace for config changes
+        initialValue = defaultValue
+    )
+```
+
+**For combining multiple streams:**
+
+```kotlin
+// ✅ CORRECT - Combine converted flows
+private val flow1: StateFlow<A> = useCase1().asFlow().stateIn(...)
+private val flow2: StateFlow<B> = useCase2().asFlow().stateIn(...)
+private val flow3: StateFlow<C> = useCase3().asFlow().stateIn(...)
+
+init {
     viewModelScope.launch {
-        engagementRepository.engagementState
-            .asFlow() // RxJava Flowable → Kotlin Flow
-            .collect { state ->
-                updateState { copy(engagementState = state) }
-            }
+        combine(flow1, flow2, flow3) { a, b, c ->
+            currentState.copy(valueA = a, valueB = b, valueC = c)
+        }.collect { newState ->
+            updateState { newState }
+        }
     }
 }
 ```
 
-This allows gradual migration without rewriting repositories.
+**For error handling:**
+
+```kotlin
+private val myValueFlow: StateFlow<T> = myUseCase()
+    .asFlow()
+    .catch { e ->
+        // Log error and emit default value
+        Logger.e(TAG, "Error in myUseCase", e)
+        emit(defaultValue)
+    }
+    .stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = defaultValue
+    )
+```
+
+### SharingStarted Strategies
+
+| Strategy | When to Use |
+|----------|-------------|
+| `WhileSubscribed(5_000)` | **Recommended default** - Stops upstream when no collectors, 5s grace for rotation |
+| `Eagerly` | Pre-load data immediately when ViewModel created |
+| `Lazily` | Start on first collector, keep active forever after |
+
+### Required Dependency
+
+The `kotlinx-coroutines-rx3` library provides `asFlow()` extension. Already available in the project:
+```toml
+# gradle/libs.versions.toml
+java-coroutines-rx3 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-rx3", version.ref = "javaCoroutinesVersion" }
+```
+
+This pattern allows gradual migration - use cases remain RxJava-based while ViewModels are RxJava-free.
 
 ---
 

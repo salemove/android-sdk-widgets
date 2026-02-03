@@ -25,6 +25,9 @@ internal sealed interface Destination : Parcelable {
     data class MessageCenter(val queueIds: List<String>?) : Destination
 
     @Parcelize
+    data object MessageCenterConfirmation : Destination
+
+    @Parcelize
     data class WebBrowser(val title: String, val url: String) : Destination
 
     @Parcelize

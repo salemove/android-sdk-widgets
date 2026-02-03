@@ -25,7 +25,10 @@ import com.glia.widgets.internal.fileupload.PickVisualMediaMultipleMimeTypes
  * - Offers the option to access chat history.
  *
  * Before this activity is launched, make sure that Glia Widgets SDK is set up correctly.
+ *
+ * @deprecated Replaced by HostActivity with MessageCenterWelcomeFragment and MessageCenterConfirmationFragment
  */
+@Deprecated("Replaced by HostActivity with MessageCenterWelcomeFragment and MessageCenterConfirmationFragment")
 internal class MessageCenterActivity : GliaActivity<MessageCenterView>, FadeTransitionActivity(),
     MessageCenterView.OnFinishListener,
     MessageCenterView.OnNavigateToMessagingListener,

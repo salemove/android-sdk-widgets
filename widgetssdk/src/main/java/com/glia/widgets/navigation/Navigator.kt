@@ -52,9 +52,13 @@ internal class Navigator(
     }
 
     fun showMessageCenter(queueIds: List<String>?) {
-        // Phase 9: MessageCenterFragment
-        // val fragment = fragmentFactory.createMessageCenterFragment(queueIds?.let { ArrayList(it) })
-        // replaceFragment(fragment, TAG_MESSAGE_CENTER)
+        val fragment = fragmentFactory.createMessageCenterWelcomeFragment(queueIds?.let { ArrayList(it) })
+        replaceFragment(fragment, TAG_MESSAGE_CENTER)
+    }
+
+    fun showMessageCenterConfirmation() {
+        val fragment = fragmentFactory.createMessageCenterConfirmationFragment()
+        replaceFragment(fragment, TAG_MESSAGE_CENTER_CONFIRMATION)
     }
 
     fun showWebBrowser(title: String, url: String) {
@@ -123,6 +127,7 @@ internal class Navigator(
         private const val TAG_CHAT = "chat"
         private const val TAG_CALL = "call"
         private const val TAG_MESSAGE_CENTER = "message_center"
+        private const val TAG_MESSAGE_CENTER_CONFIRMATION = "message_center_confirmation"
         private const val TAG_WEB_BROWSER = "web_browser"
 
         private const val DIALOG_TAG_SURVEY = "dialog_survey"

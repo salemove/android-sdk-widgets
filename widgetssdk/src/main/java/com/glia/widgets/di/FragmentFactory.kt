@@ -6,6 +6,8 @@ import androidx.fragment.app.Fragment
 import com.glia.androidsdk.engagement.Survey
 import com.glia.widgets.chat.Intention
 import com.glia.widgets.filepreview.ui.ImagePreviewDialogFragment
+import com.glia.widgets.messagecenter.MessageCenterConfirmationFragment
+import com.glia.widgets.messagecenter.MessageCenterWelcomeFragment
 import com.glia.widgets.survey.SurveyBottomSheetFragment
 import com.glia.widgets.view.dialog.VisitorCodeDialogFragment
 import com.glia.widgets.webbrowser.WebBrowserFragment
@@ -46,13 +48,21 @@ internal class FragmentFactory {
     }
 
     /**
-     * Creates a MessageCenterFragment with the specified queue IDs.
-     *
-     * Will be implemented in Phase 9 when MessageCenterFragment is created.
+     * Creates a MessageCenterWelcomeFragment with the specified queue IDs.
      */
-    fun createMessageCenterFragment(queueIds: ArrayList<String>?): Fragment {
-        // TODO: Implement in Phase 9
-        throw NotImplementedError("MessageCenterFragment will be implemented in Phase 9")
+    fun createMessageCenterWelcomeFragment(queueIds: ArrayList<String>?): MessageCenterWelcomeFragment {
+        return MessageCenterWelcomeFragment().apply {
+            arguments = Bundle().apply {
+                queueIds?.let { putStringArrayList(MessageCenterWelcomeFragment.ARG_QUEUE_IDS, it) }
+            }
+        }
+    }
+
+    /**
+     * Creates a MessageCenterConfirmationFragment.
+     */
+    fun createMessageCenterConfirmationFragment(): MessageCenterConfirmationFragment {
+        return MessageCenterConfirmationFragment()
     }
 
     /**

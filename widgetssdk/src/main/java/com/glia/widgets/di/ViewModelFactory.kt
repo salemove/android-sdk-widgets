@@ -3,6 +3,8 @@ package com.glia.widgets.di
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.glia.widgets.filepreview.ui.ImagePreviewViewModel
+import com.glia.widgets.messagecenter.MessageCenterConfirmationViewModel
+import com.glia.widgets.messagecenter.MessageCenterWelcomeViewModel
 import com.glia.widgets.survey.SurveyViewModel
 import com.glia.widgets.webbrowser.WebBrowserViewModel
 
@@ -25,6 +27,28 @@ internal class ViewModelFactory(
                 useCaseFactory.createGetImageFileFromDownloadsUseCase(),
                 useCaseFactory.createGetImageFileFromCacheUseCase(),
                 useCaseFactory.createPutImageFileToDownloadsUseCase()
+            ) as T
+            MessageCenterWelcomeViewModel::class.java -> MessageCenterWelcomeViewModel(
+                useCaseFactory.createSendSecureMessageUseCase(),
+                useCaseFactory.createAddFileAttachmentsObserverUseCase(),
+                useCaseFactory.createAddSecureFileToAttachmentAndUploadUseCase(),
+                useCaseFactory.createGetFileAttachmentsUseCase(),
+                useCaseFactory.createRemoveFileAttachmentUseCase(),
+                useCaseFactory.createIsAuthenticatedUseCase(),
+                useCaseFactory.createSupportedUploadFileTypesUseCase(),
+                useCaseFactory.createOnNextMessageUseCase(),
+                useCaseFactory.createEnableSendMessageButtonUseCase(),
+                useCaseFactory.createShowMessageLimitErrorUseCase(),
+                useCaseFactory.createResetMessageCenterUseCase(),
+                useCaseFactory.takePictureUseCase,
+                useCaseFactory.uriToFileAttachmentUseCase,
+                useCaseFactory.requestNotificationPermissionIfPushNotificationsSetUpUseCase,
+                useCaseFactory.createIsMessagingAvailableUseCase(),
+                useCaseFactory.isQueueingOrEngagementUseCase
+            ) as T
+            MessageCenterConfirmationViewModel::class.java -> MessageCenterConfirmationViewModel(
+                useCaseFactory.createResetMessageCenterUseCase(),
+                useCaseFactory.isQueueingOrEngagementUseCase
             ) as T
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }

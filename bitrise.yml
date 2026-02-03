@@ -156,6 +156,97 @@ workflows:
       - deploy-to-bitrise-io@2:
           inputs:
             - notify_email_list: $BUILD_EMAILS
+      - script@1:
+          title: Notify Slack - Release Complete (on PR merge)
+          inputs:
+            - content: |-
+                #!/usr/bin/env bash
+                set -e
+
+                # Get the most recent commit message
+                COMMIT_MSG=$(git log -1 --pretty=%B)
+
+                # Check if this is a Core SDK PR merge
+                if [[ ! "$COMMIT_MSG" =~ "Core SDK" ]] && \
+                   [[ ! "$COMMIT_MSG" =~ "Increment Core SDK" ]]; then
+                  echo "Not a Core SDK PR merge, skipping Slack notification"
+                  exit 0
+                fi
+
+                # Extract version from commit message
+                VERSION=$(echo "$COMMIT_MSG" | grep -oP '\d+\.\d+\.\d+' | head -1)
+
+                if [ -z "$VERSION" ]; then
+                  echo "Could not extract version from commit message"
+                  exit 0
+                fi
+
+                # Find Slack thread
+                RESPONSE=$(curl -s -X POST https://slack.com/api/conversations.history \
+                  -H "Authorization: Bearer ${SLACK_BOT_TOKEN}" \
+                  -H "Content-Type: application/json" \
+                  -d "{
+                    \"channel\": \"${SLACK_RELEASE_CHANNEL}\",
+                    \"limit\": 100
+                  }")
+
+                THREAD_TS=$(echo "$RESPONSE" | jq -r ".messages[] | select(.text | contains(\"$VERSION\")) | .ts" | head -1)
+
+                if [ -z "$THREAD_TS" ] || [ "$THREAD_TS" == "null" ]; then
+                  echo "Could not find Slack thread for version $VERSION"
+                  exit 0
+                fi
+
+                # Send release complete notification
+                curl -X POST https://slack.com/api/chat.postMessage \
+                  -H "Authorization: Bearer ${SLACK_BOT_TOKEN}" \
+                  -H "Content-Type: application/json" \
+                  -d "{
+                    \"channel\": \"${SLACK_RELEASE_CHANNEL}\",
+                    \"thread_ts\": \"${THREAD_TS}\",
+                    \"text\": \"🎉 Release Complete!\",
+                    \"blocks\": [
+                      {
+                        \"type\": \"header\",
+                        \"text\": {
+                          \"type\": \"plain_text\",
+                          \"text\": \"🎉 Release ${VERSION} Complete!\"
+                        }
+                      },
+                      {
+                        \"type\": \"section\",
+                        \"fields\": [
+                          {
+                            \"type\": \"mrkdwn\",
+                            \"text\": \"*Core SDK:*\n✓ Published to Maven Central\"
+                          },
+                          {
+                            \"type\": \"mrkdwn\",
+                            \"text\": \"*Widgets SDK:*\n✓ Dependency Updated\"
+                          }
+                        ]
+                      },
+                      {
+                        \"type\": \"section\",
+                        \"text\": {
+                          \"type\": \"mrkdwn\",
+                          \"text\": \"*Available Now:*\n\`\`\`implementation \\\"com.glia:android-sdk:${VERSION}\\\"\`\`\`\"
+                        }
+                      },
+                      {
+                        \"type\": \"divider\"
+                      },
+                      {
+                        \"type\": \"context\",
+                        \"elements\": [
+                          {
+                            \"type\": \"mrkdwn\",
+                            \"text\": \"✨ Release process completed successfully\"
+                          }
+                        ]
+                      }
+                    ]
+                  }"
       - slack@4:
           is_always_run: true
           inputs:
@@ -380,6 +471,137 @@ workflows:
             - use_verbose_log: true
             - test_devices: MediumPhone.arm,26,en,portrait
       - deploy-to-bitrise-io@2: { }
+      - script@1:
+          title: Notify Slack - PR Checks Passed
+          inputs:
+            - content: |-
+                #!/usr/bin/env bash
+                set -e
+
+                # Check if this is a Core SDK update PR
+                if [[ ! "$BITRISE_PULL_REQUEST_TITLE" =~ "Core SDK" ]] && \
+                   [[ ! "$BITRISE_PULL_REQUEST_TITLE" =~ "Increment Core SDK" ]]; then
+                  echo "Not a Core SDK PR, skipping Slack notification"
+                  exit 0
+                fi
+
+                # Extract version from PR title
+                VERSION=$(echo "$BITRISE_PULL_REQUEST_TITLE" | grep -oP '\d+\.\d+\.\d+' | head -1)
+
+                if [ -z "$VERSION" ]; then
+                  echo "Could not extract version from PR title"
+                  exit 0
+                fi
+
+                # Find Slack thread by searching for version in message history
+                RESPONSE=$(curl -s -X POST https://slack.com/api/conversations.history \
+                  -H "Authorization: Bearer ${SLACK_BOT_TOKEN}" \
+                  -H "Content-Type: application/json" \
+                  -d "{
+                    \"channel\": \"${SLACK_RELEASE_CHANNEL}\",
+                    \"limit\": 100
+                  }")
+
+                THREAD_TS=$(echo "$RESPONSE" | jq -r ".messages[] | select(.text | contains(\"$VERSION\")) | .ts" | head -1)
+
+                if [ -z "$THREAD_TS" ] || [ "$THREAD_TS" == "null" ]; then
+                  echo "Could not find Slack thread for version $VERSION"
+                  exit 0
+                fi
+
+                # Notify Slack that PR checks passed
+                curl -X POST https://slack.com/api/chat.postMessage \
+                  -H "Authorization: Bearer ${SLACK_BOT_TOKEN}" \
+                  -H "Content-Type: application/json" \
+                  -d "{
+                    \"channel\": \"${SLACK_RELEASE_CHANNEL}\",
+                    \"thread_ts\": \"${THREAD_TS}\",
+                    \"text\": \"✅ Widgets SDK PR Checks Passed\",
+                    \"blocks\": [
+                      {
+                        \"type\": \"section\",
+                        \"text\": {
+                          \"type\": \"mrkdwn\",
+                          \"text\": \"✅ *Widgets SDK PR Ready to Merge*\n• All checks passed\n• PR #${BITRISE_PULL_REQUEST} is ready for review\"
+                        },
+                        \"accessory\": {
+                          \"type\": \"button\",
+                          \"text\": {
+                            \"type\": \"plain_text\",
+                            \"text\": \"Review & Merge PR\"
+                          },
+                          \"url\": \"https://github.com/salemove/android-sdk-widgets/pull/${BITRISE_PULL_REQUEST}\",
+                          \"style\": \"primary\"
+                        }
+                      }
+                    ]
+                  }"
+      - script@1:
+          title: ❌ Notify Slack - PR Checks Failed
+          is_always_run: true
+          run_if: .IsBuildFailed
+          inputs:
+            - content: |-
+                #!/usr/bin/env bash
+
+                # Check if this is a Core SDK update PR
+                if [[ ! "$BITRISE_PULL_REQUEST_TITLE" =~ "Core SDK" ]] && \
+                   [[ ! "$BITRISE_PULL_REQUEST_TITLE" =~ "Increment Core SDK" ]]; then
+                  echo "Not a Core SDK PR, skipping Slack notification"
+                  exit 0
+                fi
+
+                # Extract version from PR title
+                VERSION=$(echo "$BITRISE_PULL_REQUEST_TITLE" | grep -oP '\d+\.\d+\.\d+' | head -1)
+
+                if [ -z "$VERSION" ]; then
+                  echo "Could not extract version from PR title"
+                  exit 0
+                fi
+
+                # Find Slack thread
+                RESPONSE=$(curl -s -X POST https://slack.com/api/conversations.history \
+                  -H "Authorization: Bearer ${SLACK_BOT_TOKEN}" \
+                  -H "Content-Type: application/json" \
+                  -d "{
+                    \"channel\": \"${SLACK_RELEASE_CHANNEL}\",
+                    \"limit\": 100
+                  }")
+
+                THREAD_TS=$(echo "$RESPONSE" | jq -r ".messages[] | select(.text | contains(\"$VERSION\")) | .ts" | head -1)
+
+                if [ -z "$THREAD_TS" ] || [ "$THREAD_TS" == "null" ]; then
+                  echo "Could not find Slack thread for version $VERSION"
+                  exit 0
+                fi
+
+                # Notify Slack of failure
+                curl -X POST https://slack.com/api/chat.postMessage \
+                  -H "Authorization: Bearer ${SLACK_BOT_TOKEN}" \
+                  -H "Content-Type: application/json" \
+                  -d "{
+                    \"channel\": \"${SLACK_RELEASE_CHANNEL}\",
+                    \"thread_ts\": \"${THREAD_TS}\",
+                    \"text\": \"❌ Widgets SDK PR Checks Failed\",
+                    \"blocks\": [
+                      {
+                        \"type\": \"section\",
+                        \"text\": {
+                          \"type\": \"mrkdwn\",
+                          \"text\": \"❌ *Widgets SDK PR Checks Failed*\n• One or more checks failed for PR #${BITRISE_PULL_REQUEST}\n• The PR requires attention before it can be merged\"
+                        },
+                        \"accessory\": {
+                          \"type\": \"button\",
+                          \"text\": {
+                            \"type\": \"plain_text\",
+                            \"text\": \"View PR\"
+                          },
+                          \"url\": \"https://github.com/salemove/android-sdk-widgets/pull/${BITRISE_PULL_REQUEST}\",
+                          \"style\": \"danger\"
+                        }
+                      }
+                    ]
+                  }"
       - save-gradle-cache@1: { }
   upgrade_dependencies:
     steps:
@@ -410,11 +632,11 @@ workflows:
                 set -o pipefail
                 # debug log
                 set -x
-                
+
                 NEW_BRANCH_NAME="core-sdk-version-increment/${NEW_VERSION}"
                 BASE_BRANCH_NAME="development"
                 MESSAGE="Increment Core SDK version to ${NEW_VERSION}"
-                
+
                 if [[ "$BITRISE_GIT_BRANCH" != $BASE_BRANCH_NAME ]]; then
                   echo "❌ Error: this workflow must be run on the ${BASE_BRANCH_NAME} branch to prevent merge conflicts."
                   exit 1
@@ -422,21 +644,108 @@ workflows:
                 git add -A
                 git commit -m "$MESSAGE"
                 git push origin "$NEW_BRANCH_NAME":"$NEW_BRANCH_NAME"
-                
+
                 PULL_REQUEST_NUMBER=$(curl \
                   -X POST \
                   -H "Accept: application/vnd.github+json" \
                   -H "Authorization: Bearer $GITHUB_API_TOKEN" \
                   https://api.github.com/repos/salemove/android-sdk-widgets/pulls \
                   -d "{\"title\":\"${MESSAGE}\",\"head\":\"${NEW_BRANCH_NAME}\",\"base\":\"development\"}" | jq --raw-output '.number')
-                
+
                 curl \
                   -X POST \
                   -H "Accept: application/vnd.github+json" \
                   -H "Authorization: Bearer $GITHUB_API_TOKEN" \
                   https://api.github.com/repos/salemove/android-sdk-widgets/pulls/$PULL_REQUEST_NUMBER/requested_reviewers \
                   -d "{\"team_reviewers\":[\"tm-mobile-android\"]}"
+
+                # Store PR number for Slack notification
+                envman add --key WIDGETS_PR_NUMBER --value "$PULL_REQUEST_NUMBER"
+      - script@1:
+          title: Notify Slack - Widgets PR Created
+          inputs:
+            - content: |-
+                #!/usr/bin/env bash
+                set -e
+
+                if [ -z "$SLACK_THREAD_TS" ]; then
+                  echo "SLACK_THREAD_TS not set, skipping notification"
+                  exit 0
+                fi
+
+                curl -X POST https://slack.com/api/chat.postMessage \
+                  -H "Authorization: Bearer ${SLACK_BOT_TOKEN}" \
+                  -H "Content-Type: application/json" \
+                  -d "{
+                    \"channel\": \"${SLACK_CHANNEL}\",
+                    \"thread_ts\": \"${SLACK_THREAD_TS}\",
+                    \"text\": \"📝 Widgets SDK PR Created\",
+                    \"blocks\": [
+                      {
+                        \"type\": \"section\",
+                        \"text\": {
+                          \"type\": \"mrkdwn\",
+                          \"text\": \"📝 *Widgets SDK PR Created*\nPR #${WIDGETS_PR_NUMBER}: Update Core SDK to ${NEW_VERSION}\"
+                        },
+                        \"accessory\": {
+                          \"type\": \"button\",
+                          \"text\": {
+                            \"type\": \"plain_text\",
+                            \"text\": \"View PR\"
+                          },
+                          \"url\": \"https://github.com/salemove/android-sdk-widgets/pull/${WIDGETS_PR_NUMBER}\",
+                          \"style\": \"primary\"
+                        }
+                      }
+                    ]
+                  }"
       - save-gradle-cache@1: { }
+      - script@1:
+          title: ❌ Notify Slack - Widgets Update Failed
+          is_always_run: true
+          run_if: .IsBuildFailed
+          inputs:
+            - content: |-
+                #!/usr/bin/env bash
+
+                if [ -z "$SLACK_THREAD_TS" ]; then
+                  echo "Build failed. SLACK_THREAD_TS not set."
+                  exit 0
+                fi
+
+                curl -X POST https://slack.com/api/chat.postMessage \
+                  -H "Authorization: Bearer ${SLACK_BOT_TOKEN}" \
+                  -H "Content-Type: application/json" \
+                  -d "{
+                    \"channel\": \"${SLACK_CHANNEL}\",
+                    \"thread_ts\": \"${SLACK_THREAD_TS}\",
+                    \"text\": \"❌ Widgets SDK Update Failed\",
+                    \"blocks\": [
+                      {
+                        \"type\": \"section\",
+                        \"text\": {
+                          \"type\": \"mrkdwn\",
+                          \"text\": \"❌ *Widgets SDK Dependency Update Failed*\n\nFailed to update Core SDK dependency to ${NEW_VERSION}. This will need to be done manually.\"
+                        },
+                        \"accessory\": {
+                          \"type\": \"button\",
+                          \"text\": {
+                            \"type\": \"plain_text\",
+                            \"text\": \"View Logs\"
+                          },
+                          \"url\": \"${BITRISE_BUILD_URL}\",
+                          \"style\": \"danger\"
+                        }
+                      },
+                      {
+                        \"type\": \"section\",
+                        \"text\": {
+                          \"type\": \"mrkdwn\",
+                          \"text\": \"*Manual Steps:*\n1. Update \`build.gradle\` in android-sdk-widgets\n2. Change Core SDK version to \`${NEW_VERSION}\`\n3. Create PR manually\n4. Continue with release process\"
+                        }
+                      }
+                    ]
+                  }"
   upgrade_telemetry_dependency:
     steps:
       - activate-ssh-key@4: { }

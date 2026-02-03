@@ -142,28 +142,36 @@ A single transparent `HostActivity` that hosts everything:
 
 ### Screen Inventory by Complexity
 
-| Screen | Current Activity | View | Controller | Fragment Type |
-|--------|-----------------|------|------------|---------------|
-| Survey | SurveyActivity | SurveyView | SurveyController (Java) | BottomSheetDialogFragment |
-| WebBrowser | WebBrowserActivity | WebBrowserView | None | Regular Fragment |
-| ImagePreview | ImagePreviewActivity | ImagePreviewView | ImagePreviewController | DialogFragment |
-| VisitorCode | DialogHolderActivity | VisitorCodeView | VisitorCodeController | DialogFragment |
-| MessageCenter | MessageCenterActivity | MessageCenterView | MessageCenterController | Regular Fragment |
-| EntryWidget | EntryWidgetActivity | EntryWidgetView | EntryWidgetController | BottomSheetDialogFragment |
-| Call | CallActivity | CallView | CallController (649 lines) | Regular Fragment |
-| Chat | ChatActivity | ChatView | ChatController (1140 lines) | Regular Fragment |
+| Screen | Current Activity | View | Controller | Fragment Type | Migration |
+|--------|-----------------|------|------------|---------------|-----------|
+| Survey | SurveyActivity | SurveyView | SurveyController (Java) | BottomSheetDialogFragment | → ViewModel |
+| WebBrowser | WebBrowserActivity | WebBrowserView | None | Regular Fragment | → ViewModel |
+| ImagePreview | ImagePreviewActivity | ImagePreviewView | ImagePreviewController | DialogFragment | → ViewModel |
+| VisitorCode | DialogHolderActivity | VisitorCodeView | VisitorCodeController | DialogFragment | **Keep Controller** |
+| MessageCenter | MessageCenterActivity | MessageCenterView | MessageCenterController | Regular Fragment | → ViewModel |
+| EntryWidget | EntryWidgetActivity | EntryWidgetView | EntryWidgetController | BottomSheetDialogFragment | **Keep Controller** |
+| Call | CallActivity | CallView | CallController (649 lines) | Regular Fragment | → ViewModel |
+| Chat | ChatActivity | ChatView | ChatController (1140 lines) | Regular Fragment | → ViewModel |
+
+**Note**: VisitorCode and EntryWidget keep their Controllers because their Views can be used standalone by integrators in their own view hierarchy. Only Fragment wrappers are created for HostActivity integration.
 
 ## Desired End State
 
 After completing this plan:
 - **Single `HostActivity`** with transparent background hosts all SDK screens
-- All screens migrated to Fragment + ViewModel + MVI architecture
+- Most screens migrated to Fragment + ViewModel + MVI architecture
 - Survey shown as `BottomSheetDialogFragment` (proper bottom sheet behavior)
 - All dialogs as `DialogFragment` instances
 - Custom Views contain ONLY UI rendering code (no Controllers, no business logic)
 - Business logic in ViewModels with StateFlow for state, Channel for effects
 - Cross-platform compatible (works with Flutter, React Native, Unity, etc.)
 - All tests pass with new ViewModel unit tests
+
+**Exceptions (Views usable standalone by integrators):**
+- `VisitorCodeView` + `VisitorCodeController` - Fragment wrapper only, no ViewModel
+- `EntryWidgetView` + `EntryWidgetController` - Fragment wrapper only, no ViewModel
+
+These Views can be embedded directly by integrators in their own view hierarchy without requiring a Fragment/Activity wrapper, so Controllers are preserved.
 
 ### Key Patterns to Use:
 - **Flow Collection**: `flow.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { }.launchIn(lifecycleScope)`
@@ -1351,17 +1359,25 @@ Migrate ImagePreview to `DialogFragment` hosted in `HostActivity`.
 ## Phase 8: VisitorCode Migration (Priority 2)
 
 ### Overview
-Migrate VisitorCode to `DialogFragment` hosted in `HostActivity`.
+Create a `DialogFragment` wrapper for VisitorCode to work with `HostActivity`.
+
+**Important**: `VisitorCodeView` can be used standalone by integrators in their own view hierarchy, so we **keep the existing Controller** and only add a Fragment wrapper for HostActivity integration.
+
+### Architecture Decision
+- **Keep `VisitorCodeController`** - View continues to work standalone without Fragment/Activity wrapper
+- **Create `VisitorCodeDialogFragment`** - Thin wrapper that hosts `VisitorCodeView` for HostActivity usage
+- **No ViewModel migration** - Controller remains the source of truth for business logic
 
 ### Changes Required:
-- Create `VisitorCodeDialogFragment`
-- Create `VisitorCodeViewModel` from controller logic
+- Create `VisitorCodeDialogFragment` as a thin wrapper around `VisitorCodeView`
+- Fragment delegates all logic to the existing Controller via the View
 - Update `Navigator` to handle VisitorCode destination
 - Mark `DialogHolderActivity` as `@Deprecated`
 
 ### Success Criteria:
 - [ ] Build completes
 - [ ] VisitorCode works as dialog through HostActivity
+- [ ] VisitorCodeView continues to work standalone (without Fragment)
 
 ---
 
@@ -1402,16 +1418,24 @@ Migrate MessageCenter to a regular Fragment with proper file picker handling.
 ## Phase 10: EntryWidget Migration (Priority 2)
 
 ### Overview
-EntryWidget already uses a Fragment. Migrate controller to ViewModel.
+EntryWidget already has `EntryWidgetFragment`. Keep the existing architecture since `EntryWidgetView` can be used standalone by integrators.
+
+**Important**: `EntryWidgetView` can be used standalone by integrators in their own view hierarchy, so we **keep the existing Controller** and maintain the current Fragment as a wrapper for HostActivity integration.
+
+### Architecture Decision
+- **Keep `EntryWidgetController`** - View continues to work standalone without Fragment/Activity wrapper
+- **Keep existing `EntryWidgetFragment`** - Already serves as wrapper for HostActivity usage
+- **No ViewModel migration** - Controller remains the source of truth for business logic
 
 ### Changes Required:
-- Create `EntryWidgetViewModel`
-- Update `EntryWidgetFragment` to use ViewModel
-- Remove controller reference from `EntryWidgetView`
+- Ensure `EntryWidgetFragment` works properly with `HostActivity` and `Navigator`
+- Update `Navigator` to handle EntryWidget destination if not already
+- No changes to Controller or View
 
 ### Success Criteria:
 - [ ] Build completes
-- [ ] EntryWidget works with ViewModel
+- [ ] EntryWidget works through HostActivity
+- [ ] EntryWidgetView continues to work standalone (without Fragment)
 
 ---
 
@@ -1508,18 +1532,26 @@ Remove deprecated Activities and clean up.
    - `MessageCenterActivity`
    - `CallActivity`
    - `ChatActivity`
+   - `EntryWidgetActivity`
 
 2. **Update ActivityLauncher** to only use `HostActivity`
 
 3. **Update AndroidManifest** to remove old activity declarations
 
-4. **Update unit tests** - Controller tests → ViewModel tests
+4. **Update unit tests**:
+   - Controller tests → ViewModel tests (for Survey, WebBrowser, ImagePreview, MessageCenter, Call, Chat)
+   - **Keep Controller tests** for `VisitorCodeController` and `EntryWidgetController` (these are NOT migrated to ViewModels)
 
-5. **Update CLAUDE.md** documentation
+5. **Controllers to KEEP** (used by standalone Views for integrators):
+   - `VisitorCodeController` - `VisitorCodeView` can be embedded by integrators
+   - `EntryWidgetController` - `EntryWidgetView` can be embedded by integrators
+
+6. **Update CLAUDE.md** documentation
 
 ### Success Criteria:
 - [ ] All deprecated Activities removed
 - [ ] Only `HostActivity` remains
+- [ ] VisitorCodeController and EntryWidgetController kept and functional
 - [ ] All tests pass
 
 ---

@@ -66,9 +66,8 @@ internal class Navigator(
     }
 
     fun showImagePreview(imageId: String?, imageName: String?, localImageUri: String?) {
-        // Phase 7: ImagePreviewDialogFragment
-        // val fragment = fragmentFactory.createImagePreviewFragment(imageId, imageName, localImageUri)
-        // fragment.show(fragmentManager, DIALOG_TAG_IMAGE_PREVIEW)
+        val fragment = fragmentFactory.createImagePreviewFragment(imageId, imageName, localImageUri)
+        fragment.show(fragmentManager, DIALOG_TAG_IMAGE_PREVIEW)
     }
 
     // Bottom sheets and dialogs

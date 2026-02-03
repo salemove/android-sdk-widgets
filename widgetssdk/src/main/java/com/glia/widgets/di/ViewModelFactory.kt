@@ -2,6 +2,7 @@ package com.glia.widgets.di
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.glia.widgets.filepreview.ui.ImagePreviewViewModel
 import com.glia.widgets.survey.SurveyViewModel
 import com.glia.widgets.webbrowser.WebBrowserViewModel
 
@@ -20,6 +21,11 @@ internal class ViewModelFactory(
                 useCaseFactory.surveyAnswerUseCase
             ) as T
             WebBrowserViewModel::class.java -> WebBrowserViewModel() as T
+            ImagePreviewViewModel::class.java -> ImagePreviewViewModel(
+                useCaseFactory.createGetImageFileFromDownloadsUseCase(),
+                useCaseFactory.createGetImageFileFromCacheUseCase(),
+                useCaseFactory.createPutImageFileToDownloadsUseCase()
+            ) as T
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }
     }

@@ -39,7 +39,14 @@ private const val WRITE_PERMISSION_REQUEST_CODE = 110011
  * It will be automatically added to the integrator's manifest file by the manifest merger during compilation.
  *
  * This activity is used to preview images shared in chat in full-screen.
+ *
+ * @deprecated Use [ImagePreviewDialogFragment] with [com.glia.widgets.HostActivity] instead.
+ * This Activity is kept for backward compatibility and will be removed in a future release.
  */
+@Deprecated(
+    message = "Use ImagePreviewDialogFragment with HostActivity instead",
+    replaceWith = ReplaceWith("ImagePreviewDialogFragment")
+)
 internal class ImagePreviewActivity : GliaActivity<ImagePreviewView>, AppCompatActivity(), ImagePreviewContract.View {
     private val activityLauncher: ActivityLauncher by lazy { Dependencies.activityLauncher }
     private val localeProvider = Dependencies.localeProvider

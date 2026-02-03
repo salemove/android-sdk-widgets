@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/glia_black_color"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/glia_black_color"
+        app:navigationIcon="?attr/gliaIconAppBarBack"
+        app:titleCentered="true"
+        app:titleTextColor="@color/glia_light_color" />
+
+    <com.glia.widgets.filepreview.ui.ImagePreviewView
+        android:id="@+id/preview_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:srcCompat="@android:drawable/ic_btn_speak_now" />
+
+</androidx.appcompat.widget.LinearLayoutCompat>

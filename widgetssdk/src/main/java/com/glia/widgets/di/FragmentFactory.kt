@@ -5,6 +5,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import com.glia.androidsdk.engagement.Survey
 import com.glia.widgets.chat.Intention
+import com.glia.widgets.filepreview.ui.ImagePreviewDialogFragment
 import com.glia.widgets.survey.SurveyBottomSheetFragment
 import com.glia.widgets.webbrowser.WebBrowserFragment
 
@@ -83,8 +84,6 @@ internal class FragmentFactory {
     /**
      * Creates an ImagePreviewDialogFragment with the specified parameters.
      *
-     * Will be implemented in Phase 7 when ImagePreviewDialogFragment is created.
-     *
      * @param imageId The ID of the image to preview (for remote images)
      * @param imageName The name of the image file
      * @param localImageUri The local URI of the image (for local images)
@@ -93,9 +92,14 @@ internal class FragmentFactory {
         imageId: String? = null,
         imageName: String? = null,
         localImageUri: String? = null
-    ): DialogFragment {
-        // TODO: Implement in Phase 7
-        throw NotImplementedError("ImagePreviewDialogFragment will be implemented in Phase 7")
+    ): ImagePreviewDialogFragment {
+        return ImagePreviewDialogFragment().apply {
+            arguments = Bundle().apply {
+                imageId?.let { putString(ImagePreviewDialogFragment.ARG_IMAGE_ID, it) }
+                imageName?.let { putString(ImagePreviewDialogFragment.ARG_IMAGE_NAME, it) }
+                localImageUri?.let { putString(ImagePreviewDialogFragment.ARG_LOCAL_IMAGE_URI, it) }
+            }
+        }
     }
 
     /**

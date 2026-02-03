@@ -1312,20 +1312,39 @@ Migrate WebBrowser to a regular Fragment hosted in `HostActivity`.
 
 ---
 
-## Phase 7: ImagePreview Screen Migration (Priority 1)
+## Phase 7: ImagePreview Screen Migration (Priority 1) ✅ COMPLETED
 
 ### Overview
 Migrate ImagePreview to `DialogFragment` hosted in `HostActivity`.
 
-### Changes Required:
-- Create `ImagePreviewDialogFragment`
-- Create `ImagePreviewViewModel` from controller logic
-- Update `Navigator` to handle ImagePreview destination
-- Mark `ImagePreviewActivity` as `@Deprecated`
+### Changes Completed:
+- ✅ Created `ImagePreviewMvi.kt` with State, Intent, Effect contracts
+- ✅ Created `ImagePreviewViewModel` extending `BaseViewModel`
+- ✅ Created `BaseDialogFragment` (similar to `BaseBottomSheetFragment`)
+- ✅ Created `ImagePreviewDialogFragment` extending `BaseDialogFragment`
+- ✅ Created `fragment_image_preview.xml` layout
+- ✅ Updated `FragmentFactory` to create `ImagePreviewDialogFragment`
+- ✅ Updated `ViewModelFactory` to create `ImagePreviewViewModel`
+- ✅ Updated `Navigator.showImagePreview()` to use the new Fragment
+- ✅ Marked `ImagePreviewActivity` as `@Deprecated`
+- ✅ Added `ImagePreviewViewModelTest` unit tests
 
 ### Success Criteria:
-- [ ] Build completes
-- [ ] ImagePreview works as dialog through HostActivity
+
+#### Automated Verification:
+- [x] Build completes: `./gradlew widgetssdk:assembleDebug`
+- [x] Unit tests pass: `./gradlew widgetssdk:testDebugUnitTest`
+- [x] ImagePreviewViewModel unit tests added and passing
+
+#### Manual Verification:
+- [ ] ImagePreview works through HostActivity
+- [ ] Remote images load correctly from downloads/cache
+- [ ] Local images display correctly
+- [ ] Share button works for remote images
+- [ ] Share button works for local images
+- [ ] Download button saves image to device
+- [ ] Close button (X) navigates back properly
+- [ ] Menu items (Save/Share) show/hide correctly based on state
 
 ---
 

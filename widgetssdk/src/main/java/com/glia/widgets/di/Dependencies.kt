@@ -90,6 +90,9 @@ internal object Dependencies {
         ViewModelFactory(useCaseFactory, repositoryFactory)
     }
 
+    @JvmStatic
+    val fragmentFactory: FragmentFactory by lazy { FragmentFactory() }
+
     var gliaCore: GliaCore = GliaCoreImpl()
         @VisibleForTesting set
 

@@ -6,6 +6,8 @@ import androidx.fragment.app.FragmentManager
 import com.glia.androidsdk.engagement.Survey
 import com.glia.widgets.R
 import com.glia.widgets.chat.Intention
+import com.glia.widgets.di.Dependencies
+import com.glia.widgets.di.FragmentFactory
 
 /**
  * Handles fragment navigation within HostActivity.
@@ -15,12 +17,13 @@ import com.glia.widgets.chat.Intention
  * - Dialog/BottomSheet display (Survey, VisitorCode, confirmations)
  * - Back stack management
  *
- * Note: Fragment creation methods will be implemented in Phase 4 when FragmentFactory is created.
- * For now, this class provides the navigation structure and back stack management.
+ * Note: Fragment creation is delegated to [FragmentFactory]. Navigation methods will be
+ * fully functional as individual screen migrations are completed in phases 5-12.
  */
 internal class Navigator(
     private val fragmentManager: FragmentManager,
-    private val containerId: Int = R.id.fragment_container
+    private val containerId: Int = R.id.fragment_container,
+    private val fragmentFactory: FragmentFactory = Dependencies.fragmentFactory
 ) {
 
     val hasContent: Boolean
@@ -32,28 +35,30 @@ internal class Navigator(
     val isEmpty: Boolean
         get() = !hasContent && !hasDialogs
 
-    // Full-screen fragments - to be implemented in Phase 4+ when Fragments are created
+    // Full-screen fragments
+    // Navigation methods delegate to FragmentFactory for fragment creation.
+    // Each method will be fully implemented as the corresponding Fragment is created.
 
     fun showChat(intention: Intention) {
-        // Will be implemented in Phase 12 when ChatFragment is created
+        // Phase 12: ChatFragment
         // val fragment = fragmentFactory.createChatFragment(intention)
         // replaceFragment(fragment, TAG_CHAT)
     }
 
     fun showCall(mediaType: String?) {
-        // Will be implemented in Phase 11 when CallFragment is created
+        // Phase 11: CallFragment
         // val fragment = fragmentFactory.createCallFragment(mediaType)
         // replaceFragment(fragment, TAG_CALL)
     }
 
     fun showMessageCenter(queueIds: List<String>?) {
-        // Will be implemented in Phase 9 when MessageCenterFragment is created
+        // Phase 9: MessageCenterFragment
         // val fragment = fragmentFactory.createMessageCenterFragment(queueIds?.let { ArrayList(it) })
         // replaceFragment(fragment, TAG_MESSAGE_CENTER)
     }
 
     fun showWebBrowser(title: String, url: String) {
-        // Will be implemented in Phase 6 when WebBrowserFragment is created
+        // Phase 6: WebBrowserFragment
         // val fragment = fragmentFactory.createWebBrowserFragment(title, url)
         // fragmentManager.beginTransaction()
         //     .replace(containerId, fragment, TAG_WEB_BROWSER)
@@ -62,7 +67,7 @@ internal class Navigator(
     }
 
     fun showImagePreview(imageId: String?, imageName: String?, localImageUri: String?) {
-        // Will be implemented in Phase 7 when ImagePreviewDialogFragment is created
+        // Phase 7: ImagePreviewDialogFragment
         // val fragment = fragmentFactory.createImagePreviewFragment(imageId, imageName, localImageUri)
         // fragment.show(fragmentManager, DIALOG_TAG_IMAGE_PREVIEW)
     }
@@ -70,13 +75,13 @@ internal class Navigator(
     // Bottom sheets and dialogs
 
     fun showSurvey(survey: Survey) {
-        // Will be implemented in Phase 5 when SurveyBottomSheetFragment is created
+        // Phase 5: SurveyBottomSheetFragment
         // val fragment = fragmentFactory.createSurveyBottomSheet(survey)
         // fragment.show(fragmentManager, DIALOG_TAG_SURVEY)
     }
 
     fun showVisitorCode() {
-        // Will be implemented in Phase 8 when VisitorCodeDialogFragment is created
+        // Phase 8: VisitorCodeDialogFragment
         // val fragment = fragmentFactory.createVisitorCodeDialog()
         // fragment.show(fragmentManager, DIALOG_TAG_VISITOR_CODE)
     }

@@ -837,8 +837,8 @@ val fragmentFactory: FragmentFactory by lazy { FragmentFactory() }
 ### Success Criteria:
 
 #### Automated Verification:
-- [ ] Build completes: `./gradlew widgetssdk:assembleDebug`
-- [ ] Unit tests pass: `./gradlew widgetssdk:testDebugUnitTest`
+- [x] Build completes: `./gradlew widgetssdk:assembleDebug`
+- [x] Unit tests pass: `./gradlew widgetssdk:testDebugUnitTest`
 
 ---
 

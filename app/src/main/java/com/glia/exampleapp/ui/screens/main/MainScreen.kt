@@ -864,8 +864,7 @@ private fun MainScreenContentPreview() {
                 CollapsibleEmbeddedContainer(
                     title = "Embedded View",
                     expanded = false,
-                    onToggle = {},
-                    testTagId = "preview_entry_widget_embedded"
+                    onToggle = {}
                 ) {
                     Text("Entry Widget Content")
                 }
@@ -879,12 +878,34 @@ private fun MainScreenContentPreview() {
                 CollapsibleEmbeddedContainer(
                     title = "Embedded View",
                     expanded = true,
-                    onToggle = {},
-                    testTagId = "preview_visitor_code_embedded"
+                    onToggle = {}
                 ) {
                     Text("Visitor Code Content")
                 }
             }
+        }
+    }
+}
+
+// Simple preview without custom drawables for faster rendering
+@Preview(showBackground = true)
+@Composable
+private fun MainScreenSimplePreview() {
+    GliaExampleAppTheme {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            SectionHeader("Engagements")
+            Text("Chat | Audio | Video | Secure buttons")
+            Spacer(Modifier.height(16.dp))
+            SectionHeader("Authentication")
+            Text("Authenticate | Refresh Token buttons")
+            Spacer(Modifier.height(16.dp))
+            SectionHeader("Entry Widget")
+            Text("Show Sheet button + Embedded View")
+            Spacer(Modifier.height(16.dp))
+            SectionHeader("Call Visualizer")
+            Text("Show Sheet button + Embedded View")
         }
     }
 }

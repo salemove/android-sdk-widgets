@@ -16,11 +16,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.Call
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Settings
@@ -55,17 +50,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import com.glia.exampleapp.R
 import com.glia.exampleapp.data.AuthenticationState
-import com.glia.exampleapp.ui.theme.GliaExampleAppTheme
 import com.glia.exampleapp.data.model.ConfigurationState
 import com.glia.exampleapp.ui.components.ActionButton
+import com.glia.exampleapp.ui.components.FullWidthActionButton
 import com.glia.exampleapp.ui.components.CollapsibleEmbeddedContainer
 import com.glia.exampleapp.ui.components.EngagementButton
 import com.glia.exampleapp.ui.components.GliaLogo
 import com.glia.exampleapp.ui.components.SectionHeader
+import com.glia.exampleapp.ui.theme.GliaExampleAppTheme
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.queue.Queue
 
@@ -100,12 +98,12 @@ fun MainScreen(
         topBar = {
             TopAppBar(
                 navigationIcon = {
-                    IconButton(
-                        onClick = onNavigateToSettings,
-                        modifier = Modifier.testTag("main_settings_button")
-                    ) {
-                        Icon(Icons.Default.Settings, contentDescription = "Settings")
-                    }
+                    // Configure SDK button (left side)
+                    ConfigureSdkButton(
+                        configurationState = uiState.configurationState,
+                        onClick = { viewModel.initializeSdk() },
+                        modifier = Modifier.testTag("main_configure_sdk_button")
+                    )
                 },
                 title = {
                     Box(
@@ -116,12 +114,13 @@ fun MainScreen(
                     }
                 },
                 actions = {
-                    // Configure SDK button
-                    ConfigureSdkButton(
-                        configurationState = uiState.configurationState,
-                        onClick = { viewModel.initializeSdk() },
-                        modifier = Modifier.testTag("main_configure_sdk_button")
-                    )
+                    // Settings button
+                    IconButton(
+                        onClick = onNavigateToSettings,
+                        modifier = Modifier.testTag("main_settings_button")
+                    ) {
+                        Icon(Icons.Default.Settings, contentDescription = "Settings")
+                    }
 
                     // Actions menu
                     Box {
@@ -224,7 +223,7 @@ fun MainScreen(
             Spacer(Modifier.height(16.dp))
 
             // Queue Picker
-            ActionButton(
+            FullWidthActionButton(
                 text = "Select Queue",
                 onClick = {
                     viewModel.loadQueues()
@@ -305,9 +304,10 @@ private fun ConfigureSdkButton(
                 strokeWidth = 2.dp
             )
             is ConfigurationState.Configured -> Icon(
-                Icons.Default.Check,
-                "SDK Configured",
-                tint = MaterialTheme.colorScheme.primary
+                painter = painterResource(id = R.drawable.ic_check_circle),
+                contentDescription = "SDK Configured",
+                tint = androidx.compose.ui.graphics.Color.Unspecified, // Use drawable's native color
+                modifier = Modifier.size(28.dp)
             )
             is ConfigurationState.Error -> Icon(
                 Icons.Default.Warning,
@@ -392,7 +392,7 @@ private fun EngagementButtonsRow(
     ) {
         EngagementButton(
             text = "Chat",
-            icon = Icons.Default.Email,
+            iconRes = R.drawable.ic_baseline_chat_bubble,
             onClick = onChatClick,
             enabled = enabled,
             testTagId = "main_chat_button",
@@ -401,7 +401,7 @@ private fun EngagementButtonsRow(
         Spacer(Modifier.width(8.dp))
         EngagementButton(
             text = "Audio",
-            icon = Icons.Default.Call,
+            iconRes = R.drawable.ic_baseline_call,
             onClick = onAudioClick,
             enabled = enabled,
             testTagId = "main_audio_button",
@@ -410,7 +410,7 @@ private fun EngagementButtonsRow(
         Spacer(Modifier.width(8.dp))
         EngagementButton(
             text = "Video",
-            icon = Icons.Default.Face,
+            iconRes = R.drawable.ic_baseline_videocam,
             onClick = onVideoClick,
             enabled = enabled,
             testTagId = "main_video_button",
@@ -419,7 +419,7 @@ private fun EngagementButtonsRow(
         Spacer(Modifier.width(8.dp))
         EngagementButton(
             text = "Secure",
-            icon = Icons.AutoMirrored.Filled.Send,
+            iconRes = R.drawable.ic_lock,
             onClick = onSecureMessagingClick,
             enabled = enabled,
             testTagId = "main_secure_messaging_button",
@@ -439,28 +439,30 @@ private fun AuthenticationSection(
     val isConfigured = configState is ConfigurationState.Configured
     val isAuthenticated = authState is AuthenticationState.Authenticated
 
-    if (!isConfigured) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 4.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        // Authenticate / Deauthenticate button
         ActionButton(
-            text = "Configure SDK First",
-            onClick = {},
-            enabled = false
+            text = if (isAuthenticated) "Deauthenticate" else "Authenticate",
+            onClick = if (isAuthenticated) onDeauthenticateClick else onAuthenticateClick,
+            iconRes = R.drawable.ic_key,
+            enabled = isConfigured,
+            testTagId = "main_toggle_authenticate_button",
+            modifier = Modifier.weight(1f)
         )
-    } else if (isAuthenticated) {
+
+        // Refresh Token button
         ActionButton(
-            text = "Deauthenticate",
-            onClick = onDeauthenticateClick,
-            testTagId = "main_toggle_authenticate_button"
-        )
-        ActionButton(
-            text = "Refresh Access Token",
+            text = "Refresh Token",
             onClick = onRefreshClick,
-            testTagId = "main_refresh_access_token_button"
-        )
-    } else {
-        ActionButton(
-            text = "Authenticate",
-            onClick = onAuthenticateClick,
-            testTagId = "main_toggle_authenticate_button"
+            iconRes = R.drawable.ic_refresh,
+            enabled = isConfigured && isAuthenticated,
+            testTagId = "main_refresh_access_token_button",
+            modifier = Modifier.weight(1f)
         )
     }
 }
@@ -473,9 +475,10 @@ private fun EntryWidgetSection(
     onToggleEmbedded: () -> Unit,
     viewModel: MainViewModel
 ) {
-    ActionButton(
+    FullWidthActionButton(
         text = "Show Sheet",
         onClick = onShowSheetClick,
+        iconRes = R.drawable.ic_open_in_new,
         enabled = enabled,
         testTagId = "main_entry_widget_sheet_button"
     )
@@ -505,9 +508,10 @@ private fun VisitorCodeSection(
     onShowDialogClick: () -> Unit,
     onToggleEmbedded: () -> Unit
 ) {
-    ActionButton(
-        text = "Show Dialog",
+    FullWidthActionButton(
+        text = "Show Sheet",
         onClick = onShowDialogClick,
+        iconRes = R.drawable.ic_qr_code_scanner,
         enabled = enabled,
         testTagId = "main_present_visitor_code_as_alert_button"
     )
@@ -542,7 +546,7 @@ fun AuthenticationDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Authentication") },
+        title = { Text("Add JWT authentication token") },
         text = {
             Column {
                 OutlinedTextField(
@@ -574,24 +578,15 @@ fun AuthenticationDialog(
                 },
                 modifier = Modifier.testTag("create_authentication_alert_button")
             ) {
-                Text("Authenticate")
+                Text("Create Authentication")
             }
         },
         dismissButton = {
-            Row {
-                TextButton(onClick = {
-                    jwtToken = ""
-                    accessToken = ""
-                    onClearToken()
-                }) {
-                    Text("Clear")
-                }
-                TextButton(
-                    onClick = onDismiss,
-                    modifier = Modifier.testTag("cancel_authentication_alert_button")
-                ) {
-                    Text("Cancel")
-                }
+            TextButton(
+                onClick = onDismiss,
+                modifier = Modifier.testTag("cancel_authentication_alert_button")
+            ) {
+                Text("Cancel")
             }
         }
     )
@@ -787,8 +782,14 @@ private fun MainScreenContentPreview() {
                 @OptIn(ExperimentalMaterial3Api::class)
                 TopAppBar(
                     navigationIcon = {
+                        // Green checkmark (SDK configured) on left
                         IconButton(onClick = {}) {
-                            Icon(Icons.Default.Settings, contentDescription = "Settings")
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_check_circle),
+                                contentDescription = "SDK Configured",
+                                tint = androidx.compose.ui.graphics.Color.Unspecified,
+                                modifier = Modifier.size(28.dp)
+                            )
                         }
                     },
                     title = {
@@ -800,9 +801,11 @@ private fun MainScreenContentPreview() {
                         }
                     },
                     actions = {
+                        // Settings on right
                         IconButton(onClick = {}) {
-                            Icon(Icons.Default.Check, "Configured")
+                            Icon(Icons.Default.Settings, "Settings")
                         }
+                        // Menu on right
                         IconButton(onClick = {}) {
                             Icon(Icons.Default.MoreVert, "Actions")
                         }
@@ -831,10 +834,33 @@ private fun MainScreenContentPreview() {
                 )
                 Spacer(Modifier.height(16.dp))
                 SectionHeader("Authentication")
-                ActionButton(text = "Authenticate", onClick = {})
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    ActionButton(
+                        text = "Authenticate",
+                        onClick = {},
+                        iconRes = R.drawable.ic_key,
+                        modifier = Modifier.weight(1f)
+                    )
+                    ActionButton(
+                        text = "Refresh Token",
+                        onClick = {},
+                        iconRes = R.drawable.ic_refresh,
+                        enabled = false,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
                 Spacer(Modifier.height(16.dp))
                 SectionHeader("Entry Widget")
-                ActionButton(text = "Show Sheet", onClick = {})
+                FullWidthActionButton(
+                    text = "Show Sheet",
+                    onClick = {},
+                    iconRes = R.drawable.ic_open_in_new
+                )
                 CollapsibleEmbeddedContainer(
                     title = "Embedded View",
                     expanded = false,
@@ -845,7 +871,11 @@ private fun MainScreenContentPreview() {
                 }
                 Spacer(Modifier.height(16.dp))
                 SectionHeader("Call Visualizer")
-                ActionButton(text = "Show Dialog", onClick = {})
+                FullWidthActionButton(
+                    text = "Show Sheet",
+                    onClick = {},
+                    iconRes = R.drawable.ic_qr_code_scanner
+                )
                 CollapsibleEmbeddedContainer(
                     title = "Embedded View",
                     expanded = true,

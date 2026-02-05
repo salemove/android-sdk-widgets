@@ -1,5 +1,6 @@
 package com.glia.exampleapp.ui.components
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -7,8 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -18,11 +17,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.glia.exampleapp.R
 import com.glia.exampleapp.ui.theme.GliaExampleAppTheme
 
 private val GradientStart = Color(0xFF6B4EFF)
@@ -34,7 +34,7 @@ private val GradientEnd = Color(0xFF9747FF)
 @Composable
 fun EngagementButton(
     text: String,
-    icon: ImageVector,
+    @DrawableRes iconRes: Int,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
@@ -55,7 +55,7 @@ fun EngagementButton(
             .then(testTagId?.let { Modifier.testTag(it) } ?: Modifier)
     ) {
         Icon(
-            imageVector = icon,
+            painter = painterResource(id = iconRes),
             contentDescription = text,
             tint = Color.White,
             modifier = Modifier.size(32.dp)
@@ -76,7 +76,7 @@ private fun EngagementButtonPreview() {
     GliaExampleAppTheme {
         EngagementButton(
             text = "Chat",
-            icon = Icons.Default.Email,
+            iconRes = R.drawable.ic_baseline_chat_bubble,
             onClick = {}
         )
     }
@@ -88,7 +88,7 @@ private fun EngagementButtonDisabledPreview() {
     GliaExampleAppTheme {
         EngagementButton(
             text = "Chat",
-            icon = Icons.Default.Email,
+            iconRes = R.drawable.ic_baseline_chat_bubble,
             onClick = {},
             enabled = false
         )

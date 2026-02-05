@@ -91,6 +91,7 @@ internal class HostActivity : FadeTransitionActivity() {
                 destination.localImageUri
             )
             Destination.VisitorCode -> navigator.showVisitorCode()
+            Destination.EntryWidget -> navigator.showEntryWidget()
         }
     }
 

@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
+import com.glia.widgets.HostActivity
 import com.glia.widgets.R
 import com.glia.widgets.databinding.EntryWidgetFragmentBinding
 import com.glia.widgets.di.Dependencies
@@ -84,6 +85,9 @@ internal class EntryWidgetFragment : BottomSheetDialogFragment() {
 
         onDismissListener?.invoke()
         onDismissListener = null
+
+        // If hosted by HostActivity, notify it to finish if empty
+        (activity as? HostActivity)?.finishIfEmpty()
     }
 
     fun show(parentFragmentManager: FragmentManager) {

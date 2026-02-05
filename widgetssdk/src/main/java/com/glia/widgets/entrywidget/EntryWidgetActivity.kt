@@ -7,7 +7,12 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 /**
  * EntryWidgetActivity provides a way to display the EntryWidget bottom sheet.
+ *
+ * @deprecated Replaced by [com.glia.widgets.HostActivity] with [com.glia.widgets.navigation.Destination.EntryWidget].
+ * This activity is kept for backwards compatibility but will be removed in a future release.
+ * Use HostActivity for new implementations.
  */
+@Deprecated("Use HostActivity with Destination.EntryWidget instead")
 internal class EntryWidgetActivity : AppCompatActivity(), EntryWidgetFragment.OnDismissListener {
 
     private var disposable: CompositeDisposable = CompositeDisposable()

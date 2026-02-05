@@ -123,6 +123,16 @@ internal class FragmentFactory {
         return VisitorCodeDialogFragment()
     }
 
+    /**
+     * Creates an EntryWidgetFragment.
+     *
+     * This fragment is a thin wrapper around EntryWidgetView which can be used standalone.
+     * The Controller remains the source of truth for business logic.
+     */
+    fun createEntryWidgetFragment(): com.glia.widgets.entrywidget.EntryWidgetFragment {
+        return com.glia.widgets.entrywidget.EntryWidgetFragment()
+    }
+
     // Additional dialog helpers (for internal use by Navigator)
 
     /**

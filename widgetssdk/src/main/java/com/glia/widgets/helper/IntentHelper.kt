@@ -150,7 +150,7 @@ internal class IntentHelperImpl : IntentHelper {
         setDataAndType(contentUri, fileContentType)
     }
 
-    override fun entryWidgetIntent(activity: Activity): Intent = Intent(activity, EntryWidgetActivity::class.java)
+    override fun entryWidgetIntent(activity: Activity): Intent = HostActivity.createIntent(activity, Destination.EntryWidget)
         .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
 
     override fun pushClickHandlerPendingIntent(context: Context, queueId: String?, visitorId: String): PendingIntent = PendingIntent.getActivity(

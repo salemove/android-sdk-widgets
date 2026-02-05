@@ -39,4 +39,7 @@ internal sealed interface Destination : Parcelable {
 
     @Parcelize
     data object VisitorCode : Destination
+
+    @Parcelize
+    data object EntryWidget : Destination
 }

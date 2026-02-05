@@ -88,6 +88,11 @@ internal class Navigator(
         // fragment.show(fragmentManager, DIALOG_TAG_VISITOR_CODE)
     }
 
+    fun showEntryWidget() {
+        val fragment: com.glia.widgets.entrywidget.EntryWidgetFragment = fragmentFactory.createEntryWidgetFragment()
+        fragment.show(fragmentManager, DIALOG_TAG_ENTRY_WIDGET)
+    }
+
     // Navigation helpers
 
     fun popBackStack(): Boolean {
@@ -135,5 +140,6 @@ internal class Navigator(
         private const val DIALOG_TAG_IMAGE_PREVIEW = "dialog_image_preview"
         private const val DIALOG_TAG_END_ENGAGEMENT = "dialog_end_engagement"
         private const val DIALOG_TAG_MEDIA_UPGRADE = "dialog_media_upgrade"
+        private const val DIALOG_TAG_ENTRY_WIDGET = "dialog_entry_widget"
     }
 }

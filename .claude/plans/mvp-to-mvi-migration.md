@@ -1480,7 +1480,7 @@ Migrate MessageCenter to **two separate Fragments** - one for the welcome/compos
 
 ---
 
-## Phase 10: EntryWidget Migration (Priority 2)
+## Phase 10: EntryWidget Migration (Priority 2) ✅ COMPLETED
 
 ### Overview
 EntryWidget already has `EntryWidgetFragment`. Keep the existing architecture since `EntryWidgetView` can be used standalone by integrators.
@@ -1492,15 +1492,26 @@ EntryWidget already has `EntryWidgetFragment`. Keep the existing architecture si
 - **Keep existing `EntryWidgetFragment`** - Already serves as wrapper for HostActivity usage
 - **No ViewModel migration** - Controller remains the source of truth for business logic
 
-### Changes Required:
-- Ensure `EntryWidgetFragment` works properly with `HostActivity` and `Navigator`
-- Update `Navigator` to handle EntryWidget destination if not already
-- No changes to Controller or View
+### Changes Completed:
+- ✅ Added `Destination.EntryWidget` to the Destination sealed interface
+- ✅ Added `showEntryWidget()` method to Navigator
+- ✅ Added `createEntryWidgetFragment()` method to FragmentFactory
+- ✅ Updated HostActivity to handle EntryWidget destination
+- ✅ Updated IntentHelper to use HostActivity instead of EntryWidgetActivity
+- ✅ Updated EntryWidgetFragment to call `finishIfEmpty()` on HostActivity when dismissed
+- ✅ Marked `EntryWidgetActivity` as `@Deprecated`
 
 ### Success Criteria:
-- [ ] Build completes
+
+#### Automated Verification:
+- [x] Build completes: `./gradlew widgetssdk:assembleDebug`
+- [x] Unit tests pass: `./gradlew widgetssdk:testDebugUnitTest`
+
+#### Manual Verification:
 - [ ] EntryWidget works through HostActivity
 - [ ] EntryWidgetView continues to work standalone (without Fragment)
+- [ ] Entry options (chat, call, messaging) launch correctly
+- [ ] Bottom sheet dismissal finishes HostActivity when no other content
 
 ---
 

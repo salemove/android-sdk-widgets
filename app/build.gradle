@@ -1,5 +1,8 @@
-apply plugin: 'com.android.application'
-apply plugin: 'org.jetbrains.kotlin.android'
+plugins {
+  id 'com.android.application'
+  alias libs.plugins.kotlin.android
+  alias libs.plugins.kotlin.compose
+}
 
 //Detailed information about advantages of Java toolchain https://developer.android.com/build/jdks#toolchain
 java {
@@ -84,6 +87,10 @@ android {
       'HardcodedText'
   }
   namespace 'com.glia.exampleapp'
+
+  buildFeatures {
+    compose true
+  }
 }
 
 def initEnvProperty(String propertyName, String defaultValue = "UNDEFINED") {
@@ -120,6 +127,22 @@ dependencies {
   implementation libs.java.ktor.logging
   implementation libs.java.coroutines
 
+  // Compose
+  implementation platform(libs.compose.bom)
+  implementation libs.compose.ui
+  implementation libs.compose.ui.graphics
+  implementation libs.compose.ui.tooling.preview
+  implementation libs.compose.material3
+  implementation libs.compose.activity
+  implementation libs.compose.viewmodel
+  implementation libs.compose.navigation
+  implementation libs.compose.runtime.livedata
+
+  // DataStore
+  implementation libs.datastore.preferences
+
+  debugImplementation libs.compose.ui.tooling
+  debugImplementation libs.compose.ui.test.manifest
 
   //debugImplementation libs.test.leakcanary
   testImplementation libs.test.junit

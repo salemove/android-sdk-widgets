@@ -19,6 +19,8 @@ import com.glia.exampleapp.ui.screens.main.MainScreen
 import com.glia.exampleapp.ui.screens.main.MainViewModel
 import com.glia.exampleapp.ui.screens.settings.SettingsScreen
 import com.glia.exampleapp.ui.screens.settings.SettingsViewModel
+import com.glia.exampleapp.ui.screens.visitorinfo.VisitorInfoScreen
+import com.glia.exampleapp.ui.screens.visitorinfo.VisitorInfoViewModel
 
 /**
  * Navigation routes for the app
@@ -49,9 +51,7 @@ fun AppNavigation() {
             MainScreen(
                 viewModel = viewModel,
                 onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
-                onNavigateToVisitorInfo = {
-                    // TODO: Implement in Phase 6
-                },
+                onNavigateToVisitorInfo = { navController.navigate(Screen.VisitorInfo.route) },
                 onNavigateToSensitiveData = {
                     // TODO: Implement in Phase 7
                 },
@@ -76,6 +76,16 @@ fun AppNavigation() {
             )
         }
 
-        // VisitorInfo and SensitiveData screens will be added in Phases 6 and 7
+        composable(Screen.VisitorInfo.route) {
+            val viewModel: VisitorInfoViewModel = viewModel(
+                factory = VisitorInfoViewModel.Factory(context.applicationContext)
+            )
+            VisitorInfoScreen(
+                viewModel = viewModel,
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        // SensitiveData screen will be added in Phase 7
     }
 }

@@ -21,6 +21,7 @@ import com.glia.exampleapp.ui.screens.settings.SettingsScreen
 import com.glia.exampleapp.ui.screens.settings.SettingsViewModel
 import com.glia.exampleapp.ui.screens.visitorinfo.VisitorInfoScreen
 import com.glia.exampleapp.ui.screens.visitorinfo.VisitorInfoViewModel
+import com.glia.exampleapp.ui.screens.sensitivedata.SensitiveDataScreen
 
 /**
  * Navigation routes for the app
@@ -53,7 +54,7 @@ fun AppNavigation() {
                 onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
                 onNavigateToVisitorInfo = { navController.navigate(Screen.VisitorInfo.route) },
                 onNavigateToSensitiveData = {
-                    // TODO: Implement in Phase 7
+                    navController.navigate(Screen.SensitiveData.route)
                 },
                 onNavigateToLegacyActivity = {
                     context.startActivity(Intent(context, LegacyActivity::class.java))
@@ -86,6 +87,10 @@ fun AppNavigation() {
             )
         }
 
-        // SensitiveData screen will be added in Phase 7
+        composable(Screen.SensitiveData.route) {
+            SensitiveDataScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
     }
 }

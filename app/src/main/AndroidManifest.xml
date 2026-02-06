@@ -12,18 +12,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true">
 
+        <!-- Compose-based main activity -->
         <activity
-            android:name=".TestingAppLauncherActivity"
+            android:name=".ComposeActivity"
             android:exported="true"
             android:theme="@style/Theme.GliaAndroidSDKWidgetsExample">
-            <nav-graph android:value="@navigation/nav_graph" />
-        </activity>
-
-        <activity-alias
-            android:name="LauncherActivity"
-            android:exported="true"
-            android:targetActivity=".TestingAppLauncherActivity">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -38,9 +31,8 @@
                 <data android:host="widgets" />
                 <data android:pathPrefix="/token" />
                 <data android:pathPrefix="/secret" />
-
             </intent-filter>
-        </activity-alias>
+        </activity>
 
         <activity
             android:name=".LegacyActivity"

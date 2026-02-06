@@ -17,16 +17,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.glia.exampleapp.R
 import com.glia.exampleapp.ui.theme.GliaExampleAppTheme
 
-private val GradientStart = Color(0xFF6B4EFF)
-private val GradientEnd = Color(0xFF9747FF)
+private val GradientStart = Color(0xFF3B0091)
+private val GradientEnd = Color(0xFF7C19DD)
 
 /**
  * Purple gradient button with icon and text for engagement types (Chat, Audio, Video, Secure Messaging).
@@ -40,16 +42,16 @@ fun EngagementButton(
     enabled: Boolean = true,
     testTagId: String? = null
 ) {
-    val gradientBrush = Brush.linearGradient(
+    val gradientBrush = Brush.verticalGradient(
         colors = listOf(GradientStart, GradientEnd)
     )
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
         modifier = modifier
-            .clip(RoundedCornerShape(12.dp))
-            .background(if (enabled) gradientBrush else Brush.linearGradient(listOf(Color.Gray, Color.Gray)))
+            .clip(RoundedCornerShape(16.dp))
+            .background(if (enabled) gradientBrush else Brush.verticalGradient(listOf(Color.Gray, Color.Gray)))
             .clickable(enabled = enabled, onClick = onClick)
             .padding(16.dp)
             .then(testTagId?.let { Modifier.testTag(it) } ?: Modifier)
@@ -63,9 +65,9 @@ fun EngagementButton(
         Text(
             text = text,
             color = Color.White,
-            style = MaterialTheme.typography.labelMedium,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = 8.dp)
+            fontSize = 15.sp,
+            fontWeight = FontWeight.SemiBold,
+            textAlign = TextAlign.Center
         )
     }
 }

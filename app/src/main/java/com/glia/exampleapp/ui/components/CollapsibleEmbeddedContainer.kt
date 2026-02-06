@@ -33,12 +33,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.glia.exampleapp.R
 import com.glia.exampleapp.ui.theme.GliaExampleAppTheme
 
-// Light purple background color
-private val LightPurpleBackground = Color(0xFFF0EBFF)
-private val PurpleContent = Color(0xFF6B4EFF)
+private val GliaPrimary = Color(0xFF7C19DD)
+private val LightPurpleBackground = GliaPrimary.copy(alpha = 0.1f)
+private val PurpleContent = GliaPrimary
 
 /**
  * Container that can collapse/expand by clicking header.
@@ -73,7 +74,7 @@ fun CollapsibleEmbeddedContainer(
                 .clip(RoundedCornerShape(12.dp))
                 .background(LightPurpleBackground)
                 .clickable(onClick = onToggle)
-                .padding(vertical = 14.dp, horizontal = 16.dp),
+                .padding(vertical = 12.dp, horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
@@ -81,13 +82,14 @@ fun CollapsibleEmbeddedContainer(
                 contentDescription = if (expanded) "Collapse" else "Expand",
                 tint = PurpleContent,
                 modifier = Modifier
-                    .size(20.dp)
+                    .size(14.dp)
                     .rotate(rotationAngle)
             )
             Spacer(Modifier.width(8.dp))
             Text(
                 text = title,
                 color = PurpleContent,
+                fontSize = 14.sp,
                 fontWeight = FontWeight.Medium
             )
         }

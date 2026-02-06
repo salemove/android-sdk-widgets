@@ -164,6 +164,8 @@ fun MainScreen(
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
         ) {
+            Spacer(Modifier.height(8.dp))
+
             // Default Queues Toggle
             DefaultQueuesToggle(
                 useDefaultQueues = uiState.useDefaultQueues,
@@ -171,10 +173,7 @@ fun MainScreen(
                 modifier = Modifier.testTag("settings_default_queues_switch")
             )
 
-            Spacer(Modifier.height(16.dp))
-
             // Engagement Buttons
-            SectionHeader("Engagements")
             EngagementButtonsRow(
                 enabled = uiState.configurationState is ConfigurationState.Configured,
                 onChatClick = { viewModel.startChat(activity) },
@@ -183,7 +182,7 @@ fun MainScreen(
                 onSecureMessagingClick = { viewModel.startSecureMessaging(activity) }
             )
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(24.dp))
 
             // Authentication Section
             SectionHeader("Authentication")
@@ -195,7 +194,7 @@ fun MainScreen(
                 onRefreshClick = { showRefreshAuthDialog = true }
             )
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(24.dp))
 
             // Entry Widget Section
             SectionHeader("Entry Widget")
@@ -207,7 +206,7 @@ fun MainScreen(
                 viewModel = viewModel
             )
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(24.dp))
 
             // Call Visualizer / Visitor Code Section
             SectionHeader("Call Visualizer")
@@ -712,12 +711,11 @@ private fun MainScreenContentPreview() {
                     .padding(padding)
                     .verticalScroll(rememberScrollState())
             ) {
+                Spacer(Modifier.height(8.dp))
                 DefaultQueuesToggle(
                     useDefaultQueues = false,
                     onToggle = {}
                 )
-                Spacer(Modifier.height(16.dp))
-                SectionHeader("Engagements")
                 EngagementButtonsRow(
                     enabled = true,
                     onChatClick = {},
@@ -725,7 +723,7 @@ private fun MainScreenContentPreview() {
                     onVideoClick = {},
                     onSecureMessagingClick = {}
                 )
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(24.dp))
                 SectionHeader("Authentication")
                 Row(
                     modifier = Modifier
@@ -747,7 +745,7 @@ private fun MainScreenContentPreview() {
                         modifier = Modifier.weight(1f)
                     )
                 }
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(24.dp))
                 SectionHeader("Entry Widget")
                 FullWidthActionButton(
                     text = "Show Sheet",
@@ -761,7 +759,7 @@ private fun MainScreenContentPreview() {
                 ) {
                     Text("Entry Widget Content")
                 }
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(24.dp))
                 SectionHeader("Call Visualizer")
                 FullWidthActionButton(
                     text = "Show Sheet",
@@ -788,15 +786,14 @@ private fun MainScreenSimplePreview() {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            SectionHeader("Engagements")
             Text("Chat | Audio | Video | Secure buttons")
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(24.dp))
             SectionHeader("Authentication")
             Text("Authenticate | Refresh Token buttons")
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(24.dp))
             SectionHeader("Entry Widget")
             Text("Show Sheet button + Embedded View")
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(24.dp))
             SectionHeader("Call Visualizer")
             Text("Show Sheet button + Embedded View")
         }

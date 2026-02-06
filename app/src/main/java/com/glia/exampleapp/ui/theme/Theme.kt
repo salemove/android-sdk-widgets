@@ -12,7 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 // Glia brand colors
-private val GliaPrimary = Color(0xFF6B4EFF)
+private val GliaPrimary = Color(0xFF7C19DD)
 private val GliaSecondary = Color(0xFF4DD0E1)
 private val GliaBackground = Color(0xFFF5F5F5)
 private val GliaSurface = Color(0xFFFFFFFF)

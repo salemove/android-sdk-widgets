@@ -34,14 +34,6 @@
             </intent-filter>
         </activity>
 
-        <!-- Legacy Fragment-based activity (kept for reference) -->
-        <activity
-            android:name=".TestingAppLauncherActivity"
-            android:exported="false"
-            android:theme="@style/Theme.GliaAndroidSDKWidgetsExample">
-            <nav-graph android:value="@navigation/nav_graph" />
-        </activity>
-
         <activity
             android:name=".LegacyActivity"
             android:configChanges="orientation|screenSize" />

@@ -1,18 +1,21 @@
 package com.glia.exampleapp.data.repository
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import androidx.preference.PreferenceManager
 import com.glia.exampleapp.R
 import com.glia.exampleapp.data.model.EnvironmentSelection
 import com.glia.exampleapp.data.model.GliaConfiguration
 import com.glia.exampleapp.data.model.PredefinedColor
 import com.glia.exampleapp.data.model.ThemeColors
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "glia_configuration")
@@ -31,6 +34,9 @@ class ConfigurationRepository(private val context: Context) {
         val QUEUE_ID = stringPreferencesKey("queue_id")
         val VISITOR_CONTEXT_ASSET_ID = stringPreferencesKey("visitor_context_asset_id")
         val USE_DEFAULT_QUEUES = booleanPreferencesKey("use_default_queues")
+
+        // Authentication
+        val SAVED_AUTH_TOKEN = stringPreferencesKey("saved_auth_token")
 
         // Company Settings
         val COMPANY_NAME = stringPreferencesKey("company_name")
@@ -68,6 +74,7 @@ class ConfigurationRepository(private val context: Context) {
             queueId = preferences[Keys.QUEUE_ID] ?: context.getString(R.string.glia_queue_id),
             visitorContextAssetId = preferences[Keys.VISITOR_CONTEXT_ASSET_ID] ?: "",
             useDefaultQueues = preferences[Keys.USE_DEFAULT_QUEUES] ?: false,
+            savedAuthToken = preferences[Keys.SAVED_AUTH_TOKEN] ?: "",
             companyName = preferences[Keys.COMPANY_NAME] ?: context.getString(R.string.settings_value_default_company_name),
             manualLocaleOverride = preferences[Keys.MANUAL_LOCALE_OVERRIDE] ?: "",
             enableBubbleOutsideApp = preferences[Keys.ENABLE_BUBBLE_OUTSIDE_APP] ?: true,
@@ -99,6 +106,7 @@ class ConfigurationRepository(private val context: Context) {
             preferences[Keys.QUEUE_ID] = config.queueId
             preferences[Keys.VISITOR_CONTEXT_ASSET_ID] = config.visitorContextAssetId
             preferences[Keys.USE_DEFAULT_QUEUES] = config.useDefaultQueues
+            preferences[Keys.SAVED_AUTH_TOKEN] = config.savedAuthToken
             preferences[Keys.COMPANY_NAME] = config.companyName
             preferences[Keys.MANUAL_LOCALE_OVERRIDE] = config.manualLocaleOverride
             preferences[Keys.ENABLE_BUBBLE_OUTSIDE_APP] = config.enableBubbleOutsideApp
@@ -224,6 +232,66 @@ class ConfigurationRepository(private val context: Context) {
             preferences[Keys.BASE_SHADE_COLOR] = colors.baseShade.name
             preferences[Keys.BACKGROUND_COLOR] = colors.background.name
             preferences[Keys.SYSTEM_NEGATIVE_COLOR] = colors.systemNegative.name
+        }
+    }
+
+    suspend fun updateSavedAuthToken(token: String) {
+        context.dataStore.edit { preferences ->
+            preferences[Keys.SAVED_AUTH_TOKEN] = token
+        }
+    }
+
+    /**
+     * One-time migration from SharedPreferences to DataStore.
+     * Called on app startup to migrate existing data.
+     * After migration, SharedPreferences is never written to again.
+     */
+    suspend fun migrateFromSharedPreferencesIfNeeded() {
+        val currentPrefs = context.dataStore.data.first()
+
+        // Check if DataStore is empty (never been initialized)
+        val isDataStoreEmpty = currentPrefs[Keys.SITE_ID] == null
+
+        if (isDataStoreEmpty) {
+            // Migrate from SharedPreferences
+            val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+
+            context.dataStore.edit { preferences ->
+                // Migrate site configuration
+                sharedPreferences.getString(context.getString(R.string.pref_site_id), null)?.let {
+                    preferences[Keys.SITE_ID] = it
+                }
+                sharedPreferences.getString(context.getString(R.string.pref_api_key_id), null)?.let {
+                    preferences[Keys.API_KEY_ID] = it
+                }
+                sharedPreferences.getString(context.getString(R.string.pref_api_key_secret), null)?.let {
+                    preferences[Keys.API_KEY_SECRET] = it
+                }
+                sharedPreferences.getString(context.getString(R.string.pref_environment), null)?.let {
+                    preferences[Keys.ENVIRONMENT] = it
+                }
+
+                // Migrate engagement settings
+                sharedPreferences.getString(context.getString(R.string.pref_queue_id), null)?.let {
+                    preferences[Keys.QUEUE_ID] = it
+                }
+                sharedPreferences.getString(context.getString(R.string.pref_context_asset_id), null)?.let {
+                    preferences[Keys.VISITOR_CONTEXT_ASSET_ID] = it
+                }
+
+                // Migrate auth token
+                sharedPreferences.getString(context.getString(R.string.pref_auth_token), null)?.let {
+                    preferences[Keys.SAVED_AUTH_TOKEN] = it
+                }
+
+                // Migrate authentication settings
+                if (sharedPreferences.contains(context.getString(R.string.pref_suppress_p_n_during_auth))) {
+                    preferences[Keys.SUPPRESS_PUSH_NOTIFICATION_DIALOG] =
+                        sharedPreferences.getBoolean(context.getString(R.string.pref_suppress_p_n_during_auth), false)
+                }
+
+                // Note: Theme colors will use defaults if not set in SharedPreferences
+            }
         }
     }
 }

@@ -24,6 +24,12 @@ class ComposeActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+        // Migrate from SharedPreferences to DataStore (one-time, backwards compatibility)
+        val appState = AppState.getInstance(applicationContext)
+        lifecycleScope.launch {
+            appState.configurationRepository.migrateFromSharedPreferencesIfNeeded()
+        }
+
         // Handle deep link configuration
         initGliaWidgetsWithDeepLink()
 

@@ -2,13 +2,11 @@ package com.glia.exampleapp.ui.screens.main
 
 import android.app.Activity
 import android.content.Context
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.preference.PreferenceManager
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.Glia
 import com.glia.androidsdk.fcm.GliaPushMessage
@@ -68,11 +66,9 @@ class MainViewModel(
     private var engagementLauncher: EngagementLauncher? = null
     private var entryWidget: EntryWidget? = null
     private var currentQueueId: String = ""
+    private var visitorContextAssetId: String = ""
+    private var savedAuthToken: String = ""
     private var authenticationBehaviorAllowed: Boolean = false
-
-    private val sharedPreferences: SharedPreferences by lazy {
-        PreferenceManager.getDefaultSharedPreferences(applicationContext)
-    }
 
     init {
         observeAppState()
@@ -83,6 +79,8 @@ class MainViewModel(
         viewModelScope.launch {
             appState.configuration.collect { config ->
                 currentQueueId = config.queueId
+                visitorContextAssetId = config.visitorContextAssetId
+                savedAuthToken = config.savedAuthToken
                 authenticationBehaviorAllowed = config.authenticationBehaviorAllowed
                 _uiState.value = _uiState.value.copy(useDefaultQueues = config.useDefaultQueues)
             }
@@ -119,14 +117,12 @@ class MainViewModel(
 
         viewModelScope.launch {
             try {
-                // Get configuration from DataStore
-                val config = appState.configuration.firstOrNull()
-                val gliaConfig = if (config != null) {
-                    ExampleAppConfigManager.createConfigFromDataStore(applicationContext, config)
-                } else {
-                    // Fallback to SharedPreferences for backwards compatibility
-                    ExampleAppConfigManager.createDefaultConfig(applicationContext)
+                // Get configuration from DataStore (migration happens on app startup)
+                val config = appState.configuration.firstOrNull() ?: run {
+                    appState.setConfigurationState(ConfigurationState.Error("Configuration not found"))
+                    return@launch
                 }
+                val gliaConfig = ExampleAppConfigManager.createConfigFromDataStore(applicationContext, config)
 
                 GliaWidgets.init(
                     gliaConfig,
@@ -247,19 +243,12 @@ class MainViewModel(
 
     private fun getQueueId(): String {
         return currentQueueId.ifBlank {
-            // Fallback to SharedPreferences for backwards compatibility
-            sharedPreferences.getString(
-                applicationContext.getString(R.string.pref_queue_id),
-                applicationContext.getString(R.string.glia_queue_id)
-            ) ?: applicationContext.getString(R.string.glia_queue_id)
+            applicationContext.getString(R.string.glia_queue_id)
         }
     }
 
     private fun getVisitorContextAssetId(): String? {
-        return sharedPreferences.getString(
-            applicationContext.getString(R.string.pref_context_asset_id),
-            null
-        )
+        return visitorContextAssetId.ifBlank { null }
     }
 
     // Engagement methods
@@ -395,24 +384,21 @@ class MainViewModel(
     private fun saveAuthToken(jwt: String) {
         val defaultToken = applicationContext.getString(R.string.glia_jwt)
         if (jwt != defaultToken) {
-            sharedPreferences.edit()
-                .putString(applicationContext.getString(R.string.pref_auth_token), jwt)
-                .apply()
+            viewModelScope.launch {
+                appState.configurationRepository.updateSavedAuthToken(jwt)
+            }
         }
     }
 
     fun getSavedAuthToken(): String {
-        val savedToken = sharedPreferences.getString(
-            applicationContext.getString(R.string.pref_auth_token),
-            ""
-        ) ?: ""
-        return savedToken.ifEmpty { applicationContext.getString(R.string.glia_jwt) }
+        // Return cached saved token from configuration
+        return savedAuthToken.ifEmpty { applicationContext.getString(R.string.glia_jwt) }
     }
 
     fun clearAuthToken() {
-        sharedPreferences.edit()
-            .putString(applicationContext.getString(R.string.pref_auth_token), null)
-            .apply()
+        viewModelScope.launch {
+            appState.configurationRepository.updateSavedAuthToken("")
+        }
     }
 
     // Live Observation methods
@@ -459,9 +445,9 @@ class MainViewModel(
     }
 
     fun selectQueue(queue: Queue) {
-        sharedPreferences.edit()
-            .putString(applicationContext.getString(R.string.pref_queue_id), queue.id)
-            .apply()
+        viewModelScope.launch {
+            appState.configurationRepository.updateQueueId(queue.id)
+        }
         // Reset engagement launcher to pick up new queue
         engagementLauncher = null
         entryWidget = null

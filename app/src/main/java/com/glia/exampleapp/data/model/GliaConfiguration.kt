@@ -17,6 +17,9 @@ data class GliaConfiguration(
     val visitorContextAssetId: String = "",
     val useDefaultQueues: Boolean = false,
 
+    // Authentication
+    val savedAuthToken: String = "",
+
     // Company Settings
     val companyName: String = "Glia",
     val manualLocaleOverride: String = "",

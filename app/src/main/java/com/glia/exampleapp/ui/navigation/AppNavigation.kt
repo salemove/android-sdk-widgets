@@ -34,7 +34,9 @@ sealed class Screen(val route: String) {
 }
 
 @Composable
-fun AppNavigation() {
+fun AppNavigation(
+    onPushNotificationCheck: ((MainViewModel) -> Unit)? = null
+) {
     val navController = rememberNavController()
     val context = LocalContext.current
     val appState = remember { AppState.getInstance(context) }
@@ -49,6 +51,12 @@ fun AppNavigation() {
             val viewModel: MainViewModel = viewModel(
                 factory = MainViewModel.Factory(context.applicationContext, appState)
             )
+
+            // Check for push notification launch
+            androidx.compose.runtime.LaunchedEffect(Unit) {
+                onPushNotificationCheck?.invoke(viewModel)
+            }
+
             MainScreen(
                 viewModel = viewModel,
                 onNavigateToSettings = { navController.navigate(Screen.Settings.route) },

@@ -29,7 +29,12 @@ class ComposeActivity : ComponentActivity() {
 
         setContent {
             GliaExampleAppTheme {
-                AppNavigation()
+                AppNavigation(
+                    onPushNotificationCheck = {  mainViewModel ->
+                        // Handle push notification launch after SDK initialization
+                        mainViewModel.handlePushNotificationLaunch(this, intent.extras)
+                    }
+                )
             }
         }
     }

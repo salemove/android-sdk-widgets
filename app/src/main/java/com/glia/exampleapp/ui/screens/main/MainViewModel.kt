@@ -3,6 +3,7 @@ package com.glia.exampleapp.ui.screens.main
 import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
+import android.os.Bundle
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -10,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.preference.PreferenceManager
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.Glia
+import com.glia.androidsdk.fcm.GliaPushMessage
 import com.glia.androidsdk.omnibrowse.Omnibrowse
 import com.glia.exampleapp.ExampleAppConfigManager
 import com.glia.exampleapp.R
@@ -143,6 +145,36 @@ class MainViewModel(
             } catch (e: Exception) {
                 appState.setConfigurationState(ConfigurationState.Error(e.message ?: "Configuration error"))
                 showError(e.message ?: "Failed to load configuration")
+            }
+        }
+    }
+
+    /**
+     * Handle app launch from push notification.
+     * Call this after SDK initialization to check if app was opened from a notification.
+     */
+    fun handlePushNotificationLaunch(activity: Activity, extras: Bundle?) {
+        if (!Glia.isInitialized()) return
+
+        val push = Glia.getPushNotifications()
+            .handleOnMainActivityCreate(extras) ?: return
+
+        android.util.Log.d("MainViewModel", "Handling push notification: type=${push.type}")
+
+        when (push.type) {
+            GliaPushMessage.PushType.QUEUED_MESSAGE -> {
+                // Queued message requires authentication before launching secure messaging
+                if (authentication?.isAuthenticated == true) {
+                    getEngagementLauncher().startSecureMessaging(activity)
+                } else {
+                    // For Compose app, we'll just show a toast for now
+                    // In a full implementation, you'd show an authentication dialog
+                    Toast.makeText(activity, "Authentication required for secure messaging", Toast.LENGTH_SHORT).show()
+                }
+            }
+            else -> {
+                // Other push types launch chat directly
+                getEngagementLauncher().startChat(activity)
             }
         }
     }

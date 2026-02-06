@@ -39,7 +39,6 @@ fun EngagementButton(
     @DrawableRes iconRes: Int,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true,
     testTagId: String? = null
 ) {
     val gradientBrush = Brush.verticalGradient(
@@ -51,8 +50,8 @@ fun EngagementButton(
         verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
         modifier = modifier
             .clip(RoundedCornerShape(16.dp))
-            .background(if (enabled) gradientBrush else Brush.verticalGradient(listOf(Color.Gray, Color.Gray)))
-            .clickable(enabled = enabled, onClick = onClick)
+            .background(gradientBrush)
+            .clickable(onClick = onClick)
             .padding(16.dp)
             .then(testTagId?.let { Modifier.testTag(it) } ?: Modifier)
     ) {
@@ -84,15 +83,3 @@ private fun EngagementButtonPreview() {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun EngagementButtonDisabledPreview() {
-    GliaExampleAppTheme {
-        EngagementButton(
-            text = "Chat",
-            iconRes = R.drawable.ic_baseline_chat_bubble,
-            onClick = {},
-            enabled = false
-        )
-    }
-}

@@ -26,6 +26,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 /**
  * UI state for the main screen
@@ -129,6 +130,27 @@ class MainViewModel(
                 appState.setConfigurationState(ConfigurationState.Error(e.message ?: "Configuration error"))
                 showError(e.message ?: "Failed to load configuration")
             }
+        }
+    }
+
+    private fun ensureSdkInitialized(): Boolean {
+        if (GliaWidgets.isInitialized()) return true
+
+        return try {
+            val config = runBlocking { appState.configuration.firstOrNull() }
+                ?: throw IllegalStateException("Configuration not found")
+            val gliaConfig = ExampleAppConfigManager.createConfigFromDataStore(applicationContext, config)
+            GliaWidgets.init(gliaConfig)
+            appState.setConfigurationState(ConfigurationState.Configured)
+            prepareAuthentication()
+            listenForCallVisualizerEngagements()
+            setupEngagementListeners()
+            appState.refreshSdkVersionInfo()
+            true
+        } catch (e: Exception) {
+            appState.setConfigurationState(ConfigurationState.Error(e.message ?: "Configuration error"))
+            showError(e.message ?: "Failed to initialize SDK")
+            false
         }
     }
 
@@ -240,6 +262,7 @@ class MainViewModel(
 
     // Engagement methods
     fun startChat(activity: Activity) {
+        if (!ensureSdkInitialized()) return
         runCatching {
             val assetId = getVisitorContextAssetId()
             if (assetId != null) {
@@ -251,6 +274,7 @@ class MainViewModel(
     }
 
     fun startAudioCall(activity: Activity) {
+        if (!ensureSdkInitialized()) return
         runCatching {
             val assetId = getVisitorContextAssetId()
             if (assetId != null) {
@@ -262,6 +286,7 @@ class MainViewModel(
     }
 
     fun startVideoCall(activity: Activity) {
+        if (!ensureSdkInitialized()) return
         runCatching {
             val assetId = getVisitorContextAssetId()
             if (assetId != null) {
@@ -273,6 +298,7 @@ class MainViewModel(
     }
 
     fun startSecureMessaging(activity: Activity) {
+        if (!ensureSdkInitialized()) return
         runCatching {
             val assetId = getVisitorContextAssetId()
             if (assetId != null) {
@@ -318,6 +344,7 @@ class MainViewModel(
 
     // Authentication methods
     fun authenticate(jwtToken: String, externalAccessToken: String?, onSuccess: () -> Unit) {
+        ensureSdkInitialized()
         prepareAuthentication()
         authentication?.authenticate(
             jwtToken,

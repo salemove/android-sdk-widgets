@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -175,7 +176,6 @@ fun MainScreen(
 
             // Engagement Buttons
             EngagementButtonsRow(
-                enabled = uiState.configurationState is ConfigurationState.Configured,
                 onChatClick = { viewModel.startChat(activity) },
                 onAudioClick = { viewModel.startAudioCall(activity) },
                 onVideoClick = { viewModel.startVideoCall(activity) },
@@ -199,7 +199,6 @@ fun MainScreen(
             // Entry Widget Section
             SectionHeader("Entry Widget")
             EntryWidgetSection(
-                enabled = uiState.configurationState is ConfigurationState.Configured,
                 expanded = uiState.showEntryWidgetEmbedded,
                 onShowSheetClick = { viewModel.showEntryWidgetSheet(activity) },
                 onToggleEmbedded = { viewModel.toggleEntryWidgetEmbedded(!uiState.showEntryWidgetEmbedded) },
@@ -211,7 +210,6 @@ fun MainScreen(
             // Call Visualizer / Visitor Code Section
             SectionHeader("Call Visualizer")
             VisitorCodeSection(
-                enabled = uiState.configurationState is ConfigurationState.Configured,
                 expanded = uiState.showVisitorCodeEmbedded,
                 onShowDialogClick = { viewModel.showVisitorCodeDialog() },
                 onToggleEmbedded = { viewModel.toggleVisitorCodeEmbedded(!uiState.showVisitorCodeEmbedded) }
@@ -347,7 +345,6 @@ private fun DefaultQueuesToggle(
 
 @Composable
 private fun EngagementButtonsRow(
-    enabled: Boolean,
     onChatClick: () -> Unit,
     onAudioClick: () -> Unit,
     onVideoClick: () -> Unit,
@@ -363,7 +360,6 @@ private fun EngagementButtonsRow(
             text = "Chat",
             iconRes = R.drawable.ic_baseline_chat_bubble,
             onClick = onChatClick,
-            enabled = enabled,
             testTagId = "main_chat_button",
             modifier = Modifier.weight(1f)
         )
@@ -372,7 +368,6 @@ private fun EngagementButtonsRow(
             text = "Audio",
             iconRes = R.drawable.ic_baseline_call,
             onClick = onAudioClick,
-            enabled = enabled,
             testTagId = "main_audio_button",
             modifier = Modifier.weight(1f)
         )
@@ -381,7 +376,6 @@ private fun EngagementButtonsRow(
             text = "Video",
             iconRes = R.drawable.ic_baseline_videocam,
             onClick = onVideoClick,
-            enabled = enabled,
             testTagId = "main_video_button",
             modifier = Modifier.weight(1f)
         )
@@ -390,7 +384,6 @@ private fun EngagementButtonsRow(
             text = "Secure",
             iconRes = R.drawable.ic_lock,
             onClick = onSecureMessagingClick,
-            enabled = enabled,
             testTagId = "main_secure_messaging_button",
             modifier = Modifier.weight(1f)
         )
@@ -405,7 +398,6 @@ private fun AuthenticationSection(
     onDeauthenticateClick: () -> Unit,
     onRefreshClick: () -> Unit
 ) {
-    val isConfigured = configState is ConfigurationState.Configured
     val isAuthenticated = authState is AuthenticationState.Authenticated
 
     Row(
@@ -419,7 +411,6 @@ private fun AuthenticationSection(
             text = if (isAuthenticated) "Deauthenticate" else "Authenticate",
             onClick = if (isAuthenticated) onDeauthenticateClick else onAuthenticateClick,
             iconRes = R.drawable.ic_key,
-            enabled = isConfigured,
             testTagId = "main_toggle_authenticate_button",
             modifier = Modifier.weight(1f)
         )
@@ -429,7 +420,7 @@ private fun AuthenticationSection(
             text = "Refresh Token",
             onClick = onRefreshClick,
             iconRes = R.drawable.ic_refresh,
-            enabled = isConfigured && isAuthenticated,
+            enabled = isAuthenticated,
             testTagId = "main_refresh_access_token_button",
             modifier = Modifier.weight(1f)
         )
@@ -438,7 +429,6 @@ private fun AuthenticationSection(
 
 @Composable
 private fun EntryWidgetSection(
-    enabled: Boolean,
     expanded: Boolean,
     onShowSheetClick: () -> Unit,
     onToggleEmbedded: () -> Unit,
@@ -448,7 +438,6 @@ private fun EntryWidgetSection(
         text = "Show Sheet",
         onClick = onShowSheetClick,
         iconRes = R.drawable.ic_open_in_new,
-        enabled = enabled,
         testTagId = "main_entry_widget_sheet_button"
     )
 
@@ -464,7 +453,7 @@ private fun EntryWidgetSection(
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(200.dp)
+                .wrapContentHeight()
                 .testTag("main_entry_widget_embedded_view")
         )
     }
@@ -472,16 +461,14 @@ private fun EntryWidgetSection(
 
 @Composable
 private fun VisitorCodeSection(
-    enabled: Boolean,
     expanded: Boolean,
     onShowDialogClick: () -> Unit,
     onToggleEmbedded: () -> Unit
 ) {
     FullWidthActionButton(
-        text = "Show Sheet",
+        text = "Show Dialog",
         onClick = onShowDialogClick,
         iconRes = R.drawable.ic_qr_code_scanner,
-        enabled = enabled,
         testTagId = "main_present_visitor_code_as_alert_button"
     )
 
@@ -717,7 +704,6 @@ private fun MainScreenContentPreview() {
                     onToggle = {}
                 )
                 EngagementButtonsRow(
-                    enabled = true,
                     onChatClick = {},
                     onAudioClick = {},
                     onVideoClick = {},
@@ -762,7 +748,7 @@ private fun MainScreenContentPreview() {
                 Spacer(Modifier.height(24.dp))
                 SectionHeader("Call Visualizer")
                 FullWidthActionButton(
-                    text = "Show Sheet",
+                    text = "Show Dialog",
                     onClick = {},
                     iconRes = R.drawable.ic_qr_code_scanner
                 )
@@ -829,7 +815,6 @@ private fun DeauthenticationDialogPreview() {
 private fun EngagementButtonsRowPreview() {
     GliaExampleAppTheme {
         EngagementButtonsRow(
-            enabled = true,
             onChatClick = {},
             onAudioClick = {},
             onVideoClick = {},

@@ -65,7 +65,6 @@ import com.glia.exampleapp.ui.components.GliaLogo
 import com.glia.exampleapp.ui.components.SectionHeader
 import com.glia.exampleapp.ui.theme.GliaExampleAppTheme
 import com.glia.widgets.GliaWidgets
-import com.glia.widgets.queue.Queue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -84,7 +83,6 @@ fun MainScreen(
     var showAuthDialog by remember { mutableStateOf(false) }
     var showDeauthDialog by remember { mutableStateOf(false) }
     var showRefreshAuthDialog by remember { mutableStateOf(false) }
-    var showQueuePicker by remember { mutableStateOf(false) }
 
     // Show error messages
     LaunchedEffect(uiState.errorMessage) {
@@ -220,19 +218,6 @@ fun MainScreen(
                 onToggleEmbedded = { viewModel.toggleVisitorCodeEmbedded(!uiState.showVisitorCodeEmbedded) }
             )
 
-            Spacer(Modifier.height(16.dp))
-
-            // Queue Picker
-            FullWidthActionButton(
-                text = "Select Queue",
-                onClick = {
-                    viewModel.loadQueues()
-                    showQueuePicker = true
-                },
-                enabled = uiState.configurationState is ConfigurationState.Configured,
-                testTagId = "main_queue_picker_button"
-            )
-
             Spacer(Modifier.height(32.dp))
         }
     }
@@ -271,21 +256,6 @@ fun MainScreen(
                 showRefreshAuthDialog = false
             },
             onClearToken = { viewModel.clearAuthToken() }
-        )
-    }
-
-    if (showQueuePicker) {
-        QueuePickerDialog(
-            queuesState = uiState.queuesState,
-            onDismiss = {
-                showQueuePicker = false
-                viewModel.dismissQueuePicker()
-            },
-            onQueueSelected = { queue ->
-                viewModel.selectQueue(queue)
-                showQueuePicker = false
-            },
-            onRetry = { viewModel.loadQueues() }
         )
     }
 }
@@ -690,83 +660,6 @@ fun RefreshAuthDialog(
                 TextButton(onClick = onDismiss) {
                     Text("Cancel")
                 }
-            }
-        }
-    )
-}
-
-// Queue Picker Dialog
-@Composable
-fun QueuePickerDialog(
-    queuesState: QueuesState,
-    onDismiss: () -> Unit,
-    onQueueSelected: (Queue) -> Unit,
-    onRetry: () -> Unit
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Select Queue") },
-        text = {
-            when (queuesState) {
-                is QueuesState.Idle -> {
-                    Text("Loading...")
-                }
-                is QueuesState.Loading -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp)
-                            .testTag("queue_picker_loading"),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
-                    }
-                }
-                is QueuesState.Error -> {
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            queuesState.message,
-                            modifier = Modifier.testTag("queue_picker_error")
-                        )
-                        Spacer(Modifier.height(8.dp))
-                        Button(
-                            onClick = onRetry,
-                            modifier = Modifier.testTag("queue_picker_retry_button")
-                        ) {
-                            Text("Retry")
-                        }
-                    }
-                }
-                is QueuesState.Empty -> {
-                    Text("No queues available")
-                }
-                is QueuesState.Loaded -> {
-                    Column(modifier = Modifier.testTag("queue_picker_list")) {
-                        queuesState.queues.forEachIndexed { index, queue ->
-                            ListItem(
-                                headlineContent = { Text(queue.name) },
-                                supportingContent = { Text("Status: ${queue.status.name}") },
-                                modifier = Modifier
-                                    .testTag("queue_picker_item_$index")
-                            )
-                            TextButton(
-                                onClick = { onQueueSelected(queue) },
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text("Select")
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        confirmButton = {},
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancel")
             }
         }
     )

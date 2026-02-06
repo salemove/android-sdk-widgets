@@ -21,23 +21,11 @@ import com.glia.widgets.GliaWidgetsException
 import com.glia.widgets.authentication.Authentication
 import com.glia.widgets.entrywidget.EntryWidget
 import com.glia.widgets.launcher.EngagementLauncher
-import com.glia.widgets.queue.Queue
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
-
-/**
- * State for queues loading
- */
-sealed class QueuesState {
-    data object Idle : QueuesState()
-    data object Loading : QueuesState()
-    data class Loaded(val queues: List<Queue>) : QueuesState()
-    data object Empty : QueuesState()
-    data class Error(val message: String) : QueuesState()
-}
 
 /**
  * UI state for the main screen
@@ -50,7 +38,6 @@ data class MainUiState(
     val showEntryWidgetEmbedded: Boolean = false,
     val showVisitorCodeEmbedded: Boolean = false,
     val embeddedViewExpanded: Boolean = true,
-    val queuesState: QueuesState = QueuesState.Idle,
     val errorMessage: String? = null
 )
 
@@ -422,40 +409,6 @@ class MainViewModel(
         // Reset engagement launcher and entry widget to pick up new queue settings
         engagementLauncher = null
         entryWidget = null
-    }
-
-    // Queue picker methods
-    fun loadQueues() {
-        _uiState.value = _uiState.value.copy(queuesState = QueuesState.Loading)
-
-        GliaWidgets.getQueues(
-            { queues ->
-                _uiState.value = if (queues.isEmpty()) {
-                    _uiState.value.copy(queuesState = QueuesState.Empty)
-                } else {
-                    _uiState.value.copy(queuesState = QueuesState.Loaded(queues.toList()))
-                }
-            },
-            { error ->
-                _uiState.value = _uiState.value.copy(
-                    queuesState = QueuesState.Error(error?.message ?: "Failed to load queues")
-                )
-            }
-        )
-    }
-
-    fun selectQueue(queue: Queue) {
-        viewModelScope.launch {
-            appState.configurationRepository.updateQueueId(queue.id)
-        }
-        // Reset engagement launcher to pick up new queue
-        engagementLauncher = null
-        entryWidget = null
-        _uiState.value = _uiState.value.copy(queuesState = QueuesState.Idle)
-    }
-
-    fun dismissQueuePicker() {
-        _uiState.value = _uiState.value.copy(queuesState = QueuesState.Idle)
     }
 
     // Clear session

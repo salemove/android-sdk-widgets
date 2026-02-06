@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.net.Uri
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
+import com.glia.exampleapp.data.model.EnvironmentSelection
 import com.glia.exampleapp.data.model.GliaConfiguration
 import com.glia.widgets.GliaWidgetsConfig
 import com.glia.widgets.Region
@@ -189,6 +190,48 @@ object ExampleAppConfigManager {
             .setManualLocaleOverride(config.manualLocaleOverride.takeIf { it.isNotBlank() })
             .setSuppressPushNotificationsPermissionRequestDuringAuthentication(config.suppressPushNotificationDialog)
             .build()
+    }
+
+    /**
+     * Parse deep link URI and merge with existing configuration.
+     * Only updates fields that are present in the deep link URL.
+     * Returns null if the deep link format is invalid.
+     */
+    @JvmStatic
+    fun parseDeepLinkToConfiguration(uri: Uri, context: Context, existingConfig: GliaConfiguration): GliaConfiguration? {
+        if (SECRET_KEY != uri.lastPathSegment) {
+            return null
+        }
+
+        // Extract values from deep link (only if present)
+        val siteId = uri.getQueryParameter(SITE_ID_KEY)
+        val apiKeyId = uri.getQueryParameter(API_KEY_ID_KEY)
+        val apiKeySecret = uri.getQueryParameter(API_KEY_SECRET_KEY)
+        val queueId = uri.getQueryParameter(QUEUE_ID_KEY)
+        val visitorContextAssetId = uri.getQueryParameter(VISITOR_CONTEXT_ASSET_ID_KEY)
+        val suppressPnDialog = uri.getQueryParameter(SUPPRESS_PN_DIALOG_KEY)
+
+        // Determine environment (only if present)
+        val baseDomain = uri.getQueryParameter(BASE_DOMAIN)
+        val regionStr = uri.getQueryParameter(REGION_KEY)
+
+        val environment = when {
+            baseDomain != null -> EnvironmentSelection.CUSTOM
+            regionStr != null -> EnvironmentSelection.fromString(regionStr)
+            else -> existingConfig.environment
+        }
+
+        // Merge with existing configuration - deep link values override existing
+        return existingConfig.copy(
+            siteId = siteId ?: existingConfig.siteId,
+            apiKeyId = apiKeyId ?: existingConfig.apiKeyId,
+            apiKeySecret = apiKeySecret ?: existingConfig.apiKeySecret,
+            environment = environment,
+            customEnvironmentUrl = baseDomain ?: existingConfig.customEnvironmentUrl,
+            queueId = queueId ?: existingConfig.queueId,
+            visitorContextAssetId = visitorContextAssetId ?: existingConfig.visitorContextAssetId,
+            suppressPushNotificationDialog = suppressPnDialog?.toBoolean() ?: existingConfig.suppressPushNotificationDialog
+        )
     }
 
     private fun SharedPreferences.requireString(key: String, defaultValue: String): String = getString(key, defaultValue)!!

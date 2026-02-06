@@ -5,10 +5,14 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.lifecycle.lifecycleScope
 import com.glia.androidsdk.Glia
 import com.glia.widgets.GliaWidgets
+import com.glia.exampleapp.data.AppState
 import com.glia.exampleapp.ui.navigation.AppNavigation
 import com.glia.exampleapp.ui.theme.GliaExampleAppTheme
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.launch
 
 /**
  * Main Compose-based activity for the testing app.
@@ -33,7 +37,23 @@ class ComposeActivity : ComponentActivity() {
     private fun initGliaWidgetsWithDeepLink() {
         val uri = intent.data
         if (!Glia.isInitialized() && uri != null) {
-            GliaWidgets.init(ExampleAppConfigManager.obtainConfigFromDeepLink(uri, applicationContext))
+            val appState = AppState.getInstance(applicationContext)
+
+            lifecycleScope.launch {
+                // Get existing configuration from DataStore
+                val existingConfig = appState.configuration.firstOrNull() ?: return@launch
+
+                // Parse and merge deep link with existing configuration
+                val config = ExampleAppConfigManager.parseDeepLinkToConfiguration(uri, applicationContext, existingConfig)
+                if (config != null) {
+                    // Save merged configuration to DataStore
+                    appState.configurationRepository.updateConfiguration(config)
+
+                    // Initialize SDK with merged configuration
+                    val gliaConfig = ExampleAppConfigManager.createConfigFromDataStore(applicationContext, config)
+                    GliaWidgets.init(gliaConfig)
+                }
+            }
         }
     }
 

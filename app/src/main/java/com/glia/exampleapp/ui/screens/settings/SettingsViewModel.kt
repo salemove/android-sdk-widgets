@@ -103,7 +103,6 @@ class SettingsViewModel(
     private fun loadConfiguration() {
         viewModelScope.launch {
             val config = appState.configuration.first()
-            android.util.Log.d("SettingsViewModel", "Loading configuration: siteId=${config.siteId}, apiKeyId=${config.apiKeyId}, environment=${config.environment}")
             originalSiteId = config.siteId
             originalBubbleInsideApp = config.enableBubbleInsideApp
 

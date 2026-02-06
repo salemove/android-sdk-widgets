@@ -242,6 +242,13 @@ fun SettingsScreen(
                     )
                     SettingsDivider()
                     SettingsTextField(
+                        value = uiState.companyName,
+                        onValueChange = { viewModel.updateCompanyName(it) },
+                        placeholder = "Company Name",
+                        testTagId = "settings_company_name_textfield"
+                    )
+                    SettingsDivider()
+                    SettingsTextField(
                         value = uiState.manualLocaleOverride,
                         onValueChange = { viewModel.updateManualLocaleOverride(it) },
                         placeholder = "Manual Locale Override",

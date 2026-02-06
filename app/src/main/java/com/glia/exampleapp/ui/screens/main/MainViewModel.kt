@@ -25,6 +25,7 @@ import com.glia.widgets.queue.Queue
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
 /**
@@ -64,6 +65,8 @@ class MainViewModel(
     private var authentication: Authentication? = null
     private var engagementLauncher: EngagementLauncher? = null
     private var entryWidget: EntryWidget? = null
+    private var currentQueueId: String = ""
+    private var authenticationBehaviorAllowed: Boolean = false
 
     private val sharedPreferences: SharedPreferences by lazy {
         PreferenceManager.getDefaultSharedPreferences(applicationContext)
@@ -75,11 +78,13 @@ class MainViewModel(
     }
 
     private fun loadDefaultQueuesState() {
-        val useDefaultQueues = sharedPreferences.getBoolean(
-            applicationContext.getString(R.string.pref_default_queues),
-            false
-        )
-        _uiState.value = _uiState.value.copy(useDefaultQueues = useDefaultQueues)
+        viewModelScope.launch {
+            appState.configuration.collect { config ->
+                currentQueueId = config.queueId
+                authenticationBehaviorAllowed = config.authenticationBehaviorAllowed
+                _uiState.value = _uiState.value.copy(useDefaultQueues = config.useDefaultQueues)
+            }
+        }
     }
 
     private fun observeAppState() {
@@ -110,20 +115,36 @@ class MainViewModel(
 
         appState.setConfigurationState(ConfigurationState.Loading)
 
-        GliaWidgets.init(
-            ExampleAppConfigManager.createDefaultConfig(applicationContext),
-            onComplete = {
-                appState.setConfigurationState(ConfigurationState.Configured)
-                prepareAuthentication()
-                listenForCallVisualizerEngagements()
-                setupEngagementListeners()
-                appState.refreshSdkVersionInfo()
-            },
-            onError = { error ->
-                appState.setConfigurationState(ConfigurationState.Error(error.message ?: "Unknown error"))
-                showError(error.message ?: "SDK initialization failed")
+        viewModelScope.launch {
+            try {
+                // Get configuration from DataStore
+                val config = appState.configuration.firstOrNull()
+                val gliaConfig = if (config != null) {
+                    ExampleAppConfigManager.createConfigFromDataStore(applicationContext, config)
+                } else {
+                    // Fallback to SharedPreferences for backwards compatibility
+                    ExampleAppConfigManager.createDefaultConfig(applicationContext)
+                }
+
+                GliaWidgets.init(
+                    gliaConfig,
+                    onComplete = {
+                        appState.setConfigurationState(ConfigurationState.Configured)
+                        prepareAuthentication()
+                        listenForCallVisualizerEngagements()
+                        setupEngagementListeners()
+                        appState.refreshSdkVersionInfo()
+                    },
+                    onError = { error ->
+                        appState.setConfigurationState(ConfigurationState.Error(error.message ?: "Unknown error"))
+                        showError(error.message ?: "SDK initialization failed")
+                    }
+                )
+            } catch (e: Exception) {
+                appState.setConfigurationState(ConfigurationState.Error(e.message ?: "Configuration error"))
+                showError(e.message ?: "Failed to load configuration")
             }
-        )
+        }
     }
 
     private fun prepareAuthentication() {
@@ -133,12 +154,8 @@ class MainViewModel(
     }
 
     private fun getAuthenticationBehaviorFromPrefs(): Authentication.Behavior {
-        val allowedValue = applicationContext.getString(R.string.authentication_behavior_allowed_during_engagement)
-        val valueFromPrefs = sharedPreferences.getString(
-            applicationContext.getString(R.string.pref_authentication_behavior),
-            allowedValue
-        )
-        return if (valueFromPrefs == allowedValue) {
+        // Use cached value from DataStore configuration
+        return if (authenticationBehaviorAllowed) {
             Authentication.Behavior.ALLOWED_DURING_ENGAGEMENT
         } else {
             Authentication.Behavior.FORBIDDEN_DURING_ENGAGEMENT
@@ -189,21 +206,21 @@ class MainViewModel(
     }
 
     private fun getQueueIds(): List<String> {
-        val useDefaultQueues = sharedPreferences.getBoolean(
-            applicationContext.getString(R.string.pref_default_queues),
-            false
-        )
-        if (useDefaultQueues) {
+        // Use default queues returns empty list, otherwise return specific queue ID
+        if (_uiState.value.useDefaultQueues) {
             return emptyList()
         }
-        return listOf(getQueueId())
+        return listOfNotNull(currentQueueId.takeIf { it.isNotBlank() })
     }
 
     private fun getQueueId(): String {
-        return sharedPreferences.getString(
-            applicationContext.getString(R.string.pref_queue_id),
-            applicationContext.getString(R.string.glia_queue_id)
-        ) ?: applicationContext.getString(R.string.glia_queue_id)
+        return currentQueueId.ifBlank {
+            // Fallback to SharedPreferences for backwards compatibility
+            sharedPreferences.getString(
+                applicationContext.getString(R.string.pref_queue_id),
+                applicationContext.getString(R.string.glia_queue_id)
+            ) ?: applicationContext.getString(R.string.glia_queue_id)
+        }
     }
 
     private fun getVisitorContextAssetId(): String? {
@@ -380,9 +397,9 @@ class MainViewModel(
     // Default Queues toggle
     fun toggleDefaultQueues() {
         val newValue = !_uiState.value.useDefaultQueues
-        sharedPreferences.edit()
-            .putBoolean(applicationContext.getString(R.string.pref_default_queues), newValue)
-            .apply()
+        viewModelScope.launch {
+            appState.configurationRepository.updateUseDefaultQueues(newValue)
+        }
         _uiState.value = _uiState.value.copy(useDefaultQueues = newValue)
         // Reset engagement launcher and entry widget to pick up new queue settings
         engagementLauncher = null

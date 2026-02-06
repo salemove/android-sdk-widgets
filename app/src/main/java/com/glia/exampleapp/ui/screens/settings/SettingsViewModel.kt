@@ -50,6 +50,7 @@ data class SettingsUiState(
     val visitorContextAssetId: String = "",
 
     // Company Settings
+    val companyName: String = "Glia",
     val manualLocaleOverride: String = "",
 
     // Bubble Settings
@@ -102,6 +103,7 @@ class SettingsViewModel(
     private fun loadConfiguration() {
         viewModelScope.launch {
             val config = appState.configuration.first()
+            android.util.Log.d("SettingsViewModel", "Loading configuration: siteId=${config.siteId}, apiKeyId=${config.apiKeyId}, environment=${config.environment}")
             originalSiteId = config.siteId
             originalBubbleInsideApp = config.enableBubbleInsideApp
 
@@ -113,6 +115,7 @@ class SettingsViewModel(
                 customEnvironmentUrl = config.customEnvironmentUrl,
                 queueId = config.queueId,
                 visitorContextAssetId = config.visitorContextAssetId,
+                companyName = config.companyName,
                 manualLocaleOverride = config.manualLocaleOverride,
                 enableBubbleInsideApp = config.enableBubbleInsideApp,
                 suppressPushNotificationDialog = config.suppressPushNotificationDialog,
@@ -182,6 +185,13 @@ class SettingsViewModel(
     fun updateVisitorContextAssetId(assetId: String) {
         _uiState.value = _uiState.value.copy(
             visitorContextAssetId = assetId,
+            hasChanges = true
+        )
+    }
+
+    fun updateCompanyName(name: String) {
+        _uiState.value = _uiState.value.copy(
+            companyName = name,
             hasChanges = true
         )
     }
@@ -331,6 +341,7 @@ class SettingsViewModel(
                 customEnvironmentUrl = state.customEnvironmentUrl,
                 queueId = state.queueId,
                 visitorContextAssetId = state.visitorContextAssetId,
+                companyName = state.companyName,
                 manualLocaleOverride = state.manualLocaleOverride,
                 enableBubbleOutsideApp = true, // Always true on Android
                 enableBubbleInsideApp = state.enableBubbleInsideApp,

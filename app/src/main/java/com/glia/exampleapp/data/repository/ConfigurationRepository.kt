@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.glia.exampleapp.R
 import com.glia.exampleapp.data.model.EnvironmentSelection
 import com.glia.exampleapp.data.model.GliaConfiguration
 import com.glia.exampleapp.data.model.PredefinedColor
@@ -57,16 +58,17 @@ class ConfigurationRepository(private val context: Context) {
     }
 
     val configuration: Flow<GliaConfiguration> = context.dataStore.data.map { preferences ->
+        // Use DataStore values if present, otherwise fall back to string resources from local.properties
         GliaConfiguration(
-            siteId = preferences[Keys.SITE_ID] ?: "",
-            apiKeyId = preferences[Keys.API_KEY_ID] ?: "",
-            apiKeySecret = preferences[Keys.API_KEY_SECRET] ?: "",
-            environment = EnvironmentSelection.fromString(preferences[Keys.ENVIRONMENT] ?: "beta"),
+            siteId = preferences[Keys.SITE_ID] ?: context.getString(R.string.site_id),
+            apiKeyId = preferences[Keys.API_KEY_ID] ?: context.getString(R.string.glia_api_key_id),
+            apiKeySecret = preferences[Keys.API_KEY_SECRET] ?: context.getString(R.string.glia_api_key_secret),
+            environment = EnvironmentSelection.fromString(preferences[Keys.ENVIRONMENT] ?: context.getString(R.string.glia_region)),
             customEnvironmentUrl = preferences[Keys.CUSTOM_ENVIRONMENT_URL] ?: "",
-            queueId = preferences[Keys.QUEUE_ID] ?: "",
+            queueId = preferences[Keys.QUEUE_ID] ?: context.getString(R.string.glia_queue_id),
             visitorContextAssetId = preferences[Keys.VISITOR_CONTEXT_ASSET_ID] ?: "",
             useDefaultQueues = preferences[Keys.USE_DEFAULT_QUEUES] ?: false,
-            companyName = preferences[Keys.COMPANY_NAME] ?: "Glia",
+            companyName = preferences[Keys.COMPANY_NAME] ?: context.getString(R.string.settings_value_default_company_name),
             manualLocaleOverride = preferences[Keys.MANUAL_LOCALE_OVERRIDE] ?: "",
             enableBubbleOutsideApp = preferences[Keys.ENABLE_BUBBLE_OUTSIDE_APP] ?: true,
             enableBubbleInsideApp = preferences[Keys.ENABLE_BUBBLE_INSIDE_APP] ?: true,

@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.net.Uri
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
+import com.glia.exampleapp.data.model.GliaConfiguration
 import com.glia.widgets.GliaWidgetsConfig
 import com.glia.widgets.Region
 import com.glia.widgets.SiteApiKey
@@ -161,6 +162,32 @@ object ExampleAppConfigManager {
             .setUiJsonRemoteConfig(uiJsonRemoteConfig ?: Utils.getRemoteThemeByPrefs(preferences, context.resources))
             .setManualLocaleOverride(manualLocaleOverride)
             .setSuppressPushNotificationsPermissionRequestDuringAuthentication(suppressPushNotificationDialogDuringAuthentication)
+            .build()
+    }
+
+    /**
+     * Create GliaWidgetsConfig from DataStore-backed GliaConfiguration.
+     * Used by the new Compose UI which stores configuration in DataStore.
+     */
+    @JvmStatic
+    fun createConfigFromDataStore(
+        context: Context,
+        config: GliaConfiguration
+    ): GliaWidgetsConfig {
+        val region = config.environment.toRegion(config.customEnvironmentUrl)
+        val themeJson = config.themeColors.toJsonString()
+
+        return GliaWidgetsConfig.Builder()
+            .setSiteApiKey(SiteApiKey(config.apiKeyId, config.apiKeySecret))
+            .setSiteId(config.siteId)
+            .setRegion(region)
+            .setCompanyName(config.companyName)
+            .enableBubbleOutsideApp(config.enableBubbleOutsideApp)
+            .enableBubbleInsideApp(config.enableBubbleInsideApp)
+            .setContext(context)
+            .setUiJsonRemoteConfig(themeJson)
+            .setManualLocaleOverride(config.manualLocaleOverride.takeIf { it.isNotBlank() })
+            .setSuppressPushNotificationsPermissionRequestDuringAuthentication(config.suppressPushNotificationDialog)
             .build()
     }
 

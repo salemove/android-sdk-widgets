@@ -49,7 +49,12 @@ class PropertiesIO {
 
   static void saveProperties(Properties properties, String propertiesFilePath) {
     File gradlePropsFile = new File(propertiesFilePath)
-    properties.store(gradlePropsFile.newWriter(), null)
+    gradlePropsFile.withWriter { writer ->
+      // Write properties manually without timestamp, sorted for deterministic output
+      properties.stringPropertyNames().sort().each { key ->
+        writer.writeLine("${key}=${properties.getProperty(key)}")
+      }
+    }
   }
 }
 

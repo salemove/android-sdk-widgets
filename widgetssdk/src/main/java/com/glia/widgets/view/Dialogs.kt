@@ -382,7 +382,7 @@ internal object Dialogs {
             .setView(view)
             .setBackgroundInsetStart(0)
             .setBackgroundInsetEnd(0)
-            .setCancelable(true)
+            .setCancelable(false)
             .setOnCancelListener { Dependencies.controllerFactory.callVisualizerController.dismissVisitorCodeDialog() }
             .setOnDismissListener(logDialogDismissed(DialogNames.VISITOR_CODE))
             .show()

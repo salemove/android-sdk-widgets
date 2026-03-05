@@ -5,12 +5,17 @@ import android.graphics.drawable.GradientDrawable
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.PopupWindow
+import androidx.core.view.AccessibilityDelegateCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.core.view.isVisible
 import com.glia.widgets.R
 import com.glia.widgets.databinding.ChatAttachmentPopupBinding
 import com.glia.widgets.helper.getColorCompat
+import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.helper.setTintCompat
 import com.glia.widgets.helper.wrapWithMaterialThemeOverlay
@@ -43,16 +48,19 @@ internal class AttachmentPopup(
         onBrowseClicked: () -> Unit
     ) {
         binding.photoLibraryTitle.setLocaleText(R.string.chat_attachment_photo_library)
+        binding.photoLibraryItem.setLocaleContentDescription(R.string.chat_attachment_photo_library)
         binding.photoLibraryItem.setOnClickListener {
             popupWindow.dismiss()
             onGalleryClicked()
         }
         binding.photoTitle.setLocaleText(R.string.chat_attachment_take_photo_only)
+        binding.photoItem.setLocaleContentDescription(R.string.chat_attachment_take_photo_only)
         binding.photoItem.setOnClickListener {
             popupWindow.dismiss()
             onTakePhotoClicked()
         }
         binding.browseTitle.setLocaleText(R.string.general_browse)
+        binding.browseItem.setLocaleContentDescription(R.string.general_browse)
         binding.browseItem.setOnClickListener {
             popupWindow.dismiss()
             onBrowseClicked()
@@ -109,7 +117,19 @@ internal class AttachmentPopup(
             }
         }
         binding.rootLayout.background = background
+        binding.photoLibraryItem.setButtonRole()
+        binding.photoItem.setButtonRole()
+        binding.browseItem.setButtonRole()
         return binding
+    }
+
+    private fun View.setButtonRole() {
+        ViewCompat.setAccessibilityDelegate(this, object : AccessibilityDelegateCompat() {
+            override fun onInitializeAccessibilityNodeInfo(host: View, info: AccessibilityNodeInfoCompat) {
+                super.onInitializeAccessibilityNodeInfo(host, info)
+                info.className = Button::class.java.name
+            }
+        })
     }
 
     companion object {

@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.glia.androidsdk.engagement.Survey
 import com.glia.widgets.R
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.helper.setAccessibilityHint
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.survey.QuestionItem
@@ -51,9 +52,10 @@ internal abstract class SurveyViewHolder(
             )
             title.text = Html.fromHtml(source, Html.FROM_HTML_MODE_LEGACY)
             title.setLocaleContentDescription(R.string.survey_question_required_accessibility_label)
+            title.setAccessibilityHint(question.text)
         } else {
             title.text = questionText
-            title.contentDescription = null
+            title.contentDescription = question.text
         }
     }
 

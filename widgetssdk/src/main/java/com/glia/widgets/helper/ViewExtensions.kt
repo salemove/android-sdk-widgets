@@ -192,9 +192,28 @@ internal fun TextView.setHint(locale: LocaleString?) {
     }
 }
 
+/**
+ * Sets an accessibility hint on the view.
+ * The hint is announced before content description.
+ */
+internal fun View.setAccessibilityHint(hint: String) {
+    ViewCompat.setAccessibilityDelegate(this, object : AccessibilityDelegateCompat() {
+        override fun onInitializeAccessibilityNodeInfo(host: View, info: AccessibilityNodeInfoCompat) {
+            super.onInitializeAccessibilityNodeInfo(host, info)
+            info.hintText = hint
+        }
+    })
+}
+
 internal fun View.setLocaleContentDescription(@StringRes stringKey: Int, vararg values: StringKeyPair) {
     registerLocaleListener(stringKey, *values) { upToDateTranslation ->
         contentDescription = upToDateTranslation
+    }
+}
+
+internal fun View.setPrefixedContentDescription(prefix: String, @StringRes stringKey: Int, vararg values: StringKeyPair) {
+    registerLocaleListener(stringKey, *values) { upToDateTranslation ->
+        contentDescription = "$prefix. $upToDateTranslation"
     }
 }
 

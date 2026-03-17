@@ -2,5 +2,10 @@
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "mobile-mcp"
-  ]
+  ],
+  "permissions": {
+    "allow": [
+      "Bash(find widgetssdk/src/main/java/com/glia/widgets -name \"*.kt\" -type f -exec grep -l \"Logger\\\\.\\\\\\(e\\\\|w\\\\|d\\\\|i\\\\\\)\\(\" {} \\\\;)"
+    ]
+  }
 }

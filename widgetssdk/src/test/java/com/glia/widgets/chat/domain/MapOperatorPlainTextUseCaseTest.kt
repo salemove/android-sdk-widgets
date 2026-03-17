@@ -26,7 +26,7 @@ class MapOperatorPlainTextUseCaseTest {
     @Test
     fun `invoke returns OperatorMessageItem_PlainText with showChatHead true when true is passed`() {
         mockChatMessageInternal.apply {
-            val message = useCase(chatMessageInternal, true)
+            val message = useCase(chatMessageInternal, true, true)
 
             assertTrue(message is OperatorMessageItem.PlainText)
 
@@ -43,7 +43,7 @@ class MapOperatorPlainTextUseCaseTest {
     @Test
     fun `invoke returns OperatorMessageItem_PlainText with showChatHead false when false is passed`() {
         mockChatMessageInternal.apply {
-            val message = useCase(chatMessageInternal, false)
+            val message = useCase(chatMessageInternal, false, true)
 
             assertTrue(message is OperatorMessageItem.PlainText)
             assertEquals(message.showChatHead, false)

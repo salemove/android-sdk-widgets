@@ -111,7 +111,8 @@ internal sealed class OperatorMessageItem : OperatorChatItem(ChatAdapter.OPERATO
         override val operatorProfileImgUrl: String?,
         override val operatorId: String?,
         override val operatorName: String?,
-        override val content: String?
+        override val content: String?,
+        var announced: Boolean
     ) : OperatorMessageItem() {
         override fun withShowChatHead(showChatHead: Boolean): OperatorChatItem = copy(showChatHead = showChatHead)
     }
@@ -124,6 +125,7 @@ internal sealed class OperatorMessageItem : OperatorChatItem(ChatAdapter.OPERATO
         override val operatorId: String?,
         override val operatorName: String?,
         override val content: String?,
+        val announced: Boolean,
         val singleChoiceOptions: List<SingleChoiceOption>,
         val choiceCardImageUrl: String?
     ) : OperatorMessageItem() {
@@ -141,7 +143,8 @@ internal sealed class OperatorMessageItem : OperatorChatItem(ChatAdapter.OPERATO
             operatorProfileImgUrl = operatorProfileImgUrl,
             operatorId = operatorId,
             operatorName = operatorName,
-            content = content
+            content = content,
+            announced = announced
         )
     }
 }

@@ -8,6 +8,7 @@ import com.glia.androidsdk.engagement.Survey
 import com.glia.widgets.R
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.setAccessibilityHint
+import com.glia.widgets.helper.setLocaleAccessibilityHint
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.locale.LocaleProvider
@@ -60,7 +61,7 @@ class SurveyViewHolderTest {
 
         every { requiredErrorView.setLocaleText(any<Int>()) } just Runs
         every { titleView.setLocaleContentDescription(any<Int>()) } just Runs
-        every { titleView.setAccessibilityHint(any<Int>()) } just Runs
+        every { titleView.setLocaleAccessibilityHint(any()) } just Runs
 
         listener = mockk(relaxed = true)
     }
@@ -129,7 +130,7 @@ class SurveyViewHolderTest {
 
         viewHolder.onBind(questionItem, listener)
 
-        verify(exactly = 0) { titleView.setAccessibilityHint(any<Int>()) }
+        verify(exactly = 0) { titleView.setLocaleAccessibilityHint(any()) }
     }
 
     @Test

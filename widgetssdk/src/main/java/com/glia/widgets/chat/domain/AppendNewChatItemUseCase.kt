@@ -124,7 +124,7 @@ internal class AppendNewResponseCardOrTextItemUseCase(
         val filesAttachment = message.chatMessage.attachment as? FilesAttachment
 
         if (message.chatMessage.content.isNotBlank()) {
-            chatItems += mapOperatorPlainTextUseCase(message, filesAttachment?.files.isNullOrEmpty())
+            chatItems += mapOperatorPlainTextUseCase(message, filesAttachment?.files.isNullOrEmpty(), false)
         }
 
         filesAttachment?.files?.apply {

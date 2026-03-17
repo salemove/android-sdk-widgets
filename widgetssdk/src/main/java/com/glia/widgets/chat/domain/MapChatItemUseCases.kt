@@ -56,7 +56,7 @@ internal class MapVisitorAttachmentUseCase {
 }
 
 internal class MapOperatorPlainTextUseCase {
-    operator fun invoke(chatMessageInternal: ChatMessageInternal, showChatHead: Boolean): OperatorMessageItem = chatMessageInternal.run {
+    operator fun invoke(chatMessageInternal: ChatMessageInternal, showChatHead: Boolean, history: Boolean): OperatorMessageItem = chatMessageInternal.run {
         OperatorMessageItem.PlainText(
             chatMessage.id,
             chatMessage.timestamp,
@@ -64,7 +64,8 @@ internal class MapOperatorPlainTextUseCase {
             operatorImageUrl,
             operatorId,
             operatorName,
-            chatMessage.content
+            chatMessage.content,
+            history
         )
     }
 }
@@ -80,6 +81,7 @@ internal class MapResponseCardUseCase {
                 operatorId,
                 operatorName,
                 chatMessage.content,
+                true,
                 attachment.options.asList(),
                 attachment.imageUrl.getOrNull()
             )

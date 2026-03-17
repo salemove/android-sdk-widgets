@@ -49,6 +49,7 @@ import com.glia.widgets.chat.model.ChatInputMode
 import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.ChatState
 import com.glia.widgets.chat.model.CustomCardChatItem
+import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.databinding.ChatViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.entrywidget.EntryWidgetContract
@@ -161,6 +162,14 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
             super.onItemRangeInserted(positionStart, itemCount)
 
+            for (i in positionStart until positionStart + itemCount) {
+                adapter.currentList.getOrNull(i)?.let { item ->
+                    if (item is OperatorMessageItem.PlainText && !item.announced) {
+                        binding.chatRecyclerView.announceForAccessibility(item.content)
+                        item.announced = true
+                    }
+                }
+            }
             val totalItemCount = adapter.itemCount
             val lastIndex = totalItemCount - 1
             if (isInBottom && lastIndex != -1) {
@@ -714,7 +723,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     }
 
     private fun setupViewActions() {
-        binding.chatEditText.setAccessibilityHint(R.string.general_message)
+        binding.chatEditText.setAccessibilityHint(localeProvider.getString(R.string.general_message))
         binding.chatEditText.addTextChangedListener(textWatcher)
         binding.sendButton.setOnClickListener {
             val message = binding.chatEditText.text.toString().trim { it <= ' ' }

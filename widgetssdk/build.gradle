@@ -18,8 +18,6 @@ android {
   namespace 'com.glia.widgets'
   defaultConfig {
     minSdkVersion 24
-    versionCode widgetsVersionCode
-    versionName widgetsVersionName
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     consumerProguardFiles "consumer-rules.pro"
   }

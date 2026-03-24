@@ -159,7 +159,6 @@ internal class ChatController(
 
     private var allowedFileTypes: List<String> = listOf(Constants.MIME_TYPE_ALL)
     private var allowedMediaTypes: List<String> = listOf(Constants.MIME_TYPE_IMAGES)
-    private var announcedMessageIds = mutableSetOf<String>()
 
     private val sendMessageCallback: GliaSendMessageUseCase.Listener = object : GliaSendMessageUseCase.Listener {
         override fun messageSent(message: VisitorMessage?) {

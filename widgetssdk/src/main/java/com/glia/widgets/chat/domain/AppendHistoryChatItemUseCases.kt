@@ -170,7 +170,7 @@ internal class AppendHistoryResponseCardOrTextItemUseCase(
         }
 
         if (message.chatMessage.content.isNotBlank()) {
-            chatItems += mapOperatorPlainTextUseCase(message, showChatHead && filesAttachment == null, true)
+            chatItems += mapOperatorPlainTextUseCase(message, showChatHead && filesAttachment == null,true)
         }
     }
 

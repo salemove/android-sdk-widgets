@@ -38,12 +38,16 @@
     <string name="chat_media_upgrade_video_system_message">@string/glia_chat_upgraded_to_video_call</string>
     <string name="engagement_end_confirmation_header">@string/glia_dialog_end_engagement_title</string>
     <string name="engagement_end_message">@string/glia_dialog_end_engagement_message</string>
+    <string name="engagement_end_deny_accessibility_hint">Returns to the engagement.</string>
+    <string name="engagement_end_confirm_accessibility_hint">Ends the current engagement.</string>
     <string name="engagement_ended_header">@string/glia_dialog_engagement_ended_title</string>
     <string name="engagement_ended_message">@string/glia_dialog_engagement_ended_message</string>
     <string name="engagement_queue_closed_header">@string/glia_dialog_operators_unavailable_title</string>
     <string name="engagement_queue_closed_message">@string/glia_dialog_operators_unavailable_message</string>
     <string name="engagement_queue_leave_header">@string/glia_dialog_leave_queue_title</string>
     <string name="engagement_queue_leave_message">@string/glia_dialog_leave_queue_message</string>
+    <string name="engagement_queue_leave_deny_accessibility_hint">Keeps your place in the queue.</string>
+    <string name="engagement_queue_leave_confirm_accessibility_hint">Leaves the queue and cancels the engagement.</string>
     <string name="error_general">@string/glia_dialog_unexpected_error_title</string>
     <string name="message_center_unavailable_title">@string/glia_dialog_message_center_unavailable_title</string>
     <string name="message_center_unavailable_message">@string/glia_dialog_message_center_unavailable_message</string>
@@ -165,6 +169,8 @@
     <string name="secure_messaging_chat_leave_current_conversation_message">@string/message_center_leaving_conversation_message</string>
     <string name="secure_messaging_chat_leave_current_conversation_button_positive">@string/message_center_leaving_conversation_positive_button</string>
     <string name="secure_messaging_chat_leave_current_conversation_button_negative">@string/message_center_leaving_conversation_negative_button</string>
+    <string name="secure_messaging_chat_leave_current_conversation_stay_accessibility_hint">Stays in the current conversation.</string>
+    <string name="secure_messaging_chat_leave_current_conversation_leave_accessibility_hint">Leaves the current conversation and starts a new one.</string>
 
     <!-- General -->
     <string name="general_refresh">@string/glia_visitor_code_refresh_button</string>
@@ -205,6 +211,8 @@
     <string name="engagement_confirm_link1_url" />
     <string name="engagement_confirm_link2_text">Privacy Policies</string>
     <string name="engagement_confirm_link2_url" />
+    <string name="engagement_confirm_cancel_accessibility_hint">Dismisses the dialog and returns you to the previous screen. The engagement will not start.</string>
+    <string name="engagement_confirm_allow_accessibility_hint">Allows the operator to view your screen and starts the engagement.</string>
     <string name="live_observation_indicator_message">Your app screen is visible to the operator.</string>
     <string name="engagement_incoming_request_timed_out_message">The engagement request is timed out.</string>
 
@@ -241,6 +249,8 @@
     <string name="push_notifications_alert_message">Allow push notifications so we can message you (and return your messages) in the app.</string>
     <string name="push_notifications_alert_button_positive">Allow</string>
     <string name="push_notifications_alert_button_negative">Not right now</string>
+    <string name="push_notifications_alert_button_negative_accessibility_hint">Dismisses the prompt without enabling notifications.</string>
+    <string name="push_notifications_alert_button_positive_accessibility_hint">Allows the app to send push notifications.</string>
 
 <!--    Real-Time connection quality-->
     <string name="snackbar_no_connection_message">No connection. Trying to reconnect.</string>

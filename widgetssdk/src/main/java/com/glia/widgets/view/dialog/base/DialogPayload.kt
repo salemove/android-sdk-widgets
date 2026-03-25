@@ -16,6 +16,8 @@ internal sealed interface DialogPayload {
         val poweredByText: LocaleString,
         val positiveButtonClickListener: View.OnClickListener,
         val negativeButtonClickListener: View.OnClickListener,
+        val positiveButtonAccessibilityHint: LocaleString? = null,
+        val negativeButtonAccessibilityHint: LocaleString? = null,
     ) : DialogPayload
 
     data class Confirmation(
@@ -30,6 +32,8 @@ internal sealed interface DialogPayload {
         val link2: Link,
         val link1ClickListener: View.OnClickListener,
         val link2ClickListener: View.OnClickListener,
+        val positiveButtonAccessibilityHint: LocaleString? = null,
+        val negativeButtonAccessibilityHint: LocaleString? = null,
     ) : DialogPayload
 
     data class Upgrade(

@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Use the global pre-commit hook if it exists, otherwise run the local secret scanner
+if [ -x "$HOME/.git-hooks/pre-commit" ]; then
+  "$HOME/.git-hooks/pre-commit"
+  exit $?
+fi
+
 # Check if required tools are installed
 MISSING_TOOLS=false
 

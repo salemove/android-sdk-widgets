@@ -205,6 +205,17 @@ internal fun View.setAccessibilityHint(hint: String) {
     })
 }
 
+internal fun View.setLocaleAccessibilityHint(locale: LocaleString) {
+    registerLocaleListener(locale.stringKey, *locale.values.toTypedArray()) { upToDateTranslation ->
+        ViewCompat.setAccessibilityDelegate(this, object : AccessibilityDelegateCompat() {
+            override fun onInitializeAccessibilityNodeInfo(host: View, info: AccessibilityNodeInfoCompat) {
+                super.onInitializeAccessibilityNodeInfo(host, info)
+                info.hintText = upToDateTranslation
+            }
+        })
+    }
+}
+
 internal fun View.setLocaleContentDescription(@StringRes stringKey: Int, vararg values: StringKeyPair) {
     registerLocaleListener(stringKey, *values) { upToDateTranslation ->
         contentDescription = upToDateTranslation

@@ -51,14 +51,16 @@ internal open class DefaultConfirmationDialogViewInflater<T : DefaultConfirmatio
             payload.positiveButtonText,
             alertTheme?.positiveButton,
             configuration.properties.typeface,
-            payload.positiveButtonClickListener
+            payload.positiveButtonClickListener,
+            payload.positiveButtonAccessibilityHint
         )
         setupButton(
             binding.negativeButton,
             payload.negativeButtonText,
             alertTheme?.negativeButton,
             configuration.properties.typeface,
-            payload.negativeButtonClickListener
+            payload.negativeButtonClickListener,
+            payload.negativeButtonAccessibilityHint
         )
         binding.additionalButtonsSpace.isGone = binding.link1Button.isVisible || binding.link2Button.isVisible
     }

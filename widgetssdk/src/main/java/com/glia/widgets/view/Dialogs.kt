@@ -165,7 +165,9 @@ internal object Dialogs {
                 dialogName = DialogNames.LEAVE_ENGAGEMENT_CONFIRMATION,
                 buttonName = ButtonNames.NEGATIVE,
                 clickListener = negativeButtonClickListener
-            )
+            ),
+            positiveButtonAccessibilityHint = LocaleString(R.string.engagement_end_confirm_accessibility_hint),
+            negativeButtonAccessibilityHint = LocaleString(R.string.engagement_end_deny_accessibility_hint),
         )
 
         return dialogService.showDialog(
@@ -198,8 +200,9 @@ internal object Dialogs {
                 dialogName = DialogNames.LEAVE_QUEUE_CONFIRMATION,
                 buttonName = ButtonNames.NEGATIVE,
                 clickListener = negativeButtonClickListener
-            )
-
+            ),
+            positiveButtonAccessibilityHint = LocaleString(R.string.engagement_queue_leave_confirm_accessibility_hint),
+            negativeButtonAccessibilityHint = LocaleString(R.string.engagement_queue_leave_deny_accessibility_hint),
         )
 
         return dialogService.showDialog(
@@ -267,7 +270,9 @@ internal object Dialogs {
                 dialogName = DialogNames.LIVE_OBSERVATION_CONFIRMATION,
                 buttonName = ButtonNames.ENGAGEMENT_CONFIRMATION_LINK_2,
                 clickListener = { linkClickListener(links.link2) }
-            )
+            ),
+            positiveButtonAccessibilityHint = LocaleString(R.string.engagement_confirm_allow_accessibility_hint),
+            negativeButtonAccessibilityHint = LocaleString(R.string.engagement_confirm_cancel_accessibility_hint),
         )
 
         return dialogService.showDialog(
@@ -410,7 +415,9 @@ internal object Dialogs {
                 dialogName = DialogNames.LEAVE_SECURE_CONVERSATIONS_CONFIRMATION,
                 buttonName = ButtonNames.NEGATIVE,
                 clickListener = onLeave
-            )
+            ),
+            positiveButtonAccessibilityHint = LocaleString(R.string.secure_messaging_chat_leave_current_conversation_stay_accessibility_hint),
+            negativeButtonAccessibilityHint = LocaleString(R.string.secure_messaging_chat_leave_current_conversation_leave_accessibility_hint),
         )
 
         return dialogService.showDialog(
@@ -443,7 +450,9 @@ internal object Dialogs {
                 dialogName = DialogNames.ALLOW_PUSH_NOTIFICATION,
                 buttonName = ButtonNames.NEGATIVE,
                 clickListener = negativeButtonClickListener
-            )
+            ),
+            positiveButtonAccessibilityHint = LocaleString(R.string.push_notifications_alert_button_positive_accessibility_hint),
+            negativeButtonAccessibilityHint = LocaleString(R.string.push_notifications_alert_button_negative_accessibility_hint),
         )
 
         return dialogService.showDialog(

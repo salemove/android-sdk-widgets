@@ -35,14 +35,16 @@ internal open class DefaultOptionDialogViewInflater<T : DefaultOptionDialogViewB
             payload.positiveButtonText,
             alertTheme?.positiveButton,
             configuration.properties.typeface,
-            payload.positiveButtonClickListener
+            payload.positiveButtonClickListener,
+            payload.positiveButtonAccessibilityHint
         )
         setupButton(
             binding.negativeButton,
             payload.negativeButtonText,
             alertTheme?.negativeButton,
             configuration.properties.typeface,
-            payload.negativeButtonClickListener
+            payload.negativeButtonClickListener,
+            payload.negativeButtonAccessibilityHint
         )
     }
 }
@@ -70,14 +72,16 @@ internal open class DefaultReversedOptionDialogViewInflater<T : DefaultReversedO
             payload.positiveButtonText,
             alertTheme?.negativeButton,// Since buttons are reversed, the positive button is actually GliaNegativeButton and should use NegativeButton theming
             configuration.properties.typeface,
-            payload.positiveButtonClickListener
+            payload.positiveButtonClickListener,
+            payload.positiveButtonAccessibilityHint
         )
         setupButton(
             binding.negativeButton,
             payload.negativeButtonText,
             alertTheme?.positiveButton,// Since buttons are reversed, the positive button is actually GliaNegativeButton and should use NegativeButton theming
             configuration.properties.typeface,
-            payload.negativeButtonClickListener
+            payload.negativeButtonClickListener,
+            payload.negativeButtonAccessibilityHint
         )
     }
 }
@@ -129,14 +133,16 @@ internal open class DefaultOptionWithNegativeNeutralDialogViewInflater<T : Defau
             payload.positiveButtonText,
             alertTheme?.positiveButton,
             configuration.properties.typeface,
-            payload.positiveButtonClickListener
+            payload.positiveButtonClickListener,
+            payload.positiveButtonAccessibilityHint
         )
         setupButton(
             binding.positiveButton,      // Reversed button positions: positive button takes all properties of negative
             payload.negativeButtonText,
             alertTheme?.negativeNeutralButton, // Not 'negative' theme but from 'negative neutral' theme
             configuration.properties.typeface,
-            payload.negativeButtonClickListener
+            payload.negativeButtonClickListener,
+            payload.negativeButtonAccessibilityHint
         )
     }
 }

@@ -6,6 +6,7 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.viewbinding.ViewBinding
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.helper.setLocaleAccessibilityHint
 import com.glia.widgets.helper.setText
 import com.glia.widgets.internal.dialog.model.Link
 import com.glia.widgets.locale.LocaleString
@@ -55,13 +56,15 @@ internal abstract class DialogViewInflater<T : DialogViewBinding<out ViewBinding
         text: LocaleString,
         btnTheme: ButtonTheme?,
         typeface: Typeface?,
-        onClickListener: View.OnClickListener
+        onClickListener: View.OnClickListener,
+        accessibilityHint: LocaleString? = null
     ) {
         btn.apply {
             setText(text)
             applyButtonTheme(btnTheme)
             setupTypeface(this, typeface)
             setOnClickListener(onClickListener)
+            accessibilityHint?.let { setLocaleAccessibilityHint(it) }
         }
     }
 

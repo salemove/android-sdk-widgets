@@ -60,7 +60,7 @@ class SurveyViewHolderTest {
 
         every { requiredErrorView.setLocaleText(any<Int>()) } just Runs
         every { titleView.setLocaleContentDescription(any<Int>()) } just Runs
-        every { titleView.setAccessibilityHint(any()) } just Runs
+        every { titleView.setAccessibilityHint(any<Int>()) } just Runs
 
         listener = mockk(relaxed = true)
     }
@@ -129,7 +129,7 @@ class SurveyViewHolderTest {
 
         viewHolder.onBind(questionItem, listener)
 
-        verify(exactly = 0) { titleView.setAccessibilityHint(any()) }
+        verify(exactly = 0) { titleView.setAccessibilityHint(any<Int>()) }
     }
 
     @Test

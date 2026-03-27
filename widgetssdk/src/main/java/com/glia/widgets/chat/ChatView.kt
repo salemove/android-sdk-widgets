@@ -70,6 +70,7 @@ import com.glia.widgets.helper.hideKeyboard
 import com.glia.widgets.helper.insetsController
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.requireActivity
+import com.glia.widgets.helper.setAccessibilityHint
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.setLocaleHint
 import com.glia.widgets.helper.setLocaleText
@@ -713,6 +714,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     }
 
     private fun setupViewActions() {
+        binding.chatEditText.setAccessibilityHint(R.string.general_message)
         binding.chatEditText.addTextChangedListener(textWatcher)
         binding.sendButton.setOnClickListener {
             val message = binding.chatEditText.text.toString().trim { it <= ' ' }

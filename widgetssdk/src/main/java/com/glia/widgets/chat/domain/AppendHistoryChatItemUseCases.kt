@@ -13,6 +13,8 @@ import com.glia.widgets.chat.domain.gva.IsGvaUseCase
 import com.glia.widgets.chat.domain.gva.MapGvaUseCase
 import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.CustomCardChatItem
+import com.glia.widgets.chat.model.OperatorChatItem
+import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.chat.model.OperatorStatusItem
 import com.glia.widgets.chat.model.SystemChatItem
 import com.glia.widgets.chat.model.VisitorMessageItem
@@ -168,7 +170,7 @@ internal class AppendHistoryResponseCardOrTextItemUseCase(
         }
 
         if (message.chatMessage.content.isNotBlank()) {
-            chatItems += mapOperatorPlainTextUseCase(message, showChatHead && filesAttachment == null)
+            chatItems += mapOperatorPlainTextUseCase(message, showChatHead && filesAttachment == null,true)
         }
     }
 

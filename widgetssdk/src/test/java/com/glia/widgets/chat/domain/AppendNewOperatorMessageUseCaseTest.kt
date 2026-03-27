@@ -114,7 +114,7 @@ class AppendNewOperatorMessageUseCaseTest {
         whenever(customCardAdapterTypeUseCase(any())) doReturn null
         whenever(isGvaUseCase(any())) doReturn false
 
-        val operatorChatItem: OperatorChatItem = OperatorMessageItem.PlainText("id", 1, true, "img", "operator_id", "name", "content")
+        val operatorChatItem: OperatorChatItem = OperatorMessageItem.PlainText("id", 1, true, "img", "operator_id", "name", "content", true)
         state.lastMessageWithVisibleOperatorImage = operatorChatItem
 
         doAnswer {

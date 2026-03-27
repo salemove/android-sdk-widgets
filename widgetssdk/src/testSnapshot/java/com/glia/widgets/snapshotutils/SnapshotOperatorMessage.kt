@@ -14,9 +14,10 @@ internal interface SnapshotOperatorMessage : SnapshotStrings {
         operatorProfileImgUrl: String? = null,
         operatorId: String? = "operatorId",
         operatorName: String? = "Snap Shot",
-        content: String?
+        content: String?,
+        announced: Boolean = false
     ) = OperatorMessageItem.PlainText(
-        id, timestamp, showChatHead, operatorProfileImgUrl, operatorId, operatorName, content
+        id, timestamp, showChatHead, operatorProfileImgUrl, operatorId, operatorName, content, announced
     )
 
     fun operatorMessageResponseCard(
@@ -27,10 +28,11 @@ internal interface SnapshotOperatorMessage : SnapshotStrings {
         operatorId: String? = "operatorId",
         operatorName: String? = "Snap Shot",
         content: String?,
+        announced: Boolean = false,
         singleChoiceOptions: List<SingleChoiceOption> = shortLengthTexts().mapIndexed { i, s -> singleChoiceOption(s, i.toString()) },
         choiceCardImageUrl: String? = null
     ) = OperatorMessageItem.ResponseCard(
-        id, timestamp, showChatHead, operatorProfileImgUrl, operatorId, operatorName, content, singleChoiceOptions, choiceCardImageUrl
+        id, timestamp, showChatHead, operatorProfileImgUrl, operatorId, operatorName, content, announced, singleChoiceOptions, choiceCardImageUrl
     )
 
     fun singleChoiceOption(

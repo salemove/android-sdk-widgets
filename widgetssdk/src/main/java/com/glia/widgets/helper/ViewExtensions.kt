@@ -205,6 +205,12 @@ internal fun View.setAccessibilityHint(hint: String) {
     })
 }
 
+internal fun View.setAccessibilityHint(@StringRes stringKey: Int, vararg values: StringKeyPair) {
+    registerLocaleListener(stringKey, *values) { upToDateTranslation ->
+        setAccessibilityHint(upToDateTranslation)
+    }
+}
+
 internal fun View.setLocaleAccessibilityHint(locale: LocaleString) {
     registerLocaleListener(locale.stringKey, *locale.values.toTypedArray()) { upToDateTranslation ->
         ViewCompat.setAccessibilityDelegate(this, object : AccessibilityDelegateCompat() {

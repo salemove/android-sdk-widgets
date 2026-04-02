@@ -443,7 +443,8 @@ internal object Dialogs {
                 dialogName = DialogNames.ALLOW_PUSH_NOTIFICATION,
                 buttonName = ButtonNames.POSITIVE,
                 clickListener = positiveButtonClickListener
-            )
+            ),
+            positiveButtonAccessibilityHint = LocaleString(R.string.android_push_notifications_alert_button_positive_accessibility_hint)
         )
 
         return dialogService.showDialog(

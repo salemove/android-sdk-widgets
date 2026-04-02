@@ -51,11 +51,6 @@ internal class RequestPushNotificationDuringAuthenticationUseCaseImpl(
                         "Visitor's decision for intermediate push notification permission is 'allowed'"
                     )
                     requestNotificationPermission()
-                }, onCancel = {
-                    Logger.i(
-                        TAG,
-                        "Visitor's decision for intermediate push notification permission is 'declined'"
-                    )
                 })
             }
 

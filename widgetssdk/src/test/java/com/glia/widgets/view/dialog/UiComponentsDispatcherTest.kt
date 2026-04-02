@@ -33,17 +33,13 @@ internal class UiComponentsDispatcherTest {
         state.assertEmpty().assertNotComplete()
 
         val onAllow: () -> Unit = mockk(relaxed = true)
-        val onCancel: () -> Unit = mockk(relaxed = true)
 
-        dispatcher.showNotificationPermissionDialog(onAllow, onCancel)
+        dispatcher.showNotificationPermissionDialog(onAllow)
 
         val currentState = state.values().last().value as NotificationPermissionDialog
 
         currentState.onAllow.invoke()
         verify { onAllow() }
-
-        currentState.onCancel.invoke()
-        verify { onCancel() }
     }
 
     @Test

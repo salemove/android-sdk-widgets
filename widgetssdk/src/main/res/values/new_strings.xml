@@ -247,10 +247,8 @@
     <!--    Push Notifications-->
     <string name="push_notifications_alert_title">Stay In Touch</string>
     <string name="push_notifications_alert_message">Allow push notifications so we can message you (and return your messages) in the app.</string>
-    <string name="push_notifications_alert_button_positive">Allow</string>
-    <string name="push_notifications_alert_button_negative">Not right now</string>
-    <string name="push_notifications_alert_button_negative_accessibility_hint">Dismisses the prompt without enabling notifications.</string>
-    <string name="push_notifications_alert_button_positive_accessibility_hint">Allows the app to send push notifications.</string>
+    <string name="android_push_notifications_alert_button_positive">Continue</string>
+    <string name="android_push_notifications_alert_message">Configure push notifications so we can message you (and return your messages) in the app.</string>
 
 <!--    Real-Time connection quality-->
     <string name="snackbar_no_connection_message">No connection. Trying to reconnect.</string>

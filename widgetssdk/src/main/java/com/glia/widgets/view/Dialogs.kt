@@ -432,33 +432,25 @@ internal object Dialogs {
     fun showPushNotificationsPermissionDialog(
         context: Context,
         uiTheme: UiTheme,
-        positiveButtonClickListener: View.OnClickListener,
-        negativeButtonClickListener: View.OnClickListener
+        positiveButtonClickListener: View.OnClickListener
     ): AlertDialog {
-        val payload = DialogPayload.Option(
+        val payload = DialogPayload.SingleButtonOption(
             title = LocaleString(R.string.push_notifications_alert_title),
-            message = LocaleString(R.string.push_notifications_alert_message),
-            positiveButtonText = LocaleString(R.string.push_notifications_alert_button_positive),
-            negativeButtonText = LocaleString(R.string.push_notifications_alert_button_negative),
+            message = LocaleString(R.string.android_push_notifications_alert_message),
+            positiveButtonText = LocaleString(R.string.android_push_notifications_alert_button_positive),
             poweredByText = poweredByText,
             positiveButtonClickListener = handleDialogButtonClick(
                 dialogName = DialogNames.ALLOW_PUSH_NOTIFICATION,
                 buttonName = ButtonNames.POSITIVE,
                 clickListener = positiveButtonClickListener
             ),
-            negativeButtonClickListener = handleDialogButtonClick(
-                dialogName = DialogNames.ALLOW_PUSH_NOTIFICATION,
-                buttonName = ButtonNames.NEGATIVE,
-                clickListener = negativeButtonClickListener
-            ),
-            positiveButtonAccessibilityHint = LocaleString(R.string.push_notifications_alert_button_positive_accessibility_hint),
-            negativeButtonAccessibilityHint = LocaleString(R.string.push_notifications_alert_button_negative_accessibility_hint),
+            positiveButtonAccessibilityHint = LocaleString(R.string.android_push_notifications_alert_button_positive_accessibility_hint)
         )
 
         return dialogService.showDialog(
             context = context,
             theme = uiTheme,
-            type = DialogType.Option(payload),
+            type = DialogType.SingleButtonOption(payload),
             onShow = logDialogShown(DialogNames.ALLOW_PUSH_NOTIFICATION),
             onDismiss = logDialogDismissed(DialogNames.ALLOW_PUSH_NOTIFICATION)
         )

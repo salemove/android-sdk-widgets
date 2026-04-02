@@ -8,6 +8,7 @@ import com.glia.widgets.view.dialog.alert.AlertDialogViewInflater
 import com.glia.widgets.view.dialog.confirmation.ConfirmationDialogViewInflater
 import com.glia.widgets.view.dialog.confirmation.VerticalConfirmationDialogViewInflater
 import com.glia.widgets.view.dialog.operatorendedengagement.OperatorEndedEngagementDialogViewInflater
+import com.glia.widgets.view.dialog.singlebuttonoption.SingleButtonOptionDialogViewInflater
 import com.glia.widgets.view.dialog.option.OptionDialogViewInflater
 import com.glia.widgets.view.dialog.option.OptionWithNegativeNeutralDialogViewInflater
 import com.glia.widgets.view.dialog.option.ReversedOptionDialogViewInflater
@@ -45,6 +46,7 @@ internal class DialogViewFactory(context: Context, uiTheme: UiTheme, unifiedThem
         type is DialogType.Confirmation -> ConfirmationDialogViewInflater(layoutInflater, configuration, type.payload)
         type is DialogType.Upgrade && isVerticalAxis -> VerticalUpgradeDialogViewInflater(layoutInflater, configuration, type.payload)
         type is DialogType.Upgrade -> UpgradeDialogViewInflater(layoutInflater, configuration, type.payload)
+        type is DialogType.SingleButtonOption -> SingleButtonOptionDialogViewInflater(layoutInflater, configuration, type.payload)
         type is DialogType.OperatorEndedEngagement -> OperatorEndedEngagementDialogViewInflater(layoutInflater, configuration, type.payload)
         type is DialogType.AlertDialog -> AlertDialogViewInflater(layoutInflater, configuration, type.payload)
         else -> throw UnsupportedOperationException("Dialog of unsupported -> $type type was requested")

@@ -7,5 +7,6 @@ internal sealed class DialogType(payload: DialogPayload) {
     data class Confirmation(val payload: DialogPayload.Confirmation) : DialogType(payload)
     data class Upgrade(val payload: DialogPayload.Upgrade) : DialogType(payload)
     data class OperatorEndedEngagement(val payload: DialogPayload.OperatorEndedEngagement) : DialogType(payload)
+    data class SingleButtonOption(val payload: DialogPayload.SingleButtonOption) : DialogType(payload)
     data class AlertDialog(val payload: DialogPayload.AlertDialog) : DialogType(payload)
 }

@@ -47,7 +47,7 @@ class RequestPushNotificationDuringAuthenticationUseCaseTest {
 
         useCase()
 
-        verify(exactly = 0) { uiComponentsDispatcher.showNotificationPermissionDialog(any(), any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showNotificationPermissionDialog(any()) }
         verify(exactly = 0) { permissionManager.handlePermissions(any(), any(), any(), any(), any()) }
     }
 
@@ -59,7 +59,7 @@ class RequestPushNotificationDuringAuthenticationUseCaseTest {
 
         useCase()
 
-        verify(exactly = 0) { uiComponentsDispatcher.showNotificationPermissionDialog(any(), any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showNotificationPermissionDialog(any()) }
         verify(exactly = 0) { permissionManager.handlePermissions(any(), any(), any(), any(), any()) }
     }
 
@@ -70,7 +70,7 @@ class RequestPushNotificationDuringAuthenticationUseCaseTest {
 
         useCase()
 
-        verify(exactly = 0) { uiComponentsDispatcher.showNotificationPermissionDialog(any(), any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showNotificationPermissionDialog(any()) }
         verify(exactly = 0) { permissionManager.handlePermissions(any(), any(), any(), any(), any()) }
     }
 
@@ -82,14 +82,13 @@ class RequestPushNotificationDuringAuthenticationUseCaseTest {
 
         useCase()
 
-        verify(exactly = 0) { uiComponentsDispatcher.showNotificationPermissionDialog(any(), any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showNotificationPermissionDialog(any()) }
         verify(exactly = 0) { permissionManager.handlePermissions(any(), any(), any(), any(), any()) }
     }
 
     @Test
     fun `invoke shows intermediate dialog when shouldShowPermissionRationale is true`() {
         val onAllowSlot = slot<() -> Unit>()
-        val onCancelSlot = slot<() -> Unit>()
 
         every { configurationManager.suppressPushNotificationsPermissionRequestDuringAuthentication } returns false
         every { isPushNotificationsSetUpUseCase() } returns true
@@ -99,10 +98,7 @@ class RequestPushNotificationDuringAuthenticationUseCaseTest {
         useCase()
 
         verify { permissionManager.shouldShowPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) }
-        verify { uiComponentsDispatcher.showNotificationPermissionDialog(capture(onAllowSlot), capture(onCancelSlot)) }
-
-        onCancelSlot.captured.invoke()
-        verify(exactly = 0) { permissionManager.handlePermissions(any(), any(), any(), any(), any()) }
+        verify { uiComponentsDispatcher.showNotificationPermissionDialog(capture(onAllowSlot)) }
 
         onAllowSlot.captured.invoke()
         verify { permissionManager.handlePermissions(any(), eq(listOf(Manifest.permission.POST_NOTIFICATIONS)), any(), any(), any()) }
@@ -118,7 +114,7 @@ class RequestPushNotificationDuringAuthenticationUseCaseTest {
         useCase()
 
         verify { permissionManager.shouldShowPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) }
-        verify(exactly = 0) { uiComponentsDispatcher.showNotificationPermissionDialog(any(), any()) }
+        verify(exactly = 0) { uiComponentsDispatcher.showNotificationPermissionDialog(any()) }
         verify { permissionManager.handlePermissions(any(), eq(listOf(Manifest.permission.POST_NOTIFICATIONS)), any(), any(), any()) }
     }
 

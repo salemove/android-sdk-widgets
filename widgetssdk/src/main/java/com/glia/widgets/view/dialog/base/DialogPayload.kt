@@ -54,6 +54,15 @@ internal sealed interface DialogPayload {
         val buttonClickListener: View.OnClickListener,
     ) : DialogPayload
 
+    data class SingleButtonOption(
+        override val title: LocaleString,
+        val message: LocaleString,
+        val positiveButtonText: LocaleString,
+        val poweredByText: LocaleString,
+        val positiveButtonClickListener: View.OnClickListener,
+        val positiveButtonAccessibilityHint: LocaleString? = null,
+    ) : DialogPayload
+
     data class AlertDialog(
         override val title: LocaleString,
         val message: LocaleString,

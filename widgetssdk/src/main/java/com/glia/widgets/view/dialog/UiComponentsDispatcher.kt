@@ -13,7 +13,7 @@ internal interface UiComponentsDispatcher {
     val state: Flowable<OneTimeEvent<State>>
 
     // Dialog
-    fun showNotificationPermissionDialog(onAllow: () -> Unit, onCancel: () -> Unit = {})
+    fun showNotificationPermissionDialog(onAllow: () -> Unit)
     fun dismissDialog()
 
     // Snackbar
@@ -24,7 +24,7 @@ internal interface UiComponentsDispatcher {
 
     sealed interface State {
         data object DismissDialog : State
-        data class NotificationPermissionDialog(val onAllow: () -> Unit, val onCancel: () -> Unit) : State
+        data class NotificationPermissionDialog(val onAllow: () -> Unit) : State
         data class ShowSnackBar(@param:StringRes val messageResId: Int) : State
         data class LaunchChatScreen(val intention: Intention) : State
     }
@@ -34,8 +34,8 @@ internal class UiComponentsDispatcherImpl : UiComponentsDispatcher {
     private val _state: PublishProcessor<UiComponentsDispatcher.State> = PublishProcessor.create()
     override val state: Flowable<OneTimeEvent<UiComponentsDispatcher.State>> = _state.asOneTimeStateFlowable()
 
-    override fun showNotificationPermissionDialog(onAllow: () -> Unit, onCancel: () -> Unit) =
-        _state.onNext(NotificationPermissionDialog(onAllow, onCancel))
+    override fun showNotificationPermissionDialog(onAllow: () -> Unit) =
+        _state.onNext(NotificationPermissionDialog(onAllow))
 
     override fun dismissDialog() = _state.onNext(DismissDialog)
 

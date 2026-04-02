@@ -95,7 +95,7 @@ internal class UiComponentsActivityWatcherTest {
     fun `handleState will skip when activity is finishing`() {
         val activity = mockkActivity(isFinishing = true)
         watcher.onActivityResumed(activity)
-        val event = mockkOneTimeEvent(UiComponentsDispatcher.State.NotificationPermissionDialog({ }, {}))
+        val event = mockkOneTimeEvent(UiComponentsDispatcher.State.NotificationPermissionDialog({ }))
         stateFlowable.onNext(event)
 
         verify { event.consumed }
@@ -110,7 +110,7 @@ internal class UiComponentsActivityWatcherTest {
         watcher.onActivityResumed(activity)
         resumedActivity.values().forEach { it.clear() }
 
-        val event = mockkOneTimeEvent(UiComponentsDispatcher.State.NotificationPermissionDialog({ }, {}))
+        val event = mockkOneTimeEvent(UiComponentsDispatcher.State.NotificationPermissionDialog({ }))
         stateFlowable.onNext(event)
 
         verify { event.consumed }
@@ -123,26 +123,20 @@ internal class UiComponentsActivityWatcherTest {
 
         val dialog: AlertDialog = mockk(relaxed = true)
         val positiveButtonSlot = slot<View.OnClickListener>()
-        val negativeButtonSlot = slot<View.OnClickListener>()
-        every { Dialogs.showPushNotificationsPermissionDialog(any(), any(), any(), any()) } returns dialog
+        every { Dialogs.showPushNotificationsPermissionDialog(any(), any(), any()) } returns dialog
 
         watcher.onActivityResumed(activity)
         val onAllow = mockk<() -> Unit>(relaxed = true)
-        val onCancel = mockk<() -> Unit>(relaxed = true)
-        val event = mockkOneTimeEvent(UiComponentsDispatcher.State.NotificationPermissionDialog(onAllow, onCancel))
+        val event = mockkOneTimeEvent(UiComponentsDispatcher.State.NotificationPermissionDialog(onAllow))
         stateFlowable.onNext(event)
 
         verify(exactly = 0) { Logger.d(any(), match(skippingMatcher)) }
-        verify { Dialogs.showPushNotificationsPermissionDialog(any(), any(), capture(positiveButtonSlot), capture(negativeButtonSlot)) }
+        verify { Dialogs.showPushNotificationsPermissionDialog(any(), any(), capture(positiveButtonSlot)) }
 
         positiveButtonSlot.captured.onClick(mockk(relaxed = true))
         verify { event.markConsumed() }
         verify { dialog.dismiss() }
         verify { onAllow() }
-
-        negativeButtonSlot.captured.onClick(mockk(relaxed = true))
-        verify { event.markConsumed() }
-        verify { onCancel() }
     }
 
     @Test
@@ -150,16 +144,15 @@ internal class UiComponentsActivityWatcherTest {
         val activity = mockkActivity()
 
         val dialog: AlertDialog = mockk(relaxed = true)
-        every { Dialogs.showPushNotificationsPermissionDialog(any(), any(), any(), any()) } returns dialog
+        every { Dialogs.showPushNotificationsPermissionDialog(any(), any(), any()) } returns dialog
 
         watcher.onActivityResumed(activity)
         val onAllow = mockk<() -> Unit>(relaxed = true)
-        val onCancel = mockk<() -> Unit>(relaxed = true)
-        val event = mockkOneTimeEvent(UiComponentsDispatcher.State.NotificationPermissionDialog(onAllow, onCancel))
+        val event = mockkOneTimeEvent(UiComponentsDispatcher.State.NotificationPermissionDialog(onAllow))
         stateFlowable.onNext(event)
 
         verify(exactly = 0) { Logger.d(any(), match(skippingMatcher)) }
-        verify { Dialogs.showPushNotificationsPermissionDialog(any(), any(), any(), any()) }
+        verify { Dialogs.showPushNotificationsPermissionDialog(any(), any(), any()) }
 
         val dismissEvent = mockkOneTimeEvent(UiComponentsDispatcher.State.DismissDialog)
         every { dismissEvent.consume(captureLambda()) } answers {
@@ -168,7 +161,6 @@ internal class UiComponentsActivityWatcherTest {
         stateFlowable.onNext(dismissEvent)
         verify { dialog.dismiss() }
         verify(exactly = 0) { onAllow() }
-        verify(exactly = 0) { onCancel() }
     }
 
     @Test

@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.res.TypedArray
 import android.util.AttributeSet
 import android.view.View
+import android.widget.Button
 import android.widget.FrameLayout
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.withStyledAttributes
@@ -194,6 +195,7 @@ internal class ChatHeadView @JvmOverloads constructor(
                     info: AccessibilityNodeInfoCompat
                 ) {
                     super.onInitializeAccessibilityNodeInfo(host, info)
+                    info.className = Button::class.java.name
                     info.addAction(AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_CLICK)
                 }
             }

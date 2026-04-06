@@ -6,7 +6,9 @@ import com.glia.widgets.view.dialog.base.DialogPayload
 import com.glia.widgets.view.dialog.base.DialogType
 import org.junit.Test
 
-internal class SingleButtonOptionDialogTest : SnapshotTest(), SnapshotDialog {
+internal class SingleButtonOptionDialogTest : SnapshotTest(
+    renderingMode = fullWidthRenderMode
+), SnapshotDialog {
 
     private val dialogType: DialogType = DialogType.SingleButtonOption(
         DialogPayload.SingleButtonOption(

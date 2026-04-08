@@ -43,8 +43,7 @@ internal class UiComponentsActivityWatcher(
             state is UiComponentsDispatcher.State.NotificationPermissionDialog -> showPermissionsDialog(
                 activity,
                 event::markConsumed,
-                state.onAllow,
-                state.onCancel
+                state.onAllow
             )
 
             state is UiComponentsDispatcher.State.ShowSnackBar -> event.consume {
@@ -60,7 +59,7 @@ internal class UiComponentsActivityWatcher(
     private fun showSnackbar(activity: Activity, messageResId: Int) =
         SnackBarDelegateFactory(activity, messageResId, localeProvider, themeManager.theme).createDelegate().show()
 
-    private fun showPermissionsDialog(activity: Activity, consumeCallback: () -> Unit, onAllow: () -> Unit, onCancel: () -> Unit) {
+    private fun showPermissionsDialog(activity: Activity, consumeCallback: () -> Unit, onAllow: () -> Unit) {
         showAlertDialogWithStyledContext(activity) { context, uiTheme ->
             Dialogs.showPushNotificationsPermissionDialog(
                 context = context,
@@ -69,13 +68,8 @@ internal class UiComponentsActivityWatcher(
                     dismissDialogAndFinishHolderActivity()
                     consumeCallback()
                     onAllow()
-                },
-                negativeButtonClickListener = {
-                    dismissDialogAndFinishHolderActivity()
-                    consumeCallback()
-                    onCancel()
-                })
-
+                }
+            )
         }
     }
 

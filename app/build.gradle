@@ -82,6 +82,10 @@ android {
       'WrongViewIdFormat',
       'HardcodedText'
   }
+  buildFeatures {
+    // The buildTypes block below uses resValue(); resValues default flipped to false in AGP 9.
+    resValues = true
+  }
   namespace 'com.glia.exampleapp'
 }
 

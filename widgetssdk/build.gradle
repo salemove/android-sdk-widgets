@@ -63,6 +63,16 @@ android {
     buildConfig true
   }
 
+  // Build runs on JDK 21 (set via java toolchain) so JVMTI can retransform
+  // Android API 35 stub classes during MockK-driven unit tests. The published
+  // AAR is pinned to Java 17 bytecode so integrators on AGP 8.x / JDK 17
+  // remain supported. Kotlin's jvmTarget cascades from targetCompatibility
+  // under AGP 9 built-in Kotlin, so no separate kotlin jvmTarget needed.
+  compileOptions {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+  }
+
   //After adding `Mockk` dependency to the instrumentation tests it started to fail builds with message that
   // there are 6 files in project with these two Licences. Since all of them were related to Junit, it is safe to merge them.
   packaging {

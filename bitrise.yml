@@ -78,7 +78,7 @@ workflows:
       - set-java-version@1:
           is_always_run: true
           inputs:
-            - set_java_version: "17"
+            - set_java_version: "21"
       - install-missing-android-tools@3:
           inputs:
             - gradlew_path: $PROJECT_LOCATION/gradlew
@@ -94,7 +94,7 @@ workflows:
       - set-java-version@1:
           is_always_run: true
           inputs:
-            - set_java_version: "17"
+            - set_java_version: "21"
       - install-missing-android-tools@3:
           inputs:
             - gradlew_path: $PROJECT_LOCATION/gradlew
@@ -119,7 +119,7 @@ workflows:
       - set-java-version@1:
           is_always_run: true
           inputs:
-            - set_java_version: "17"
+            - set_java_version: "21"
       - install-missing-android-tools@3:
           inputs:
             - gradlew_path: $PROJECT_LOCATION/gradlew
@@ -235,7 +235,7 @@ workflows:
       - set-java-version@1:
           is_always_run: true
           inputs:
-            - set_java_version: "17"
+            - set_java_version: "21"
       - install-missing-android-tools@3:
           inputs:
             - gradlew_path: $PROJECT_LOCATION/gradlew
@@ -314,7 +314,7 @@ workflows:
       - set-java-version@1:
           is_always_run: true
           inputs:
-            - set_java_version: "17"
+            - set_java_version: "21"
       - install-missing-android-tools@3:
           inputs:
             - gradlew_path: $PROJECT_LOCATION/gradlew
@@ -391,7 +391,7 @@ workflows:
       - set-java-version@1.1:
           is_always_run: true
           inputs:
-            - set_java_version: "17"
+            - set_java_version: "21"
       - install-missing-android-tools@3:
           inputs:
             - gradlew_path: $PROJECT_LOCATION/gradlew
@@ -447,7 +447,7 @@ workflows:
       - set-java-version@1.1:
           is_always_run: true
           inputs:
-            - set_java_version: "17"
+            - set_java_version: "21"
       - install-missing-android-tools@3:
           inputs:
             - gradlew_path: $PROJECT_LOCATION/gradlew

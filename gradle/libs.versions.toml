@@ -1,5 +1,5 @@
 [versions]
-javaVersion = "17"
+javaVersion = "21"
 
 kotlinVersion = "2.2.10" # Kotlin and Dokka versions should have the same minor version to support the same kotlin version
 dokkaVersion = "2.2.0" # Kotlin and Dokka versions should have the same minor version to support the same kotlin version

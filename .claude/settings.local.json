@@ -1,4 +1,30 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(./gradlew help *)",
+      "Bash(./gradlew build *)",
+      "Bash(curl -s \"https://repo1.maven.org/maven2/app/cash/paparazzi/paparazzi-gradle-plugin/maven-metadata.xml\")",
+      "Bash(cat)",
+      "Bash(bash /tmp/check_versions.sh)",
+      "WebFetch(domain:plugins.gradle.org)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:coil-kt.github.io)",
+      "Bash(./gradlew widgetssdk:assembleDebug)",
+      "Bash(./gradlew widgetssdk:compileDebugKotlin)",
+      "Bash(./gradlew widgetssdk:compileDebugKotlin --info)",
+      "Bash(curl -s \"https://repo1.maven.org/maven2/org/jetbrains/kotlin/kotlin-parcelize-runtime/2.2.10/\")",
+      "Bash(curl -s \"https://repo1.maven.org/maven2/org/jetbrains/kotlin/kotlin-parcelize-runtime/maven-metadata.xml\")",
+      "Bash(./gradlew widgetssdk:compileDebugKotlin --debug)",
+      "Bash(./gradlew widgetssdk:dependencies --configuration kotlinCompilerPluginClasspathDebug)",
+      "WebFetch(domain:youtrack.jetbrains.com)",
+      "Bash(curl -s \"https://repo1.maven.org/maven2/org/jetbrains/kotlin/kotlin-parcelize-compiler/2.2.10/\")",
+      "Bash(curl -s \"https://repo1.maven.org/maven2/org/jetbrains/kotlin/kotlin-parcelize-compiler/maven-metadata.xml\")",
+      "Bash(./gradlew app:assembleDebug)",
+      "Bash(./gradlew widgetssdk:compileDebugUnitTestKotlin)",
+      "Bash(git checkout *)",
+      "Bash(git add *)"
+    ]
+  },
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "mobile-mcp"

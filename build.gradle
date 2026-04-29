@@ -13,7 +13,7 @@ plugins {
   alias libs.plugins.dokkaJavadoc
   alias libs.plugins.maven.publish
   alias libs.plugins.kt.lint
-  alias libs.plugins.kotlin.android apply false
+  alias libs.plugins.kotlin.parcelize apply false
   alias libs.plugins.paparazzi apply false
 }
 

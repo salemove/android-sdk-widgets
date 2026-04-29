@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'org.jetbrains.kotlin.android'
 
 //Detailed information about advantages of Java toolchain https://developer.android.com/build/jdks#toolchain
 java {
@@ -9,11 +8,11 @@ java {
 }
 
 android {
-  compileSdkVersion 36
+  compileSdk = 36
   defaultConfig {
     applicationId "com.glia.exampleapp"
-    minSdkVersion 24
-    targetSdkVersion 36
+    minSdk = 24
+    targetSdk = 36
     versionCode 1
     versionName "1.0"
 

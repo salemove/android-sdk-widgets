@@ -1,8 +1,10 @@
 import com.vanniktech.maven.publish.AndroidSingleVariantLibrary
 
-apply plugin: 'com.android.library'
-apply plugin: 'org.jetbrains.kotlin.android'
-apply plugin: 'kotlin-parcelize'
+plugins {
+  id 'com.android.library'
+  alias libs.plugins.kotlin.parcelize
+}
+
 apply plugin: 'com.vanniktech.maven.publish'
 apply plugin: 'org.jetbrains.dokka-javadoc'
 
@@ -14,10 +16,12 @@ java {
 }
 
 android {
-  compileSdkVersion 35
+  compileSdk = 35
   namespace 'com.glia.widgets'
   defaultConfig {
-    minSdkVersion 24
+    minSdk = 24
+    versionCode widgetsVersionCode
+    versionName widgetsVersionName
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     consumerProguardFiles "consumer-rules.pro"
   }
@@ -35,6 +39,12 @@ android {
       // Build type used for snapshot testing.
       apply plugin: 'app.cash.paparazzi'
     }
+  }
+
+  // Workaround for Paparazzi <= 2.0.0-alpha04 incompatibility with Gradle 9.
+  // https://github.com/cashapp/paparazzi/issues/2111
+  tasks.withType(Test).configureEach {
+    reports.html.required = false
   }
 
   lint {
@@ -55,7 +65,7 @@ android {
 
   //After adding `Mockk` dependency to the instrumentation tests it started to fail builds with message that
   // there are 6 files in project with these two Licences. Since all of them were related to Junit, it is safe to merge them.
-  packagingOptions {
+  packaging {
     resources {
       merges += ['META-INF/LICENSE.md', 'META-INF/LICENSE-notice.md']
     }
@@ -205,6 +215,10 @@ dependencies {
   implementation libs.data.gson
   implementation libs.java.core.ktx
   implementation libs.media.exif.interface
+  implementation libs.kotlin.parcelize.runtime
+  // AGP 9 built-in Kotlin doesn't auto-register the parcelize compiler plugin via the
+  // kotlin-parcelize Gradle plugin alone, so add the compiler artifact explicitly.
+  kotlinCompilerPluginClasspath "org.jetbrains.kotlin:kotlin-parcelize-compiler:${libs.versions.kotlinVersion.get()}"
 
   implementation platform(libs.firebase.bom)
   implementation libs.firebase.messaging

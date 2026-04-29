@@ -1,47 +1,48 @@
 [versions]
 javaVersion = "17"
 
-kotlinVersion = "2.1.21" # Kotlin and Dokka versions should have the same minor version to support the same kotlin version
-dokkaVersion = "2.0.0" # Kotlin and Dokka versions should have the same minor version to support the same kotlin version
-agpVersion = "8.13.2"
-ktlintVersion = "13.1.0"
+kotlinVersion = "2.2.10" # Kotlin and Dokka versions should have the same minor version to support the same kotlin version
+dokkaVersion = "2.2.0" # Kotlin and Dokka versions should have the same minor version to support the same kotlin version
+agpVersion = "9.2.1"
+ktlintVersion = "14.2.0"
 #Publishing
-mavenPublish = "0.35.0"
+mavenPublish = "0.36.0"
 
 # be carefully with updating this plugin, it may upgrade kotlin version for the entire project
 # check the release notes and set the version similar with the project kotlin version
 # https://github.com/cashapp/paparazzi/releases
-paparazziVersion = "1.3.5"
+# 2.0.0-alpha04 is required for AGP 9 (older versions reference removed BaseExtension API).
+paparazziVersion = "2.0.0-alpha04"
 
 javaAppCompatVersion = "1.7.1"
 javaConstraintLayoutVersion = "2.2.1"
 javaCoreKtxVersion = "1.16.0" # 1.17.0 requires the project to be compiled with compileSdk 36
-javaKtorVersion = "3.3.1"
+javaKtorVersion = "3.4.3"
 javaCoroutinesVersion = "1.10.2"
-javaDokkaVersion = "2.0.0"
-javaLifecycleProcessVersion = "2.9.4"
-javaLintVersion = "31.13.2"
+javaDokkaVersion = "2.2.0"
+javaLifecycleProcessVersion = "2.9.4" # 2.10.0+ requires compileSdk 36
+javaLintVersion = "32.2.1"
 javaMaterialVersion = "1.13.0"
 javaPreferenceVersion = "1.2.1"
 javaRxAndroid3Version = "3.0.2"
 javaRxJava3Version = "3.1.12"
-javaNavVersion = "2.9.5"
-dataGsonVersion = "2.13.2"
-firebaseBomVersion = "34.4.0"
-mediaAudioswitch = "1.2.4"
-mediaCoilCoreVersion = "3.2.0" # versions above 3.2.0 require Kotlin 2.2.0 or higher
-mediaCoilNetworkVersion = "3.2.0" # versions above 3.2.0 require Kotlin 2.2.0 or higher
-mediaLottieVersion = "6.6.10"
-mediaExifInterfaceVersion = "1.4.1"
+javaNavVersion = "2.9.8"
+dataGsonVersion = "2.14.0"
+firebaseBomVersion = "34.12.0"
+mediaAudioswitch = "1.2.5"
+mediaCoilCoreVersion = "3.4.0" # versions above 3.2.0 require Kotlin 2.2.0 or higher
+mediaCoilNetworkVersion = "3.4.0" # versions above 3.2.0 require Kotlin 2.2.0 or higher
+mediaLottieVersion = "6.7.1"
+mediaExifInterfaceVersion = "1.4.2"
 testEspressoVersion = "3.7.0"
 testAndroidXTestVersion = "1.3.0"
 archCoreVersion = "2.2.0"
-testMockkVersion = "1.14.6"
-testMockitoKotlinVersion = "6.1.0"
+testMockkVersion = "1.14.9"
+testMockitoKotlinVersion = "6.3.0"
 testRulesVersion = "1.7.0"
-testRobolectricVersion = "4.16"
+testRobolectricVersion = "4.16.1"
 testJunitVersion = "4.13.2"
-testJsonVersion = "20250517"
+testJsonVersion = "20251224"
 
 debugLeakcanaryVersion = "3.0-alpha-8"
 
@@ -66,6 +67,7 @@ java-navigation-ui = { module = "androidx.navigation:navigation-ui", version.ref
 java-preference = { module = "androidx.preference:preference", version.ref = "javaPreferenceVersion" }
 java-rxandroid = { module = "io.reactivex.rxjava3:rxandroid", version.ref = "javaRxAndroid3Version" }
 java-rxjava = { module = "io.reactivex.rxjava3:rxjava", version.ref = "javaRxJava3Version" }
+kotlin-parcelize-runtime = { module = "org.jetbrains.kotlin:kotlin-parcelize-runtime", version.ref = "kotlinVersion" }
 lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "javaLifecycleProcessVersion" }
 media-lottie = { module = "com.airbnb.android:lottie", version.ref = "mediaLottieVersion" }
 media-coil-core = { module = "io.coil-kt.coil3:coil", version.ref = "mediaCoilCoreVersion" }
@@ -90,7 +92,7 @@ debug-leakcanary = { module = "com.squareup.leakcanary:leakcanary-android", vers
 [plugins]
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokkaVersion" }
 dokkaJavadoc = { id = "org.jetbrains.dokka-javadoc", version.ref = "dokkaVersion" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlinVersion" }
+kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlinVersion" }
 kt-lint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlintVersion" }
 paparazzi = { id = "app.cash.paparazzi", version.ref = "paparazziVersion" }
 # Publishing

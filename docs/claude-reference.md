@@ -221,6 +221,8 @@ Both channels are required when logging on public API paths:
 
 **Rebasing a branch without re-recording Paparazzi snapshots is a recurring mistake.** After any rebase that touches layout, theme, or resource files, run `./gradlew widgetssdk:recordPaparazziSnapshot` before pushing.
 
+**`@Parcelize` silently no-ops if the kotlin-parcelize compiler artifact is missing from `kotlinCompilerPluginClasspath`.** Under AGP 9 built-in Kotlin, the standalone `org.jetbrains.kotlin.plugin.parcelize` Gradle plugin alone is not enough — the Kotlin compiler classpath stays empty and `@Parcelize`-annotated classes fail with "Class is not abstract and does not implement abstract members" at compile time. The fix is to declare both the runtime (`implementation libs.kotlin.parcelize.runtime`) and the compiler (`kotlinCompilerPluginClasspath "org.jetbrains.kotlin:kotlin-parcelize-compiler:<kotlinVersion>"`) explicitly in `widgetssdk/build.gradle`.
+
 ---
 
 ## Stack Constraints
@@ -230,19 +232,19 @@ Both channels are required when logging on public API paths:
 All of the following pins have WHY comments in `gradle/libs.versions.toml` and must not be changed without resolving the underlying issue:
 
 - `core-ktx 1.16.0` — version 1.17.0 requires `compileSdk 36`, which the SDK module does not use (demo app uses 36, SDK uses 35).
-- `coil-core` / `coil-network` `3.2.0` — versions above 3.2.0 require Kotlin 2.2.0 or higher; the project is on Kotlin 2.1.21.
-- `dokka 2.0.0` — Kotlin and Dokka versions must share the same minor version.
-- `paparazzi 1.3.5` — updating risks silently upgrading the Kotlin version for the entire project, not just the snapshot build type.
+- `lifecycle-process 2.9.4` — version 2.10.0+ requires `compileSdk 36`, which the SDK module does not use.
+- `dokka 2.2.0` — Kotlin and Dokka must share the same minor version (project is on Kotlin 2.2.10).
+- `paparazzi 2.0.0-alpha04` — older versions reference `BaseExtension`, which AGP 9 removed; this is the latest release and is required for AGP 9 compatibility, plus the HTML-test-reports workaround in `widgetssdk/build.gradle`.
 
 ### Forced Resolution Rules
 
 - `com.fasterxml.jackson.core:jackson-core:2.15.3` is forced project-wide via `resolutionStrategy` in root `build.gradle`. Reason: Dokka CVE workaround. Do not remove or change this pin to address Snyk alerts — it will break `dokkaGeneratePublicationJavadoc`.
-- `lint-api` version must equal AGP version plus the 23.0.0 offset (AGP 8.13.0 → lint-api 31.13.0). The custom `lint_checker/` module breaks silently on version mismatch.
+- `lint-api` version must equal AGP version plus the 23.0.0 offset (AGP 9.2.0 → lint-api 32.2.0). The custom `lint_checker/` module breaks silently on version mismatch.
 
 ### Packaging Quirks
 
-- MockK introduces duplicate `META-INF/LICENSE` files. An explicit `merges` rule in `packagingOptions` resolves this — do not remove it.
-- Unit tests require `org.json:json:20250517` to fill gaps in Robolectric's stub coverage of Android JSON APIs.
+- MockK introduces duplicate `META-INF/LICENSE` files. An explicit `merges` rule in the `packaging` block resolves this — do not remove it. (The DSL name is `packaging`, not the deprecated `packagingOptions`, after AGP 9 migration.)
+- Unit tests require `org.json:json` to fill gaps in Robolectric's stub coverage of Android JSON APIs.
 
 ### Build Type and Variant Behavior
 
@@ -250,6 +252,8 @@ All of the following pins have WHY comments in `gradle/libs.versions.toml` and m
 - Firebase BOM and `firebase-messaging` are declared as `implementation` in the SDK module but stripped from the published POM via `excludeOptionalDependencies`.
 - Demo app targets `compileSdk 36`; SDK module targets `compileSdk 35`.
 - Paparazzi is applied only inside the `snapshot buildTypes` block — non-standard placement, intentional.
+- AGP 9 uses **built-in Kotlin** (no `org.jetbrains.kotlin.android` plugin applied anywhere). The parcelize Gradle plugin alone does not register the compiler plugin under built-in Kotlin, so `widgetssdk/build.gradle` adds `kotlinCompilerPluginClasspath "org.jetbrains.kotlin:kotlin-parcelize-compiler:<kotlinVersion>"` and an `implementation` on `kotlin-parcelize-runtime` explicitly. Removing either makes `@Parcelize` silently stop generating Parcelable implementations.
+- Paparazzi 2.0.0-alpha04 is incompatible with Gradle 9's HTML test reports. `widgetssdk/build.gradle` disables `reports.html.required` on every `Test` task as the documented workaround. Do not remove it until a higher Paparazzi release fixes the upstream bug.
 - Gradle parallel execution is disabled. Modules are not guaranteed to be fully decoupled.
 - `resolutionStrategy.cacheChangingModulesFor 0, 'seconds'` forces a remote re-fetch of every `-SNAPSHOT` dependency on each build. Do not "optimize" this away.
 

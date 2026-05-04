@@ -1,4 +1,5 @@
-format_version: "8"
+---
+format_version: '8'
 default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
 project_type: android
 workflows:
@@ -22,8 +23,8 @@ workflows:
       - gradle-runner@3:
           title: Increment project version
           inputs:
-            - gradle_file: $PROJECT_LOCATION/build.gradle
-            - gradlew_path: $PROJECT_LOCATION/gradlew
+            - gradle_file: "$PROJECT_LOCATION/build.gradle"
+            - gradlew_path: "$PROJECT_LOCATION/gradlew"
             - gradle_task: saveWidgetsVersion --type=$VERSION_INCREMENT_TYPE
       - script@1:
           title: Create PR
@@ -43,7 +44,7 @@ workflows:
                 NEW_BRANCH_NAME="project-version-increment/${NEW_VERSION}"
                 BASE_BRANCH_NAME="development"
                 MESSAGE="Increment project version to ${NEW_VERSION}"
-
+                
                 git stash
                 git fetch origin $BASE_BRANCH_NAME
                 git checkout -b $NEW_BRANCH_NAME origin/$BASE_BRANCH_NAME
@@ -72,115 +73,115 @@ workflows:
   authenticated_increment_project_version:
     description: Task builds an SDK and uploads it to Nexus.
     steps:
-      - activate-ssh-key@4: { }
-      - git-clone@8: { }
-      - restore-gradle-cache@2: { }
+      - activate-ssh-key@4: {}
+      - git-clone@8: {}
+      - restore-gradle-cache@2: {}
       - set-java-version@1:
           is_always_run: true
           inputs:
-            - set_java_version: "21"
+            - set_java_version: '21'
       - install-missing-android-tools@3:
           inputs:
-            - gradlew_path: $PROJECT_LOCATION/gradlew
-      - save-gradle-cache@1: { }
+            - gradlew_path: "$PROJECT_LOCATION/gradlew"
+      - save-gradle-cache@1: {}
     after_run:
       - _increment_project_version
   browserstack_upload:
     steps:
       - activate-ssh-key@4:
           run_if: '{{getenv "SSH_RSA_PRIVATE_KEY" | ne ""}}'
-      - git-clone@8: { }
-      - restore-gradle-cache@2: { }
+      - git-clone@8: {}
+      - restore-gradle-cache@2: {}
       - set-java-version@1:
           is_always_run: true
           inputs:
-            - set_java_version: "21"
+            - set_java_version: '21'
       - install-missing-android-tools@3:
           inputs:
-            - gradlew_path: $PROJECT_LOCATION/gradlew
+            - gradlew_path: "$PROJECT_LOCATION/gradlew"
       - android-build@1.0:
           inputs:
-            - variant: $INTEGRATOR_VARIANT
-            - module: $EXAMPLE_APP_MODULE
+            - variant: "$INTEGRATOR_VARIANT"
+            - module: "$EXAMPLE_APP_MODULE"
       - browserstack-upload@0:
           title: Upload APP to BrowserStack
           inputs:
-            - custom_id: $BROWSERSTACK_APP_ID
+            - custom_id: "$BROWSERSTACK_APP_ID"
       - deploy-to-bitrise-io@2:
           inputs:
-            - notify_email_list: $BUILD_EMAILS
-      - save-gradle-cache@1: { }
+            - notify_email_list: "$BUILD_EMAILS"
+      - save-gradle-cache@1: {}
   development:
     steps:
       - activate-ssh-key@4:
           run_if: '{{getenv "SSH_RSA_PRIVATE_KEY" | ne ""}}'
-      - git-clone@8: { }
-      - restore-gradle-cache@2: { }
+      - git-clone@8: {}
+      - restore-gradle-cache@2: {}
       - set-java-version@1:
           is_always_run: true
           inputs:
-            - set_java_version: "21"
+            - set_java_version: '21'
       - install-missing-android-tools@3:
           inputs:
-            - gradlew_path: $PROJECT_LOCATION/gradlew
+            - gradlew_path: "$PROJECT_LOCATION/gradlew"
       - android-build@1:
           inputs:
-            - variant: $INTEGRATOR_VARIANT
-            - module: $EXAMPLE_APP_MODULE
+            - variant: "$INTEGRATOR_VARIANT"
+            - module: "$EXAMPLE_APP_MODULE"
       - android-lint@0:
           title: Run Lint for SDK
           inputs:
-            - project_location: $PROJECT_LOCATION
-            - module: $WIDGET_SDK_MODULE
-            - variant: $SDK_VARIANT
+            - project_location: "$PROJECT_LOCATION"
+            - module: "$WIDGET_SDK_MODULE"
+            - variant: "$SDK_VARIANT"
       - android-unit-test@1:
           title: Unit Test for SDK
           inputs:
-            - project_location: $PROJECT_LOCATION
-            - module: $WIDGET_SDK_MODULE
-            - variant: $SDK_VARIANT
+            - project_location: "$PROJECT_LOCATION"
+            - module: "$WIDGET_SDK_MODULE"
+            - variant: "$SDK_VARIANT"
       - android-lint@0:
           title: Run Lint for APP
           inputs:
-            - project_location: $PROJECT_LOCATION
-            - module: $EXAMPLE_APP_MODULE
-            - variant: $DEBUG_VARIANT
+            - project_location: "$PROJECT_LOCATION"
+            - module: "$EXAMPLE_APP_MODULE"
+            - variant: "$DEBUG_VARIANT"
       - android-unit-test@1:
           title: Unit Test for APP
           inputs:
-            - project_location: $PROJECT_LOCATION
-            - module: $EXAMPLE_APP_MODULE
-            - variant: $DEBUG_VARIANT
+            - project_location: "$PROJECT_LOCATION"
+            - module: "$EXAMPLE_APP_MODULE"
+            - variant: "$DEBUG_VARIANT"
       - browserstack-upload@0:
           title: Upload APP to BrowserStack
           inputs:
-            - custom_id: $BROWSERSTACK_APP_ID
+            - custom_id: "$BROWSERSTACK_APP_ID"
       - deploy-to-bitrise-io@2:
           inputs:
-            - notify_email_list: $BUILD_EMAILS
+            - notify_email_list: "$BUILD_EMAILS"
       - slack@4:
           is_always_run: true
           inputs:
-            - channel: '#tm-mobile-builds'
+            - channel: "#tm-mobile-builds"
             - text: Android Build Succeeded!
-            - webhook_url_on_error: $SLACK_ANDROID_WEBHOOK
-            - channel_on_error: '#tm-mobile'
-            - text_on_error: '@mobile-caretaker Android Build Failed! (development-build)'
-            - emoji_on_error: "\U0001F4A5"
-            - color_on_error: '#d9482b'
+            - webhook_url_on_error: "$SLACK_ANDROID_WEBHOOK"
+            - channel_on_error: "#tm-mobile"
+            - text_on_error: "@mobile-caretaker Android Build Failed! (development-build)"
+            - emoji_on_error: "💥"
+            - color_on_error: "#d9482b"
             - from_username_on_error: Bitrise
-            - pretext: ""
-            - webhook_url: $SLACK_ANDROID_WEBHOOK
-      - save-gradle-cache@1: { }
+            - pretext: ''
+            - webhook_url: "$SLACK_ANDROID_WEBHOOK"
+      - save-gradle-cache@1: {}
   post_release:
     steps:
       - trigger-bitrise-workflow@0:
           title: Update dependency in Cortex Financial
           inputs:
-            - api_token: $ANDROID_CORTEX_BANKING_APP_BUILD_TRIGGER_TOKEN
+            - api_token: "$ANDROID_CORTEX_BANKING_APP_BUILD_TRIGGER_TOKEN"
             - workflow_id: upgrade_dependencies
             - exported_environment_variable_names: NEW_VERSION
-            - app_slug: $ANDROID_CORTEX_BANKING_APP_SLUG
+            - app_slug: "$ANDROID_CORTEX_BANKING_APP_SLUG"
       - script@1:
           title: Update dependency in Glia Widgets Flutter SDK
           is_always_run: true
@@ -189,7 +190,7 @@ workflows:
                 #!/usr/bin/env bash
                 set -e
                 set -x
-
+                
                 curl -X POST \
                   -H "Accept: application/vnd.github+json" \
                   -H "Authorization: Bearer $GITHUB_API_TOKEN" \
@@ -203,7 +204,7 @@ workflows:
                 #!/usr/bin/env bash
                 set -e
                 set -x
-
+                
                 curl -X POST \
                   -H "Accept: application/vnd.github+json" \
                   -H "Authorization: Bearer $GITHUB_API_TOKEN" \
@@ -217,7 +218,7 @@ workflows:
                 #!/usr/bin/env bash
                 set -e
                 set -x
-
+                
                 curl -X POST \
                   -H "Accept: application/vnd.github+json" \
                   -H "Authorization: Bearer $GITHUB_API_TOKEN" \
@@ -226,33 +227,33 @@ workflows:
   publish_to_nexus:
     description: Task builds an SDK and uploads it to Nexus.
     steps:
-      - activate-ssh-key@4: { }
+      - activate-ssh-key@4: {}
       - git-clone:
           inputs:
             - clone_depth: "-1"
-            - fetch_tags: "yes"
-      - restore-gradle-cache@2: { }
+            - fetch_tags: 'yes'
+      - restore-gradle-cache@2: {}
       - set-java-version@1:
           is_always_run: true
           inputs:
-            - set_java_version: "21"
+            - set_java_version: '21'
       - install-missing-android-tools@3:
           inputs:
-            - gradlew_path: $PROJECT_LOCATION/gradlew
+            - gradlew_path: "$PROJECT_LOCATION/gradlew"
       - android-build@1:
           inputs:
-            - variant: $INTEGRATOR_VARIANT
-            - module: $EXAMPLE_APP_MODULE
+            - variant: "$INTEGRATOR_VARIANT"
+            - module: "$EXAMPLE_APP_MODULE"
       - android-unit-test@1:
           inputs:
-            - module: $WIDGET_SDK_MODULE
-            - variant: $SDK_VARIANT
-            - project_location: $PROJECT_LOCATION
+            - module: "$WIDGET_SDK_MODULE"
+            - variant: "$SDK_VARIANT"
+            - project_location: "$PROJECT_LOCATION"
       - android-unit-test@1:
           inputs:
-            - module: $EXAMPLE_APP_MODULE
-            - variant: $DEBUG_VARIANT
-            - project_location: $PROJECT_LOCATION
+            - module: "$EXAMPLE_APP_MODULE"
+            - variant: "$DEBUG_VARIANT"
+            - project_location: "$PROJECT_LOCATION"
       - gradle-runner@3:
           title: Generate JavaDoc
           inputs:
@@ -260,11 +261,11 @@ workflows:
       - amazon-s3-upload@3:
           title: Upload JavaDoc
           inputs:
-            - secret_access_key: $AMAZON_AWS_SECRET
-            - upload_bucket: $AMAZON_AWS_NAME/widgets
+            - secret_access_key: "$AMAZON_AWS_SECRET"
+            - upload_bucket: "$AMAZON_AWS_NAME/widgets"
             - acl_control: public-read
-            - upload_local_path: $PROJECT_LOCATION/$WIDGET_SDK_MODULE/build/dokka
-            - access_key_id: $AMAZON_AWS_KEY
+            - upload_local_path: "$PROJECT_LOCATION/$WIDGET_SDK_MODULE/build/dokka"
+            - access_key_id: "$AMAZON_AWS_KEY"
       - script@1:
           title: Publish Android SDK to Nexus Repository Manager (Staging)
           inputs:
@@ -280,7 +281,7 @@ workflows:
       - git-tag@1:
           title: Create Git tag
           inputs:
-            - tag: $NEW_VERSION
+            - tag: "$NEW_VERSION"
       - script@1:
           title: Generate changelog
           inputs:
@@ -295,46 +296,46 @@ workflows:
                 bash ./scripts/generate-changelog.sh
       - github-release@0:
           inputs:
-            - username: $GITHUB_USERNAME
-            - tag: $NEW_VERSION
-            - commit: $GIT_CLONE_COMMIT_HASH
+            - username: "$GITHUB_USERNAME"
+            - tag: "$NEW_VERSION"
+            - commit: "$GIT_CLONE_COMMIT_HASH"
             - name: Glia Android Widgets $NEW_VERSION
-            - body: $BITRISE_CHANGELOG
-            - draft: "no"
-            - api_token: $GITHUB_API_TOKEN
-      - save-gradle-cache@1: { }
+            - body: "$BITRISE_CHANGELOG"
+            - draft: 'no'
+            - api_token: "$GITHUB_API_TOKEN"
+      - save-gradle-cache@1: {}
     after_run:
       - _increment_project_version
   pull_request:
     steps:
       - activate-ssh-key@4:
           run_if: '{{getenv "SSH_RSA_PRIVATE_KEY" | ne ""}}'
-      - git-clone@8: { }
-      - restore-gradle-cache@2: { }
+      - git-clone@8: {}
+      - restore-gradle-cache@3: {}
       - set-java-version@1:
           is_always_run: true
           inputs:
-            - set_java_version: "21"
+            - set_java_version: '21'
       - install-missing-android-tools@3:
           inputs:
-            - gradlew_path: $PROJECT_LOCATION/gradlew
+            - gradlew_path: "$PROJECT_LOCATION/gradlew"
       - android-lint@0:
           title: Run Lint for SDK
           inputs:
-            - project_location: $PROJECT_LOCATION
-            - module: $WIDGET_SDK_MODULE
-            - variant: $SDK_VARIANT
+            - project_location: "$PROJECT_LOCATION"
+            - module: "$WIDGET_SDK_MODULE"
+            - variant: "$SDK_VARIANT"
       - android-unit-test@1:
           title: Unit Test for SDK
           inputs:
-            - project_location: $PROJECT_LOCATION
-            - module: $WIDGET_SDK_MODULE
+            - project_location: "$PROJECT_LOCATION"
+            - module: "$WIDGET_SDK_MODULE"
             - variant: debug
-      - gradle-unit-test@1:
+      - gradle-unit-test@2:
           title: Snapshot Test for SDK
           inputs:
-            - unit_test_flags: ""
-            - unit_test_task: $WIDGET_SDK_MODULE:verifyPaparazziSnapshot
+            - unit_test_flags: ''
+            - unit_test_task: "$WIDGET_SDK_MODULE:verifyPaparazziSnapshot"
           is_always_run: true
       - script@1:
           title: Export reports for Snapshot Test for SDK
@@ -361,45 +362,45 @@ workflows:
       - android-lint@0:
           title: Run Lint for APP
           inputs:
-            - project_location: $PROJECT_LOCATION
-            - module: $EXAMPLE_APP_MODULE
-            - variant: $DEBUG_VARIANT
+            - project_location: "$PROJECT_LOCATION"
+            - module: "$EXAMPLE_APP_MODULE"
+            - variant: "$DEBUG_VARIANT"
       - android-unit-test@1:
           title: Unit Test for APP
           inputs:
-            - project_location: $PROJECT_LOCATION
-            - module: $EXAMPLE_APP_MODULE
-            - variant: $DEBUG_VARIANT
-      - gradle-runner@3:
+            - project_location: "$PROJECT_LOCATION"
+            - module: "$EXAMPLE_APP_MODULE"
+            - variant: "$DEBUG_VARIANT"
+      - gradle-runner@5:
           title: Assemble SDK for instrumentation tests
           inputs:
-            - gradlew_path: ./gradlew
-            - gradle_task: :$WIDGET_SDK_MODULE:assembleDebugAndroidTest
+            - gradlew_path: "./gradlew"
+            - gradle_task: ":$WIDGET_SDK_MODULE:assembleDebugAndroidTest"
       - virtual-device-testing-for-android@1:
           title: UI Test for APP
           inputs:
             - test_type: instrumentation
             - use_verbose_log: true
             - test_devices: MediumPhone.arm,26,en,portrait
-      - deploy-to-bitrise-io@2: { }
-      - save-gradle-cache@1: { }
+      - deploy-to-bitrise-io@2: {}
+      - save-gradle-cache@1: {}
   upgrade_dependencies:
     steps:
-      - activate-ssh-key@4: { }
-      - git-clone@6: { }
-      - restore-gradle-cache@2: { }
+      - activate-ssh-key@4: {}
+      - git-clone@6: {}
+      - restore-gradle-cache@2: {}
       - set-java-version@1.1:
           is_always_run: true
           inputs:
-            - set_java_version: "21"
+            - set_java_version: '21'
       - install-missing-android-tools@3:
           inputs:
-            - gradlew_path: $PROJECT_LOCATION/gradlew
+            - gradlew_path: "$PROJECT_LOCATION/gradlew"
       - gradle-runner@3:
           title: Upgrade Core SDK version
           inputs:
-            - gradlew_path: $PROJECT_LOCATION/gradlew
-            - gradle_file: $PROJECT_LOCATION/build.gradle
+            - gradlew_path: "$PROJECT_LOCATION/gradlew"
+            - gradle_file: "$PROJECT_LOCATION/build.gradle"
             - gradle_task: saveCoreSdkVersion --coreSdkVersion=$NEW_VERSION
       - script@1:
           title: Create PR
@@ -412,11 +413,11 @@ workflows:
                 set -o pipefail
                 # debug log
                 set -x
-
+                
                 NEW_BRANCH_NAME="core-sdk-version-increment/${NEW_VERSION}"
                 BASE_BRANCH_NAME="development"
                 MESSAGE="Increment Core SDK version to ${NEW_VERSION}"
-
+                
                 git stash
                 git fetch origin $BASE_BRANCH_NAME
                 git checkout -b $NEW_BRANCH_NAME origin/$BASE_BRANCH_NAME
@@ -438,24 +439,24 @@ workflows:
                   -H "Authorization: Bearer $GITHUB_API_TOKEN" \
                   https://api.github.com/repos/salemove/android-sdk-widgets/pulls/$PULL_REQUEST_NUMBER/requested_reviewers \
                   -d "{\"team_reviewers\":[\"tm-mobile-android\"]}"
-      - save-gradle-cache@1: { }
+      - save-gradle-cache@1: {}
   upgrade_telemetry_dependency:
     steps:
-      - activate-ssh-key@4: { }
-      - git-clone@6: { }
-      - restore-gradle-cache@2: { }
+      - activate-ssh-key@4: {}
+      - git-clone@6: {}
+      - restore-gradle-cache@2: {}
       - set-java-version@1.1:
           is_always_run: true
           inputs:
-            - set_java_version: "21"
+            - set_java_version: '21'
       - install-missing-android-tools@3:
           inputs:
-            - gradlew_path: $PROJECT_LOCATION/gradlew
+            - gradlew_path: "$PROJECT_LOCATION/gradlew"
       - gradle-runner@3:
           title: Upgrade Telemetry lib version
           inputs:
-            - gradlew_path: $PROJECT_LOCATION/gradlew
-            - gradle_file: $PROJECT_LOCATION/build.gradle
+            - gradlew_path: "$PROJECT_LOCATION/gradlew"
+            - gradle_file: "$PROJECT_LOCATION/build.gradle"
             - gradle_task: saveTelemetryLibVersion --sdkVersion=$NEW_VERSION
       - script@1:
           title: Create PR
@@ -468,11 +469,11 @@ workflows:
                 set -o pipefail
                 # debug log
                 set -x
-
+                
                 NEW_BRANCH_NAME="telemetry-lib-version-increment/${NEW_VERSION}"
                 BASE_BRANCH_NAME="development"
                 MESSAGE="Increment Telemetry lib version to ${NEW_VERSION}"
-
+                
                 git stash
                 git fetch origin $BASE_BRANCH_NAME
                 git checkout -b $NEW_BRANCH_NAME origin/$BASE_BRANCH_NAME
@@ -494,18 +495,18 @@ workflows:
                   -H "Authorization: Bearer $GITHUB_API_TOKEN" \
                   https://api.github.com/repos/salemove/android-sdk-widgets/pulls/$PULL_REQUEST_NUMBER/requested_reviewers \
                   -d "{\"team_reviewers\":[\"tm-mobile-android\"]}"
-      - save-gradle-cache@1: { }
+      - save-gradle-cache@1: {}
 app:
   envs:
     - opts:
         is_expand: false
-      PROJECT_LOCATION: .
+      PROJECT_LOCATION: "."
     - opts:
         is_expand: false
       GRADLE_BUILD_FILE_PATH: build.gradle
     - opts:
         is_expand: false
-      GRADLEW_PATH: ./gradlew
+      GRADLEW_PATH: "./gradlew"
     - opts:
         is_expand: false
       EXAMPLE_APP_MODULE: app
@@ -542,7 +543,7 @@ app:
 trigger_map:
   - push_branch: development
     workflow: development
-  - pull_request_target_branch: '*'
+  - pull_request_target_branch: "*"
     workflow: pull_request
 meta:
   bitrise.io:

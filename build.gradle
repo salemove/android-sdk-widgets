@@ -4,16 +4,16 @@ buildscript {
     mavenCentral()
   }
   dependencies {
-    classpath libs.android.gradle.plugin
+    classpath libs.android.gradlePlugin
   }
 }
 
 plugins {
   alias libs.plugins.dokka
   alias libs.plugins.dokkaJavadoc
-  alias libs.plugins.maven.publish
-  alias libs.plugins.kt.lint
-  alias libs.plugins.kotlin.parcelize apply false
+  alias libs.plugins.mavenPublish
+  alias libs.plugins.ktlint
+  alias libs.plugins.kotlinParcelize apply false
   alias libs.plugins.paparazzi apply false
 }
 
@@ -110,6 +110,6 @@ dokka {
   // This adds support for @hide keyword inside in-code docs
   // For some reason artifact ID mentioned in docs does not exist, probably a typo. This one has slightly different order of words
   dependencies {
-    dokkaPlugin(libs.java.dokka)
+    dokkaPlugin(libs.dokka.androidDocumentation)
   }
 }

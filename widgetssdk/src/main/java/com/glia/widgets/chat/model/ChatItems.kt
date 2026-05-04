@@ -170,22 +170,27 @@ internal object NewMessagesDividerItem : ChatItem(ChatAdapter.NEW_MESSAGES_DIVID
 }
 
 internal sealed class OperatorStatusItem : ChatItem(ChatAdapter.OPERATOR_STATUS_VIEW_TYPE) {
-    override val id: String = "operator_status_item"
     override val timestamp: Long = -1
 
-    data object InQueue : OperatorStatusItem()
+    data object InQueue : OperatorStatusItem() {
+        override val id: String = "operator_status_in_queue"
+    }
+
+    data object Transferring : OperatorStatusItem() {
+        override val id: String = "operator_status_transferring"
+    }
 
     data class Connected(
         val operatorName: String,
-        val profileImgUrl: String?
+        val profileImgUrl: String?,
+        override val id: String = UUID.randomUUID().toString()
     ) : OperatorStatusItem()
 
     data class Joined(
         val operatorName: String,
-        val profileImgUrl: String?
+        val profileImgUrl: String?,
+        override val id: String = UUID.randomUUID().toString()
     ) : OperatorStatusItem()
-
-    data object Transferring : OperatorStatusItem()
 }
 
 // Visitor

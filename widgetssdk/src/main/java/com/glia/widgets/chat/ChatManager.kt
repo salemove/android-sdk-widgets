@@ -437,9 +437,13 @@ internal class ChatManager(
 
     @VisibleForTesting
     fun mapTransferring(state: State): State = state.apply {
-        operatorStatusItem?.also { chatItems -= it }
-        operatorStatusItem = OperatorStatusItem.Transferring.also {
-            chatItems += it
+        val previous = operatorStatusItem
+        if (previous is OperatorStatusItem.InQueue) {
+            chatItems -= previous
+        }
+        operatorStatusItem = OperatorStatusItem.Transferring
+        if (!chatItems.contains(OperatorStatusItem.Transferring)) {
+            chatItems += OperatorStatusItem.Transferring
         }
     }
 

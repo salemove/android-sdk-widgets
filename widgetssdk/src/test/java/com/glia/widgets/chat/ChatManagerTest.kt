@@ -286,6 +286,63 @@ class ChatManagerTest {
     }
 
     @Test
+    fun `multi-transfer sequence preserves all Connected and Joined items with unique stable ids`() {
+        val connectedA = ChatManager.Action.OperatorConnected("operator_a", "image_a")
+        val joinedA = ChatManager.Action.OperatorJoined("operator_a", "image_a")
+        val connectedB = ChatManager.Action.OperatorConnected("operator_b", "image_b")
+        val joinedB = ChatManager.Action.OperatorJoined("operator_b", "image_b")
+
+        subjectUnderTest.mapInQueue(state)
+        subjectUnderTest.mapOperatorConnected(connectedA, state)
+        subjectUnderTest.mapOperatorJoined(joinedA, state)
+        subjectUnderTest.mapTransferring(state)
+        subjectUnderTest.mapOperatorConnected(connectedB, state)
+        subjectUnderTest.mapOperatorJoined(joinedB, state)
+
+        val statusItems = state.chatItems.filterIsInstance<OperatorStatusItem>()
+        assertEquals(4, statusItems.size)
+        val first = statusItems[0] as OperatorStatusItem.Connected
+        val second = statusItems[1] as OperatorStatusItem.Joined
+        val third = statusItems[2] as OperatorStatusItem.Connected
+        val fourth = statusItems[3] as OperatorStatusItem.Joined
+        assertEquals("operator_a", first.operatorName)
+        assertEquals("operator_a", second.operatorName)
+        assertEquals("operator_b", third.operatorName)
+        assertEquals("operator_b", fourth.operatorName)
+
+        val stableIds = statusItems.map { it.stableId }
+        assertEquals(stableIds.size, stableIds.toSet().size)
+        assertFalse(state.chatItems.contains(OperatorStatusItem.Transferring))
+        assertFalse(state.chatItems.contains(OperatorStatusItem.InQueue))
+    }
+
+    @Test
+    fun `mapTransferring does not remove preceding Connected or Joined items`() {
+        val connectedAction = ChatManager.Action.OperatorConnected("operator_a", "image_a")
+        val joinedAction = ChatManager.Action.OperatorJoined("operator_a", "image_a")
+
+        subjectUnderTest.mapOperatorConnected(connectedAction, state)
+        subjectUnderTest.mapOperatorJoined(joinedAction, state)
+        val connectedBefore = state.chatItems[0] as OperatorStatusItem.Connected
+        val joinedBefore = state.chatItems[1] as OperatorStatusItem.Joined
+
+        subjectUnderTest.mapTransferring(state)
+
+        assertEquals(3, state.chatItems.size)
+        assertEquals(connectedBefore, state.chatItems[0])
+        assertEquals(joinedBefore, state.chatItems[1])
+        assertEquals(OperatorStatusItem.Transferring, state.chatItems[2])
+    }
+
+    @Test
+    fun `mapTransferring is idempotent when called repeatedly`() {
+        subjectUnderTest.mapTransferring(state)
+        subjectUnderTest.mapTransferring(state)
+
+        assertEquals(1, state.chatItems.count { it is OperatorStatusItem.Transferring })
+    }
+
+    @Test
     fun `mapMediaUpgrade adds MediaUpgradeStartedTimerItem_Video to chatItems when video is true`() {
         subjectUnderTest.mapMediaUpgrade(true, state).apply {
             assertTrue(chatItems.count() == 1)

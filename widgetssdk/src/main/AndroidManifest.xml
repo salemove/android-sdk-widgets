@@ -27,6 +27,8 @@
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
     <uses-permission
         android:name="android.permission.CAMERA"
         android:required="false" />
@@ -91,6 +93,13 @@
             android:stopWithTask="true" />
 
         <service android:name=".core.notification.NotificationRemovalService" />
+
+        <service
+            android:name=".internal.notification.device.CallForegroundService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="microphone|camera"
+            android:stopWithTask="false" />
 
         <provider
             android:name=".core.fileupload.GliaFileProvider"

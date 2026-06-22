@@ -48,7 +48,7 @@ internal class GliaLoadHistoryUseCase(
 
     private fun loadHistory() = Single.create { emitter ->
         loadHistory { messages, error ->
-            error?.also { emitter.onError(it) } ?: emitter.onSuccess(messages)
+            error?.also { emitter.onError(it) } ?: emitter.onSuccess(messages.orEmpty())
         }
     }
 

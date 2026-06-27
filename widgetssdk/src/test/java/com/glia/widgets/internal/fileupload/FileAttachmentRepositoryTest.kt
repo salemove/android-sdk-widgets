@@ -38,11 +38,10 @@ class LocalAttachmentRepositoryTest {
 
     private val gliaException = GliaException("", GliaException.Cause.INTERNAL_ERROR)
 
-    private val fileAttachment1: LocalAttachment
-        get() = LocalAttachment(uri1, "image/jpeg", "attachment_1", 123)
-
-    private val fileAttachment2: LocalAttachment
-        get() = LocalAttachment(uri2, "application/pdf", "attachment_2", 321)
+    // Stable per-test instances: LocalAttachment now carries a unique generated id, so each test must
+    // reuse the same instance for value-equality assertions (attach/detach/contains) to hold.
+    private lateinit var fileAttachment1: LocalAttachment
+    private lateinit var fileAttachment2: LocalAttachment
 
     @Before
     fun setUp() {
@@ -53,6 +52,8 @@ class LocalAttachmentRepositoryTest {
         engagementFile = mockk(relaxUnitFun = true)
         uri1 = mockk(relaxUnitFun = true)
         uri2 = mockk(relaxUnitFun = true)
+        fileAttachment1 = LocalAttachment(uri1, "image/jpeg", "attachment_1", 123)
+        fileAttachment2 = LocalAttachment(uri2, "application/pdf", "attachment_2", 321)
         observer1 = mockk(relaxUnitFun = true)
         observer2 = mockk(relaxUnitFun = true)
 

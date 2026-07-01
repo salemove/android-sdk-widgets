@@ -12,13 +12,14 @@ internal data class LocalAttachment(
     val size: Long,
     val attachmentStatus: Status = Status.UPLOADING,
     val engagementFile: EngagementFile? = null,
-    val id: String = UUID.randomUUID().toString(),
 ) {
 
     val isReadyToSend: Boolean
         get() = attachmentStatus == Status.READY_TO_SEND
     val isImage: Boolean
         get() = mimeType?.startsWith("image") ?: false
+    val id: String
+        get() = engagementFile?.id ?: UUID.randomUUID().toString()
 
     fun toVisitorAttachmentItem(messageId: String): VisitorAttachmentItem = if (isImage) {
         VisitorAttachmentItem.LocalImage(id, messageId, this)

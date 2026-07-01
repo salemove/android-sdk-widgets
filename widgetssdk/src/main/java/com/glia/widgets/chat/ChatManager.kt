@@ -298,11 +298,9 @@ internal class ChatManager(
         }
 
         files?.forEach { attachment ->
-            val index = chatItems.indexOfLast { (it as? LocalAttachmentItem)?.attachment?.engagementFile?.id == attachment.id }
+            val index = chatItems.indexOfLast { it.id == attachment.id }
 
-            if (index != -1) {
-                chatItems[index] = (chatItems[index] as VisitorChatItem).copyWithError(false)
-            }
+            chatItems[index] = (chatItems[index] as VisitorChatItem).copyWithError(false)
         }
     }
 
@@ -319,11 +317,9 @@ internal class ChatManager(
         }
 
         files.forEach { attachment ->
-            val index = chatItems.indexOfLast { (it as? LocalAttachmentItem)?.attachment?.engagementFile?.id == attachment.id }
+            val index = chatItems.indexOfLast { it.id == attachment.id }
 
-            if (index != -1) {
-                chatItems[index] = (chatItems[index] as VisitorChatItem).copyWithError(true)
-            }
+            chatItems[index] = (chatItems[index] as VisitorChatItem).copyWithError(true)
         }
 
         val lastItemIndex = if (files.isNotEmpty()) {

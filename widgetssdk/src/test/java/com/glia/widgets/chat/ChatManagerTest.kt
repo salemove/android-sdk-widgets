@@ -3,8 +3,6 @@ package com.glia.widgets.chat
 import android.os.Looper
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.chat.AttachmentFile
-import com.glia.androidsdk.engagement.EngagementFile
-import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.glia.androidsdk.chat.ChatMessage
 import com.glia.androidsdk.chat.FilesAttachment
 import com.glia.androidsdk.chat.OperatorMessage
@@ -945,12 +943,10 @@ class ChatManagerTest {
             on { files } doReturn arrayOf(file)
         }
         val payload = SendMessagePayload(content = "", messageId = messageId, attachment = filesAttachment)
-        val engagementFileMock: EngagementFile = mock { on { id } doReturn "attachment_id" }
-        val localAttachment: LocalAttachment = mock { on { engagementFile } doReturn engagementFileMock }
         val attachmentItem = VisitorAttachmentItem.LocalFile(
-            id = "local_attachment_id",
+            id = "attachment_id",
             messageId = messageId,
-            attachment = localAttachment,
+            attachment = mock(),
             isError = true
         )
         state.messagePreviews[messageId] = payload
@@ -976,12 +972,10 @@ class ChatManagerTest {
         }
         val payload = SendMessagePayload(content = "message", messageId = messageId, attachment = filesAttachment)
         val visitorChatItem = VisitorMessageItem(payload.content, payload.messageId, isError = true)
-        val engagementFileMock: EngagementFile = mock { on { id } doReturn "attachment_id" }
-        val localAttachment: LocalAttachment = mock { on { engagementFile } doReturn engagementFileMock }
         val attachmentItem = VisitorAttachmentItem.LocalFile(
-            id = "local_attachment_id",
+            id = "attachment_id",
             messageId = messageId,
-            attachment = localAttachment,
+            attachment = mock(),
             isError = true
         )
         state.messagePreviews[messageId] = payload
@@ -1023,13 +1017,7 @@ class ChatManagerTest {
             on { files } doReturn arrayOf(file)
         }
         val payload = SendMessagePayload(content = "", messageId = messageId, attachment = filesAttachment)
-        val engagementFileMock: EngagementFile = mock { on { id } doReturn "attachment_id" }
-        val localAttachment: LocalAttachment = mock { on { engagementFile } doReturn engagementFileMock }
-        val attachmentItem = VisitorAttachmentItem.LocalFile(
-            id = "local_attachment_id",
-            messageId = messageId,
-            attachment = localAttachment
-        )
+        val attachmentItem = VisitorAttachmentItem.LocalFile(id = "attachment_id", messageId = messageId, attachment = mock())
         state.messagePreviews[messageId] = payload
         state.chatItems.add(attachmentItem)
 
@@ -1052,13 +1040,7 @@ class ChatManagerTest {
         }
         val payload = SendMessagePayload(content = "message", messageId = messageId, attachment = filesAttachment)
         val visitorChatItem = VisitorMessageItem(payload.content, payload.messageId)
-        val engagementFileMock: EngagementFile = mock { on { id } doReturn "attachment_id" }
-        val localAttachment: LocalAttachment = mock { on { engagementFile } doReturn engagementFileMock }
-        val attachmentItem = VisitorAttachmentItem.LocalFile(
-            id = "local_attachment_id",
-            messageId = messageId,
-            attachment = localAttachment
-        )
+        val attachmentItem = VisitorAttachmentItem.LocalFile(id = "attachment_id", messageId = messageId, attachment = mock())
         state.messagePreviews[messageId] = payload
         state.chatItems.add(visitorChatItem)
         state.chatItems.add(attachmentItem)

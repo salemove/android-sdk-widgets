@@ -2,11 +2,9 @@ package com.glia.widgets.chat.data
 
 import com.glia.androidsdk.Glia
 import com.glia.androidsdk.GliaException
-import com.glia.androidsdk.RequestCallback
+import com.glia.androidsdk.chat.Chat
 import com.glia.androidsdk.chat.ChatMessage
-import com.glia.androidsdk.chat.SendMessagePayload
-import com.glia.androidsdk.chat.VisitorMessage
-import com.glia.widgets.chat.domain.GliaSendMessageUseCase.Listener
+import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.widgets.di.GliaCore
 import java.util.function.Consumer
 
@@ -36,31 +34,27 @@ internal class GliaChatRepository(private val gliaCore: GliaCore) {
 
     fun sendMessagePreview(message: String?) {
         message ?: return
-        gliaCore.currentEngagement.ifPresent { it.chat.sendMessagePreview(message) }
+        withChat { it.sendMessagePreview(message) }
     }
 
-    fun sendMessage(payload: SendMessagePayload, callback: RequestCallback<VisitorMessage?>) {
-        gliaCore.currentEngagement.ifPresent { engagement ->
-            engagement.chat.sendMessage(payload) { visitorMessage, ex -> callback.onResult(visitorMessage, ex) }
-        }
+    fun sendMessage(content: String, messageId: String, onSuccess: () -> Unit, onFailure: (GliaException) -> Unit) {
+        withChat { it.sendMessage(content, messageId, onSuccess, onFailure) }
     }
 
-    fun sendMessage(payload: SendMessagePayload, listener: Listener) {
-        sendMessage(payload) { visitorMessage, ex -> onMessageReceived(visitorMessage, ex, listener, payload.messageId) }
-    }
-
-    private fun onMessageReceived(
-        visitorMessage: VisitorMessage?,
-        ex: GliaException?,
-        listener: Listener?,
-        messageId: String
+    fun sendSingleChoiceAttachment(
+        singleChoiceAttachment: SingleChoiceAttachment,
+        messageId: String,
+        onSuccess: () -> Unit,
+        onFailure: (GliaException) -> Unit
     ) {
-        if (listener != null) {
-            if (ex != null) {
-                listener.error(ex, messageId)
-            } else {
-                listener.messageSent(visitorMessage)
-            }
-        }
+        withChat { it.sendSingleChoiceAttachment(singleChoiceAttachment, messageId, onSuccess, onFailure) }
+    }
+
+    fun sendFileAttachment(fileId: String, onSuccess: () -> Unit, onFailure: (GliaException) -> Unit) {
+        withChat { it.sendFileAttachment(fileId, onSuccess, onFailure) }
+    }
+
+    private fun withChat(block: (Chat) -> Unit) {
+        gliaCore.currentEngagement.ifPresent { block(it.chat) }
     }
 }

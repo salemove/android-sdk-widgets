@@ -1,82 +1,63 @@
 package com.glia.widgets.internal.secureconversations.domain
 
-import com.glia.androidsdk.RequestCallback
-import com.glia.androidsdk.chat.FilesAttachment
-import com.glia.androidsdk.chat.SendMessagePayload
-import com.glia.androidsdk.chat.VisitorMessage
-import com.glia.widgets.chat.data.GliaChatRepository
-import com.glia.widgets.engagement.domain.IsQueueingOrLiveEngagementUseCase
+import com.glia.androidsdk.GliaException
 import com.glia.widgets.internal.fileupload.FileAttachmentRepository
 import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.glia.widgets.internal.secureconversations.SecureConversationsRepository
 import com.glia.widgets.internal.secureconversations.SendMessageRepository
+import java.util.UUID
 
+/**
+ * Use case for sending the Message Center message as a secure conversation.
+ *
+ * Sends the current [SendMessageRepository] value together with any ready-to-send file
+ * attachments through [SecureConversationsRepository]. On a successful send with attachments,
+ * the composed message and the attachments are cleared before [onSuccess] is invoked.
+ */
 internal class SendSecureMessageUseCase(
     private val sendMessageRepository: SendMessageRepository,
     private val secureConversationsRepository: SecureConversationsRepository,
-    private val fileAttachmentRepository: FileAttachmentRepository,
-    private val chatRepository: GliaChatRepository,
-    private val isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase
+    private val fileAttachmentRepository: FileAttachmentRepository
 ) {
 
-    private val hasOngoingEngagement: Boolean
-        get() = isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement
-
-    operator fun invoke(
-        callback: RequestCallback<VisitorMessage?>
-    ) {
+    operator fun invoke(onSuccess: () -> Unit, onFailure: (GliaException) -> Unit) {
         val message = sendMessageRepository.value
         val fileAttachments = fileAttachmentRepository.getReadyToSendFileAttachments()
-        sendMessage(message, fileAttachments, callback)
+        sendMessage(message, fileAttachments, onSuccess, onFailure)
     }
 
-    private fun sendMessage(
-        message: String,
-        localAttachments: List<LocalAttachment>,
-        callback: RequestCallback<VisitorMessage?>
-    ) {
+    private fun sendMessage(message: String, localAttachments: List<LocalAttachment>, onSuccess: () -> Unit, onFailure: (GliaException) -> Unit) {
         if (localAttachments.isNotEmpty()) {
-            sendMessageWithAttachments(message, localAttachments) { result, ex ->
-                if (ex == null) {
-                    sendMessageRepository.reset()
-                    fileAttachmentRepository.detachFiles(localAttachments)
-                }
-                callback.onResult(result, ex)
-            }
+            sendMessageWithAttachments(message, localAttachments, {
+                sendMessageRepository.reset()
+                fileAttachmentRepository.detachFiles(localAttachments)
+                onSuccess()
+            }, onFailure)
         } else {
-            sendMessage(message, callback)
-        }
-    }
-
-    private fun sendMessage(
-        message: String,
-        callback: RequestCallback<VisitorMessage?>
-    ) {
-        val payload = SendMessagePayload(content = message)
-
-        if (hasOngoingEngagement) {
-            chatRepository.sendMessage(payload, callback)
-        } else {
-            secureConversationsRepository.send(payload, callback)
+            secureConversationsRepository.sendMessage(
+                content = message,
+                messageId = UUID.randomUUID().toString(),
+                onSuccess = onSuccess,
+                onFailure = onFailure
+            )
         }
     }
 
     private fun sendMessageWithAttachments(
         message: String,
         localAttachments: List<LocalAttachment>,
-        callback: RequestCallback<VisitorMessage?>
+        onSuccess: () -> Unit,
+        onFailure: (GliaException) -> Unit
     ) {
-        val attachment = localAttachments
-            .mapNotNull { it.engagementFile }
-            .takeIf { it.isNotEmpty() }
-            ?.run { FilesAttachment.from(toTypedArray()) }
+        val attachments = localAttachments
+            .mapNotNull { it.engagementFile?.id }
 
-        val payload = SendMessagePayload(content = message, attachment)
-
-        if (hasOngoingEngagement) {
-            chatRepository.sendMessage(payload, callback)
-        } else {
-            secureConversationsRepository.send(payload, callback)
-        }
+        secureConversationsRepository.sendMessageWithAttachments(
+            content = message,
+            fileAttachments = attachments,
+            messageId = UUID.randomUUID().toString(),
+            onSuccess = onSuccess,
+            onFailure = onFailure
+        )
     }
 }

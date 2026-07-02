@@ -28,6 +28,7 @@ import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -172,34 +173,56 @@ internal class MessageCenterControllerTest {
         verify(viewContract).setupViewAppearance()
     }
 
+    private fun stubSendMessageFlow(sendResult: GliaException?) {
+        whenever(requestNotificationPermissionIfPushNotificationsSetUpUseCase.invoke(any())) doAnswer {
+            it.getArgument<() -> Unit>(0).invoke()
+        }
+        whenever(sendSecureMessageUseCase.invoke(any(), any())) doAnswer {
+            if (sendResult == null) {
+                it.getArgument<() -> Unit>(0).invoke()
+            } else {
+                it.getArgument<(GliaException) -> Unit>(1).invoke(sendResult)
+            }
+        }
+    }
+
     @Test
-    fun handleMessageSendResult_CallsShowNavigationScreen_WhenErrorNull() {
+    fun onSendMessageClicked_ShowsConfirmationScreen_WhenSendSucceeds() {
         messageCenterController.setView(viewContract)
-        messageCenterController.handleSendMessageResult(null)
+        stubSendMessageFlow(sendResult = null)
+
+        messageCenterController.onSendMessageClicked()
+
         verify(viewContract, times(1)).showConfirmationScreen()
     }
 
     @Test
-    fun handleMessageSendResult_CallsNavigateToMessaging_WhenAuthError() {
+    fun onSendMessageClicked_ShowsMessageCenterUnavailableDialog_WhenAuthError() {
         messageCenterController.setView(viewContract)
-        val gliaException = GliaException("Message", GliaException.Cause.AUTHENTICATION_ERROR)
-        messageCenterController.handleSendMessageResult(gliaException)
+        stubSendMessageFlow(GliaException("Message", GliaException.Cause.AUTHENTICATION_ERROR))
+
+        messageCenterController.onSendMessageClicked()
+
         verify(dialogController).showMessageCenterUnavailableDialog()
     }
 
     @Test
-    fun handleMessageSendResult_CallsNavigateToMessaging_WhenInternalError() {
+    fun onSendMessageClicked_ShowsUnexpectedErrorDialog_WhenInternalError() {
         messageCenterController.setView(viewContract)
-        val gliaException = GliaException("Message", GliaException.Cause.INTERNAL_ERROR)
-        messageCenterController.handleSendMessageResult(gliaException)
+        stubSendMessageFlow(GliaException("Message", GliaException.Cause.INTERNAL_ERROR))
+
+        messageCenterController.onSendMessageClicked()
+
         verify(dialogController).showUnexpectedErrorDialog()
     }
 
     @Test
-    fun handleMessageSendResult_CallsNavigateToMessaging_WhenOtherError() {
+    fun onSendMessageClicked_ShowsUnexpectedErrorDialog_WhenOtherError() {
         messageCenterController.setView(viewContract)
-        val gliaException = GliaException("Message", GliaException.Cause.INVALID_INPUT)
-        messageCenterController.handleSendMessageResult(gliaException)
+        stubSendMessageFlow(GliaException("Message", GliaException.Cause.INVALID_INPUT))
+
+        messageCenterController.onSendMessageClicked()
+
         verify(dialogController).showUnexpectedErrorDialog()
     }
 

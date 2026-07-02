@@ -13,7 +13,6 @@ import com.glia.widgets.chat.ChatManager
 import com.glia.widgets.chat.domain.gva.IsGvaUseCase
 import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.DeliveredItem
-import com.glia.widgets.chat.model.LocalAttachmentItem
 import com.glia.widgets.chat.model.OperatorChatItem
 import com.glia.widgets.chat.model.VisitorChatItem
 import com.glia.widgets.chat.model.VisitorMessageItem
@@ -49,6 +48,19 @@ internal class AppendNewChatMessageUseCase(
 
             else -> Logger.d(TAG, "Unexpected type of message received -> $message")
         }
+    }
+
+    /**
+     * Marks the optimistically rendered visitor message with [messageId] as delivered once the
+     * send API reports success. Does nothing when the message was already reconciled through the
+     * incoming message stream (its preview is gone by then).
+     */
+    fun markMessageDelivered(messageId: String, state: ChatManager.State) {
+        if (state.messagePreviews.remove(messageId) != null) {
+            state.preEngagementChatItemIds.remove(messageId)
+            appendNewVisitorMessageUseCase.markMessageDelivered(state, messageId)
+        }
+        state.resetOperator()
     }
 }
 
@@ -160,7 +172,7 @@ internal class AppendNewVisitorMessageUseCase(private val mapVisitorAttachmentUs
 
         if (state.messagePreviews.remove(message.id) != null) {
             state.preEngagementChatItemIds.remove(message.id)
-            markMessageDelivered(state, message)
+            markMessageDelivered(state, message.id)
             return
         }
 
@@ -195,38 +207,21 @@ internal class AppendNewVisitorMessageUseCase(private val mapVisitorAttachmentUs
         }
     }
 
-    private fun markMessageDelivered(state: ChatManager.State, message: VisitorMessage) {
+    fun markMessageDelivered(state: ChatManager.State, messageId: String) {
         markLastDeliveredItemAsDelivered(state)
 
         val chatItems = state.chatItems
 
-        val files = (message.attachment as? FilesAttachment)?.files.orEmpty()
-
-        val messageIndex = chatItems.indexOfLast { it.id == message.id }
+        val messageIndex = chatItems.indexOfLast { it.id == messageId }
 
         if (messageIndex != -1) {
-            chatItems[messageIndex] = VisitorMessageItem(message.content, message.id, false, message.timestamp)
+            chatItems[messageIndex] = (chatItems[messageIndex] as VisitorChatItem).copyWithError(false)
         }
 
-        files.forEach { attachment ->
-            val index = chatItems.indexOfLast { it.id == attachment.id }
-            val visitorChatItem = chatItems[index] as VisitorChatItem
-
-            chatItems[index] = visitorChatItem.copyWithError(false)
-        }
-
-        val lastDeliveredIndex = if (files.isNotEmpty()) {
-            chatItems.indexOfLast { (it as? LocalAttachmentItem)?.messageId == message.id }
-        } else {
-            messageIndex
-        }
-
-        val deliveredItem = DeliveredItem(messageId = message.id, timestamp = message.timestamp).also {
+        val deliveredItem = DeliveredItem(messageId = messageId).also {
             lastDeliveredItem = it
         }
 
-        chatItems.add(lastDeliveredIndex + 1, deliveredItem)
-
+        chatItems.add(messageIndex + 1, deliveredItem)
     }
-
 }

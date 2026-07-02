@@ -21,10 +21,16 @@ internal data class LocalAttachment(
     val id: String
         get() = engagementFile?.id ?: UUID.randomUUID().toString()
 
-    fun toVisitorAttachmentItem(messageId: String): VisitorAttachmentItem = if (isImage) {
-        VisitorAttachmentItem.LocalImage(id, messageId, this)
-    } else {
-        VisitorAttachmentItem.LocalFile(id, messageId, this)
+    /**
+     * Maps this attachment to its optimistic chat item, or `null` when the file has not been
+     * uploaded yet. The uploaded file id is used as both the item id and the message id because
+     * each file is sent as a separate message and the file id is the only key available to
+     * reconcile it with the echoed message from the incoming message stream.
+     */
+    fun toVisitorAttachmentItem(): VisitorAttachmentItem? = when {
+        engagementFile == null -> null
+        isImage -> VisitorAttachmentItem.LocalImage(engagementFile.id, engagementFile.id, this)
+        else -> VisitorAttachmentItem.LocalFile(engagementFile.id, engagementFile.id, this)
     }
 
     enum class Status(val isError: Boolean) {

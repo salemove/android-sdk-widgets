@@ -40,13 +40,7 @@ class ChatManagerDialogStateTest {
         state.chatItemIds.add("2")
         state.chatItemIds.add("3")
 
-        val chatMessage: ChatMessage = mock()
-        whenever(chatMessage.id) doReturn "4"
-
-        val chatMessageInternal: ChatMessageInternal = mock()
-        whenever(chatMessageInternal.chatMessage) doReturn chatMessage
-
-        assertTrue(state.isNew(chatMessageInternal))
+        assertTrue(state.isNew("4"))
         assertTrue(state.chatItemIds.count() == 4)
         assertTrue(state.chatItemIds.contains("4"))
     }
@@ -57,13 +51,7 @@ class ChatManagerDialogStateTest {
         state.chatItemIds.add("2")
         state.chatItemIds.add("3")
 
-        val chatMessage: ChatMessage = mock()
-        whenever(chatMessage.id) doReturn "3"
-
-        val chatMessageInternal: ChatMessageInternal = mock()
-        whenever(chatMessageInternal.chatMessage) doReturn chatMessage
-
-        assertFalse(state.isNew(chatMessageInternal))
+        assertFalse(state.isNew("3"))
         assertTrue(state.chatItemIds.count() == 3)
     }
 

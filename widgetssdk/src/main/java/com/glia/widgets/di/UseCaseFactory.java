@@ -519,9 +519,7 @@ public class UseCaseFactory {
         return new SendSecureMessageUseCase(
             repositoryFactory.getSendMessageRepository(),
             repositoryFactory.getSecureConversationsRepository(),
-            repositoryFactory.getGliaFileAttachmentRepository(),
-            repositoryFactory.getGliaMessageRepository(),
-            getIsQueueingOrEngagementUseCase()
+            repositoryFactory.getGliaFileAttachmentRepository()
         );
     }
 

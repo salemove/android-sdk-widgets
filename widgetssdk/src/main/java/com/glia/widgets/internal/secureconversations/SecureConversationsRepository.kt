@@ -3,13 +3,13 @@ package com.glia.widgets.internal.secureconversations
 import android.annotation.SuppressLint
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
-import com.glia.androidsdk.chat.SendMessagePayload
-import com.glia.androidsdk.chat.VisitorMessage
+import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.androidsdk.secureconversations.SecureConversations
 import com.glia.widgets.chat.data.GliaChatRepository
-import com.glia.widgets.chat.domain.GliaSendMessageUseCase
+import com.glia.widgets.di.Dependencies
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.asStateFlowable
+import com.glia.widgets.helper.rx.Schedulers
 import com.glia.widgets.internal.queue.QueueRepository
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Observable
@@ -17,7 +17,11 @@ import io.reactivex.rxjava3.processors.BehaviorProcessor
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.reactivex.rxjava3.subjects.Subject
 
-internal class SecureConversationsRepository(private val core: GliaCore, private val queueRepository: QueueRepository) {
+internal class SecureConversationsRepository @JvmOverloads constructor(
+    private val core: GliaCore,
+    private val queueRepository: QueueRepository,
+    private val schedulers: Schedulers = Dependencies.schedulers
+) {
     private val secureConversations: SecureConversations by lazy { core.secureConversations }
 
     private val _messageSendingObservable: Subject<Boolean> = BehaviorSubject.createDefault(false)
@@ -68,20 +72,97 @@ internal class SecureConversationsRepository(private val core: GliaCore, private
     }
 
     @SuppressLint("CheckResult")
-    fun send(payload: SendMessagePayload, callback: RequestCallback<VisitorMessage?>) {
-        _messageSendingObservable.onNext(true)
+    private fun withQueues(onSuccess: (Array<String>) -> Unit, onFailure: (GliaException) -> Unit) {
         queueRepository.relevantQueueIds.subscribe { queueIds ->
             if (queueIds.isNotEmpty()) {
-                secureConversations.send(payload, queueIds.toTypedArray(), handleResult(callback))
+                onSuccess(queueIds.toTypedArray())
             } else {
-                handleResult(callback).onResult(null, GliaException("relevant queues are empty", GliaException.Cause.INVALID_INPUT))
+                onFailure(GliaException("relevant queues are empty", GliaException.Cause.INVALID_INPUT))
             }
-
         }
     }
 
-    fun send(payload: SendMessagePayload, listener: GliaSendMessageUseCase.Listener) {
-        send(payload) { visitorMessage, ex -> onMessageReceived(visitorMessage, ex, listener, payload) }
+    private fun wrapFailure(onFailure: (GliaException) -> Unit): (GliaException) -> Unit = {
+        _messageSendingObservable.onNext(false)
+        runOnMain { onFailure(it) }
+    }
+
+    private fun wrapSuccess(onSuccess: () -> Unit): () -> Unit = {
+        _messageSendingObservable.onNext(false)
+        runOnMain { onSuccess() }
+    }
+
+    // Core no longer hops to the main thread before invoking send callbacks, so marshal them
+    // back onto it for the UI-driving consumers and the message-sending state.
+    private fun runOnMain(block: () -> Unit) {
+        schedulers.mainScheduler.scheduleDirect { block() }
+    }
+
+    fun sendMessageWithAttachments(
+        content: String,
+        fileAttachments: List<String>,
+        messageId: String,
+        onSuccess: () -> Unit,
+        onFailure: (GliaException) -> Unit
+    ) {
+        _messageSendingObservable.onNext(true)
+
+        withQueues({
+            secureConversations.sendMessageWithAttachments(
+                content = content,
+                fileAttachments = fileAttachments,
+                queueIds = it,
+                messageId = messageId,
+                onSuccess = wrapSuccess(onSuccess),
+                onFailure = wrapFailure(onFailure)
+            )
+        }, wrapFailure(onFailure))
+    }
+
+    fun sendMessage(content: String, messageId: String, onSuccess: () -> Unit, onFailure: (GliaException) -> Unit) {
+        _messageSendingObservable.onNext(true)
+
+        withQueues({
+            secureConversations.sendMessage(
+                content = content,
+                queueIds = it,
+                messageId = messageId,
+                onSuccess = wrapSuccess(onSuccess),
+                onFailure = wrapFailure(onFailure)
+            )
+        }, wrapFailure(onFailure))
+    }
+
+    fun sendSingleChoiceAttachment(
+        singleChoiceAttachment: SingleChoiceAttachment,
+        messageId: String,
+        onSuccess: () -> Unit,
+        onFailure: (GliaException) -> Unit
+    ) {
+        _messageSendingObservable.onNext(true)
+
+        withQueues({
+            secureConversations.sendSingleChoiceAttachment(
+                singleChoiceAttachment = singleChoiceAttachment,
+                queueIds = it,
+                messageId = messageId,
+                onSuccess = wrapSuccess(onSuccess),
+                onFailure = wrapFailure(onFailure)
+            )
+        }, wrapFailure(onFailure))
+    }
+
+    fun sendFileAttachment(fileId: String, onSuccess: () -> Unit, onFailure: (GliaException) -> Unit) {
+        _messageSendingObservable.onNext(true)
+
+        withQueues({
+            secureConversations.sendFileAttachment(
+                queueIds = it,
+                fileId = fileId,
+                onSuccess = wrapSuccess(onSuccess),
+                onFailure = wrapFailure(onFailure)
+            )
+        }, wrapFailure(onFailure))
     }
 
     fun markMessagesRead(callback: RequestCallback<Void>) {
@@ -90,25 +171,5 @@ internal class SecureConversationsRepository(private val core: GliaCore, private
 
     fun setLeaveSecureConversationDialogVisible(visible: Boolean) {
         _isLeaveSecureConversationDialogVisibleObservable.onNext(visible)
-    }
-
-    private fun handleResult(callback: RequestCallback<VisitorMessage?>): RequestCallback<VisitorMessage?> {
-        return RequestCallback { message: VisitorMessage?, exception: GliaException? ->
-            _messageSendingObservable.onNext(false)
-            callback.onResult(message, exception)
-        }
-    }
-
-    private fun onMessageReceived(
-        visitorMessage: VisitorMessage?,
-        ex: GliaException?,
-        listener: GliaSendMessageUseCase.Listener,
-        payload: SendMessagePayload
-    ) {
-        if (ex != null) {
-            listener.error(ex, payload.messageId)
-        } else {
-            listener.messageSent(visitorMessage)
-        }
     }
 }

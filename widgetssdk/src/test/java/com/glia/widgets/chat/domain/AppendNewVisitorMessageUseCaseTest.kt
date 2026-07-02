@@ -5,6 +5,7 @@ import com.glia.androidsdk.chat.FilesAttachment
 import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.widgets.chat.ChatManager
 import com.glia.widgets.chat.model.DeliveredItem
+import com.glia.widgets.chat.model.OutgoingMessage
 import com.glia.widgets.chat.model.VisitorAttachmentItem
 import com.glia.widgets.chat.model.VisitorMessageItem
 import com.glia.widgets.internal.engagement.domain.model.ChatMessageInternal
@@ -143,8 +144,8 @@ class AppendNewVisitorMessageUseCaseTest {
         whenever(mapVisitorAttachmentUseCase(eq(file), any())) doReturn attachment
         whenever(mapVisitorAttachmentUseCase(eq(file1), any())) doReturn attachment1
 
-        state.messagePreviews[messageId] = mock()
-        state.messagePreviews[messageId1] = mock()
+        state.messagePreviews[messageId] = OutgoingMessage.Text(messageContent, messageId)
+        state.messagePreviews[messageId1] = OutgoingMessage.Text(messageContent1, messageId1)
         state.chatItems += VisitorMessageItem(messageContent, messageId, isError = false, messageTimeStamp)
         state.chatItems += VisitorMessageItem(messageContent1, messageId1, isError = false, messageTimeStamp1)
         state.chatItems += attachment
@@ -176,7 +177,39 @@ class AppendNewVisitorMessageUseCaseTest {
         assertTrue(state.chatItems.count() == 5)
         assertTrue(state.chatItems.first() is VisitorMessageItem)
         assertTrue(state.chatItems[1] is VisitorMessageItem)
-        assertTrue(state.chatItems.last() is DeliveredItem)
+        // The DeliveredItem is placed right after the delivered message item - attachments are
+        // separate messages in the new send model and no longer affect its position.
+        val deliveredItem = state.chatItems[2] as DeliveredItem
+        assertEquals(messageId1, deliveredItem.messageId)
         assertEquals(0, state.messagePreviews.count())
+    }
+
+    @Test
+    fun `markMessageDelivered clears error and adds DeliveredItem after the message item`() {
+        val messageId = "1"
+        state.chatItems += VisitorMessageItem("content", messageId, isError = true, timestamp = 1)
+
+        useCase.markMessageDelivered(state, messageId)
+
+        assertTrue(state.chatItems.count() == 2)
+        val messageItem = state.chatItems.first() as VisitorMessageItem
+        assertFalse(messageItem.isError)
+        val deliveredItem = state.chatItems.last() as DeliveredItem
+        assertEquals(messageId, deliveredItem.messageId)
+    }
+
+    @Test
+    fun `markMessageDelivered moves DeliveredItem to the newly delivered message`() {
+        val firstId = "1"
+        val secondId = "2"
+        state.chatItems += VisitorMessageItem("first", firstId, isError = false, timestamp = 1)
+        state.chatItems += VisitorMessageItem("second", secondId, isError = false, timestamp = 2)
+
+        useCase.markMessageDelivered(state, firstId)
+        useCase.markMessageDelivered(state, secondId)
+
+        assertEquals(1, state.chatItems.count { it is DeliveredItem })
+        val deliveredItem = state.chatItems.last() as DeliveredItem
+        assertEquals(secondId, deliveredItem.messageId)
     }
 }

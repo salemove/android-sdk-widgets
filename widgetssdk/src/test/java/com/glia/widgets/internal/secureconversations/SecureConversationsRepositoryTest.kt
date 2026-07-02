@@ -3,8 +3,7 @@ package com.glia.widgets.internal.secureconversations
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
 import com.glia.androidsdk.chat.ChatMessage
-import com.glia.androidsdk.chat.SendMessagePayload
-import com.glia.androidsdk.chat.VisitorMessage
+import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.androidsdk.secureconversations.SecureConversations
 import com.glia.widgets.chat.data.GliaChatRepository
 import com.glia.widgets.di.GliaCore
@@ -15,12 +14,15 @@ import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
+import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
 import org.junit.After
+import org.junit.Assert.assertArrayEquals
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
+import com.glia.widgets.helper.rx.Schedulers as GliaSchedulers
 
 class SecureConversationsRepositoryTest {
 
@@ -33,11 +35,16 @@ class SecureConversationsRepositoryTest {
     private val pendingSCSlot = slot<RequestCallback<Boolean>>()
 
 
+    private val testSchedulers: GliaSchedulers = object : GliaSchedulers {
+        override val computationScheduler: Scheduler = Schedulers.trampoline()
+        override val mainScheduler: Scheduler = Schedulers.trampoline()
+    }
+
     @Before
     fun setUp() {
         RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
         every { core.secureConversations } returns secureConversations
-        repository = SecureConversationsRepository(core, queueRepository)
+        repository = SecureConversationsRepository(core, queueRepository, testSchedulers)
         verify(inverse = true) { secureConversations.subscribeToUnreadMessageCount(any()) }
         verify(inverse = true) { secureConversations.subscribeToPendingSecureConversationStatus(any()) }
         repository.unreadMessagesCountObservable.test()
@@ -146,29 +153,93 @@ class SecureConversationsRepositoryTest {
     }
 
     @Test
-    fun `send should call secureConversations send with queueIds`() {
-        val payload: SendMessagePayload = mockk()
-        val callback: RequestCallback<VisitorMessage?> = mockk(relaxed = true)
-        val queueIds = listOf("queue1", "queue2")
+    fun `sendMessage sends through secureConversations with relevant queue ids`() {
+        val queueIdsSlot = slot<Array<String>>()
+        every { queueRepository.relevantQueueIds } returns Single.just(listOf("queue1", "queue2"))
+        every { secureConversations.sendMessage(any(), capture(queueIdsSlot), any(), any(), any()) } returns Unit
 
-        every { queueRepository.relevantQueueIds } returns Single.just(queueIds)
+        repository.sendMessage("content", MESSAGE_ID, {}, {})
 
-        repository.send(payload, callback)
-
-        verify { secureConversations.send(payload, queueIds.toTypedArray(), any()) }
+        verify { secureConversations.sendMessage(eq("content"), any(), eq(MESSAGE_ID), any(), any()) }
+        assertArrayEquals(arrayOf("queue1", "queue2"), queueIdsSlot.captured)
     }
 
     @Test
-    fun `send should call callback with exception when queueIds are empty`() {
-        val payload: SendMessagePayload = mockk()
-        val callback: RequestCallback<VisitorMessage?> = mockk(relaxed = true)
-        val queueIds = emptyList<String>()
+    fun `sendMessage emits sending state and invokes onSuccess when Core reports success`() {
+        val onSuccess: () -> Unit = mockk(relaxed = true)
+        val sdkOnSuccessSlot = slot<() -> Unit>()
+        every { queueRepository.relevantQueueIds } returns Single.just(listOf("queue1"))
+        every { secureConversations.sendMessage(any(), any(), any(), capture(sdkOnSuccessSlot), any()) } returns Unit
 
-        every { queueRepository.relevantQueueIds } returns Single.just(queueIds)
+        val sendingObserver = repository.messageSendingObservable.test()
 
-        repository.send(payload, callback)
+        repository.sendMessage("content", MESSAGE_ID, onSuccess, {})
+        sdkOnSuccessSlot.captured.invoke()
 
-        verify { callback.onResult(null, any<GliaException>()) }
+        verify { onSuccess.invoke() }
+        sendingObserver.assertValues(false, true, false)
+    }
+
+    @Test
+    fun `sendMessage invokes onFailure and stops sending state when Core reports failure`() {
+        val onFailure: (GliaException) -> Unit = mockk(relaxed = true)
+        val exception = GliaException("error", GliaException.Cause.INTERNAL_ERROR)
+        val sdkOnFailureSlot = slot<(GliaException) -> Unit>()
+        every { queueRepository.relevantQueueIds } returns Single.just(listOf("queue1"))
+        every { secureConversations.sendMessage(any(), any(), any(), any(), capture(sdkOnFailureSlot)) } returns Unit
+
+        val sendingObserver = repository.messageSendingObservable.test()
+
+        repository.sendMessage("content", MESSAGE_ID, {}, onFailure)
+        sdkOnFailureSlot.captured.invoke(exception)
+
+        verify { onFailure.invoke(exception) }
+        sendingObserver.assertValues(false, true, false)
+    }
+
+    @Test
+    fun `sendMessage invokes onFailure when relevant queue ids are empty`() {
+        val onFailure: (GliaException) -> Unit = mockk(relaxed = true)
+        every { queueRepository.relevantQueueIds } returns Single.just(emptyList())
+
+        repository.sendMessage("content", MESSAGE_ID, {}, onFailure)
+
+        verify { onFailure.invoke(any()) }
+        verify(inverse = true) { secureConversations.sendMessage(any(), any(), any(), any(), any()) }
+    }
+
+    @Test
+    fun `sendMessageWithAttachments sends content and file ids through secureConversations`() {
+        val fileAttachments = listOf("file1", "file2")
+        every { queueRepository.relevantQueueIds } returns Single.just(listOf("queue1"))
+        every { secureConversations.sendMessageWithAttachments(any(), any(), any(), any(), any(), any()) } returns Unit
+
+        repository.sendMessageWithAttachments("content", fileAttachments, MESSAGE_ID, {}, {})
+
+        verify {
+            secureConversations.sendMessageWithAttachments(eq("content"), eq(fileAttachments), any(), eq(MESSAGE_ID), any(), any())
+        }
+    }
+
+    @Test
+    fun `sendSingleChoiceAttachment sends attachment through secureConversations`() {
+        val attachment: SingleChoiceAttachment = mockk()
+        every { queueRepository.relevantQueueIds } returns Single.just(listOf("queue1"))
+        every { secureConversations.sendSingleChoiceAttachment(any(), any(), any(), any(), any()) } returns Unit
+
+        repository.sendSingleChoiceAttachment(attachment, MESSAGE_ID, {}, {})
+
+        verify { secureConversations.sendSingleChoiceAttachment(eq(attachment), any(), eq(MESSAGE_ID), any(), any()) }
+    }
+
+    @Test
+    fun `sendFileAttachment sends file id through secureConversations`() {
+        every { queueRepository.relevantQueueIds } returns Single.just(listOf("queue1"))
+        every { secureConversations.sendFileAttachment(any(), any(), any(), any()) } returns Unit
+
+        repository.sendFileAttachment(FILE_ID, {}, {})
+
+        verify { secureConversations.sendFileAttachment(eq(FILE_ID), any(), any(), any()) }
     }
 
     @Test
@@ -178,5 +249,10 @@ class SecureConversationsRepositoryTest {
         repository.markMessagesRead(callback)
 
         verify { secureConversations.markMessagesRead(callback) }
+    }
+
+    private companion object {
+        const val MESSAGE_ID = "message-id"
+        const val FILE_ID = "file-id"
     }
 }

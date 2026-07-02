@@ -6,10 +6,8 @@ import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.Operator
 import com.glia.androidsdk.chat.AttachmentFile
-import com.glia.androidsdk.chat.SendMessagePayload
 import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.androidsdk.chat.SingleChoiceOption
-import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.engagement.EngagementFile
 import com.glia.telemetry_lib.ButtonNames
@@ -39,6 +37,7 @@ import com.glia.widgets.chat.model.CustomCardChatItem
 import com.glia.widgets.chat.model.Gva
 import com.glia.widgets.chat.model.GvaButton
 import com.glia.widgets.chat.model.OperatorMessageItem
+import com.glia.widgets.chat.model.OutgoingMessage
 import com.glia.widgets.chat.model.VisitorAttachmentItem
 import com.glia.widgets.chat.model.VisitorChatItem
 import com.glia.widgets.di.Dependencies
@@ -66,7 +65,6 @@ import com.glia.widgets.helper.TimeCounter.FormattedTimerStatusListener
 import com.glia.widgets.helper.exists
 import com.glia.widgets.helper.formattedName
 import com.glia.widgets.helper.imageUrl
-import com.glia.widgets.helper.isValid
 import com.glia.widgets.internal.dialog.DialogContract
 import com.glia.widgets.internal.dialog.domain.ConfirmationDialogLinksUseCase
 import com.glia.widgets.internal.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
@@ -161,9 +159,9 @@ internal class ChatController(
     private var allowedMediaTypes: List<String> = listOf(Constants.MIME_TYPE_IMAGES)
 
     private val sendMessageCallback: GliaSendMessageUseCase.Listener = object : GliaSendMessageUseCase.Listener {
-        override fun messageSent(message: VisitorMessage?) {
-            Logger.d(TAG, "messageSent: $message, id: ${message?.id}")
-            onMessageSent(message)
+        override fun messageSent(messageId: String) {
+            Logger.d(TAG, "message sent id=$messageId")
+            onMessageSent(messageId)
         }
 
         override fun onMessageValidated() {
@@ -176,13 +174,13 @@ internal class ChatController(
             onSendMessageOperatorOffline()
         }
 
-        override fun onMessagePrepared(visitorChatItem: VisitorChatItem, payload: SendMessagePayload) {
+        override fun onMessagePrepared(visitorChatItem: VisitorChatItem, payload: OutgoingMessage) {
             addMessagePreview(visitorChatItem, payload)
             scrollChatToBottom()
         }
 
-        override fun onAttachmentsPrepared(items: List<VisitorAttachmentItem>, payload: SendMessagePayload?) {
-            addAttachmentPreview(items, payload)
+        override fun onAttachmentPrepared(attachment: VisitorAttachmentItem, outgoingMessage: OutgoingMessage) {
+            chatManager.onChatAction(ChatManager.Action.AttachmentPreviewAdded(attachment, outgoingMessage))
             scrollChatToBottom()
         }
 
@@ -441,17 +439,12 @@ internal class ChatController(
         }
     }
 
-    private fun onMessageSent(message: VisitorMessage?) {
-        message?.takeIf { it.isValid() }?.also { chatManager.onChatAction(ChatManager.Action.OnMessageSent(it)) }
+    private fun onMessageSent(messageId: String) {
+        chatManager.onChatAction(ChatManager.Action.OnMessageSent(messageId))
     }
 
-    private fun addMessagePreview(visitorChatItem: VisitorChatItem, payload: SendMessagePayload) {
+    private fun addMessagePreview(visitorChatItem: VisitorChatItem, payload: OutgoingMessage) {
         chatManager.onChatAction(ChatManager.Action.MessagePreviewAdded(visitorChatItem, payload))
-        scrollChatToBottom()
-    }
-
-    private fun addAttachmentPreview(items: List<VisitorAttachmentItem>, payload: SendMessagePayload?) {
-        chatManager.onChatAction(ChatManager.Action.AttachmentPreviewAdded(items, payload))
         scrollChatToBottom()
     }
 

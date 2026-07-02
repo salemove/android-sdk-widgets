@@ -1,9 +1,7 @@
 package com.glia.widgets.messagecenter
 
 import android.net.Uri
-import androidx.annotation.VisibleForTesting
 import com.glia.androidsdk.GliaException
-import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.androidsdk.engagement.EngagementFile
 import com.glia.telemetry_lib.ButtonNames
 import com.glia.telemetry_lib.GliaLogger
@@ -137,36 +135,29 @@ internal class MessageCenterController(
         view?.hideSoftKeyboard()
 
         requestNotificationPermissionIfPushNotificationsSetUpUseCase {
-            sendSecureMessageUseCase { _: VisitorMessage?, gliaException: GliaException? ->
-                handleSendMessageResult(gliaException)
-            }
-        }
-    }
+            sendSecureMessageUseCase({
+                view?.showConfirmationScreen()
+            }) {
+                when (it.cause) {
+                    GliaException.Cause.AUTHENTICATION_ERROR -> {
+                        dialogController.showMessageCenterUnavailableDialog()
+                        setState(state.copy(showSendMessageGroup = false))
+                    }
 
-    @VisibleForTesting
-    fun handleSendMessageResult(gliaException: GliaException?) {
-        if (gliaException == null) {
-            view?.showConfirmationScreen()
-        } else {
-            when (gliaException.cause) {
-                GliaException.Cause.AUTHENTICATION_ERROR -> {
-                    dialogController.showMessageCenterUnavailableDialog()
-                    setState(state.copy(showSendMessageGroup = false))
-                }
+                    GliaException.Cause.INTERNAL_ERROR -> {
+                        dialogController.showUnexpectedErrorDialog()
+                        setState(state.copy(showSendMessageGroup = false))
+                    }
 
-                GliaException.Cause.INTERNAL_ERROR -> {
-                    dialogController.showUnexpectedErrorDialog()
-                    setState(state.copy(showSendMessageGroup = false))
-                }
-
-                else -> {
-                    dialogController.showUnexpectedErrorDialog()
-                    setState(
-                        state.copy(
-                            messageEditTextEnabled = true,
-                            addAttachmentButtonEnabled = true
+                    else -> {
+                        dialogController.showUnexpectedErrorDialog()
+                        setState(
+                            state.copy(
+                                messageEditTextEnabled = true,
+                                addAttachmentButtonEnabled = true
+                            )
                         )
-                    )
+                    }
                 }
             }
         }

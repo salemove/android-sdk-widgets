@@ -2,11 +2,8 @@ package com.glia.widgets.chat
 
 import android.os.Looper
 import com.glia.androidsdk.GliaException
-import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.androidsdk.chat.ChatMessage
-import com.glia.androidsdk.chat.FilesAttachment
 import com.glia.androidsdk.chat.OperatorMessage
-import com.glia.androidsdk.chat.SendMessagePayload
 import com.glia.androidsdk.chat.SystemMessage
 import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.widgets.chat.domain.AddNewMessagesDividerUseCase
@@ -25,6 +22,7 @@ import com.glia.widgets.chat.model.NewMessagesDividerItem
 import com.glia.widgets.chat.model.OperatorAttachmentItem
 import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.chat.model.OperatorStatusItem
+import com.glia.widgets.chat.model.OutgoingMessage
 import com.glia.widgets.chat.model.RemoteAttachmentItem
 import com.glia.widgets.chat.model.TapToRetryItem
 import com.glia.widgets.chat.model.VisitorAttachmentItem
@@ -210,7 +208,7 @@ class ChatManagerTest {
 
     @Test
     fun `mapMessagePreviewAdded adds message preview to the chat items`() {
-        val payload = SendMessagePayload(content = "content")
+        val payload = OutgoingMessage.Text(content = "content")
         val item = VisitorMessageItem(payload.content, payload.messageId)
 
         assertTrue(state.messagePreviews.isEmpty())
@@ -225,7 +223,7 @@ class ChatManagerTest {
 
     @Test
     fun `mapMessagePreviewAdded adds message preview before OperatorStatusItem when chatItems contain OperatorStatusItem_InQueue`() {
-        val payload = SendMessagePayload(content = "content")
+        val payload = OutgoingMessage.Text(content = "content")
         val item = VisitorMessageItem(payload.content, payload.messageId)
 
         val inQueue = OperatorStatusItem.InQueue
@@ -243,19 +241,17 @@ class ChatManagerTest {
     }
 
     @Test
-    fun `mapAttachmentPreviewAdded adds attachment previews to the chat items`() {
-        val payload = SendMessagePayload(content = "content")
-        val item = VisitorAttachmentItem.LocalImage(id = "tota", messageId = payload.messageId, attachment = mock())
-        val item1 = VisitorAttachmentItem.LocalFile(id = "animal", messageId = payload.messageId, attachment = mock())
+    fun `mapAttachmentPreviewAdded adds attachment preview to the chat items`() {
+        val payload = OutgoingMessage.File(fileId = "tota")
+        val item = VisitorAttachmentItem.LocalImage(id = payload.fileId, messageId = payload.messageId, attachment = mock())
 
         assertTrue(state.messagePreviews.isEmpty())
         assertTrue(state.chatItems.isEmpty())
 
-        val newState = subjectUnderTest.mapAttachmentPreviewAdded(listOf(item, item1), payload, state)
-        assertEquals(payload, newState.messagePreviews.entries.first().value)
+        val newState = subjectUnderTest.mapAttachmentPreviewAdded(item, payload, state)
+        assertEquals(payload, newState.messagePreviews[item.id])
         assertEquals(item, newState.chatItems.first())
-        assertEquals(item1, newState.chatItems[1])
-        assertEquals(2, newState.chatItems.count())
+        assertEquals(1, newState.chatItems.count())
         assertEquals(1, newState.messagePreviews.count())
     }
 
@@ -516,7 +512,9 @@ class ChatManagerTest {
 
     @Test
     fun `mapAction calls mapAttachmentPreviewAdded when Action_AttachmentPreviewAdded passed`() {
-        val action: ChatManager.Action.AttachmentPreviewAdded = ChatManager.Action.AttachmentPreviewAdded(emptyList(), mock())
+        val attachment = VisitorAttachmentItem.LocalFile(id = "file_id", messageId = "file_id", attachment = mock())
+        val action: ChatManager.Action.AttachmentPreviewAdded =
+            ChatManager.Action.AttachmentPreviewAdded(attachment, OutgoingMessage.File(fileId = "file_id"))
         val subjectUnderTestSpy = spy(subjectUnderTest)
         subjectUnderTestSpy.mapAction(action, state)
         verify(subjectUnderTestSpy).mapAttachmentPreviewAdded(any(), any(), any())
@@ -524,7 +522,9 @@ class ChatManagerTest {
 
     @Test
     fun `mapAction calls mapMessagePreviewAdded when Action_MessagePreviewAdded passed`() {
-        val action: ChatManager.Action.MessagePreviewAdded = ChatManager.Action.MessagePreviewAdded(mock(), mock())
+        val payload = OutgoingMessage.Text(content = "content")
+        val action: ChatManager.Action.MessagePreviewAdded =
+            ChatManager.Action.MessagePreviewAdded(VisitorMessageItem(payload.content, payload.messageId), payload)
         val subjectUnderTestSpy = spy(subjectUnderTest)
         subjectUnderTestSpy.mapAction(action, state)
         verify(subjectUnderTestSpy).mapMessagePreviewAdded(any(), any(), any())
@@ -547,12 +547,11 @@ class ChatManagerTest {
     }
 
     @Test
-    fun `mapAction calls mapNewMessage when Action_OnMessageSent passed`() {
-        val message = mockChatMessage<VisitorMessage>()
-        val action: ChatManager.Action.OnMessageSent = ChatManager.Action.OnMessageSent(message.chatMessage as VisitorMessage)
+    fun `mapAction calls mapMessageSent when Action_OnMessageSent passed`() {
+        val action: ChatManager.Action.OnMessageSent = ChatManager.Action.OnMessageSent("message_id")
         val subjectUnderTestSpy = spy(subjectUnderTest)
         subjectUnderTestSpy.mapAction(action, state)
-        verify(subjectUnderTestSpy).mapNewMessage(any(), any())
+        verify(subjectUnderTestSpy).mapMessageSent(eq("message_id"), any())
     }
 
     @Test
@@ -600,8 +599,9 @@ class ChatManagerTest {
     @Test
     fun `mapNewMessage does nothing when message is not new`() {
         val chatMessageInternal = mockChatMessage<OperatorMessage>()
+        val messageId = chatMessageInternal.chatMessage.id
         val stateSpy = spy(state)
-        doReturn(false).whenever(stateSpy).isNew(chatMessageInternal)
+        doReturn(false).whenever(stateSpy).isNew(messageId)
 
         val subjectUnderTestSpy = spy(subjectUnderTest)
         subjectUnderTestSpy.mapNewMessage(chatMessageInternal, stateSpy)
@@ -613,9 +613,10 @@ class ChatManagerTest {
     @Test
     fun `mapNewMessage calls appendNewChatMessageUseCase when message is new`() {
         val chatMessageInternal = mockChatMessage<OperatorMessage>()
+        val messageId = chatMessageInternal.chatMessage.id
         val stateSpy = spy(state)
 
-        doReturn(true).whenever(stateSpy).isNew(chatMessageInternal)
+        doReturn(true).whenever(stateSpy).isNew(messageId)
 
         val subjectUnderTestSpy = spy(subjectUnderTest)
         subjectUnderTestSpy.mapNewMessage(chatMessageInternal, stateSpy)
@@ -627,8 +628,9 @@ class ChatManagerTest {
     @Test
     fun `mapNewMessage calls checkUnsentMessage when message is new VisitorMessage`() {
         val chatMessageInternal = mockChatMessage<VisitorMessage>()
+        val messageId = chatMessageInternal.chatMessage.id
         val stateSpy = spy(state)
-        doReturn(true).whenever(stateSpy).isNew(chatMessageInternal)
+        doReturn(true).whenever(stateSpy).isNew(messageId)
 
         val subjectUnderTestSpy = spy(subjectUnderTest)
         subjectUnderTestSpy.mapNewMessage(chatMessageInternal, stateSpy)
@@ -661,33 +663,34 @@ class ChatManagerTest {
 
     @Test
     fun `checkUnsentMessages calls sendUnsentMessagesUseCase when message previews is not empty`() {
-        val unsentMessage = SendMessagePayload(content = "message")
+        val unsentMessage = OutgoingMessage.Text(content = "message")
 
         state.messagePreviews[unsentMessage.messageId] = unsentMessage
         state.preEngagementChatItemIds.add(unsentMessage.messageId)
 
         val subjectUnderTestSpy = spy(subjectUnderTest)
         subjectUnderTestSpy.checkUnsentMessages(state)
-        val successCaptor = argumentCaptor<(VisitorMessage) -> Unit>()
+        val successCaptor = argumentCaptor<() -> Unit>()
         val failureCaptor = argumentCaptor<(GliaException) -> Unit>()
         verify(sendUnsentMessagesUseCase).invoke(eq(unsentMessage), successCaptor.capture(), failureCaptor.capture())
-        successCaptor.lastValue.invoke(mock())
+        successCaptor.lastValue.invoke()
 
         val actionCaptor = argumentCaptor<ChatManager.Action>()
         verify(subjectUnderTestSpy).onChatAction(actionCaptor.capture())
-        assertTrue(actionCaptor.lastValue is ChatManager.Action.OnMessageSent)
+        val action = actionCaptor.lastValue as ChatManager.Action.OnMessageSent
+        assertEquals(unsentMessage.messageId, action.messageId)
     }
 
     @Test
     fun `checkUnsentMessages calls OnSendMessageError action when message response is failure`() {
-        val unsentMessage = SendMessagePayload(content = "message")
+        val unsentMessage = OutgoingMessage.Text(content = "message")
 
         state.messagePreviews[unsentMessage.messageId] = unsentMessage
         state.preEngagementChatItemIds.add(unsentMessage.messageId)
 
         val subjectUnderTestSpy = spy(subjectUnderTest)
         subjectUnderTestSpy.checkUnsentMessages(state)
-        val successCaptor = argumentCaptor<(VisitorMessage) -> Unit>()
+        val successCaptor = argumentCaptor<() -> Unit>()
         val failureCaptor = argumentCaptor<(GliaException) -> Unit>()
         verify(sendUnsentMessagesUseCase).invoke(eq(unsentMessage), successCaptor.capture(), failureCaptor.capture())
         failureCaptor.lastValue.invoke(mock())
@@ -813,8 +816,9 @@ class ChatManagerTest {
     @Test
     fun `subscribeToState subscribes to history and messages`() {
         val chatMessageInternal = mockChatMessage<SystemMessage>()
+        val messageId = chatMessageInternal.chatMessage.id
         val stateSpy = spy(state)
-        doReturn(true).whenever(stateSpy).isNew(chatMessageInternal)
+        doReturn(true).whenever(stateSpy).isNew(messageId)
         doReturn(10).whenever(stateSpy).addedMessagesCount
         stateProcessor.onNext(stateSpy)
 
@@ -832,6 +836,23 @@ class ChatManagerTest {
         val test = action.test()
         subjectUnderTest.onChatAction(ChatManager.Action.Transferring)
         test.assertValue(ChatManager.Action.Transferring)
+    }
+
+    @Test
+    fun `onChatAction delivers all actions when called concurrently from multiple threads`() {
+        val threadCount = 4
+        val actionsPerThread = 50
+        val test = action.test()
+
+        val threads = (1..threadCount).map {
+            Thread {
+                repeat(actionsPerThread) { subjectUnderTest.onChatAction(ChatManager.Action.Transferring) }
+            }
+        }
+        threads.forEach(Thread::start)
+        threads.forEach(Thread::join)
+
+        test.assertValueCount(threadCount * actionsPerThread)
     }
 
     @Test
@@ -865,8 +886,9 @@ class ChatManagerTest {
     @Test
     fun `initialize subscribes to state and quick replies`() {
         val chatMessageInternal = mockChatMessage<SystemMessage>()
+        val messageId = chatMessageInternal.chatMessage.id
         val stateSpy = spy(state)
-        doReturn(true).whenever(stateSpy).isNew(chatMessageInternal)
+        doReturn(true).whenever(stateSpy).isNew(messageId)
 
         whenever(loadHistoryUseCase()) doReturn Single.just(ChatHistoryResponse(emptyList()))
         whenever(onMessageUseCase()) doReturn Observable.just(chatMessageInternal)
@@ -905,8 +927,8 @@ class ChatManagerTest {
     }
 
     @Test
-    fun `mapRetryClicked updates chat items with no Error status for message without attachments when tap to retry item does not exist`() {
-        val payload = SendMessagePayload(content = "message")
+    fun `mapRetryClicked updates chat items with no Error status for message when tap to retry item does not exist`() {
+        val payload = OutgoingMessage.Text(content = "message")
         val visitorChatItem = VisitorMessageItem(payload.content, payload.messageId, isError = true)
         state.messagePreviews[payload.messageId] = payload
         state.chatItems.add(visitorChatItem)
@@ -918,8 +940,8 @@ class ChatManagerTest {
     }
 
     @Test
-    fun `mapRetryClicked updates chat items with no Error status for message without attachments`() {
-        val payload = SendMessagePayload(content = "message")
+    fun `mapRetryClicked updates chat items with no Error status for message`() {
+        val payload = OutgoingMessage.Text(content = "message")
         val visitorChatItem = VisitorMessageItem(payload.content, payload.messageId, isError = true)
         state.messagePreviews[payload.messageId] = payload
         state.chatItems.add(visitorChatItem)
@@ -934,27 +956,20 @@ class ChatManagerTest {
     }
 
     @Test
-    fun `mapRetryClicked updates chat items with preview status for attachment without message`() {
-        val messageId = "message_id"
-        val file: AttachmentFile = mock {
-            on { id } doReturn "attachment_id"
-        }
-        val filesAttachment: FilesAttachment = mock {
-            on { files } doReturn arrayOf(file)
-        }
-        val payload = SendMessagePayload(content = "", messageId = messageId, attachment = filesAttachment)
+    fun `mapRetryClicked updates chat items with preview status for attachment`() {
+        val payload = OutgoingMessage.File(fileId = "attachment_id")
         val attachmentItem = VisitorAttachmentItem.LocalFile(
-            id = "attachment_id",
-            messageId = messageId,
+            id = payload.fileId,
+            messageId = payload.messageId,
             attachment = mock(),
             isError = true
         )
-        state.messagePreviews[messageId] = payload
+        state.messagePreviews[payload.messageId] = payload
         state.chatItems.add(attachmentItem)
         val tapToRetryItem = TapToRetryItem(payload.messageId)
         state.chatItems.add(tapToRetryItem)
 
-        val newState = subjectUnderTest.mapRetryClicked(messageId, state)
+        val newState = subjectUnderTest.mapRetryClicked(payload.messageId, state)
 
         val updatedAttachmentItem = newState.chatItems[0] as VisitorAttachmentItem
         assertFalse(updatedAttachmentItem.isError)
@@ -962,40 +977,37 @@ class ChatManagerTest {
     }
 
     @Test
-    fun `mapRetryClicked updates chat items with preview status for message with attachments`() {
-        val messageId = "message_id"
-        val file: AttachmentFile = mock {
-            on { id } doReturn "attachment_id"
-        }
-        val filesAttachment: FilesAttachment = mock {
-            on { files } doReturn arrayOf(file)
-        }
-        val payload = SendMessagePayload(content = "message", messageId = messageId, attachment = filesAttachment)
-        val visitorChatItem = VisitorMessageItem(payload.content, payload.messageId, isError = true)
+    fun `mapRetryClicked resends only the message with the given id`() {
+        val textPayload = OutgoingMessage.Text(content = "message")
+        val filePayload = OutgoingMessage.File(fileId = "attachment_id")
+        val visitorChatItem = VisitorMessageItem(textPayload.content, textPayload.messageId, isError = true)
         val attachmentItem = VisitorAttachmentItem.LocalFile(
-            id = "attachment_id",
-            messageId = messageId,
+            id = filePayload.fileId,
+            messageId = filePayload.messageId,
             attachment = mock(),
             isError = true
         )
-        state.messagePreviews[messageId] = payload
+        state.messagePreviews[textPayload.messageId] = textPayload
+        state.messagePreviews[filePayload.messageId] = filePayload
         state.chatItems.add(visitorChatItem)
         state.chatItems.add(attachmentItem)
-        val tapToRetryItem = TapToRetryItem(payload.messageId)
+        val tapToRetryItem = TapToRetryItem(textPayload.messageId)
         state.chatItems.add(tapToRetryItem)
 
-        val newState = subjectUnderTest.mapRetryClicked(messageId, state)
+        val newState = subjectUnderTest.mapRetryClicked(textPayload.messageId, state)
 
         val updatedMessageItem = newState.chatItems.first() as VisitorMessageItem
-        val updatedAttachmentItem = newState.chatItems[1] as VisitorAttachmentItem
+        val untouchedAttachmentItem = newState.chatItems[1] as VisitorAttachmentItem
         assertFalse(updatedMessageItem.isError)
-        assertFalse(updatedAttachmentItem.isError)
+        assertTrue(untouchedAttachmentItem.isError)
         assertFalse(newState.chatItems.contains(tapToRetryItem))
+        verify(sendUnsentMessagesUseCase).invoke(eq(textPayload), any(), any())
+        verify(sendUnsentMessagesUseCase, never()).invoke(eq(filePayload), any(), any())
     }
 
     @Test
-    fun `mapSendMessageFailed updates chat items with error indicator status for message without attachments`() {
-        val payload = SendMessagePayload(content = "message")
+    fun `mapSendMessageFailed updates chat items with error indicator status for message`() {
+        val payload = OutgoingMessage.Text(content = "message")
         val visitorChatItem = VisitorMessageItem(payload.content, payload.messageId)
         state.messagePreviews[payload.messageId] = payload
         state.chatItems.add(visitorChatItem)
@@ -1008,51 +1020,39 @@ class ChatManagerTest {
     }
 
     @Test
-    fun `mapSendMessageFailed updates chat items with error indicator status for attachments without message`() {
-        val messageId = "message_id"
-        val file: AttachmentFile = mock {
-            on { id } doReturn "attachment_id"
-        }
-        val filesAttachment: FilesAttachment = mock {
-            on { files } doReturn arrayOf(file)
-        }
-        val payload = SendMessagePayload(content = "", messageId = messageId, attachment = filesAttachment)
-        val attachmentItem = VisitorAttachmentItem.LocalFile(id = "attachment_id", messageId = messageId, attachment = mock())
-        state.messagePreviews[messageId] = payload
+    fun `mapSendMessageFailed updates chat items with error indicator status for attachment`() {
+        val payload = OutgoingMessage.File(fileId = "attachment_id")
+        val attachmentItem = VisitorAttachmentItem.LocalFile(id = payload.fileId, messageId = payload.messageId, attachment = mock())
+        state.messagePreviews[payload.messageId] = payload
         state.chatItems.add(attachmentItem)
 
-        val newState = subjectUnderTest.mapSendMessageFailed(messageId, state)
+        val newState = subjectUnderTest.mapSendMessageFailed(payload.messageId, state)
 
         val updatedAttachmentItem = newState.chatItems[0] as VisitorAttachmentItem
         assertTrue(updatedAttachmentItem.isError)
         val tapToRetryItem = newState.chatItems.last() as TapToRetryItem
-        assertEquals(messageId, tapToRetryItem.messageId)
+        assertEquals(payload.messageId, tapToRetryItem.messageId)
     }
 
     @Test
-    fun `mapSendMessageFailed updates chat items with error status for message with attachments`() {
-        val messageId = "message_id"
-        val file: AttachmentFile = mock {
-            on { id } doReturn "attachment_id"
-        }
-        val filesAttachment: FilesAttachment = mock {
-            on { files } doReturn arrayOf(file)
-        }
-        val payload = SendMessagePayload(content = "message", messageId = messageId, attachment = filesAttachment)
-        val visitorChatItem = VisitorMessageItem(payload.content, payload.messageId)
-        val attachmentItem = VisitorAttachmentItem.LocalFile(id = "attachment_id", messageId = messageId, attachment = mock())
-        state.messagePreviews[messageId] = payload
+    fun `mapSendMessageFailed marks only the failed message as error`() {
+        val textPayload = OutgoingMessage.Text(content = "message")
+        val filePayload = OutgoingMessage.File(fileId = "attachment_id")
+        val visitorChatItem = VisitorMessageItem(textPayload.content, textPayload.messageId)
+        val attachmentItem = VisitorAttachmentItem.LocalFile(id = filePayload.fileId, messageId = filePayload.messageId, attachment = mock())
+        state.messagePreviews[textPayload.messageId] = textPayload
+        state.messagePreviews[filePayload.messageId] = filePayload
         state.chatItems.add(visitorChatItem)
         state.chatItems.add(attachmentItem)
 
-        val newState = subjectUnderTest.mapSendMessageFailed(messageId, state)
+        val newState = subjectUnderTest.mapSendMessageFailed(textPayload.messageId, state)
 
         val updatedMessageItem = newState.chatItems.first() as VisitorChatItem
-        val updatedAttachmentItem = newState.chatItems[1] as VisitorAttachmentItem
-        val tapToRetryItem = newState.chatItems[2] as TapToRetryItem
+        val tapToRetryItem = newState.chatItems[1] as TapToRetryItem
+        val untouchedAttachmentItem = newState.chatItems[2] as VisitorAttachmentItem
         assertTrue(updatedMessageItem.isError)
-        assertTrue(updatedAttachmentItem.isError)
-        assertEquals(messageId, tapToRetryItem.messageId)
+        assertEquals(textPayload.messageId, tapToRetryItem.messageId)
+        assertFalse(untouchedAttachmentItem.isError)
     }
 
     @Test

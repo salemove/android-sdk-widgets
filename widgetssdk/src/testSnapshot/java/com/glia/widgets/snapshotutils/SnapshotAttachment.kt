@@ -12,17 +12,17 @@ import org.mockito.kotlin.whenever
 internal interface SnapshotAttachment {
 
     fun remoteAttachment(
-        id: String = "imageId",
-        size: Long = 12345,
-        contentType: String = "image",
-        isDeleted: Boolean = false,
-        name: String = "tricky_plan.jpg"
-    ) = object : AttachmentFile {
-        override fun getId(): String = id
-        override fun getSize(): Long = size
-        override fun getContentType(): String = contentType
-        override fun isDeleted(): Boolean = isDeleted
-        override fun getName(): String = name
+        fileId: String = "imageId",
+        fileSize: Long = 12345,
+        fileContentType: String = "image",
+        fileIsDeleted: Boolean = false,
+        fileName: String = "tricky_plan.jpg"
+    ): AttachmentFile = object : AttachmentFile {
+        override val id: String = fileId
+        override val size: Long = fileSize
+        override val contentType: String = fileContentType
+        override val isDeleted: Boolean = fileIsDeleted
+        override val name: String = fileName
     }
 
     fun visitorAttachmentItemImage(attachment: AttachmentFile = remoteAttachment()): VisitorAttachmentItem.RemoteImage {
@@ -31,10 +31,10 @@ internal interface SnapshotAttachment {
 
     fun visitorAttachmentItemFile(
         attachment: AttachmentFile = remoteAttachment(
-            id = "fileId",
-            size = 1234567890,
-            contentType = "pdf",
-            name = "File Name.pdf"
+            fileId = "fileId",
+            fileSize = 1234567890,
+            fileContentType = "pdf",
+            fileName = "File Name.pdf"
         )
     ): VisitorAttachmentItem.RemoteFile {
         return VisitorAttachmentItem.RemoteFile(
@@ -59,7 +59,7 @@ internal interface SnapshotAttachment {
     fun operatorAttachmentItemFile(
         isFileExists: Boolean = false,
         isDownloading: Boolean = false,
-        attachment: AttachmentFile = remoteAttachment(id = "pdfId", contentType = "pdf", name = "Document.pdf"),
+        attachment: AttachmentFile = remoteAttachment(fileId = "pdfId", fileContentType = "pdf", fileName = "Document.pdf"),
         id: String = "operatorImageId",
         timestamp: Long = 1706534848,
         showChatHead: Boolean = false,

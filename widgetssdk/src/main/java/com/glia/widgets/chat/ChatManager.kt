@@ -2,9 +2,7 @@ package com.glia.widgets.chat
 
 import android.text.format.DateUtils
 import androidx.annotation.VisibleForTesting
-import com.glia.androidsdk.chat.FilesAttachment
 import com.glia.androidsdk.chat.OperatorMessage
-import com.glia.androidsdk.chat.SendMessagePayload
 import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.androidsdk.chat.SystemMessage
 import com.glia.androidsdk.chat.VisitorMessage
@@ -23,12 +21,12 @@ import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.CustomCardChatItem
 import com.glia.widgets.chat.model.GvaButton
 import com.glia.widgets.chat.model.GvaQuickReplies
-import com.glia.widgets.chat.model.LocalAttachmentItem
 import com.glia.widgets.chat.model.MediaUpgradeStartedTimerItem
 import com.glia.widgets.chat.model.NewMessagesDividerItem
 import com.glia.widgets.chat.model.OperatorChatItem
 import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.chat.model.OperatorStatusItem
+import com.glia.widgets.chat.model.OutgoingMessage
 import com.glia.widgets.chat.model.RemoteAttachmentItem
 import com.glia.widgets.chat.model.TapToRetryItem
 import com.glia.widgets.chat.model.VisitorAttachmentItem
@@ -47,6 +45,7 @@ import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.processors.BehaviorProcessor
+import io.reactivex.rxjava3.processors.FlowableProcessor
 import io.reactivex.rxjava3.schedulers.Schedulers
 
 internal class ChatManager(
@@ -68,6 +67,10 @@ internal class ChatManager(
     private val action: BehaviorProcessor<Action> = BehaviorProcessor.create(),
     private val historyLoaded: BehaviorProcessor<Boolean> = BehaviorProcessor.createDefault(false)
 ) {
+    // Send callbacks invoke onChatAction from Core's background threads - BehaviorProcessor.onNext
+    // is not thread-safe, so emissions must go through this serialized wrapper.
+    private val serializedAction: FlowableProcessor<Action> = action.toSerialized()
+
     fun initialize(
         onHistoryLoaded: (hasHistory: Boolean) -> Unit,
         onQuickReplyReceived: (List<GvaButton>) -> Unit,
@@ -104,7 +107,7 @@ internal class ChatManager(
     }
 
     fun onChatAction(action: Action) {
-        this.action.onNext(action)
+        serializedAction.onNext(action)
     }
 
     @VisibleForTesting
@@ -148,11 +151,19 @@ internal class ChatManager(
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe { onQuickReplyReceived(it) }
 
+    // Core invokes send callbacks and emits CHAT_MESSAGE events on background threads, so the
+    // send-success path and the message-stream echo can arrive concurrently. State is mutable and
+    // not thread-safe - hop to the main thread before mapping so `isNew` reconciliation never
+    // processes the same message twice (which duplicated delivered messages).
     @VisibleForTesting
-    fun onMessage(): Flowable<State> = onMessageUseCase().toFlowable(BackpressureStrategy.BUFFER).withLatestFrom(state, ::mapNewMessage)
+    fun onMessage(): Flowable<State> = onMessageUseCase().toFlowable(BackpressureStrategy.BUFFER)
+        .observeOn(AndroidSchedulers.mainThread())
+        .withLatestFrom(state, ::mapNewMessage)
 
     @VisibleForTesting
-    fun onAction(): Flowable<State> = action.withLatestFrom(state, ::mapAction)
+    fun onAction(): Flowable<State> = action
+        .observeOn(AndroidSchedulers.mainThread())
+        .withLatestFrom(state, ::mapAction)
 
     @VisibleForTesting
     fun checkUnsentMessages(state: State) {
@@ -163,9 +174,9 @@ internal class ChatManager(
         sendMessage(payload)
     }
 
-    private fun sendMessage(payload: SendMessagePayload) {
+    private fun sendMessage(payload: OutgoingMessage) {
         sendUnsentMessagesUseCase(payload, {
-            onChatAction(Action.OnMessageSent(it))
+            onChatAction(Action.OnMessageSent(payload.messageId))
         }, {
             onChatAction(Action.OnSendMessageError(payload.messageId))
         })
@@ -179,7 +190,7 @@ internal class ChatManager(
 
         for (index in rawItems.indices.reversed()) {
             val rawMessage = rawItems[index]
-            if (state.isNew(rawMessage)) {
+            if (state.isNew(rawMessage.chatMessage.id)) {
                 appendHistoryChatMessageUseCase(chatItems, rawMessage, index == rawItems.lastIndex)
             }
         }
@@ -196,11 +207,26 @@ internal class ChatManager(
         return state
     }
 
+    /**
+     * Handles a send-API success confirmation: marks the optimistic item with [messageId] as
+     * delivered and tries the next unsent message. Skipped when the message was already
+     * reconciled through the incoming message stream.
+     */
+    @VisibleForTesting
+    fun mapMessageSent(messageId: String, messagesState: State): State {
+        if (messagesState.isNew(messageId)) {
+            appendNewChatMessageUseCase.markMessageDelivered(messageId, messagesState)
+            checkUnsentMessages(messagesState)
+        }
+
+        return messagesState
+    }
+
     @VisibleForTesting
     fun mapNewMessage(chatMessage: ChatMessageInternal, messagesState: State): State {
         check(chatMessage.chatMessage.isValid()) { "Invalid chat message passed -> ${chatMessage.chatMessage}" }
 
-        if (messagesState.isNew(chatMessage)) {
+        if (messagesState.isNew(chatMessage.chatMessage.id)) {
             appendNewChatMessageUseCase(messagesState, chatMessage)
             if (chatMessage.chatMessage is VisitorMessage) {
                 checkUnsentMessages(messagesState)
@@ -238,9 +264,9 @@ internal class ChatManager(
             is Action.OnMediaUpgradeTimerUpdated -> mapMediaUpgradeTimerUpdated(action.formattedValue, state)
             is Action.CustomCardClicked -> mapCustomCardClicked(action, state)
             Action.ChatRestored, Action.None -> state
-            is Action.AttachmentPreviewAdded -> mapAttachmentPreviewAdded(action.attachments, action.payload, state)
+            is Action.AttachmentPreviewAdded -> mapAttachmentPreviewAdded(action.attachment, action.outgoingMessage, state)
             is Action.MessagePreviewAdded -> mapMessagePreviewAdded(action.visitorChatItem, action.payload, state)
-            is Action.OnMessageSent -> mapNewMessage(ChatMessageInternal(action.message), state)
+            is Action.OnMessageSent -> mapMessageSent(action.messageId, state)
             is Action.OnSendMessageError -> mapSendMessageFailed(action.messageId, state)
             is Action.OnRetryClicked -> mapRetryClicked(action.messageId, state)
             is Action.OnSendMessageOperatorOffline -> mapSendMessageOperatorOffline(action.messageId, state)
@@ -289,18 +315,10 @@ internal class ChatManager(
             .takeIf { it != -1 }
             ?.also { chatItems.removeAt(it) }
 
-        val files = (payload.attachment as? FilesAttachment)?.files
-
         val messageIndex = chatItems.indexOfLast { it.id == payload.messageId }
 
         if (messageIndex != -1) {
             chatItems[messageIndex] = (chatItems[messageIndex] as VisitorChatItem).copyWithError(false)
-        }
-
-        files?.forEach { attachment ->
-            val index = chatItems.indexOfLast { it.id == attachment.id }
-
-            chatItems[index] = (chatItems[index] as VisitorChatItem).copyWithError(false)
         }
     }
 
@@ -308,40 +326,26 @@ internal class ChatManager(
     fun mapSendMessageFailed(messageId: String, state: State): State = state.apply {
         val payload = messagePreviews[messageId] ?: return@apply
 
-        val files = (payload.attachment as? FilesAttachment)?.files.orEmpty()
-
         val messageIndex = chatItems.indexOfLast { it.id == payload.messageId }
 
         if (messageIndex != -1) {
             chatItems[messageIndex] = (chatItems[messageIndex] as VisitorChatItem).copyWithError(true)
         }
 
-        files.forEach { attachment ->
-            val index = chatItems.indexOfLast { it.id == attachment.id }
-
-            chatItems[index] = (chatItems[index] as VisitorChatItem).copyWithError(true)
-        }
-
-        val lastItemIndex = if (files.isNotEmpty()) {
-            chatItems.indexOfLast { (it as? LocalAttachmentItem)?.messageId == payload.messageId }
-        } else {
-            messageIndex
-        }
-
-        chatItems.add(lastItemIndex + 1, TapToRetryItem(messageId = payload.messageId))
+        chatItems.add(messageIndex + 1, TapToRetryItem(messageId = payload.messageId))
     }
 
     @VisibleForTesting
-    fun mapMessagePreviewAdded(visitorChatItem: VisitorChatItem, payload: SendMessagePayload, state: State): State = state.apply {
+    fun mapMessagePreviewAdded(visitorChatItem: VisitorChatItem, payload: OutgoingMessage, state: State): State = state.apply {
         val index = indexForMessageItem(chatItems)
         chatItems.add(index, visitorChatItem)
         messagePreviews[payload.messageId] = payload
     }
 
     @VisibleForTesting
-    fun mapAttachmentPreviewAdded(attachments: List<VisitorAttachmentItem>, payload: SendMessagePayload?, state: State): State = state.apply {
-        payload?.also { messagePreviews[it.messageId] = it }
-        chatItems.addAll(attachments)
+    fun mapAttachmentPreviewAdded(attachment: VisitorAttachmentItem, outgoingMessage: OutgoingMessage, state: State): State = state.apply {
+        messagePreviews[attachment.id] = outgoingMessage
+        chatItems.add(attachment)
     }
 
     @VisibleForTesting
@@ -485,7 +489,7 @@ internal class ChatManager(
         val chatItems: MutableList<ChatItem> = mutableListOf(),
         val chatItemIds: MutableSet<String> = mutableSetOf(),
         val preEngagementChatItemIds: LinkedHashSet<String> = linkedSetOf(),
-        val messagePreviews: LinkedHashMap<String, SendMessagePayload> = LinkedHashMap(),
+        val messagePreviews: LinkedHashMap<String, OutgoingMessage> = LinkedHashMap(),
         var lastMessageWithVisibleOperatorImage: OperatorChatItem? = null,
         var operatorStatusItem: OperatorStatusItem? = null,
         var mediaUpgradeTimerItem: MediaUpgradeStartedTimerItem? = null,
@@ -493,7 +497,7 @@ internal class ChatManager(
     ) {
         val immutableChatItems: List<ChatItem> get() = chatItems.toList()
 
-        fun isNew(chatMessageInternal: ChatMessageInternal): Boolean = chatItemIds.add(chatMessageInternal.chatMessage.id)
+        fun isNew(messageId: String): Boolean = chatItemIds.add(messageId)
 
         fun isOperatorChanged(operatorChatItem: OperatorChatItem): Boolean = lastMessageWithVisibleOperatorImage.let {
             lastMessageWithVisibleOperatorImage = operatorChatItem
@@ -518,9 +522,9 @@ internal class ChatManager(
         data class CustomCardClicked(val customCard: CustomCardChatItem, val attachment: SingleChoiceAttachment) : Action
         data object ChatRestored : Action
         data object None : Action
-        data class MessagePreviewAdded(val visitorChatItem: VisitorChatItem, val payload: SendMessagePayload) : Action
-        data class AttachmentPreviewAdded(val attachments: List<VisitorAttachmentItem>, val payload: SendMessagePayload?) : Action
-        data class OnMessageSent(val message: VisitorMessage) : Action
+        data class MessagePreviewAdded(val visitorChatItem: VisitorChatItem, val payload: OutgoingMessage) : Action
+        data class AttachmentPreviewAdded(val attachment: VisitorAttachmentItem, val outgoingMessage: OutgoingMessage) : Action
+        data class OnMessageSent(val messageId: String) : Action
         data class OnSendMessageError(val messageId: String) : Action
         data class OnRetryClicked(val messageId: String) : Action
         data class OnSendMessageOperatorOffline(val messageId: String) : Action

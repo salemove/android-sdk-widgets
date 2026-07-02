@@ -6,9 +6,7 @@ import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
 import com.glia.androidsdk.chat.Chat
 import com.glia.androidsdk.chat.ChatMessage
-import com.glia.androidsdk.chat.SendMessagePayload
-import com.glia.androidsdk.chat.VisitorMessage
-import com.glia.widgets.chat.domain.GliaSendMessageUseCase.Listener
+import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.widgets.di.GliaCore
 import io.mockk.clearAllMocks
 import io.mockk.every
@@ -98,58 +96,50 @@ class GliaChatRepositoryTest {
     }
 
     @Test
-    fun `sendMessage with callback forwards Core result to the callback`() {
-        val payload: SendMessagePayload = mockk()
-        val visitorMessage: VisitorMessage = mockk()
-        val callback: RequestCallback<VisitorMessage?> = mockk(relaxed = true)
+    fun `sendMessage delegates to the current engagement chat`() {
+        val onSuccess: () -> Unit = mockk(relaxed = true)
+        val onFailure: (GliaException) -> Unit = mockk(relaxed = true)
         every { gliaCore.currentEngagement } returns Optional.of(engagement)
-        val sdkCallbackSlot = slot<RequestCallback<VisitorMessage>>()
-        every { chat.sendMessage(payload, capture(sdkCallbackSlot)) } answers {
-            sdkCallbackSlot.captured.onResult(visitorMessage, null)
-        }
 
-        repository.sendMessage(payload, callback)
+        repository.sendMessage("content", MESSAGE_ID, onSuccess, onFailure)
 
-        verify { callback.onResult(visitorMessage, null) }
+        verify { chat.sendMessage("content", MESSAGE_ID, onSuccess, onFailure) }
     }
 
     @Test
-    fun `sendMessage with listener notifies messageSent on success`() {
-        val payload: SendMessagePayload = mockk()
-        val visitorMessage: VisitorMessage = mockk()
-        val listener: Listener = mockk(relaxed = true)
-        every { payload.messageId } returns MESSAGE_ID
-        every { gliaCore.currentEngagement } returns Optional.of(engagement)
-        val sdkCallbackSlot = slot<RequestCallback<VisitorMessage>>()
-        every { chat.sendMessage(payload, capture(sdkCallbackSlot)) } answers {
-            sdkCallbackSlot.captured.onResult(visitorMessage, null)
-        }
+    fun `sendMessage does nothing when there is no current engagement`() {
+        every { gliaCore.currentEngagement } returns Optional.empty()
 
-        repository.sendMessage(payload, listener)
+        repository.sendMessage("content", MESSAGE_ID, {}, {})
 
-        verify { listener.messageSent(visitorMessage) }
-        verify(inverse = true) { listener.error(any(), any()) }
+        verify(inverse = true) { chat.sendMessage(any(), any(), any(), any()) }
     }
 
     @Test
-    fun `sendMessage with listener notifies error with messageId on failure`() {
-        val payload: SendMessagePayload = mockk()
-        val exception = GliaException("error", GliaException.Cause.INTERNAL_ERROR)
-        val listener: Listener = mockk(relaxed = true)
-        every { payload.messageId } returns MESSAGE_ID
+    fun `sendSingleChoiceAttachment delegates to the current engagement chat`() {
+        val attachment: SingleChoiceAttachment = mockk()
+        val onSuccess: () -> Unit = mockk(relaxed = true)
+        val onFailure: (GliaException) -> Unit = mockk(relaxed = true)
         every { gliaCore.currentEngagement } returns Optional.of(engagement)
-        val sdkCallbackSlot = slot<RequestCallback<VisitorMessage>>()
-        every { chat.sendMessage(payload, capture(sdkCallbackSlot)) } answers {
-            sdkCallbackSlot.captured.onResult(null, exception)
-        }
 
-        repository.sendMessage(payload, listener)
+        repository.sendSingleChoiceAttachment(attachment, MESSAGE_ID, onSuccess, onFailure)
 
-        verify { listener.error(exception, MESSAGE_ID) }
-        verify(inverse = true) { listener.messageSent(any()) }
+        verify { chat.sendSingleChoiceAttachment(attachment, MESSAGE_ID, onSuccess, onFailure) }
+    }
+
+    @Test
+    fun `sendFileAttachment delegates to the current engagement chat`() {
+        val onSuccess: () -> Unit = mockk(relaxed = true)
+        val onFailure: (GliaException) -> Unit = mockk(relaxed = true)
+        every { gliaCore.currentEngagement } returns Optional.of(engagement)
+
+        repository.sendFileAttachment(FILE_ID, onSuccess, onFailure)
+
+        verify { chat.sendFileAttachment(FILE_ID, onSuccess, onFailure) }
     }
 
     private companion object {
         const val MESSAGE_ID = "message-id"
+        const val FILE_ID = "file-id"
     }
 }

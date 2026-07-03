@@ -37,7 +37,9 @@ workflows:
                 # debug log
                 set -x
 
-                NEW_VERSION=`./gradlew -q printCurrentVersionName`
+                # Read the version straight from the properties file - Gradle output
+                # is polluted by the Bitrise Gradle Mirrors init script log lines
+                NEW_VERSION=$(grep '^widgets.versionName=' version.properties | cut -d= -f2)
                 NEW_BRANCH_NAME="project-version-increment/${NEW_VERSION}"
                 BASE_BRANCH_NAME="development"
                 MESSAGE="Increment project version to ${NEW_VERSION}"

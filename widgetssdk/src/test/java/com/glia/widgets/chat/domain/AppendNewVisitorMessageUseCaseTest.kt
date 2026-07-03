@@ -185,6 +185,65 @@ class AppendNewVisitorMessageUseCaseTest {
     }
 
     @Test
+    fun `invoke replaces optimistic text with echoed content when message is in previews`() {
+        val messageId = "1"
+        state.messagePreviews[messageId] = OutgoingMessage.Text("local content", messageId)
+        state.chatItems += VisitorMessageItem("local content", messageId, isError = false, timestamp = 1)
+
+        whenever(visitorMessage.content) doReturn "server content"
+        whenever(visitorMessage.timestamp) doReturn 1L
+        whenever(visitorMessage.id) doReturn messageId
+
+        useCase(state, chatMessageInternal)
+
+        val messageItem = state.chatItems.first() as VisitorMessageItem
+        assertEquals("server content", messageItem.message)
+        assertTrue(state.chatItems[1] is DeliveredItem)
+        assertTrue(state.messagePreviews.isEmpty())
+    }
+
+    @Test
+    fun `updateMessageContent replaces the text of the matching message item`() {
+        val messageId = "1"
+        state.chatItems += VisitorMessageItem("local content", messageId, isError = false, timestamp = 1)
+
+        whenever(visitorMessage.content) doReturn "server content"
+        whenever(visitorMessage.id) doReturn messageId
+
+        useCase.updateMessageContent(state, visitorMessage)
+
+        val messageItem = state.chatItems.first() as VisitorMessageItem
+        assertEquals("server content", messageItem.message)
+    }
+
+    @Test
+    fun `updateMessageContent does nothing when echoed content is blank`() {
+        val messageId = "1"
+        val messageItem = VisitorMessageItem("local content", messageId, isError = false, timestamp = 1)
+        state.chatItems += messageItem
+
+        whenever(visitorMessage.content) doReturn " "
+        whenever(visitorMessage.id) doReturn messageId
+
+        useCase.updateMessageContent(state, visitorMessage)
+
+        assertEquals(messageItem, state.chatItems.first())
+    }
+
+    @Test
+    fun `updateMessageContent does nothing when no item matches the message id`() {
+        val messageItem = VisitorMessageItem("local content", "1", isError = false, timestamp = 1)
+        state.chatItems += messageItem
+
+        whenever(visitorMessage.content) doReturn "server content"
+        whenever(visitorMessage.id) doReturn "2"
+
+        useCase.updateMessageContent(state, visitorMessage)
+
+        assertEquals(messageItem, state.chatItems.first())
+    }
+
+    @Test
     fun `markMessageDelivered clears error and adds DeliveredItem after the message item`() {
         val messageId = "1"
         state.chatItems += VisitorMessageItem("content", messageId, isError = true, timestamp = 1)

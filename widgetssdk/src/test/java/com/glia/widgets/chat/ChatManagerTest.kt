@@ -611,6 +611,19 @@ class ChatManagerTest {
     }
 
     @Test
+    fun `mapNewMessage updates visitor message content when message is not new`() {
+        val chatMessageInternal = mockChatMessage<VisitorMessage>()
+        val messageId = chatMessageInternal.chatMessage.id
+        val stateSpy = spy(state)
+        doReturn(false).whenever(stateSpy).isNew(messageId)
+
+        subjectUnderTest.mapNewMessage(chatMessageInternal, stateSpy)
+
+        verify(appendNewChatMessageUseCase, never()).invoke(any(), any())
+        verify(appendNewChatMessageUseCase).updateVisitorMessageContent(chatMessageInternal, stateSpy)
+    }
+
+    @Test
     fun `mapNewMessage calls appendNewChatMessageUseCase when message is new`() {
         val chatMessageInternal = mockChatMessage<OperatorMessage>()
         val messageId = chatMessageInternal.chatMessage.id

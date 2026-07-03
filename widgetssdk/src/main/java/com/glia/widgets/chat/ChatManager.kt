@@ -245,6 +245,10 @@ internal class ChatManager(
                 }
                 put(EventAttribute.MessageType, messageType)
             }
+        } else {
+            // The message was already reconciled through the send-success callback, which carries
+            // no content - the echo is still the source of truth for the displayed text.
+            appendNewChatMessageUseCase.updateVisitorMessageContent(chatMessage, messagesState)
         }
 
         return messagesState

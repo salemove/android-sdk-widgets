@@ -85,6 +85,24 @@ class AppendNewChatMessageUseCaseTest {
     }
 
     @Test
+    fun `updateVisitorMessageContent delegates to appendNewVisitorMessageUseCase when message is Visitor message`() {
+        mockCHatMessage<VisitorMessage>()
+
+        useCase.updateVisitorMessageContent(chatMessageInternal, state)
+
+        verify(appendNewVisitorMessageUseCase).updateMessageContent(state, chatMessage as VisitorMessage)
+    }
+
+    @Test
+    fun `updateVisitorMessageContent does nothing when message is not Visitor message`() {
+        mockCHatMessage<OperatorMessage>()
+
+        useCase.updateVisitorMessageContent(chatMessageInternal, state)
+
+        verify(appendNewVisitorMessageUseCase, never()).updateMessageContent(any(), any())
+    }
+
+    @Test
     fun `markMessageDelivered marks message delivered and resets operator when preview exists`() {
         val realState = spy(ChatManager.State())
         val payload = OutgoingMessage.Text("message")

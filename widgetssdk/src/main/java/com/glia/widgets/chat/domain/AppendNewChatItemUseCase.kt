@@ -51,6 +51,16 @@ internal class AppendNewChatMessageUseCase(
     }
 
     /**
+     * Applies the server-echoed content of an already reconciled visitor message to its chat item.
+     * Used when the send-success callback (which carries no content) reconciled the message before
+     * the echo arrived through the incoming message stream.
+     */
+    fun updateVisitorMessageContent(chatMessageInternal: ChatMessageInternal, state: ChatManager.State) {
+        val message = chatMessageInternal.chatMessage as? VisitorMessage ?: return
+        appendNewVisitorMessageUseCase.updateMessageContent(state, message)
+    }
+
+    /**
      * Marks the optimistically rendered visitor message with [messageId] as delivered once the
      * send API reports success. Does nothing when the message was already reconciled through the
      * incoming message stream (its preview is gone by then).
@@ -172,11 +182,25 @@ internal class AppendNewVisitorMessageUseCase(private val mapVisitorAttachmentUs
 
         if (state.messagePreviews.remove(message.id) != null) {
             state.preEngagementChatItemIds.remove(message.id)
+            updateMessageContent(state, message)
             markMessageDelivered(state, message.id)
             return
         }
 
         addNewMessage(state, message)
+    }
+
+    /**
+     * Replaces the optimistically rendered text with the server-echoed [VisitorMessage.getContent],
+     * which is authoritative (the server may transform the submitted text).
+     */
+    fun updateMessageContent(state: ChatManager.State, message: VisitorMessage) {
+        val content = message.content.takeIf { it.isNotBlank() } ?: return
+        val index = state.chatItems.indexOfLast { it.id == message.id }.takeIf { it != -1 } ?: return
+        val item = state.chatItems[index] as? VisitorMessageItem ?: return
+        if (item.message == content) return
+
+        state.chatItems[index] = item.copy(message = content)
     }
 
     private fun markLastDeliveredItemAsDelivered(state: ChatManager.State) {

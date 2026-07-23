@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'org.jetbrains.kotlin.android'
 
 //Detailed information about advantages of Java toolchain https://developer.android.com/build/jdks#toolchain
 java {
@@ -9,11 +8,11 @@ java {
 }
 
 android {
-  compileSdkVersion 36
+  compileSdk = 37
   defaultConfig {
     applicationId "com.glia.exampleapp"
-    minSdkVersion 24
-    targetSdkVersion 36
+    minSdk = 24
+    targetSdk = 37
     versionCode 1
     versionName "1.0"
 
@@ -83,6 +82,10 @@ android {
       'WrongViewIdFormat',
       'HardcodedText'
   }
+  buildFeatures {
+    // The buildTypes block below uses resValue(); resValues default flipped to false in AGP 9.
+    resValues = true
+  }
   namespace 'com.glia.exampleapp'
 }
 
@@ -101,12 +104,12 @@ afterEvaluate {
 }
 
 dependencies {
-  implementation libs.java.appcompat
-  implementation libs.java.material
-  implementation libs.java.constraintlayout
-  implementation libs.java.navigation.fargment
-  implementation libs.java.navigation.ui
-  implementation libs.java.preference
+  implementation libs.androidx.appcompat
+  implementation libs.material
+  implementation libs.androidx.constraintlayout
+  implementation libs.androidx.navigation.fragment
+  implementation libs.androidx.navigation.ui
+  implementation libs.androidx.preference
   implementation platform(libs.firebase.bom)
   implementation libs.firebase.messaging
 
@@ -114,15 +117,15 @@ dependencies {
   // To test against properly compiled SDK, the SDK is auto-uploaded to local maven with '-SNAPSHOT' suffix
   releaseImplementation "com.glia:android-widgets:${widgetsVersionName}-SNAPSHOT"
 
-  implementation libs.java.core.ktx
+  implementation libs.androidx.core.ktx
 
-  implementation libs.java.ktor.android
-  implementation libs.java.ktor.logging
-  implementation libs.java.coroutines
+  implementation libs.ktor.client.android
+  implementation libs.ktor.client.logging
+  implementation libs.kotlinx.coroutines.android
 
 
-  //debugImplementation libs.test.leakcanary
-  testImplementation libs.test.junit
-  androidTestImplementation libs.test.ext.junit
-  androidTestImplementation libs.test.espresso.core
+  //debugImplementation libs.leakcanary
+  testImplementation libs.junit
+  androidTestImplementation libs.androidx.test.ext.junit
+  androidTestImplementation libs.androidx.test.espresso.core
 }

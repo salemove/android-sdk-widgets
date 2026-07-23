@@ -1,8 +1,10 @@
 import com.vanniktech.maven.publish.AndroidSingleVariantLibrary
 
-apply plugin: 'com.android.library'
-apply plugin: 'org.jetbrains.kotlin.android'
-apply plugin: 'kotlin-parcelize'
+plugins {
+  id 'com.android.library'
+  alias libs.plugins.kotlinParcelize
+}
+
 apply plugin: 'com.vanniktech.maven.publish'
 apply plugin: 'org.jetbrains.dokka-javadoc'
 
@@ -14,10 +16,12 @@ java {
 }
 
 android {
-  compileSdkVersion 35
+  compileSdk = 36
   namespace 'com.glia.widgets'
   defaultConfig {
-    minSdkVersion 24
+    minSdk = 24
+    versionCode widgetsVersionCode
+    versionName widgetsVersionName
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     consumerProguardFiles "consumer-rules.pro"
   }
@@ -37,6 +41,12 @@ android {
     }
   }
 
+  // Workaround for Paparazzi <= 2.0.0-alpha04 incompatibility with Gradle 9.
+  // https://github.com/cashapp/paparazzi/issues/2111
+  tasks.withType(Test).configureEach {
+    reports.html.required = false
+  }
+
   lint {
     disable 'WrongLayoutName',
       'LayoutFileNameMatchesClass',
@@ -53,9 +63,19 @@ android {
     buildConfig true
   }
 
+  // Build runs on JDK 21 (set via java toolchain) so JVMTI can retransform
+  // Android API 36 stub classes during MockK-driven unit tests. The published
+  // AAR is pinned to Java 17 bytecode so integrators on AGP 8.x / JDK 17
+  // remain supported. Kotlin's jvmTarget cascades from targetCompatibility
+  // under AGP 9 built-in Kotlin, so no separate kotlin jvmTarget needed.
+  compileOptions {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+  }
+
   //After adding `Mockk` dependency to the instrumentation tests it started to fail builds with message that
   // there are 6 files in project with these two Licences. Since all of them were related to Junit, it is safe to merge them.
-  packagingOptions {
+  packaging {
     resources {
       merges += ['META-INF/LICENSE.md', 'META-INF/LICENSE-notice.md']
     }
@@ -170,16 +190,16 @@ afterEvaluate {
 apply from: "${rootProject.projectDir}/scripts/direct-core.gradle"
 
 dependencies {
-  implementation libs.java.appcompat
-  implementation libs.java.material
-  implementation libs.java.constraintlayout
-  implementation libs.lifecycle.process
-  implementation libs.media.coil.core
-  implementation libs.media.coil.network
+  implementation libs.androidx.appcompat
+  implementation libs.material
+  implementation libs.androidx.constraintlayout
+  implementation libs.androidx.lifecycle.process
+  implementation libs.coil.core
+  implementation libs.coil.network.okhttp
 
   // Used for audio and video permissions by CallActivity
-  implementation libs.java.rxandroid
-  implementation libs.java.rxjava
+  implementation libs.rxandroid
+  implementation libs.rxjava
 
   releaseApi "${libs.glia.core.get().module}:$gliaSdkVersion"
 
@@ -200,31 +220,35 @@ dependencies {
     }
   }
 
-  implementation libs.media.audioswitch
-  implementation libs.media.lottie
-  implementation libs.data.gson
-  implementation libs.java.core.ktx
-  implementation libs.media.exif.interface
+  implementation libs.audioswitch
+  implementation libs.lottie
+  implementation libs.gson
+  implementation libs.androidx.core.ktx
+  implementation libs.androidx.exifinterface
+  implementation libs.kotlin.parcelize.runtime
+  // AGP 9 built-in Kotlin doesn't auto-register the parcelize compiler plugin via the
+  // kotlin-parcelize Gradle plugin alone, so add the compiler artifact explicitly.
+  kotlinCompilerPluginClasspath "org.jetbrains.kotlin:kotlin-parcelize-compiler:${libs.versions.kotlin.get()}"
 
   implementation platform(libs.firebase.bom)
   implementation libs.firebase.messaging
 
-  testImplementation libs.test.junit
-  testImplementation libs.test.mockito.kotlin
-  testImplementation libs.test.core.testing
-  testImplementation libs.test.robolectric
-  testImplementation libs.test.mockk.android
-  androidTestImplementation libs.test.mockk.android
-  androidTestImplementation libs.test.ext.junit
-  androidTestImplementation libs.test.espresso.core
-  androidTestImplementation libs.test.rules
+  testImplementation libs.junit
+  testImplementation libs.mockito.kotlin
+  testImplementation libs.androidx.arch.core.testing
+  testImplementation libs.robolectric
+  testImplementation libs.mockk.android
+  androidTestImplementation libs.mockk.android
+  androidTestImplementation libs.androidx.test.ext.junit
+  androidTestImplementation libs.androidx.test.espresso.core
+  androidTestImplementation libs.androidx.test.rules
 
   // Test dependencies to Android native libraries
   // To prevent unit tests firing errors like 'Method length in org.json.JSONObject not mocked'
-  testImplementation libs.test.json
+  testImplementation libs.json
 
   lintChecks project(':lint_checker')
-  debugImplementation libs.debug.leakcanary
+  debugImplementation libs.leakcanary
 }
 
 configurations.configureEach {

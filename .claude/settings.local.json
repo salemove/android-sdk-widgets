@@ -1,4 +1,18 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(./gradlew help *)",
+      "Bash(./gradlew build *)",
+      "Bash(./gradlew widgetssdk:assembleDebug)",
+      "Bash(./gradlew widgetssdk:compileDebugKotlin)",
+      "Bash(./gradlew widgetssdk:compileDebugKotlin --info)",
+      "Bash(./gradlew widgetssdk:compileDebugKotlin --debug)",
+      "Bash(./gradlew widgetssdk:dependencies --configuration kotlinCompilerPluginClasspathDebug)",
+      "Bash(./gradlew app:assembleDebug)",
+      "Bash(./gradlew widgetssdk:compileDebugUnitTestKotlin)",
+      "Bash(./gradlew widgetssdk:assembleDebug app:assembleDebug)"
+    ]
+  },
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "mobile-mcp"

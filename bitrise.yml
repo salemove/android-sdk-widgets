@@ -546,5 +546,5 @@ trigger_map:
     workflow: pull_request
 meta:
   bitrise.io:
-    stack: linux-docker-android-22.04
-    machine_type_id: standard
+    stack: ubuntu-latest-stable
+    machine_type_id: g2.linux.medium

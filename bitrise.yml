@@ -255,11 +255,11 @@ workflows:
             - variant: "$DEBUG_VARIANT"
             - project_location: "$PROJECT_LOCATION"
       - gradle-runner@3:
-          title: Generate JavaDoc
+          title: Generate API docs (Dokka HTML)
           inputs:
-            - gradle_task: dokkaGenerate
+            - gradle_task: dokkaGeneratePublicationHtml
       - amazon-s3-upload@3:
-          title: Upload JavaDoc
+          title: Upload API docs
           inputs:
             - secret_access_key: "$AMAZON_AWS_SECRET"
             - upload_bucket: "$AMAZON_AWS_NAME/widgets"

@@ -12,7 +12,7 @@ import java.util.UUID
  *
  * Sends the current [SendMessageRepository] value together with any ready-to-send file
  * attachments through [SecureConversationsRepository]. On a successful send with attachments,
- * the composed message and the attachments are cleared before [onSuccess] is invoked.
+ * the composed message and the attachments are cleared before `onSuccess` is invoked.
  */
 internal class SendSecureMessageUseCase(
     private val sendMessageRepository: SendMessageRepository,

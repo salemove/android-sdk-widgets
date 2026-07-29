@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Fixtures for GliaThemeOverlaysTest.
+
+    They live in the `debug` source set because AGP does not merge resources declared in the unit
+    test source sets (`src/test/res` is silently ignored, verified empirically), and unit tests run
+    against the debug variant. Only the `release` variant is published, so nothing here ships in the
+    AAR. Everything is namespaced `Test.Glia.*` / `glia_test_*` and referenced by tests only.
+
+    Deliberately absent: a redefinition of `GliaTheme`. Overriding that resource here would also
+    re-theme the demo app's debug build, so tests inject their own customization style through
+    `applyGliaThemeOverlays(customizationStyle = ...)` instead. The resource-merge behaviour of a
+    real `GliaTheme` redefinition is covered by the demo app and the snapshot suites.
+-->
+<resources>
+
+    <!-- ============================ Legacy mechanism fixtures ============================ -->
+
+    <!--
+        Reproduces the documented legacy chain exactly:
+        `gliaChatStyle` -> style parenting `Application.Glia.Chat` -> `materialThemeOverlay`
+        parenting `ThemeOverlay.Glia.Chat`.
+    -->
+    <style name="Test.Glia.Legacy.ChatStyle" parent="Application.Glia.Chat">
+        <item name="materialThemeOverlay">@style/Test.Glia.Legacy.Overlay</item>
+    </style>
+
+    <style name="Test.Glia.Legacy.Overlay" parent="ThemeOverlay.Glia.Chat">
+        <item name="gliaBrandPrimaryColor">@color/glia_test_legacy_brand</item>
+        <item name="gliaIconAppBarBack">@drawable/glia_test_legacy_icon</item>
+    </style>
+
+    <!-- A `gliaChatStyle` style that declares no `materialThemeOverlay` at all. -->
+    <style name="Test.Glia.Legacy.ChatStyleWithoutOverlay" parent="Application.Glia.Chat" />
+
+    <!-- Sets an un-prefixed `GliaView` item, the undocumented path that is no longer honoured. -->
+    <style name="Test.Glia.Legacy.ChatStyleWithUnPrefixedItems" parent="Application.Glia.Chat">
+        <item name="materialThemeOverlay">@style/Test.Glia.Legacy.Overlay</item>
+        <item name="brandPrimaryColor">@color/glia_test_unprefixed_brand</item>
+    </style>
+
+    <!-- Second, distinct legacy chain, used to prove the live theme wins over the fallback. -->
+    <style name="Test.Glia.Legacy.ContextChatStyle" parent="Application.Glia.Chat">
+        <item name="materialThemeOverlay">@style/Test.Glia.Legacy.ContextOverlay</item>
+    </style>
+
+    <style name="Test.Glia.Legacy.ContextOverlay" parent="ThemeOverlay.Glia.Chat">
+        <item name="gliaBrandPrimaryColor">@color/glia_test_context_brand</item>
+    </style>
+
+    <!-- Themes that declare `gliaChatStyle` in the live theme hierarchy. -->
+    <style name="Test.Glia.Theme.WithLegacyChatStyle" parent="Theme.Glia.Internal">
+        <item name="gliaChatStyle">@style/Test.Glia.Legacy.ChatStyle</item>
+    </style>
+
+    <style name="Test.Glia.Theme.WithLegacyChatStyleWithoutOverlay" parent="Theme.Glia.Internal">
+        <item name="gliaChatStyle">@style/Test.Glia.Legacy.ChatStyleWithoutOverlay</item>
+    </style>
+
+    <style name="Test.Glia.Theme.WithUnPrefixedLegacyItems" parent="Theme.Glia.Internal">
+        <item name="gliaChatStyle">@style/Test.Glia.Legacy.ChatStyleWithUnPrefixedItems</item>
+    </style>
+
+    <style name="Test.Glia.Theme.WithContextLegacyChatStyle" parent="Theme.Glia.Internal">
+        <item name="gliaChatStyle">@style/Test.Glia.Legacy.ContextChatStyle</item>
+    </style>
+
+    <!--
+        Stand-ins for `Application.Glia.Activity.Style`, the library resource integrators override to
+        carry `gliaChatStyle`. `resolveLegacyThemeOverlay` reads it through a scratch theme; tests
+        inject these instead of redefining the library resource, so that the "no legacy mechanism at
+        all" case stays testable.
+    -->
+    <style name="Test.Glia.Legacy.ActivityStyleWithChatStyle" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="gliaChatStyle">@style/Test.Glia.Legacy.ChatStyle</item>
+    </style>
+
+    <style name="Test.Glia.Legacy.ActivityStyleWithoutChatStyle" parent="Theme.MaterialComponents.DayNight.NoActionBar" />
+
+    <!-- =========================== New mechanism fixtures ============================= -->
+
+    <!--
+        Stands in for a redefined `GliaTheme`. `gliaBrandPrimaryColor` overlaps with the legacy
+        overlay above (customization must win); `gliaIconLeaveQueue` does not (both must apply).
+    -->
+    <style name="Test.Glia.Customization" parent="">
+        <item name="gliaBrandPrimaryColor">@color/glia_test_customization_brand</item>
+        <item name="gliaIconLeaveQueue">@drawable/glia_test_customization_icon</item>
+    </style>
+
+    <!-- Plain host-app theme, deliberately not a Glia theme: used to test `wrapWithGliaTheme`. -->
+    <style name="Test.Glia.Theme.HostApp" parent="Theme.MaterialComponents.DayNight.NoActionBar" />
+
+</resources>

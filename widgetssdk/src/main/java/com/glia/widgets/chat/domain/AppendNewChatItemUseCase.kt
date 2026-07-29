@@ -191,7 +191,7 @@ internal class AppendNewVisitorMessageUseCase(private val mapVisitorAttachmentUs
     }
 
     /**
-     * Replaces the optimistically rendered text with the server-echoed [VisitorMessage.getContent],
+     * Replaces the optimistically rendered text with the server-echoed `VisitorMessage.getContent`,
      * which is authoritative (the server may transform the submitted text).
      */
     fun updateMessageContent(state: ChatManager.State, message: VisitorMessage) {

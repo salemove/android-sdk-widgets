@@ -64,7 +64,7 @@ internal val View.backgroundGradientDrawable: GradientDrawable
 
 /**
  * will update whole background without keeping an old background or stroke
- * in case when the old background differs from [GradientDrawable]
+ * in case when the old background differs from `GradientDrawable`
  */
 internal fun View.applyLayerTheme(layerTheme: LayerTheme?) {
     if (layerTheme?.fill == null && layerTheme?.stroke == null) return

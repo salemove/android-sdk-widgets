@@ -35,7 +35,7 @@ import com.glia.widgets.chat.adapter.CustomCardMessage
  */
 abstract class CustomCardViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     /**
-     * Called to display the data for the specified [ChatMessage]. This method should
+     * Called to display the data for the specified `ChatMessage`. This method should
      * update the content of [itemView] to reflect the item for the given message.
      * Override this function for your own implementation of the message renderer.
      * @param message a chat message with metadata.

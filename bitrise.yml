@@ -325,6 +325,10 @@ workflows:
             - project_location: "$PROJECT_LOCATION"
             - module: "$WIDGET_SDK_MODULE"
             - variant: "$SDK_VARIANT"
+      - gradle-runner@3:
+          title: Check API docs (Dokka HTML, failOnWarning)
+          inputs:
+            - gradle_task: dokkaGeneratePublicationHtml
       - android-unit-test@1:
           title: Unit Test for SDK
           inputs:

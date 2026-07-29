@@ -43,12 +43,12 @@ internal typealias WindowInsetsAnimationCallback = (insets: Insets) -> Unit
 
 /**
  * This class is designed
- * to handle [Insets] changes for SystemBars: [WindowInsetsCompat.Type.systemBars] and Keyboard:
- * [WindowInsetsCompat.Type.ime],
+ * to handle `Insets` changes for SystemBars: `WindowInsetsCompat.Type.systemBars` and Keyboard:
+ * `WindowInsetsCompat.Type.ime`,
  * update the [target] View margins according to that Insets size,
  * and listen to Insets changes during Keyboard animation
  *
- * [WindowCompat.setDecorFitsSystemWindows] should be called, to make callbacks work.
+ * `WindowCompat.setDecorFitsSystemWindows` should be called, to make callbacks work.
  *
  * See [Work with window insets and cutouts](https://developer.android.com/develop/ui/views/layout/insets")
  */

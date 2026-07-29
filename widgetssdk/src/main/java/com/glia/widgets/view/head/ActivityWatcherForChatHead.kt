@@ -36,7 +36,7 @@ internal class ActivityWatcherForChatHead(
     }
 
     /**
-     * Returns last activity that called [Activity.onResume], but didn't call [Activity.onPause] yet
+     * Returns last activity that called `Activity.onResume`, but didn't call `Activity.onPause` yet
      * @return Currently resumed activity.
      */
 

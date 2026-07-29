@@ -37,7 +37,7 @@ import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.R as Material_R
 
 /**
- * [DiffUtil.ItemCallback] for [LocalAttachment] type
+ * `DiffUtil.ItemCallback` for [LocalAttachment] type
  */
 internal class UploadAttachmentItemCallback : DiffUtil.ItemCallback<LocalAttachment>() {
     override fun areItemsTheSame(oldItem: LocalAttachment, newItem: LocalAttachment): Boolean =

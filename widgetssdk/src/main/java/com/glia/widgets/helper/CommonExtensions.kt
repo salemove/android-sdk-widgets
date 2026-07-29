@@ -227,7 +227,7 @@ internal fun throwGliaException(cause: GliaWidgetsException.Cause, lazyMessage: 
  * exception and falls back to [String.hashCode], ensuring the app never crashes
  * due to malformed IDs.
  *
- * * **Purpose:** Ideal for [androidx.recyclerview.widget.RecyclerView.Adapter.getItemId]
+ * * **Purpose:** Ideal for `RecyclerView.Adapter.getItemId`
  * where stable, unique 64-bit IDs are required for correct animations and state preservation.
  */
 internal val String.asStableId: Long

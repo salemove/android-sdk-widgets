@@ -18,7 +18,7 @@ internal class RemoteConfigurationParser(
     resourceProvider: ResourceProvider = Dependencies.resourceProvider
 ) {
     /**
-     * @return [Gson] instance with applied deserializers to parse remote config.
+     * @return `Gson` instance with applied deserializers to parse remote config.
      */
     val defaultGson: Gson by lazy {
         GsonBuilder()

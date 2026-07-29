@@ -1,4 +1,6 @@
 import com.vanniktech.maven.publish.AndroidSingleVariantLibrary
+import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.SourcesJar
 
 plugins {
   id 'com.android.library'
@@ -132,7 +134,13 @@ mavenPublishing {
 
   version = isSnapshot ? widgetsVersionName + "-SNAPSHOT" : widgetsVersionName
   coordinates(group, 'android-widgets', version)
-  configure(new AndroidSingleVariantLibrary('release', true, false/* enable javadoc generation */))
+  // The javadoc jar is built from Dokka's javadoc output and attached to the publication by the
+  // maven-publish plugin itself — no manual Jar task or afterEvaluate wiring needed.
+  configure(new AndroidSingleVariantLibrary(
+    new JavadocJar.Dokka('dokkaGeneratePublicationJavadoc'),
+    new SourcesJar.Sources(),
+    'release'
+  ))
 
   pom {
     excludeOptionalDependencies(it)
@@ -200,25 +208,6 @@ tasks.register("publishCoreSdkToLocalMaven") {
   } else {
     println("Cannot publish Core SDK to local maven repository!")
     println("Core SDK is not configured to be used directly.")
-  }
-}
-
-// For generating Javadoc jar using Dokka
-tasks.register('dokkaJavadocJar', Jar.class) {
-  dependsOn(dokkaGeneratePublicationJavadoc)
-  from(dokkaGeneratePublicationJavadoc)
-  archiveClassifier.set("javadoc")
-}
-
-// CRITICAL: Ensure the Dokka JAR is included in the published artifacts.
-afterEvaluate {
-  publishing {
-    publications {
-      maven(MavenPublication) {
-        // CRITICAL: Add the generated Javadoc jar to the published artifacts.
-        artifact dokkaJavadocJar
-      }
-    }
   }
 }
 

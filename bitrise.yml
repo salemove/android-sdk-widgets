@@ -334,8 +334,7 @@ workflows:
       - gradle-unit-test@2:
           title: Snapshot Test for SDK
           inputs:
-            - unit_test_flags: ''
-            - unit_test_task: "$WIDGET_SDK_MODULE:verifyPaparazziSnapshot"
+            - test_task: "$WIDGET_SDK_MODULE:verifySnapshots"
           is_always_run: true
       - script@1:
           title: Export reports for Snapshot Test for SDK

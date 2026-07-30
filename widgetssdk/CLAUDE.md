@@ -19,14 +19,15 @@ See [root CLAUDE.md](../CLAUDE.md) for project-wide architecture, MVP pattern, D
 | Add/change activity flags | `src/main/AndroidManifest.xml` |
 | Add integrator-visible ProGuard keep | `consumer-rules.pro` |
 | Add internal shrinking rule | `proguard-rules.pro` |
-| Run/record Paparazzi snapshots | `./gradlew widgetssdk:recordPaparazziSnapshot` (snapshot build type only) |
+| Run/record Paparazzi snapshots | `./gradlew widgetssdk:recordSnapshots` / `widgetssdk:verifySnapshots` (nested-build wrappers; set `testBuildType=snapshot` automatically) |
 | Regenerate Javadoc | `./gradlew dokkaGeneratePublicationJavadoc` (Dokka V2) |
 
 ## Conventions
 - Version is owned entirely by `version.properties` at the repo root. Neither `gradle.properties` nor `defaultConfig.versionName` are authoritative — `build.gradle` reads `widgetsVersionName` injected via `scripts/version-updater.gradle`.
-- Paparazzi plugin is applied **inside** the `snapshot` buildTypes block, not at the top level. Tests in `src/test/java` are excluded from the `snapshot` variant by design — `test.java.srcDirs = []` with re-addition only for `testDebug`/`testRelease`. Evidence: `build.gradle` sourceSets block
+- Paparazzi plugin is applied **inside** the `snapshot` buildTypes block, not at the top level. Tests in `src/test/java` are excluded from the `snapshot` variant by design — `test.java.srcDirs = []` **and** `test.kotlin.srcDirs = []` (AGP 9 built-in Kotlin reads the `kotlin` set; clearing only `java` is silently ignored) with re-addition only for `testDebug`/`testRelease`. Evidence: `build.gradle` sourceSets block
+- AGP 9 registers unit-test tasks only for `android.testBuildType` (default `debug`), so snapshot-variant tasks don't exist on a plain checkout. `recordSnapshots`/`verifySnapshots` are `GradleBuild` wrappers that re-run the build with `-PtestBuildType=snapshot` where the real `recordPaparazziSnapshot`/`verifyPaparazziSnapshot` tasks exist. Evidence: `build.gradle`
 - Firebase Messaging is `implementation` but stripped from the published POM via `excludeOptionalDependencies()`. Integrators supply their own FCM service and call `PushNotifications.onNewMessage()`. Never promote `firebase-messaging` to `api`. Evidence: `build.gradle`
-- Paparazzi PNG files are tracked via Git LFS, routed by `.gitattributes` (`widgetssdk/src/test/snapshots/**/*.png`). Never commit raw PNGs.
+- Paparazzi PNG files are tracked via Git LFS, routed by `.gitattributes` (`widgetssdk/src/testSnapshot/snapshots/**/*.png`). Never commit raw PNGs.
 - Dokka task wired into Maven publishing is `dokkaGeneratePublicationJavadoc` (Dokka V2). The `dokkaHtml` task does not exist in this project.
 
 ## Anti-Patterns

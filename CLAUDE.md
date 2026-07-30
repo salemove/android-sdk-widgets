@@ -62,7 +62,7 @@ MVP pattern: View + Controller + Contract interfaces. `ChatController` and `Call
 - Never write new classes in Java — all new code must be Kotlin. When touching an existing Java file for a small, self-contained change, migrate it to Kotlin in the same PR if doing so fits the task's context; leave large/high-churn Java files (e.g., `ControllerFactory.java`, `UseCaseFactory.java`, `RepositoryFactory.java`) for coordinated migration.
 - Always dispose `CompositeDisposable` in `onDestroy(retain = false)`, not in `onPause` or unconditional `onDestroy`.
 - Always declare explicit return types on Kotlin functions and class/file-level variables; local variables may use inference.
-- Always add or update unit tests for every changed layer; always run `recordPaparazziSnapshot` + `verifyPaparazziSnapshot` for any UI change.
+- Always add or update unit tests for every changed layer; always run `recordSnapshots` + `verifySnapshots` for any UI change.
 - MockK and Mockito-Kotlin coexist in the test suite intentionally — do not migrate one to the other.
 
 ## Directory Map

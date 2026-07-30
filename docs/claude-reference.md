@@ -193,7 +193,7 @@ Both channels are required when logging on public API paths:
 
 **`EntryWidget.getView(context)` returns a fresh instance every call.** `Dependencies.entryWidget` is a computed `get()` property, not `by lazy`. Caching the returned view externally causes double-parent attachment exceptions.
 
-**`./gradlew testSnapshotUnitTest` runs zero unit tests by design.** The `test.java.srcDirs = []` configuration removes the default test source set, then re-adds sources only to `testDebug` and `testRelease`. Use `./gradlew widgetssdk:test` for unit tests and `./gradlew widgetssdk:verifyPaparazzi` for snapshot verification.
+**Snapshot-variant test tasks only exist when `testBuildType=snapshot`.** AGP 9 registers unit-test components solely for `android.testBuildType` (default `debug`), so `testSnapshotUnitTest`/`verifyPaparazziSnapshot` are absent on a plain checkout. Use `./gradlew widgetssdk:test` for unit tests and the `./gradlew widgetssdk:verifySnapshots` / `recordSnapshots` wrappers for snapshot tests — they run a nested build with `-PtestBuildType=snapshot`. Unit tests stay out of the snapshot variant via `test.java.srcDirs = []` **and** `test.kotlin.srcDirs = []` (clearing only `java` is a no-op under AGP 9 built-in Kotlin), with sources re-added only to `testDebug`/`testRelease`.
 
 **Screen sharing in Widgets SDK was fully removed (MOB-4366).** It is not deprecated — it was deleted. Any residual references are dead ends. CallVisualizer retains screen sharing capability; that is a separate path.
 
@@ -219,7 +219,7 @@ Both channels are required when logging on public API paths:
 
 **The `use_overlay` bubble flag is deprecated and was reverted once.** The "display inside app" bubble behavior using `use_overlay` was reverted. Current flags: `enableBubbleOutsideApp` and `enableBubbleInsideApp`. Never propose reinstating `use_overlay`.
 
-**Rebasing a branch without re-recording Paparazzi snapshots is a recurring mistake.** After any rebase that touches layout, theme, or resource files, run `./gradlew widgetssdk:recordPaparazzi` before pushing.
+**Rebasing a branch without re-recording Paparazzi snapshots is a recurring mistake.** After any rebase that touches layout, theme, or resource files, run `./gradlew widgetssdk:recordSnapshots` before pushing.
 
 **`@Parcelize` silently no-ops if the kotlin-parcelize compiler artifact is missing from `kotlinCompilerPluginClasspath`.** Under AGP 9 built-in Kotlin, the standalone `org.jetbrains.kotlin.plugin.parcelize` Gradle plugin alone is not enough — the Kotlin compiler classpath stays empty and `@Parcelize`-annotated classes fail with "Class is not abstract and does not implement abstract members" at compile time. The fix is to declare both the runtime (`implementation libs.kotlin.parcelize.runtime`) and the compiler (`kotlinCompilerPluginClasspath "org.jetbrains.kotlin:kotlin-parcelize-compiler:<kotlinVersion>"`) explicitly in `widgetssdk/build.gradle`.
 
@@ -274,8 +274,8 @@ All of the following pins have WHY comments in `gradle/libs.versions.toml` and m
 
 ```
 ./gradlew widgetssdk:test                                       # Unit tests (testDebug + testRelease)
-./gradlew widgetssdk:recordPaparazzi                            # Record/update Paparazzi snapshots
-./gradlew widgetssdk:verifyPaparazzi                            # Verify against stored snapshots
+./gradlew widgetssdk:recordSnapshots                            # Record/update Paparazzi snapshots
+./gradlew widgetssdk:verifySnapshots                            # Verify against stored snapshots
 ./gradlew widgetssdk:lintDebug                                  # Lint SDK (includes custom lint_checker rules)
 ./gradlew ktlintCheck                                           # KtLint check
 ./gradlew ktlintFormat                                          # KtLint format + auto-fix
@@ -351,7 +351,7 @@ Maven Central signing: `ORG_GRADLE_PROJECT_signAllPublications=true` is set by B
 
 - **Push notification layers accumulate regressions.** PN functionality was built incrementally (initial → transcript-from-PN → secure-messaging PN → visitor ID in auth → permissions → dialog simplification). Each layer introduced regressions. The auth/engagement/PN triangle is the highest-risk area.
 
-- **Snapshot updates after rebase are a recurring commit pattern.** Before pushing any rebase, run `./gradlew widgetssdk:recordPaparazzi` and include resulting PNG changes.
+- **Snapshot updates after rebase are a recurring commit pattern.** Before pushing any rebase, run `./gradlew widgetssdk:recordSnapshots` and include resulting PNG changes.
 
 ### Architectural Decisions — Never Revert
 

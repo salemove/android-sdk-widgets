@@ -6,8 +6,8 @@ Parent: [CLAUDE.md](../../../CLAUDE.md) | [docs/claude-reference.md](../../../do
 
 ## Context Loading Order
 1. `java/com/glia/widgets/SnapshotTest.kt` — base class; all defaults live here (device, theme, pixel diff, `_paparazzi` rule)
-2. `../../build.gradle` — `snapshot` buildTypes block where Paparazzi plugin is applied; also shows `test.java.srcDirs = []` exclusion
-3. `../../../.gitattributes` (repo root) — LFS filter for `widgetssdk/src/test/snapshots/**/*.png`
+2. `../../build.gradle` — `snapshot` buildTypes block where Paparazzi plugin is applied; also shows the `test.java.srcDirs = []` + `test.kotlin.srcDirs = []` exclusion and the `verifySnapshots`/`recordSnapshots` wrapper tasks
+3. `../../../.gitattributes` (repo root) — LFS filter for `widgetssdk/src/testSnapshot/snapshots/**/*.png`
 
 ## Where to Look
 | Task | File/Location |
@@ -17,14 +17,15 @@ Parent: [CLAUDE.md](../../../CLAUDE.md) | [docs/claude-reference.md](../../../do
 | Paparazzi plugin config | `widgetssdk/build.gradle` — `snapshot { apply plugin: 'app.cash.paparazzi' }` |
 | Theme helpers | `java/com/glia/widgets/snapshotutils/SnapshotTheme.kt`, `SnapshotThemeConfiguration.kt` |
 | Locale-flake fix | `_paparazzi` rule constructor parameters in `SnapshotTest.kt` |
-| PNG outputs | `widgetssdk/src/test/snapshots/` (Git LFS) |
+| PNG outputs | `widgetssdk/src/testSnapshot/snapshots/` (Git LFS) |
 
 ## Conventions
 - Extend `SnapshotTest` and implement one or more `Snapshot*` interfaces (`SnapshotTheme`, `SnapshotContent`, `SnapshotStrings`, `SnapshotProviders`, etc.) — never duplicate what the base class provides.
 - The Paparazzi JUnit rule is named `_paparazzi` (leading underscore) — this is intentional; do not rename it.
 - Default device `DeviceConfig.PIXEL_4A`, theme `"ThemeOverlay_Glia_Chat_Material"`, max pixel diff `0.001` — override only via the `SnapshotTest` constructor, never by patching globals.
 - Full-width views use the `SnapshotTest.fullWidthRenderMode` companion val (itself a Mockito mock of `RenderingMode`) — do not roll your own per-test `RenderingMode` substitute.
-- After rebasing onto UI changes, always re-run `./gradlew widgetssdk:recordPaparazziSnapshot` — stale PNGs cause false failures in CI.
+- After rebasing onto UI changes, always re-run `./gradlew widgetssdk:recordSnapshots` — stale PNGs cause false failures in CI.
+- **Android Studio**: to get IDE support for these tests (source roots, run gutters), add `testBuildType=snapshot` to `local.properties` and sync, then select the `snapshot` build variant. Revert and re-sync when done — unit tests and snapshot tests can never be active in the IDE at the same time (AGP 9 allows one `testBuildType`).
 
 ## Anti-Patterns
 - **Do NOT add Paparazzi to `debug` or `release` buildTypes** — the plugin injects Kotlin classpaths; moving it out of `snapshot {}` breaks those build types.

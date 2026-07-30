@@ -15,6 +15,20 @@ java {
   }
 }
 
+// AGP 9 creates unit-test components only for the single android.testBuildType (default "debug").
+// Resolution order: -PtestBuildType wins, then local.properties, then "debug".
+// CLI: use the verifySnapshots / recordSnapshots wrapper tasks — they pass the property themselves.
+// Android Studio: to work on snapshot tests in the IDE, add `testBuildType=snapshot` to
+// local.properties, sync, and select the snapshot build variant; revert and re-sync when done
+// (unit tests and snapshot tests can never be active at the same time).
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+  localPropertiesFile.withInputStream { localProperties.load(it) }
+}
+def resolvedTestBuildType = providers.gradleProperty('testBuildType')
+  .getOrElse(localProperties.getProperty('testBuildType', 'debug'))
+
 android {
   compileSdk = 36
   namespace 'com.glia.widgets'
@@ -25,6 +39,8 @@ android {
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     consumerProguardFiles "consumer-rules.pro"
   }
+
+  testBuildType = resolvedTestBuildType
 
   buildTypes {
     configureEach {
@@ -39,12 +55,6 @@ android {
       // Build type used for snapshot testing.
       apply plugin: 'app.cash.paparazzi'
     }
-  }
-
-  // Workaround for Paparazzi <= 2.0.0-alpha04 incompatibility with Gradle 9.
-  // https://github.com/cashapp/paparazzi/issues/2111
-  tasks.withType(Test).configureEach {
-    reports.html.required = false
   }
 
   lint {
@@ -95,12 +105,17 @@ android {
   }
   sourceSets {
     // Exclude the default test directory ("src/test/java") for all build types.
-    // It is necessary to exclude unit tests from snapshot tests.
+    // It is necessary to exclude unit tests from snapshot tests. Under AGP 9 built-in
+    // Kotlin the compiler reads the `kotlin` source-directory set, so it must be
+    // cleared alongside `java` — clearing only `java` is silently ignored.
     test.java.srcDirs = []
+    test.kotlin.srcDirs = []
 
     // Add the default test directory for debug and release build types.
     testDebug.java.srcDirs += ['src/test/java']
+    testDebug.kotlin.srcDirs += ['src/test/java']
     testRelease.java.srcDirs += ['src/test/java']
+    testRelease.kotlin.srcDirs += ['src/test/java']
 
     // Add resource directory for snapshot testing.
     snapshot.res.srcDirs += ['src/testSnapshot/res']
@@ -139,6 +154,26 @@ def excludeOptionalDependencies(mavenPom) {
       it.parent().remove(it)
     }
   }
+}
+
+// The real Paparazzi tasks (verifyPaparazziSnapshot / recordPaparazziSnapshot) only exist when
+// testBuildType is "snapshot" (see above). These wrappers run them in a nested build with the
+// property pre-set, so they work regardless of the active testBuildType and the default checkout
+// keeps the regular unit-test suite on the debug variant.
+tasks.register('verifySnapshots', GradleBuild) {
+  description = 'Verifies Paparazzi screenshot tests against recorded golden images'
+  group = 'verification'
+
+  tasks = [':widgetssdk:verifyPaparazziSnapshot']
+  startParameter.projectProperties = ['testBuildType': 'snapshot']
+}
+
+tasks.register('recordSnapshots', GradleBuild) {
+  description = 'Records Paparazzi golden images for screenshot tests'
+  group = 'verification'
+
+  tasks = [':widgetssdk:recordPaparazziSnapshot']
+  startParameter.projectProperties = ['testBuildType': 'snapshot']
 }
 
 tasks.register('publishSnapshotPublicationToMavenLocal', GradleBuild) {

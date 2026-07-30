@@ -33,7 +33,7 @@ Parent: [CLAUDE.md](../../../../../../../../../CLAUDE.md) | [docs/claude-referen
 - **New screen theme not wired into `UnifiedTheme`** — a `FooTheme` data class that isn't added to `UnifiedTheme` and `RemoteConfiguration.toUnifiedTheme()` is unreachable at runtime.
 - **Hardcoding colors or dimensions in Views** — all values must flow from `GlobalColorsConfig` / theme overlay. Hardcoded values break white-label and operator-configured theming silently.
 - **Extending `UiTheme.kt`** — that class is `@Parcelize` and deprecated. New themeable properties go exclusively through the JSON remote config path.
-- **Skipping snapshot test updates** — every change in this package has visual impact. Run `./gradlew widgetssdk:recordPaparazziSnapshot` and commit updated snapshots.
+- **Skipping snapshot test updates** — every change in this package has visual impact. Run `./gradlew widgetssdk:recordSnapshots` and commit updated snapshots.
 
 ## For AI Agents
 - Never add a new theme property to only `RemoteConfiguration` or only `DefaultTheme` — both files must be edited together or the property is null at runtime with no error.

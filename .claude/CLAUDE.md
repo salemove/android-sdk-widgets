@@ -43,8 +43,8 @@ app/                    # Demo app
 ## Testing Commands
 ```bash
 # Snapshot tests (UI validation)
-./gradlew widgetssdk:recordPaparazziSnapshot  # Generate/update snapshots
-./gradlew widgetssdk:verifyPaparazziSnapshot  # Verify against existing
+./gradlew widgetssdk:recordSnapshots  # Generate/update snapshots
+./gradlew widgetssdk:verifySnapshots  # Verify against existing
 
 # Unit tests
 ./gradlew widgetssdk:test

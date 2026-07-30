@@ -303,6 +303,8 @@ internal class CallController(
         view.emitState(callState)
     }
 
+    override fun getView(): CallContract.View? = view
+
     override fun endEngagementDialogYesClicked() {
         Logger.d(TAG, "endEngagementDialogYesClicked")
         stop()

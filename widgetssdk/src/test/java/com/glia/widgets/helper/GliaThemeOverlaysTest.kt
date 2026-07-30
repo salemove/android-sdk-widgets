@@ -6,6 +6,7 @@ import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
+import androidx.core.content.ContextCompat
 import com.glia.widgets.R
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -265,6 +266,91 @@ internal class GliaThemeOverlaysTest {
         legacyActivityStyle = R.style.Test_Glia_Legacy_ActivityStyleWithChatStyle,
         customizationStyle = R.style.Test_Glia_Customization
     )
+
+    // endregion
+
+    // region attribute resolution
+
+    @Test
+    fun `gliaAttrResourceId returns the resource the theme points at`() {
+        val context = themed(R.style.Theme_Glia_Internal)
+
+        assertEquals(R.color.glia_primary_color, context.gliaAttrResourceId(R.attr.gliaBrandPrimaryColor))
+        assertEquals(R.drawable.ic_baseline_arrow_back, context.gliaAttrResourceId(R.attr.gliaIconAppBarBack))
+    }
+
+    @Test
+    fun `gliaAttrResourceId returns null when the theme does not declare the attribute`() {
+        val context = themed(R.style.Test_Glia_Theme_HostApp)
+
+        assertNull(context.gliaAttrResourceId(R.attr.gliaIconSendMessage))
+        assertEquals(R.drawable.ic_baseline_send, context.gliaAttrResourceId(R.attr.gliaIconSendMessage, R.drawable.ic_baseline_send))
+    }
+
+    @Test
+    fun `gliaAttrDrawableRes resolves icon attributes and falls back when absent`() {
+        val glia = themed(R.style.Theme_Glia_Internal)
+        val host = themed(R.style.Test_Glia_Theme_HostApp)
+
+        assertEquals(
+            R.drawable.ic_baseline_close,
+            glia.gliaAttrDrawableRes(R.attr.gliaIconLeaveQueue, R.drawable.ic_baseline_send)
+        )
+        assertEquals(
+            R.drawable.ic_baseline_send,
+            host.gliaAttrDrawableRes(R.attr.gliaIconLeaveQueue, R.drawable.ic_baseline_send)
+        )
+    }
+
+    @Test
+    fun `gliaAttrColor resolves a colour attribute and falls back when absent`() {
+        val glia = themed(R.style.Theme_Glia_Internal)
+        val host = themed(R.style.Test_Glia_Theme_HostApp)
+
+        assertEquals(
+            ContextCompat.getColor(glia, R.color.glia_primary_color),
+            glia.gliaAttrColor(R.attr.gliaBrandPrimaryColor, R.color.glia_dark_color)
+        )
+        assertEquals(
+            ContextCompat.getColor(host, R.color.glia_dark_color),
+            host.gliaAttrColor(R.attr.gliaBrandPrimaryColor, R.color.glia_dark_color)
+        )
+    }
+
+    @Test
+    fun `gliaAttrBoolean reads the attribute and falls back to the given default`() {
+        val glia = themed(R.style.Theme_Glia_Internal)
+        val host = themed(R.style.Test_Glia_Theme_HostApp)
+        val customized = themed(R.style.Theme_Glia_Internal)
+            .apply { theme.applyStyle(R.style.Test_Glia_Customization_Booleans, true) }
+
+        assertFalse(glia.gliaAttrBoolean(R.attr.whiteLabel))
+        assertFalse(glia.gliaAttrBoolean(R.attr.gliaAlertDialogButtonUseVerticalAlignment))
+        assertTrue(customized.gliaAttrBoolean(R.attr.whiteLabel))
+        assertTrue(customized.gliaAttrBoolean(R.attr.gliaAlertDialogButtonUseVerticalAlignment))
+        assertFalse(host.gliaAttrBoolean(R.attr.whiteLabel))
+        assertTrue(host.gliaAttrBoolean(R.attr.whiteLabel, default = true))
+    }
+
+    @Test
+    fun `the helpers read the composed theme, not the base one`() {
+        val context = themed(R.style.Test_Glia_Theme_WithLegacyChatStyle)
+
+        context.applyGliaThemeOverlays(customizationStyle = R.style.Test_Glia_Customization)
+
+        assertEquals(
+            R.color.glia_test_customization_brand,
+            context.gliaAttrResourceId(R.attr.gliaBrandPrimaryColor)
+        )
+        assertEquals(
+            R.drawable.glia_test_legacy_icon,
+            context.gliaAttrDrawableRes(R.attr.gliaIconAppBarBack, R.drawable.ic_baseline_send)
+        )
+        assertEquals(
+            R.drawable.glia_test_customization_icon,
+            context.gliaAttrDrawableRes(R.attr.gliaIconLeaveQueue, R.drawable.ic_baseline_send)
+        )
+    }
 
     // endregion
 

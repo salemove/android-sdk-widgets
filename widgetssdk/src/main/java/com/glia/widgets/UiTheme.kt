@@ -7,9 +7,6 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.FontRes
 import androidx.core.content.res.ResourcesCompat
 import com.glia.widgets.helper.isAlertDialogButtonUseVerticalAlignment
-import com.glia.widgets.view.configuration.ButtonConfiguration
-import com.glia.widgets.view.configuration.ChatHeadConfiguration
-import com.glia.widgets.view.configuration.TextConfiguration
 import com.glia.widgets.view.configuration.survey.SurveyStyle
 import com.glia.widgets.view.unifiedui.Mergeable
 import com.glia.widgets.view.unifiedui.merge
@@ -166,24 +163,6 @@ internal data class UiTheme(
     val gliaChatHeaderExitQueueButtonTintColor: Int? = null,
 
     /**
-     * Color for Visitor Code numbers
-     */
-    @ColorRes
-    val visitorCodeTextColor: Int? = null,
-
-    /**
-     * Color for Visitor Code number slots background
-     */
-    @ColorRes
-    val visitorCodeBackgroundColor: Int? = null,
-
-    /**
-     * Color for Visitor Code number slots border
-     */
-    @ColorRes
-    val visitorCodeBorderColor: Int? = null,
-
-    /**
      * Allow overriding the view's fontFamily
      */
     @FontRes
@@ -326,22 +305,6 @@ internal data class UiTheme(
     val gliaAlertDialogButtonUseVerticalAlignment: Boolean? = null,
 
     @get:Deprecated("Replaced by Unified Ui")
-    val gliaChoiceCardContentTextConfiguration: TextConfiguration? = null,
-
-    @get:Deprecated("Replaced by Unified Ui")
-    val gliaEndButtonConfiguration: ButtonConfiguration? = null,
-
-    @get:Deprecated("Replaced by Unified Ui")
-    val gliaPositiveButtonConfiguration: ButtonConfiguration? = null,
-
-    @get:Deprecated("Replaced by Unified Ui")
-    val gliaNegativeButtonConfiguration: ButtonConfiguration? = null,
-
-    @get:Deprecated("Replaced by Unified Ui")
-    val gliaNeutralButtonConfiguration: ButtonConfiguration? = null,
-    @get:Deprecated("Replaced by Unified Ui")
-    val chatHeadConfiguration: ChatHeadConfiguration? = null,
-    @get:Deprecated("Replaced by Unified Ui")
     val surveyStyle: SurveyStyle? = null,
 
     //    GVA
@@ -367,9 +330,6 @@ internal data class UiTheme(
         systemNegativeColor = builder.systemNegativeColor,
         visitorMessageBackgroundColor = builder.visitorMessageBackgroundColor,
         visitorMessageTextColor = builder.visitorMessageTextColor,
-        visitorCodeTextColor = builder.visitorCodeTextColor,
-        visitorCodeBackgroundColor = builder.visitorCodeBackgroundColor,
-        visitorCodeBorderColor = builder.visitorCodeBorderColor,
         operatorMessageBackgroundColor = builder.operatorMessageBackgroundColor,
         newMessageDividerColor = builder.newMessageDividerColor,
         newMessageDividerTextColor = builder.newMessageDividerTextColor,
@@ -403,16 +363,10 @@ internal data class UiTheme(
         iconOnHold = builder.iconOnHold,
         whiteLabel = builder.whiteLabel,
         gliaAlertDialogButtonUseVerticalAlignment = builder.gliaAlertDialogButtonUseVerticalAlignment,
-        gliaEndButtonConfiguration = builder.headerEndButtonConfiguration,
-        gliaPositiveButtonConfiguration = builder.positiveButtonConfiguration,
-        gliaNegativeButtonConfiguration = builder.negativeButtonConfiguration,
-        gliaNeutralButtonConfiguration = builder.neutralButtonConfiguration,
         gliaChatStartingCaptionTextColor = builder.chatStartingCaptionTextColor,
         gliaChatStartingHeadingTextColor = builder.chatStartingHeadingTextColor,
         gliaChatStartedCaptionTextColor = builder.chatStartedCaptionTextColor,
         gliaChatStartedHeadingTextColor = builder.chatStartedHeadingTextColor,
-        gliaChoiceCardContentTextConfiguration = builder.choiceCardContentTextConfiguration,
-        chatHeadConfiguration = builder.chatHeadConfiguration,
         surveyStyle = builder.surveyStyle,
         gvaQuickReplyBackgroundColor = builder.gvaQuickReplyBackgroundColor,
         gvaQuickReplyStrokeColor = builder.gvaQuickReplyStrokeColor,
@@ -442,9 +396,6 @@ internal data class UiTheme(
         gliaChatHeaderTitleTintColor = gliaChatHeaderTitleTintColor merge other.gliaChatHeaderTitleTintColor,
         gliaChatHeaderHomeButtonTintColor = gliaChatHeaderHomeButtonTintColor merge other.gliaChatHeaderHomeButtonTintColor,
         gliaChatHeaderExitQueueButtonTintColor = gliaChatHeaderExitQueueButtonTintColor merge other.gliaChatHeaderExitQueueButtonTintColor,
-        visitorCodeTextColor = visitorCodeTextColor merge other.visitorCodeTextColor,
-        visitorCodeBackgroundColor = visitorCodeBackgroundColor merge other.visitorCodeBackgroundColor,
-        visitorCodeBorderColor = visitorCodeBorderColor merge other.visitorCodeBorderColor,
         fontRes = fontRes merge other.fontRes,
         iconAppBarBack = iconAppBarBack merge other.iconAppBarBack,
         iconLeaveQueue = iconLeaveQueue merge other.iconLeaveQueue,
@@ -470,12 +421,6 @@ internal data class UiTheme(
         gliaChatStartedCaptionTextColor = gliaChatStartedCaptionTextColor merge other.gliaChatStartedCaptionTextColor,
         whiteLabel = whiteLabel merge other.whiteLabel,
         gliaAlertDialogButtonUseVerticalAlignment = gliaAlertDialogButtonUseVerticalAlignment merge other.gliaAlertDialogButtonUseVerticalAlignment,
-        gliaChoiceCardContentTextConfiguration = gliaChoiceCardContentTextConfiguration merge other.gliaChoiceCardContentTextConfiguration,
-        gliaEndButtonConfiguration = gliaEndButtonConfiguration merge other.gliaEndButtonConfiguration,
-        gliaPositiveButtonConfiguration = gliaPositiveButtonConfiguration merge other.gliaPositiveButtonConfiguration,
-        gliaNegativeButtonConfiguration = gliaNegativeButtonConfiguration merge other.gliaNegativeButtonConfiguration,
-        gliaNeutralButtonConfiguration = gliaNeutralButtonConfiguration merge other.gliaNeutralButtonConfiguration,
-        chatHeadConfiguration = chatHeadConfiguration merge other.chatHeadConfiguration,
         surveyStyle = surveyStyle merge other.surveyStyle,
         gvaQuickReplyBackgroundColor = gvaQuickReplyBackgroundColor merge other.gvaQuickReplyBackgroundColor,
         gvaQuickReplyStrokeColor = gvaQuickReplyStrokeColor merge other.gvaQuickReplyStrokeColor,
@@ -584,27 +529,6 @@ internal data class UiTheme(
          */
         @ColorRes
         var visitorMessageTextColor: Int? = null
-            private set
-
-        /**
-         * Color for Visitor Code numbers
-         */
-        @ColorRes
-        var visitorCodeTextColor: Int? = null
-            private set
-
-        /**
-         * Color for Visitor Code number slots background
-         */
-        @ColorRes
-        var visitorCodeBackgroundColor: Int? = null
-            private set
-
-        /**
-         * Color for Visitor Code number slots border
-         */
-        @ColorRes
-        var visitorCodeBorderColor: Int? = null
             private set
 
         /**
@@ -869,18 +793,6 @@ internal data class UiTheme(
             private set
         var gliaAlertDialogButtonUseVerticalAlignment: Boolean? = null
             private set
-        var headerEndButtonConfiguration: ButtonConfiguration? = null
-            private set
-        var positiveButtonConfiguration: ButtonConfiguration? = null
-            private set
-        var negativeButtonConfiguration: ButtonConfiguration? = null
-            private set
-        var neutralButtonConfiguration: ButtonConfiguration? = null
-            private set
-        var choiceCardContentTextConfiguration: TextConfiguration? = null
-            private set
-        var chatHeadConfiguration: ChatHeadConfiguration? = null
-            private set
         var surveyStyle: SurveyStyle? = SurveyStyle.Builder().build()
             private set
 
@@ -935,18 +847,6 @@ internal data class UiTheme(
 
         fun setVisitorMessageTextColor(@ColorRes color: Int?) {
             visitorMessageTextColor = color
-        }
-
-        fun setVisitorCodeTextColor(@ColorRes color: Int?) {
-            visitorCodeTextColor = color
-        }
-
-        fun setVisitorCodeBackgroundColor(@ColorRes color: Int?) {
-            visitorCodeBackgroundColor = color
-        }
-
-        fun setVisitorCodeBorderColor(@ColorRes color: Int?) {
-            visitorCodeBorderColor = color
         }
 
         fun setIconCallVisualizerTintColor(@ColorRes color: Int?) {
@@ -1065,22 +965,6 @@ internal data class UiTheme(
             gliaAlertDialogButtonUseVerticalAlignment = value
         }
 
-        fun setHeaderEndButtonConfiguration(configuration: ButtonConfiguration?) {
-            headerEndButtonConfiguration = configuration
-        }
-
-        fun setPositiveButtonConfiguration(configuration: ButtonConfiguration?) {
-            positiveButtonConfiguration = configuration
-        }
-
-        fun setNegativeButtonConfiguration(configuration: ButtonConfiguration?) {
-            negativeButtonConfiguration = configuration
-        }
-
-        fun setNeutralButtonConfiguration(configuration: ButtonConfiguration?) {
-            neutralButtonConfiguration = configuration
-        }
-
         fun setSendMessageButtonTintColor(color: Int?) {
             sendMessageButtonTintColor = color
         }
@@ -1115,14 +999,6 @@ internal data class UiTheme(
 
         fun setChatStartedCaptionTextColor(color: Int?) {
             chatStartedCaptionTextColor = color
-        }
-
-        fun setChoiceCardContentTextConfiguration(textConfiguration: TextConfiguration?) {
-            choiceCardContentTextConfiguration = textConfiguration
-        }
-
-        fun setChatHeadConfiguration(chatHeadConfiguration: ChatHeadConfiguration?) {
-            this.chatHeadConfiguration = chatHeadConfiguration
         }
 
         fun setSurveyStyle(surveyStyle: SurveyStyle?) {
@@ -1179,10 +1055,6 @@ internal data class UiTheme(
             iconPlaceholder = theme.iconPlaceholder
             iconOnHold = theme.iconOnHold
             whiteLabel = theme.whiteLabel
-            headerEndButtonConfiguration = theme.gliaEndButtonConfiguration
-            positiveButtonConfiguration = theme.gliaPositiveButtonConfiguration
-            negativeButtonConfiguration = theme.gliaNegativeButtonConfiguration
-            neutralButtonConfiguration = theme.gliaNeutralButtonConfiguration
             sendMessageButtonTintColor = theme.sendMessageButtonTintColor
             gliaChatBackgroundColor = theme.gliaChatBackgroundColor
             gliaChatHeaderTitleTintColor = theme.gliaChatHeaderTitleTintColor
@@ -1192,8 +1064,6 @@ internal data class UiTheme(
             chatStartingHeadingTextColor = theme.gliaChatStartingHeadingTextColor
             chatStartedCaptionTextColor = theme.gliaChatStartedCaptionTextColor
             chatStartedHeadingTextColor = theme.gliaChatStartedHeadingTextColor
-            choiceCardContentTextConfiguration = theme.gliaChoiceCardContentTextConfiguration
-            chatHeadConfiguration = theme.chatHeadConfiguration
             surveyStyle = theme.surveyStyle
             gvaQuickReplyBackgroundColor = theme.gvaQuickReplyBackgroundColor
             gvaQuickReplyStrokeColor = theme.gvaQuickReplyStrokeColor

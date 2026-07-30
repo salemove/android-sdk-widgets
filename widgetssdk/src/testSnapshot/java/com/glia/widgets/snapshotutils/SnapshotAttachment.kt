@@ -3,6 +3,7 @@ package com.glia.widgets.snapshotutils
 import android.net.Uri
 import androidx.core.net.toUri
 import com.glia.androidsdk.chat.AttachmentFile
+import com.glia.androidsdk.chat.InteractionEntryIdentifiers
 import com.glia.widgets.chat.model.OperatorAttachmentItem
 import com.glia.widgets.chat.model.VisitorAttachmentItem
 import com.glia.widgets.internal.fileupload.model.LocalAttachment
@@ -16,13 +17,16 @@ internal interface SnapshotAttachment {
         fileSize: Long = 12345,
         fileContentType: String = "image",
         fileIsDeleted: Boolean = false,
-        fileName: String = "tricky_plan.jpg"
+        fileName: String = "tricky_plan.jpg",
+        fileUrl: String? = null
     ): AttachmentFile = object : AttachmentFile {
         override val id: String = fileId
         override val size: Long = fileSize
         override val contentType: String = fileContentType
         override val isDeleted: Boolean = fileIsDeleted
         override val name: String = fileName
+        override val url: String? = fileUrl
+        override val interactionEntryIdentifiers: InteractionEntryIdentifiers? = null
     }
 
     fun visitorAttachmentItemImage(attachment: AttachmentFile = remoteAttachment()): VisitorAttachmentItem.RemoteImage {

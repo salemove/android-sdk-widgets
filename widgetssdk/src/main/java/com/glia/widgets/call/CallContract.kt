@@ -25,6 +25,7 @@ internal interface CallContract {
         fun onResume()
         fun onPause()
         fun setView(view: View)
+        fun getView(): View?
         fun onLiveObservationDialogRequested()
         fun endEngagementDialogYesClicked()
         fun endEngagementDialogDismissed()

@@ -35,6 +35,7 @@ import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.SimpleWindowInsetsAndAnimationHandler
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.Utils
+import com.glia.widgets.helper.asActivity
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getColorStateListCompat
 import com.glia.widgets.helper.getFontCompat
@@ -206,6 +207,14 @@ internal class CallView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     }
 
     private fun destroyControllers() {
+        // The retained controller keeps a strong reference to its current view; release it here,
+        // otherwise the destroyed CallActivity stays reachable through this view until the next
+        // CallView attaches. A newer view may have already taken over the controller - leave it be.
+        callController?.let {
+            if (it.getView() == this) {
+                it.onDestroy(context.asActivity() is CallActivity)
+            }
+        }
         callController = null
         dialogController = null
     }

@@ -9,11 +9,13 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import coil3.dispose
 import com.glia.widgets.R
-import com.glia.widgets.UiTheme
 import com.glia.widgets.databinding.OperatorStatusViewBinding
 import com.glia.widgets.helper.addColorFilter
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getColorStateListCompat
+import com.glia.widgets.helper.gliaAttrColor
+import com.glia.widgets.helper.gliaAttrDrawableRes
+import com.glia.widgets.helper.gliaAttrResourceId
 import com.glia.widgets.helper.load
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.view.unifiedui.applyImageColorTheme
@@ -81,6 +83,10 @@ internal class OperatorStatusView @JvmOverloads constructor(
             updateProfilePictureViewSize(operatorImageSize)
         }
 
+        // After the styleable, so `app:rippleTint` stays overridden by the theme's brand colour - the
+        // order `setTheme` used to establish by running after inflation.
+        applyThemeAttributes()
+
         setOnHoldVisibility()
     }
 
@@ -89,21 +95,24 @@ internal class OperatorStatusView @JvmOverloads constructor(
         profilePictureView.dispose()
     }
 
-    fun setTheme(theme: UiTheme) {
-        // icons
-        setPlaceHolderIcon(theme)
-        setOnHoldIcon(theme)
-
-        // colors
-        theme.brandPrimaryColor?.let(::getColorCompat)
-            ?.also(profilePictureBackgroundColorDrawable::setColor)
-        theme.brandPrimaryColor?.let(::getColorCompat)
-            ?.also(binding.rippleAnimation::addColorFilter)
+    /**
+     * The layout resolves each of these attributes declaratively too, but the profile picture needs
+     * its colour in a [GradientDrawable] rather than the plain one `srcCompat` produces, so that the
+     * unified theme can turn it into a gradient later.
+     */
+    private fun applyThemeAttributes() {
+        val brandPrimaryColor = context.gliaAttrColor(R.attr.gliaBrandPrimaryColor, R.color.glia_primary_color)
+        profilePictureBackgroundColorDrawable.setColor(brandPrimaryColor)
+        binding.rippleAnimation.addColorFilter(brandPrimaryColor)
 
         profilePictureView.setLocaleContentDescription(R.string.call_operator_avatar_accessibility_label)
         profilePictureView.setImageDrawable(profilePictureBackgroundColorDrawable)
-        theme.baseLightColor?.let(::getColorStateListCompat)
-            ?.also(placeholderView::setImageTintList)
+
+        placeholderView.setImageResource(context.gliaAttrDrawableRes(R.attr.gliaIconPlaceholder, R.drawable.ic_person))
+        placeholderView.imageTintList =
+            getColorStateListCompat(context.gliaAttrResourceId(R.attr.gliaBaseLightColor, R.color.glia_light_color))
+
+        onHoldOverlayView.setImageResource(context.gliaAttrDrawableRes(R.attr.gliaIconOnHold, R.drawable.ic_pause_circle))
     }
 
     internal fun applyUserImageTheme(userImageTheme: UserImageTheme?) {
@@ -234,13 +243,5 @@ internal class OperatorStatusView @JvmOverloads constructor(
 
     private fun setOnHoldVisibility() {
         onHoldOverlayView.isVisible = isOnHold
-    }
-
-    private fun setPlaceHolderIcon(theme: UiTheme) {
-        theme.iconPlaceholder?.also(placeholderView::setImageResource)
-    }
-
-    private fun setOnHoldIcon(theme: UiTheme) {
-        theme.iconOnHold?.also(onHoldOverlayView::setImageResource)
     }
 }

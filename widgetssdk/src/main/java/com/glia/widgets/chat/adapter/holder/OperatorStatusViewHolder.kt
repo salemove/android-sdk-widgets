@@ -6,12 +6,10 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
-import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.model.OperatorStatusItem
 import com.glia.widgets.databinding.ChatOperatorStatusLayoutBinding
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.helper.getColorCompat
-import com.glia.widgets.helper.getFontCompat
+import com.glia.widgets.helper.gliaAttrFont
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.locale.StringKey
@@ -22,8 +20,7 @@ import com.glia.widgets.view.unifiedui.theme.chat.EngagementStateTheme
 import com.glia.widgets.view.unifiedui.theme.chat.EngagementStatesTheme
 
 internal class OperatorStatusViewHolder(
-    binding: ChatOperatorStatusLayoutBinding,
-    uiTheme: UiTheme
+    binding: ChatOperatorStatusLayoutBinding
 ) : RecyclerView.ViewHolder(binding.root) {
     private val statusPictureView: OperatorStatusView by lazy { binding.statusPictureView }
     private val chatStartingHeadingView: TextView by lazy { binding.chatStartingHeadingView }
@@ -36,7 +33,7 @@ internal class OperatorStatusViewHolder(
     }
 
     init {
-        applyBaseConfig(uiTheme)
+        applyBaseConfig()
         setBaseStrings()
     }
 
@@ -44,14 +41,12 @@ internal class OperatorStatusViewHolder(
         chatStartingCaptionView.setLocaleText(R.string.engagement_connection_screen_message)
     }
 
-    private fun applyBaseConfig(uiTheme: UiTheme) {
-        statusPictureView.setTheme(uiTheme)
-        setStartingHeadingTextColor(uiTheme)
-        setStartingCaptionTextColor(uiTheme)
-        setStartedHeadingTextColor(uiTheme)
-        setStartedCaptionTextColor(uiTheme)
-
-        uiTheme.fontRes?.let(itemView::getFontCompat)?.also {
+    /**
+     * The four text colours come straight from the layout's `?attr/gliaChatStart*` values; only the
+     * theme typeface still has to be applied here, since a `textAppearance` would otherwise win.
+     */
+    private fun applyBaseConfig() {
+        itemView.context.gliaAttrFont()?.also {
             chatStartingHeadingView.setTypeface(it, Typeface.BOLD)
             chatStartingCaptionView.typeface = it
             chatStartedNameView.setTypeface(it, Typeface.BOLD)
@@ -59,26 +54,6 @@ internal class OperatorStatusViewHolder(
             chatStartedCaptionView.setLocaleText(R.string.engagement_connection_screen_message)
         }
         engagementStatesTheme?.operator.also(statusPictureView::applyOperatorTheme)
-    }
-
-    private fun setStartingHeadingTextColor(uiTheme: UiTheme) {
-        uiTheme.gliaChatStartingHeadingTextColor?.let(itemView::getColorCompat)
-            ?.also(chatStartingHeadingView::setTextColor)
-    }
-
-    private fun setStartingCaptionTextColor(uiTheme: UiTheme) {
-        uiTheme.gliaChatStartingCaptionTextColor?.let(itemView::getColorCompat)
-            ?.also(chatStartingCaptionView::setTextColor)
-    }
-
-    private fun setStartedHeadingTextColor(uiTheme: UiTheme) {
-        uiTheme.gliaChatStartedHeadingTextColor?.let(itemView::getColorCompat)
-            ?.also(chatStartedNameView::setTextColor)
-    }
-
-    private fun setStartedCaptionTextColor(uiTheme: UiTheme) {
-        uiTheme.gliaChatStartedCaptionTextColor?.let(itemView::getColorCompat)
-            ?.also(chatStartedCaptionView::setTextColor)
     }
 
     fun bind(item: OperatorStatusItem) {

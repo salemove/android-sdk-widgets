@@ -1,7 +1,6 @@
 package com.glia.widgets.chat.adapter.holder
 
 import com.glia.widgets.SnapshotTest
-import com.glia.widgets.UiTheme
 import com.glia.widgets.databinding.ChatNewMessagesDividerLayoutBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.snapshotutils.SnapshotChatScreen
@@ -60,8 +59,7 @@ internal class NewMessagesDividerViewHolderSnapshotTest : SnapshotTest(
         }
 
         return NewMessagesDividerViewHolder(
-            ChatNewMessagesDividerLayoutBinding.inflate(layoutInflater),
-            UiTheme()
+            ChatNewMessagesDividerLayoutBinding.inflate(layoutInflater)
         )
     }
 }

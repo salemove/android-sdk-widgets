@@ -3,7 +3,6 @@ package com.glia.widgets.chat.adapter.holder
 import androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
-import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.adapter.ChatAdapter
 import com.glia.widgets.chat.adapter.GvaGalleryAdapter
 import com.glia.widgets.chat.model.GvaGalleryCard
@@ -15,10 +14,9 @@ import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 internal class GvaGalleryViewHolder(
     private val contentBinding: ChatGvaGalleryLayoutBinding,
     buttonsClickListener: ChatAdapter.OnGvaButtonsClickListener,
-    uiTheme: UiTheme,
     unifiedTheme: UnifiedTheme? = Dependencies.gliaThemeManager.theme
-) : OperatorBaseViewHolder(contentBinding.root, contentBinding.chatHeadView, uiTheme, unifiedTheme) {
-    private val adapter = GvaGalleryAdapter(buttonsClickListener, uiTheme, unifiedTheme)
+) : OperatorBaseViewHolder(contentBinding.root, contentBinding.chatHeadView, unifiedTheme) {
+    private val adapter = GvaGalleryAdapter(buttonsClickListener, unifiedTheme)
 
     init {
         contentBinding.cardRecyclerView.adapter = adapter

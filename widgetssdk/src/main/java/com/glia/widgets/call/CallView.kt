@@ -418,7 +418,6 @@ internal class CallView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     private fun setupViewAppearance() {
         setAppBarTheme()
         // icons
-        operatorStatusView.setTheme(theme)
         operatorStatusView.applyOperatorTheme(callTheme?.connect?.operator)
 
         theme.iconCallChat?.also(chatButton::setImageResource)

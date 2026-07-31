@@ -8,14 +8,11 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
-import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.databinding.ChatOperatorMessageLayoutBinding
 import com.glia.widgets.databinding.ChatReceiveMessageContentBinding
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.helper.getColorCompat
-import com.glia.widgets.helper.getColorStateListCompat
-import com.glia.widgets.helper.getFontCompat
+import com.glia.widgets.helper.gliaAttrFont
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.locale.StringKey
@@ -27,8 +24,7 @@ import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.chat.MessageBalloonTheme
 
 internal class OperatorMessageViewHolder(
-    private val binding: ChatOperatorMessageLayoutBinding,
-    private val uiTheme: UiTheme
+    private val binding: ChatOperatorMessageLayoutBinding
 ) : RecyclerView.ViewHolder(binding.root) {
     private val operatorTheme: MessageBalloonTheme? by lazy {
         Dependencies.gliaThemeManager.theme?.chatTheme?.operatorMessage
@@ -39,13 +35,8 @@ internal class OperatorMessageViewHolder(
             binding.contentLayout,
             false
         ).root.apply {
-            uiTheme.operatorMessageBackgroundColor?.let(::getColorStateListCompat)?.also {
-                backgroundTintList = it
-            }
-            uiTheme.operatorMessageTextColor?.let(::getColorCompat)?.also(::setTextColor)
-            uiTheme.operatorMessageTextColor?.let(::getColorCompat)?.also(::setLinkTextColor)
-
-            uiTheme.fontRes?.let(::getFontCompat)?.also(::setTypeface)
+            // The bubble's colours come from the layout's `?attr/gliaOperatorMessage*`.
+            context.gliaAttrFont()?.also(::setTypeface)
 
             importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
 
@@ -60,7 +51,6 @@ internal class OperatorMessageViewHolder(
     }
 
     private fun setupOperatorStatusView() {
-        binding.chatHeadView.setTheme(uiTheme)
         binding.chatHeadView.setShowRippleAnimation(false)
         binding.chatHeadView.applyUserImageTheme(operatorTheme?.userImage)
     }
@@ -83,10 +73,7 @@ internal class OperatorMessageViewHolder(
     ) {
         val singleChoiceCardView = SingleChoiceCardView(itemView.context)
         singleChoiceCardView.setOnOptionClickedListener(onOptionClickedListener)
-        singleChoiceCardView.setData(
-            item,
-            uiTheme
-        )
+        singleChoiceCardView.setData(item)
         val params = FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT

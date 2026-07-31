@@ -6,7 +6,6 @@ import androidx.annotation.IntDef
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.androidsdk.chat.AttachmentFile
-import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.adapter.holder.CustomCardViewHolder
 import com.glia.widgets.chat.adapter.holder.DeliveredItemViewHolder
 import com.glia.widgets.chat.adapter.holder.GvaGalleryViewHolder
@@ -63,7 +62,6 @@ import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.glia.widgets.view.SingleChoiceCardView.OnOptionClickedListener
 
 internal class ChatAdapter(
-    private val uiTheme: UiTheme,
     private val onRetryClickListener: OnRetryClickListener,
     private val onOptionClickedListener: OnOptionClickedListener,
     private val onFileItemClickListener: OnFileItemClickListener,
@@ -82,7 +80,7 @@ internal class ChatAdapter(
         val inflater = parent.layoutInflater
         return when (viewType) {
             OPERATOR_STATUS_VIEW_TYPE ->
-                OperatorStatusViewHolder(ChatOperatorStatusLayoutBinding.inflate(inflater, parent, false), uiTheme)
+                OperatorStatusViewHolder(ChatOperatorStatusLayoutBinding.inflate(inflater, parent, false))
 
             VISITOR_FILE_VIEW_TYPE ->
                 VisitorFileAttachmentViewHolder(
@@ -106,8 +104,7 @@ internal class ChatAdapter(
             VISITOR_MESSAGE_TYPE -> {
                 VisitorMessageViewHolder(
                     ChatVisitorMessageLayoutBinding.inflate(inflater, parent, false),
-                    onRetryClickListener,
-                    uiTheme
+                    onRetryClickListener
                 )
             }
 
@@ -118,7 +115,6 @@ internal class ChatAdapter(
                     getImageFileFromDownloadsUseCase,
                     getImageFileFromNetworkUseCase,
                     schedulers,
-                    uiTheme,
                     onImageItemClickListener
                 )
             }
@@ -126,20 +122,19 @@ internal class ChatAdapter(
             OPERATOR_FILE_VIEW_TYPE ->
                 OperatorFileAttachmentViewHolder(
                     ChatAttachmentOperatorFileLayoutBinding.inflate(inflater, parent, false),
-                    uiTheme,
                     onFileItemClickListener
                 )
 
             OPERATOR_MESSAGE_VIEW_TYPE ->
-                OperatorMessageViewHolder(ChatOperatorMessageLayoutBinding.inflate(inflater, parent, false), uiTheme)
+                OperatorMessageViewHolder(ChatOperatorMessageLayoutBinding.inflate(inflater, parent, false))
 
             MEDIA_UPGRADE_ITEM_TYPE ->
-                MediaUpgradeStartedViewHolder(ChatMediaUpgradeLayoutBinding.inflate(inflater, parent, false), uiTheme)
+                MediaUpgradeStartedViewHolder(ChatMediaUpgradeLayoutBinding.inflate(inflater, parent, false))
 
             NEW_MESSAGES_DIVIDER_TYPE ->
-                NewMessagesDividerViewHolder(ChatNewMessagesDividerLayoutBinding.inflate(inflater, parent, false), uiTheme)
+                NewMessagesDividerViewHolder(ChatNewMessagesDividerLayoutBinding.inflate(inflater, parent, false))
 
-            SYSTEM_MESSAGE_TYPE -> SystemMessageViewHolder(ChatReceiveMessageContentBinding.inflate(inflater, parent, false), uiTheme)
+            SYSTEM_MESSAGE_TYPE -> SystemMessageViewHolder(ChatReceiveMessageContentBinding.inflate(inflater, parent, false))
 
             GVA_RESPONSE_TEXT_TYPE, GVA_QUICK_REPLIES_TYPE -> {
                 val operatorMessageBinding = ChatOperatorMessageLayoutBinding.inflate(inflater, parent, false)
@@ -149,8 +144,7 @@ internal class ChatAdapter(
                         inflater,
                         operatorMessageBinding.contentLayout,
                         true
-                    ),
-                    uiTheme
+                    )
                 )
             }
 
@@ -163,19 +157,17 @@ internal class ChatAdapter(
                         operatorMessageBinding.contentLayout,
                         true
                     ),
-                    onGvaButtonsClickListener,
-                    uiTheme
+                    onGvaButtonsClickListener
                 )
             }
 
             GVA_GALLERY_CARDS_TYPE ->
-                GvaGalleryViewHolder(ChatGvaGalleryLayoutBinding.inflate(inflater, parent, false), onGvaButtonsClickListener, uiTheme)
+                GvaGalleryViewHolder(ChatGvaGalleryLayoutBinding.inflate(inflater, parent, false), onGvaButtonsClickListener)
 
-            DELIVERED_ITEM_TYPE -> DeliveredItemViewHolder(ChatDeliveredItemLayoutBinding.inflate(inflater, parent, false), uiTheme)
+            DELIVERED_ITEM_TYPE -> DeliveredItemViewHolder(ChatDeliveredItemLayoutBinding.inflate(inflater, parent, false))
 
             TAP_TO_RETRY_ITEM_TYPE -> TapToRetryItemViewHolder(
                 ChatTapToRetryItemLayoutBinding.inflate(inflater, parent, false),
-                uiTheme,
                 onRetryClickListener
             )
 

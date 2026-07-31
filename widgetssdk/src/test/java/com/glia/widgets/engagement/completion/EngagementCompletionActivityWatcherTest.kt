@@ -1,19 +1,15 @@
 package com.glia.widgets.engagement.completion
 
-import android.CONTEXT_EXTENSIONS_CLASS_PATH
 import android.LOGGER_PATH
 import android.app.Activity
-import android.content.Context
 import android.os.Parcelable
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import com.glia.androidsdk.engagement.Survey
-import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.helper.GliaActivityManager
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.OneTimeEvent
-import com.glia.widgets.helper.withRuntimeTheme
 import com.glia.widgets.launcher.ActivityLauncher
 import com.glia.widgets.view.Dialogs
 import io.mockk.Runs
@@ -49,12 +45,11 @@ class EngagementCompletionActivityWatcherTest {
         RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
 
         mockkObject(Dialogs)
-        mockkStatic(CONTEXT_EXTENSIONS_CLASS_PATH)
 
         dialog = mockk(relaxed = true)
-        every { Dialogs.showOperatorEndedEngagementDialog(any(), any(), any()) } returns dialog
-        every { Dialogs.showNoMoreOperatorsAvailableDialog(any(), any(), any()) } returns dialog
-        every { Dialogs.showUnexpectedErrorDialog(any(), any(), any()) } returns dialog
+        every { Dialogs.showOperatorEndedEngagementDialog(any(), any()) } returns dialog
+        every { Dialogs.showNoMoreOperatorsAvailableDialog(any(), any()) } returns dialog
+        every { Dialogs.showUnexpectedErrorDialog(any(), any()) } returns dialog
 
         gliaActivityManager = mockk(relaxed = true)
 
@@ -76,7 +71,6 @@ class EngagementCompletionActivityWatcherTest {
         confirmVerified(controller)
 
         unmockkObject(Dialogs)
-        unmockkStatic(CONTEXT_EXTENSIONS_CLASS_PATH)
     }
 
     @Test
@@ -98,9 +92,9 @@ class EngagementCompletionActivityWatcherTest {
         verify(exactly = 2) { event.value }
 
         verify(exactly = 0) { event.consume(any()) }
-        verify(exactly = 0) { Dialogs.showOperatorEndedEngagementDialog(any(), any(), any()) }
-        verify(exactly = 0) { Dialogs.showNoMoreOperatorsAvailableDialog(any(), any(), any()) }
-        verify(exactly = 0) { Dialogs.showUnexpectedErrorDialog(any(), any(), any()) }
+        verify(exactly = 0) { Dialogs.showOperatorEndedEngagementDialog(any(), any()) }
+        verify(exactly = 0) { Dialogs.showNoMoreOperatorsAvailableDialog(any(), any()) }
+        verify(exactly = 0) { Dialogs.showUnexpectedErrorDialog(any(), any()) }
 
         verify(exactly = 0) { activity.startActivity(any()) }
         verify(exactly = 0) { gliaActivityManager.finishActivities() }
@@ -126,9 +120,9 @@ class EngagementCompletionActivityWatcherTest {
 
         verify { gliaActivityManager.finishActivities() }
 
-        verify(exactly = 0) { Dialogs.showOperatorEndedEngagementDialog(any(), any(), any()) }
-        verify(exactly = 0) { Dialogs.showNoMoreOperatorsAvailableDialog(any(), any(), any()) }
-        verify(exactly = 0) { Dialogs.showUnexpectedErrorDialog(any(), any(), any()) }
+        verify(exactly = 0) { Dialogs.showOperatorEndedEngagementDialog(any(), any()) }
+        verify(exactly = 0) { Dialogs.showNoMoreOperatorsAvailableDialog(any(), any()) }
+        verify(exactly = 0) { Dialogs.showUnexpectedErrorDialog(any(), any()) }
 
         verify(exactly = 0) { activity.startActivity(any()) }
 
@@ -155,9 +149,9 @@ class EngagementCompletionActivityWatcherTest {
         verify(exactly = 1) { event.value }
 
         verify(exactly = 0) { event.consume(any()) }
-        verify(exactly = 0) { Dialogs.showOperatorEndedEngagementDialog(any(), any(), any()) }
-        verify(exactly = 0) { Dialogs.showNoMoreOperatorsAvailableDialog(any(), any(), any()) }
-        verify(exactly = 0) { Dialogs.showUnexpectedErrorDialog(any(), any(), any()) }
+        verify(exactly = 0) { Dialogs.showOperatorEndedEngagementDialog(any(), any()) }
+        verify(exactly = 0) { Dialogs.showNoMoreOperatorsAvailableDialog(any(), any()) }
+        verify(exactly = 0) { Dialogs.showUnexpectedErrorDialog(any(), any()) }
 
         verify(exactly = 0) { activity.startActivity(any()) }
         verify(exactly = 0) { gliaActivityManager.finishActivities() }
@@ -181,15 +175,15 @@ class EngagementCompletionActivityWatcherTest {
         verify(exactly = 1) { event.value }
 
         verify(exactly = 0) { event.consume(any()) }
-        verify(exactly = 0) { Dialogs.showOperatorEndedEngagementDialog(any(), any(), any()) }
-        verify(exactly = 0) { Dialogs.showUnexpectedErrorDialog(any(), any(), any()) }
+        verify(exactly = 0) { Dialogs.showOperatorEndedEngagementDialog(any(), any()) }
+        verify(exactly = 0) { Dialogs.showUnexpectedErrorDialog(any(), any()) }
 
         verify(exactly = 0) { activity.startActivity(any()) }
         verify(exactly = 0) { gliaActivityManager.finishActivities() }
 
         val dialogCallbackSlot = slot<View.OnClickListener>()
 
-        verify { Dialogs.showNoMoreOperatorsAvailableDialog(activity, any(), capture(dialogCallbackSlot)) }
+        verify { Dialogs.showNoMoreOperatorsAvailableDialog(activity, capture(dialogCallbackSlot)) }
 
         verify(exactly = 0) { dialog.dismiss() }
         verify(exactly = 0) { gliaActivityManager.finishActivities() }
@@ -218,15 +212,15 @@ class EngagementCompletionActivityWatcherTest {
         verify(exactly = 1) { event.value }
 
         verify(exactly = 0) { event.consume(any()) }
-        verify(exactly = 0) { Dialogs.showOperatorEndedEngagementDialog(any(), any(), any()) }
-        verify(exactly = 0) { Dialogs.showNoMoreOperatorsAvailableDialog(any(), any(), any()) }
+        verify(exactly = 0) { Dialogs.showOperatorEndedEngagementDialog(any(), any()) }
+        verify(exactly = 0) { Dialogs.showNoMoreOperatorsAvailableDialog(any(), any()) }
 
         verify(exactly = 0) { activity.startActivity(any()) }
         verify(exactly = 0) { gliaActivityManager.finishActivities() }
 
         val dialogCallbackSlot = slot<View.OnClickListener>()
 
-        verify { Dialogs.showUnexpectedErrorDialog(activity, any(), capture(dialogCallbackSlot)) }
+        verify { Dialogs.showUnexpectedErrorDialog(activity, capture(dialogCallbackSlot)) }
 
         verify(exactly = 0) { dialog.dismiss() }
         verify(exactly = 0) { gliaActivityManager.finishActivities() }
@@ -255,15 +249,15 @@ class EngagementCompletionActivityWatcherTest {
         verify(exactly = 1) { event.value }
 
         verify(exactly = 0) { event.consume(any()) }
-        verify(exactly = 0) { Dialogs.showUnexpectedErrorDialog(any(), any(), any()) }
-        verify(exactly = 0) { Dialogs.showNoMoreOperatorsAvailableDialog(any(), any(), any()) }
+        verify(exactly = 0) { Dialogs.showUnexpectedErrorDialog(any(), any()) }
+        verify(exactly = 0) { Dialogs.showNoMoreOperatorsAvailableDialog(any(), any()) }
 
         verify(exactly = 0) { activity.startActivity(any()) }
         verify(exactly = 0) { gliaActivityManager.finishActivities() }
 
         val dialogCallbackSlot = slot<View.OnClickListener>()
 
-        verify { Dialogs.showOperatorEndedEngagementDialog(activity, any(), capture(dialogCallbackSlot)) }
+        verify { Dialogs.showOperatorEndedEngagementDialog(activity, capture(dialogCallbackSlot)) }
 
         verify(exactly = 0) { dialog.dismiss() }
         verify(exactly = 0) { gliaActivityManager.finishActivities() }
@@ -292,9 +286,9 @@ class EngagementCompletionActivityWatcherTest {
         verify { activity.isFinishing }
         verify(exactly = 1) { event.value }
 
-        verify(exactly = 0) { Dialogs.showUnexpectedErrorDialog(any(), any(), any()) }
-        verify(exactly = 0) { Dialogs.showNoMoreOperatorsAvailableDialog(any(), any(), any()) }
-        verify(exactly = 0) { Dialogs.showOperatorEndedEngagementDialog(any(), any(), any()) }
+        verify(exactly = 0) { Dialogs.showUnexpectedErrorDialog(any(), any()) }
+        verify(exactly = 0) { Dialogs.showNoMoreOperatorsAvailableDialog(any(), any()) }
+        verify(exactly = 0) { Dialogs.showOperatorEndedEngagementDialog(any(), any()) }
 
         verify { event.consume(any()) }
 
@@ -308,15 +302,7 @@ class EngagementCompletionActivityWatcherTest {
 
 }
 
-private inline fun <reified T : Activity> mockkActivity(uiTheme: UiTheme = UiTheme()): T {
-    val activity: T = mockk(relaxed = true)
-
-    every { any<Activity>().withRuntimeTheme(captureLambda()) } answers {
-        secondArg<(Context, UiTheme) -> Unit>().invoke(activity, uiTheme)
-    }
-
-    return activity
-}
+private inline fun <reified T : Activity> mockkActivity(): T = mockk(relaxed = true)
 
 private fun createMockEvent(state: EngagementCompletionState): OneTimeEvent<EngagementCompletionState> {
     val event: OneTimeEvent<EngagementCompletionState> = mockk(relaxed = true)

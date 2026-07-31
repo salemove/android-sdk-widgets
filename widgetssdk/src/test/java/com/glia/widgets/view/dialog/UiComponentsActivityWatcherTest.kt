@@ -1,20 +1,15 @@
 package com.glia.widgets.view.dialog
 
-import android.CONTEXT_EXTENSIONS_CLASS_PATH
-import android.app.Activity
-import android.content.Context
 import android.mock
 import android.mockkOneTimeEvent
 import android.unMock
 import android.view.View
 import androidx.appcompat.app.AlertDialog
-import com.glia.widgets.UiTheme
 import com.glia.widgets.call.CallActivity
 import com.glia.widgets.chat.Intention
 import com.glia.widgets.helper.GliaActivityManager
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.OneTimeEvent
-import com.glia.widgets.helper.withRuntimeTheme
 import com.glia.widgets.launcher.ActivityLauncher
 import com.glia.widgets.view.Dialogs
 import com.glia.widgets.view.snackbar.SnackBarDelegate
@@ -48,7 +43,6 @@ internal class UiComponentsActivityWatcherTest {
         RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
 
         Logger.mock()
-        mockkStatic(CONTEXT_EXTENSIONS_CLASS_PATH)
         mockkObject(Dialogs)
 
         stateFlowable = PublishProcessor.create()
@@ -75,7 +69,6 @@ internal class UiComponentsActivityWatcherTest {
 
         Logger.unMock()
         unmockkObject(Dialogs)
-        unmockkStatic(CONTEXT_EXTENSIONS_CLASS_PATH)
     }
 
     private val skippingMatcher: (String) -> Boolean = { it.contains("skipping..") }
@@ -123,7 +116,7 @@ internal class UiComponentsActivityWatcherTest {
 
         val dialog: AlertDialog = mockk(relaxed = true)
         val positiveButtonSlot = slot<View.OnClickListener>()
-        every { Dialogs.showPushNotificationsPermissionDialog(any(), any(), any()) } returns dialog
+        every { Dialogs.showPushNotificationsPermissionDialog(any(), any()) } returns dialog
 
         watcher.onActivityResumed(activity)
         val onAllow = mockk<() -> Unit>(relaxed = true)
@@ -131,7 +124,7 @@ internal class UiComponentsActivityWatcherTest {
         stateFlowable.onNext(event)
 
         verify(exactly = 0) { Logger.d(any(), match(skippingMatcher)) }
-        verify { Dialogs.showPushNotificationsPermissionDialog(any(), any(), capture(positiveButtonSlot)) }
+        verify { Dialogs.showPushNotificationsPermissionDialog(any(), capture(positiveButtonSlot)) }
 
         positiveButtonSlot.captured.onClick(mockk(relaxed = true))
         verify { event.markConsumed() }
@@ -144,7 +137,7 @@ internal class UiComponentsActivityWatcherTest {
         val activity = mockkActivity()
 
         val dialog: AlertDialog = mockk(relaxed = true)
-        every { Dialogs.showPushNotificationsPermissionDialog(any(), any(), any()) } returns dialog
+        every { Dialogs.showPushNotificationsPermissionDialog(any(), any()) } returns dialog
 
         watcher.onActivityResumed(activity)
         val onAllow = mockk<() -> Unit>(relaxed = true)
@@ -152,7 +145,7 @@ internal class UiComponentsActivityWatcherTest {
         stateFlowable.onNext(event)
 
         verify(exactly = 0) { Logger.d(any(), match(skippingMatcher)) }
-        verify { Dialogs.showPushNotificationsPermissionDialog(any(), any(), any()) }
+        verify { Dialogs.showPushNotificationsPermissionDialog(any(), any()) }
 
         val dismissEvent = mockkOneTimeEvent(UiComponentsDispatcher.State.DismissDialog)
         every { dismissEvent.consume(captureLambda()) } answers {
@@ -199,9 +192,6 @@ internal class UiComponentsActivityWatcherTest {
 
     private fun mockkActivity(isFinishing: Boolean = false) = mockk<CallActivity>(relaxed = true) {
         every { this@mockk.isFinishing } returns isFinishing
-        every { any<Activity>().withRuntimeTheme(captureLambda()) } answers {
-            secondArg<(Context, UiTheme) -> Unit>().invoke(this@mockk, UiTheme())
-        }
     }
 
 }

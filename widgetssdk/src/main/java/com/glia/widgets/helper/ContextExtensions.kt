@@ -14,11 +14,8 @@ import android.widget.Toast
 import androidx.annotation.DimenRes
 import androidx.annotation.IntRange
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.withStyledAttributes
 import androidx.core.util.TypedValueCompat
 import com.glia.widgets.BuildConfig
-import com.glia.widgets.R
-import com.glia.widgets.UiTheme
 
 internal fun Context.asActivity(): Activity? = (this as? ContextWrapper)?.let {
     it as? Activity ?: it.baseContext.asActivity()
@@ -41,17 +38,6 @@ internal fun Context.showToast(
 
 internal val Activity.rootView: View
     get() = findViewById(android.R.id.content) ?: window.decorView.findViewById(android.R.id.content)
-
-/**
- * A Glia activity composes its own theme in `onCreate`, so no wrapping is needed here - the
- * activity's theme already carries the `glia*` values that `Application.Glia.Chat` projects into
- * `R.styleable.GliaView`.
- */
-internal fun Activity.withRuntimeTheme(callback: (themedContext: Context, uiTheme: UiTheme) -> Unit) {
-    withStyledAttributes(R.style.Application_Glia_Chat, R.styleable.GliaView) {
-        callback(this@withRuntimeTheme, Utils.getThemeFromTypedArray(this, this@withRuntimeTheme))
-    }
-}
 
 internal val Activity.qualifiedName: String
     get() = this::class.qualifiedName!!

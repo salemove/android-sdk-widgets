@@ -279,6 +279,12 @@ private fun createDrawableStateList(defColor: ColorTheme?, disabledColor: ColorT
     return stateList
 }
 
+/**
+ * The state an enabled bar button is in. The empty state the lists are built with matches a selector's
+ * disabled entry first, so looking the enabled colour up with it returns the disabled one.
+ */
+private val enabledLookupState: IntArray = intArrayOf(android.R.attr.state_enabled)
+
 internal fun FloatingActionButton.applyBarButtonStatesTheme(barButtonStatesTheme: BarButtonStatesTheme?) {
     if (barButtonStatesTheme == null) return
 
@@ -308,7 +314,7 @@ internal fun FloatingActionButton.applyBarButtonStatesTheme(barButtonStatesTheme
     }
 
     val bgEnabledColor = barButtonStatesTheme.enabled?.background?.primaryColor
-        ?: oldBgTint.colorForState(enabledState)
+        ?: oldBgTint.colorForState(enabledLookupState)
 
 //        Default value must be at the latest position
     if (bgEnabledColor != null) {
@@ -339,7 +345,7 @@ internal fun FloatingActionButton.applyBarButtonStatesTheme(barButtonStatesTheme
     }
 
     val enabledColor = barButtonStatesTheme.enabled?.imageColor?.primaryColor
-        ?: oldImageTintList.colorForState(enabledState)
+        ?: oldImageTintList.colorForState(enabledLookupState)
 
     if (enabledColor != null) {
         colors.add(enabledColor)
@@ -398,7 +404,7 @@ private fun ImageButton.applyBarButtonStyleTheme(
     }
 
     val bgEnabledColor = enabled?.background?.primaryColor
-        ?: oldBgTint.colorForState(enabledState)
+        ?: oldBgTint.colorForState(enabledLookupState)
 
 //        Default value must be at the latest position
     if (bgEnabledColor != null) {
@@ -429,7 +435,7 @@ private fun ImageButton.applyBarButtonStyleTheme(
     }
 
     val enabledColor = enabled?.imageColor?.primaryColor
-        ?: oldImageTintList.colorForState(enabledState)
+        ?: oldImageTintList.colorForState(enabledLookupState)
 
     if (enabledColor != null) {
         colors.add(enabledColor)

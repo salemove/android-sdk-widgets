@@ -66,6 +66,7 @@ internal class FloatingVisitorVideoView @JvmOverloads constructor(
     }
 
     fun showVisitorVideo(newVideoView: VideoView) {
+        videoView?.release()
         videoView = newVideoView
         newVideoView.setZOrderMediaOverlay(true)
         removeVideoView()

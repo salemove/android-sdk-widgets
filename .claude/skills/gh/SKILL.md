@@ -99,12 +99,16 @@ When creating a PR:
 
    Read the template:
    ```bash
-   cat .github/PULL_REQUEST_TEMPLATE.md
+   cat .github/PULL_REQUEST_TEMPLATE.md 2>/dev/null || echo "No template found"
    ```
+
+   This repo has a template, so the filled-body path below is the one that applies.
+   Only if the template is genuinely missing, fall back to `--web` (see below).
 
   - Analyze the commits and diff from step 5
   - Fill in each section of the template with relevant information based on the actual changes
-  - Keep every heading and the `Additional info` checklist verbatim and in order
+  - Keep every section label (`**Jira issue:**`, `**What was solved?**`, `**Additional info:**`, `**Screenshots:**`) and the `Additional info` checklist verbatim and in order — they are bold labels, not markdown headings; do not convert them
+  - Leave checklist boxes unchecked; they are the author's to confirm
   - Create the PR using `--body` with a heredoc containing the filled template:
    ```bash
    gh pr create --title "Brief title (under 70 chars)" --base "$PARENT_BRANCH" --body "$(cat <<'EOF'
@@ -113,9 +117,21 @@ When creating a PR:
    )"
    ```
 
-   Do not use `--template`: it only pre-loads an interactive editor, so in an agent
-   run it either fails or files an unfilled template. Do not use `--web` either —
-   fill the body yourself.
+   **If no template exists** (does not happen in this repo), open the browser for a
+   manual description instead:
+   ```bash
+   gh pr create --title "Brief title (under 70 chars)" --base "$PARENT_BRANCH" --web
+   ```
+   Note what `--web` costs: it does not create the PR, only opens the compare page.
+   It prints nothing in a non-TTY run, so no URL comes back, and it is rejected
+   outright with `--draft`, `--reviewer`, and `--dry-run` — so it cannot open a
+   draft PR.
+
+   **Never use `--template`.** It seeds an interactive prompt only: rejected
+   alongside `--body`/`--body-file`, exits 1 in a non-TTY run (`must provide
+   --title and --body ... when not running interactively`), silently ignored when
+   combined with `--fill`, and it matches a *remote* template filename rather than
+   a local path.
 
    **Base branch logic**:
   - Auto-detect: Use the parent branch from which current branch was created
@@ -214,9 +230,10 @@ Examples:
 
 - Read the template at `.github/PULL_REQUEST_TEMPLATE.md`
 - Analyze commits and diff to understand the changes
-- Fill each template section with relevant details from the actual changes, keeping headings and the checklist verbatim
+- Fill each template section with relevant details from the actual changes, keeping the bold section labels and the checklist verbatim
 - Use `--body` with the filled template content
-- Never use `--template` or `--web` - both leave the body unfilled
+- If no template exists, use `--web` to open the browser for a manual description — note it does not create the PR and cannot be combined with `--draft`
+- Never use `--template` - it exits 1 in a non-TTY run and is rejected alongside `--body`
 
 ### Base Branch Selection
 - **Auto-detect**: Automatically use the parent branch from which the current branch was created
@@ -241,6 +258,7 @@ Or download from: https://cli.github.com/
 
 - **Always use the PR template**: Read `.github/PULL_REQUEST_TEMPLATE.md`, fill its sections with change details, and pass the result via `--body`
 - **Fill template with actual changes**: Analyze commits and diff, then populate each template section with relevant information
-- **Never use `--template` or `--web`**: Neither fills the body in an agent run
+- **No template?**: Use `--web` to open the browser - it does not create the PR and rejects `--draft`
+- **Never use `--template`**: It exits 1 in a non-TTY run and conflicts with `--body`
 - Always verify branch is pushed before creating PR
 - Check CI status before requesting review

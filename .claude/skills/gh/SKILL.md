@@ -81,27 +81,48 @@ When creating a PR:
    fi
    ```
 
-5. **Create PR:**
+5. **Gather change information:**
 
-   Check if a PR template exists and use it, otherwise open in browser:
+   Get commits and diff to understand the changes:
    ```bash
-   if [ -f .github/PULL_REQUEST_TEMPLATE.md ]; then
-     gh pr create --title "Brief title (under 70 chars)" --base "$PARENT_BRANCH" --template .github/PULL_REQUEST_TEMPLATE.md
-   else
-     gh pr create --title "Brief title (under 70 chars)" --base "$PARENT_BRANCH" --web
-   fi
+   # Get commit messages for this branch
+   git log --oneline "$PARENT_BRANCH"..HEAD
+
+   # Get the diff summary (files changed)
+   git diff --stat "$PARENT_BRANCH"..HEAD
+
+   # Get the full diff for detailed analysis
+   git diff "$PARENT_BRANCH"..HEAD
    ```
+
+6. **Create PR with filled template:**
+
+   Read the template:
+   ```bash
+   cat .github/PULL_REQUEST_TEMPLATE.md
+   ```
+
+  - Analyze the commits and diff from step 5
+  - Fill in each section of the template with relevant information based on the actual changes
+  - Keep every heading and the `Additional info` checklist verbatim and in order
+  - Create the PR using `--body` with a heredoc containing the filled template:
+   ```bash
+   gh pr create --title "Brief title (under 70 chars)" --base "$PARENT_BRANCH" --body "$(cat <<'EOF'
+   [Filled template content here based on actual changes]
+   EOF
+   )"
+   ```
+
+   Do not use `--template`: it only pre-loads an interactive editor, so in an agent
+   run it either fails or files an unfilled template. Do not use `--web` either —
+   fill the body yourself.
 
    **Base branch logic**:
   - Auto-detect: Use the parent branch from which current branch was created
   - Fallback: Use common default branches if detection fails
   - Override: Use explicitly specified base branch if provided by user
 
-   **Template handling**:
-  - If `.github/PULL_REQUEST_TEMPLATE.md` exists: Use `--template` flag to fill it via CLI
-  - If no template: Use `--web` flag to open browser for manual description
-
-6. **Display PR URL to user**
+7. **Display PR URL to user**
 
 ### View Pull Request
 
@@ -191,9 +212,11 @@ Examples:
 
 ### Description Format
 
-- If the repository has a PR template at `.github/PULL_REQUEST_TEMPLATE.md`, use the `--template` flag
-- If no template exists, use the `--web` flag to open browser for manual description
-- Never create custom descriptions with `--body` - always use template or browser
+- Read the template at `.github/PULL_REQUEST_TEMPLATE.md`
+- Analyze commits and diff to understand the changes
+- Fill each template section with relevant details from the actual changes, keeping headings and the checklist verbatim
+- Use `--body` with the filled template content
+- Never use `--template` or `--web` - both leave the body unfilled
 
 ### Base Branch Selection
 - **Auto-detect**: Automatically use the parent branch from which the current branch was created
@@ -216,7 +239,8 @@ Or download from: https://cli.github.com/
 
 ## Important Notes
 
-- **Check for PR template first**: Use `--template` if `.github/PULL_REQUEST_TEMPLATE.md` exists, otherwise use `--web`
-- **Never use `--body` parameter**: Always use template or browser for PR descriptions
+- **Always use the PR template**: Read `.github/PULL_REQUEST_TEMPLATE.md`, fill its sections with change details, and pass the result via `--body`
+- **Fill template with actual changes**: Analyze commits and diff, then populate each template section with relevant information
+- **Never use `--template` or `--web`**: Neither fills the body in an agent run
 - Always verify branch is pushed before creating PR
 - Check CI status before requesting review

@@ -6,6 +6,11 @@ Android UI library (AAR) for customer engagement widgets - chat, audio/video cal
 
 **Language**: Kotlin preferred, Java legacy exists. No Jetpack Compose - traditional View system only.
 
+**GitHub Operations**: Use `/gh` skill for PRs, issues, and CI status.
+**Making commits & PRs**: Always use the skills — `/commit` for every commit, `/gh` for every PR — never raw `git commit` / `gh pr create`, and never `/create-pr` (it ignores the PR template).
+**PR body**: Every PR body must be `.github/PULL_REQUEST_TEMPLATE.md` filled in — never a freeform description. Keep all headings and the `Additional info` checklist verbatim and in order. Take the Jira key from the branch name (`MOB-1234-...` → `https://glia.atlassian.net/browse/MOB-1234`); if the branch has no key, leave the placeholder URL untouched rather than guessing. Fill `Screenshots:` for every user-visible change — before/after images or a recording — and leave it empty only for non-UI work. Never pass `--web` — fill the body yourself.
+**Commit & PR descriptions**: Keep them short and high-level — an imperative summary plus a sentence or two on *why*, not a restatement of the diff or deep implementation detail. Write like a terse human engineer: no LLM tells ("This PR aims to…", "In summary", "It's worth noting"), marketing adjectives, padded bullet lists, or emoji.
+
 ## Module Structure
 ```
 widgetssdk/           # Main SDK (published)
@@ -91,6 +96,9 @@ app/                    # Demo app
 
 ## Custom Skills
 - `/gh` - GitHub operations (PRs, issues, CI status) - see `.claude/skills/gh/`
+- `/commit` - Git commits - mandatory for every commit
+
+See the PR and commit rules at the top of this file before using either.
 
 ## Resources
 - [Developer Docs](https://developer.glia.com/api-usage-refs/android-api)

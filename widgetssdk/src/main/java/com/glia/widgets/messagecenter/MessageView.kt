@@ -2,7 +2,6 @@ package com.glia.widgets.messagecenter
 
 import android.content.Context
 import android.content.res.ColorStateList
-import android.content.res.TypedArray
 import android.util.AttributeSet
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -10,25 +9,21 @@ import android.widget.Space
 import android.widget.TextView
 import androidx.annotation.VisibleForTesting
 import androidx.constraintlayout.widget.Group
-import androidx.core.content.withStyledAttributes
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.widget.NestedScrollView
-import androidx.core.widget.TextViewCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.telemetry_lib.ButtonNames
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.widgets.R
-import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.AttachmentPopup
 import com.glia.widgets.chat.adapter.UploadAttachmentAdapter
 import com.glia.widgets.databinding.MessageCenterMessageViewBinding
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.helper.Utils
 import com.glia.widgets.helper.getColorCompat
-import com.glia.widgets.helper.getColorStateListCompat
+import com.glia.widgets.helper.gliaAttrColor
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.logScWelcomeScreenButtonClicked
 import com.glia.widgets.helper.setCompoundDrawableTintListCompat
@@ -44,7 +39,11 @@ import com.google.android.material.button.MaterialButton
 import java.util.concurrent.Executor
 import kotlin.properties.Delegates
 
-internal class MessageView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : NestedScrollView(
+internal class MessageView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
+) : NestedScrollView(
     context,
     attrs,
     defStyleAttr
@@ -95,40 +94,8 @@ internal class MessageView(context: Context, attrs: AttributeSet?, defStyleAttr:
         setBackgroundColor(getColorCompat(R.color.glia_chat_background_color))
         setupViewAppearance()
         initCallbacks()
-        readTypedArray(attrs, defStyleAttr, defStyleRes)
+        setupAttachmentIconTheme()
         setupUnifiedTheme()
-    }
-
-    @JvmOverloads
-    constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = R.attr.gliaChatStyle) : this(
-        context,
-        attrs,
-        defStyleAttr,
-        R.style.Application_Glia_Chat
-    )
-
-    private fun readTypedArray(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
-        messageErrorTextView.setLocaleText(R.string.message_center_welcome_message_length_error)
-        context.withStyledAttributes(attrs, R.styleable.GliaView, defStyleAttr, defStyleRes) {
-            setDefaultTheme(this)
-        }
-    }
-
-    private fun setDefaultTheme(typedArray: TypedArray) {
-        val theme = Utils.getThemeFromTypedArray(typedArray, this.context)
-        setupAttachmentIconTheme(theme)
-        setupMessageErrorTextTheme(theme)
-    }
-
-    private fun setupMessageErrorTextTheme(theme: UiTheme) {
-        val systemNegativeColorId = theme.systemNegativeColor ?: return
-
-        TextViewCompat.setCompoundDrawableTintList(
-            messageErrorTextView,
-            getColorStateListCompat(systemNegativeColorId)
-        )
-
-        messageErrorTextView.setTextColor(getColorCompat(systemNegativeColorId))
     }
 
     private fun setupUnifiedTheme() {
@@ -163,6 +130,7 @@ internal class MessageView(context: Context, attrs: AttributeSet?, defStyleAttr:
     }
 
     private fun setupViewAppearance() {
+        messageErrorTextView.setLocaleText(R.string.message_center_welcome_message_length_error)
         title.setLocaleText(R.string.message_center_welcome_title)
         description.setLocaleText(R.string.message_center_welcome_subtitle)
         checkMessagesButton.setLocaleText(R.string.message_center_welcome_check_messages)
@@ -184,26 +152,20 @@ internal class MessageView(context: Context, attrs: AttributeSet?, defStyleAttr:
         attachmentRecyclerView.adapter = uploadAttachmentAdapter
     }
 
-    private fun setupAttachmentIconTheme(theme: UiTheme) {
+    /**
+     * The file-picker icon carries a two-state tint, so the JSON theme has to be merged with the
+     * theme attributes into one [ColorStateList] rather than layered over a layout value.
+     */
+    private fun setupAttachmentIconTheme() {
         val normalColor = unifiedTheme?.filePickerButtonTheme?.primaryColor
-            ?: theme.baseNormalColor?.let { getColorCompat(it) }
+            ?: context.gliaAttrColor(R.attr.gliaBaseNormalColor, R.color.glia_normal_color)
         val disabledColor = unifiedTheme?.filePickerButtonDisabledTheme?.primaryColor
-            ?: theme.baseShadeColor?.let { getColorCompat(it) }
+            ?: context.gliaAttrColor(R.attr.gliaBaseShadeColor, R.color.glia_shade_color)
 
-        val colors: MutableList<Int> = mutableListOf()
-        val states: MutableList<IntArray> = mutableListOf()
-
-        val disabledState = intArrayOf(-android.R.attr.state_enabled)
-        val enabledState = intArrayOf()
-
-        colors.add(disabledColor ?: return)
-        states.add(disabledState)
-
-        colors.add(normalColor ?: return)
-        states.add(enabledState)
-
-        addAttachmentButton.imageTintList =
-            ColorStateList(states.toTypedArray(), colors.toIntArray())
+        addAttachmentButton.imageTintList = ColorStateList(
+            arrayOf(intArrayOf(-android.R.attr.state_enabled), intArrayOf()),
+            intArrayOf(disabledColor, normalColor)
+        )
     }
 
     private fun initCallbacks() {

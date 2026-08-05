@@ -3,7 +3,6 @@ package com.glia.widgets.snapshotutils
 import android.widget.EditText
 import androidx.annotation.DrawableRes
 import com.glia.widgets.R
-import com.glia.widgets.UiTheme
 import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.glia.widgets.di.ControllerFactory
 import com.glia.widgets.di.Dependencies
@@ -49,7 +48,6 @@ internal interface SnapshotMessageCenterView : SnapshotTestLifecycle, SnapshotCo
         message: String? = null,
         executor: Executor? = Executor(Runnable::run),
         unifiedTheme: UnifiedTheme? = null,
-        uiTheme: UiTheme? = null,
         callback: ((MessageCenterContract.View) -> Unit)? = null
     ): ViewData {
         val mock = messageCenterViewMock()

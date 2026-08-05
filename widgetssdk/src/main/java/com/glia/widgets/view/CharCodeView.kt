@@ -7,13 +7,13 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.glia.widgets.R
-import com.glia.widgets.UiTheme
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.applyTextTheme
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getDimenRes
 import com.glia.widgets.helper.getDimenResPx
-import com.glia.widgets.helper.getFontCompat
+import com.glia.widgets.helper.gliaAttrColor
+import com.glia.widgets.helper.gliaAttrFont
 import com.glia.widgets.view.unifiedui.applyLayerTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
@@ -41,7 +41,6 @@ internal class CharCodeView @JvmOverloads constructor(
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
     private val charViewProps: ViewDefaultProperties
-    private var runtimeTheme: UiTheme? = null
     private val remoteTheme: VisitorCodeTheme? by lazy {
         Dependencies.gliaThemeManager.theme?.callVisualizerTheme?.visitorCodeTheme
     }
@@ -69,18 +68,14 @@ internal class CharCodeView @JvmOverloads constructor(
         }
     }
 
-    fun applyRuntimeTheme(theme: UiTheme) {
-        runtimeTheme = theme
-    }
-
     fun setText(text: String) {
         removeAllViews()
         for (character in text) {
-            addView(createCharSlotView(character, runtimeTheme, remoteTheme))
+            addView(createCharSlotView(character, remoteTheme))
         }
     }
 
-    private fun createCharSlotView(character: Char, runtimeTheme: UiTheme?, remoteTheme: VisitorCodeTheme?): TextView {
+    private fun createCharSlotView(character: Char, remoteTheme: VisitorCodeTheme?): TextView {
         val charView = TextView(context, null, R.attr.visitorCodeStyle, R.style.Application_Glia_VisitorCode) // TODO: confirm this
         charView.isFocusable = false
         charView.text = character.toString()
@@ -88,7 +83,7 @@ internal class CharCodeView @JvmOverloads constructor(
         charView.gravity = Gravity.CENTER
         charView.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_YES
 
-        applyRuntimeTheme(runtimeTheme, charView)
+        applyThemeAttributes(charView)
         applyRemoteTheme(remoteTheme, charView)
 
         val charViewLayout = LayoutParams(
@@ -114,27 +109,25 @@ internal class CharCodeView @JvmOverloads constructor(
         return charView
     }
 
-    private fun applyRuntimeTheme(theme: UiTheme?, charView: TextView) {
-        if (theme == null) {
-            return
-        }
-
-        val fontFamily = theme.fontRes?.let { getFontCompat(it) }
-        val textColor = theme.baseDarkColor?.let { getColorCompat(it) }
-
-        val backgroundTheme = LayerTheme(
-            fill = ColorTheme(charViewProps.backgroundColor),
-            stroke = charViewProps.borderColor,
-            borderWidth = charViewProps.borderWidth,
-            cornerRadius = charViewProps.borderRadius
-        )
-
+    /**
+     * The slot views are created in code, so their colour and typeface are resolved from the theme
+     * here instead of from a layout. `Application.Glia.VisitorCode` (the slot's `defStyleRes`)
+     * cannot carry the border, because it is drawn as a [LayerTheme] the JSON config can replace.
+     */
+    private fun applyThemeAttributes(charView: TextView) {
         charView.applyTextTheme(
-            textColor = textColor,
-            textFont = fontFamily
+            textColor = context.gliaAttrColor(R.attr.gliaBaseDarkColor, R.color.glia_dark_color),
+            textFont = context.gliaAttrFont()
         )
 
-        charView.applyLayerTheme(backgroundTheme)
+        charView.applyLayerTheme(
+            LayerTheme(
+                fill = ColorTheme(charViewProps.backgroundColor),
+                stroke = charViewProps.borderColor,
+                borderWidth = charViewProps.borderWidth,
+                cornerRadius = charViewProps.borderRadius
+            )
+        )
     }
 
     private fun applyRemoteTheme(theme: VisitorCodeTheme?, charView: TextView) {

@@ -17,7 +17,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         tools:text="Title"
-        android:textAppearance="?attr/textAppearanceBody1" />
+        android:textAppearance="?attr/textAppearanceBody1"
+        android:textColor="?attr/gliaBaseDarkColor"
+        android:textStyle="bold" />
 
     <EditText
         android:id="@+id/et_comment"
@@ -31,7 +33,10 @@
         android:hint="@string/glia_survey_open_text_item_edit_hint"
         android:imeOptions="actionNone"
         android:inputType="textCapSentences|textMultiLine"
-        android:padding="@dimen/glia_medium" />
+        android:padding="@dimen/glia_medium"
+        android:textColor="?attr/gliaBaseDarkColor"
+        android:textColorHint="?attr/gliaBaseShadeColor"
+        android:textSize="@dimen/glia_survey_default_text_size" />
 
     <TextView
         android:id="@+id/required_error"

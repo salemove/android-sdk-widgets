@@ -4,7 +4,6 @@ import android.os.Parcelable
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.FontRes
-import com.glia.widgets.view.configuration.survey.SurveyStyle
 import com.glia.widgets.view.unifiedui.Mergeable
 import com.glia.widgets.view.unifiedui.merge
 import kotlinx.parcelize.Parcelize
@@ -294,9 +293,6 @@ internal data class UiTheme(
 
     val gliaAlertDialogButtonUseVerticalAlignment: Boolean? = null,
 
-    @get:Deprecated("Replaced by Unified Ui")
-    val surveyStyle: SurveyStyle? = null,
-
     //    GVA
     @ColorRes
     val gvaQuickReplyBackgroundColor: Int? = null,
@@ -357,7 +353,6 @@ internal data class UiTheme(
         gliaChatStartingHeadingTextColor = builder.chatStartingHeadingTextColor,
         gliaChatStartedCaptionTextColor = builder.chatStartedCaptionTextColor,
         gliaChatStartedHeadingTextColor = builder.chatStartedHeadingTextColor,
-        surveyStyle = builder.surveyStyle,
         gvaQuickReplyBackgroundColor = builder.gvaQuickReplyBackgroundColor,
         gvaQuickReplyStrokeColor = builder.gvaQuickReplyStrokeColor,
         gvaQuickReplyTextColor = builder.gvaQuickReplyTextColor
@@ -411,7 +406,6 @@ internal data class UiTheme(
         gliaChatStartedCaptionTextColor = gliaChatStartedCaptionTextColor merge other.gliaChatStartedCaptionTextColor,
         whiteLabel = whiteLabel merge other.whiteLabel,
         gliaAlertDialogButtonUseVerticalAlignment = gliaAlertDialogButtonUseVerticalAlignment merge other.gliaAlertDialogButtonUseVerticalAlignment,
-        surveyStyle = surveyStyle merge other.surveyStyle,
         gvaQuickReplyBackgroundColor = gvaQuickReplyBackgroundColor merge other.gvaQuickReplyBackgroundColor,
         gvaQuickReplyStrokeColor = gvaQuickReplyStrokeColor merge other.gvaQuickReplyStrokeColor,
         gvaQuickReplyTextColor = gvaQuickReplyTextColor merge other.gvaQuickReplyTextColor
@@ -755,8 +749,6 @@ internal data class UiTheme(
             private set
         var gliaAlertDialogButtonUseVerticalAlignment: Boolean? = null
             private set
-        var surveyStyle: SurveyStyle? = SurveyStyle.Builder().build()
-            private set
 
         //    GVA
         @ColorRes
@@ -961,10 +953,6 @@ internal data class UiTheme(
 
         fun setChatStartedCaptionTextColor(color: Int?) {
             chatStartedCaptionTextColor = color
-        }
-
-        fun setSurveyStyle(surveyStyle: SurveyStyle?) {
-            this.surveyStyle = surveyStyle
         }
 
         fun setGvaQuickReplyBackgroundColor(@ColorRes gvaQuickReplyBackgroundColor: Int?) {

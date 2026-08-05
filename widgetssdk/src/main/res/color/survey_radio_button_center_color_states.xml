@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Single-choice radio dot: brand coloured when checked, invisible otherwise. `SingleQuestionViewHolder`
+    used to build this exact two-state list in code and tint the layer with it.
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="?attr/gliaBrandPrimaryColor" android:state_checked="true" />
+    <item android:color="@android:color/transparent" />
+</selector>

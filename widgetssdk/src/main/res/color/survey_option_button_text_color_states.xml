@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Survey option button (boolean / scale) label.
+
+    Selected wins over the error state, matching the code this replaces: the error only ever changed
+    the stroke, never the label.
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="?attr/gliaBaseLightColor" android:state_selected="true" />
+    <item android:color="?attr/gliaBaseDarkColor" />
+</selector>

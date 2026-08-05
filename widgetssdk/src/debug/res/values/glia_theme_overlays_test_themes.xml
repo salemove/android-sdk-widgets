@@ -97,6 +97,11 @@
         <item name="gliaSendMessageButtonTintColor">@color/glia_test_customization_brand</item>
     </style>
 
+    <!-- Sets only `gliaBaseNormalColor` - used to prove the file-upload title text follows it. -->
+    <style name="Test.Glia.Customization.NormalColor" parent="">
+        <item name="gliaBaseNormalColor">@color/glia_test_customization_normal</item>
+    </style>
+
     <!-- Flips the two boolean attributes, which default to `false` in `Theme.Glia.Internal`. -->
     <style name="Test.Glia.Customization.Booleans" parent="">
         <item name="whiteLabel">true</item>

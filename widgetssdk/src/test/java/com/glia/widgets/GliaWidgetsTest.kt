@@ -1,24 +1,17 @@
 package com.glia.widgets
 
-import android.app.Application
-import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.glia.androidsdk.AuthorizationMethod
-import com.glia.androidsdk.CoreConfiguration
-import com.glia.androidsdk.Glia
-import com.glia.androidsdk.GliaException
-import com.glia.androidsdk.RequestCallback
-import com.glia.androidsdk.omnibrowse.Omnibrowse
 import com.glia.widgets.callbacks.OnComplete
 import com.glia.widgets.callbacks.OnError
 import com.glia.widgets.callvisualizer.controller.CallVisualizerController
 import com.glia.widgets.di.ControllerFactory
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.di.GliaCore
+import com.glia.widgets.di.GliaCoreImpl
 import com.glia.widgets.di.RepositoryFactory
 import com.glia.widgets.engagement.EngagementRepository
-import com.glia.widgets.helper.toCoreType
 import com.glia.widgets.internal.queue.QueueRepository
+import org.junit.After
 import org.junit.Assert
 import org.junit.Before
 import org.junit.ClassRule
@@ -26,15 +19,15 @@ import org.junit.Test
 import org.junit.rules.TestRule
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
-import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doThrow
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
-import com.glia.androidsdk.SiteApiKey as CoreSiteApiKey
 
 @get:ClassRule
 val rule: TestRule = InstantTaskExecutorRule()
@@ -55,274 +48,120 @@ class GliaWidgetsTest {
         Dependencies.controllerFactory = controllerFactory
         Dependencies.repositoryFactory = repositoryFactory
         Dependencies.localeProvider = mock()
+    }
 
-        // Reset the state before each test
-        GliaWidgets::class.java.getDeclaredField("isInitialized").apply {
-            isAccessible = true
-            set(null, false)
-        }
+    @After
+    fun tearDown() {
+        // Dependencies is a process-wide singleton - restore the real GliaCore so the mock does not leak into other test classes
+        Dependencies.gliaCore = GliaCoreImpl()
     }
 
     @Test
-    fun `init sets config to glia core when called`() {
-        val siteApiKey = SiteApiKey("SiteApiId", "SiteApiSecret")
-        val siteId = "SiteId"
-        val region = Region.Beta
-        val (context, applicationContext) = mockContext()
-
-        val widgetsConfig = GliaWidgetsConfig.Builder()
-            .setSiteApiKey(siteApiKey)
-            .setSiteId(siteId)
-            .setRegion(region)
-            .setContext(context)
-            .build()
-        val callVisualizer = mock<Omnibrowse>()
-        whenever(gliaCore.callVisualizer).thenReturn(callVisualizer)
-        val callVisualizerController = mock<CallVisualizerController>()
-        whenever(controllerFactory.callVisualizerController).thenReturn(callVisualizerController)
-        val engagementRepository = mock<EngagementRepository>()
-        whenever(repositoryFactory.engagementRepository) doReturn engagementRepository
-        val queueRepository = mock<QueueRepository>()
-        whenever(repositoryFactory.queueRepository) doReturn queueRepository
-
-        GliaWidgets.init(widgetsConfig)
-
-        val captor = argumentCaptor<CoreConfiguration>()
-        verify(gliaCore).init(captor.capture())
-        verify(repositoryFactory).initialize()
-        val gliaConfig = captor.lastValue
-        val authorizationMethod = gliaConfig.authorizationMethod as AuthorizationMethod.SiteApiKey
-        Assert.assertEquals(siteApiKey.id, authorizationMethod.id)
-        Assert.assertEquals(siteApiKey.secret, authorizationMethod.secret)
-        Assert.assertEquals(siteId, gliaConfig.siteId)
-        Assert.assertEquals(region.toCoreType(), gliaConfig.region)
-        Assert.assertEquals(applicationContext, gliaConfig.applicationContext)
-        Assert.assertTrue(GliaWidgets.isInitialized())
-    }
-
-    @Test
-    fun `onSdkInit sets ApiKey when deprecated setSiteApiKey is used`() {
-        val siteApiKey = CoreSiteApiKey("SiteApiId", "SiteApiSecret")
-        val siteId = "SiteId"
-        val region = GliaWidgetsConfig.Regions.US
-        val (context, _) = mockContext()
-        val widgetsConfig = GliaWidgetsConfig.Builder()
-            .setSiteApiKey(siteApiKey)
-            .setSiteId(siteId)
-            .setRegion(region)
-            .setContext(context)
-            .build()
-        val callVisualizer = mock<Omnibrowse>()
-        whenever(gliaCore.callVisualizer).thenReturn(callVisualizer)
-        val callVisualizerController = mock<CallVisualizerController>()
-        whenever(controllerFactory.callVisualizerController).thenReturn(callVisualizerController)
-        val engagementRepository = mock<EngagementRepository>()
-        whenever(repositoryFactory.engagementRepository) doReturn engagementRepository
-        val queueRepository = mock<QueueRepository>()
-        whenever(repositoryFactory.queueRepository) doReturn queueRepository
-
-        GliaWidgets.init(widgetsConfig)
-
-        val captor = argumentCaptor<CoreConfiguration>()
-        verify(gliaCore).init(captor.capture())
-        val gliaConfig = captor.lastValue
-        val authorizationMethod = gliaConfig.authorizationMethod as AuthorizationMethod.SiteApiKey
-        Assert.assertEquals(siteApiKey.id, authorizationMethod.id)
-        Assert.assertEquals(siteApiKey.secret, authorizationMethod.secret)
-        Assert.assertEquals(Region.US.toCoreType(), gliaConfig.region)
-    }
-
-    @Test
-    fun `init sets config to glia core with UserApiKey when called`() {
-        val userApiKey = com.glia.widgets.AuthorizationMethod.UserApiKey("UserApiId", "UserApiSecret")
-        val gliaWidgetsConfig = GliaWidgetsConfig.Builder()
-            .setContext(RuntimeEnvironment.getApplication())
-            .setSiteId("SiteId")
-            .setRegion(Region.EU)
-            .setAuthorizationMethod(userApiKey)
-            .build()
-        val callVisualizer = mock<Omnibrowse>()
-        whenever(gliaCore.callVisualizer).thenReturn(callVisualizer)
-        val callVisualizerController = mock<CallVisualizerController>()
-        whenever(controllerFactory.callVisualizerController).thenReturn(callVisualizerController)
-        val engagementRepository = mock<EngagementRepository>()
-        whenever(repositoryFactory.engagementRepository) doReturn engagementRepository
-        val queueRepository = mock<QueueRepository>()
-        whenever(repositoryFactory.queueRepository) doReturn queueRepository
+    fun `deprecated init initializes dependencies synchronously`() {
+        val gliaWidgetsConfig = widgetsConfig()
+        mockWidgetsInitialization()
 
         GliaWidgets.init(gliaWidgetsConfig)
 
-        val captor = argumentCaptor<CoreConfiguration>()
-        verify(gliaCore).init(captor.capture())
+        verify(gliaCore).init(eq(gliaWidgetsConfig))
+        verify(controllerFactory).init()
+        verify(repositoryFactory).initialize()
+    }
 
-        val coreConfig = captor.firstValue
-        Assert.assertTrue(coreConfig.authorizationMethod is AuthorizationMethod.UserApiKey)
+    @Test
+    fun `deprecated init throws when core initialization fails`() {
+        val gliaWidgetsConfig = widgetsConfig()
+        val initializationError = GliaWidgetsException("Invalid configuration", GliaWidgetsException.Cause.INVALID_INPUT)
+        whenever(gliaCore.init(eq(gliaWidgetsConfig))) doThrow initializationError
 
-        val authMethod = coreConfig.authorizationMethod as AuthorizationMethod.UserApiKey
-        Assert.assertEquals("UserApiId", authMethod.id)
-        Assert.assertEquals("UserApiSecret", authMethod.secret)
-        Assert.assertEquals("SiteId", coreConfig.siteId)
-        Assert.assertEquals(com.glia.androidsdk.Region.EU, coreConfig.region)
+        val exception = Assert.assertThrows(GliaWidgetsException::class.java) {
+            GliaWidgets.init(gliaWidgetsConfig)
+        }
+
+        Assert.assertEquals(initializationError, exception)
+        verify(controllerFactory, never()).init()
+        verify(repositoryFactory, never()).initialize()
+    }
+
+    @Test
+    fun `init passes config to glia core`() {
+        val gliaWidgetsConfig = widgetsConfig()
+
+        GliaWidgets.init(gliaWidgetsConfig, {}, {})
+
+        verify(gliaCore).init(eq(gliaWidgetsConfig), any(), any())
     }
 
     @Test
     fun `init should invoke onComplete when initialization succeeds`() {
-        val siteApiKey = SiteApiKey("SiteApiId", "SiteApiSecret")
-        val gliaWidgetsConfig = GliaWidgetsConfig.Builder()
-            .setSiteApiKey(siteApiKey)
-            .setSiteId("SiteId")
-            .setRegion(GliaWidgetsConfig.Regions.EU)
-            .setContext(RuntimeEnvironment.getApplication())
-            .build()
+        val gliaWidgetsConfig = widgetsConfig()
         val onComplete = mock<OnComplete>()
         val onError = mock<OnError>()
-        val callbackCaptor = argumentCaptor<RequestCallback<Boolean?>>()
-        whenever(gliaCore.init(any(), callbackCaptor.capture())).thenAnswer {
-            // Simulate success by invoking the captured callback
-            callbackCaptor.firstValue.onResult(true, null)
+        mockWidgetsInitialization()
+        whenever(gliaCore.init(any(), any(), any())).thenAnswer {
+            // Simulate successful Core SDK initialization by invoking the onComplete callback
+            (it.arguments[1] as OnComplete).onComplete()
         }
 
         GliaWidgets.init(gliaWidgetsConfig, onComplete, onError)
 
         verify(onComplete).onComplete()
         verify(onError, never()).onError(any())
+        verify(controllerFactory).init()
+        verify(repositoryFactory).initialize()
+    }
+
+    @Test
+    fun `init should invoke onError when core initialization fails`() {
+        val gliaWidgetsConfig = widgetsConfig()
+        val onComplete = mock<OnComplete>()
+        val onError = mock<OnError>()
+        val initializationError = GliaWidgetsException(
+            "Network timeout. Please check the Internet connection.",
+            GliaWidgetsException.Cause.NETWORK_TIMEOUT
+        )
+        whenever(gliaCore.init(any(), any(), any())).thenAnswer {
+            (it.arguments[2] as OnError).onError(initializationError)
+        }
+
+        GliaWidgets.init(gliaWidgetsConfig, onComplete, onError)
+
+        verify(onComplete, never()).onComplete()
+        verify(onError).onError(initializationError)
+        verify(controllerFactory, never()).init()
+    }
+
+    @Test
+    fun `isInitialized delegates to glia core`() {
+        whenever(gliaCore.isInitialized) doReturn false
+        Assert.assertFalse(GliaWidgets.isInitialized())
+
+        whenever(gliaCore.isInitialized) doReturn true
         Assert.assertTrue(GliaWidgets.isInitialized())
     }
 
     @Test
-    fun `init should invoke onError with specific exception when initialization fails with NETWORK_TIMEOUT error`() {
-        val siteApiKey = SiteApiKey("SiteApiId", "SiteApiSecret")
-        val gliaWidgetsConfig = GliaWidgetsConfig.Builder()
-            .setSiteApiKey(siteApiKey)
-            .setSiteId("SiteId")
-            .setRegion(Region.Beta)
-            .setContext(RuntimeEnvironment.getApplication())
-            .build()
-        val onComplete = mock<OnComplete>()
-        val onError = mock<OnError>()
-        val callbackCaptor = argumentCaptor<RequestCallback<Boolean?>>()
-        whenever(gliaCore.init(any(), callbackCaptor.capture())).thenAnswer {
-            // Simulate error by invoking the captured callback
-            callbackCaptor.firstValue.onResult(null, GliaException("Glia Core SDK exception", GliaException.Cause.NETWORK_TIMEOUT))
-        }
+    fun `isInitializationInProgress delegates to glia core`() {
+        whenever(gliaCore.isInitializationInProgress) doReturn false
+        Assert.assertFalse(GliaWidgets.isInitializationInProgress())
 
-        GliaWidgets.init(gliaWidgetsConfig, onComplete, onError)
-
-        verify(onComplete, never()).onComplete()
-        argumentCaptor<GliaWidgetsException>().apply {
-            verify(onError).onError(capture())
-            Assert.assertEquals(GliaWidgetsException.Cause.NETWORK_TIMEOUT, firstValue.gliaCause)
-            Assert.assertEquals("Network timeout. Please check the Internet connection.", firstValue.debugMessage)
-        }
+        whenever(gliaCore.isInitializationInProgress) doReturn true
+        Assert.assertTrue(GliaWidgets.isInitializationInProgress())
     }
 
-    @Test
-    fun `init should invoke onError with specific exception when initialization fails with INVALID_INPUT error`() {
-        val siteApiKey = SiteApiKey("SiteApiId", "SiteApiSecret")
-        val gliaWidgetsConfig = GliaWidgetsConfig.Builder()
-            .setSiteApiKey(siteApiKey)
-            .setSiteId("SiteId")
-            .setRegion(Region.Beta)
-            .setContext(RuntimeEnvironment.getApplication())
-            .build()
-        val onComplete = mock<OnComplete>()
-        val onError = mock<OnError>()
-        val callbackCaptor = argumentCaptor<RequestCallback<Boolean?>>()
-        whenever(gliaCore.init(any(), callbackCaptor.capture())).thenAnswer {
-            // Simulate error by invoking the captured callback
-            callbackCaptor.firstValue.onResult(null, GliaException("Glia Core SDK exception", GliaException.Cause.INVALID_INPUT))
-        }
+    private fun widgetsConfig(): GliaWidgetsConfig = GliaWidgetsConfig.Builder()
+        .setSiteApiKey(SiteApiKey("SiteApiId", "SiteApiSecret"))
+        .setSiteId("SiteId")
+        .setRegion(GliaWidgetsConfig.Regions.EU)
+        .setContext(RuntimeEnvironment.getApplication())
+        .build()
 
-        GliaWidgets.init(gliaWidgetsConfig, onComplete, onError)
-
-        verify(onComplete, never()).onComplete()
-        argumentCaptor<GliaWidgetsException>().apply {
-            verify(onError).onError(capture())
-            Assert.assertEquals(GliaWidgetsException.Cause.INVALID_INPUT, firstValue.gliaCause)
-            Assert.assertEquals("Failed to initialise Glia Widgets SDK. Invalid input. Please check credentials.", firstValue.debugMessage)
-        }
-    }
-
-    @Test
-    fun `init should invoke onError with specific exception when initialization fails with FORBIDDEN error`() {
-        val siteApiKey = SiteApiKey("SiteApiId", "SiteApiSecret")
-        val gliaWidgetsConfig = GliaWidgetsConfig.Builder()
-            .setSiteApiKey(siteApiKey)
-            .setSiteId("SiteId")
-            .setRegion(Region.Beta)
-            .setContext(RuntimeEnvironment.getApplication())
-            .build()
-        val onComplete = mock<OnComplete>()
-        val onError = mock<OnError>()
-        val callbackCaptor = argumentCaptor<RequestCallback<Boolean?>>()
-        whenever(gliaCore.init(any(), callbackCaptor.capture())).thenAnswer {
-            // Simulate error by invoking the captured callback
-            callbackCaptor.firstValue.onResult(null, GliaException("Glia Core SDK exception", GliaException.Cause.FORBIDDEN))
-        }
-
-        GliaWidgets.init(gliaWidgetsConfig, onComplete, onError)
-
-        verify(onComplete, never()).onComplete()
-        argumentCaptor<GliaWidgetsException>().apply {
-            verify(onError).onError(capture())
-            Assert.assertEquals(GliaWidgetsException.Cause.INVALID_INPUT, firstValue.gliaCause)
-            Assert.assertEquals("Failed to initialise Glia Widgets SDK. Forbidden. Please check credentials.", firstValue.debugMessage)
-        }
-    }
-
-    @Test
-    fun `isInitialized returns false before initialization`() {
-        Assert.assertFalse(Glia.isInitialized())
-        Assert.assertFalse(GliaWidgets.isInitialized())
-    }
-
-    @Test
-    fun `isInitialized returns false if initialization fails`() {
-        val siteApiKey = SiteApiKey("SiteApiId", "SiteApiSecret")
-        val widgetsConfig = GliaWidgetsConfig.Builder()
-            .setSiteApiKey(siteApiKey)
-            .setSiteId("SiteId")
-            .setRegion(GliaWidgetsConfig.Regions.EU)
-            .setContext(RuntimeEnvironment.getApplication())
-            .build()
-        whenever(Dependencies.onSdkInit(widgetsConfig)).thenThrow(RuntimeException("Initialization failed"))
-
-        try {
-            GliaWidgets.init(widgetsConfig)
-        } catch (e: Exception) {
-            // Ignore exception
-        }
-
-        Assert.assertFalse(Glia.isInitialized())
-        Assert.assertFalse(GliaWidgets.isInitialized())
-    }
-
-    @Test
-    fun `isInitialized returns false if initialization with callbacks fails`() {
-        val siteApiKey = SiteApiKey("SiteApiId", "SiteApiSecret")
-        val widgetsConfig = GliaWidgetsConfig.Builder()
-            .setSiteApiKey(siteApiKey)
-            .setSiteId("SiteId")
-            .setRegion(GliaWidgetsConfig.Regions.EU)
-            .setContext(RuntimeEnvironment.getApplication())
-            .build()
-        whenever(Dependencies.onSdkInit(widgetsConfig)).thenThrow(RuntimeException("Initialization failed"))
-
-        try {
-            GliaWidgets.init(widgetsConfig, mock(), mock())
-        } catch (e: Exception) {
-            // Ignore exception
-        }
-
-        Assert.assertFalse(Glia.isInitialized())
-        Assert.assertFalse(GliaWidgets.isInitialized())
-    }
-
-    private fun mockContext(): Pair<Context, Application> {
-        val applicationContext = mock<Application>()
-        whenever(applicationContext.applicationContext).thenReturn(applicationContext)
-        val context = mock<Context>()
-        whenever(context.applicationContext).thenReturn(applicationContext)
-        return context to applicationContext
+    private fun mockWidgetsInitialization() {
+        val callVisualizerController = mock<CallVisualizerController>()
+        whenever(controllerFactory.callVisualizerController).thenReturn(callVisualizerController)
+        val engagementRepository = mock<EngagementRepository>()
+        whenever(repositoryFactory.engagementRepository) doReturn engagementRepository
+        val queueRepository = mock<QueueRepository>()
+        whenever(repositoryFactory.queueRepository) doReturn queueRepository
     }
 }

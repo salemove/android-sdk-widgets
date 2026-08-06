@@ -1,7 +1,6 @@
 package com.glia.widgets.di
 
 import android.content.Context
-import com.glia.androidsdk.CoreConfiguration
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.Glia
 import com.glia.androidsdk.Glia.OmnicoreEvent
@@ -24,8 +23,18 @@ import com.glia.androidsdk.visitor.Authentication
 import com.glia.androidsdk.visitor.Visitor
 import com.glia.androidsdk.visitor.VisitorInfo
 import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest
+import com.glia.telemetry_lib.GliaLogger
+import com.glia.telemetry_lib.LogEvents
+import com.glia.widgets.GliaWidgets.TAG
+import com.glia.widgets.GliaWidgetsConfig
+import com.glia.widgets.GliaWidgetsException
+import com.glia.widgets.callbacks.OnComplete
+import com.glia.widgets.callbacks.OnError
 import com.glia.widgets.engagement.MediaType
+import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.toCoreType
 import com.glia.widgets.queue.toCoreType
+import com.glia.widgets.toWidgetsType
 import java.io.InputStream
 import java.util.Optional
 import java.util.function.Consumer
@@ -36,6 +45,9 @@ internal class GliaCoreImpl : GliaCore {
     // It is not connected to the Widgets-specific `GliaWidgets.isInitialized()` Boolean.
     override val isInitialized: Boolean
         get() = Glia.isInitialized()
+
+    override val isInitializationInProgress: Boolean
+        get() = Glia.isInitInProgress()
 
     override val pushNotifications: PushNotifications
         get() = Glia.getPushNotifications()
@@ -53,16 +65,86 @@ internal class GliaCoreImpl : GliaCore {
         get() = Glia.getLiveObservation()
 
     @Synchronized
-    @Throws(GliaException::class)
-    override fun init(config: CoreConfiguration) {
-        Glia.init(config)
+    @Throws(GliaWidgetsException::class)
+    override fun init(config: GliaWidgetsConfig) {
+        try {
+            @Suppress("DEPRECATION")
+            Glia.init(config.toCoreType())
+        } catch (gliaException: GliaException) {
+            throw gliaException.toWidgetsType()
+        }
     }
 
     @Synchronized
-    @Throws(GliaException::class)
-    override fun init(config: CoreConfiguration, callback: RequestCallback<Boolean?>) {
-        Glia.init(config, callback)
+    override fun init(config: GliaWidgetsConfig, onComplete: OnComplete, onError: OnError) {
+        // The initialization result is delivered asynchronously via the callbacks, but config
+        // mapping and `Glia.init` can still throw synchronously (e.g. missing required
+        // configuration fields). The `try` routes those failures to `onError` as well, so
+        // integrators get every failure through a single channel instead of a thrown exception.
+        try {
+            Glia.init(config.toCoreType(), onComplete::onComplete) {
+                reportInitializationFailure(onError, it.toInitializationError(), it)
+            }
+        } catch (gliaWidgetsException: GliaWidgetsException) {
+            reportInitializationFailure(onError, gliaWidgetsException)
+        } catch (gliaException: GliaException) {
+            reportInitializationFailure(onError, gliaException.toWidgetsType(), gliaException)
+        } catch (ex: Exception) {
+            reportInitializationFailure(onError, GliaWidgetsException("Internal SDK error", GliaWidgetsException.Cause.INTERNAL_ERROR), ex)
+        }
     }
+
+    private fun reportInitializationFailure(onError: OnError, error: GliaWidgetsException, loggedError: Throwable = error) {
+        onError.onError(error)
+
+        Logger.e(TAG, "Glia Widgets SDK initialization failed", loggedError)
+        GliaLogger.e(LogEvents.WIDGETS_SDK_UNCATEGORIZED, "Glia Widgets SDK initialization failed", loggedError)
+    }
+
+    private fun GliaException.toInitializationError(): GliaWidgetsException =
+        when (cause) {
+            GliaException.Cause.ALREADY_INITIALIZED -> {
+                GliaWidgetsException(
+                    "Glia Widgets SDK is already initialized or initialization is already in progress.",
+                    GliaWidgetsException.Cause.INVALID_INPUT
+                )
+            }
+
+            GliaException.Cause.NETWORK_TIMEOUT -> {
+                GliaWidgetsException(
+                    "Network timeout. Please check the Internet connection.",
+                    GliaWidgetsException.Cause.NETWORK_TIMEOUT
+                )
+            }
+
+            GliaException.Cause.INVALID_INPUT -> {
+                GliaWidgetsException(
+                    "Failed to initialise Glia Widgets SDK. Invalid input. Please check credentials.",
+                    GliaWidgetsException.Cause.INVALID_INPUT
+                )
+            }
+
+            GliaException.Cause.AUTHENTICATION_ERROR -> {
+                GliaWidgetsException(
+                    "Failed to initialise Glia Widgets SDK. Authentication error. Please check credentials.",
+                    GliaWidgetsException.Cause.AUTHENTICATION_ERROR
+                )
+            }
+
+            GliaException.Cause.FORBIDDEN -> {
+                GliaWidgetsException(
+                    "Failed to initialise Glia Widgets SDK. Forbidden. Please check credentials.",
+                    GliaWidgetsException.Cause.INVALID_INPUT
+                )
+            }
+
+            else -> {
+                GliaWidgetsException(
+                    "Failed to initialise Glia Widgets SDK. Please check logs.",
+                    GliaWidgetsException.Cause.INVALID_INPUT
+                )
+            }
+        }
 
     override fun getVisitorInfo(visitorCallback: RequestCallback<VisitorInfo?>) {
         Glia.getVisitorInfo(visitorCallback)

@@ -1,7 +1,6 @@
 package com.glia.widgets.di
 
 import android.content.Context
-import com.glia.androidsdk.CoreConfiguration
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.Glia.OmnicoreEvent
 import com.glia.androidsdk.GliaException
@@ -23,6 +22,10 @@ import com.glia.androidsdk.visitor.Authentication
 import com.glia.androidsdk.visitor.Visitor
 import com.glia.androidsdk.visitor.VisitorInfo
 import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest
+import com.glia.widgets.GliaWidgetsConfig
+import com.glia.widgets.GliaWidgetsException
+import com.glia.widgets.callbacks.OnComplete
+import com.glia.widgets.callbacks.OnError
 import com.glia.widgets.engagement.MediaType
 import java.io.InputStream
 import java.util.Optional
@@ -30,15 +33,16 @@ import java.util.function.Consumer
 
 internal interface GliaCore {
     val isInitialized: Boolean
+    val isInitializationInProgress: Boolean
     val pushNotifications: PushNotifications
     val currentEngagement: Optional<Engagement>
     val callVisualizer: Omnibrowse
     val secureConversations: SecureConversations
     val liveObservation: LiveObservation
 
-    @Throws(GliaException::class)
-    fun init(config: CoreConfiguration)
-    fun init(config: CoreConfiguration, callback: RequestCallback<Boolean?>)
+    @Throws(GliaWidgetsException::class)
+    fun init(config: GliaWidgetsConfig)
+    fun init(config: GliaWidgetsConfig, onComplete: OnComplete, onError: OnError)
     fun getVisitorInfo(visitorCallback: RequestCallback<VisitorInfo?>)
     fun updateVisitorInfo(visitorInfoUpdateRequest: VisitorInfoUpdateRequest, visitorCallback: Consumer<GliaException?>)
     fun <T> on(event: OmnicoreEvent<T>, listener: Consumer<T>)

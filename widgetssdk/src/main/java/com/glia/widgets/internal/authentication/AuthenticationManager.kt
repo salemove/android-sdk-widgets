@@ -123,7 +123,7 @@ internal fun AuthenticationManager.toCoreType(): CoreAuthentication = this.let {
                 return widgetAuthentication.isAuthenticated
             }
 
-        override fun refresh(jwtToken: String, externalAccessToken: String?, authCallback: RequestCallback<Void>?) {
+        override fun refresh(jwtToken: String, externalAccessToken: String?, authCallback: RequestCallback<Void>) {
             GliaLogger.logDeprecatedApiUse(SdkType.WIDGETS_SDK, CoreAuthentication::class, "refresh")
             if (jwtToken.isBlank()) {
                 reportTokenInvalidError(authCallback)

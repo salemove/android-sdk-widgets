@@ -105,7 +105,7 @@ class AuthenticationManagerToCoreTypeTest {
         val jwtToken = "validToken"
         val externalAccessToken = "externalToken"
 
-        coreAuthentication.refresh(jwtToken, externalAccessToken, null)
+        coreAuthentication.refresh(jwtToken, externalAccessToken) { _, _ ->  }
 
         verify(widgetAuthentication).refresh(eq(jwtToken), eq(externalAccessToken), any(), any())
     }

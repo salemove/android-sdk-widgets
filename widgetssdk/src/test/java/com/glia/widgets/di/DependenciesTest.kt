@@ -1,12 +1,8 @@
 package com.glia.widgets.di
 
-import android.COMMON_EXTENSIONS_CLASS_PATH
 import android.mockk
 import android.unMockk
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.glia.androidsdk.CoreConfiguration
-import com.glia.androidsdk.GliaException
-import com.glia.androidsdk.RequestCallback
 import com.glia.widgets.AuthorizationMethod as WidgetsAuthorizationMethod
 import com.glia.widgets.Region
 import com.glia.telemetry_lib.EventAttribute
@@ -17,22 +13,23 @@ import com.glia.telemetry_lib.LogEvents
 import com.glia.telemetry_lib.StringAttribute
 import com.glia.widgets.BuildConfig
 import com.glia.widgets.GliaWidgetsConfig
+import com.glia.widgets.GliaWidgetsException
 import com.glia.widgets.apiKeyId
+import com.glia.widgets.callbacks.OnComplete
+import com.glia.widgets.callbacks.OnError
 import com.glia.widgets.helper.orNotApplicable
 import com.glia.widgets.helper.stringValue
-import com.glia.widgets.helper.toCoreType
 import com.glia.widgets.launcher.ConfigurationManager
 import com.glia.widgets.locale.LocaleProvider
 import io.mockk.Ordering
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.mockkStatic
 import io.mockk.slot
-import io.mockk.unmockkStatic
 import io.mockk.verify
 import io.mockk.verifyOrder
 import junit.framework.TestCase.assertEquals
 import org.junit.After
+import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.ClassRule
 import org.junit.Test
@@ -52,12 +49,13 @@ class DependenciesTest {
     private lateinit var repositoryFactory: RepositoryFactory
     private lateinit var localeProvider: LocaleProvider
     private lateinit var configurationManager: ConfigurationManager
+    private lateinit var onComplete: OnComplete
+    private lateinit var onError: OnError
 
     @Before
     fun setUp() {
         GliaTelemetry.mockk()
         GliaLogger.mockk()
-        mockkStatic(COMMON_EXTENSIONS_CLASS_PATH)
 
         // create mocks
         gliaCore = mockk(relaxUnitFun = true)
@@ -65,6 +63,8 @@ class DependenciesTest {
         repositoryFactory = mockk(relaxUnitFun = true)
         localeProvider = mockk(relaxUnitFun = true)
         configurationManager = mockk(relaxUnitFun = true)
+        onComplete = mockk(relaxUnitFun = true)
+        onError = mockk(relaxUnitFun = true)
 
         // assign mocks to Dependencies
         Dependencies.gliaCore = gliaCore
@@ -78,91 +78,76 @@ class DependenciesTest {
     fun tearDown() {
         GliaTelemetry.unMockk()
         GliaLogger.unMockk()
-        unmockkStatic(COMMON_EXTENSIONS_CLASS_PATH)
-    }
 
-    @Test(expected = GliaException::class)
-    fun `onSdkInit fails when configuration is invalid`() {
-        val widgetsConfig: GliaWidgetsConfig = mockk()
-        every { any<GliaWidgetsConfig>().toCoreType() } throws GliaException("Invalid configuration", GliaException.Cause.INVALID_INPUT)
-
-        Dependencies.onSdkInit(gliaWidgetsConfig = widgetsConfig)
-    }
-
-    @Test(expected = GliaException::class)
-    fun `onSdkInit(callback) fails when configuration is invalid`() {
-        val widgetsConfig: GliaWidgetsConfig = mockk()
-        every { any<GliaWidgetsConfig>().toCoreType() } throws GliaException("Invalid configuration", GliaException.Cause.INVALID_INPUT)
-
-        Dependencies.onSdkInit(gliaWidgetsConfig = widgetsConfig, null)
-    }
-
-    @Test(expected = GliaException::class)
-    fun `onSdkInit fails when gliaCore init fails`() {
-        every { gliaCore.init(any()) } throws GliaException("Failed to init core", GliaException.Cause.INVALID_INPUT)
-
-        Dependencies.onSdkInit(gliaWidgetsConfig = mockConfiguration())
+        // Dependencies is a process-wide singleton - restore the real GliaCore so the strict mock does not leak into other test classes
+        Dependencies.gliaCore = GliaCoreImpl()
     }
 
     @Test
-    fun `onSdkInit(callback) fails when gliaCore init fails`() {
+    fun `onSdkInit initializes dependencies synchronously`() {
         val widgetsConfig = mockConfiguration()
-        val coreCallbackSlot = slot<RequestCallback<Boolean?>>()
-        val widgetsCallback: RequestCallback<Boolean?> = mockk(relaxUnitFun = true)
 
-        Dependencies.onSdkInit(gliaWidgetsConfig = widgetsConfig, widgetsCallback)
+        Dependencies.onSdkInit(widgetsConfig)
+
+        verifyInitLogger(widgetsConfig)
+        verifyOrder {
+            gliaCore.init(widgetsConfig)
+            controllerFactory.init()
+            repositoryFactory.initialize()
+            configurationManager.applyConfiguration(widgetsConfig)
+            localeProvider.setCompanyName(widgetsConfig.companyName)
+            GliaLogger.i(LogEvents.WIDGETS_SDK_CONFIGURED)
+        }
+    }
+
+    @Test
+    fun `onSdkInit propagates error and does not initialize dependencies when gliaCore init throws`() {
+        val widgetsConfig = mockConfiguration()
+        val initializationError = GliaWidgetsException("Invalid configuration", GliaWidgetsException.Cause.INVALID_INPUT)
+        every { gliaCore.init(widgetsConfig) } throws initializationError
+
+        val exception = assertThrows(GliaWidgetsException::class.java) {
+            Dependencies.onSdkInit(widgetsConfig)
+        }
+
+        assertEquals(initializationError, exception)
+        verifyNotInitialized()
+    }
+
+    @Test
+    fun `onSdkInit(callbacks) passes onError to gliaCore and reports error when gliaCore init fails`() {
+        val widgetsConfig = mockConfiguration()
+        val coreOnErrorSlot = slot<OnError>()
+
+        Dependencies.onSdkInit(widgetsConfig, onComplete, onError)
 
         verifyInitLogger(widgetsConfig)
         verifyNotInitialized()
 
-        verify { gliaCore.init(any(), capture(coreCallbackSlot)) }
-        val coreException = GliaException("Failed to init core", GliaException.Cause.INVALID_INPUT)
-        coreCallbackSlot.captured.onResult(null, coreException)
+        verify { gliaCore.init(widgetsConfig, any(), capture(coreOnErrorSlot)) }
+        val initializationError = GliaWidgetsException("Failed to init core", GliaWidgetsException.Cause.INVALID_INPUT)
+        coreOnErrorSlot.captured.onError(initializationError)
 
-        verify { widgetsCallback.onResult(null, coreException) }
-        verifyNotInitialized(excludeLogger = true)
+        verify { onError.onError(initializationError) }
+        verify(exactly = 0) { onComplete.onComplete() }
+        verifyNotInitialized()
     }
 
     @Test
-    fun `onSdkInit succeeds when all required fields are present`() {
+    fun `onSdkInit(callbacks) initializes dependencies and reports completion when gliaCore init succeeds`() {
         val widgetsConfig = mockConfiguration()
+        val coreOnCompleteSlot = slot<OnComplete>()
 
-        Dependencies.onSdkInit(gliaWidgetsConfig = widgetsConfig)
-        verifyInitLogger(widgetsConfig)
-        verifyInitialized(widgetsConfig)
-    }
-
-    @Test
-    fun `onSdkInit(callback) succeeds when all required fields are present and gliaCore init succeeds`() {
-        val widgetsConfig = mockConfiguration()
-        val coreCallbackSlot = slot<RequestCallback<Boolean?>>()
-        val widgetsCallback: RequestCallback<Boolean?> = mockk(relaxUnitFun = true)
-
-        Dependencies.onSdkInit(gliaWidgetsConfig = widgetsConfig, widgetsCallback)
+        Dependencies.onSdkInit(widgetsConfig, onComplete, onError)
 
         verifyInitLogger(widgetsConfig)
         verifyNotInitialized()
 
-        verify { gliaCore.init(any(), capture(coreCallbackSlot)) }
-        coreCallbackSlot.captured.onResult(true, null)
+        verify { gliaCore.init(widgetsConfig, capture(coreOnCompleteSlot), any()) }
+        coreOnCompleteSlot.captured.onComplete()
 
-        verify { widgetsCallback.onResult(true, null) }
-        verifyInitialized(widgetsConfig)
-    }
-
-    @Test
-    fun `onSdkInit(callback) initialized all the required controllers when callback is null and gliaCore init succeeds`() {
-        val widgetsConfig = mockConfiguration()
-        val coreCallbackSlot = slot<RequestCallback<Boolean?>>()
-
-        Dependencies.onSdkInit(gliaWidgetsConfig = widgetsConfig, null)
-
-        verifyInitLogger(widgetsConfig)
-        verifyNotInitialized()
-
-        verify { gliaCore.init(any(), capture(coreCallbackSlot)) }
-        coreCallbackSlot.captured.onResult(true, null)
-
+        verify { onComplete.onComplete() }
+        verify(exactly = 0) { onError.onError(any()) }
         verifyInitialized(widgetsConfig)
     }
 
@@ -176,7 +161,7 @@ class DependenciesTest {
             .setAuthorizationMethod(userApiKey)
             .build()
 
-        Dependencies.onSdkInit(config)
+        Dependencies.onSdkInit(config, onComplete, onError)
 
         val attributeSlot = slot<Map<StringAttribute, String>>()
         verify {
@@ -187,12 +172,7 @@ class DependenciesTest {
         assertEquals("user-api-key-123", attributes[EventAttribute.ApiKeyId])
     }
 
-    private fun mockConfiguration(): GliaWidgetsConfig {
-        val widgetsConfig: GliaWidgetsConfig = mockk(relaxed = true)
-        val coreConfig: CoreConfiguration = mockk(relaxed = true)
-        every { any<GliaWidgetsConfig>().toCoreType() } returns coreConfig
-        return widgetsConfig
-    }
+    private fun mockConfiguration(): GliaWidgetsConfig = mockk(relaxed = true)
 
     private fun verifyInitLogger(widgetsConfig: GliaWidgetsConfig) {
         val attributeSlot = slot<Map<StringAttribute, String>>()
@@ -218,7 +198,7 @@ class DependenciesTest {
         }
     }
 
-    private fun verifyNotInitialized(excludeLogger: Boolean = false) {
+    private fun verifyNotInitialized() {
         verify(exactly = 0) {
             controllerFactory.init()
             repositoryFactory.initialize()
@@ -226,7 +206,7 @@ class DependenciesTest {
             localeProvider.setCompanyName(any())
         }
 
-        verify(inverse = !excludeLogger) {
+        verify(inverse = true) {
             GliaLogger.i(LogEvents.WIDGETS_SDK_CONFIGURED)
         }
     }

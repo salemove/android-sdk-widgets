@@ -6,7 +6,7 @@
 
 ```
 Integrator App
-  -> GliaWidgets.init(GliaWidgetsConfig) -> Dependencies.onSdkInit()
+  -> GliaWidgets.init(GliaWidgetsConfig, OnComplete, OnError) -> Dependencies.onSdkInit()
   -> GliaWidgets.getEngagementLauncher(queueIds)
 EngagementLauncher -> ActivityLauncherImpl -> ChatActivity | CallActivity | MessageCenterActivity | ...
 Activities inflate Views (ChatView, CallView, ...) which self-wire Controllers via Dependencies.controllerFactory

@@ -7,6 +7,7 @@ import com.glia.widgets.chat.ChatView
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.di.GliaCoreImpl
 import com.glia.widgets.engagement.EndAction
 import com.glia.widgets.engagement.MediaType
 import com.glia.widgets.engagement.State
@@ -68,6 +69,8 @@ internal class ActivityWatcherForChatHeadTest {
         mockkStatic(Dependencies::class)
         secureConversationsMock = mockk<SecureConversations>(relaxed = true)
         every { Dependencies.secureConversations } returns secureConversationsMock
+        // GliaWidgets.isInitialized() reads Dependencies.gliaCore - use a relaxed mock (isInitialized = false) so the bubble is not added on resume
+        Dependencies.gliaCore = mockk(relaxed = true)
 
         RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
 
@@ -88,6 +91,7 @@ internal class ActivityWatcherForChatHeadTest {
     fun tearDown() {
         RxAndroidPlugins.reset()
         io.mockk.unmockkStatic(Dependencies::class)
+        Dependencies.gliaCore = GliaCoreImpl()
     }
 
     @Test

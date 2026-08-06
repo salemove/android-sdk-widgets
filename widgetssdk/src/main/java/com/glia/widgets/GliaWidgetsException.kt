@@ -62,6 +62,9 @@ private fun GliaCoreException.Cause.toWidgetsType(): Cause =
         GliaCoreException.Cause.FILE_UPLOAD_FORBIDDEN -> Cause.FILE_UPLOAD_FORBIDDEN
         GliaCoreException.Cause.QUEUE_CLOSED -> Cause.QUEUE_CLOSED
         GliaCoreException.Cause.QUEUE_FULL -> Cause.QUEUE_FULL
+        // The Widgets API does not expose a dedicated "already initialized" cause - repeated
+        // initialization is an integrator input error, so it is reported as INVALID_INPUT.
+        GliaCoreException.Cause.ALREADY_INITIALIZED -> Cause.INVALID_INPUT
     }
 
 internal fun GliaWidgetsException.toCoreType(): GliaCoreException = GliaCoreException(debugMessage, gliaCause.toCoreType())

@@ -5,7 +5,6 @@ import android.os.Build
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
-import com.glia.androidsdk.RequestCallback
 import com.glia.telemetry_lib.EventAttribute
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.telemetry_lib.GliaTelemetry
@@ -13,9 +12,13 @@ import com.glia.telemetry_lib.GlobalAttribute
 import com.glia.telemetry_lib.LogEvents
 import com.glia.widgets.BuildConfig
 import com.glia.widgets.GliaWidgets
+import com.glia.widgets.GliaWidgets.TAG
 import com.glia.widgets.GliaWidgetsConfig
+import com.glia.widgets.GliaWidgetsException
 import com.glia.widgets.apiKeyId
 import com.glia.widgets.authentication.Authentication
+import com.glia.widgets.callbacks.OnComplete
+import com.glia.widgets.callbacks.OnError
 import com.glia.widgets.callvisualizer.CallVisualizerActivityWatcher
 import com.glia.widgets.engagement.completion.EngagementCompletionActivityWatcher
 import com.glia.widgets.entrywidget.EntryWidget
@@ -27,12 +30,14 @@ import com.glia.widgets.helper.ApplicationLifecycleManager
 import com.glia.widgets.helper.DeviceMonitor
 import com.glia.widgets.helper.GliaActivityManagerImpl
 import com.glia.widgets.helper.IntentHelperImpl
+import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.Logger.SITE_ID_KEY
+import com.glia.widgets.helper.Logger.addGlobalMetadata
 import com.glia.widgets.helper.ResourceProvider
 import com.glia.widgets.helper.orNotApplicable
 import com.glia.widgets.helper.rx.GliaWidgetsSchedulers
 import com.glia.widgets.helper.rx.Schedulers
 import com.glia.widgets.helper.stringValue
-import com.glia.widgets.helper.toCoreType
 import com.glia.widgets.internal.audio.AudioControlManager
 import com.glia.widgets.internal.audio.domain.OnAudioStartedUseCase
 import com.glia.widgets.internal.authentication.AuthenticationManager
@@ -268,32 +273,49 @@ internal object Dependencies {
         )
     }
 
+    /**
+     * Legacy synchronous initialization: the SDK is considered initialized as soon as this
+     * method returns, and failures are thrown to the caller as [GliaWidgetsException].
+     */
     @JvmStatic
+    @Throws(GliaWidgetsException::class)
     fun onSdkInit(gliaWidgetsConfig: GliaWidgetsConfig) {
         initLogger(gliaWidgetsConfig)
+        Logger.i(TAG, "Initialize Glia Widgets SDK")
 
-        gliaCore.init(gliaWidgetsConfig.toCoreType())
+        gliaCore.init(gliaWidgetsConfig)
+
+        initializeWidgets(gliaWidgetsConfig)
+        GliaLogger.i(LogEvents.WIDGETS_SDK_CONFIGURED)
+
+        setupLoggingMetadata(gliaWidgetsConfig)
+        gliaThemeManager.applyJsonConfig(gliaWidgetsConfig.uiJsonRemoteConfig)
+    }
+
+    @JvmStatic
+    fun onSdkInit(gliaWidgetsConfig: GliaWidgetsConfig, onComplete: OnComplete, onError: OnError) {
+        initLogger(gliaWidgetsConfig)
+        Logger.i(TAG, "Initialize Glia Widgets SDK")
+
+        gliaCore.init(gliaWidgetsConfig, onComplete = {
+            initializeWidgets(gliaWidgetsConfig)
+            onComplete.onComplete()
+            GliaLogger.i(LogEvents.WIDGETS_SDK_CONFIGURED)
+        }, onError = onError)
+
+        setupLoggingMetadata(gliaWidgetsConfig)
+        gliaThemeManager.applyJsonConfig(gliaWidgetsConfig.uiJsonRemoteConfig)
+    }
+
+    private fun initializeWidgets(gliaWidgetsConfig: GliaWidgetsConfig) {
         controllerFactory.init()
         repositoryFactory.initialize()
         configurationManager.applyConfiguration(gliaWidgetsConfig)
         localeProvider.setCompanyName(gliaWidgetsConfig.companyName)
-        GliaLogger.i(LogEvents.WIDGETS_SDK_CONFIGURED)
     }
 
-    @JvmStatic
-    fun onSdkInit(gliaWidgetsConfig: GliaWidgetsConfig, callback: RequestCallback<Boolean?>? = null) {
-        initLogger(gliaWidgetsConfig)
-
-        gliaCore.init(gliaWidgetsConfig.toCoreType()) { success, error ->
-            if (error == null) {
-                controllerFactory.init()
-                repositoryFactory.initialize()
-                configurationManager.applyConfiguration(gliaWidgetsConfig)
-                localeProvider.setCompanyName(gliaWidgetsConfig.companyName)
-            }
-            callback?.onResult(success, error)
-            GliaLogger.i(LogEvents.WIDGETS_SDK_CONFIGURED)
-        }
+    private fun setupLoggingMetadata(gliaWidgetsConfig: GliaWidgetsConfig) {
+        addGlobalMetadata(mapOf(Pair(SITE_ID_KEY, gliaWidgetsConfig.siteId.orNotApplicable)))
     }
 
     private fun initLogger(gliaWidgetsConfig: GliaWidgetsConfig) {

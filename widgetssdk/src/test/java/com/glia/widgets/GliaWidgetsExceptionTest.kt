@@ -16,19 +16,17 @@ class GliaWidgetsExceptionTest {
 
     @Test
     fun toWidgetsType_withAllValidGliaException_returnsGliaWidgetsException() {
-        val allCoreCauses: List<GliaException.Cause> = GliaException.Cause.entries
-        val gliaCoreExceptions = allCoreCauses.map { GliaException("Test message", it) }
-
-        val allWidgetsCauses: List<GliaWidgetsException.Cause> = GliaWidgetsException.Cause.entries
-        val gliaWidgetsExceptions = allWidgetsCauses.map { GliaWidgetsException("Test message", it) }
-
-        assertEquals(allCoreCauses.size, allWidgetsCauses.size)
-        gliaCoreExceptions.forEachIndexed { index, item ->
-            val widgetsException = item.toWidgetsType()
+        GliaException.Cause.entries.forEach { coreCause ->
+            val widgetsException = GliaException("Test message", coreCause).toWidgetsType()
 
             assertNotNull(widgetsException)
             assertEquals("Test message", widgetsException.debugMessage)
-            assertEquals(widgetsException.gliaCause, gliaWidgetsExceptions[index].gliaCause)
+            val expectedCause = when (coreCause) {
+                // ALREADY_INITIALIZED is intentionally not exposed in the Widgets API - it is reported as INVALID_INPUT
+                GliaException.Cause.ALREADY_INITIALIZED -> GliaWidgetsException.Cause.INVALID_INPUT
+                else -> GliaWidgetsException.Cause.valueOf(coreCause.name)
+            }
+            assertEquals(expectedCause, widgetsException.gliaCause)
         }
     }
 
@@ -42,19 +40,12 @@ class GliaWidgetsExceptionTest {
 
     @Test
     fun toCoreType_withAllValidGliaWidgetsException_returnsGliaException() {
-        val allWidgetsCauses: List<GliaWidgetsException.Cause> = GliaWidgetsException.Cause.entries
-        val gliaWidgetsExceptions = allWidgetsCauses.map { GliaWidgetsException("Test message", it) }
-
-        val allCoreCauses: List<GliaException.Cause> = GliaException.Cause.entries
-        val gliaCoreExceptions = allCoreCauses.map { GliaException("Test message", it) }
-
-        assertEquals(allCoreCauses.size, allWidgetsCauses.size)
-        gliaWidgetsExceptions.forEachIndexed { index, item ->
-            val coreException = item.toCoreType()
+        GliaWidgetsException.Cause.entries.forEach { widgetsCause ->
+            val coreException = GliaWidgetsException("Test message", widgetsCause).toCoreType()
 
             assertNotNull(coreException)
             assertEquals("Test message", coreException.debugMessage)
-            assertEquals(coreException.cause, gliaCoreExceptions[index].cause)
+            assertEquals(GliaException.Cause.valueOf(widgetsCause.name), coreException.cause)
         }
     }
 }

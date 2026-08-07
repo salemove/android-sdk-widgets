@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!--
+        @deprecated The legacy customization hook: integrators pointed this at a style whose
+        `materialThemeOverlay` carried the `glia*` values. Redefine the `GliaTheme` style with those
+        same items instead - the attribute names are unchanged. Still read and still applied, one
+        layer below `GliaTheme`; see docs/theming-migration.md.
+    -->
     <attr name="gliaChatStyle" format="reference" />
 
     <!-- Primary color for your brand. Used for example to set the color of the appbar -->

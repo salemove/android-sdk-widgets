@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
 import com.glia.widgets.databinding.ChatReceiveMessageContentBinding
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.helper.gliaAttrFont
+import com.glia.widgets.helper.applyGliaThemeFont
 import com.glia.widgets.locale.StringKey
 import com.glia.widgets.locale.StringKeyPair
 import com.glia.widgets.view.unifiedui.applyLayerTheme
@@ -44,7 +44,7 @@ internal class SystemMessageViewHolder(
     /** The bubble's colours come from the layout's `?attr/gliaOperatorMessage*`. */
     private fun setupTheme() {
         content.apply {
-            context.gliaAttrFont()?.also(::setTypeface)
+            context.applyGliaThemeFont(this)
 
             // Unified Ui
             applyLayerTheme(operatorTheme?.background)

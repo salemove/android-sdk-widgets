@@ -14,8 +14,8 @@ import com.glia.widgets.R
 import com.glia.widgets.databinding.AppBarBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.ResourceProvider
+import com.glia.widgets.helper.applyGliaThemeFont
 import com.glia.widgets.helper.getColorCompat
-import com.glia.widgets.helper.gliaAttrFont
 import com.glia.widgets.helper.gliaAttrResourceId
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.setLocaleContentDescription
@@ -105,10 +105,7 @@ internal class AppBarView @JvmOverloads constructor(
 
         // A `textAppearance` cannot express "the typeface the theme asks for", so this is the one
         // value the app bar still has to resolve in code.
-        context.gliaAttrFont()?.also {
-            binding.title.typeface = it
-            binding.endButton.typeface = it
-        }
+        context.applyGliaThemeFont(binding.title, binding.endButton)
     }
 
     fun hideBackButton() {

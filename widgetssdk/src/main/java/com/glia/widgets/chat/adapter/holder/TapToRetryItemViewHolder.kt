@@ -6,7 +6,7 @@ import com.glia.widgets.chat.adapter.ChatAdapter
 import com.glia.widgets.chat.model.TapToRetryItem
 import com.glia.widgets.databinding.ChatTapToRetryItemLayoutBinding
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.helper.gliaAttrFont
+import com.glia.widgets.helper.applyGliaThemeFont
 import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
@@ -35,6 +35,6 @@ internal class TapToRetryItemViewHolder(
 
     /** The text colour comes from the layout's `?attr/gliaSystemNegativeColor`. */
     private fun applyThemeFont() {
-        itemView.context.gliaAttrFont()?.also { binding.errorView.typeface = it }
+        itemView.context.applyGliaThemeFont(binding.errorView)
     }
 }

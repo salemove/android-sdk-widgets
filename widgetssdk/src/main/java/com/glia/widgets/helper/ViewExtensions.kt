@@ -1,5 +1,6 @@
 package com.glia.widgets.helper
 
+import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
@@ -59,6 +60,24 @@ internal fun View.getFontCompat(@FontRes resId: Int) = ResourcesCompat.getFont(c
 @AnyRes
 internal fun View.getAttr(@AttrRes attr: Int, @AnyRes fallBackResId: Int): Int =
     context.gliaAttrResourceId(attr, fallBackResId)
+
+/**
+ * Applies the composed theme's typeface to [views], resolving it once.
+ *
+ * The typeface is the one `glia*` value that cannot be a layout attribute, which is why every screen
+ * needs this call rather than an `android:fontFamily` in XML. `android:fontFamily` on a view beats
+ * its `textAppearance` unconditionally, so a layout could not express "use the theme's font, and
+ * otherwise leave the `textAppearance`'s alone" - and [gliaAttrFont] is `null` unless the integrator
+ * points `fontFamily` at a font *resource*, which is the common case.
+ *
+ * @param style an optional [Typeface] style to derive, for the few places whose `textAppearance`
+ * weight has to survive the substitution. Omit it to assign the typeface as-is: `setTypeface(tf, 0)`
+ * additionally clears fake-bold and skew, which is not the same thing.
+ */
+internal fun Context.applyGliaThemeFont(vararg views: TextView, style: Int? = null) {
+    val font = gliaAttrFont() ?: return
+    views.forEach { if (style == null) it.typeface = font else it.setTypeface(font, style) }
+}
 
 internal fun ViewGroup.hasChildOfType(clazz: Class<*>) = children.any { clazz.isInstance(it) }
 internal fun MenuItem.applyIconColorTheme(@ColorInt iconColor: Int?) {

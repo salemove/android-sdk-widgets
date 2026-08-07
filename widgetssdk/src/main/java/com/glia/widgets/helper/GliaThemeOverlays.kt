@@ -140,6 +140,10 @@ internal fun Context.gliaAttrBoolean(@AttrRes attr: Int, default: Boolean = fals
  * Resolves the `materialThemeOverlay` of the legacy `gliaChatStyle` style, or `null` when the
  * integrator does not use the legacy mechanism.
  *
+ * The mechanism is deprecated but fully supported: whatever it resolves is applied one layer below
+ * `GliaTheme`, so an integrator can migrate one attribute at a time. Detecting it emits a single
+ * warning naming the replacement - see [logLegacyMechanismUsage].
+ *
  * @param legacyActivityStyle the resource integrators override to carry `gliaChatStyle`. Only
  * overridden by tests, which must not redefine the library resource itself.
  */
@@ -175,10 +179,23 @@ private fun Resources.Theme.resolveGliaChatStyle(): Int? {
     return typedValue.resourceId.takeIf { it != NO_RESOURCE }
 }
 
+/**
+ * Warns once per process that the integrator is on the deprecated mechanism, and names its
+ * replacement. A warning rather than info because it is the only signal an integrator gets who
+ * neither reads the release notes nor opens the deprecated styles in the IDE - and it stays quiet
+ * for everyone else, since it fires only when a `gliaChatStyle` is actually declared.
+ *
+ * Contains no integrator values, only the mechanism names.
+ */
 private fun logLegacyMechanismUsage() {
     if (legacyOverlayDetectionLogged) return
     legacyOverlayDetectionLogged = true
-    Logger.i(TAG, "Legacy gliaChatStyle theming detected")
+    Logger.w(
+        TAG,
+        "Deprecated gliaChatStyle theming detected. It still applies, below any GliaTheme values. " +
+            "Move the items from your materialThemeOverlay into a GliaTheme style - the attribute " +
+            "names are unchanged. See docs/theming-migration.md"
+    )
 }
 
 @StyleRes

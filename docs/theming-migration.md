@@ -19,8 +19,11 @@ That is the whole contract. No activity theme to override, no `gliaChatStyle`, n
 `materialThemeOverlay`, and nothing to declare for the attributes you leave alone.
 
 **The legacy chain still works.** Nothing about it changed, so an integration that does not touch its
-resources keeps rendering exactly as before. Migrating is worthwhile because the new form is one file
-with no inheritance to get wrong — but it is not urgent.
+resources keeps rendering exactly as before. It is *deprecated*, not removed: `gliaChatStyle`,
+`Application.Glia.Activity.Style`, `Application.Glia.Chat`, `ThemeOverlay.Glia.Chat` and the four
+`Application.Glia.*.Activity` themes are all marked `@deprecated`, and the SDK logs a single warning
+naming this guide the first time it detects a `gliaChatStyle`. Migrating is worthwhile because the
+new form is one file with no inheritance to get wrong — but it is not urgent.
 
 ## What changed and why
 

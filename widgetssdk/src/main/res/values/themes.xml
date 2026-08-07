@@ -59,8 +59,6 @@
         <item name="gliaNewMessagesDividerTextColor">?attr/gliaBrandPrimaryColor</item>
         <item name="gliaBotActionButtonBackgroundColor">?attr/gliaSystemAgentBubbleColor</item>
         <item name="gliaBotActionButtonTextColor">?attr/gliaBaseDarkColor</item>
-        <item name="gliaBotActionButtonSelectedBackgroundColor">?attr/gliaBrandPrimaryColor</item>
-        <item name="gliaBotActionButtonSelectedTextColor">?attr/gliaBaseShadeColor</item>
 
         <!--        GVA-->
         <item name="gvaOptionButtonStyle">@style/Application.Glia.Chat.Button.Gva</item>
@@ -183,65 +181,14 @@
         ==========================================================================================
     -->
 
-    <!-- @deprecated Legacy `defStyleRes` for Glia views. Kept for backward compatibility only. -->
-    <style name="Application.Glia.Chat" parent="">
-        <item name="brandPrimaryColor">?attr/gliaBrandPrimaryColor</item>
-        <item name="baseLightColor">?attr/gliaBaseLightColor</item>
-        <item name="baseDarkColor">?attr/gliaBaseDarkColor</item>
-        <item name="systemAgentBubbleColor">?attr/gliaSystemAgentBubbleColor</item>
-        <item name="baseNormalColor">?attr/gliaBaseNormalColor</item>
-        <item name="baseShadeColor">?attr/gliaBaseShadeColor</item>
-        <item name="android:fontFamily">?attr/fontFamily</item>
-        <item name="appBarTitle">@string/engagement_chat_title</item>
-        <item name="systemNegativeColor">?attr/gliaSystemNegativeColor</item>
-        <item name="iconAppBarBack">?attr/gliaIconAppBarBack</item>
-        <item name="iconLeaveQueue">?attr/gliaIconLeaveQueue</item>
-        <item name="iconSendMessage">?attr/gliaIconSendMessage</item>
-        <item name="iconChatAudioUpgrade">?attr/gliaIconChatAudioUpgrade</item>
-        <item name="iconUpgradeAudioDialog">?attr/gliaIconUpgradeAudioDialog</item>
-        <item name="iconCallAudioOn">?attr/gliaIconCallAudioOn</item>
-        <item name="iconChatVideoUpgrade">?attr/gliaIconChatVideoUpgrade</item>
-        <item name="iconUpgradeVideoDialog">?attr/gliaIconUpgradeVideoDialog</item>
-        <item name="iconCallVideoOn">?attr/gliaIconCallVideoOn</item>
-        <item name="iconCallAudioOff">?attr/gliaIconCallAudioOff</item>
-        <item name="iconCallVideoOff">?attr/gliaIconCallVideoOff</item>
-        <item name="iconCallChat">?attr/gliaIconCallChat</item>
-        <item name="iconCallSpeakerOn">?attr/gliaIconCallSpeakerOn</item>
-        <item name="iconCallSpeakerOff">?attr/gliaIconCallSpeakerOff</item>
-        <item name="iconCallMinimize">?attr/gliaIconCallMinimize</item>
-        <item name="iconPlaceholder">?attr/gliaIconPlaceholder</item>
-        <item name="iconOnHold">?attr/gliaIconOnHold</item>
-        <item name="iconCallVisualizer">?attr/gliaIconCallVisualizer</item>
-        <item name="chatSendMessageButtonTintColor">?attr/gliaSendMessageButtonTintColor</item>
-        <item name="chatHeaderTitleTintColor">?attr/gliaChatHeaderTitleTintColor</item>
-        <item name="chatHeaderHomeButtonTintColor">?attr/gliaChatHeaderHomeButtonTintColor</item>
-        <item name="chatHeaderExitQueueButtonTintColor">?attr/gliaChatHeaderExitQueueButtonTintColor</item>
-        <item name="chatStartingHeadingTextColor">?attr/gliaChatStartingHeadingTextColor</item>
-        <item name="chatStartingCaptionTextColor">?attr/gliaChatStartingCaptionTextColor</item>
-        <item name="chatStartedHeadingTextColor">?attr/gliaChatStartedHeadingTextColor</item>
-        <item name="chatStartedCaptionTextColor">?attr/gliaChatStartedCaptionTextColor</item>
-        <item name="iconCallVisualizerTintColor">?attr/gliaIconCallVisualizerTintColor</item>
-        <item name="visitorMessageBackgroundColor">?attr/gliaVisitorMessageBackgroundColor</item>
-        <item name="visitorMessageTextColor">?attr/gliaVisitorMessageTextColor</item>
-        <item name="operatorMessageBackgroundColor">?attr/gliaOperatorMessageBackgroundColor</item>
-        <item name="operatorMessageTextColor">?attr/gliaOperatorMessageTextColor</item>
-        <item name="newMessagesDividerColor">?attr/gliaNewMessagesDividerColor</item>
-        <item name="newMessagesDividerTextColor">?attr/gliaNewMessagesDividerTextColor</item>
-        <item name="botActionButtonBackgroundColor">?attr/gliaBotActionButtonBackgroundColor</item>
-        <item name="botActionButtonTextColor">?attr/gliaBotActionButtonTextColor</item>
-        <item name="botActionButtonSelectedBackgroundColor">?attr/gliaBotActionButtonSelectedBackgroundColor</item>
-        <item name="botActionButtonSelectedTextColor">?attr/gliaBotActionButtonSelectedTextColor</item>
-        <item name="gliaHeaderEndButtonStyle">?attr/gliaHeaderEndButtonStyle</item>
-        <item name="buttonBarPositiveButtonStyle">?attr/buttonBarPositiveButtonStyle</item>
-        <item name="buttonBarNegativeButtonStyle">?attr/buttonBarNegativeButtonStyle</item>
-        <item name="buttonBarNeutralButtonStyle">?attr/buttonBarNeutralButtonStyle</item>
-        <item name="buttonSurveyOptionButtonStyle">?attr/buttonSurveyOptionButtonStyle</item>
-
-        <item name="chatHeadStyle">?attr/chatHeadStyle</item>
-
-        <item name="gliaAlertDialogButtonUseVerticalAlignment">?attr/gliaAlertDialogButtonUseVerticalAlignment</item>
-        <item name="whiteLabel">?attr/whiteLabel</item>
-    </style>
+    <!--
+        @deprecated Legacy `defStyleRes` for Glia views, and the documented parent of every legacy
+        integrator `gliaChatStyle` style. Kept declared so those styles still compile, but blanked:
+        it used to bridge each un-prefixed `GliaView` attribute to its `?attr/glia*` twin, and both
+        the styleable and the `UiTheme` parsing that read it are gone. Every value it carried is now
+        resolved from the composed theme directly.
+    -->
+    <style name="Application.Glia.Chat" parent="" />
 
     <!--
         @deprecated Legacy integrator hook: integrators redefine this resource to declare

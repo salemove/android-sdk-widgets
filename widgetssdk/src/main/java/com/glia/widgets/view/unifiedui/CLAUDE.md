@@ -32,7 +32,7 @@ Parent: [CLAUDE.md](../../../../../../../../../CLAUDE.md) | [docs/claude-referen
 - **Adding a theme property to only one side of the pipeline** — adding to `RemoteConfiguration` without updating the `DefaultTheme` function (or vice versa) silently yields `null` everywhere. Both sides are required.
 - **New screen theme not wired into `UnifiedTheme`** — a `FooTheme` data class that isn't added to `UnifiedTheme` and `RemoteConfiguration.toUnifiedTheme()` is unreachable at runtime.
 - **Hardcoding colors or dimensions in Views** — all values must flow from `GlobalColorsConfig` / theme overlay. Hardcoded values break white-label and operator-configured theming silently.
-- **Adding a new `glia*` XML theme attribute for a new themeable property** — the XML mechanism (`Theme.Glia.Internal` defaults + the `GliaTheme` override hook, see `helper/GliaThemeOverlays.kt`) is frozen at its current attribute set. New themeable properties go exclusively through the JSON remote config path.
+- **Adding a new `glia*` XML theme attribute for a new themeable property** — the XML mechanism (`Theme.Glia.Internal` defaults + the `GliaTheme` override hook, see `helper/GliaThemeOverlays.kt` and [docs/theming-migration.md](../../../../../../../../../docs/theming-migration.md)) is frozen at its current attribute set. New themeable properties go exclusively through the JSON remote config path.
 - **Skipping snapshot test updates** — every change in this package has visual impact. Run `./gradlew widgetssdk:recordSnapshots` and commit updated snapshots.
 
 ## For AI Agents

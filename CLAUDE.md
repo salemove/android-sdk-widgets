@@ -108,6 +108,7 @@ scripts/                # version-updater.gradle, direct-core.gradle, changelog,
 | [testSnapshot/CLAUDE.md](widgetssdk/src/testSnapshot/CLAUDE.md) | Paparazzi setup, snapshot build type, record/verify workflow |
 
 ### External
+- [Theming migration guide](docs/theming-migration.md) — legacy `gliaChatStyle` chain → `GliaTheme`, precedence, removed APIs
 - [Developer Guide](.claude/DEVELOPER_GUIDE.md) — local setup, composite build, git hooks
 - [Developer Docs](https://developer.glia.com/api-usage-refs/android-api) — public API reference
 - [iOS counterpart](https://github.com/salemove/ios-sdk-widgets) — cross-platform parity reference

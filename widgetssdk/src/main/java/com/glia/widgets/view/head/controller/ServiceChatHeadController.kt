@@ -79,6 +79,15 @@ internal class ServiceChatHeadController(
         chatHeadView = view
     }
 
+    override fun onClearChatHeadView(view: ChatHeadContract.View) {
+        // This controller is a singleton, so it outlives the view; without this the last
+        // ChatHeadView (and the ChatHeadService behind its context) stays reachable forever.
+        // A newer service instance may have already registered its view - leave it be.
+        if (chatHeadView === view) {
+            chatHeadView = null
+        }
+    }
+
     override fun onApplicationStop() {
         Logger.d(TAG, "onApplicationStop()")
         displayBubbleOutsideAppUseCase(null)

@@ -118,6 +118,9 @@ class MainFragment : Fragment() {
         val visitorContextAssetId = getContextAssetIdFromPrefs(sharedPreferences)
         view.findViewById<View>(R.id.chat_activity_button)
             .setOnClickListener {
+                if (!GliaWidgets.isInitialized()) {
+                    initGliaWidgets(legacy = true)
+                }
                 runCatching {
                     visitorContextAssetId?.run { engagementLauncher.startChat(requireActivity(), this) }
                         ?: engagementLauncher.startChat(requireActivity())
@@ -125,6 +128,9 @@ class MainFragment : Fragment() {
             }
         view.findViewById<View>(R.id.audio_call_button)
             .setOnClickListener {
+                if (!GliaWidgets.isInitialized()) {
+                    initGliaWidgets(legacy = true)
+                }
                 runCatching {
                     visitorContextAssetId?.run { engagementLauncher.startAudioCall(requireActivity(), this) }
                         ?: engagementLauncher.startAudioCall(requireActivity())
@@ -132,6 +138,9 @@ class MainFragment : Fragment() {
             }
         view.findViewById<View>(R.id.video_call_button)
             .setOnClickListener {
+                if (!GliaWidgets.isInitialized()) {
+                    initGliaWidgets(legacy = true)
+                }
                 runCatching {
                     visitorContextAssetId?.run { engagementLauncher.startVideoCall(requireActivity(), this) }
                         ?: engagementLauncher.startVideoCall(requireActivity())
@@ -525,30 +534,37 @@ class MainFragment : Fragment() {
         }
     }
 
-    private fun initGliaWidgets() {
+    private fun initGliaWidgets(legacy: Boolean = false) {
         if (GliaWidgets.isInitialized()) {
             setupAuthButtonsVisibility()
             listenForCallVisualizerEngagements()
             return
         }
 
-        GliaWidgets.init(
-            createDefaultConfig(
-                context = requireActivity().applicationContext,
-//                uiJsonRemoteConfig = UnifiedUiConfigurationLoader.fetchLocalConfigSample(requireContext()),
-//                region = Region.Beta
-            ),
-            onComplete = {
-                prepareAuthentication()
-                setupAuthButtonsVisibility()
-                listenForCallVisualizerEngagements()
-
-                view?.post { initMenu() }
-            },
-            onError = { error ->
-                showToast(error.message.toString())
-            }
+        val gliaWidgetsConfig = createDefaultConfig(
+            context = requireActivity().applicationContext,
+//            uiJsonRemoteConfig = UnifiedUiConfigurationLoader.fetchLocalConfigSample(requireContext()),
+//            region = Region.Beta
         )
+        val onComplete: () -> Unit = {
+            prepareAuthentication()
+            setupAuthButtonsVisibility()
+            listenForCallVisualizerEngagements()
+
+            view?.post { initMenu() }
+        }
+        if (legacy) {
+            GliaWidgets.init(gliaWidgetsConfig)
+            onComplete()
+        } else {
+            GliaWidgets.init(
+                gliaWidgetsConfig,
+                onComplete = onComplete,
+                onError = { error ->
+                    showToast(error.message.toString())
+                }
+            )
+        }
     }
 
     private fun prepareAuthentication() {

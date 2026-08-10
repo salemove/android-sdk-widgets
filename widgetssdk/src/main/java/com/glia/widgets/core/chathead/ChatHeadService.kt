@@ -102,7 +102,11 @@ internal class ChatHeadService : Service() {
 
         Logger.d(TAG, "onDestroy")
 
-        chatHeadView?.also(windowManager::removeView)
+        chatHeadView?.also {
+            windowManager.removeView(it)
+            Dependencies.controllerFactory.chatHeadController.onClearChatHeadView(it)
+        }
+        chatHeadView = null
     }
 
     @SuppressLint("ClickableViewAccessibility")

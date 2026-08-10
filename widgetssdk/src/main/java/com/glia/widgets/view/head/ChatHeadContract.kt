@@ -13,6 +13,7 @@ internal interface ChatHeadContract {
         fun onPause(gliaOrRootView: android.view.View?)
         fun updateChatHeadView()
         fun onSetChatHeadView(view: View)
+        fun onClearChatHeadView(view: View)
     }
 
     interface View : BaseView<Controller> {

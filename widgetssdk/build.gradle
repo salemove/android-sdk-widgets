@@ -38,7 +38,6 @@ android {
     minSdk = 24
     versionCode widgetsVersionCode
     versionName widgetsVersionName
-    testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     consumerProguardFiles "consumer-rules.pro"
   }
 
@@ -83,14 +82,6 @@ android {
   compileOptions {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
-  }
-
-  //After adding `Mockk` dependency to the instrumentation tests it started to fail builds with message that
-  // there are 6 files in project with these two Licences. Since all of them were related to Junit, it is safe to merge them.
-  packaging {
-    resources {
-      merges += ['META-INF/LICENSE.md', 'META-INF/LICENSE-notice.md']
-    }
   }
 
   testOptions {
@@ -262,10 +253,8 @@ dependencies {
   testImplementation libs.androidx.arch.core.testing
   testImplementation libs.robolectric
   testImplementation libs.mockk.android
-  androidTestImplementation libs.mockk.android
-  androidTestImplementation libs.androidx.test.ext.junit
-  androidTestImplementation libs.androidx.test.espresso.core
-  androidTestImplementation libs.androidx.test.rules
+  testImplementation libs.androidx.test.ext.junit
+  testImplementation libs.androidx.test.espresso.core
 
   // Test dependencies to Android native libraries
   // To prevent unit tests firing errors like 'Method length in org.json.JSONObject not mocked'

@@ -89,6 +89,9 @@ class ChatManagerTest {
     @Before
     fun setUp() {
         RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
+        // The init handler is a no-op once another test in the same sandbox has already
+        // initialized AndroidSchedulers.mainThread(), so override the per-call handler too.
+        RxAndroidPlugins.setMainThreadSchedulerHandler { Schedulers.trampoline() }
         state = ChatManager.State()
         onMessageUseCase = mock()
         loadHistoryUseCase = mock()

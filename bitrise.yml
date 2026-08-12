@@ -258,14 +258,31 @@ workflows:
           inputs:
             - gradlew_path: "./gradlew"
             - gradle_task: dokkaGeneratePublicationHtml
-      - amazon-s3-upload@3:
+      - script@1:
           title: Upload API docs
           inputs:
-            - secret_access_key: "$AMAZON_AWS_SECRET"
-            - upload_bucket: "$AMAZON_AWS_NAME/widgets"
-            - acl_control: public-read
-            - upload_local_path: "$PROJECT_LOCATION/$WIDGET_SDK_MODULE/build/dokka"
-            - access_key_id: "$AMAZON_AWS_KEY"
+            - content: |-
+                #!/usr/bin/env bash
+                # fail if any commands fails
+                set -e
+                # debug log
+                set -x
+
+                # The deprecated amazon-s3-upload step installed awscli via apt-get,
+                # which no longer exists on Ubuntu 24.04 stacks. The official
+                # aws-s3-upload replacement step neither applies the public-read ACL
+                # nor deletes stale objects, so run the same sync the old step did.
+                if ! command -v aws >/dev/null 2>&1 ; then
+                  curl -sSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o /tmp/awscliv2.zip
+                  unzip -q /tmp/awscliv2.zip -d /tmp
+                  sudo /tmp/aws/install
+                fi
+
+                export AWS_ACCESS_KEY_ID="$AMAZON_AWS_KEY"
+                export AWS_SECRET_ACCESS_KEY="$AMAZON_AWS_SECRET"
+
+                aws s3 sync "$PROJECT_LOCATION/$WIDGET_SDK_MODULE/build/dokka" \
+                  "s3://$AMAZON_AWS_NAME/widgets" --delete --acl public-read
       - script@1:
           title: Publish Android SDK to Nexus Repository Manager (Staging)
           inputs:

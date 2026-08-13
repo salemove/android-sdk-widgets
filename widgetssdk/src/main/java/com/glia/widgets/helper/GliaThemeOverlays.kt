@@ -125,7 +125,7 @@ internal fun Context.gliaAttrColor(@AttrRes attr: Int, @ColorRes fallback: Int):
  * Resolves the typeface the theme asks for, or `null` when it asks for none.
  *
  * `fontFamily` accepts a family name (`sans-serif`) as well as a font resource, and only the latter
- * can become a [Typeface] - so a theme that names a family resolves to `null` here and the view keeps
+ * can become a `Typeface` - so a theme that names a family resolves to `null` here and the view keeps
  * whatever its `textAppearance` gave it. That is the same contract the removed `UiTheme.fontRes` had.
  */
 internal fun Context.gliaAttrFont(@AttrRes attr: Int = androidx.appcompat.R.attr.fontFamily): Typeface? =

@@ -14,7 +14,7 @@ import com.glia.widgets.entrywidget.adapter.EntryWidgetAdapter
 import com.glia.widgets.entrywidget.adapter.EntryWidgetItemDivider
 import com.glia.widgets.helper.getDrawableCompat
 import com.glia.widgets.helper.requireActivity
-import com.glia.widgets.helper.wrapWithMaterialThemeOverlay
+import com.glia.widgets.helper.wrapWithGliaTheme
 import com.glia.widgets.view.unifiedui.applyLayerTheme
 import com.glia.widgets.view.unifiedui.nullSafeMerge
 import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
@@ -55,11 +55,11 @@ internal class EntryWidgetView : RecyclerView, EntryWidgetContract.View {
         setupDefaultViewAppearance()
     }
 
-    constructor(context: Context) : super(context.wrapWithMaterialThemeOverlay())
+    constructor(context: Context) : super(context.wrapWithGliaTheme())
 
-    constructor(context: Context, attrs: AttributeSet) : super(context.wrapWithMaterialThemeOverlay(), attrs)
+    constructor(context: Context, attrs: AttributeSet) : super(context.wrapWithGliaTheme(), attrs)
 
-    constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(context.wrapWithMaterialThemeOverlay(), attrs, defStyle)
+    constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(context.wrapWithGliaTheme(), attrs, defStyle)
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()

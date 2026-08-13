@@ -8,22 +8,17 @@ import android.content.ContextWrapper
 import android.content.Intent
 import android.os.Build
 import android.os.Parcelable
-import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.View
 import android.widget.Toast
-import androidx.annotation.AttrRes
 import androidx.annotation.DimenRes
 import androidx.annotation.IntRange
-import androidx.annotation.StyleRes
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.withStyledAttributes
 import androidx.core.util.TypedValueCompat
 import com.glia.widgets.BuildConfig
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
-import com.google.android.material.theme.overlay.MaterialThemeOverlay
 
 internal fun Context.asActivity(): Activity? = (this as? ContextWrapper)?.let {
     it as? Activity ?: it.baseContext.asActivity()
@@ -37,22 +32,6 @@ internal fun Context.getDimenRes(@DimenRes dimenId: Int): Float = resources.getD
 internal fun Context.getDimenResPx(@DimenRes dimenId: Int): Int =
     resources.getDimensionPixelSize(dimenId)
 
-internal fun Context.wrapWithMaterialThemeOverlay(
-    attrs: AttributeSet? = null,
-    @AttrRes defStyleAttr: Int = R.attr.gliaChatStyle,
-    @StyleRes defStyleRes: Int = R.style.Application_Glia_Chat
-): Context {
-    return MaterialThemeOverlay.wrap(
-        this,
-        attrs,
-        defStyleAttr,
-        defStyleRes
-    )
-}
-
-internal fun Context.wrapWithTheme(@StyleRes themeResId: Int = R.style.Application_Glia_Activity_Style): Context =
-    ContextThemeWrapper(this, themeResId)
-
 internal fun Context.showToast(
     message: String,
     @IntRange(from = 0, to = 1) duration: Int = Toast.LENGTH_LONG
@@ -63,10 +42,14 @@ internal fun Context.showToast(
 internal val Activity.rootView: View
     get() = findViewById(android.R.id.content) ?: window.decorView.findViewById(android.R.id.content)
 
+/**
+ * A Glia activity composes its own theme in `onCreate`, so no wrapping is needed here - the
+ * activity's theme already carries the `glia*` values that `Application.Glia.Chat` projects into
+ * `R.styleable.GliaView`.
+ */
 internal fun Activity.withRuntimeTheme(callback: (themedContext: Context, uiTheme: UiTheme) -> Unit) {
-    val themedContext = wrapWithMaterialThemeOverlay()
-    themedContext.withStyledAttributes(R.style.Application_Glia_Chat, R.styleable.GliaView) {
-        callback(themedContext, Utils.getThemeFromTypedArray(this, themedContext))
+    withStyledAttributes(R.style.Application_Glia_Chat, R.styleable.GliaView) {
+        callback(this@withRuntimeTheme, Utils.getThemeFromTypedArray(this, this@withRuntimeTheme))
     }
 }
 

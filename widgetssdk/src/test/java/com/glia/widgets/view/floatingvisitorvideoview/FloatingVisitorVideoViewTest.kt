@@ -7,8 +7,7 @@ import com.glia.androidsdk.comms.VideoView
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.ResourceProvider
-import com.glia.widgets.helper.wrapWithMaterialThemeOverlay
-import com.glia.widgets.helper.wrapWithTheme
+import com.glia.widgets.helper.wrapWithGliaTheme
 import com.glia.widgets.locale.LocaleProvider
 import com.glia.widgets.locale.StringKeyPair
 import io.reactivex.rxjava3.core.Observable
@@ -44,7 +43,7 @@ internal class FloatingVisitorVideoViewTest {
             whenever(it.getStringInternal(any<Int>(), any<List<StringKeyPair>>())) doReturn "stub"
         }
 
-        context = application.wrapWithTheme().wrapWithMaterialThemeOverlay()
+        context = application.wrapWithGliaTheme()
         view = FloatingVisitorVideoView(context)
     }
 

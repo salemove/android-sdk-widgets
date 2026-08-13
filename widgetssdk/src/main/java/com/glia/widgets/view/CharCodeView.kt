@@ -19,7 +19,6 @@ import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
 import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
 import com.glia.widgets.view.unifiedui.theme.callvisulaizer.VisitorCodeTheme
-import com.google.android.material.theme.overlay.MaterialThemeOverlay
 
 private data class ViewDefaultProperties(
     val borderWidth: Float,
@@ -39,7 +38,7 @@ internal class CharCodeView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
-) : LinearLayout(MaterialThemeOverlay.wrap(context, attrs, defStyleAttr, R.style.Application_Glia_Chat), attrs, defStyleAttr) {
+) : LinearLayout(context, attrs, defStyleAttr) {
 
     private val charViewProps: ViewDefaultProperties
     private var runtimeTheme: UiTheme? = null

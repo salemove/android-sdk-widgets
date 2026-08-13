@@ -46,48 +46,48 @@
         <activity
             android:name=".chat.ChatActivity"
             android:launchMode="singleTask"
-            android:theme="@style/Application.Glia.Chat.Activity"
+            android:theme="@style/Theme.Glia.Internal.Chat"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".filepreview.ui.ImagePreviewActivity"
             android:launchMode="singleTop"
             android:parentActivityName=".chat.ChatActivity"
-            android:theme="@style/Application.Glia.ImagePreview.Activity" />
+            android:theme="@style/Theme.Glia.Internal.ImagePreview" />
         <activity
             android:name=".call.CallActivity"
             android:launchMode="singleTask"
-            android:theme="@style/Application.Glia.Call.Activity" />
+            android:theme="@style/Theme.Glia.Internal" />
         <activity
             android:name=".survey.SurveyActivity"
             android:launchMode="singleTop"
-            android:theme="@style/Application.Glia.Translucent.Activity"
+            android:theme="@style/Theme.Glia.Internal.Translucent"
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name="com.glia.widgets.messagecenter.MessageCenterActivity"
             android:launchMode="singleTask"
-            android:theme="@style/Application.Glia.Chat.Activity"
+            android:theme="@style/Theme.Glia.Internal.Chat"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name="com.glia.widgets.webbrowser.WebBrowserActivity"
             android:launchMode="singleTask"
-            android:theme="@style/Application.Glia.Chat.Activity" />
+            android:theme="@style/Theme.Glia.Internal.Chat" />
 
         <activity
             android:name=".entrywidget.EntryWidgetActivity"
             android:launchMode="singleTask"
-            android:theme="@style/Application.Glia.Translucent.Activity" />
+            android:theme="@style/Theme.Glia.Internal.Translucent" />
 
         <activity
             android:name=".helper.DialogHolderActivity"
             android:launchMode="singleTask"
-            android:theme="@style/Application.Glia.Translucent.Activity" />
+            android:theme="@style/Theme.Glia.Internal.Translucent" />
 
         <activity
             android:name=".push.notifications.PushClickHandlerActivity"
             android:launchMode="singleTask"
             android:taskAffinity=""
             android:excludeFromRecents="true"
-            android:theme="@style/Application.Glia.Translucent.Activity" />
+            android:theme="@style/Theme.Glia.Internal.Translucent" />
 
         <service
             android:name=".core.chathead.ChatHeadService"

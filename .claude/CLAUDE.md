@@ -83,6 +83,7 @@ Engagement kinds, phases and states follow the core vocabulary: android-sdk `.cl
 - **NEVER block main thread** - Use RxJava schedulers
 - **ALWAYS implement Controller cleanup** - Dispose subscriptions when Controller detaches from view
 - Document all `public` APIs with KDoc
+- KDoc `[links]` must resolve — Dokka (`./gradlew dokkaGeneratePublicationHtml`) fails CI on any warning; use backticks, not `[links]`, for generated classes (`R.*`, `BuildConfig`) and nested platform classes (e.g. `Resources.Theme`)
 
 ## Kotlin Style
 - **Explicit return types**: All functions must explicitly declare return types

@@ -78,8 +78,10 @@
         <attr name="chatSendMessageButtonTintColor" format="reference" />
         <!-- Call Visualizer icon tint color -->
         <attr name="iconCallVisualizerTintColor" format="reference" />
-        <!-- Chat background color -->
-        <attr name="gliaChatBackgroundColor" format="reference" />
+        <!-- Chat background color. Declared top-level below - listed here for membership only,
+             so `R.styleable.GliaView_gliaChatBackgroundColor` keeps resolving while the legacy
+             `UiTheme` parsing exists. Same arrangement as `whiteLabel` below. -->
+        <attr name="gliaChatBackgroundColor" />
         <!--The color of "new messages" divider in the chat-->
         <attr name="newMessagesDividerColor" format="reference" />
         <!--The color of "new messages" divider text in the chat-->
@@ -117,6 +119,8 @@
     <attr name="gliaSystemAgentBubbleColor" format="reference" />
     <!-- Color for any error or chat widgets.  -->
     <attr name="gliaSystemNegativeColor" format="reference" />
+    <!-- Chat background color -->
+    <attr name="gliaChatBackgroundColor" format="reference" />
     <!-- The appbar's back icon resId.  -->
     <attr name="gliaIconAppBarBack" format="reference" />
     <!-- The appbar's leave queue icon resId.  -->

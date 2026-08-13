@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:layout_marginTop="@dimen/glia_medium"
     android:background="@drawable/bg_message"
-    android:backgroundTint="?attr/gliaSystemAgentBubbleColor">
+    android:backgroundTint="?attr/gliaOperatorMessageBackgroundColor">
 
     <TextView
         android:id="@+id/message"
@@ -15,11 +15,11 @@
         android:paddingTop="@dimen/glia_medium"
         android:paddingHorizontal="@dimen/glia_large"
         android:autoLink="web|email|phone"
-        android:backgroundTint="?attr/gliaSystemAgentBubbleColor"
+        android:backgroundTint="?attr/gliaOperatorMessageBackgroundColor"
         android:textAppearance="?attr/textAppearanceBody1"
-        android:textColor="?attr/gliaBaseDarkColor"
+        android:textColor="?attr/gliaOperatorMessageTextColor"
         android:textIsSelectable="true"
-        android:textColorLink="?attr/gliaBaseDarkColor" />
+        android:textColorLink="?attr/gliaOperatorMessageTextColor" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/buttons_recycler_view"

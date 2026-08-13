@@ -15,7 +15,7 @@
         android:paddingTop="@dimen/glia_large"
         android:paddingHorizontal="@dimen/glia_large"
         android:background="@drawable/bg_message"
-        android:backgroundTint="?attr/gliaSystemAgentBubbleColor">
+        android:backgroundTint="?attr/gliaOperatorMessageBackgroundColor">
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/image"
@@ -34,11 +34,11 @@
             android:paddingTop="@dimen/glia_large"
             android:paddingBottom="@dimen/glia_medium"
             android:autoLink="web|email|phone"
-            android:backgroundTint="?attr/gliaSystemAgentBubbleColor"
+            android:backgroundTint="?attr/gliaOperatorMessageBackgroundColor"
             android:textAppearance="?attr/textAppearanceHeadline3"
-            android:textColor="?attr/gliaBaseDarkColor"
+            android:textColor="?attr/gliaOperatorMessageTextColor"
             android:textIsSelectable="true"
-            android:textColorLink="?attr/gliaBaseDarkColor"
+            android:textColorLink="?attr/gliaOperatorMessageTextColor"
             android:importantForAccessibility="no" />
 
         <TextView
@@ -47,11 +47,11 @@
             android:layout_height="wrap_content"
             android:paddingBottom="@dimen/glia_medium"
             android:autoLink="web|email|phone"
-            android:backgroundTint="?attr/gliaSystemAgentBubbleColor"
+            android:backgroundTint="?attr/gliaOperatorMessageBackgroundColor"
             android:textAppearance="?attr/textAppearanceBody1"
-            android:textColor="?attr/gliaBaseDarkColor"
+            android:textColor="?attr/gliaOperatorMessageTextColor"
             android:textIsSelectable="true"
-            android:textColorLink="?attr/gliaBaseDarkColor"
+            android:textColorLink="?attr/gliaOperatorMessageTextColor"
             android:importantForAccessibility="no" />
 
         <androidx.recyclerview.widget.RecyclerView

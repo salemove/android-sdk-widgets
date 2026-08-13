@@ -63,6 +63,7 @@ MVP pattern: View + Controller + Contract interfaces. `ChatController` and `Call
 - Always dispose `CompositeDisposable` in `onDestroy(retain = false)`, not in `onPause` or unconditional `onDestroy`.
 - Always declare explicit return types on Kotlin functions and class/file-level variables; local variables may use inference.
 - Always add or update unit tests for every changed layer; always run `recordSnapshots` + `verifySnapshots` for any UI change.
+- Never write a KDoc `[link]` that Dokka cannot resolve — the API-docs CI step (`./gradlew dokkaGeneratePublicationHtml`) fails on any warning. Generated classes (`R.*`, `BuildConfig`) and nested platform classes (e.g. `Resources.Theme`) never resolve; write those in backticks instead.
 - MockK and Mockito-Kotlin coexist in the test suite intentionally — do not migrate one to the other.
 
 ## Directory Map

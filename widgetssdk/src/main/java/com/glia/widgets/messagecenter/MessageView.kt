@@ -154,7 +154,7 @@ internal class MessageView @JvmOverloads constructor(
 
     /**
      * The file-picker icon carries a two-state tint, so the JSON theme has to be merged with the
-     * theme attributes into one [ColorStateList] rather than layered over a layout value.
+     * theme attributes into one `ColorStateList` rather than layered over a layout value.
      */
     private fun setupAttachmentIconTheme() {
         val normalColor = unifiedTheme?.filePickerButtonTheme?.primaryColor

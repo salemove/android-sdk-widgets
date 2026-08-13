@@ -31,7 +31,6 @@ import com.glia.widgets.GliaWidgetsConfig
 import com.glia.widgets.GliaWidgetsConfig.Regions
 import com.glia.widgets.GliaWidgetsException
 import com.glia.widgets.Region
-import com.glia.widgets.UiTheme
 import com.glia.widgets.engagement.MediaType
 import com.glia.widgets.queue.Queue
 import com.glia.widgets.toCoreType
@@ -76,7 +75,6 @@ internal val Operator.formattedName: String get() = name.substringBefore(' ')
 
 internal val Operator.imageUrl: String? get() = picture?.url?.getOrNull()
 
-internal fun UiTheme?.isAlertDialogButtonUseVerticalAlignment(): Boolean = this?.gliaAlertDialogButtonUseVerticalAlignment == true
 
 /**
  * Returns styled text from the provided HTML string. Replaces \n to <br> regardless of the operating system where the string was created.

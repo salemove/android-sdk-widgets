@@ -15,9 +15,9 @@ import com.glia.telemetry_lib.EngagementType
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.telemetry_lib.LogEvents
 import com.glia.widgets.R
-import com.glia.widgets.UiTheme
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.domain.MediaUpgradeOfferData
+import com.glia.widgets.helper.gliaAttrDrawableRes
 import com.glia.widgets.helper.isOneWayVideo
 import com.glia.widgets.helper.isTwoWayVideo
 import com.glia.widgets.internal.dialog.model.ConfirmationDialogLinks
@@ -47,7 +47,7 @@ internal object Dialogs {
     private val decline: LocaleString by lazy { LocaleString(R.string.general_decline) }
     private val backingOperatorName: Int by lazy { R.string.engagement_default_operator }
 
-    fun showNoMoreOperatorsAvailableDialog(context: Context, uiTheme: UiTheme, buttonClickListener: View.OnClickListener): AlertDialog {
+    fun showNoMoreOperatorsAvailableDialog(context: Context, buttonClickListener: View.OnClickListener): AlertDialog {
         val payload = DialogPayload.AlertDialog(
             title = LocaleString(R.string.engagement_queue_closed_header),
             message = LocaleString(R.string.engagement_queue_closed_message),
@@ -62,14 +62,13 @@ internal object Dialogs {
 
         return dialogService.showDialog(
             context = context,
-            theme = uiTheme,
             type = DialogType.AlertDialog(payload),
             onShow = logDialogShown(DialogNames.QUEUE_IS_CLOSED),
             onDismiss = logDialogDismissed(DialogNames.QUEUE_IS_CLOSED)
         )
     }
 
-    fun showUnexpectedErrorDialog(context: Context, uiTheme: UiTheme, buttonClickListener: View.OnClickListener): AlertDialog {
+    fun showUnexpectedErrorDialog(context: Context, buttonClickListener: View.OnClickListener): AlertDialog {
         val payload = DialogPayload.AlertDialog(
             title = LocaleString(R.string.error_general),
             message = LocaleString(R.string.engagement_queue_reconnection_failed),
@@ -83,14 +82,13 @@ internal object Dialogs {
         )
         return dialogService.showDialog(
             context = context,
-            theme = uiTheme,
             type = DialogType.AlertDialog(payload),
             onShow = logDialogShown(DialogNames.UNEXPECTED_ERROR),
             onDismiss = logDialogDismissed(DialogNames.UNEXPECTED_ERROR)
         )
     }
 
-    fun showMissingPermissionsDialog(context: Context, uiTheme: UiTheme, buttonClickListener: View.OnClickListener): AlertDialog {
+    fun showMissingPermissionsDialog(context: Context, buttonClickListener: View.OnClickListener): AlertDialog {
         val payload = DialogPayload.AlertDialog(
             title = LocaleString(R.string.android_permissions_title),
             message = LocaleString(R.string.android_permissions_message),
@@ -104,7 +102,6 @@ internal object Dialogs {
         )
         return dialogService.showDialog(
             context = context,
-            theme = uiTheme,
             type = DialogType.AlertDialog(payload),
             onShow = logDialogShown(DialogNames.MISSING_PERMISSION),
             onDismiss = logDialogDismissed(DialogNames.MISSING_PERMISSION)
@@ -113,7 +110,6 @@ internal object Dialogs {
 
     fun showOverlayPermissionsDialog(
         context: Context,
-        uiTheme: UiTheme,
         positiveButtonClickListener: View.OnClickListener,
         negativeButtonClickListener: View.OnClickListener
     ): AlertDialog {
@@ -137,7 +133,6 @@ internal object Dialogs {
 
         return dialogService.showDialog(
             context = context,
-            theme = uiTheme,
             type = DialogType.Option(payload),
             onShow = logDialogShown(DialogNames.SCREEN_OVERLAY_PERMISSION_REQUEST),
             onDismiss = logDialogDismissed(DialogNames.SCREEN_OVERLAY_PERMISSION_REQUEST)
@@ -146,7 +141,6 @@ internal object Dialogs {
 
     fun showEndEngagementDialog(
         context: Context,
-        uiTheme: UiTheme,
         positiveButtonClickListener: View.OnClickListener,
         negativeButtonClickListener: View.OnClickListener
     ): AlertDialog {
@@ -172,7 +166,6 @@ internal object Dialogs {
 
         return dialogService.showDialog(
             context = context,
-            theme = uiTheme,
             type = DialogType.ReversedOption(payload),
             onShow = logDialogShown(DialogNames.LEAVE_ENGAGEMENT_CONFIRMATION),
             onDismiss = logDialogDismissed(DialogNames.LEAVE_ENGAGEMENT_CONFIRMATION)
@@ -181,7 +174,6 @@ internal object Dialogs {
 
     fun showExitQueueDialog(
         context: Context,
-        uiTheme: UiTheme,
         positiveButtonClickListener: View.OnClickListener,
         negativeButtonClickListener: View.OnClickListener
     ): AlertDialog {
@@ -207,14 +199,13 @@ internal object Dialogs {
 
         return dialogService.showDialog(
             context = context,
-            theme = uiTheme,
             type = DialogType.ReversedOption(payload),
             onShow = logDialogShown(DialogNames.LEAVE_QUEUE_CONFIRMATION),
             onDismiss = logDialogDismissed(DialogNames.LEAVE_QUEUE_CONFIRMATION)
         )
     }
 
-    fun showUnAuthenticatedDialog(context: Context, uiTheme: UiTheme, buttonClickListener: View.OnClickListener): AlertDialog {
+    fun showUnAuthenticatedDialog(context: Context, buttonClickListener: View.OnClickListener): AlertDialog {
         val payload = DialogPayload.AlertDialog(
             title = LocaleString(R.string.message_center_unavailable_title),
             message = LocaleString(R.string.message_center_not_authenticated_message),
@@ -228,7 +219,6 @@ internal object Dialogs {
         )
         return dialogService.showDialog(
             context = context,
-            theme = uiTheme,
             type = DialogType.AlertDialog(payload),
             onShow = logDialogShown(DialogNames.UNAUTHENTICATED_ERROR),
             onDismiss = logDialogDismissed(DialogNames.UNAUTHENTICATED_ERROR)
@@ -237,7 +227,6 @@ internal object Dialogs {
 
     fun showEngagementConfirmationDialog(
         context: Context,
-        theme: UiTheme,
         links: ConfirmationDialogLinks,
         linkClickListener: (Link) -> Unit,
         positiveButtonClickListener: View.OnClickListener,
@@ -277,14 +266,13 @@ internal object Dialogs {
 
         return dialogService.showDialog(
             context = context,
-            theme = theme,
             type = DialogType.Confirmation(payload),
             onShow = logDialogShown(DialogNames.LIVE_OBSERVATION_CONFIRMATION),
             onDismiss = logDialogDismissed(DialogNames.LIVE_OBSERVATION_CONFIRMATION)
         )
     }
 
-    fun showOperatorEndedEngagementDialog(context: Context, theme: UiTheme, buttonClickListener: View.OnClickListener): AlertDialog {
+    fun showOperatorEndedEngagementDialog(context: Context, buttonClickListener: View.OnClickListener): AlertDialog {
         val payload = DialogPayload.OperatorEndedEngagement(
             title = LocaleString(R.string.engagement_ended_header),
             message = LocaleString(R.string.engagement_ended_message),
@@ -298,7 +286,6 @@ internal object Dialogs {
 
         return dialogService.showDialog(
             context = context,
-            theme = theme,
             type = DialogType.OperatorEndedEngagement(payload),
             onShow = logDialogShown(DialogNames.ENGAGEMENT_ENDED),
             onDismiss = logDialogDismissed(DialogNames.ENGAGEMENT_ENDED)
@@ -307,21 +294,21 @@ internal object Dialogs {
 
     fun showUpgradeDialog(
         context: Context,
-        theme: UiTheme,
         data: MediaUpgradeOfferData,
         onAcceptOfferClickListener: View.OnClickListener,
         onCloseClickListener: View.OnClickListener
     ): AlertDialog {
 
+        val videoIcon = context.gliaAttrDrawableRes(R.attr.gliaIconUpgradeVideoDialog, R.drawable.ic_baseline_videocam)
+        val audioIcon = context.gliaAttrDrawableRes(R.attr.gliaIconUpgradeAudioDialog, R.drawable.ic_baseline_mic)
+
         val titleIconResPair = data.offer.run {
             when {
-                isOneWayVideo -> R.string.media_upgrade_video_one_way_title to (theme.iconUpgradeVideoDialog
-                    ?: R.drawable.ic_baseline_videocam)
+                isOneWayVideo -> R.string.media_upgrade_video_one_way_title to videoIcon
 
-                isTwoWayVideo -> R.string.media_upgrade_video_two_way_title to (theme.iconUpgradeVideoDialog
-                    ?: R.drawable.ic_baseline_videocam)
+                isTwoWayVideo -> R.string.media_upgrade_video_two_way_title to videoIcon
 
-                else -> R.string.media_upgrade_audio_title to (theme.iconUpgradeAudioDialog ?: R.drawable.ic_baseline_mic)
+                else -> R.string.media_upgrade_audio_title to audioIcon
             }
         }
 
@@ -347,7 +334,6 @@ internal object Dialogs {
 
         return dialogService.showDialog(
             context = context,
-            theme = theme,
             type = DialogType.Upgrade(payload),
             onShow = logDialogShown(DialogNames.MEDIA_UPGRADE_CONFIRMATION, data.offer),
             onDismiss = logDialogDismissed(DialogNames.MEDIA_UPGRADE_CONFIRMATION, data.offer)
@@ -355,8 +341,7 @@ internal object Dialogs {
     }
 
     fun showMessageCenterUnavailableDialog(
-        context: Context,
-        theme: UiTheme
+        context: Context
     ): AlertDialog {
         val payload = DialogPayload.AlertDialog(
             title = LocaleString(R.string.message_center_unavailable_title),
@@ -365,7 +350,6 @@ internal object Dialogs {
 
         return dialogService.showDialog(
             context = context,
-            theme = theme,
             type = DialogType.AlertDialog(payload),
             onShow = logDialogShown(DialogNames.SECURE_CONVERSATION_UNAVAILABLE_ERROR),
             onDismiss = logDialogDismissed(DialogNames.SECURE_CONVERSATION_UNAVAILABLE_ERROR),
@@ -396,7 +380,6 @@ internal object Dialogs {
 
     fun showLeaveCurrentConversationDialog(
         context: Context,
-        theme: UiTheme,
         onStay: View.OnClickListener,
         onLeave: View.OnClickListener
     ): AlertDialog {
@@ -422,7 +405,6 @@ internal object Dialogs {
 
         return dialogService.showDialog(
             context = context,
-            theme = theme,
             type = DialogType.OptionWithNegativeNeutral(payload),
             onShow = logDialogShown(DialogNames.LEAVE_SECURE_CONVERSATIONS_CONFIRMATION),
             onDismiss = logDialogDismissed(DialogNames.LEAVE_SECURE_CONVERSATIONS_CONFIRMATION)
@@ -431,7 +413,6 @@ internal object Dialogs {
 
     fun showPushNotificationsPermissionDialog(
         context: Context,
-        uiTheme: UiTheme,
         positiveButtonClickListener: View.OnClickListener
     ): AlertDialog {
         val payload = DialogPayload.SingleButtonOption(
@@ -449,7 +430,6 @@ internal object Dialogs {
 
         return dialogService.showDialog(
             context = context,
-            theme = uiTheme,
             type = DialogType.SingleButtonOption(payload),
             onShow = logDialogShown(DialogNames.ALLOW_PUSH_NOTIFICATION),
             onDismiss = logDialogDismissed(DialogNames.ALLOW_PUSH_NOTIFICATION)

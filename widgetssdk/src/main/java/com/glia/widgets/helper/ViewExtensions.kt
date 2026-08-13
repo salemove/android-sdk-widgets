@@ -70,7 +70,7 @@ internal fun View.getAttr(@AttrRes attr: Int, @AnyRes fallBackResId: Int): Int =
  * otherwise leave the `textAppearance`'s alone" - and [gliaAttrFont] is `null` unless the integrator
  * points `fontFamily` at a font *resource*, which is the common case.
  *
- * @param style an optional [Typeface] style to derive, for the few places whose `textAppearance`
+ * @param style an optional `Typeface` style to derive, for the few places whose `textAppearance`
  * weight has to survive the substitution. Omit it to assign the typeface as-is: `setTypeface(tf, 0)`
  * additionally clears fake-bold and skew, which is not the same thing.
  */

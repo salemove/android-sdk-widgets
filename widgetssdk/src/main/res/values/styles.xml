@@ -65,15 +65,26 @@
         <item name="android:backgroundTint">?attr/gliaSystemAgentBubbleColor</item>
     </style>
 
-    <!-- {@deprecated For internal use only} -->
+    <!--
+        {@deprecated For internal use only}
+
+        Carries everything `GliaSurveyOptionButton.applyView()` used to force in code. The three
+        colour state lists cover the normal / selected / error triple, `shapeAppearance` provides the
+        4dp corner (`glia_small` == `glia_survey_default_corner_radius`) and `textAppearanceBody1`
+        the 16sp label (== `glia_survey_default_text_size`), so the default rendering is unchanged
+        while every colour now follows the composed Glia theme.
+    -->
     <style name="Application.Glia.Chat.Button.SurveyOption" parent="Widget.MaterialComponents.Button">
         <item name="shapeAppearance">@style/Application.Glia.Chat.ShapeAppearance.SmallComponent
         </item>
         <item name="android:textAppearance">?attr/textAppearanceBody1</item>
+        <item name="android:textColor">@color/survey_option_button_text_color_states</item>
+        <item name="backgroundTint">@color/survey_option_button_background_color_states</item>
+        <item name="strokeColor">@color/survey_option_button_stroke_color_states</item>
         <item name="android:minWidth">@dimen/glia_survey_option_button_width</item>
         <item name="android:insetTop">0dp</item>
         <item name="android:insetBottom">0dp</item>
-        <item name="strokeWidth">1dp</item>
+        <item name="strokeWidth">@dimen/glia_survey_default_border_width</item>
     </style>
 
     <!-- {@deprecated For internal use only} -->

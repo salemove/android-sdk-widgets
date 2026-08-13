@@ -45,7 +45,7 @@ internal val Activity.rootView: View
 /**
  * A Glia activity composes its own theme in `onCreate`, so no wrapping is needed here - the
  * activity's theme already carries the `glia*` values that `Application.Glia.Chat` projects into
- * [R.styleable.GliaView].
+ * `R.styleable.GliaView`.
  */
 internal fun Activity.withRuntimeTheme(callback: (themedContext: Context, uiTheme: UiTheme) -> Unit) {
     withStyledAttributes(R.style.Application_Glia_Chat, R.styleable.GliaView) {

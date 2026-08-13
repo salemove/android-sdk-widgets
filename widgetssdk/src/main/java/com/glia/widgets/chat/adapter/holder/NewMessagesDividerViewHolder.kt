@@ -2,19 +2,16 @@ package com.glia.widgets.chat.adapter.holder
 
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
-import com.glia.widgets.UiTheme
 import com.glia.widgets.databinding.ChatNewMessagesDividerLayoutBinding
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.helper.getColorCompat
-import com.glia.widgets.helper.getFontCompat
+import com.glia.widgets.helper.gliaAttrFont
 import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.view.unifiedui.applyColorTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.chat.ChatTheme
 
 internal class NewMessagesDividerViewHolder(
-    binding: ChatNewMessagesDividerLayoutBinding,
-    uiTheme: UiTheme
+    binding: ChatNewMessagesDividerLayoutBinding
 ) :
     RecyclerView.ViewHolder(binding.root) {
 
@@ -23,35 +20,19 @@ internal class NewMessagesDividerViewHolder(
     }
 
     init {
-        setupUiTheme(uiTheme, binding)
-        setupUnifiedUiTheme(binding)
+        applyThemeFont(binding)
+        applyUnifiedTheme(binding)
     }
 
-    private fun setupUiTheme(
-        uiTheme: UiTheme,
-        binding: ChatNewMessagesDividerLayoutBinding
-    ) {
-        uiTheme.newMessageDividerColor?.also {
-            binding.newMessagesDividerLeft.setBackgroundResource(it)
-            binding.newMessagesDividerRight.setBackgroundResource(it)
-        }
-        uiTheme.newMessageDividerTextColor?.also {
-            binding.newMessagesTv.setTextColor(itemView.getColorCompat(it))
-        }
-
-        if (uiTheme.fontRes != null) {
-            val fontFamily = itemView.getFontCompat(uiTheme.fontRes)
-            binding.newMessagesTv.typeface = fontFamily
-        }
-
-        uiTheme.fontRes?.let {
-            itemView.getFontCompat(it)
-        }?.also {
-            binding.newMessagesTv.typeface = it
-        }
+    /**
+     * The divider and its text take their colours from the layout's
+     * `?attr/gliaNewMessagesDivider{,Text}Color`.
+     */
+    private fun applyThemeFont(binding: ChatNewMessagesDividerLayoutBinding) {
+        itemView.context.gliaAttrFont()?.also { binding.newMessagesTv.typeface = it }
     }
 
-    private fun setupUnifiedUiTheme(binding: ChatNewMessagesDividerLayoutBinding) {
+    private fun applyUnifiedTheme(binding: ChatNewMessagesDividerLayoutBinding) {
         binding.newMessagesTv.setLocaleText(R.string.chat_unread_message_divider)
         theme?.apply {
             newMessagesDividerColorTheme.also {

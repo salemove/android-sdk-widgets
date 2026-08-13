@@ -1,7 +1,6 @@
 package com.glia.widgets.chat.adapter.holder
 
 import com.glia.widgets.SnapshotTest
-import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.model.GvaButton
 import com.glia.widgets.chat.model.GvaPersistentButtons
 import com.glia.widgets.databinding.ChatGvaPersistentButtonsContentBinding
@@ -131,7 +130,6 @@ internal class GvaPersistentButtonsViewHolderSnapshotTest : SnapshotTest(), Snap
             chatOperatorMessageLayoutBinding,
             gvaPersistentButtonsContentBinding,
             {},
-            UiTheme(),
             unifiedTheme
         )
 

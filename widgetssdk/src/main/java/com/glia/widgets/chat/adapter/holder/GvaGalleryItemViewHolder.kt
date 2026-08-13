@@ -9,15 +9,12 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.glia.widgets.R
-import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.adapter.ChatAdapter
 import com.glia.widgets.chat.adapter.GvaButtonsAdapter
 import com.glia.widgets.chat.model.GvaGalleryCard
 import com.glia.widgets.databinding.ChatGvaGalleryItemBinding
 import com.glia.widgets.helper.fromHtml
-import com.glia.widgets.helper.getColorCompat
-import com.glia.widgets.helper.getColorStateListCompat
-import com.glia.widgets.helper.getFontCompat
+import com.glia.widgets.helper.gliaAttrFont
 import com.glia.widgets.helper.load
 import com.glia.widgets.view.unifiedui.applyLayerTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
@@ -29,7 +26,6 @@ import kotlin.properties.Delegates
 internal class GvaGalleryItemViewHolder(
     private val binding: ChatGvaGalleryItemBinding,
     buttonsClickListener: ChatAdapter.OnGvaButtonsClickListener,
-    private val uiTheme: UiTheme,
     private val unifiedTheme: UnifiedTheme?
 ) : ViewHolder(binding.root) {
 
@@ -56,23 +52,18 @@ internal class GvaGalleryItemViewHolder(
                 }
             }
         )
-        adapter = GvaButtonsAdapter(buttonsClickListener, uiTheme, galleryCardTheme?.button)
+        // The card and both of its texts take their colours from the layout's
+        // `?attr/gliaOperatorMessage*`.
+        adapter = GvaButtonsAdapter(buttonsClickListener, galleryCardTheme?.button)
         binding.buttonsRecyclerView.adapter = adapter
         binding.item.apply {
-            uiTheme.operatorMessageBackgroundColor?.let(::getColorStateListCompat)?.also {
-                backgroundTintList = it
-            }
-
             importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
 
             // Unified Ui
             applyLayerTheme(galleryCardTheme?.background ?: operatorTheme?.background)
         }
         binding.title.apply {
-            uiTheme.operatorMessageTextColor?.let(::getColorCompat)?.also(::setTextColor)
-            uiTheme.operatorMessageTextColor?.let(::getColorCompat)?.also(::setLinkTextColor)
-
-            uiTheme.fontRes?.let(::getFontCompat)?.also(::setTypeface)
+            context.gliaAttrFont()?.also(::setTypeface)
 
             importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
 
@@ -80,10 +71,7 @@ internal class GvaGalleryItemViewHolder(
             applyTextTheme(galleryCardTheme?.title ?: operatorTheme?.text)
         }
         binding.subtitle.apply {
-            uiTheme.operatorMessageTextColor?.let(::getColorCompat)?.also(::setTextColor)
-            uiTheme.operatorMessageTextColor?.let(::getColorCompat)?.also(::setLinkTextColor)
-
-            uiTheme.fontRes?.let(::getFontCompat)?.also(::setTypeface)
+            context.gliaAttrFont()?.also(::setTypeface)
 
             importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
 

@@ -4,7 +4,6 @@ import android.view.View
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.widgets.R
 import com.glia.widgets.SnapshotTest
-import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.adapter.ChatAdapter
 import com.glia.widgets.chat.adapter.holder.imageattachment.OperatorImageAttachmentViewHolder
 import com.glia.widgets.chat.model.OperatorAttachmentItem
@@ -164,7 +163,7 @@ internal class OperatorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), S
 
         val viewHolder = OperatorImageAttachmentViewHolder(
             binding, imageFileMock.getImageFileFromCacheUseCaseMock, imageFileMock.getImageFileFromDownloadsUseCaseMock,
-            imageFileMock.getImageFileFromNetworkUseCaseMock, schedulersMock.schedulers, UiTheme(), object : ChatAdapter.OnImageItemClickListener {
+            imageFileMock.getImageFileFromNetworkUseCaseMock, schedulersMock.schedulers, object : ChatAdapter.OnImageItemClickListener {
                 override fun onImageItemClick(item: AttachmentFile, view: View) {}
                 override fun onLocalImageItemClick(attachment: LocalAttachment, view: View) {}
             }

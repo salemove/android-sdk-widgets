@@ -2,7 +2,6 @@ package com.glia.widgets.chat.adapter.holder
 
 import com.glia.widgets.R
 import com.glia.widgets.SnapshotTest
-import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.model.MediaUpgradeStartedTimerItem
 import com.glia.widgets.databinding.ChatMediaUpgradeLayoutBinding
 import com.glia.widgets.di.Dependencies
@@ -102,8 +101,7 @@ internal class MediaUpgradeStartedViewHolderSnapshotTest : SnapshotTest(), Snaps
         }
 
         return MediaUpgradeStartedViewHolder(
-            ChatMediaUpgradeLayoutBinding.inflate(layoutInflater),
-            UiTheme(iconChatVideoUpgrade = R.drawable.ic_baseline_videocam)
+            ChatMediaUpgradeLayoutBinding.inflate(layoutInflater)
         ).also { viewHolder ->
             viewHolder.bind(item)
         }

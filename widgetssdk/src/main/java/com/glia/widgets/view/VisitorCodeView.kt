@@ -1,7 +1,7 @@
 package com.glia.widgets.view
 
 import android.content.Context
-import android.content.res.TypedArray
+import android.content.res.ColorStateList
 import android.os.CountDownTimer
 import android.view.View
 import android.view.accessibility.AccessibilityEvent
@@ -10,24 +10,19 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageButton
-import androidx.core.content.withStyledAttributes
 import androidx.core.view.isVisible
 import com.glia.androidsdk.omnibrowse.VisitorCode
 import com.glia.widgets.R
-import com.glia.widgets.UiTheme
 import com.glia.widgets.callvisualizer.VisitorCodeContract
 import com.glia.widgets.core.callvisualizer.domain.CallVisualizer
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
-import com.glia.widgets.helper.Utils
-import com.glia.widgets.helper.applyButtonTheme
 import com.glia.widgets.helper.applyImageColorTheme
-import com.glia.widgets.helper.applyProgressColorTheme
-import com.glia.widgets.helper.applyTextTheme
 import com.glia.widgets.helper.combineStringWith
-import com.glia.widgets.helper.getColorCompat
-import com.glia.widgets.helper.getFontCompat
+import com.glia.widgets.helper.gliaAttrBoolean
+import com.glia.widgets.helper.gliaAttrColor
+import com.glia.widgets.helper.gliaAttrFont
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.separateStringWithSymbol
 import com.glia.widgets.helper.setLocaleContentDescription
@@ -85,10 +80,10 @@ internal class VisitorCodeView internal constructor(
         closeButton = findViewById(R.id.close_button)
         closeButton.setOnClickListener { controller?.onCloseButtonClicked() }
         logoContainer = findViewById(R.id.logo_container)
+        logoView = findViewById(R.id.logo_view)
         logoText = findViewById(R.id.powered_by_text)
         logoText.setLocaleText(R.string.general_powered)
-        logoView = findViewById(R.id.logo_view)
-        readTypedArray()
+        applyThemeAttributes()
         applyRemoteThemeConfig(Dependencies.gliaThemeManager.theme)
     }
 
@@ -108,16 +103,6 @@ internal class VisitorCodeView internal constructor(
 
     internal fun setClosable(isClosable: Boolean) {
         closeButton.isVisible = isClosable
-    }
-
-    private fun readTypedArray() {
-        context.withStyledAttributes(
-            set = null,
-            attrs = R.styleable.GliaView,
-            defStyleAttr = 0
-        ) {
-            setDefaultTheme(this)
-        }
     }
 
     override fun setTimer(duration: Long) {
@@ -143,10 +128,6 @@ internal class VisitorCodeView internal constructor(
     override fun setController(controller: VisitorCodeContract.Controller) {
         this.controller = controller
         this.controller?.setView(this, closeButton.isVisible)
-    }
-
-    private fun setDefaultTheme(typedArray: TypedArray) {
-        applyRuntimeThemeConfig(Utils.getThemeFromTypedArray(typedArray, this.context))
     }
 
     override fun startLoading() {
@@ -221,39 +202,26 @@ internal class VisitorCodeView internal constructor(
         logoContainer.applyWhiteLabel(theme?.isWhiteLabel)
     }
 
-    private fun applyRuntimeThemeConfig(theme: UiTheme?) {
-        if (theme == null) {
-            Logger.d(TAG, "UiTheme is null!")
-            return
+    /**
+     * The values `visitor_code_view.xml` cannot express on its own: the typeface (a `textAppearance`
+     * would win over it), the refresh button's background (`Application.Glia.Chat.Button.Positive`
+     * sets only the `android:`-prefixed `backgroundTint`, which `MaterialButton` ignores), the
+     * white-label flag, the Glia logo's tint (`app:tint` needs AppCompat view inflation, which an
+     * integrator-hosted `ImageView` cannot be relied on to get), and this view's own background -
+     * the layout root is a child of it.
+     */
+    private fun applyThemeAttributes() {
+        context.gliaAttrFont()?.also {
+            successTitle.typeface = it
+            failureTitle.typeface = it
+            refreshButton.typeface = it
         }
-        charCodeView.applyRuntimeTheme(theme)
+        refreshButton.backgroundTintList = ColorStateList.valueOf(
+            context.gliaAttrColor(R.attr.gliaBrandPrimaryColor, R.color.glia_primary_color)
+        )
+        logoContainer.isVisible = !context.gliaAttrBoolean(R.attr.whiteLabel)
+        logoView.applyImageColorTheme(context.gliaAttrColor(R.attr.gliaBaseShadeColor, R.color.glia_shade_color))
 
-        val brandPrimaryColor = theme.brandPrimaryColor?.let(::getColorCompat)
-        val baseLightColor = theme.baseLightColor?.let(::getColorCompat)
-        val baseNormalColor = theme.baseNormalColor?.let(::getColorCompat)
-        val baseShadeColor = theme.baseShadeColor?.let(::getColorCompat)
-        val baseDarkColor = theme.baseDarkColor?.let(::getColorCompat)
-        val fontFamily = theme.fontRes?.let(::getFontCompat)
-        successTitle.applyTextTheme(
-            textColor = baseDarkColor,
-            textFont = fontFamily
-        )
-        failureTitle.applyTextTheme(
-            textColor = baseDarkColor,
-            textFont = fontFamily
-        )
-        refreshButton.applyButtonTheme(
-            backgroundColor = brandPrimaryColor,
-            textColor = baseLightColor,
-            textFont = fontFamily
-        )
-        logoContainer.apply {
-            isVisible = theme.whiteLabel?.not() ?: true
-            logoView.applyImageColorTheme(baseShadeColor)
-        }
-        progressBar.applyProgressColorTheme(brandPrimaryColor)
-        closeButton.applyImageColorTheme(baseNormalColor)
-
-        setBackgroundColor(baseLightColor ?: return)
+        setBackgroundColor(context.gliaAttrColor(R.attr.gliaBaseLightColor, R.color.glia_light_color))
     }
 }

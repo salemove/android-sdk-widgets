@@ -1,7 +1,7 @@
 # Theming migration guide
 
-> How to move an integration from the legacy `gliaChatStyle` chain to `GliaTheme`, and what the
-> major version removes.
+> How to move an integration from the legacy `gliaChatStyle` chain to the `GliaTheme` style
+> introduced in Widgets SDK 4.0.0.
 
 ## TL;DR
 
@@ -35,6 +35,10 @@ is no longer a parallel code path that parses the same values into an object and
 replaces a library style wholesale when the app declares one of the same name, and because every
 default lives in `Theme.Glia.Internal` rather than in `GliaTheme`, a partial redefinition is safe:
 your style contributes exactly the items you write and nothing else.
+
+One screen gains customization along the way: the image preview (files an operator sends) never
+participated in the legacy mechanism, but it does resolve `GliaTheme` — setting `gliaIconAppBarBack`
+or `gliaBrandPrimaryColor` now reaches it too.
 
 ## Precedence
 
@@ -83,14 +87,17 @@ identical — there is no renaming, no reformatting and no reordering:
 </style>
 ```
 
-Two things to check while you do it:
+One thing to check while you do it: **drop `parent`.** `GliaTheme` is a single-segment name, so
+Android infers no implicit parent and you need none. Do not parent it to `ThemeOverlay.Glia.Chat`;
+that style is a blank backward-compatibility placeholder.
 
-- **Drop `parent`.** `GliaTheme` is a single-segment name, so Android infers no implicit parent and
-  you need none. Do not parent it to `ThemeOverlay.Glia.Chat`; that style is a blank
-  backward-compatibility placeholder.
-- **Un-prefixed item names are gone.** If your overlay set `<item name="brandPrimaryColor">` rather
-  than `<item name="gliaBrandPrimaryColor">`, see [Removed](#removed-in-this-major-version) below —
-  those now fail to compile, and the fix is to add the `glia` prefix.
+### Verifying the migration
+
+- Run the app and open any Glia screen. The one-time
+  `Deprecated gliaChatStyle theming detected` warning must no longer appear in Logcat — it only
+  fires while a `gliaChatStyle` is still declared somewhere.
+- Spot-check the surfaces your overlay customized (brand colour, icons, dialog button alignment).
+  Attribute names are 1:1, so anything that looked right before must look identical after.
 
 ### React Native, Flutter and other wrappers
 
@@ -98,53 +105,15 @@ Two things to check while you do it:
 XML file dropped into `android/app/src/main/res/values/`. Nothing needs to touch the host app's
 `AppTheme` or `LaunchTheme`, and no native code runs to apply it.
 
-## Removed in this major version
+## Surveys now follow your theme
 
-### Public configuration classes
-
-Survey and widget styling used to be expressed as Java configuration objects built at runtime. They
-are replaced by the `glia*` attributes and remote JSON, and are deleted:
-
-| Removed | Replacement |
-|---|---|
-| `view.configuration.survey.SurveyStyle` | `GliaTheme` attributes / `unifiedTheme.surveyTheme` |
-| `view.configuration.survey.BooleanQuestionConfiguration` | as above |
-| `view.configuration.survey.InputQuestionConfiguration` | as above |
-| `view.configuration.survey.ScaleQuestionConfiguration` | as above |
-| `view.configuration.survey.SingleQuestionConfiguration` | as above |
-| `view.configuration.OptionButtonConfiguration` | as above |
-| `view.configuration.ButtonConfiguration` | the button styles resolved from the theme |
-| `view.configuration.TextConfiguration` | the text appearances resolved from the theme |
-| `view.configuration.LayerConfiguration` | `gliaBaseLightColor` (the survey card fill) |
-| `view.configuration.ChatHeadConfiguration` | `gliaBrandPrimaryColor`, `gliaIconPlaceholder`, `gliaBaseLightColor`, `gliaIconOnHold` |
-| `view.OutlinedOptionView` (`@hide`) | — no inflation site existed |
-
-### Behaviour change: survey widgets follow your brand colour
-
-Survey question widgets — the single-choice radio tint, and the boolean and scale selected states —
-used to render Glia blue regardless of the theme, because their defaults read colour resources
-directly. They now resolve `?attr/gliaBrandPrimaryColor`, so **an integration with a custom brand
-colour will see its survey change colour**. Titles, borders and error states likewise follow
-`gliaBaseDarkColor`, `gliaBaseNormalColor` and `gliaSystemNegativeColor`.
-
-Remote JSON (`unifiedTheme.surveyTheme`) already styled surveys correctly and is unaffected.
-
-### Un-prefixed attribute names
-
-The `GliaView` styleable and the ~45 un-prefixed `<attr>` declarations inside it
-(`brandPrimaryColor`, `baseLightColor`, `iconAppBarBack`, …) are removed. They were never documented
-and only ever worked as a side effect of that styleable being public: values set that way reached the
-SDK's code-side theme object while every layout, which resolves `?attr/glia*`, ignored them.
-
-Removing them is a **compile** break, never a silent one — AAPT reports
-`resource attr/brandPrimaryColor not found`. The fix is to prefix the name: `brandPrimaryColor` →
-`gliaBrandPrimaryColor`, `iconAppBarBack` → `gliaIconAppBarBack`, and so on for every item.
-
-### Attributes with no effect
-
-`gliaBotActionButtonSelectedBackgroundColor` and `gliaBotActionButtonSelectedTextColor` are removed.
-Response-card option buttons have no selected state — a card is answered once and never re-rendered —
-so these never rendered anything.
+Survey question widgets — the single-choice radio tint, the boolean and scale selected states,
+titles, borders and error states — now resolve the theme (`gliaBrandPrimaryColor`,
+`gliaBaseDarkColor`, `gliaBaseNormalColor`, `gliaSystemNegativeColor`). Previously they kept the
+SDK's default blue regardless of any customization, so **an integration with a custom brand colour
+will see its surveys pick it up** starting with 4.0.0. No action is needed; if the new rendering is
+unwanted, remote JSON (`unifiedTheme.surveyTheme`) styles surveys explicitly and is unaffected by
+this change.
 
 ## Reference
 
@@ -152,4 +121,4 @@ so these never rendered anything.
 - Defaults and composition order: `widgetssdk/src/main/res/values/themes.xml` (`Theme.Glia.Internal`)
 - The composition itself: `widgetssdk/src/main/java/com/glia/widgets/helper/GliaThemeOverlays.kt`
 - Worked example, both mechanisms side by side: `app/src/main/res/values/themes.xml`
-- Remote JSON configuration: [view/unifiedui/CLAUDE.md](../widgetssdk/src/main/java/com/glia/widgets/view/unifiedui/CLAUDE.md)
+- Remote JSON (Unified) customization: [Glia docs — Android Customization](https://docs.glia.com/developer-portal/android-customization)

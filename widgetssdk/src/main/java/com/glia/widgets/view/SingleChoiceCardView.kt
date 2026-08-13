@@ -16,10 +16,10 @@ import com.glia.widgets.R
 import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.databinding.SingleChoiceCardViewBinding
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.helper.applyGliaThemeFont
 import com.glia.widgets.helper.getAttr
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getColorStateListCompat
-import com.glia.widgets.helper.gliaAttrFont
 import com.glia.widgets.helper.gliaAttrResourceId
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.load
@@ -120,7 +120,7 @@ internal class SingleChoiceCardView @JvmOverloads constructor(
             it.text = text
             onClickListener?.also(it::setOnClickListener)
 
-            context.gliaAttrFont()?.also(it::setTypeface)
+            context.applyGliaThemeFont(it)
 
             it.backgroundTintList = getColorStateListCompat(
                 context.gliaAttrResourceId(R.attr.gliaBotActionButtonBackgroundColor, R.color.glia_neutral_color)

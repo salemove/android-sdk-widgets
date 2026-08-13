@@ -18,11 +18,11 @@ import com.glia.widgets.core.callvisualizer.domain.CallVisualizer
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
+import com.glia.widgets.helper.applyGliaThemeFont
 import com.glia.widgets.helper.applyImageColorTheme
 import com.glia.widgets.helper.combineStringWith
 import com.glia.widgets.helper.gliaAttrBoolean
 import com.glia.widgets.helper.gliaAttrColor
-import com.glia.widgets.helper.gliaAttrFont
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.separateStringWithSymbol
 import com.glia.widgets.helper.setLocaleContentDescription
@@ -211,11 +211,7 @@ internal class VisitorCodeView internal constructor(
      * the layout root is a child of it.
      */
     private fun applyThemeAttributes() {
-        context.gliaAttrFont()?.also {
-            successTitle.typeface = it
-            failureTitle.typeface = it
-            refreshButton.typeface = it
-        }
+        context.applyGliaThemeFont(successTitle, failureTitle, refreshButton)
         refreshButton.backgroundTintList = ColorStateList.valueOf(
             context.gliaAttrColor(R.attr.gliaBrandPrimaryColor, R.color.glia_primary_color)
         )

@@ -22,7 +22,7 @@ private var legacyOverlayDetectionLogged = false
 private var unPrefixedLegacyItemsChecked = false
 
 /**
- * Composes the Glia theme on top of the receiver's live [Resources.Theme], in place.
+ * Composes the Glia theme on top of the receiver's live `Resources.Theme`, in place.
  *
  * Precedence, lowest to highest:
  * 1. `Theme.Glia.Internal` - SDK defaults for every `glia*` attribute (already the receiver's theme).
@@ -114,7 +114,7 @@ private fun Resources.Theme.resolveGliaChatStyle(): Int? {
 }
 
 /**
- * Whether the given legacy style sets any un-prefixed [R.styleable.GliaView] item itself.
+ * Whether the given legacy style sets any un-prefixed `R.styleable.GliaView` item itself.
  *
  * Those twins (`brandPrimaryColor` and friends) were never a supported way to customize the SDK:
  * layouts have always resolved the `glia*`-prefixed theme attributes and ignored them. They are no

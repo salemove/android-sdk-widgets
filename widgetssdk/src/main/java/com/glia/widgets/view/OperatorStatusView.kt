@@ -97,7 +97,7 @@ internal class OperatorStatusView @JvmOverloads constructor(
 
     /**
      * The layout resolves each of these attributes declaratively too, but the profile picture needs
-     * its colour in a [GradientDrawable] rather than the plain one `srcCompat` produces, so that the
+     * its colour in a `GradientDrawable` rather than the plain one `srcCompat` produces, so that the
      * unified theme can turn it into a gradient later.
      */
     private fun applyThemeAttributes() {

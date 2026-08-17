@@ -55,7 +55,6 @@ import com.glia.widgets.view.dialog.base.DialogDelegate
 import com.glia.widgets.view.dialog.base.DialogDelegateImpl
 import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContainer
 import com.glia.widgets.view.head.BadgeTextView
-import com.glia.widgets.view.head.ChatHeadContract
 import com.glia.widgets.view.header.AppBarView
 import com.glia.widgets.view.snackbar.SnackBarDelegate
 import com.glia.widgets.view.snackbar.logNoConnectionSnackBarDismissed
@@ -123,7 +122,6 @@ internal class CallView @JvmOverloads constructor(
     private val poorConnectionView: AppCompatTextView get() = binding.poorConnectionView
 
     private var callController: CallContract.Controller? = null
-    private var serviceChatHeadController: ChatHeadContract.Controller? = null
     private var dialogCallback: DialogContract.Controller.Callback? = null
     private var dialogController: DialogContract.Controller? = null
 
@@ -182,14 +180,12 @@ internal class CallView @JvmOverloads constructor(
         callController?.onResume()
         operatorVideoView?.resumeRendering()
         dialogCallback?.also { dialogController?.addCallback(it) }
-        serviceChatHeadController?.onResume(this)
     }
 
     fun onPause() {
         floatingVisitorVideoContainer.onPause()
         operatorVideoView?.pauseRendering()
         dialogCallback?.also { dialogController?.removeCallback(it) }
-        serviceChatHeadController?.onPause(this)
         callController?.onPause()
     }
 
@@ -222,7 +218,6 @@ internal class CallView @JvmOverloads constructor(
             }
         }
         dialogController = Dependencies.controllerFactory.dialogController
-        serviceChatHeadController = Dependencies.controllerFactory.chatHeadController
     }
 
     override fun setController(controller: CallContract.Controller) {

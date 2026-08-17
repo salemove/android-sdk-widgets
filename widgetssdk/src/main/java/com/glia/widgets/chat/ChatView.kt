@@ -82,7 +82,6 @@ import com.glia.widgets.view.SingleChoiceCardView.OnOptionClickedListener
 import com.glia.widgets.view.animation.SimpleTransitionListener
 import com.glia.widgets.view.dialog.base.DialogDelegate
 import com.glia.widgets.view.dialog.base.DialogDelegateImpl
-import com.glia.widgets.view.head.ChatHeadContract
 import com.glia.widgets.view.snackbar.SnackBarDelegate
 import com.glia.widgets.view.snackbar.logNoConnectionSnackBarDismissed
 import com.glia.widgets.view.snackbar.logNoConnectionSnackBarShown
@@ -115,7 +114,6 @@ internal class ChatView @JvmOverloads constructor(
     private var dialogCallback: DialogContract.Controller.Callback? = null
     private var dialogController: DialogContract.Controller? = null
 
-    private var serviceChatHeadController: ChatHeadContract.Controller? = null
 
     private var uploadAttachmentAdapter by Delegates.notNull<UploadAttachmentAdapter>()
     private var adapter by Delegates.notNull<ChatAdapter>()
@@ -321,7 +319,6 @@ internal class ChatView @JvmOverloads constructor(
         setController(Dependencies.controllerFactory.chatController)
         setupDialogCallback()
         dialogController = Dependencies.controllerFactory.dialogController
-        serviceChatHeadController = Dependencies.controllerFactory.chatHeadController
     }
 
     override fun setController(controller: ChatContract.Controller) {

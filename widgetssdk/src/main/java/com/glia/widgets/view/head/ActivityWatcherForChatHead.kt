@@ -2,38 +2,41 @@ package com.glia.widgets.view.head
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.graphics.PointF
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.contains
+import com.glia.widgets.GliaWidgets
 import com.glia.widgets.base.BaseActivityStackWatcher
 import com.glia.widgets.base.GliaActivity
-import com.glia.widgets.call.CallActivity
 import com.glia.widgets.chat.Intention
-import com.glia.widgets.filepreview.ui.ImagePreviewActivity
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.WeakReferenceDelegate
 import com.glia.widgets.helper.hasChildOfType
 import com.glia.widgets.helper.rootView
+import com.glia.widgets.internal.chathead.BubbleContextEvent
+import com.glia.widgets.internal.chathead.BubbleRenderTarget
+import com.glia.widgets.internal.chathead.BubbleUiModel
+import com.glia.widgets.internal.chathead.ChatBubbleContract
+import com.glia.widgets.internal.chathead.VisibleScreen
+import com.glia.widgets.internal.chathead.toVisibleScreen
 import com.glia.widgets.launcher.ActivityLauncher
-import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadContract
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 
+/**
+ * The only place that reports screen lifecycle to the bubble controller, and the host of the in-app
+ * bubble. It attaches [ChatHeadLayout] while the controller says the bubble renders in the app.
+ */
 @SuppressLint("CheckResult")
 internal class ActivityWatcherForChatHead(
-    val controller: ActivityWatcherForChatHeadContract.Controller,
+    private val controller: ChatBubbleContract.Controller,
     private val activityLauncher: ActivityLauncher
-) : BaseActivityStackWatcher(), ActivityWatcherForChatHeadContract.Watcher {
-
-    init {
-        topActivityObserver.subscribe(
-            { resumedActivity = it },
-            { error -> Logger.e(TAG, "Observable monitoring top activity FAILED", error) }
-        )
-        controller.setWatcher(this)
-    }
+) : BaseActivityStackWatcher() {
 
     /**
      * Returns last activity that called `Activity.onResume`, but didn't call `Activity.onPause` yet
@@ -42,23 +45,54 @@ internal class ActivityWatcherForChatHead(
 
     private var resumedActivity: Activity? by WeakReferenceDelegate()
     private var chatHeadLayout: ChatHeadLayout? by WeakReferenceDelegate()
-    private var screenOrientation: Int? = null
-    private var chatHeadViewPosition: PointF? = null
+
+    /*
+     * Declared after the fields above on purpose: collecting starts by replaying the current state,
+     * which reads chatHeadLayout - and property delegates are only initialized in declaration order.
+     */
+    init {
+        topActivityObserver.subscribe(
+            { resumedActivity = it },
+            { error -> Logger.e(TAG, "Observable monitoring top activity FAILED", error) }
+        )
+        // Process-lifetime scope: the watcher is registered for the whole application lifecycle
+        CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate).launch {
+            controller.uiState.collect(::onBubbleState)
+        }
+    }
 
     override fun onActivityResumed(activity: Activity) {
         super.onActivityResumed(activity)
-        controller.onActivityResumed()
-        if (isSameOrientation(activity)) restoreBubblePosition()
+        reportVisibleScreen()
+        // Also attempted unconditionally, not just from the state collector: navigating between two
+        // screens of the same kind leaves the model untouched, and StateFlow does not re-emit an
+        // unchanged value, so the newly resumed screen would never get a bubble.
+        addChatHeadLayoutIfAbsent()
     }
 
     override fun onActivityPaused(activity: Activity) {
         super.onActivityPaused(activity)
-        screenOrientation = activity.resources.configuration.orientation
-        controller.onActivityPaused()
         if (activity === resumedActivity) {
             // MOB-3516: Android emulator with API 29 calls onActivityPaused() AFTER onActivityResumed().
             // activity === resumedActivity prevents hiding a bubble when onActivityPaused() is called for
             // an activity that is not resumed at the moment
+            removeChatHeadLayoutIfPresent()
+        }
+        reportVisibleScreen()
+    }
+
+    /**
+     * Reports the screen of whichever activity is on top of the resumed stack now. `super` has
+     * already updated [resumedActivity], so this is correct for both resumes and pauses.
+     */
+    private fun reportVisibleScreen() {
+        controller.onContextEvent(BubbleContextEvent.ScreenChanged(resumedActivity?.toVisibleScreen()))
+    }
+
+    private fun onBubbleState(state: BubbleUiModel) {
+        if (state.target == BubbleRenderTarget.APPLICATION) {
+            addChatHeadLayoutIfAbsent()
+        } else if (chatHeadLayout != null) {
             removeChatHeadLayoutIfPresent()
         }
     }
@@ -86,10 +120,12 @@ internal class ActivityWatcherForChatHead(
         this.chatHeadLayout = chatHeadLayout
     }
 
-    override fun addChatHeadLayoutIfAbsent() {
+    private fun addChatHeadLayoutIfAbsent() {
+        if (controller.uiState.value.target != BubbleRenderTarget.APPLICATION) return
         val activity = resumedActivity ?: return
-        val viewName = fetchGliaOrRootView()?.javaClass?.simpleName
-        if (isCallOrImagePreviewScreen(activity) || !controller.shouldShowBubble(viewName)) return
+        // The watcher is registered before the SDK is initialized, so there may be nothing to show yet
+        if (!GliaWidgets.isInitialized()) return
+        if (isCallOrImagePreviewScreen(activity)) return
         val viewGroup = (fetchGliaOrRootView() as? ViewGroup) ?: return
         if (viewGroup.hasChildOfType(ChatHeadLayout::class.java)) return
 
@@ -111,34 +147,25 @@ internal class ActivityWatcherForChatHead(
         }
     }
 
-    override fun removeChatHeadLayoutIfPresent() {
+    private fun removeChatHeadLayoutIfPresent() {
         Logger.d(TAG, "Bubble: remove application-only bubble")
-        saveBubblePosition()
 
+        // Position needs no saving here: [ChatHeadLayout] hands it to the controller on every drag,
+        // and maps it back into its bounds when the replacement layout is measured.
         chatHeadLayout?.apply {
             chatHeadLayout = null
             post { removeSelf() }
         }
     }
 
-    private fun saveBubblePosition() {
-        chatHeadLayout?.position?.let {
-            chatHeadViewPosition = it
-        }
-    }
+    private fun isCallOrImagePreviewScreen(activity: Activity): Boolean =
+        activity.toVisibleScreen().let { it == VisibleScreen.CALL || it == VisibleScreen.IMAGE_PREVIEW }
 
-    private fun isSameOrientation(activity: Activity) =
-        screenOrientation == activity.resources.configuration.orientation
-
-    private fun restoreBubblePosition() {
-        chatHeadViewPosition?.let {
-            chatHeadLayout?.setPosition(it.x, it.y)
-        }
-    }
-
-    private fun isCallOrImagePreviewScreen(activity: Activity?): Boolean = activity is CallActivity || activity is ImagePreviewActivity
-
-    override fun fetchGliaOrRootView(): View? {
+    /**
+     * The `ViewGroup` the in-app bubble is attached to. Glia screens expose their own view so that the
+     * bubble lands inside it; every other activity contributes its root view.
+     */
+    internal fun fetchGliaOrRootView(): View? {
         val currentActivity = resumedActivity ?: return null
 
         return when (currentActivity) {

@@ -62,7 +62,14 @@ internal class AuthenticationManager(
         //Need to cancel queueing before de-authentication, because it uses current visitor id, so after de-authentication will be impossible.
         repositoryFactory.engagementRepository.cancelQueuing()
 
+        //Set before delegating, so the end core issues while de-authenticating is already marked.
+        repositoryFactory.engagementRepository.expectDeauthenticationEnd()
+
         authentication.deauthenticate(stopPushNotifications) { _, gliaException ->
+            //Cleared on failure too - de-authentication during an engagement can be forbidden, and
+            //the engagement then stays live and must still show its dialog when the Operator ends it.
+            repositoryFactory.engagementRepository.clearDeauthenticationEnd()
+
             if (gliaException != null) {
                 onError.onError(gliaException.toWidgetsType())
             } else {

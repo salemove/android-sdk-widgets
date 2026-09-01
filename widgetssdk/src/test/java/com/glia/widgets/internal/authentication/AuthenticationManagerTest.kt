@@ -18,6 +18,7 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
+import io.mockk.verifyOrder
 import junit.framework.TestCase.assertTrue
 import org.junit.After
 import org.junit.Before
@@ -170,13 +171,16 @@ internal class AuthenticationManagerTest {
         authenticationManager.deauthenticate(stopPushNotifications, onComplete, onError)
 
         verify { Logger.i(any(), any()) }
-        verify { engagementRepository.cancelQueuing() }
-        verify {
+        verifyOrder {
+            engagementRepository.cancelQueuing()
+            engagementRepository.expectDeauthenticationEnd()
             coreAuthentication.deauthenticate(eq(stopPushNotifications), capture(authCallbackSlot))
         }
+        verify(exactly = 0) { engagementRepository.clearDeauthenticationEnd() }
 
         authCallbackSlot.captured.onResult(null, null)
 
+        verify { engagementRepository.clearDeauthenticationEnd() }
         verify { Dependencies.destroyControllersAndResetEngagementData() }
         verify { secureConversationsRepository.unsubscribeAndResetData() }
         verify { onComplete.onComplete() }
@@ -196,13 +200,15 @@ internal class AuthenticationManagerTest {
         authenticationManager.deauthenticate(stopPushNotifications, onComplete, onError)
 
         verify { Logger.i(any(), any()) }
-        verify { engagementRepository.cancelQueuing() }
-        verify {
+        verifyOrder {
+            engagementRepository.cancelQueuing()
+            engagementRepository.expectDeauthenticationEnd()
             coreAuthentication.deauthenticate(eq(stopPushNotifications), capture(authCallbackSlot))
         }
 
         authCallbackSlot.captured.onResult(null, GliaException("error", GliaException.Cause.INVALID_INPUT))
 
+        verify { engagementRepository.clearDeauthenticationEnd() }
         verify(exactly = 0) { onComplete.onComplete() }
         verify(exactly = 0) { Dependencies.destroyControllersAndResetEngagementData() }
         verify(exactly = 0) { secureConversationsRepository.unsubscribeAndResetData() }

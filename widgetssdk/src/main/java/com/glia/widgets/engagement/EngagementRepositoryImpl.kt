@@ -146,6 +146,9 @@ internal class EngagementRepositoryImpl(
     override val isSecureMessagingRequested: Boolean
         get() = _isSecureMessagingRequested
 
+    @Volatile
+    private var isDeauthenticationEndExpected: Boolean = false
+
     override val isRetainAfterEnd: Boolean
         get() = currentEngagement?.state?.actionOnEnd.isRetain
 
@@ -161,6 +164,7 @@ internal class EngagementRepositoryImpl(
 
     override fun reset() {
         _isSecureMessagingRequested = false
+        isDeauthenticationEndExpected = false
 
         if (currentState?.isQueueing == true) {
             cancelQueuing()
@@ -234,6 +238,14 @@ internal class EngagementRepositoryImpl(
                 }
             }
         }
+    }
+
+    override fun expectDeauthenticationEnd() {
+        isDeauthenticationEndExpected = true
+    }
+
+    override fun clearDeauthenticationEnd() {
+        isDeauthenticationEndExpected = false
     }
 
     override fun queueForEngagement(mediaType: MediaType, replaceExisting: Boolean) {
@@ -540,13 +552,19 @@ internal class EngagementRepositoryImpl(
     private fun handleEngagementEnd() {
         ensureNotScTransferredEngagement {
             currentEngagement = null
-            Logger.i(TAG, "Engagement ended by Operator")
+            Logger.i(TAG, if (isDeauthenticationEndExpected) "Engagement ended by de-authentication" else "Engagement ended by Operator")
             unsubscribeFromEvents(this)
-            resetState(state.actionOnEnd.isRetain)
+            resetState(state.actionOnEnd.isRetain && !isDeauthenticationEndExpected)
 
             when {
                 //We need just silently clear internal state when Call Visualizer engagement ends
                 this.isCallVisualizer -> _engagementState.onNext(State.EngagementEnded(endAction = EndAction.ClearStateCallVisualizer))
+
+                //The Visitor asked to be de-authenticated and this end is the consequence, so close
+                //the engagement silently. Retaining it, or asking for a survey, addresses a Visitor
+                //who is no longer signed in.
+                isDeauthenticationEndExpected -> _engagementState.onNext(State.EngagementEnded(endAction = EndAction.ClearStateRegular))
+
                 state.actionOnEnd.isRetain -> _engagementState.onNext(State.EngagementEnded(endAction = EndAction.Retain))
                 state.actionOnEnd.isShowEndDialog -> _engagementState.onNext(State.EngagementEnded(endAction = EndAction.ShowEndDialog))
                 state.actionOnEnd.isSurvey -> {

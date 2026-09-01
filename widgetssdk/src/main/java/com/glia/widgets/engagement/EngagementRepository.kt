@@ -52,6 +52,20 @@ internal interface EngagementRepository {
     fun terminateEngagement()
     fun queueForEngagement(mediaType: MediaType, replaceExisting: Boolean)
     fun cancelQueuing()
+
+    /**
+     * De-authentication ends an ongoing engagement from the Core SDK, and that end reaches us as
+     * the same engagement-end event the Operator hanging up produces; the event carries no cause.
+     * An end delivered between [expectDeauthenticationEnd] and [clearDeauthenticationEnd] is
+     * closed silently: no "Engagement Ended" dialog, no survey and no retained engagement, since
+     * all three address a Visitor who is no longer signed in.
+     *
+     * Clearing in the de-authentication callback is late enough because core delivers the end
+     * before it reports de-authentication complete. Any other end arriving inside the window is
+     * silenced the same way.
+     */
+    fun expectDeauthenticationEnd()
+    fun clearDeauthenticationEnd()
     fun acceptCurrentEngagementRequest(visitorContextAssetId: String)
     fun declineCurrentEngagementRequest()
     fun acceptMediaUpgradeRequest(offer: MediaUpgradeOffer)

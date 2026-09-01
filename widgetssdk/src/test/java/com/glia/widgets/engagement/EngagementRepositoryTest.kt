@@ -729,6 +729,93 @@ class EngagementRepositoryTest {
     }
 
     @Test
+    fun `endEngagement event will emit new EngagementEnded state with action ClearStateRegular when de-authentication end is expected`() {
+        mockEngagementAndStart(actionOnEnd = ActionOnEnd.END_NOTIFICATION)
+        fillStates()
+        repository.expectDeauthenticationEnd()
+        engagementEndCallbackSlot.captured.run()
+        verify { engagement.state }
+        verifyEngagementEnd(endAction = EndAction.ClearStateRegular)
+        verify(exactly = 0) { engagement.getSurvey(any()) }
+    }
+
+    @Test
+    fun `endEngagement event will not request a survey when de-authentication end is expected and actionOnEnd is SHOW_SURVEY`() {
+        mockEngagementAndStart(actionOnEnd = ActionOnEnd.SHOW_SURVEY)
+        fillStates()
+        repository.expectDeauthenticationEnd()
+        engagementEndCallbackSlot.captured.run()
+        verify { engagement.state }
+        verifyEngagementEnd(endAction = EndAction.ClearStateRegular)
+        verify(exactly = 0) { engagement.getSurvey(any()) }
+    }
+
+    @Test
+    fun `endEngagement event will emit new EngagementEnded state with action ShowEndDialog when the expected de-authentication end was cleared`() {
+        mockEngagementAndStart(actionOnEnd = ActionOnEnd.END_NOTIFICATION)
+        fillStates()
+        repository.expectDeauthenticationEnd()
+        repository.clearDeauthenticationEnd()
+        engagementEndCallbackSlot.captured.run()
+        verify { engagement.state }
+        verifyEngagementEnd(endAction = EndAction.ShowEndDialog)
+    }
+
+    @Test
+    fun `endEngagement event will emit new EngagementEnded state with action ClearStateRegular when de-authentication end is expected and actionOnEnd is RETAIN`() {
+        mockEngagementAndStart(actionOnEnd = ActionOnEnd.RETAIN)
+        repository.updateIsSecureMessagingRequested(true)
+        fillStates()
+        repository.expectDeauthenticationEnd()
+        engagementEndCallbackSlot.captured.run()
+        verify { engagement.state }
+        verifyEngagementEnd(endAction = EndAction.ClearStateRegular)
+        assertFalse(repository.isSecureMessagingRequested)
+        verify(exactly = 0) { engagement.getSurvey(any()) }
+    }
+
+    @Test
+    fun `endEngagement event will emit new EngagementEnded state with action ClearStateCallVisualizer when de-authentication end is expected and engagement is CV engagement`() {
+        mockEngagementAndStart(callVisualizer = true, actionOnEnd = ActionOnEnd.SHOW_SURVEY)
+        fillStates()
+        repository.expectDeauthenticationEnd()
+        engagementEndCallbackSlot.captured.run()
+        verify { engagement.state }
+        verifyEngagementEnd(endAction = EndAction.ClearStateCallVisualizer)
+        verify(exactly = 0) { engagement.getSurvey(any()) }
+    }
+
+    @Test
+    fun `reset clears the expected de-authentication end so the next engagement end shows the dialog`() {
+        mockEngagementAndStart()
+        repository.expectDeauthenticationEnd()
+        repository.reset()
+        verifyEngagementEnd(endAction = EndAction.ClearStateRegular)
+
+        val newEngagement = mockk<OmnicoreEngagement>(relaxUnitFun = true)
+        val newMedia: Media = mockk(relaxUnitFun = true)
+        val newChat: Chat = mockk(relaxUnitFun = true)
+        val newOperator: Operator = mockk(relaxUnitFun = true)
+        val newEngagementState: EngagementState = mockk(relaxUnitFun = true)
+        every { newEngagementState.visitorStatus } returns EngagementState.VisitorStatus.ENGAGED
+        every { newEngagementState.isLiveEngagementTransferredToSecureConversation } returns false
+        every { newEngagementState.operator } returns newOperator
+        every { newEngagementState.actionOnEnd } returns ActionOnEnd.END_NOTIFICATION
+        every { newEngagement.state } returns newEngagementState
+        every { newEngagement.media } returns newMedia
+        every { newEngagement.chat } returns newChat
+        every { newMedia.currentCameraDevice } returns mockk()
+
+        val newEngagementEndCallbackSlot = slot<Runnable>()
+        omniCoreEngagementCallbackSlot.captured.accept(newEngagement)
+        verify { operatorRepository.emit(newOperator) }
+        verify { newEngagement.on(Engagement.Events.END, capture(newEngagementEndCallbackSlot)) }
+
+        newEngagementEndCallbackSlot.captured.run()
+        repository.engagementState.test().assertNotComplete().assertValue(State.EngagementEnded(endAction = EndAction.ShowEndDialog))
+    }
+
+    @Test
     fun `endEngagement event will emit new EngagementEnded state with action ShowEndDialog when engagement actionOnEnd is UNKNOWN`() {
         mockEngagementAndStart(actionOnEnd = ActionOnEnd.UNKNOWN)
         repository.updateIsSecureMessagingRequested(true)

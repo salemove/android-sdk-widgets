@@ -2,6 +2,7 @@ package com.glia.widgets.chat.controller
 
 import android.net.Uri
 import com.glia.androidsdk.Engagement
+import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.widgets.chat.ChatContract
 import com.glia.widgets.chat.ChatManager
@@ -336,6 +337,49 @@ class ChatControllerTest {
         }
     }
 
+    private fun captureHistoryLoadFailedCallback(): (Throwable) -> Unit {
+        whenever(chatManager.initialize(any(), any(), any(), any())) doReturn Flowable.empty()
+        whenever(isMessagingAvailableUseCase()) doReturn Flowable.empty()
+        whenever(fileUploadLimitNotExceededObservableUseCase()) doReturn Observable.empty()
+
+        chatController.initChat(Intention.LIVE_CHAT)
+
+        val callbackCaptor = argumentCaptor<(Throwable) -> Unit>()
+        verify(chatManager).initialize(any(), callbackCaptor.capture(), any(), any())
+        return callbackCaptor.lastValue
+    }
+
+    @Test
+    fun `history load failure releases resources and shows an error when the visitor token is rejected`() {
+        val onHistoryLoadFailed = captureHistoryLoadFailedCallback()
+
+        onHistoryLoadFailed(GliaException("rejected", GliaException.Cause.AUTHENTICATION_ERROR))
+
+        verify(releaseResourcesUseCase).invoke()
+        verify(dialogController).showUnexpectedErrorDialog()
+    }
+
+    @Test
+    fun `history load failure shows an error in Secure Conversations, which never reloads the transcript`() {
+        val onHistoryLoadFailed = captureHistoryLoadFailedCallback()
+        whenever(manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging) doReturn true
+
+        onHistoryLoadFailed(RuntimeException("forbidden"))
+
+        verify(dialogController).showUnexpectedErrorDialog()
+        verify(releaseResourcesUseCase, never()).invoke()
+    }
+
+    @Test
+    fun `history load failure is left to the reload on engagement start in a live engagement`() {
+        val onHistoryLoadFailed = captureHistoryLoadFailedCallback()
+
+        onHistoryLoadFailed(RuntimeException("forbidden"))
+
+        verify(dialogController, never()).showUnexpectedErrorDialog()
+        verify(releaseResourcesUseCase, never()).invoke()
+    }
+
     @Test
     fun `restoreChat calls ChatManager with action ChatManager_Action_ChatRestored`() {
         chatController.restoreChat()
@@ -344,25 +388,25 @@ class ChatControllerTest {
 
     @Test
     fun `initChat calls restoreChat when intention is RETURN_TO_CHAT and chat is initialized`() {
-        whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.empty()
+        whenever(chatManager.initialize(any(), any(), any(), any())) doReturn Flowable.empty()
         whenever(isMessagingAvailableUseCase()) doReturn Flowable.empty()
         whenever(fileUploadLimitNotExceededObservableUseCase()) doReturn Observable.empty()
 
         chatController.initChat(Intention.LIVE_CHAT)
         chatController.initChat(Intention.RETURN_TO_CHAT)
-        verify(chatManager, times(1)).initialize(any(), any(), any())
+        verify(chatManager, times(1)).initialize(any(), any(), any(), any())
         verify(updateOperatorDefaultImageUrlUseCase, times(2)).invoke()
         verify(chatManager).onChatAction(eq(ChatManager.Action.ChatRestored))
     }
 
     @Test
     fun `initChat calls initLiveChat when intention is RETURN_TO_CHAT and chat is not initialized`() {
-        whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.empty()
+        whenever(chatManager.initialize(any(), any(), any(), any())) doReturn Flowable.empty()
         whenever(isMessagingAvailableUseCase()) doReturn Flowable.empty()
         whenever(fileUploadLimitNotExceededObservableUseCase()) doReturn Observable.empty()
 
         chatController.initChat(Intention.RETURN_TO_CHAT)
-        verify(chatManager, times(1)).initialize(any(), any(), any())
+        verify(chatManager, times(1)).initialize(any(), any(), any(), any())
         verify(updateOperatorDefaultImageUrlUseCase, times(1)).invoke()
         verify(chatManager, never()).onChatAction(eq(ChatManager.Action.ChatRestored))
         val stateKArgumentCaptor = argumentCaptor<ChatState>()
@@ -375,12 +419,12 @@ class ChatControllerTest {
 
     @Test
     fun `initChat emits live chat state when intention is LIVE_CHAT`() {
-        whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.empty()
+        whenever(chatManager.initialize(any(), any(), any(), any())) doReturn Flowable.empty()
         whenever(isMessagingAvailableUseCase()) doReturn Flowable.empty()
         whenever(fileUploadLimitNotExceededObservableUseCase()) doReturn Observable.empty()
 
         chatController.initChat(Intention.LIVE_CHAT)
-        verify(chatManager).initialize(any(), any(), any())
+        verify(chatManager).initialize(any(), any(), any(), any())
         val stateKArgumentCaptor = argumentCaptor<ChatState>()
 
         verify(chatView).emitState(stateKArgumentCaptor.capture())
@@ -391,12 +435,12 @@ class ChatControllerTest {
 
     @Test
     fun `initChat emits SC chat state when intention is SC_CHAT`() {
-        whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.empty()
+        whenever(chatManager.initialize(any(), any(), any(), any())) doReturn Flowable.empty()
         whenever(isMessagingAvailableUseCase()) doReturn Flowable.just(true)
         whenever(fileUploadLimitNotExceededObservableUseCase()) doReturn Observable.empty()
 
         chatController.initChat(Intention.SC_CHAT)
-        verify(chatManager).initialize(any(), any(), any())
+        verify(chatManager).initialize(any(), any(), any(), any())
         val stateKArgumentCaptor = argumentCaptor<ChatState>()
 
         verify(isMessagingAvailableUseCase, times(2)).invoke()
@@ -408,13 +452,13 @@ class ChatControllerTest {
 
     @Test
     fun `initChat emits SC chat unavailable state when intention is SC_CHAT and messaging is not available`() {
-        whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.empty()
+        whenever(chatManager.initialize(any(), any(), any(), any())) doReturn Flowable.empty()
         whenever(isMessagingAvailableUseCase()) doReturn Flowable.just(false)
         whenever(fileUploadLimitNotExceededObservableUseCase()) doReturn Observable.empty()
         whenever(manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging) doReturn true
 
         chatController.initChat(Intention.SC_CHAT)
-        verify(chatManager).initialize(any(), any(), any())
+        verify(chatManager).initialize(any(), any(), any(), any())
         val stateKArgumentCaptor = argumentCaptor<ChatState>()
 
         verify(isMessagingAvailableUseCase, times(2)).invoke()
@@ -426,12 +470,12 @@ class ChatControllerTest {
 
     @Test
     fun `initChat calls initLeaveCurrentConversationDialog with AUDIO when intention is SC_DIALOG_START_AUDIO`() {
-        whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.empty()
+        whenever(chatManager.initialize(any(), any(), any(), any())) doReturn Flowable.empty()
         whenever(isMessagingAvailableUseCase()) doReturn Flowable.just(true)
         whenever(fileUploadLimitNotExceededObservableUseCase()) doReturn Observable.empty()
 
         chatController.initChat(Intention.SC_DIALOG_START_AUDIO)
-        verify(chatManager).initialize(any(), any(), any())
+        verify(chatManager).initialize(any(), any(), any(), any())
         val stateKArgumentCaptor = argumentCaptor<ChatState>()
 
         verify(isMessagingAvailableUseCase, times(2)).invoke()
@@ -444,12 +488,12 @@ class ChatControllerTest {
 
     @Test
     fun `initChat calls initLeaveCurrentConversationDialog with VIDEO when intention is SC_DIALOG_START_VIDEO`() {
-        whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.empty()
+        whenever(chatManager.initialize(any(), any(), any(), any())) doReturn Flowable.empty()
         whenever(isMessagingAvailableUseCase()) doReturn Flowable.just(true)
         whenever(fileUploadLimitNotExceededObservableUseCase()) doReturn Observable.empty()
 
         chatController.initChat(Intention.SC_DIALOG_START_VIDEO)
-        verify(chatManager).initialize(any(), any(), any())
+        verify(chatManager).initialize(any(), any(), any(), any())
         val stateKArgumentCaptor = argumentCaptor<ChatState>()
 
         verify(isMessagingAvailableUseCase, times(2)).invoke()
@@ -462,12 +506,12 @@ class ChatControllerTest {
 
     @Test
     fun `initChat calls initLeaveCurrentConversationDialog with LIVE_CHAT when intention is SC_DIALOG_ENQUEUE_FOR_TEXT`() {
-        whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.empty()
+        whenever(chatManager.initialize(any(), any(), any(), any())) doReturn Flowable.empty()
         whenever(isMessagingAvailableUseCase()) doReturn Flowable.just(true)
         whenever(fileUploadLimitNotExceededObservableUseCase()) doReturn Observable.empty()
 
         chatController.initChat(Intention.SC_DIALOG_ENQUEUE_FOR_TEXT)
-        verify(chatManager).initialize(any(), any(), any())
+        verify(chatManager).initialize(any(), any(), any(), any())
         val stateKArgumentCaptor = argumentCaptor<ChatState>()
 
         verify(isMessagingAvailableUseCase, times(2)).invoke()
@@ -480,13 +524,13 @@ class ChatControllerTest {
 
     @Test
     fun `initChat disables the attachment button when sc is unavailable`() {
-        whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.empty()
+        whenever(chatManager.initialize(any(), any(), any(), any())) doReturn Flowable.empty()
         whenever(isMessagingAvailableUseCase()) doReturn Flowable.just(false)
         whenever(fileUploadLimitNotExceededObservableUseCase()) doReturn Observable.just(true)
         whenever(manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging) doReturn true
 
         chatController.initChat(Intention.SC_CHAT)
-        verify(chatManager).initialize(any(), any(), any())
+        verify(chatManager).initialize(any(), any(), any(), any())
         val stateKArgumentCaptor = argumentCaptor<ChatState>()
 
         verify(isMessagingAvailableUseCase, times(2)).invoke()
@@ -499,13 +543,13 @@ class ChatControllerTest {
 
     @Test
     fun `initChat disables the attachment button when sc is available but limit is exceeded`() {
-        whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.empty()
+        whenever(chatManager.initialize(any(), any(), any(), any())) doReturn Flowable.empty()
         whenever(isMessagingAvailableUseCase()) doReturn Flowable.just(true)
         whenever(fileUploadLimitNotExceededObservableUseCase()) doReturn Observable.just(false)
         whenever(manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging) doReturn true
 
         chatController.initChat(Intention.SC_CHAT)
-        verify(chatManager).initialize(any(), any(), any())
+        verify(chatManager).initialize(any(), any(), any(), any())
         val stateKArgumentCaptor = argumentCaptor<ChatState>()
 
         verify(isMessagingAvailableUseCase, times(2)).invoke()
@@ -518,13 +562,13 @@ class ChatControllerTest {
 
     @Test
     fun `initChat enables the attachment button when history is loaded sc is available and limit is not exceeded`() {
-        whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.empty()
+        whenever(chatManager.initialize(any(), any(), any(), any())) doReturn Flowable.empty()
         whenever(isMessagingAvailableUseCase()) doReturn Flowable.just(true)
         whenever(fileUploadLimitNotExceededObservableUseCase()) doReturn Observable.just(true)
         whenever(manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging) doReturn true
 
         chatController.initChat(Intention.SC_CHAT)
-        verify(chatManager).initialize(any(), any(), any())
+        verify(chatManager).initialize(any(), any(), any(), any())
         val stateKArgumentCaptor = argumentCaptor<ChatState>()
 
         verify(isMessagingAvailableUseCase, times(2)).invoke()
@@ -537,13 +581,13 @@ class ChatControllerTest {
 
     @Test
     fun `initChat disables the attachment button when history is loaded and upload limit is exceeded`() {
-        whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.empty()
+        whenever(chatManager.initialize(any(), any(), any(), any())) doReturn Flowable.empty()
         whenever(isMessagingAvailableUseCase()) doReturn Flowable.just(true)
         whenever(fileUploadLimitNotExceededObservableUseCase()) doReturn Observable.just(false)
         whenever(manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging) doReturn false
 
         chatController.initChat(Intention.SC_CHAT)
-        verify(chatManager).initialize(any(), any(), any())
+        verify(chatManager).initialize(any(), any(), any(), any())
         val stateKArgumentCaptor = argumentCaptor<ChatState>()
 
         verify(isMessagingAvailableUseCase, times(2)).invoke()
@@ -556,13 +600,13 @@ class ChatControllerTest {
 
     @Test
     fun `initChat enables the attachment button when history is loaded and upload limit is not exceeded`() {
-        whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.empty()
+        whenever(chatManager.initialize(any(), any(), any(), any())) doReturn Flowable.empty()
         whenever(isMessagingAvailableUseCase()) doReturn Flowable.just(true)
         whenever(fileUploadLimitNotExceededObservableUseCase()) doReturn Observable.just(true)
         whenever(manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging) doReturn false
 
         chatController.initChat(Intention.SC_CHAT)
-        verify(chatManager).initialize(any(), any(), any())
+        verify(chatManager).initialize(any(), any(), any(), any())
         val stateKArgumentCaptor = argumentCaptor<ChatState>()
 
         verify(isMessagingAvailableUseCase, times(2)).invoke()
@@ -575,7 +619,7 @@ class ChatControllerTest {
 
     @Test
     fun `leaveCurrentConversationDialogLeaveClicked dismisses dialog and starts live chat`() {
-        whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.empty()
+        whenever(chatManager.initialize(any(), any(), any(), any())) doReturn Flowable.empty()
         whenever(isMessagingAvailableUseCase()) doReturn Flowable.never()
         whenever(fileUploadLimitNotExceededObservableUseCase()) doReturn Observable.empty()
 

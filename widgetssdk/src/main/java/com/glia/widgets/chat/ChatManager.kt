@@ -46,6 +46,7 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.processors.BehaviorProcessor
 import io.reactivex.rxjava3.processors.FlowableProcessor
+import io.reactivex.rxjava3.processors.UnicastProcessor
 import io.reactivex.rxjava3.schedulers.Schedulers
 
 internal class ChatManager(
@@ -65,19 +66,28 @@ internal class ChatManager(
     private val state: BehaviorProcessor<State> = BehaviorProcessor.createDefault(State()),
     private val quickReplies: BehaviorProcessor<List<GvaButton>> = BehaviorProcessor.create(),
     private val action: BehaviorProcessor<Action> = BehaviorProcessor.create(),
-    private val historyLoaded: BehaviorProcessor<Boolean> = BehaviorProcessor.createDefault(false)
+    private val historyLoaded: BehaviorProcessor<Boolean> = BehaviorProcessor.createDefault(false),
+    // Opens once the transcript has been applied or given up on, which is not the same as
+    // `historyLoaded` - that one stays false after a failure so the transcript is retried.
+    private val historySettled: BehaviorProcessor<Boolean> = BehaviorProcessor.createDefault(false)
 ) {
     // Send callbacks invoke onChatAction from Core's background threads - BehaviorProcessor.onNext
     // is not thread-safe, so emissions must go through this serialized wrapper.
     private val serializedAction: FlowableProcessor<Action> = action.toSerialized()
 
+    // The transcript can settle from the initial load or from a retry, on whichever Core thread
+    // called back, while subscribeToState() opens it from the main thread - so writes go through
+    // this serialized wrapper for the same reason `action` does.
+    private val serializedHistorySettled: FlowableProcessor<Boolean> = historySettled.toSerialized()
+
     fun initialize(
         onHistoryLoaded: (hasHistory: Boolean) -> Unit,
+        onHistoryLoadFailed: (Throwable) -> Unit,
         onQuickReplyReceived: (List<GvaButton>) -> Unit,
         onOperatorMessageReceived: (count: Int) -> Unit
     ): Flowable<List<ChatItem>> {
         compositeDisposable.clear()
-        subscribe(onHistoryLoaded, onOperatorMessageReceived, onQuickReplyReceived)
+        subscribe(onHistoryLoaded, onHistoryLoadFailed, onOperatorMessageReceived, onQuickReplyReceived)
         return state
             .doOnNext(::updateQuickReplies)
             .map(State::immutableChatItems)
@@ -90,10 +100,11 @@ internal class ChatManager(
     @VisibleForTesting
     fun subscribe(
         onHistoryLoaded: (hasHistory: Boolean) -> Unit,
+        onHistoryLoadFailed: (Throwable) -> Unit,
         onOperatorMessageReceived: (count: Int) -> Unit,
         onQuickReplyReceived: (List<GvaButton>) -> Unit
     ) {
-        subscribeToState(onHistoryLoaded, onOperatorMessageReceived).also(compositeDisposable::add)
+        subscribeToState(onHistoryLoaded, onHistoryLoadFailed, onOperatorMessageReceived).also(compositeDisposable::add)
         subscribeToQuickReplies(onQuickReplyReceived).also(compositeDisposable::add)
     }
 
@@ -104,6 +115,7 @@ internal class ChatManager(
         markMessagesReadDisposable.clear()
         action.onNext(Action.None)
         historyLoaded.onNext(false)
+        serializedHistorySettled.onNext(false)
     }
 
     fun onChatAction(action: Action) {
@@ -111,22 +123,61 @@ internal class ChatManager(
     }
 
     @VisibleForTesting
-    fun subscribeToState(onHistoryLoaded: (hasHistory: Boolean) -> Unit, onOperatorMessageReceived: (count: Int) -> Unit): Disposable = state.run {
-        loadHistory(onHistoryLoaded)
-            .concatWith(subscribeToMessages(onOperatorMessageReceived))
-            .doOnError { it.printStackTrace() }
-            .subscribe(::onNext, ::onError)
+    fun subscribeToState(
+        onHistoryLoaded: (hasHistory: Boolean) -> Unit,
+        onHistoryLoadFailed: (Throwable) -> Unit,
+        onOperatorMessageReceived: (count: Int) -> Unit
+    ): Disposable {
+        serializedHistorySettled.onNext(false)
+
+        // Core registers its CHAT_MESSAGE listener only when the message stream is subscribed, and
+        // `action` retains no more than its latest value, so neither survives a late subscription.
+        // Both are buffered from here and drained once the transcript has been applied, which keeps
+        // history above the messages that followed it without losing anything that arrived while
+        // the request was in flight.
+        val messages: UnicastProcessor<ChatMessageInternal> = UnicastProcessor.create()
+        val actions: UnicastProcessor<Action> = UnicastProcessor.create()
+
+        // `state` is a BehaviorProcessor: terminating it drops every later emission, including a
+        // successful retry from reloadHistoryIfNeeded(), and reset() cannot revive it. Failures
+        // here end their own stream and leave the screen alive.
+        return CompositeDisposable(
+            onMessageUseCase().toFlowable(BackpressureStrategy.BUFFER).subscribe(messages::onNext, messages::onError),
+            action.subscribe(actions::onNext, actions::onError),
+            loadHistory(onHistoryLoaded, onHistoryLoadFailed).subscribe(state::onNext) { Logger.e(TAG, "Chat history stream failed", it) },
+            subscribeToMessages(messages, actions, onOperatorMessageReceived)
+                .delaySubscription(historySettled.filter { it })
+                .subscribe(state::onNext) { Logger.e(TAG, "Chat message stream failed", it) }
+        )
     }
 
     @VisibleForTesting
-    fun loadHistory(onHistoryLoaded: (hasHistory: Boolean) -> Unit): Flowable<State> {
+    fun loadHistory(onHistoryLoaded: (hasHistory: Boolean) -> Unit, onHistoryLoadFailed: (Throwable) -> Unit): Flowable<State> {
         val historyEvent = if (isAuthenticatedUseCase() || isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement) {
             loadHistoryUseCase()
                 .doOnSuccess { historyLoaded.onNext(true) }
                 .zipWith(state.firstOrError(), ::mapChatHistory)
+                // Core calls back on its own threads and the callbacks below reach the screen.
+                .observeOn(AndroidSchedulers.mainThread())
+                // A rejected transcript still has to initialize the screen - `onHistoryLoaded` is
+                // what brings the chat input up - and reloadHistoryIfNeeded() retries it once the
+                // engagement the visitor is actually in has started. The failure is reported to the
+                // screen rather than terminating the stream, so that retry can still land.
+                .onErrorResumeNext {
+                    // Warn, not error: every mid-engagement authentication takes this path and
+                    // recovers through the engagement-start reload, so nothing here needs
+                    // investigating on its own - only a spike does, and error would forward every
+                    // occurrence to Sentry. The variants that do lose the screen are logged at
+                    // error by the consumer.
+                    Logger.w(TAG, "Chat history load failed: ${it.message}")
+                    onHistoryLoadFailed(it)
+                    state.firstOrError()
+                }
                 .doOnSuccess { onHistoryLoaded(it.chatItems.isNotEmpty()) }
+                .doAfterSuccess { serializedHistorySettled.onNext(true) }
         } else {
             onHistoryLoaded(false)
+            serializedHistorySettled.onNext(true)
             state.firstOrError()
         }
 
@@ -134,7 +185,11 @@ internal class ChatManager(
     }
 
     @VisibleForTesting
-    fun subscribeToMessages(onOperatorMessageReceived: (count: Int) -> Unit): Flowable<State> = Flowable.merge(onMessage(), onAction())
+    fun subscribeToMessages(
+        messages: Flowable<ChatMessageInternal>,
+        actions: Flowable<Action>,
+        onOperatorMessageReceived: (count: Int) -> Unit
+    ): Flowable<State> = Flowable.merge(onMessage(messages), onAction(actions))
         .doOnNext { onOperatorMessageReceived(it.addedMessagesCount) }
 
     @VisibleForTesting
@@ -156,12 +211,12 @@ internal class ChatManager(
     // not thread-safe - hop to the main thread before mapping so `isNew` reconciliation never
     // processes the same message twice (which duplicated delivered messages).
     @VisibleForTesting
-    fun onMessage(): Flowable<State> = onMessageUseCase().toFlowable(BackpressureStrategy.BUFFER)
+    fun onMessage(messages: Flowable<ChatMessageInternal>): Flowable<State> = messages
         .observeOn(AndroidSchedulers.mainThread())
         .withLatestFrom(state, ::mapNewMessage)
 
     @VisibleForTesting
-    fun onAction(): Flowable<State> = action
+    fun onAction(actions: Flowable<Action>): Flowable<State> = actions
         .observeOn(AndroidSchedulers.mainThread())
         .withLatestFrom(state, ::mapAction)
 
@@ -224,7 +279,12 @@ internal class ChatManager(
 
     @VisibleForTesting
     fun mapNewMessage(chatMessage: ChatMessageInternal, messagesState: State): State {
-        check(chatMessage.chatMessage.isValid()) { "Invalid chat message passed -> ${chatMessage.chatMessage}" }
+        // Never interpolate the message itself - ChatMessage.toString() carries the message
+        // content and the operator name, and this throwable is logged at error, which ships to
+        // Kibana and Sentry in release builds.
+        check(chatMessage.chatMessage.isValid()) {
+            "Invalid chat message passed -> id=${chatMessage.chatMessage.id}, senderType=${chatMessage.chatMessage.senderType}"
+        }
 
         if (messagesState.isNew(chatMessage.chatMessage.id)) {
             appendNewChatMessageUseCase(messagesState, chatMessage)
@@ -479,11 +539,25 @@ internal class ChatManager(
         chatItems.remove(NewMessagesDividerItem)
     }
 
+    /**
+     * A transcript request issued against an engagement being replaced can fail, or produce no
+     * outcome at all. In the latter case this retry is the only thing that settles the history
+     * stage and releases the buffered live messages for a screen opened during the replacement.
+     *
+     * A transcript that only arrives on the retry is appended below the live messages that
+     * rendered in the meantime, because [mapChatHistory] always appends. The visitor keeps the
+     * newer messages and gains the older ones under them.
+     */
     fun reloadHistoryIfNeeded() {
         val loadHistory = historyLoaded.firstElement()
             .filter { !it }
             .flatMap { loadHistoryUseCase().toMaybe() }
+            // By the time a retry runs, the message stream is writing the same mutable State from
+            // the main thread. Applying the transcript there too keeps a single writer.
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSuccess { historyLoaded.onNext(true) }
             .zipWith(state.firstElement(), ::mapChatHistory)
+            .doAfterSuccess { serializedHistorySettled.onNext(true) }
             .subscribe(state::onNext, { Logger.e(TAG, "Chat reload failed", it) }, { Logger.i(TAG, "Chat history is already loaded") })
 
         compositeDisposable.add(loadHistory)

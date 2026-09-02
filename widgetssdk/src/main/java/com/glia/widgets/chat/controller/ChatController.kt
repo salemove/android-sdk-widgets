@@ -806,7 +806,7 @@ internal class ChatController(
     }
 
     private fun initChatManager() {
-        chatManager.initialize(::onHistoryLoaded, ::addQuickReplyButtons, ::updateUnSeenMessagesCount)
+        chatManager.initialize(::onHistoryLoaded, ::onHistoryLoadFailed, ::addQuickReplyButtons, ::updateUnSeenMessagesCount)
             .subscribe(::emitItems, ::error)
             .also(disposable::add)
     }
@@ -820,6 +820,21 @@ internal class ChatController(
         emitViewState {
             val notSeenCount = chatState.messagesNotSeen
             chatState.messagesNotSeenChanged(if (chatState.isChatInBottom) 0 else notSeenCount + count)
+        }
+    }
+
+    /**
+     * A transcript that fails to load leaves the screen usable but empty, so the visitor is only
+     * told when nothing else will fix it. A live engagement reloads the transcript once it starts
+     * ([newEngagementLoaded]), which covers a request rejected because the engagement it was issued
+     * against was replaced. Secure Conversations has no such reload, and a rejected visitor token
+     * invalidates the screen whichever flow it is - both have to surface.
+     */
+    private fun onHistoryLoadFailed(throwable: Throwable) {
+        val isAuthenticationError = (throwable as? GliaException)?.cause == GliaException.Cause.AUTHENTICATION_ERROR
+
+        if (isAuthenticationError || manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging) {
+            error(throwable)
         }
     }
 

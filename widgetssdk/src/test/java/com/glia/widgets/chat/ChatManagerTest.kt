@@ -40,6 +40,7 @@ import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.processors.BehaviorProcessor
 import io.reactivex.rxjava3.schedulers.Schedulers
+import io.reactivex.rxjava3.subjects.SingleSubject
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -53,6 +54,7 @@ import org.mockito.ArgumentMatchers.anyBoolean
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -85,6 +87,7 @@ class ChatManagerTest {
     private lateinit var quickReplies: BehaviorProcessor<List<GvaButton>>
     private lateinit var action: BehaviorProcessor<ChatManager.Action>
     private lateinit var historyLoaded: BehaviorProcessor<Boolean>
+    private lateinit var historySettled: BehaviorProcessor<Boolean>
 
     @Before
     fun setUp() {
@@ -110,6 +113,7 @@ class ChatManagerTest {
         quickReplies = BehaviorProcessor.create()
         action = BehaviorProcessor.create()
         historyLoaded = BehaviorProcessor.createDefault(false)
+        historySettled = BehaviorProcessor.createDefault(false)
 
         subjectUnderTest = ChatManager(
             onMessageUseCase,
@@ -128,7 +132,8 @@ class ChatManagerTest {
             stateProcessor,
             quickReplies,
             action,
-            historyLoaded
+            historyLoaded,
+            historySettled
         )
     }
 
@@ -720,7 +725,7 @@ class ChatManagerTest {
     fun `onAction triggers mapAction when new action received`() {
         stateProcessor.onNext(state)
         val subjectUnderTestSpy = spy(subjectUnderTest)
-        val onActionFlowable = subjectUnderTestSpy.onAction().test()
+        val onActionFlowable = subjectUnderTestSpy.onAction(action).test()
         onActionFlowable.assertNoValues()
 
         action.onNext(ChatManager.Action.ChatRestored)
@@ -732,10 +737,9 @@ class ChatManagerTest {
     fun `mapNewMessage triggers mapNewMessage when new message received`() {
         stateProcessor.onNext(state)
         val messageProcessor: BehaviorProcessor<ChatMessageInternal> = BehaviorProcessor.create()
-        whenever(onMessageUseCase()) doReturn messageProcessor.share().toObservable()
 
         val subjectUnderTestSpy = spy(subjectUnderTest)
-        val onMessageFlowable = subjectUnderTestSpy.onMessage().test()
+        val onMessageFlowable = subjectUnderTestSpy.onMessage(messageProcessor).test()
         onMessageFlowable.assertNoValues()
 
         messageProcessor.onNext(mockChatMessage<OperatorMessage>())
@@ -780,7 +784,7 @@ class ChatManagerTest {
         val loadHistoryCallback: (Boolean) -> Unit = mock()
 
         val subjectUnderTestSpy = spy(subjectUnderTest)
-        val testFlowable = subjectUnderTestSpy.loadHistory(loadHistoryCallback).test()
+        val testFlowable = subjectUnderTestSpy.loadHistory(loadHistoryCallback, mock()).test()
 
         verify(subjectUnderTestSpy).mapChatHistory(any(), any())
 
@@ -800,7 +804,7 @@ class ChatManagerTest {
         val loadHistoryCallback: (Boolean) -> Unit = mock()
 
         val subjectUnderTestSpy = spy(subjectUnderTest)
-        val testFlowable = subjectUnderTestSpy.loadHistory(loadHistoryCallback).test()
+        val testFlowable = subjectUnderTestSpy.loadHistory(loadHistoryCallback, mock()).test()
 
         verify(subjectUnderTestSpy).mapChatHistory(any(), any())
 
@@ -820,7 +824,7 @@ class ChatManagerTest {
         val loadHistoryCallback: (Boolean) -> Unit = mock()
 
         val subjectUnderTestSpy = spy(subjectUnderTest)
-        val testFlowable = subjectUnderTestSpy.loadHistory(loadHistoryCallback).test()
+        val testFlowable = subjectUnderTestSpy.loadHistory(loadHistoryCallback, mock()).test()
 
         verify(subjectUnderTestSpy, never()).mapChatHistory(any(), any())
         verify(loadHistoryCallback).invoke(false)
@@ -842,9 +846,112 @@ class ChatManagerTest {
         whenever(onMessageUseCase()) doReturn Observable.just(chatMessageInternal)
 
         val subjectUnderTestSpy = spy(subjectUnderTest)
-        subjectUnderTestSpy.subscribeToState(mock(), mock())
-        verify(subjectUnderTestSpy).loadHistory(any())
-        verify(subjectUnderTestSpy).subscribeToMessages(any())
+        subjectUnderTestSpy.subscribeToState(mock(), mock(), mock())
+        verify(subjectUnderTestSpy).loadHistory(any(), any())
+        verify(subjectUnderTestSpy).subscribeToMessages(any(), any(), any())
+    }
+
+    @Test
+    fun `subscribeToState delivers messages that arrive while the history request is in flight`() {
+        whenever(isAuthenticatedUseCase()) doReturn true
+        val history: SingleSubject<ChatHistoryResponse> = SingleSubject.create()
+        whenever(loadHistoryUseCase()) doReturn history
+        val messageProcessor: BehaviorProcessor<ChatMessageInternal> = BehaviorProcessor.create()
+        whenever(onMessageUseCase()) doReturn messageProcessor.toObservable()
+
+        val subjectUnderTestSpy = spy(subjectUnderTest)
+        subjectUnderTestSpy.subscribeToState(mock(), mock(), mock())
+
+        messageProcessor.onNext(mockChatMessage<OperatorMessage>())
+        shadowOf(Looper.getMainLooper()).idle()
+        verify(subjectUnderTestSpy, never()).mapNewMessage(any(), any())
+
+        history.onSuccess(mock())
+        shadowOf(Looper.getMainLooper()).idle()
+
+        verify(subjectUnderTestSpy).mapNewMessage(any(), any())
+    }
+
+    @Test
+    fun `subscribeToState delivers messages after a history request that never completes is reloaded`() {
+        whenever(isAuthenticatedUseCase()) doReturn true
+        whenever(loadHistoryUseCase()).thenReturn(Single.never(), Single.just(mock()))
+        val messageProcessor: BehaviorProcessor<ChatMessageInternal> = BehaviorProcessor.create()
+        whenever(onMessageUseCase()) doReturn messageProcessor.toObservable()
+
+        val subjectUnderTestSpy = spy(subjectUnderTest)
+        subjectUnderTestSpy.subscribeToState(mock(), mock(), mock())
+
+        messageProcessor.onNext(mockChatMessage<OperatorMessage>())
+        shadowOf(Looper.getMainLooper()).idle()
+        verify(subjectUnderTestSpy, never()).mapNewMessage(any(), any())
+
+        subjectUnderTestSpy.reloadHistoryIfNeeded()
+        shadowOf(Looper.getMainLooper()).idle()
+
+        verify(subjectUnderTestSpy).mapNewMessage(any(), any())
+    }
+
+    @Test
+    fun `subscribeToState keeps state alive and delivers messages when the history request fails`() {
+        whenever(isAuthenticatedUseCase()) doReturn true
+        whenever(loadHistoryUseCase()) doReturn Single.error(RuntimeException("forbidden"))
+        val messageProcessor: BehaviorProcessor<ChatMessageInternal> = BehaviorProcessor.create()
+        whenever(onMessageUseCase()) doReturn messageProcessor.toObservable()
+
+        val stateTest = stateProcessor.test()
+        val onHistoryLoaded: (Boolean) -> Unit = mock()
+
+        val subjectUnderTestSpy = spy(subjectUnderTest)
+        subjectUnderTestSpy.subscribeToState(onHistoryLoaded, mock(), mock())
+
+        messageProcessor.onNext(mockChatMessage<OperatorMessage>())
+        shadowOf(Looper.getMainLooper()).idle()
+
+        verify(onHistoryLoaded).invoke(false)
+        verify(subjectUnderTestSpy).mapNewMessage(any(), any())
+        stateTest.assertNoErrors()
+    }
+
+    @Test
+    fun `loadHistory reports the failure while still initializing the screen`() {
+        whenever(isAuthenticatedUseCase()) doReturn true
+        val failure = RuntimeException("forbidden")
+        whenever(loadHistoryUseCase()) doReturn Single.error(failure)
+
+        val onHistoryLoaded: (Boolean) -> Unit = mock()
+        val onHistoryLoadFailed: (Throwable) -> Unit = mock()
+
+        val testFlowable = subjectUnderTest.loadHistory(onHistoryLoaded, onHistoryLoadFailed).test()
+
+        verify(onHistoryLoadFailed).invoke(failure)
+        verify(onHistoryLoaded).invoke(false)
+        testFlowable.assertNoErrors().assertValueCount(1)
+        assertEquals(true, historySettled.value)
+    }
+
+    @Test
+    fun `reloadHistoryIfNeeded appends the retried transcript below the messages that already rendered`() {
+        state.chatItems.add(VisitorMessageItem("live message", "live-message-id"))
+
+        val historyMessage = mockChatMessage<OperatorMessage>()
+        val historyResponse: ChatHistoryResponse = mock()
+        whenever(historyResponse.items) doReturn listOf(historyMessage)
+        whenever(loadHistoryUseCase()) doReturn Single.just(historyResponse)
+        whenever(appendHistoryChatMessageUseCase(any(), any(), any())) doAnswer {
+            val chatItems = it.getArgument<MutableList<ChatItem>>(0)
+            val message = it.getArgument<ChatMessageInternal>(1)
+            chatItems.add(VisitorMessageItem("history message", message.chatMessage.id))
+            Unit
+        }
+
+        subjectUnderTest.reloadHistoryIfNeeded()
+        shadowOf(Looper.getMainLooper()).idle()
+
+        assertEquals(
+            listOf("live-message-id", historyMessage.chatMessage.id),
+            state.chatItems.map { (it as VisitorMessageItem).id }
+        )
     }
 
     @Test
@@ -876,6 +983,7 @@ class ChatManagerTest {
         stateProcessor.onNext(ChatManager.State(addedMessagesCount = 10))
         quickReplies.onNext(listOf(mock()))
         historyLoaded.onNext(true)
+        historySettled.onNext(true)
 
         subjectUnderTest.reset()
 
@@ -884,6 +992,7 @@ class ChatManagerTest {
         assertEquals(stateProcessor.value, ChatManager.State())
         assertEquals(quickReplies.value, emptyList<GvaButton>())
         assertEquals(historyLoaded.value, false)
+        assertEquals(historySettled.value, false)
     }
 
     @Test
@@ -893,8 +1002,8 @@ class ChatManagerTest {
         whenever(onMessageUseCase()) doReturn Observable.just(mockChatMessage)
 
         spy(subjectUnderTest).apply {
-            subscribe({ }, { }, { })
-            verify(this).subscribeToState(any(), any())
+            subscribe({ }, { }, { }, { })
+            verify(this).subscribeToState(any(), any(), any())
             verify(this).subscribeToQuickReplies(any())
         }
     }
@@ -911,14 +1020,16 @@ class ChatManagerTest {
 
         spy(subjectUnderTest).apply {
             val onHistoryLoaded = mock<(hasHistory: Boolean) -> Unit>()
+            val onHistoryLoadFailed = mock<(Throwable) -> Unit>()
             val onQuickReplyReceived = mock<(List<GvaButton>) -> Unit>()
             val onOperatorMessageReceived = mock<(count: Int) -> Unit>()
 
-            initialize(onHistoryLoaded, onQuickReplyReceived, onOperatorMessageReceived).test().assertNoErrors().awaitCount(1)
+            initialize(onHistoryLoaded, onHistoryLoadFailed, onQuickReplyReceived, onOperatorMessageReceived)
+                .test().assertNoErrors().awaitCount(1)
 
             verify(compositeDisposable).clear()
-            verify(this).subscribe(onHistoryLoaded, onOperatorMessageReceived, onQuickReplyReceived)
-            verify(this).subscribeToState(onHistoryLoaded, onOperatorMessageReceived)
+            verify(this).subscribe(onHistoryLoaded, onHistoryLoadFailed, onOperatorMessageReceived, onQuickReplyReceived)
+            verify(this).subscribeToState(onHistoryLoaded, onHistoryLoadFailed, onOperatorMessageReceived)
             verify(this).subscribeToQuickReplies(onQuickReplyReceived)
 
             stateProcessor.onNext(stateSpy)

@@ -21,6 +21,7 @@ import com.glia.widgets.di.Dependencies.engagementLauncher
 import com.glia.widgets.di.Dependencies.entryWidget
 import com.glia.widgets.di.Dependencies.getAuthenticationManager
 import com.glia.widgets.di.Dependencies.gliaCore
+import com.glia.widgets.di.Dependencies.lifecycleEvents
 import com.glia.widgets.di.Dependencies.liveObservation
 import com.glia.widgets.di.Dependencies.pushNotifications
 import com.glia.widgets.di.Dependencies.repositoryFactory
@@ -32,6 +33,7 @@ import com.glia.widgets.helper.Logger
 import com.glia.widgets.internal.authentication.toCoreType
 import com.glia.widgets.internal.authentication.toWidgetsType
 import com.glia.widgets.launcher.EngagementLauncher
+import com.glia.widgets.lifecycle.OnGliaEvent
 import com.glia.widgets.liveobservation.LiveObservation
 import com.glia.widgets.queue.Queue
 import com.glia.widgets.queue.toWidgetsType
@@ -497,6 +499,31 @@ object GliaWidgets {
     fun getPushNotifications(): PushNotifications {
         GliaLogger.logMethodUse(GliaWidgets::class, "getPushNotifications")
         return pushNotifications
+    }
+
+    /**
+     * Subscribes to Widgets SDK lifecycle events.
+     *
+     * @param listener [OnGliaEvent] callback that will be invoked for lifecycle events.
+     *
+     * Note: Ensure to unsubscribe using [unsubscribeFromEvents] when updates are no longer needed
+     * to avoid memory leaks or unnecessary updates.
+     */
+    @JvmStatic
+    fun subscribeToEvents(listener: OnGliaEvent) {
+        GliaLogger.logMethodUse(GliaWidgets::class, "subscribeToEvents")
+        lifecycleEvents.subscribe(listener)
+    }
+
+    /**
+     * Unsubscribes from Widgets SDK lifecycle events.
+     *
+     * @param listener [OnGliaEvent] callback that was previously subscribed via [subscribeToEvents].
+     */
+    @JvmStatic
+    fun unsubscribeFromEvents(listener: OnGliaEvent) {
+        GliaLogger.logMethodUse(GliaWidgets::class, "unsubscribeFromEvents")
+        lifecycleEvents.unsubscribe(listener)
     }
 
     private fun setupQueueIds(queueIds: List<String>) {

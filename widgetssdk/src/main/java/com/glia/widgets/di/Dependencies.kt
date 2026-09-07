@@ -163,7 +163,7 @@ internal object Dependencies {
 
     @JvmStatic
     val lifecycleEvents: GliaLifecycleEvents by lazy {
-        GliaLifecycleEventsImpl()
+        GliaLifecycleEventsImpl(useCaseFactory.gliaLifecycleEventUseCase)
     }
 
     private val applicationLifecycleManager: ApplicationLifecycleManager by lazy {

@@ -353,6 +353,14 @@ class MainFragment : Fragment() {
         }
     }
 
+    private fun listenForGliaEvents() {
+        GliaWidgets.subscribeToEvents { event ->
+            activity?.runOnUiThread {
+                Toast.makeText(context, "GliaEvent: $event", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
     private fun getQueueIdsFromPrefs(sharedPreferences: SharedPreferences): List<String> {
         val defaultQueues = sharedPreferences.getBoolean(resources.getString(R.string.pref_default_queues), false)
         if (defaultQueues) {
@@ -538,6 +546,7 @@ class MainFragment : Fragment() {
         if (GliaWidgets.isInitialized()) {
             setupAuthButtonsVisibility()
             listenForCallVisualizerEngagements()
+            listenForGliaEvents()
             return
         }
 
@@ -550,6 +559,7 @@ class MainFragment : Fragment() {
             prepareAuthentication()
             setupAuthButtonsVisibility()
             listenForCallVisualizerEngagements()
+            listenForGliaEvents()
 
             view?.post { initMenu() }
         }

@@ -28,7 +28,7 @@ class GliaLifecycleEventsImplTest {
 
     @Test
     fun `subscribe registers a listener and dispatches events`() {
-        val listener: OnGliaEvent = mockk(relaxed = true)
+        val listener: OnEvent = mockk(relaxed = true)
 
         gliaLifecycleEvents.subscribe(listener)
         eventsProcessor.onNext(GliaEvent.EngagementStarted)
@@ -39,7 +39,7 @@ class GliaLifecycleEventsImplTest {
 
     @Test
     fun `subscribe does not duplicate the same listener instance`() {
-        val listener: OnGliaEvent = mockk(relaxed = true)
+        val listener: OnEvent = mockk(relaxed = true)
 
         gliaLifecycleEvents.subscribe(listener)
         gliaLifecycleEvents.subscribe(listener)
@@ -52,8 +52,8 @@ class GliaLifecycleEventsImplTest {
 
     @Test
     fun `subscribe registers multiple distinct listeners independently`() {
-        val firstListener: OnGliaEvent = mockk(relaxed = true)
-        val secondListener: OnGliaEvent = mockk(relaxed = true)
+        val firstListener: OnEvent = mockk(relaxed = true)
+        val secondListener: OnEvent = mockk(relaxed = true)
 
         gliaLifecycleEvents.subscribe(firstListener)
         gliaLifecycleEvents.subscribe(secondListener)
@@ -66,7 +66,7 @@ class GliaLifecycleEventsImplTest {
 
     @Test
     fun `unsubscribe disposes the subscription and stops further events`() {
-        val listener: OnGliaEvent = mockk(relaxed = true)
+        val listener: OnEvent = mockk(relaxed = true)
         gliaLifecycleEvents.subscribe(listener)
 
         gliaLifecycleEvents.unsubscribe(listener)
@@ -78,7 +78,7 @@ class GliaLifecycleEventsImplTest {
 
     @Test
     fun `unsubscribe is a no-op for a listener that was never subscribed`() {
-        val listener: OnGliaEvent = mockk(relaxed = true)
+        val listener: OnEvent = mockk(relaxed = true)
 
         gliaLifecycleEvents.unsubscribe(listener)
 

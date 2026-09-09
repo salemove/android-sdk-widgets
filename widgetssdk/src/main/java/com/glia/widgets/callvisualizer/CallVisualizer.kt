@@ -2,6 +2,7 @@ package com.glia.widgets.callvisualizer
 
 import android.content.Context
 import android.view.View
+import com.glia.widgets.callbacks.OnComplete
 
 /**
  * Provides controls related to Call Visualizer module
@@ -63,9 +64,9 @@ interface CallVisualizer {
      * Callback won't be triggered for engagement started before the callback has been set or the ongoing engagements.
      * Setting new callback will override the old one.
      *
-     * @param runnable The Runnable that will be executed on Call Visualizer engagement start
+     * @param onComplete The [OnComplete] callback that will be executed on Call Visualizer engagement start
      */
-    fun onEngagementStart(runnable: Runnable)
+    fun onEngagementStart(onComplete: OnComplete)
 
     /**
      * Sets callback that will be called when Call Visualizer engagement is ended.
@@ -73,7 +74,7 @@ interface CallVisualizer {
      * Callback won't be triggered for engagement ended before the callback has been set.
      * Setting new callback will override the old one.
      *
-     * @param runnable The Runnable that will be executed on Call Visualizer engagement end
+     * @param onComplete The [OnComplete] callback that will be executed on Call Visualizer engagement end
      */
-    fun onEngagementEnd(runnable: Runnable)
+    fun onEngagementEnd(onComplete: OnComplete)
 }

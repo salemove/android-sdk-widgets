@@ -12,7 +12,7 @@ import com.glia.widgets.callbacks.OnError
 import com.glia.widgets.callbacks.OnResult
 import com.glia.widgets.chat.adapter.CustomCardAdapter
 import com.glia.widgets.chat.adapter.WebViewCardAdapter
-import com.glia.widgets.core.callvisualizer.domain.CallVisualizer
+import com.glia.widgets.callvisualizer.CallVisualizer
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.di.Dependencies.callVisualizerManager
 import com.glia.widgets.di.Dependencies.configurationManager

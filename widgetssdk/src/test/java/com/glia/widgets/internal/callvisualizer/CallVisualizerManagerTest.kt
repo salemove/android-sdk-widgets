@@ -4,6 +4,7 @@ import android.content.Context
 import android.mockk
 import android.unMockk
 import com.glia.telemetry_lib.GliaLogger
+import com.glia.widgets.callbacks.OnComplete
 import com.glia.widgets.callvisualizer.controller.CallVisualizerContract
 import com.glia.widgets.internal.callvisualizer.domain.VisitorCodeViewBuilderUseCase
 import com.glia.widgets.view.VisitorCodeView
@@ -78,20 +79,20 @@ internal class CallVisualizerManagerTest {
     }
 
     @Test
-    fun `onEngagementStart runnable is invoked when engagementStartFlow emits`() {
+    fun `onEngagementStart callback is invoked when engagementStartFlow emits`() {
         var invoked = false
 
-        callVisualizerManager.onEngagementStart(Runnable { invoked = true })
+        callVisualizerManager.onEngagementStart(OnComplete { invoked = true })
         engagementStartProcessor.onNext(mockk())
 
         assert(invoked)
     }
 
     @Test
-    fun `onEngagementEnd runnable is invoked when engagementEndFlow emits`() {
+    fun `onEngagementEnd callback is invoked when engagementEndFlow emits`() {
         var invoked = false
 
-        callVisualizerManager.onEngagementEnd(Runnable { invoked = true })
+        callVisualizerManager.onEngagementEnd(OnComplete { invoked = true })
         engagementEndProcessor.onNext(mockk())
 
         assert(invoked)

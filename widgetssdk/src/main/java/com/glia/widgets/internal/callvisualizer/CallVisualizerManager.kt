@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
 import com.glia.telemetry_lib.GliaLogger
+import com.glia.widgets.callbacks.OnComplete
 import com.glia.widgets.callvisualizer.controller.CallVisualizerContract
 import com.glia.widgets.callvisualizer.CallVisualizer
 import com.glia.widgets.internal.callvisualizer.domain.VisitorCodeViewBuilderUseCase
@@ -34,14 +35,14 @@ internal class CallVisualizerManager(
     }
 
     @SuppressLint("CheckResult")
-    override fun onEngagementStart(runnable: Runnable) {
+    override fun onEngagementStart(onComplete: OnComplete) {
         GliaLogger.logMethodUse(CallVisualizer::class, "onEngagementStart")
-        callVisualizerController.engagementStartFlow.subscribe { runnable.run() }
+        callVisualizerController.engagementStartFlow.subscribe { onComplete.onComplete() }
     }
 
     @SuppressLint("CheckResult")
-    override fun onEngagementEnd(runnable: Runnable) {
+    override fun onEngagementEnd(onComplete: OnComplete) {
         GliaLogger.logMethodUse(CallVisualizer::class, "onEngagementEnd")
-        callVisualizerController.engagementEndFlow.subscribe { runnable.run() }
+        callVisualizerController.engagementEndFlow.subscribe { onComplete.onComplete() }
     }
 }

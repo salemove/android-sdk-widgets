@@ -1,4 +1,4 @@
-package com.glia.widgets.core.callvisualizer.domain
+package com.glia.widgets.callvisualizer
 
 import android.content.Context
 import android.view.View

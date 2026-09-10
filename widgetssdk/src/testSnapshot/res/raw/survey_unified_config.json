@@ -1,0 +1,408 @@
+{
+  "surveyScreen": {
+    "layer": {
+      "color": {
+        "type": "fill",
+        "value": [
+          "#fff3e0"
+        ]
+      },
+      "cornerRadius": 4
+    },
+    "title": {
+      "alignment": "center",
+      "font": {
+        "size": 18,
+        "style": "bold"
+      },
+      "foreground": {
+        "type": "fill",
+        "value": [
+          "#004d40"
+        ]
+      }
+    },
+    "submitButton": {
+      "background": {
+        "border": {
+          "type": "fill",
+          "value": [
+            "#004d40"
+          ]
+        },
+        "borderWidth": 2,
+        "color": {
+          "type": "fill",
+          "value": [
+            "#00796b"
+          ]
+        },
+        "cornerRadius": 16
+      },
+      "text": {
+        "alignment": "center",
+        "font": {
+          "size": 16,
+          "style": "regular"
+        },
+        "foreground": {
+          "type": "fill",
+          "value": [
+            "#ffffff"
+          ]
+        }
+      }
+    },
+    "cancelButton": {
+      "background": {
+        "border": {
+          "type": "fill",
+          "value": [
+            "#004d40"
+          ]
+        },
+        "borderWidth": 2,
+        "color": {
+          "type": "fill",
+          "value": [
+            "#fff3e0"
+          ]
+        },
+        "cornerRadius": 16
+      },
+      "text": {
+        "alignment": "center",
+        "font": {
+          "size": 16,
+          "style": "regular"
+        },
+        "foreground": {
+          "type": "fill",
+          "value": [
+            "#004d40"
+          ]
+        }
+      }
+    },
+    "booleanQuestion": {
+      "title": {
+        "font": {
+          "size": 16,
+          "style": "bold"
+        },
+        "foreground": {
+          "type": "fill",
+          "value": [
+            "#1a237e"
+          ]
+        }
+      },
+      "optionButton": {
+        "normalLayer": {
+          "border": {
+            "type": "fill",
+            "value": [
+              "#1a237e"
+            ]
+          },
+          "borderWidth": 2,
+          "color": {
+            "type": "fill",
+            "value": [
+              "#e8eaf6"
+            ]
+          },
+          "cornerRadius": 16
+        },
+        "normalText": {
+          "foreground": {
+            "type": "fill",
+            "value": [
+              "#1a237e"
+            ]
+          }
+        },
+        "selectedLayer": {
+          "border": {
+            "type": "fill",
+            "value": [
+              "#1a237e"
+            ]
+          },
+          "borderWidth": 2,
+          "color": {
+            "type": "fill",
+            "value": [
+              "#1a237e"
+            ]
+          },
+          "cornerRadius": 16
+        },
+        "selectedText": {
+          "foreground": {
+            "type": "fill",
+            "value": [
+              "#e8eaf6"
+            ]
+          }
+        },
+        "highlightedLayer": {
+          "border": {
+            "type": "fill",
+            "value": [
+              "#ff6f00"
+            ]
+          },
+          "borderWidth": 2,
+          "color": {
+            "type": "fill",
+            "value": [
+              "#e8eaf6"
+            ]
+          },
+          "cornerRadius": 16
+        },
+        "highlightedText": {
+          "foreground": {
+            "type": "fill",
+            "value": [
+              "#ff6f00"
+            ]
+          }
+        },
+        "error": {
+          "foreground": {
+            "type": "fill",
+            "value": [
+              "#ff6f00"
+            ]
+          }
+        }
+      }
+    },
+    "scaleQuestion": {
+      "title": {
+        "font": {
+          "size": 16,
+          "style": "bold"
+        },
+        "foreground": {
+          "type": "fill",
+          "value": [
+            "#4a148c"
+          ]
+        }
+      },
+      "optionButton": {
+        "normalLayer": {
+          "border": {
+            "type": "fill",
+            "value": [
+              "#4a148c"
+            ]
+          },
+          "borderWidth": 2,
+          "color": {
+            "type": "fill",
+            "value": [
+              "#f3e5f5"
+            ]
+          },
+          "cornerRadius": 16
+        },
+        "normalText": {
+          "foreground": {
+            "type": "fill",
+            "value": [
+              "#4a148c"
+            ]
+          }
+        },
+        "selectedLayer": {
+          "border": {
+            "type": "fill",
+            "value": [
+              "#4a148c"
+            ]
+          },
+          "borderWidth": 2,
+          "color": {
+            "type": "fill",
+            "value": [
+              "#4a148c"
+            ]
+          },
+          "cornerRadius": 16
+        },
+        "selectedText": {
+          "foreground": {
+            "type": "fill",
+            "value": [
+              "#f3e5f5"
+            ]
+          }
+        },
+        "highlightedLayer": {
+          "border": {
+            "type": "fill",
+            "value": [
+              "#ff6f00"
+            ]
+          },
+          "borderWidth": 2,
+          "color": {
+            "type": "fill",
+            "value": [
+              "#f3e5f5"
+            ]
+          },
+          "cornerRadius": 16
+        },
+        "highlightedText": {
+          "foreground": {
+            "type": "fill",
+            "value": [
+              "#ff6f00"
+            ]
+          }
+        },
+        "error": {
+          "foreground": {
+            "type": "fill",
+            "value": [
+              "#ff6f00"
+            ]
+          }
+        }
+      }
+    },
+    "singleQuestion": {
+      "title": {
+        "font": {
+          "size": 16,
+          "style": "bold"
+        },
+        "foreground": {
+          "type": "fill",
+          "value": [
+            "#006064"
+          ]
+        }
+      },
+      "tintColor": {
+        "type": "fill",
+        "value": [
+          "#00838f"
+        ]
+      },
+      "option": {
+        "font": {
+          "size": 16,
+          "style": "regular"
+        },
+        "foreground": {
+          "type": "fill",
+          "value": [
+            "#006064"
+          ]
+        }
+      },
+      "error": {
+        "foreground": {
+          "type": "fill",
+          "value": [
+            "#ff6f00"
+          ]
+        }
+      }
+    },
+    "inputQuestion": {
+      "title": {
+        "font": {
+          "size": 16,
+          "style": "bold"
+        },
+        "foreground": {
+          "type": "fill",
+          "value": [
+            "#3e2723"
+          ]
+        }
+      },
+      "inputField": {
+        "normalLayer": {
+          "border": {
+            "type": "fill",
+            "value": [
+              "#8d6e63"
+            ]
+          },
+          "borderWidth": 2,
+          "color": {
+            "type": "fill",
+            "value": [
+              "#efebe9"
+            ]
+          },
+          "cornerRadius": 12
+        },
+        "normalText": {
+          "foreground": {
+            "type": "fill",
+            "value": [
+              "#3e2723"
+            ]
+          }
+        },
+        "selectedLayer": {
+          "border": {
+            "type": "fill",
+            "value": [
+              "#3e2723"
+            ]
+          },
+          "borderWidth": 2,
+          "color": {
+            "type": "fill",
+            "value": [
+              "#efebe9"
+            ]
+          },
+          "cornerRadius": 12
+        },
+        "highlightedLayer": {
+          "border": {
+            "type": "fill",
+            "value": [
+              "#ff6f00"
+            ]
+          },
+          "borderWidth": 2,
+          "color": {
+            "type": "fill",
+            "value": [
+              "#efebe9"
+            ]
+          },
+          "cornerRadius": 12
+        },
+        "placeholder": {
+          "foreground": {
+            "type": "fill",
+            "value": [
+              "#8d6e63"
+            ]
+          }
+        },
+        "error": {
+          "foreground": {
+            "type": "fill",
+            "value": [
+              "#ff6f00"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

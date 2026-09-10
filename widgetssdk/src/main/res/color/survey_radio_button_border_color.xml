@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Single-choice radio ring. Stateless - the ring keeps the same colour checked or not - but it has
+    to be a colour state list so `android:alpha` can express the 30% the code used to apply through
+    the `@color/glia_normal_color_opacity_30` literal.
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:alpha="0.3" android:color="?attr/gliaBaseNormalColor" />
+</selector>

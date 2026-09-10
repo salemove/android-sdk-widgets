@@ -27,10 +27,8 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.NavHostFragment
 import androidx.preference.PreferenceManager
-import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.Glia
 import com.glia.androidsdk.fcm.GliaPushMessage
-import com.glia.androidsdk.omnibrowse.Omnibrowse
 import com.glia.exampleapp.ExampleAppConfigManager.createDefaultConfig
 import com.glia.exampleapp.Utils.getAuthenticationBehaviorFromPrefs
 import com.glia.widgets.GliaWidgets
@@ -38,6 +36,7 @@ import com.glia.widgets.GliaWidgetsException
 import com.glia.widgets.authentication.Authentication
 import com.glia.widgets.entrywidget.EntryWidget
 import com.glia.widgets.launcher.EngagementLauncher
+import com.glia.widgets.lifecycle.GliaEvent
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -48,6 +47,7 @@ class MainFragment : Fragment() {
 
     private var containerView: ConstraintLayout? = null
     private var authentication: Authentication? = null
+    private var isEngagementOngoing: Boolean = false
 
     private var pauseItem: MenuItem by Delegates.notNull()
     private var resumeItem: MenuItem by Delegates.notNull()
@@ -180,13 +180,13 @@ class MainFragment : Fragment() {
             pauseItem = findItem(R.id.lo_pause).setOnMenuItemClickListener {
                 it.isVisible = false
                 resumeItem.isVisible = true
-                Glia.getLiveObservation().pause()
+                GliaWidgets.getLiveObservation().pause()
                 true
             }
             resumeItem = findItem(R.id.lo_resume).setOnMenuItemClickListener {
                 it.isVisible = false
                 pauseItem.isVisible = true
-                Glia.getLiveObservation().resume()
+                GliaWidgets.getLiveObservation().resume()
                 true
             }
             ongoingEngagementItem = findItem(R.id.menu_engagement_ongoing)
@@ -216,7 +216,7 @@ class MainFragment : Fragment() {
     private fun requestPushNotificationPermission() = pushNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
 
     private fun initMenu() {
-        if (Glia.getCurrentEngagement().isPresent) {
+        if (isEngagementOngoing) {
             pauseItem.isVisible = true
             resumeItem.isVisible = false
             ongoingEngagementItem.isVisible = true
@@ -227,26 +227,10 @@ class MainFragment : Fragment() {
             ongoingEngagementItem.isVisible = false
             engagementEndedItem.isVisible = true
         }
-
-
-        Glia.on(Glia.Events.ENGAGEMENT) {
-            onEngagementStarted()
-
-            it.on(Engagement.Events.END) {
-                onEngagementEnded()
-            }
-        }
-
-        Glia.omnibrowse.on(Omnibrowse.Events.ENGAGEMENT) {
-            onEngagementStarted()
-
-            it.on(Engagement.Events.END) {
-                onEngagementEnded()
-            }
-        }
     }
 
     private fun onEngagementStarted() {
+        isEngagementOngoing = true
         view?.post {
             ongoingEngagementItem.isVisible = true
             engagementEndedItem.isVisible = false
@@ -256,6 +240,7 @@ class MainFragment : Fragment() {
     }
 
     private fun onEngagementEnded() {
+        isEngagementOngoing = false
         view?.post {
             ongoingEngagementItem.isVisible = false
             engagementEndedItem.isVisible = true
@@ -276,11 +261,11 @@ class MainFragment : Fragment() {
     }
 
     private fun authenticate(callback: OnAuthCallback) {
-        if (Glia.isInitialized() && authentication == null) {
+        if (GliaWidgets.isInitialized() && authentication == null) {
             prepareAuthentication()
             setupAuthButtonsVisibility()
         }
-        if (!Glia.isInitialized()) {
+        if (!GliaWidgets.isInitialized()) {
             thread {
                 initGliaWidgets()
                 requireActivity().runOnUiThread { showAuthenticationDialog(callback) }
@@ -295,7 +280,7 @@ class MainFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        if (Glia.isInitialized()) {
+        if (GliaWidgets.isInitialized()) {
             initMenu()
 
             if (authentication == null) {
@@ -309,7 +294,7 @@ class MainFragment : Fragment() {
 
     private fun setupAuthButtonsVisibility() {
         if (activity == null || containerView == null) return
-        if (!Glia.isInitialized()) {
+        if (!GliaWidgets.isInitialized()) {
             requireActivity().runOnUiThread {
                 containerView!!.findViewById<View>(R.id.initGliaWidgetsButton).visibility = View.VISIBLE
                 containerView!!.findViewById<View>(R.id.authenticationButton).visibility = View.GONE
@@ -356,6 +341,11 @@ class MainFragment : Fragment() {
     private fun listenForGliaEvents() {
         GliaWidgets.subscribeToEvents { event ->
             activity?.runOnUiThread {
+                when (event) {
+                    is GliaEvent.EngagementStarted -> onEngagementStarted()
+                    is GliaEvent.EngagementEnded -> onEngagementEnded()
+                    else -> {}
+                }
                 Toast.makeText(context, "GliaEvent: $event", Toast.LENGTH_SHORT).show()
             }
         }
@@ -537,7 +527,7 @@ class MainFragment : Fragment() {
     }
 
     private fun ensureInitialized() {
-        if (!Glia.isInitialized()) {
+        if (!GliaWidgets.isInitialized()) {
             initGliaWidgets()
         }
     }

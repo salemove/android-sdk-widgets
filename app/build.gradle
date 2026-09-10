@@ -103,6 +103,13 @@ afterEvaluate {
   preReleaseBuild.dependsOn ':widgetssdk:publishSnapshotPublicationToMavenLocal'
 }
 
+// Widgets is being changed to no longer expose Core SDK to integrators (dropping it to an
+// `implementation` dependency of widgetssdk), so this app declares its own Core SDK dependency.
+// It is needed for exactly one thing: Glia.getPushNotifications().handleOnMainActivityCreate()
+// in MainFragment.kt, which routes cold starts from a push notification click and has no
+// Widgets-side equivalent.
+apply from: "${rootProject.projectDir}/scripts/direct-core.gradle"
+
 dependencies {
   implementation libs.androidx.appcompat
   implementation libs.material
@@ -116,6 +123,13 @@ dependencies {
   debugImplementation project(path: ':widgetssdk')
   // To test against properly compiled SDK, the SDK is auto-uploaded to local maven with '-SNAPSHOT' suffix
   releaseImplementation "com.glia:android-widgets:${widgetsVersionName}-SNAPSHOT"
+
+  def coreDebugVersion = coreSdkDebugVersion(gliaSdkVersion)
+  implementation ("${libs.glia.core.get().module}:$coreDebugVersion") {
+    if (coreDebugVersion.endsWith("-SNAPSHOT")) {
+      changing = true
+    }
+  }
 
   implementation libs.androidx.core.ktx
 

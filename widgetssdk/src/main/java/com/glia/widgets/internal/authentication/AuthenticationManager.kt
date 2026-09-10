@@ -1,14 +1,9 @@
 package com.glia.widgets.internal.authentication
 
-import com.glia.androidsdk.GliaException
-import com.glia.androidsdk.RequestCallback
 import com.glia.telemetry_lib.GliaLogger
-import com.glia.telemetry_lib.SdkType
 import com.glia.widgets.authentication.Authentication
 import com.glia.widgets.callbacks.OnComplete
 import com.glia.widgets.callbacks.OnError
-import com.glia.widgets.callbacks.toOnComplete
-import com.glia.widgets.callbacks.toOnError
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.di.Dependencies.repositoryFactory
 import com.glia.widgets.helper.Logger
@@ -91,63 +86,8 @@ internal class AuthenticationManager(
     }
 }
 
-internal fun AuthenticationManager.toCoreType(): CoreAuthentication = this.let { widgetAuthentication ->
-    object : CoreAuthentication {
-        override fun setBehavior(behavior: CoreAuthentication.Behavior) {
-            GliaLogger.logDeprecatedApiUse(SdkType.WIDGETS_SDK, CoreAuthentication::class, "setBehavior", "behavior")
-            widgetAuthentication.setBehavior(behavior.toWidgetsType())
-        }
-
-        override fun authenticate(jwtToken: String, externalAccessToken: String?, authCallback: RequestCallback<Void>?) {
-            GliaLogger.logDeprecatedApiUse(SdkType.WIDGETS_SDK, CoreAuthentication::class, "authenticate")
-            if (jwtToken.isBlank()) {
-                reportTokenInvalidError(authCallback)
-                return
-            }
-            widgetAuthentication.authenticate(jwtToken, externalAccessToken, authCallback.toOnComplete(), authCallback.toOnError())
-        }
-
-        override fun deauthenticate(stopPushNotifications: Boolean, authCallback: RequestCallback<Void>?) {
-            GliaLogger.logDeprecatedApiUse(SdkType.WIDGETS_SDK, CoreAuthentication::class, "deauthenticate", "stopPushNotifications", "callback")
-            widgetAuthentication.deauthenticate(stopPushNotifications, authCallback.toOnComplete(), authCallback.toOnError())
-        }
-
-        override fun deauthenticate(authCallback: RequestCallback<Void>?) {
-            GliaLogger.logDeprecatedApiUse(SdkType.WIDGETS_SDK, CoreAuthentication::class, "deauthenticate", "callback")
-            widgetAuthentication.deauthenticate(authCallback.toOnComplete(), authCallback.toOnError())
-        }
-
-        override val isAuthenticated: Boolean
-            get() {
-                GliaLogger.logDeprecatedApiUse(SdkType.WIDGETS_SDK, CoreAuthentication::class, "isAuthenticated")
-                return widgetAuthentication.isAuthenticated
-            }
-
-        override fun refresh(jwtToken: String, externalAccessToken: String?, authCallback: RequestCallback<Void>) {
-            GliaLogger.logDeprecatedApiUse(SdkType.WIDGETS_SDK, CoreAuthentication::class, "refresh")
-            if (jwtToken.isBlank()) {
-                reportTokenInvalidError(authCallback)
-                return
-            }
-            widgetAuthentication.refresh(jwtToken, externalAccessToken, authCallback.toOnComplete(), authCallback.toOnError())
-        }
-
-        private fun reportTokenInvalidError(authCallback: RequestCallback<Void>?) {
-            val errorMessage = "JWT token is not valid or empty"
-            val invalidInputException = GliaException(errorMessage, GliaException.Cause.INVALID_INPUT)
-            authCallback?.onResult(null, invalidInputException)
-        }
-    }
-}
-
 internal fun Authentication.Behavior.toCoreType(): CoreAuthentication.Behavior =
     when (this) {
         Authentication.Behavior.FORBIDDEN_DURING_ENGAGEMENT -> CoreAuthentication.Behavior.FORBIDDEN_DURING_ENGAGEMENT
         Authentication.Behavior.ALLOWED_DURING_ENGAGEMENT -> CoreAuthentication.Behavior.ALLOWED_DURING_ENGAGEMENT
-    }
-
-internal fun CoreAuthentication.Behavior.toWidgetsType(): Authentication.Behavior =
-    when (this) {
-        CoreAuthentication.Behavior.FORBIDDEN_DURING_ENGAGEMENT -> Authentication.Behavior.FORBIDDEN_DURING_ENGAGEMENT
-        CoreAuthentication.Behavior.ALLOWED_DURING_ENGAGEMENT -> Authentication.Behavior.ALLOWED_DURING_ENGAGEMENT
     }

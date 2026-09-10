@@ -34,12 +34,15 @@ import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
 
-internal class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) :
+internal class SurveyView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
+) :
     FrameLayout(
         context,
         attrs,
-        defStyleAttr,
-        defStyleRes
+        defStyleAttr
     ),
     SurveyContract.View,
     SurveyAdapterListener {
@@ -64,13 +67,6 @@ internal class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: 
     private val cancelButton: MaterialButton get() = binding.btnCancel
 
     private var surveyAdapter: SurveyAdapter? = null
-
-    @JvmOverloads
-    constructor(
-        context: Context,
-        attrs: AttributeSet? = null,
-        defStyleAttr: Int = R.attr.gliaChatStyle
-    ) : this(context, attrs, defStyleAttr, R.style.Application_Glia_Chat)
 
     init {
         SimpleWindowInsetsAndAnimationHandler(this)

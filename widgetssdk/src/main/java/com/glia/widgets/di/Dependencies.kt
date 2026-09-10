@@ -43,6 +43,8 @@ import com.glia.widgets.internal.audio.domain.OnAudioStartedUseCase
 import com.glia.widgets.internal.authentication.AuthenticationManager
 import com.glia.widgets.internal.authentication.toCoreType
 import com.glia.widgets.internal.callvisualizer.CallVisualizerManager
+import com.glia.widgets.internal.chathead.BubbleContextEvent
+import com.glia.widgets.internal.chathead.ChatBubbleContract
 import com.glia.widgets.internal.chathead.ChatHeadManager
 import com.glia.widgets.internal.dialog.PermissionDialogManager
 import com.glia.widgets.internal.notification.device.INotificationManager
@@ -65,7 +67,6 @@ import com.glia.widgets.view.dialog.UiComponentsActivityWatcher
 import com.glia.widgets.view.dialog.UiComponentsDispatcher
 import com.glia.widgets.view.dialog.UiComponentsDispatcherImpl
 import com.glia.widgets.view.head.ActivityWatcherForChatHead
-import com.glia.widgets.view.head.ChatHeadContract
 import com.glia.widgets.view.snackbar.liveobservation.ActivityWatcherForLiveObservation
 import com.glia.widgets.view.unifiedui.theme.UnifiedThemeManager
 
@@ -190,7 +191,6 @@ internal object Dependencies {
             PermissionDialogManager(application),
             notificationManager,
             configurationManager,
-            ChatHeadManager(application),
             audioControlManager,
             authenticationManagerProvider,
             schedulers,
@@ -211,9 +211,10 @@ internal object Dependencies {
             notificationManager,
             configurationManager,
             uiComponentsDispatcher,
-            deviceMonitor
+            deviceMonitor,
+            ChatHeadManager(application)
         )
-        initApplicationLifecycleObserver(applicationLifecycleManager, controllerFactory.chatHeadController)
+        initApplicationLifecycleObserver(applicationLifecycleManager, controllerFactory.chatBubbleController)
 
         val callVisualizerActivityWatcher = CallVisualizerActivityWatcher(
             controllerFactory.callVisualizerController,
@@ -226,7 +227,7 @@ internal object Dependencies {
         application.registerActivityLifecycleCallbacks(callVisualizerActivityWatcher)
 
         val activityWatcherForChatHead = ActivityWatcherForChatHead(
-            controllerFactory.activityWatcherForChatHeadController,
+            controllerFactory.chatBubbleController,
             activityLauncher
         )
         application.registerActivityLifecycleCallbacks(activityWatcherForChatHead)
@@ -339,7 +340,7 @@ internal object Dependencies {
             authenticationManagerProvider.authenticationManager = this
         }
 
-    private fun initApplicationLifecycleObserver(lifecycleManager: ApplicationLifecycleManager, chatBubbleController: ChatHeadContract.Controller) {
+    private fun initApplicationLifecycleObserver(lifecycleManager: ApplicationLifecycleManager, chatBubbleController: ChatBubbleContract.Controller) {
         lifecycleManager.addObserver { _, event: Lifecycle.Event ->
             when (event) {
                 Lifecycle.Event.ON_PAUSE -> {
@@ -350,7 +351,7 @@ internal object Dependencies {
                     }
                 }
 
-                Lifecycle.Event.ON_STOP -> chatBubbleController.onApplicationStop()
+                Lifecycle.Event.ON_STOP -> chatBubbleController.onContextEvent(BubbleContextEvent.AppBackgrounded)
                 Lifecycle.Event.ON_DESTROY -> chatBubbleController.onDestroy()
                 else -> { /* no-op */
                 }

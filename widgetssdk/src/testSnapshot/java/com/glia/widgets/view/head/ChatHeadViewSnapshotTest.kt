@@ -2,10 +2,10 @@ package com.glia.widgets.view.head
 
 import com.glia.widgets.R
 import com.glia.widgets.SnapshotTest
-import com.glia.widgets.di.ControllerFactory
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.di.UseCaseFactory
-import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
+import com.glia.widgets.internal.chathead.BubbleContent
+import com.glia.widgets.internal.chathead.BubbleRenderTarget
+import com.glia.widgets.internal.chathead.BubbleUiModel
 import com.glia.widgets.snapshotutils.SnapshotChatView
 import com.glia.widgets.snapshotutils.SnapshotLottie
 import com.glia.widgets.snapshotutils.SnapshotCoil
@@ -256,6 +256,30 @@ internal class ChatHeadViewSnapshotTest : SnapshotTest(
         )
     }
 
+    // MARK: Chat screen theming
+
+    /**
+     * The bubble sitting on the chat screen belongs to the chat UI, so it is themed by
+     * `chatTheme.bubble` — every other snapshot in this file renders the standalone bubble, themed by
+     * the top-level `bubbleTheme`.
+     */
+    @Test
+    fun renderOnChatScreenWithUnifiedTheme() {
+        snapshot(
+            setupView(unifiedTheme = unifiedTheme()).also {
+                it.render(
+                    BubbleUiModel(
+                        target = BubbleRenderTarget.APPLICATION,
+                        content = BubbleContent.Ended,
+                        unreadCount = 5,
+                        isOnHold = false,
+                        isOnChatScreen = true
+                    )
+                )
+            }
+        )
+    }
+
     // MARK: utils for tests
 
     private fun setupView(
@@ -266,16 +290,6 @@ internal class ChatHeadViewSnapshotTest : SnapshotTest(
         localeProviderMock()
         resourceProviderMock()
         mockCoil(listOf(R.drawable.test_launcher2))
-
-        val controllerFactoryMock = mock<ControllerFactory>()
-        val chatHeadControllerMock = mock<ChatHeadContract.Controller>()
-        whenever(controllerFactoryMock.chatHeadController).thenReturn(chatHeadControllerMock)
-        Dependencies.controllerFactory = controllerFactoryMock
-
-        val useCaseFactoryMock = mock<UseCaseFactory>()
-        val isCurrentEngagementCallVisualizerUseCaseMock = mock<IsCurrentEngagementCallVisualizerUseCase>()
-        whenever(useCaseFactoryMock.isCurrentEngagementCallVisualizer).thenReturn(isCurrentEngagementCallVisualizerUseCaseMock)
-        Dependencies.useCaseFactory = useCaseFactoryMock
 
         setUnifiedTheme(unifiedTheme)
 

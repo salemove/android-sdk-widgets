@@ -17,7 +17,6 @@ import com.glia.widgets.di.ControllerFactory
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.ResourceProvider
 import com.glia.widgets.locale.LocaleProvider
-import com.glia.widgets.view.head.ChatHeadContract
 import io.mockk.CapturingSlot
 import io.mockk.every
 import io.mockk.mockk
@@ -38,7 +37,6 @@ internal class CallActivityTest {
     private lateinit var controllerFactory: ControllerFactory
     private lateinit var callController: CallContract.Controller
     private lateinit var callView: CallContract.View
-    private lateinit var serviceChatHeadController: ChatHeadContract.Controller
     private lateinit var resourceProvider: ResourceProvider
     private lateinit var callStatus: CallStatus
     private lateinit var callViewSlot: CapturingSlot<CallContract.View>
@@ -57,11 +55,7 @@ internal class CallActivityTest {
         callController = mockk(relaxed = true)
         every { callController.shouldShowMediaEngagementView(any()) } returns true
 
-        serviceChatHeadController = mockk(relaxed = true)
-
         every { controllerFactory.callController } answers { callController }
-
-        every { controllerFactory.chatHeadController } answers { serviceChatHeadController }
         Dependencies.controllerFactory = controllerFactory
 
         Dependencies.repositoryFactory = mockk(relaxed = true)

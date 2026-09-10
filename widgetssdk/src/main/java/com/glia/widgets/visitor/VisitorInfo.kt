@@ -17,7 +17,7 @@ data class VisitorInfo(
     val id: String? = null,
     val externalId: String? = null,
 ) {
-    constructor(visitorInfo: com.glia.androidsdk.visitor.VisitorInfo) : this(
+    internal constructor(visitorInfo: com.glia.androidsdk.visitor.VisitorInfo) : this(
         visitorInfo.name,
         visitorInfo.email,
         visitorInfo.phone,

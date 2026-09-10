@@ -29,7 +29,7 @@ interface LiveObservation {
 /**
  * @hide
  */
-class LiveObservationImpl(
+internal class LiveObservationImpl(
     private val liveObservation: com.glia.androidsdk.liveobservation.LiveObservation
 ) : LiveObservation {
 

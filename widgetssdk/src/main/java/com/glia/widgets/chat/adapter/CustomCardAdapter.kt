@@ -6,8 +6,6 @@ import androidx.annotation.VisibleForTesting
 import androidx.collection.SparseArrayCompat
 import com.glia.androidsdk.chat.ChatMessage
 import com.glia.widgets.chat.adapter.holder.CustomCardViewHolder
-import com.glia.widgets.helper.Logger
-import com.glia.widgets.helper.TAG
 
 /**
  * The base class of CustomCardAdapter.
@@ -24,36 +22,6 @@ abstract class CustomCardAdapter {
     // - key is custom card view type;
     // - value is recycler view adapter view type.
     val viewTypeMap: SparseArrayCompat<Int> = SparseArrayCompat()
-
-    /**
-     * Returns the view type of the chat message item.
-     * Override this function for your own implementation of the message renderer.
-     * <p>
-     * Consider using a resource id to uniquely identify item view types.
-     * <p>
-     * <b>Usage example:</b>
-     * <pre>{@code
-     *     override fun getItemViewType(message: ChatMessage): Int? {
-     *         if (message.metadata?.has("insurance") == true) {
-     *             return INSURANCE_TYPE
-     *         }
-     *         return null
-     *     }
-     * }<pre/>
-     * @param message a chat message with metadata.
-     * @return an integer value that specifies the type of view needed to represent the
-     * current message. Or `null` for the default Glia message implementation.
-     */
-    @Deprecated(
-        "Use {@link #getItemViewType(CustomCardMessage message)}",
-        ReplaceWith(
-            "getItemViewType(message: CustomCardMessage)",
-            "com.glia.widgets.chat.adapter.CustomCardMessage"
-        )
-    )
-    open fun getItemViewType(message: ChatMessage): Int? {
-        return null
-    }
 
     /**
      * Returns the view type of the chat message item.
@@ -122,28 +90,6 @@ abstract class CustomCardAdapter {
      *
      * @param message a chat message with metadata.
      * @param viewType the view type of the new view.
-     * The type is provided by [getItemViewType].
-     * @return a boolean indicating if the custom card view should be shown when
-     * the card is interactable and an option is selected.
-     * The default implementation returns `false`.
-     */
-    @Deprecated(
-        "Use {@link #shouldShowCard(CustomCardMessage message, int viewType)}", ReplaceWith(
-            "shouldShowCard(message: CustomCardMessage, viewType: Int)",
-            "com.glia.widgets.chat.adapter.CustomCardMessage"
-        )
-    )
-    open fun shouldShowCard(message: ChatMessage, viewType: Int): Boolean {
-        Logger.logDeprecatedMethodUse(TAG, "shouldShowCard(ChatMessage)")
-        return shouldShowCard(CustomCardMessage(message), viewType)
-    }
-
-    /**
-     * Whether the custom card view should be shown when the card is interactable
-     * and an option is selected
-     *
-     * @param message a chat message with metadata.
-     * @param viewType the view type of the new view.
      * The type is provided by [.getItemViewType].
      * @return a boolean indicating if the custom card view should be shown when
      * the card is interactable and an option is selected.
@@ -155,10 +101,7 @@ abstract class CustomCardAdapter {
 
     @JvmName("getChatAdapterViewType")
     internal fun getChatAdapterViewType(message: ChatMessage): Int? {
-        if (getItemViewType(CustomCardMessage(message)) == null && getItemViewType(message) != null) {
-            Logger.logDeprecatedMethodUse(TAG, "getItemViewType(ChatMessage)")
-        }
-        val customCardViewType = getItemViewType(CustomCardMessage(message)) ?: getItemViewType(message)
+        val customCardViewType = getItemViewType(CustomCardMessage(message))
         if (customCardViewType != null) {
             var chatAdapterViewType = viewTypeMap[customCardViewType]
             if (chatAdapterViewType == null) {

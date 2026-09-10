@@ -20,6 +20,8 @@ import io.mockk.slot
 import io.mockk.verify
 import junit.framework.TestCase.assertTrue
 import org.junit.After
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
 import com.glia.androidsdk.visitor.Authentication as CoreAuthentication
@@ -262,6 +264,20 @@ internal class AuthenticationManagerTest {
 
         verify(exactly = 0) { onComplete.onComplete() }
         verify(exactly = 1) { onError.onError(any()) }
+    }
+
+    @Test
+    fun `all widgets authentication behaviors correspond to core authentication behaviors`() {
+        val allCoreAuthBehaviors = CoreAuthentication.Behavior.entries
+        val allWidgetsAuthBehaviors = Authentication.Behavior.entries
+
+        assertEquals(allCoreAuthBehaviors.size, allWidgetsAuthBehaviors.size)
+        allWidgetsAuthBehaviors.forEachIndexed { index, item ->
+            val coreBehavior = item.toCoreType()
+
+            assertNotNull(coreBehavior)
+            assertEquals(coreBehavior.name, allWidgetsAuthBehaviors[index].name)
+        }
     }
 
 }

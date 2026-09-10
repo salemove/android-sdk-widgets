@@ -13,6 +13,7 @@ import com.glia.androidsdk.chat.Chat;
 import com.glia.androidsdk.chat.ChatMessage;
 import com.glia.androidsdk.chat.SingleChoiceAttachment;
 import com.glia.widgets.chat.adapter.CustomCardAdapter;
+import com.glia.widgets.chat.adapter.CustomCardMessage;
 
 import org.json.JSONObject;
 import org.junit.Before;
@@ -109,7 +110,7 @@ public class CustomCardShouldShowUseCaseTest {
     public void execute_returnsFalse_whenMetadataIsNull() {
         ChatMessage message = mock(ChatMessage.class);
         when(message.getMetadata()).thenReturn(null);
-        when(customCardAdapter.shouldShowCard(any(ChatMessage.class), anyInt())).thenReturn(true);
+        when(customCardAdapter.shouldShowCard(any(CustomCardMessage.class), anyInt())).thenReturn(true);
 
         boolean result = useCase.execute(message, VIEW_TYPE, false);
 
@@ -123,7 +124,7 @@ public class CustomCardShouldShowUseCaseTest {
         when(message.getContent()).thenReturn("");
         when(message.getSenderType()).thenReturn(Chat.Participant.OPERATOR);
         when(message.getMetadata()).thenReturn(new JSONObject());
-        when(customCardAdapter.shouldShowCard(any(ChatMessage.class), anyInt())).thenReturn(false);
+        when(customCardAdapter.shouldShowCard(any(CustomCardMessage.class), anyInt())).thenReturn(false);
 
         boolean result = useCase.execute(message, VIEW_TYPE, false);
 
@@ -137,7 +138,7 @@ public class CustomCardShouldShowUseCaseTest {
         when(message.getId()).thenReturn("id");
         when(message.getContent()).thenReturn("");
         when(message.getSenderType()).thenReturn(Chat.Participant.OPERATOR);
-        when(customCardAdapter.shouldShowCard(any(ChatMessage.class), anyInt())).thenReturn(true);
+        when(customCardAdapter.shouldShowCard(any(CustomCardMessage.class), anyInt())).thenReturn(true);
 
         boolean result = useCase.execute(message, VIEW_TYPE, false);
 
@@ -151,11 +152,11 @@ public class CustomCardShouldShowUseCaseTest {
         when(message.getContent()).thenReturn("");
         when(message.getSenderType()).thenReturn(Chat.Participant.OPERATOR);
         when(message.getMetadata()).thenReturn(new JSONObject());
-        when(customCardAdapter.shouldShowCard(any(ChatMessage.class), anyInt())).thenReturn(true);
+        when(customCardAdapter.shouldShowCard(any(CustomCardMessage.class), anyInt())).thenReturn(true);
 
         useCase.execute(message, VIEW_TYPE, false);
 
-        verify(customCardAdapter).shouldShowCard(any(ChatMessage.class), eq(VIEW_TYPE));
+        verify(customCardAdapter).shouldShowCard(any(CustomCardMessage.class), eq(VIEW_TYPE));
     }
 
 }

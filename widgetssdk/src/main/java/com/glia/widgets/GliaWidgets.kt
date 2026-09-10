@@ -30,8 +30,6 @@ import com.glia.widgets.di.Dependencies.useCaseFactory
 import com.glia.widgets.entrywidget.EntryWidget
 import com.glia.widgets.fcm.PushNotifications
 import com.glia.widgets.helper.Logger
-import com.glia.widgets.internal.authentication.toCoreType
-import com.glia.widgets.internal.authentication.toWidgetsType
 import com.glia.widgets.launcher.EngagementLauncher
 import com.glia.widgets.lifecycle.OnGliaEvent
 import com.glia.widgets.liveobservation.LiveObservation
@@ -412,25 +410,6 @@ object GliaWidgets {
             useCaseFactory.endEngagementUseCase.silently()
             // Here we destroy controllers to not keep queueing state for authenticated chat when it is minimized
             Dependencies.destroyControllers()
-        } catch (gliaException: GliaException) {
-            throw gliaException.toWidgetsType()
-        }
-    }
-
-    /**
-     * Creates `Authentication` instance for a given JWT token.
-     *
-     * @param behavior authentication behavior
-     * @return `com.glia.androidsdk.visitor.Authentication` object or throws [GliaWidgetsException] if error happened.
-     * Exception may have the following cause:
-     * [GliaWidgetsException.Cause.INVALID_INPUT] - when SDK is not initialized
-     */
-    @Deprecated("Please use getAuthentication(behavior: com.glia.widgets.authentication.Authentication.Behavior)")
-    @JvmStatic
-    fun getAuthentication(behavior: com.glia.androidsdk.visitor.Authentication.Behavior): com.glia.androidsdk.visitor.Authentication {
-        GliaLogger.logDeprecatedApiUse(SdkType.WIDGETS_SDK, GliaWidgets::class, "getAuthentication")
-        try {
-            return getAuthenticationManager(behavior.toWidgetsType()).toCoreType()
         } catch (gliaException: GliaException) {
             throw gliaException.toWidgetsType()
         }

@@ -44,10 +44,6 @@ internal fun AuthorizationMethod.toCoreType(): com.glia.androidsdk.Authorization
     }
 }
 
-internal fun com.glia.androidsdk.AuthorizationMethod.SiteApiKey.toWidgetType(): AuthorizationMethod.SiteApiKey {
-    return AuthorizationMethod.SiteApiKey(id, secret)
-}
-
 internal val AuthorizationMethod.apiKeyId: String
     get() = when (this) {
         is AuthorizationMethod.SiteApiKey -> this.id

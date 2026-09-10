@@ -19,7 +19,7 @@ import com.google.android.material.progressindicator.LinearProgressIndicator;
 /**
  * @hide
  */
-public class FileAttachmentViewHolder extends RecyclerView.ViewHolder {
+class FileAttachmentViewHolder extends RecyclerView.ViewHolder {
     private final CardView extensionContainerView;
     private final TextView extensionTypeText;
     private final LinearProgressIndicator progressIndicator;

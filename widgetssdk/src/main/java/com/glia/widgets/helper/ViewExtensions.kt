@@ -6,7 +6,6 @@ import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.graphics.Typeface
 import android.os.Build
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -68,9 +67,7 @@ internal fun View.getTypedArrayResId(
 
 @AnyRes
 internal fun View.getAttr(@AttrRes attr: Int, @AnyRes fallBackResId: Int): Int =
-    TypedValue().takeIf {
-        context.theme.resolveAttribute(attr, it, true)
-    }?.resourceId ?: fallBackResId
+    context.gliaAttrResourceId(attr, fallBackResId)
 
 internal fun ViewGroup.hasChildOfType(clazz: Class<*>) = children.any { clazz.isInstance(it) }
 internal fun MenuItem.applyIconColorTheme(@ColorInt iconColor: Int?) {

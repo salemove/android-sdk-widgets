@@ -17,7 +17,7 @@ import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.databinding.SingleChoiceCardViewBinding
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.helper.Utils
+import com.glia.widgets.helper.getAttr
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getColorStateListCompat
 import com.glia.widgets.helper.getFontCompat
@@ -45,9 +45,9 @@ internal class SingleChoiceCardView @JvmOverloads constructor(
         binding = SingleChoiceCardViewBinding.inflate(layoutInflater, this)
 
         bgDrawable.color =
-            getColorStateListCompat(Utils.getAttrResourceId(context, R.attr.gliaBaseLightColor))
+            getColorStateListCompat(getAttr(R.attr.gliaBaseLightColor, R.color.glia_light_color))
 
-        setStroke(getColorCompat(Utils.getAttrResourceId(context, R.attr.gliaBrandPrimaryColor)))
+        setStroke(getColorCompat(getAttr(R.attr.gliaBrandPrimaryColor, R.color.glia_primary_color)))
 
         bgDrawable.cornerRadius = resources.getDimension(R.dimen.glia_medium)
         orientation = VERTICAL
@@ -70,7 +70,7 @@ internal class SingleChoiceCardView @JvmOverloads constructor(
     ) {
         setupCardView(theme)
         setupImage(item.choiceCardImageUrl)
-        setupText(item.content.orEmpty(), theme)
+        setupText(item.content.orEmpty())
         setupButtons(item, theme)
     }
 
@@ -102,9 +102,8 @@ internal class SingleChoiceCardView @JvmOverloads constructor(
         }
     }
 
-    private fun setupText(content: String, theme: UiTheme) {
+    private fun setupText(content: String) {
         binding.contentView.text = content
-        binding.contentView.setTheme(theme)
         binding.contentView.applyTextTheme(responseCardTheme?.text, true)
     }
 
@@ -113,7 +112,7 @@ internal class SingleChoiceCardView @JvmOverloads constructor(
         uiTheme: UiTheme,
         onClickListener: OnClickListener?
     ): MaterialButton {
-        val styleResId = Utils.getAttrResourceId(this.context, R.attr.buttonBarNeutralButtonStyle)
+        val styleResId = getAttr(R.attr.buttonBarNeutralButtonStyle, R.style.Application_Glia_Chat_Button_Neutral)
         return MaterialButton(ContextThemeWrapper(this.context, styleResId), null, 0).also {
             it.id = View.generateViewId()
             it.text = text

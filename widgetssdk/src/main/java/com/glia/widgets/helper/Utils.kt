@@ -3,7 +3,6 @@ package com.glia.widgets.helper
 import android.content.Context
 import android.content.res.TypedArray
 import android.graphics.Typeface
-import android.util.TypedValue
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleableRes
 import androidx.core.content.res.ResourcesCompat
@@ -406,18 +405,8 @@ internal object Utils {
         return if (typedArray.hasValue(index)) {
             typedArray.getResourceId(index, 0)
         } else {
-            getAttrResourceId(context, defaultValue)
+            context.gliaAttrResourceId(defaultValue) ?: 0
         }
-    }
-
-    fun getAttrResourceId(
-        context: Context,
-        @AttrRes attrId: Int
-    ): Int {
-        val typedValue = TypedValue()
-        val theme = context.theme
-        theme.resolveAttribute(attrId, typedValue, true)
-        return typedValue.resourceId
     }
 
     fun getFont(typedArray: TypedArray, context: Context): Typeface? {

@@ -7,7 +7,6 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.Navigation;
 
-import com.glia.androidsdk.Glia;
 import com.glia.widgets.GliaWidgets;
 
 public class TestingAppLauncherActivity extends AppCompatActivity {
@@ -22,7 +21,7 @@ public class TestingAppLauncherActivity extends AppCompatActivity {
 
     private void initGliaWidgetsWithDeepLink() {
         Uri uri = getIntent().getData();
-        if (!Glia.isInitialized() && uri != null) {
+        if (!GliaWidgets.isInitialized() && uri != null) {
             GliaWidgets.init(ExampleAppConfigManager.obtainConfigFromDeepLink(uri, getApplicationContext()));
         }
     }

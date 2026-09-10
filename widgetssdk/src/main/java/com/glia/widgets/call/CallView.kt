@@ -25,7 +25,6 @@ import com.glia.telemetry_lib.GliaLogger
 import com.glia.telemetry_lib.LogEvents
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
-import com.glia.widgets.UiTheme.UiThemeBuilder
 import com.glia.widgets.call.CallState.ViewState
 import com.glia.widgets.databinding.CallButtonsLayoutBinding
 import com.glia.widgets.databinding.CallViewBinding
@@ -416,7 +415,7 @@ internal class CallView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         !callState.landscapeLayoutControlsVisible && appBar.isVisible && buttonsLayout.isVisible && buttonsLayoutBackground.isVisible
 
     private fun setupViewAppearance() {
-        setAppBarTheme()
+        appBar.applyHeaderTheme(callTheme?.header)
         // icons
         operatorStatusView.applyOperatorTheme(callTheme?.connect?.operator)
 
@@ -485,20 +484,6 @@ internal class CallView(context: Context, attrs: AttributeSet?, defStyleAttr: In
 
         // Video
         floatingVisitorVideoContainer.setTheme(callTheme?.visitorVideo)
-    }
-
-    private fun setAppBarTheme() {
-        val builder = UiThemeBuilder()
-        builder.setTheme(theme)
-        builder.setSystemNegativeColor(R.color.glia_negative_color)
-        builder.setBaseLightColor(R.color.glia_light_color)
-        builder.setBrandPrimaryColor(R.color.glia_call_view_background_color)
-        builder.setGliaChatHeaderTitleTintColor(android.R.color.white)
-        builder.setGliaChatHeaderHomeButtonTintColor(android.R.color.white)
-        builder.setGliaChatHeaderExitQueueButtonTintColor(android.R.color.white)
-        builder.setFontRes(theme.fontRes)
-        appBar.setTheme(builder.build())
-        appBar.applyHeaderTheme(callTheme?.header)
     }
 
     private fun initConfigurations() {

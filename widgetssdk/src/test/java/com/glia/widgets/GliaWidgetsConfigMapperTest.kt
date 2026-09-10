@@ -23,7 +23,7 @@ class GliaWidgetsConfigMapperTest {
     @Test(expected = GliaException::class)
     fun `toCoreType fails when the siteApiKey ID is blank`() {
         GliaWidgetsConfig.Builder()
-            .setSiteApiKey(com.glia.androidsdk.SiteApiKey("", "Secret"))
+            .setSiteApiKey(SiteApiKey("", "Secret"))
             .setSiteId("SiteId")
             .setRegion(GliaWidgetsConfig.Regions.US)
             .setContext(mockContext())

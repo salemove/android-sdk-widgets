@@ -193,22 +193,6 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
                 "com.glia.widgets.AuthorizationMethod"
             )
         )
-        fun setSiteApiKey(siteApiKey: com.glia.androidsdk.SiteApiKey): Builder {
-            return setSiteApiKey(siteApiKey.toWidgetType())
-        }
-
-        /**
-         * @param siteApiKey - your site API key
-         * @return Builder instance
-         * @deprecated Will be removed in version 4.0.0.
-         */
-        @Deprecated(
-            "Use {@link #setAuthorizationMethod(AuthorizationMethod.UserApiKey)}",
-            ReplaceWith(
-                "setAuthorizationMethod(AuthorizationMethod.UserApiKey(id, secret))",
-                "com.glia.widgets.AuthorizationMethod"
-            )
-        )
         fun setSiteApiKey(siteApiKey: AuthorizationMethod.SiteApiKey): Builder {
             this.authorizationMethod = siteApiKey
             return this

@@ -78,13 +78,34 @@ class EngagementTypeUseCaseImplTest {
     }
 
     @Test
-    fun `invoke returns UNKNOWN when operator has no media`() {
+    fun `invoke returns UNKNOWN when operator has no media and it's not a chat engagement`() {
         val operatorMediaState = mockk<MediaState>()
         every { operatorMediaState.video } returns null
         every { operatorMediaState.audio } returns null
         every { operatorMediaUseCase() } returns Flowable.just(operatorMediaState)
+        every { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement } returns false
+        every { isCurrentEngagementCallVisualizerUseCase() } returns false
+        every { isOperatorPresentUseCase() } returns false
+        every { visitorMediaUseCase.hasMedia } returns false
+        every { operatorMediaUseCase.hasMedia } returns false
 
         val result = useCase().blockingFirst()
         assertEquals(MediaType.UNKNOWN, result)
+    }
+
+    @Test
+    fun `invoke returns TEXT when operator has no media and it's an ongoing chat engagement`() {
+        val operatorMediaState = mockk<MediaState>()
+        every { operatorMediaState.video } returns null
+        every { operatorMediaState.audio } returns null
+        every { operatorMediaUseCase() } returns Flowable.just(operatorMediaState)
+        every { isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement } returns true
+        every { isCurrentEngagementCallVisualizerUseCase() } returns false
+        every { isOperatorPresentUseCase() } returns true
+        every { visitorMediaUseCase.hasMedia } returns false
+        every { operatorMediaUseCase.hasMedia } returns false
+
+        val result = useCase().blockingFirst()
+        assertEquals(MediaType.TEXT, result)
     }
 }

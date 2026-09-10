@@ -90,11 +90,11 @@
     <!-- {@deprecated For internal use only} -->
     <style name="Application.Glia.Chat.ChatHead">
         <item name="badgeBackgroundTintList">?attr/gliaBrandPrimaryColor</item>
-        <item name="badgeTextColor">?attr/baseLightColor</item>
-        <item name="backgroundTintList">?attr/baseLightColor</item>
+        <item name="badgeTextColor">?attr/gliaBaseLightColor</item>
+        <item name="backgroundTintList">?attr/gliaBaseLightColor</item>
         <item name="operatorPlaceholderIcon">?attr/gliaIconPlaceholder</item>
         <item name="operatorPlaceholderBackgroundColor">?attr/gliaBrandPrimaryColor</item>
-        <item name="operatorPlaceholderIconTintList">?attr/baseLightColor</item>
+        <item name="operatorPlaceholderIconTintList">?attr/gliaBaseLightColor</item>
     </style>
 
     <!-- {@deprecated For internal use only} -->

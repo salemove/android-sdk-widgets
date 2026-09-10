@@ -2,15 +2,12 @@ package com.glia.widgets.chat.adapter.holder
 
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
-import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.adapter.ChatAdapter
 import com.glia.widgets.chat.model.VisitorMessageItem
 import com.glia.widgets.databinding.ChatVisitorMessageLayoutBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.addClickActionAccessibilityLabel
-import com.glia.widgets.helper.getColorCompat
-import com.glia.widgets.helper.getColorStateListCompat
-import com.glia.widgets.helper.getFontCompat
+import com.glia.widgets.helper.gliaAttrFont
 import com.glia.widgets.helper.removeAccessibilityClickAction
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.locale.LocaleProvider
@@ -24,7 +21,6 @@ import com.glia.widgets.view.unifiedui.theme.chat.MessageBalloonTheme
 internal class VisitorMessageViewHolder(
     private val binding: ChatVisitorMessageLayoutBinding,
     private val onRetryClickListener: ChatAdapter.OnRetryClickListener,
-    uiTheme: UiTheme,
     unifiedTheme: UnifiedTheme? = Dependencies.gliaThemeManager.theme,
     private val localeProvider: LocaleProvider = Dependencies.localeProvider
 ) : RecyclerView.ViewHolder(binding.root) {
@@ -34,7 +30,7 @@ internal class VisitorMessageViewHolder(
     private lateinit var id: String
 
     init {
-        applyUiTheme(uiTheme)
+        applyThemeFont()
         applyUnifiedTheme()
     }
 
@@ -43,15 +39,9 @@ internal class VisitorMessageViewHolder(
         binding.content.applyTextTheme(visitorTheme?.text)
     }
 
-    private fun applyUiTheme(uiTheme: UiTheme) {
-        uiTheme.visitorMessageBackgroundColor?.let(itemView::getColorStateListCompat)?.also(binding.content::setBackgroundTintList)
-
-        uiTheme.visitorMessageTextColor?.let(itemView::getColorCompat)?.also(binding.content::setTextColor)
-
-        if (uiTheme.fontRes != null) {
-            val fontFamily = itemView.getFontCompat(uiTheme.fontRes)
-            binding.content.typeface = fontFamily
-        }
+    /** The bubble's background and text colours come from the layout's `?attr/gliaVisitorMessage*`. */
+    private fun applyThemeFont() {
+        itemView.context.gliaAttrFont()?.also { binding.content.typeface = it }
     }
 
     fun bind(item: VisitorMessageItem) {

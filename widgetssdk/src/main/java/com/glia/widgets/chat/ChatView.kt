@@ -619,14 +619,13 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
 
     private fun setupViewAppearance() {
         adapter = ChatAdapter(
-            theme,
             onRetryClickListener,
             onOptionClickedListener,
             this,
             this,
             onCustomCardResponse,
             onGvaButtonsClickListener,
-            ChatItemHeightManager(theme, layoutInflater, resources),
+            ChatItemHeightManager(layoutInflater, resources),
             GliaWidgets.getCustomCardAdapter(),
             Dependencies.useCaseFactory.createGetImageFileFromCacheUseCase(),
             Dependencies.useCaseFactory.createGetImageFileFromDownloadsUseCase(),
@@ -659,7 +658,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             .setBottomEdge(MarkerEdgeTreatment(resources.getDimension(R.dimen.glia_chat_new_messages_bottom_edge_radius))).build()
 
         binding.newMessagesIndicatorImage.setShowRippleAnimation(false)
-        binding.newMessagesIndicatorImage.setTheme(theme)
         binding.newMessagesIndicatorCard.shapeAppearanceModel = shapeAppearanceModel
 
         // global colors

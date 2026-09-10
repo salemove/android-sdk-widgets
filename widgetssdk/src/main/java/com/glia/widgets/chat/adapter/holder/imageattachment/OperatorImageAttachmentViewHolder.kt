@@ -2,7 +2,6 @@ package com.glia.widgets.chat.adapter.holder.imageattachment
 
 import android.view.View
 import com.glia.widgets.R
-import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.adapter.ChatAdapter.OnImageItemClickListener
 import com.glia.widgets.chat.model.OperatorAttachmentItem
 import com.glia.widgets.databinding.ChatAttachmentOperatorImageLayoutBinding
@@ -22,7 +21,6 @@ internal class OperatorImageAttachmentViewHolder(
     getImageFileFromDownloadsUseCase: GetImageFileFromDownloadsUseCase,
     getImageFileFromNetworkUseCase: GetImageFileFromNetworkUseCase,
     schedulers: Schedulers,
-    uiTheme: UiTheme,
     private val onImageItemClickListener: OnImageItemClickListener,
     private val localeProvider: LocaleProvider = Dependencies.localeProvider
 ) : ImageAttachmentViewHolder(
@@ -38,11 +36,10 @@ internal class OperatorImageAttachmentViewHolder(
     }
 
     init {
-        setupOperatorStatus(uiTheme)
+        setupOperatorStatus()
     }
 
-    private fun setupOperatorStatus(uiTheme: UiTheme) {
-        binding.chatHeadView.setTheme(uiTheme)
+    private fun setupOperatorStatus() {
         binding.chatHeadView.setShowRippleAnimation(false)
         binding.chatHeadView.applyUserImageTheme(operatorTheme?.userImage)
     }

@@ -317,6 +317,23 @@ internal class GliaThemeOverlaysTest {
         )
     }
 
+    /**
+     * The `fontFamily` -> font-resource branch is not covered: asserting it would mean shipping a
+     * binary font fixture in the published module's `debug` source set for one assertion, and the
+     * branch is a single delegation to `ResourcesCompat.getFont`. What is worth locking is that
+     * neither of the two "no typeface" cases produces one, since both are reached in production.
+     */
+    @Test
+    fun `gliaAttrFont resolves to null unless the theme points at a font resource`() {
+        val glia = themed(R.style.Theme_Glia_Internal)
+        val familyName = themed(R.style.Theme_Glia_Internal)
+            .apply { theme.applyStyle(R.style.Test_Glia_Customization_FontFamilyName, true) }
+
+        assertNull(glia.gliaAttrFont())
+        assertNull(familyName.gliaAttrFont())
+        assertNull(familyName.gliaAttrResourceId(androidx.appcompat.R.attr.fontFamily))
+    }
+
     @Test
     fun `gliaAttrBoolean reads the attribute and falls back to the given default`() {
         val glia = themed(R.style.Theme_Glia_Internal)

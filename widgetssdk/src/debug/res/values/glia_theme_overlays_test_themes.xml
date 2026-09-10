@@ -33,12 +33,6 @@
     <!-- A `gliaChatStyle` style that declares no `materialThemeOverlay` at all. -->
     <style name="Test.Glia.Legacy.ChatStyleWithoutOverlay" parent="Application.Glia.Chat" />
 
-    <!-- Sets an un-prefixed `GliaView` item, the undocumented path that is no longer honoured. -->
-    <style name="Test.Glia.Legacy.ChatStyleWithUnPrefixedItems" parent="Application.Glia.Chat">
-        <item name="materialThemeOverlay">@style/Test.Glia.Legacy.Overlay</item>
-        <item name="brandPrimaryColor">@color/glia_test_unprefixed_brand</item>
-    </style>
-
     <!-- Second, distinct legacy chain, used to prove the live theme wins over the fallback. -->
     <style name="Test.Glia.Legacy.ContextChatStyle" parent="Application.Glia.Chat">
         <item name="materialThemeOverlay">@style/Test.Glia.Legacy.ContextOverlay</item>
@@ -55,10 +49,6 @@
 
     <style name="Test.Glia.Theme.WithLegacyChatStyleWithoutOverlay" parent="Theme.Glia.Internal">
         <item name="gliaChatStyle">@style/Test.Glia.Legacy.ChatStyleWithoutOverlay</item>
-    </style>
-
-    <style name="Test.Glia.Theme.WithUnPrefixedLegacyItems" parent="Theme.Glia.Internal">
-        <item name="gliaChatStyle">@style/Test.Glia.Legacy.ChatStyleWithUnPrefixedItems</item>
     </style>
 
     <style name="Test.Glia.Theme.WithContextLegacyChatStyle" parent="Theme.Glia.Internal">

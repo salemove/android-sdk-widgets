@@ -107,12 +107,11 @@ import com.glia.widgets.view.unifiedui.theme.chat.InputTheme
 import com.glia.widgets.view.unifiedui.theme.chat.UnreadIndicatorTheme
 import com.glia.widgets.view.unifiedui.theme.securemessaging.SecureMessagingTheme
 import com.google.android.material.shape.MarkerEdgeTreatment
-import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import java.util.concurrent.Executor
 import kotlin.properties.Delegates
 
 internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : ConstraintLayout(
-    MaterialThemeOverlay.wrap(context, attrs, defStyleAttr, defStyleRes), attrs, defStyleAttr, defStyleRes
+    context, attrs, defStyleAttr, defStyleRes
 ), OnFileItemClickListener, OnImageItemClickListener, ChatContract.View, DialogDelegate by DialogDelegateImpl() {
     private val activityLauncher: ActivityLauncher by lazy { Dependencies.activityLauncher }
 

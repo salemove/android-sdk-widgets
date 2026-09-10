@@ -20,7 +20,6 @@ import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.logScConfirmationScreenButtonClicked
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.setLocaleText
-import com.glia.widgets.helper.wrapWithMaterialThemeOverlay
 import com.glia.widgets.view.unifiedui.applyButtonTheme
 import com.glia.widgets.view.unifiedui.applyColorTheme
 import com.glia.widgets.view.unifiedui.applyImageColorTheme
@@ -29,7 +28,7 @@ import com.glia.widgets.view.unifiedui.theme.securemessaging.SecureMessagingConf
 import com.google.android.material.transition.MaterialFadeThrough
 
 internal class ConfirmationScreenView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : LinearLayout(
-    context.wrapWithMaterialThemeOverlay(attrs, defStyleAttr, defStyleRes),
+    context,
     attrs,
     defStyleAttr,
     defStyleRes

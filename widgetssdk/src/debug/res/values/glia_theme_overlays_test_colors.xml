@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fixtures for GliaThemeOverlaysTest. Debug-variant only, never published. -->
+<resources>
+    <color name="glia_test_legacy_brand">#FF0001</color>
+    <color name="glia_test_customization_brand">#FF0002</color>
+    <color name="glia_test_context_brand">#FF0003</color>
+    <color name="glia_test_unprefixed_brand">#FF0004</color>
+</resources>

@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
-import com.glia.androidsdk.chat.ChatMessage
 import com.glia.widgets.R
 import com.glia.widgets.chat.adapter.CustomCardMessage
 import org.json.JSONException
@@ -13,7 +12,7 @@ import org.json.JSONException
 /**
  * The implementation of [CustomCardViewHolder] allows displaying the card message as a WebView.
  * <p>
- * It can render HTML content if the [ChatMessage.metadata] has an HTML body with the `html` key.
+ * It can render HTML content if the [CustomCardMessage.metadata] has an HTML body with the `html` key.
  * <p>
  * <b>Metadata example:</b>
  * <pre>{@code
@@ -112,19 +111,6 @@ class WebViewViewHolder @SuppressLint("SetJavaScriptEnabled") constructor(parent
             "function sendResponse(text, value){Glia.response(text, value);}" +
             "function callMobileAction(action){Glia.action(action);}" +
             "</script>"
-
-        /**
-         * Allows checking if the message can be displayed using [WebViewViewHolder].
-         * @param message the chat message with metadata.
-         * @return true if the message metadata has the `html` key.
-         */
-        fun isWebViewType(message: ChatMessage): Boolean {
-            val metadata = message.metadata
-            if (metadata == null || metadata.length() == 0) {
-                return false
-            }
-            return metadata.has(METADATA_KEY)
-        }
 
         /**
          * Allows checking if the message can be displayed using [WebViewViewHolder].

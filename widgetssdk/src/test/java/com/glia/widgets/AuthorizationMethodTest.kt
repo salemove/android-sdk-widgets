@@ -30,15 +30,4 @@ class AuthorizationMethodTest {
         assertEquals(widgetsUserApiKey.id, authorizationMethod.id)
         assertEquals(widgetsUserApiKey.secret, authorizationMethod.secret)
     }
-
-    @Test
-    fun toWidgetType_convertsToWidgetsSiteApiKey() {
-        val coreSiteApiKey = com.glia.androidsdk.SiteApiKey("testId", "testSecret")
-
-        val widgetsApiKey = coreSiteApiKey.toWidgetType()
-
-        assertEquals(AuthorizationMethod.SiteApiKey::class.java, widgetsApiKey::class.java)
-        assertEquals(coreSiteApiKey.id, widgetsApiKey.id)
-        assertEquals(coreSiteApiKey.secret, widgetsApiKey.secret)
-    }
 }

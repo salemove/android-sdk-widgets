@@ -60,8 +60,8 @@ internal open class LocaleProvider(
             localeManager.onLocaleChanged { localeCode, error ->
                 if (error == null && localeCode != null) {
                     localeEmitter.onNext(localeCode)
-                } else {
-                    Logger.e(TAG, "Locale update observable crashed", error)
+                } else if (error != null) {
+                    Logger.w(TAG, "Locale update callback received an error: $error")
                 }
             }
         }

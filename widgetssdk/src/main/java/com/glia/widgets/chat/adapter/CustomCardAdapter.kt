@@ -153,7 +153,8 @@ abstract class CustomCardAdapter {
         return false
     }
 
-    fun getChatAdapterViewType(message: ChatMessage): Int? {
+    @JvmName("getChatAdapterViewType")
+    internal fun getChatAdapterViewType(message: ChatMessage): Int? {
         if (getItemViewType(CustomCardMessage(message)) == null && getItemViewType(message) != null) {
             Logger.logDeprecatedMethodUse(TAG, "getItemViewType(ChatMessage)")
         }

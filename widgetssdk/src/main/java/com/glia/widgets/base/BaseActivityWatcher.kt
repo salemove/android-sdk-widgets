@@ -7,13 +7,11 @@ import android.os.Bundle
 import androidx.annotation.CallSuper
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AlertDialog
-import com.glia.widgets.UiTheme
 import com.glia.widgets.helper.DialogHolderActivity
 import com.glia.widgets.helper.GliaActivityManager
 import com.glia.widgets.helper.asStateFlowable
 import com.glia.widgets.helper.isGlia
 import com.glia.widgets.helper.parentActivity
-import com.glia.widgets.helper.withRuntimeTheme
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.processors.PublishProcessor
@@ -122,13 +120,16 @@ internal open class BaseSingleActivityWatcher(private val gliaActivityManager: G
         }
     }
 
+    /**
+     * The dialog is always built against a Glia activity - an integrator's activity is proxied
+     * through [DialogHolderActivity] first - so the context handed to [callback] already carries the
+     * composed Glia theme and needs no styling of its own.
+     */
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
-    fun showAlertDialogWithStyledContext(activity: Activity, callback: (Context, UiTheme) -> AlertDialog) {
+    fun showAlertDialogWithStyledContext(activity: Activity, callback: (Context) -> AlertDialog) {
         enforceGliaActivity(activity) {
             dismissAlertDialogSilently()
-            withRuntimeTheme { themedContext, uiTheme ->
-                alertDialog = callback(themedContext, uiTheme)
-            }
+            alertDialog = callback(this)
         }
     }
 

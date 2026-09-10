@@ -44,8 +44,8 @@ internal class EngagementCompletionActivityWatcher(
     private fun showSurvey(activity: Activity, survey: Survey) = activityLauncher.launchSurvey(activity, survey)
 
     private fun showOperatorEndedEngagementDialog(activity: Activity, consumeCallback: () -> Unit) {
-        showAlertDialogWithStyledContext(activity) { context, theme ->
-            Dialogs.showOperatorEndedEngagementDialog(context = context, theme = theme) {
+        showAlertDialogWithStyledContext(activity) { context ->
+            Dialogs.showOperatorEndedEngagementDialog(context = context) {
                 dismissAlertDialogSilently()
                 finishActivities()
                 consumeCallback()
@@ -54,8 +54,8 @@ internal class EngagementCompletionActivityWatcher(
     }
 
     private fun showNoOperatorsAvailableDialog(activity: Activity, consumeCallback: () -> Unit) {
-        showAlertDialogWithStyledContext(activity) { context, theme ->
-            Dialogs.showNoMoreOperatorsAvailableDialog(context = context, uiTheme = theme) {
+        showAlertDialogWithStyledContext(activity) { context ->
+            Dialogs.showNoMoreOperatorsAvailableDialog(context = context) {
                 dismissAlertDialogSilently()
                 finishActivities()
                 consumeCallback()
@@ -64,8 +64,8 @@ internal class EngagementCompletionActivityWatcher(
     }
 
     private fun showUnexpectedErrorDialog(activity: Activity, consumeCallback: () -> Unit) {
-        showAlertDialogWithStyledContext(activity) { context, theme ->
-            Dialogs.showUnexpectedErrorDialog(context = context, uiTheme = theme) {
+        showAlertDialogWithStyledContext(activity) { context ->
+            Dialogs.showUnexpectedErrorDialog(context = context) {
                 dismissAlertDialogSilently()
                 finishActivities()
                 consumeCallback()

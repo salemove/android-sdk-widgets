@@ -350,7 +350,6 @@ internal class CallView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     private fun showExitQueueDialog() = showDialog {
         Dialogs.showExitQueueDialog(
             context = context,
-            uiTheme = theme,
             positiveButtonClickListener = {
                 resetDialogStateAndDismiss()
                 callController?.endEngagementDialogYesClicked()
@@ -556,7 +555,6 @@ internal class CallView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     private fun showEndEngagementDialog() = showDialog {
         Dialogs.showEndEngagementDialog(
             context = context,
-            uiTheme = theme,
             positiveButtonClickListener = {
                 resetDialogStateAndDismiss()
                 callController?.endEngagementDialogYesClicked()
@@ -569,7 +567,7 @@ internal class CallView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     }
 
     override fun showMissingPermissionsDialog() = showDialog {
-        Dialogs.showMissingPermissionsDialog(context, theme) {
+        Dialogs.showMissingPermissionsDialog(context) {
             resetDialogStateAndDismiss()
             callController?.unexpectedErrorDialogDismissed()
             onEndListener?.onEnd()
@@ -581,7 +579,6 @@ internal class CallView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             showDialog {
                 Dialogs.showEngagementConfirmationDialog(
                     context = context,
-                    theme = theme,
                     links = links,
                     positiveButtonClickListener = {
                         resetDialogStateAndDismiss()
@@ -602,7 +599,6 @@ internal class CallView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     private fun showOverlayPermissionsDialog() = showDialog {
         Dialogs.showOverlayPermissionsDialog(
             context = context,
-            uiTheme = theme,
             positiveButtonClickListener = {
                 resetDialogStateAndDismiss()
                 callController?.overlayPermissionsDialogDismissed()

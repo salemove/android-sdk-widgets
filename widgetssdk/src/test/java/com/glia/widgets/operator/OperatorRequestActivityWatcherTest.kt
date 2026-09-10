@@ -4,12 +4,10 @@ import android.COMMON_EXTENSIONS_CLASS_PATH
 import android.CONTEXT_EXTENSIONS_CLASS_PATH
 import android.LOGGER_PATH
 import android.app.Activity
-import android.content.Context
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import com.glia.androidsdk.Engagement.MediaType
 import com.glia.androidsdk.comms.MediaUpgradeOffer
-import com.glia.widgets.UiTheme
 import com.glia.widgets.call.CallActivity
 import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.engagement.domain.MediaUpgradeOfferData
@@ -17,7 +15,6 @@ import com.glia.widgets.helper.GliaActivityManager
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.OneTimeEvent
 import com.glia.widgets.helper.showToast
-import com.glia.widgets.helper.withRuntimeTheme
 import com.glia.widgets.launcher.ActivityLauncher
 import com.glia.widgets.view.Dialogs
 import io.mockk.Runs
@@ -174,7 +171,7 @@ class OperatorRequestActivityWatcherTest {
     fun `RequestMediaUpgrade will open show dialog when activity is a Glia activity`() {
         mockkObject(Dialogs)
         val dialog: AlertDialog = mockk(relaxed = true)
-        every { Dialogs.showUpgradeDialog(any(), any(), any(), any(), any()) } returns dialog
+        every { Dialogs.showUpgradeDialog(any(), any(), any(), any()) } returns dialog
         val offer: MediaUpgradeOffer = mockk(relaxed = true)
         val data: MediaUpgradeOfferData = mockk(relaxed = true)
         every { data.offer } returns offer
@@ -185,11 +182,10 @@ class OperatorRequestActivityWatcherTest {
         ) { event, activity ->
 
             verify(exactly = 0) { event.markConsumed() }
-            verify { activity.withRuntimeTheme(any()) }
 
             val onAcceptSlot = slot<View.OnClickListener>()
             val onDeclineSlot = slot<View.OnClickListener>()
-            verify { Dialogs.showUpgradeDialog(activity, any(), data, capture(onAcceptSlot), capture(onDeclineSlot)) }
+            verify { Dialogs.showUpgradeDialog(activity, data, capture(onAcceptSlot), capture(onDeclineSlot)) }
 
             onAcceptSlot.captured.onClick(mockk())
             verify { event.markConsumed() }
@@ -207,7 +203,7 @@ class OperatorRequestActivityWatcherTest {
         mockkObject(Dialogs)
         mockkStatic(COMMON_EXTENSIONS_CLASS_PATH)
         val dialog: AlertDialog = mockk(relaxed = true)
-        every { Dialogs.showUpgradeDialog(any(), any(), any(), any(), any()) } returns dialog
+        every { Dialogs.showUpgradeDialog(any(), any(), any(), any()) } returns dialog
         val offer: MediaUpgradeOffer = mockk(relaxed = true)
         val data: MediaUpgradeOfferData = mockk(relaxed = true)
         every { data.offer } returns offer
@@ -218,11 +214,10 @@ class OperatorRequestActivityWatcherTest {
         ) { event, activity ->
 
             verify(exactly = 0) { event.markConsumed() }
-            verify { activity.withRuntimeTheme(any()) }
 
             val onAcceptSlot = slot<View.OnClickListener>()
             val onDeclineSlot = slot<View.OnClickListener>()
-            verify { Dialogs.showUpgradeDialog(activity, any(), data, capture(onAcceptSlot), capture(onDeclineSlot)) }
+            verify { Dialogs.showUpgradeDialog(activity, data, capture(onAcceptSlot), capture(onDeclineSlot)) }
 
             onDeclineSlot.captured.onClick(mockk())
             verify { event.markConsumed() }
@@ -239,7 +234,7 @@ class OperatorRequestActivityWatcherTest {
     fun `DismissAlertDialog will dismiss dialog`() {
         mockkObject(Dialogs)
         val dialog: AlertDialog = mockk(relaxed = true)
-        every { Dialogs.showUpgradeDialog(any(), any(), any(), any(), any()) } returns dialog
+        every { Dialogs.showUpgradeDialog(any(), any(), any(), any()) } returns dialog
         val offer: MediaUpgradeOffer = mockk(relaxed = true)
         val data: MediaUpgradeOfferData = mockk(relaxed = true)
         every { data.offer } returns offer
@@ -250,11 +245,10 @@ class OperatorRequestActivityWatcherTest {
         ) { event, activity ->
 
             verify(exactly = 0) { event.markConsumed() }
-            verify { activity.withRuntimeTheme(any()) }
 
             val onAcceptSlot = slot<View.OnClickListener>()
             val onDeclineSlot = slot<View.OnClickListener>()
-            verify { Dialogs.showUpgradeDialog(activity, any(), data, capture(onAcceptSlot), capture(onDeclineSlot)) }
+            verify { Dialogs.showUpgradeDialog(activity, data, capture(onAcceptSlot), capture(onDeclineSlot)) }
 
             val dismissEvent: OneTimeEvent<OperatorRequestContract.State> = mockk(relaxed = true)
             every { dismissEvent.value } returns OperatorRequestContract.State.DismissAlertDialog
@@ -328,10 +322,6 @@ internal inline fun <reified T : Activity> fireState(
 ) {
     val activity = mockk<T>(relaxed = true)
     every { activity.isFinishing } returns false
-
-    every { any<Activity>().withRuntimeTheme(captureLambda()) } answers {
-        secondArg<(Context, UiTheme) -> Unit>().invoke(activity, UiTheme())
-    }
 
     val event: OneTimeEvent<OperatorRequestContract.State> = createMockEvent(state)
 

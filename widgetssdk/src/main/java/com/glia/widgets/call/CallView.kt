@@ -31,9 +31,9 @@ import com.glia.widgets.engagement.MediaType
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.SimpleWindowInsetsAndAnimationHandler
 import com.glia.widgets.helper.TAG
+import com.glia.widgets.helper.applyGliaThemeFont
 import com.glia.widgets.helper.asActivity
 import com.glia.widgets.helper.getColorCompat
-import com.glia.widgets.helper.gliaAttrFont
 import com.glia.widgets.helper.gliaAttrResourceId
 import com.glia.widgets.helper.hideKeyboard
 import com.glia.widgets.helper.insetsController
@@ -413,20 +413,11 @@ internal class CallView @JvmOverloads constructor(
         operatorStatusView.applyOperatorTheme(callTheme?.connect?.operator)
 
         // fonts
-        context.gliaAttrFont()?.also {
-            operatorNameView.typeface = it
-            companyNameView.typeface = it
-            msrView.typeface = it
-            callTimerView.typeface = it
-            connectingView.typeface = it
-            continueBrowsingView.typeface = it
-            chatButtonLabel.typeface = it
-            videoButtonLabel.typeface = it
-            muteButtonLabel.typeface = it
-            speakerButtonLabel.typeface = it
-            minimizeButtonLabel.typeface = it
-            poorConnectionView.typeface = it
-        }
+        context.applyGliaThemeFont(
+            operatorNameView, companyNameView, msrView, callTimerView, connectingView,
+            continueBrowsingView, chatButtonLabel, videoButtonLabel, muteButtonLabel,
+            speakerButtonLabel, minimizeButtonLabel, poorConnectionView
+        )
 
         // ButtonBar Buttons
         chatButton.applyBarButtonStatesTheme(callTheme?.buttonBar?.chatButton)

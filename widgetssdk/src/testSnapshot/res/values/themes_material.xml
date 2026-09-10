@@ -34,4 +34,74 @@
         <item name="gliaSystemNegativeColor">@color/systemNegativeColor</item>
     </style>
 
+    <!--
+        The whole-screen equivalent of the survey fixture: what an integrator's `GliaTheme` looks
+        like once it covers the palette rather than a single widget. Rendered by
+        `ChatViewCustomizedThemeSnapshotTest` and `CallViewCustomizedThemeSnapshotTest`.
+
+        Both the coarse attributes and the precise ones Phase 3 introduced are set, to distinct
+        values, so the goldens show which one each surface actually honours - a layout that
+        regressed to the coarse attribute would render purple where the golden has pink.
+    -->
+    <style name="Test.Glia.Customized" parent="ThemeOverlay.Glia.Chat.Material">
+        <item name="gliaBrandPrimaryColor">@color/brandPrimaryColor</item>
+        <item name="gliaBaseLightColor">@color/baseLightColor</item>
+        <item name="gliaBaseDarkColor">@color/baseDarkColor</item>
+        <item name="gliaBaseNormalColor">@color/baseNormalColor</item>
+        <item name="gliaBaseShadeColor">@color/baseShadeColor</item>
+        <item name="gliaSystemNegativeColor">@color/systemNegativeColor</item>
+        <item name="gliaChatBackgroundColor">@color/gliaChatBackgroundColor</item>
+        <item name="gliaVisitorMessageBackgroundColor">@color/visitorMessageBackgroundColor</item>
+        <item name="gliaVisitorMessageTextColor">@color/visitorMessageTextColor</item>
+        <item name="gliaOperatorMessageBackgroundColor">@color/operatorMessageBackgroundColor</item>
+        <item name="gliaOperatorMessageTextColor">@color/operatorMessageTextColor</item>
+        <item name="gliaSendMessageButtonTintColor">@color/sendMessageButtonTintColor</item>
+        <item name="gliaIconAppBarBack">@drawable/test_ic_app_bar_back</item>
+        <item name="gliaIconLeaveQueue">@drawable/test_ic_leave_queue</item>
+        <item name="gliaIconSendMessage">@drawable/test_ic_send_message</item>
+    </style>
+
+    <!--
+        ==============================================================================================
+        Fixtures for `GliaThemeCompositionSnapshotTest`, which drives the real
+        `applyGliaThemeOverlays` chokepoint rather than rendering against a pre-baked theme.
+
+        They cannot redefine `GliaTheme` or `Application.Glia.Activity.Style` - those are library
+        resources of this very module, and overriding them here would re-theme every other snapshot
+        suite that reaches the chokepoint (the entry widget and visitor code views wrap themselves).
+        The test injects these through the `customizationStyle` / `legacyActivityStyle` seams instead,
+        which are the same parameters production defaults to the real resources.
+        ==============================================================================================
+    -->
+
+    <!--
+        The documented legacy chain, reproduced exactly:
+        `gliaChatStyle` -> style parenting `Application.Glia.Chat` -> `materialThemeOverlay`
+        parenting `ThemeOverlay.Glia.Chat`. Both parents ship blank, which is what makes an overlay
+        contribute only the items it declares under `applyStyle(force = true)`.
+    -->
+    <style name="Test.Glia.Composition.LegacyOverlay" parent="ThemeOverlay.Glia.Chat">
+        <item name="gliaBrandPrimaryColor">@color/compositionLegacyBrandColor</item>
+        <item name="gliaSystemNegativeColor">@color/compositionLegacyNegativeColor</item>
+    </style>
+
+    <style name="Test.Glia.Composition.LegacyChatStyle" parent="Application.Glia.Chat">
+        <item name="materialThemeOverlay">@style/Test.Glia.Composition.LegacyOverlay</item>
+    </style>
+
+    <!-- Stand-in for the `Application.Glia.Activity.Style` resource integrators override. -->
+    <style name="Test.Glia.Composition.ActivityStyle" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="gliaChatStyle">@style/Test.Glia.Composition.LegacyChatStyle</item>
+    </style>
+
+    <!--
+        Stand-in for a redefined `GliaTheme`. `gliaBrandPrimaryColor` overlaps the legacy overlay, so
+        it proves precedence; `gliaBaseDarkColor` does not, so it proves both layers apply; and the
+        legacy overlay's `gliaSystemNegativeColor` proves customization replaces only what it declares.
+    -->
+    <style name="Test.Glia.Composition.Customization" parent="">
+        <item name="gliaBrandPrimaryColor">@color/compositionCustomizationBrandColor</item>
+        <item name="gliaBaseDarkColor">@color/compositionCustomizationDarkColor</item>
+    </style>
+
 </resources>

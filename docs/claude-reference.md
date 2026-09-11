@@ -250,7 +250,7 @@ All of the following pins have WHY comments in `gradle/libs.versions.toml` and m
 
 ### Build Type and Variant Behavior
 
-- Core SDK is declared per build type: `releaseApi`, `debugApi`, `snapshotApi`. The `snapshot` build type cannot use `includeBuild` composite for local Core SDK substitution.
+- Core SDK is declared per build type as `implementation` (not `api`) — `releaseImplementation`, `debugImplementation`, `snapshotImplementation` — so it stays off the integrator's compile classpath while remaining a transitive runtime dependency (MOB-4245). The `snapshot` build type cannot use `includeBuild` composite for local Core SDK substitution.
 - Firebase BOM and `firebase-messaging` are declared as `implementation` in the SDK module but stripped from the published POM via `excludeOptionalDependencies`.
 - Demo app targets `compileSdk 37`; SDK module targets `compileSdk 36`.
 - Paparazzi is applied only inside the `snapshot buildTypes` block — non-standard placement, intentional.

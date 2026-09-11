@@ -5,7 +5,7 @@ package com.glia.widgets.lifecycle
  *
  * @see com.glia.widgets.GliaWidgets.subscribeToEvents
  */
-fun interface OnGliaEvent {
+fun interface OnEvent {
     /**
      * Function that is fired when a lifecycle event occurs.
      *

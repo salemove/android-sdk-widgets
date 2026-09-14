@@ -10,7 +10,6 @@ import androidx.annotation.Nullable;
 import androidx.core.content.res.ResourcesCompat;
 
 import com.glia.widgets.R;
-import com.glia.widgets.UiTheme;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.ContextExtensions;
 import com.glia.widgets.helper.ResourceProvider;
@@ -48,8 +47,6 @@ public abstract class BaseConfigurableTextView extends MaterialTextView {
         updateView();
     }
 
-    public abstract TextConfiguration getTextConfigurationFromTheme(UiTheme theme);
-
     private void createBuildTimeConfiguration() {
         textConfiguration = TextConfiguration
             .builder()
@@ -58,27 +55,6 @@ public abstract class BaseConfigurableTextView extends MaterialTextView {
             .hintColor(getHintTextColors())
             .textSize(ContextExtensions.pxToSp(getContext(), getTextSize()))
             .build(resourceProvider);
-    }
-
-    public void setTheme(UiTheme theme) {
-        if (theme == null) return;
-        TextConfiguration runTimeConfiguration = getTextConfigurationFromTheme(theme);
-        if (runTimeConfiguration == null) return;
-        TextConfiguration.Builder builder = new TextConfiguration.Builder(textConfiguration);
-
-        if (runTimeConfiguration.getTextColor() != null)
-            builder.textColor(runTimeConfiguration.getTextColor());
-        if (runTimeConfiguration.getTextColorHighlight() != textConfiguration.getTextColorHighlight())
-            builder.textColorHighlight(runTimeConfiguration.getTextColorHighlight());
-        if (runTimeConfiguration.getHintColor() != null)
-            builder.hintColor(runTimeConfiguration.getHintColor());
-        if (runTimeConfiguration.getTextSize() != textConfiguration.getTextSize())
-            builder.textSize(runTimeConfiguration.getTextSize());
-        if (runTimeConfiguration.getFontFamily() != textConfiguration.getFontFamily())
-            builder.fontFamily(runTimeConfiguration.getFontFamily());
-
-        textConfiguration = builder.build(resourceProvider);
-        updateView();
     }
 
     private void updateView() {

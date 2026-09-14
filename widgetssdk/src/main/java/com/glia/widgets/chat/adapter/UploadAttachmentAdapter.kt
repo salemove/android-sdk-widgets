@@ -17,6 +17,7 @@ import com.glia.widgets.databinding.ChatAttachmentUploadedItemBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getColorStateListCompat
+import com.glia.widgets.helper.gliaAttrColor
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.load
 import com.glia.widgets.helper.setLocaleContentDescription
@@ -143,7 +144,7 @@ internal class ViewHolder(
             extensionTypeImage.applyImageColorTheme(filePreviewTheme?.errorIcon)
         } else {
             extensionContainerView.setCardBackgroundColor(
-                itemView.getColorCompat(R.color.glia_primary_color)
+                context.gliaAttrColor(R.attr.gliaBrandPrimaryColor, R.color.glia_primary_color)
             )
             extensionTypeImage.scaleType = ImageView.ScaleType.FIT_XY
             extensionTypeImage.imageTintList = null
@@ -188,9 +189,12 @@ internal class ViewHolder(
     }
 
     private fun updateTitleAndStatusText(fileName: String, byteSize: String, status: Status) {
-        val textColorRes =
-            if (status.isError) Material_R.color.design_default_color_error else R.color.glia_normal_color
-        titleText.setTextColor(itemView.getColorCompat(textColorRes))
+        val textColor = if (status.isError) {
+            itemView.getColorCompat(Material_R.color.design_default_color_error)
+        } else {
+            context.gliaAttrColor(R.attr.gliaBaseNormalColor, R.color.glia_normal_color)
+        }
+        titleText.setTextColor(textColor)
 
         titleText.text =
             if (status.isError) localeProvider.getString(getTitleErrorStringRes(status)) else "$fileName • $byteSize"
@@ -237,7 +241,7 @@ internal class ViewHolder(
 
     private fun setProgressIndicatorState(status: Status) {
         val normalColor = theme?.progress?.primaryColor
-            ?: itemView.getColorCompat(R.color.glia_primary_color)
+            ?: context.gliaAttrColor(R.attr.gliaBrandPrimaryColor, R.color.glia_primary_color)
         val errorColor = theme?.errorProgress?.primaryColor
             ?: itemView.getColorCompat(com.google.android.material.R.color.design_default_color_error)
 

@@ -2,44 +2,41 @@ package com.glia.widgets.view.head
 
 import android.app.Service
 import android.content.Context
-import android.content.res.TypedArray
 import android.util.AttributeSet
 import android.view.View
 import android.widget.Button
 import android.widget.FrameLayout
+import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
 import androidx.annotation.VisibleForTesting
-import androidx.core.content.withStyledAttributes
 import androidx.core.view.AccessibilityDelegateCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.core.view.isVisible
 import com.glia.widgets.R
-import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.Intention
 import com.glia.widgets.databinding.ChatHeadViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
-import com.glia.widgets.helper.Utils
 import com.glia.widgets.helper.addColorFilter
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getColorStateListCompat
+import com.glia.widgets.helper.gliaAttrDrawableRes
+import com.glia.widgets.helper.gliaAttrResourceId
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.load
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.launcher.ActivityLauncher
-import com.glia.widgets.view.configuration.ChatHeadConfiguration
 import com.glia.widgets.view.unifiedui.applyColorTheme
 import com.glia.widgets.view.unifiedui.applyImageColorTheme
 import com.glia.widgets.view.unifiedui.theme.bubble.BubbleTheme
 import com.glia.widgets.view.unifiedui.theme.chat.UserImageTheme
 import java.util.concurrent.Executor
-import kotlin.properties.Delegates
 
 internal class ChatHeadView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = R.attr.gliaChatStyle,
-    defStyleRes: Int = R.style.Application_Glia_Chat
+    defStyleAttr: Int = 0
 ) : FrameLayout(
     context,
     attrs,
@@ -47,7 +44,26 @@ internal class ChatHeadView @JvmOverloads constructor(
 ), ChatHeadContract.View {
     private val activityLauncher: ActivityLauncher by lazy { Dependencies.activityLauncher }
     private val binding by lazy { ChatHeadViewBinding.inflate(layoutInflater, this) }
-    private var configuration: ChatHeadConfiguration by Delegates.notNull()
+
+    /*
+     * The bubble is repainted per state (placeholder / queueing / operator picture), so these are
+     * resolved on every read instead of being captured once at inflation.
+     */
+    @get:ColorRes
+    private val brandPrimaryColorRes: Int
+        get() = context.gliaAttrResourceId(R.attr.gliaBrandPrimaryColor, R.color.glia_primary_color)
+
+    @get:ColorRes
+    private val baseLightColorRes: Int
+        get() = context.gliaAttrResourceId(R.attr.gliaBaseLightColor, R.color.glia_light_color)
+
+    @get:DrawableRes
+    private val placeholderIconRes: Int
+        get() = context.gliaAttrDrawableRes(R.attr.gliaIconPlaceholder, R.drawable.ic_person)
+
+    @get:DrawableRes
+    private val onHoldIconRes: Int
+        get() = context.gliaAttrDrawableRes(R.attr.gliaIconOnHold, R.drawable.ic_pause_circle)
 
     private val isService by lazy { context is Service }
 
@@ -62,17 +78,6 @@ internal class ChatHeadView @JvmOverloads constructor(
         serviceChatHeadController = Dependencies.controllerFactory.chatHeadController
         isCallVisualizerUseCase = Dependencies.useCaseFactory.isCurrentEngagementCallVisualizer
         setAccessibilityLabels()
-        readTypedArray()
-    }
-
-    private fun readTypedArray() {
-        context.withStyledAttributes(set = null, attrs = R.styleable.GliaView, defStyleAttr = 0) {
-            setDefaultTheme(this)
-        }
-    }
-
-    private fun setDefaultTheme(typedArray: TypedArray) {
-        configuration = createConfiguration(Utils.getThemeFromTypedArray(typedArray, this.context))
         post { updateView() }
         updateView()
     }
@@ -112,8 +117,8 @@ internal class ChatHeadView @JvmOverloads constructor(
                 queueingLottieAnimation.visibility = GONE
                 queueingLottieAnimationPlaceholder.visibility = GONE
                 profilePictureView.setImageDrawable(null)
-                profilePictureView.backgroundTintList = getColorStateListCompat(configuration.backgroundColorRes)
-                placeholderView.setImageResource(configuration.operatorPlaceholderIcon)
+                profilePictureView.backgroundTintList = getColorStateListCompat(brandPrimaryColorRes)
+                placeholderView.setImageResource(placeholderIconRes)
                 placeholderView.visibility = VISIBLE
             }
         }
@@ -124,7 +129,7 @@ internal class ChatHeadView @JvmOverloads constructor(
             binding.apply {
                 placeholderView.visibility = GONE
                 profilePictureView.setImageDrawable(null)
-                profilePictureView.backgroundTintList = getColorStateListCompat(configuration.badgeTextColor)
+                profilePictureView.backgroundTintList = getColorStateListCompat(baseLightColorRes)
                 queueingLottieAnimation.visibility = VISIBLE
                 queueingLottieAnimationPlaceholder.visibility = VISIBLE
             }
@@ -167,18 +172,6 @@ internal class ChatHeadView @JvmOverloads constructor(
         activityLauncher.launchCall(context, null, false)
     }
 
-    private fun createConfiguration(buildTimeTheme: UiTheme): ChatHeadConfiguration =
-        ChatHeadConfiguration.builder()
-            .operatorPlaceholderBackgroundColor(buildTimeTheme.brandPrimaryColor)
-            .operatorPlaceholderIcon(buildTimeTheme.iconPlaceholder)
-            .operatorPlaceholderIconTintList(buildTimeTheme.baseLightColor)
-            .badgeTextColor(buildTimeTheme.baseLightColor)
-            .badgeBackgroundTintList(buildTimeTheme.brandPrimaryColor)
-            .backgroundColorRes(buildTimeTheme.brandPrimaryColor)
-            .iconOnHold(buildTimeTheme.iconOnHold)
-            .iconOnHoldTintList(buildTimeTheme.baseLightColor)
-            .build()
-
     private fun setAccessibilityLabels() {
         val view = binding.root
         view.isFocusable = true
@@ -200,37 +193,37 @@ internal class ChatHeadView @JvmOverloads constructor(
 
     private fun updatePlaceholderImageView() {
         binding.placeholderView.apply {
-            setImageResource(configuration.operatorPlaceholderIcon)
-            setBackgroundColor(getColorCompat(configuration.operatorPlaceholderBackgroundColor))
-            imageTintList = getColorStateListCompat(configuration.operatorPlaceholderIconTintList)
+            setImageResource(placeholderIconRes)
+            setBackgroundColor(getColorCompat(brandPrimaryColorRes))
+            imageTintList = getColorStateListCompat(baseLightColorRes)
         }
         binding.queueingLottieAnimationPlaceholder.apply {
-            setImageResource(configuration.operatorPlaceholderIcon)
-            setBackgroundColor(getColorCompat(configuration.operatorPlaceholderBackgroundColor))
-            imageTintList = getColorStateListCompat(configuration.operatorPlaceholderIconTintList)
+            setImageResource(placeholderIconRes)
+            setBackgroundColor(getColorCompat(brandPrimaryColorRes))
+            imageTintList = getColorStateListCompat(baseLightColorRes)
         }
     }
 
     private fun updateOnHoldImageView() {
         binding.onHoldIcon.apply {
-            setImageResource(configuration.iconOnHold)
-            imageTintList = getColorStateListCompat(configuration.iconOnHoldTintList)
+            setImageResource(onHoldIconRes)
+            imageTintList = getColorStateListCompat(baseLightColorRes)
         }
     }
 
     private fun updateBadgeView() {
         binding.chatBubbleBadge.apply {
-            backgroundTintList = getColorStateListCompat(configuration.badgeBackgroundTintList)
-            setTextColor(getColorCompat(configuration.badgeTextColor))
+            backgroundTintList = getColorStateListCompat(brandPrimaryColorRes)
+            setTextColor(getColorCompat(baseLightColorRes))
         }
     }
 
     private fun updateProfilePictureView() {
-        binding.profilePictureView.setBackgroundColor(getColorCompat(configuration.backgroundColorRes))
+        binding.profilePictureView.setBackgroundColor(getColorCompat(brandPrimaryColorRes))
     }
 
     private fun updateQueueingAnimationView() {
-        binding.queueingLottieAnimation.addColorFilter(color = getColorCompat(configuration.backgroundColorRes))
+        binding.queueingLottieAnimation.addColorFilter(color = getColorCompat(brandPrimaryColorRes))
     }
 
     private fun updateView() {

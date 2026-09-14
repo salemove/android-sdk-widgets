@@ -1,7 +1,6 @@
 package com.glia.widgets.chat
 
 import android.content.Context
-import android.content.res.TypedArray
 import android.net.Uri
 import android.text.Editable
 import android.text.TextWatcher
@@ -15,7 +14,6 @@ import androidx.annotation.VisibleForTesting
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.app.ActivityOptionsCompat
-import androidx.core.content.withStyledAttributes
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -38,7 +36,6 @@ import com.glia.telemetry_lib.ScBannerTypes
 import com.glia.widgets.Constants
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.R
-import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.adapter.ChatAdapter
 import com.glia.widgets.chat.adapter.ChatAdapter.OnCustomCardResponse
 import com.glia.widgets.chat.adapter.ChatAdapter.OnFileItemClickListener
@@ -58,15 +55,13 @@ import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.SimpleTextWatcher
 import com.glia.widgets.helper.SimpleWindowInsetsAndAnimationHandler
 import com.glia.widgets.helper.TAG
-import com.glia.widgets.helper.Utils
 import com.glia.widgets.helper.addColorFilter
 import com.glia.widgets.helper.asActivity
 import com.glia.widgets.helper.ensureVisibility
 import com.glia.widgets.helper.fileName
-import com.glia.widgets.helper.getColorCompat
-import com.glia.widgets.helper.getColorStateListCompat
 import com.glia.widgets.helper.getContentUriCompat
-import com.glia.widgets.helper.getFontCompat
+import com.glia.widgets.helper.gliaAttrColor
+import com.glia.widgets.helper.gliaAttrFont
 import com.glia.widgets.helper.hideKeyboard
 import com.glia.widgets.helper.insetsController
 import com.glia.widgets.helper.layoutInflater
@@ -94,12 +89,9 @@ import com.glia.widgets.view.snackbar.logNoConnectionSnackBarShown
 import com.glia.widgets.view.snackbar.makeNoConnectionSnackBar
 import com.glia.widgets.view.unifiedui.applyButtonTheme
 import com.glia.widgets.view.unifiedui.applyColorTheme
-import com.glia.widgets.view.unifiedui.applyHintColor
 import com.glia.widgets.view.unifiedui.applyHintTheme
-import com.glia.widgets.view.unifiedui.applyImageColor
 import com.glia.widgets.view.unifiedui.applyImageColorTheme
 import com.glia.widgets.view.unifiedui.applyLayerTheme
-import com.glia.widgets.view.unifiedui.applyTextColor
 import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.glia.widgets.view.unifiedui.theme.base.HeaderTheme
@@ -110,8 +102,12 @@ import com.google.android.material.shape.MarkerEdgeTreatment
 import java.util.concurrent.Executor
 import kotlin.properties.Delegates
 
-internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : ConstraintLayout(
-    context, attrs, defStyleAttr, defStyleRes
+internal class ChatView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
+) : ConstraintLayout(
+    context, attrs, defStyleAttr
 ), OnFileItemClickListener, OnImageItemClickListener, ChatContract.View, DialogDelegate by DialogDelegateImpl() {
     private val activityLauncher: ActivityLauncher by lazy { Dependencies.activityLauncher }
 
@@ -126,7 +122,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
 
     private var localeProvider = Dependencies.localeProvider
     private var isInBottom = true
-    private var theme: UiTheme by Delegates.notNull()
 
     private var onTitleUpdatedListener: OnTitleUpdatedListener? = null
     private var onEndListener: OnEndListener? = null
@@ -225,18 +220,11 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     init {
         initConfigurations()
         bindViews()
-        readTypedArray(attrs, defStyleAttr, defStyleRes)
         setupViewAppearance()
         setupViewActions()
         setupControllers()
         SimpleWindowInsetsAndAnimationHandler(this, appBarOrToolBar = binding.appBarView)
     }
-
-    @JvmOverloads
-    constructor(
-        context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = R.attr.gliaChatStyle
-    ) : this(context, attrs, defStyleAttr, R.style.Application_Glia_Chat)
-
 
     fun startChat(intention: Intention) {
         dialogCallback?.also { dialogController?.addCallback(it) }
@@ -599,16 +587,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         controller = null
     }
 
-    private fun readTypedArray(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
-        context.withStyledAttributes(attrs, R.styleable.GliaView, defStyleAttr, defStyleRes) {
-            setDefaultTheme(this)
-        }
-    }
-
-    private fun setDefaultTheme(typedArray: TypedArray) {
-        theme = Utils.getThemeFromTypedArray(typedArray, this.context)
-    }
-
     private fun initConfigurations() {
         isInvisible = true
     }
@@ -649,8 +627,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         binding.addAttachmentQueue.layoutManager = LinearLayoutManager(this.context)
         binding.addAttachmentQueue.adapter = uploadAttachmentAdapter
         binding.appBarView.setTitle(LocaleString(R.string.engagement_chat_title))
-        // icons
-        theme.iconSendMessage?.also(binding.sendButton::setImageResource)
 
         // new messages indicator shape
         val shapeAppearanceModel = binding.newMessagesIndicatorCard.shapeAppearanceModel.toBuilder()
@@ -659,41 +635,16 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         binding.newMessagesIndicatorImage.setShowRippleAnimation(false)
         binding.newMessagesIndicatorCard.shapeAppearanceModel = shapeAppearanceModel
 
-        // global colors
-        theme.brandPrimaryColor
-            ?.also(binding.operatorTypingAnimationView::addColorFilter)
-            ?.let(::getColorStateListCompat)
-            ?.also(binding.newMessagesBadgeView::setBackgroundTintList)
+        // The typing indicator is a Lottie animation, so its colour cannot come from the layout.
+        binding.operatorTypingAnimationView.addColorFilter(
+            context.gliaAttrColor(R.attr.gliaBrandPrimaryColor, R.color.glia_primary_color)
+        )
 
-        theme.baseLightColor?.let(::getColorCompat)
-            ?.also(binding.newMessagesBadgeView::setTextColor)
-            ?.also(binding.scErrorLabel::setTextColor)
-        theme.baseLightColor?.let(::getColorStateListCompat)
-            ?.also(binding.scErrorLabel::setCompoundDrawableTintList)
+        // The root of `chat_view.xml` is a `<merge>`, so it has no slot for a background attribute.
+        setBackgroundColor(context.gliaAttrColor(R.attr.gliaChatBackgroundColor, R.color.glia_chat_background_color))
 
-        theme.systemNegativeColor?.let(::getColorCompat)
-            ?.also(binding.scErrorLabel::setBackgroundColor)
-
-        val disabledInputColor = theme.baseShadeColor?.let(::getColorCompat)
-            ?.also(binding.chatDivider::setBackgroundColor)
-            ?.also(binding.scBottomBannerDivider::setBackgroundColor)
-
-        theme.baseDarkColor?.let(::getColorCompat)
-            ?.also { binding.chatEditText.applyTextColor(it, disabledInputColor) }
-        theme.baseNormalColor?.let(::getColorCompat)
-            ?.also { binding.chatEditText.applyHintColor(it, disabledInputColor) }
-            ?.also { binding.addAttachmentButton.applyImageColor(it, disabledInputColor) }
-            ?.also(binding.scBottomBannerLabel::setTextColor)
-        theme.systemAgentBubbleColor?.let(::getColorCompat)?.also(binding.scBottomBannerLabel::setBackgroundColor)
-
-        // other
-        theme.sendMessageButtonTintColor?.let(::getColorCompat)
-            ?.also { binding.sendButton.applyImageColor(it, disabledInputColor) }
-        theme.gliaChatBackgroundColor?.let(::getColorCompat)?.also(::setBackgroundColor)
-        binding.gvaQuickRepliesLayout.updateTheme(theme)
-
-        // fonts
-        theme.fontRes?.also { binding.chatEditText.typeface = getFontCompat(it) }
+        // A `textAppearance` would win over a typeface set by the theme, so it has to be applied here.
+        context.gliaAttrFont()?.also { binding.chatEditText.typeface = it }
 
         // remote locales
         binding.scErrorLabel.setLocaleText(R.string.secure_messaging_chat_unavailable_message)

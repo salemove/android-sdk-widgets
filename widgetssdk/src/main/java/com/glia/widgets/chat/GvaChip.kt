@@ -4,14 +4,11 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.util.AttributeSet
 import android.view.ViewGroup
-import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.transition.TransitionManager
-import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.model.GvaButton
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.applyShadow
-import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.base.ButtonTheme
 import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
@@ -52,15 +49,6 @@ internal class GvaChip @JvmOverloads constructor(
             cornerRadius?.also { shapeAppearanceModel = shapeAppearanceModel.withCornerSize(it) }
         }
     }
-
-    internal fun applyUiTheme(uiTheme: UiTheme?) {
-        with(uiTheme ?: return) {
-            gvaQuickReplyBackgroundColor?.let { setChipBackgroundColorResource(it) }
-            gvaQuickReplyStrokeColor?.let { setChipStrokeColorResource(it) }
-            gvaQuickReplyTextColor?.let { getColorCompat(it) }?.let { setTextColor(it) }
-            applyQuickReplyTheme()
-        }
-    }
 }
 
 internal class GvaChipGroup @JvmOverloads constructor(
@@ -70,7 +58,6 @@ internal class GvaChipGroup @JvmOverloads constructor(
 ) : ChipGroup(context, attrs, defStyleAttr) {
 
     internal var onItemClickedListener: OnItemClickedListener? = null
-    private var theme: UiTheme? = null
 
     init {
         isSelectionRequired = false
@@ -89,18 +76,12 @@ internal class GvaChipGroup @JvmOverloads constructor(
         }
     }
 
-    internal fun updateTheme(theme: UiTheme?) {
-        this.theme = theme
-
-        children.forEach { (it as? GvaChip)?.applyUiTheme(theme) }
-    }
-
     internal fun setButtons(buttons: List<GvaButton>) {
         val hasItems = buttons.isNotEmpty()
 
         if (hasItems) {
             removeAllViews()
-            buttons.forEach { addButton(it, theme) }
+            buttons.forEach(::addButton)
 
             if (isVisible) return
 
@@ -110,9 +91,8 @@ internal class GvaChipGroup @JvmOverloads constructor(
         isVisible = hasItems
     }
 
-    private fun addButton(gvaButton: GvaButton, uiTheme: UiTheme?) {
+    private fun addButton(gvaButton: GvaButton) {
         GvaChip(context).apply {
-            applyUiTheme(uiTheme)
             text = gvaButton.text
             setOnClickListener {
                 onItemClickedListener?.onItemClicked(gvaButton)

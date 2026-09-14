@@ -18,16 +18,14 @@ import com.glia.widgets.view.header.AppBarView
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.glia.widgets.view.unifiedui.theme.base.HeaderTheme
 
-internal class WebBrowserView(
+internal class WebBrowserView @JvmOverloads constructor(
     context: Context,
-    attrs: AttributeSet?,
-    defStyleAttr: Int,
-    defStyleRes: Int
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
 ) : LinearLayout(
     context,
     attrs,
-    defStyleAttr,
-    defStyleRes
+    defStyleAttr
 ) {
 
     private val unifiedTheme: UnifiedTheme? by lazy { Dependencies.gliaThemeManager.theme }
@@ -46,13 +44,6 @@ internal class WebBrowserView(
         setupViewAppearance()
         SimpleWindowInsetsAndAnimationHandler(this, appBar)
     }
-
-    @JvmOverloads
-    constructor(
-        context: Context,
-        attrs: AttributeSet? = null,
-        defStyleAttr: Int = R.attr.gliaChatStyle
-    ) : this(context, attrs, defStyleAttr, R.style.Application_Glia_Chat)
 
     fun setTitle(title: LocaleString?) {
         appBar?.setTitle(title)

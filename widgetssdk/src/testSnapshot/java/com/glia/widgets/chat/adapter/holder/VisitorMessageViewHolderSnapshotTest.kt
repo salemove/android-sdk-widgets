@@ -1,7 +1,6 @@
 package com.glia.widgets.chat.adapter.holder
 
 import com.glia.widgets.SnapshotTest
-import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.model.VisitorMessageItem
 import com.glia.widgets.databinding.ChatVisitorMessageLayoutBinding
 import com.glia.widgets.snapshotutils.SnapshotChatScreen
@@ -58,7 +57,7 @@ internal class VisitorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotCh
 
     private fun setupView(item: VisitorMessageItem, unifiedTheme: UnifiedTheme? = null): ViewData {
         val binding = ChatVisitorMessageLayoutBinding.inflate(layoutInflater)
-        val viewHolder = VisitorMessageViewHolder(binding, {}, UiTheme(), unifiedTheme, localeProviderMock())
+        val viewHolder = VisitorMessageViewHolder(binding, {}, unifiedTheme, localeProviderMock())
 
         viewHolder.bind(item)
 

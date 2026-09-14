@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Free-text survey answer field border.
+
+    Reproduces `InputQuestionConfiguration`'s three layers: normal 30% of the normal colour, focused
+    the full normal colour, required-answer error (`state_activated`) the negative colour. Error is
+    listed first so it survives the field being focused - the code path it replaces lost the error
+    colour as soon as the field took focus.
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="?attr/gliaSystemNegativeColor" android:state_activated="true" />
+    <item android:color="?attr/gliaBaseNormalColor" android:state_focused="true" />
+    <item android:alpha="0.3" android:color="?attr/gliaBaseNormalColor" />
+</selector>

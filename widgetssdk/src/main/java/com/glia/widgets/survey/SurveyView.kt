@@ -2,16 +2,12 @@ package com.glia.widgets.survey
 
 import android.content.Context
 import android.content.res.ColorStateList
-import android.graphics.Color
-import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.util.AttributeSet
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.cardview.widget.CardView
-import androidx.core.content.withStyledAttributes
-import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.androidsdk.engagement.Survey
 import com.glia.telemetry_lib.ButtonNames
@@ -22,15 +18,13 @@ import com.glia.widgets.R
 import com.glia.widgets.databinding.SurveyViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.SimpleWindowInsetsAndAnimationHandler
-import com.glia.widgets.helper.Utils
+import com.glia.widgets.helper.gliaAttrColor
 import com.glia.widgets.helper.hideKeyboard
 import com.glia.widgets.helper.insetsController
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.helper.showToast
 import com.glia.widgets.survey.SurveyAdapter.SurveyAdapterListener
-import com.glia.widgets.view.configuration.ButtonConfiguration
-import com.glia.widgets.view.configuration.survey.SurveyStyle
 import com.glia.widgets.view.unifiedui.applyButtonTheme
 import com.glia.widgets.view.unifiedui.applyColorTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
@@ -80,7 +74,8 @@ internal class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: 
 
     init {
         SimpleWindowInsetsAndAnimationHandler(this)
-        readTypedArray(attrs, defStyleAttr, defStyleRes)
+        initAdapter()
+        applyUnifiedTheme()
         setupViewAppearance()
         initCallbacks()
     }
@@ -98,49 +93,33 @@ internal class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: 
         this.onFinishListener = onFinishListener
     }
 
-    private fun applyStyle(surveyStyle: SurveyStyle?) {
-        setupCardView(surveyStyle, surveyTheme)
+    /**
+     * Layers the JSON unified theme over what the layout and the composed Glia theme already
+     * resolved. Everything the deleted `SurveyStyle` used to apply here - the title colour and size,
+     * the button panel background, the Submit/Cancel styling - now comes from `survey_view.xml` and
+     * `buttonBar*ButtonStyle`, so only the card background is still built in code: no XML shape can
+     * express the JSON gradient fill.
+     */
+    private fun applyUnifiedTheme() {
+        setupCardView()
 
-        surveyStyle?.title?.also { textConfiguration ->
-            textConfiguration.textColor.also(title::setTextColor)
-            textConfiguration.textSize.also(title::setTextSize)
-            if (textConfiguration.isBold) title.typeface = Typeface.DEFAULT_BOLD
-        }
-
-        // The elevated view (buttonPanel) needs to have a background to cast a shadow
-        surveyStyle?.layer?.backgroundColor
-            ?.let(Color::parseColor)
-            ?.also(buttonPanel::setBackgroundColor)
         surveyTheme?.layer?.fill?.also(buttonPanel::applyColorTheme)
         surveyTheme?.title?.also(title::applyTextTheme)
 
-        applyButtonStyle(surveyStyle?.submitButton, submitButton)
-        applyButtonStyle(surveyStyle?.cancelButton, cancelButton)
         surveyTheme?.submitButton?.also(submitButton::applyButtonTheme)
         surveyTheme?.cancelButton?.also(cancelButton::applyButtonTheme)
     }
 
-    private fun setupCardView(surveyStyle: SurveyStyle?, surveyTheme: SurveyTheme?) {
-        if (surveyStyle == null && surveyTheme == null) {
-            return
-        }
+    private fun setupCardView() {
+        val cornerRadius = surveyTheme?.layer?.cornerRadius
+            ?.let(Dependencies.resourceProvider::convertDpToPixel)
+            ?: resources.getDimension(R.dimen.glia_survey_default_survey_corner_radius)
 
-        val cornerRadiusFloat = surveyTheme?.layer?.cornerRadius
-            ?: surveyStyle?.layer?.cornerRadius?.toFloat()
-            ?: SurveyStyle.Builder().build().layer.cornerRadius.toFloat() // default value
-        val resourceProvider = Dependencies.resourceProvider
-        val cornerRadius = resourceProvider.convertDpToPixel(cornerRadiusFloat)
-
-        surveyTheme?.layer?.fill?.also {
-            if (it.isGradient) {
-                setupCardView(cornerRadius, it.valuesArray)
-            } else {
-                setupCardView(cornerRadius, it.primaryColor)
-            }
-        } ?: run {
-            val backgroundColor = surveyStyle?.layer?.backgroundColor
-                ?: SurveyStyle.Builder().build().layer.backgroundColor // default value
-            setupCardView(cornerRadius, backgroundColor.toColorInt())
+        val fill = surveyTheme?.layer?.fill
+        when {
+            fill == null -> setupCardView(cornerRadius, context.gliaAttrColor(R.attr.gliaBaseLightColor, R.color.glia_light_color))
+            fill.isGradient -> setupCardView(cornerRadius, fill.valuesArray)
+            else -> setupCardView(cornerRadius, fill.primaryColor)
         }
     }
 
@@ -168,39 +147,8 @@ internal class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: 
         cardView.background = background
     }
 
-    private fun applyButtonStyle(configuration: ButtonConfiguration?, button: MaterialButton?) {
-        if (configuration == null) {
-            // Default attributes from
-            // "Application.GliaAndroidSdkWidgetsExample.Button" styles
-            // will be in use
-            return
-        }
-        val backgroundColor = configuration.backgroundColor
-        button?.backgroundTintList = backgroundColor
-        val textColor = configuration.textConfiguration.textColor
-        button?.setTextColor(textColor)
-        button?.textSize = configuration.textConfiguration.textSize
-        button?.strokeColor = configuration.strokeColor
-        configuration.strokeWidth?.let { button?.strokeWidth = it }
-        if (configuration.textConfiguration.isBold) button?.typeface = Typeface.DEFAULT_BOLD
-    }
-
-    private fun readTypedArray(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
-        this.context.withStyledAttributes(attrs, R.styleable.GliaView, defStyleAttr, defStyleRes) {
-            setDefaultTheme(attrs, defStyleAttr, defStyleRes)
-        }
-    }
-
-    private fun setDefaultTheme(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
-        this.context.withStyledAttributes(attrs, R.styleable.GliaView, defStyleAttr, defStyleRes) {
-            val surveyStyle = Utils.getThemeFromTypedArray(this, this@SurveyView.context).surveyStyle
-            initAdapter(surveyStyle)
-            applyStyle(surveyStyle)
-        }
-    }
-
-    private fun initAdapter(surveyStyle: SurveyStyle?) {
-        surveyAdapter = SurveyAdapter(this, surveyStyle ?: SurveyStyle.Builder().build())
+    private fun initAdapter() {
+        surveyAdapter = SurveyAdapter(this)
         recyclerView.adapter = surveyAdapter
 
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {

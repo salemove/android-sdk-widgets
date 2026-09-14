@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Survey option button (boolean / scale) stroke.
+
+    `state_activated` carries the required-answer error (`GliaSurveyOptionButton.isError`) and is
+    listed first because the error colour used to win over the selected one in code.
+
+    The unselected stroke is 30% of the normal colour: `android:alpha="0.3"` modulates to 0x4D, the
+    exact value of the `@color/glia_normal_color_opacity_30` literal it replaces.
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="?attr/gliaSystemNegativeColor" android:state_activated="true" />
+    <item android:color="?attr/gliaBrandPrimaryColor" android:state_selected="true" />
+    <item android:alpha="0.3" android:color="?attr/gliaBaseNormalColor" />
+</selector>

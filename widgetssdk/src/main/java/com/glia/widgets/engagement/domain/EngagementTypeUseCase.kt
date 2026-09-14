@@ -13,6 +13,9 @@ internal interface EngagementTypeUseCase {
     val isCallVisualizer: Boolean
     val hasVideo: Boolean
 
+    /** Any audio or video flowing, in either direction. Says nothing about the operator being present. */
+    val hasMedia: Boolean
+
     operator fun invoke(): Flowable<MediaType>
 }
 
@@ -28,9 +31,9 @@ internal class EngagementTypeUseCaseImpl(
     override val hasVideo: Boolean get() = visitorMediaUseCase.hasVideo || operatorMediaUseCase.hasVideo
     override val isAudioEngagement: Boolean get() = hasOngoingEngagement && isOperatorPresentUseCase() && hasAudio
     override val isVideoEngagement: Boolean get() = hasOngoingEngagement && isOperatorPresentUseCase() && hasVideo
-    private val hasAnyMedia: Boolean get() = visitorMediaUseCase.hasMedia || operatorMediaUseCase.hasMedia
-    override val isMediaEngagement: Boolean get() = hasOngoingEngagement && isOperatorPresentUseCase() && hasAnyMedia
-    override val isChatEngagement: Boolean get() = hasOngoingEngagement && !isCurrentEngagementCallVisualizerUseCase() && isOperatorPresentUseCase() && !hasAnyMedia
+    override val hasMedia: Boolean get() = visitorMediaUseCase.hasMedia || operatorMediaUseCase.hasMedia
+    override val isMediaEngagement: Boolean get() = hasOngoingEngagement && isOperatorPresentUseCase() && hasMedia
+    override val isChatEngagement: Boolean get() = hasOngoingEngagement && !isCurrentEngagementCallVisualizerUseCase() && isOperatorPresentUseCase() && !hasMedia
     override val isCallVisualizer: Boolean get() = isCurrentEngagementCallVisualizerUseCase()
     private val operatorMediaObservable by lazy { operatorMediaUseCase() }
 

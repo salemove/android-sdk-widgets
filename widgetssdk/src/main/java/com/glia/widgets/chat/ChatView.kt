@@ -648,7 +648,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         binding.addAttachmentButton.setLocaleContentDescription(R.string.chat_attach_files)
         binding.addAttachmentQueue.layoutManager = LinearLayoutManager(this.context)
         binding.addAttachmentQueue.adapter = uploadAttachmentAdapter
-        binding.appBarView.setTheme(theme)
         binding.appBarView.setTitle(LocaleString(R.string.engagement_chat_title))
         // icons
         theme.iconSendMessage?.also(binding.sendButton::setImageResource)

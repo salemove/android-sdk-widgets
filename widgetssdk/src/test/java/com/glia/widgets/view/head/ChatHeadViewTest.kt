@@ -9,6 +9,7 @@ import com.glia.widgets.di.Dependencies
 import com.glia.widgets.di.UseCaseFactory
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
 import com.glia.widgets.helper.ResourceProvider
+import com.glia.widgets.helper.wrapWithGliaTheme
 import io.reactivex.rxjava3.core.Observable
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -50,7 +51,9 @@ internal class ChatHeadViewTest {
         whenever(useCaseFactory.isCurrentEngagementCallVisualizer) doReturn isCallVisualizerUseCase
         Dependencies.useCaseFactory = useCaseFactory
 
-        chatHeadView = ChatHeadView(application)
+        // In production ChatHeadView is always hosted by an already-composed context -
+        // ChatHeadService's base context or ChatHeadLayout - so it does not wrap on its own.
+        chatHeadView = ChatHeadView(application.wrapWithGliaTheme())
     }
 
     @Test

@@ -24,7 +24,7 @@ These three Java files form the manual DI registry. They must change in lockstep
 
 **`Dependencies.onAppCreate` ↔ ActivityLifecycleCallbacks watchers**
 
-`CallVisualizerActivityWatcher`, `ActivityWatcherForChatHead`, `ActivityWatcherForLiveObservation`, `ActivityWatcherForPermissionsRequest`, `EngagementCompletionActivityWatcher`, `OperatorRequestActivityWatcher`, `UiComponentsActivityWatcher` all extend `BaseSingleActivityWatcher` and expose `resumedActivity: Flowable<WeakReference<Activity>>` backed by a `PublishProcessor`. This is the implicit UI coordination bus — anything needing "top activity" reads from it. Moving watcher registration between `onAppCreate` and `onSdkInit` causes watchers to miss early app lifecycle events or run without config. Evidence: `widgetssdk/src/main/java/com/glia/widgets/base/BaseActivityWatcher.kt`
+Watchers extend one of two bases. `ActivityWatcherForChatHead`, `ActivityWatcherForLiveObservation` and `ActivityWatcherForPermissionsRequest` extend `BaseActivityStackWatcher`, which tracks the whole resumed stack and exposes `topActivityObserver: Observable<Activity>`. `CallVisualizerActivityWatcher`, `EngagementCompletionActivityWatcher`, `OperatorRequestActivityWatcher` and `UiComponentsActivityWatcher` extend `BaseSingleActivityWatcher` and expose `resumedActivity: Flowable<WeakReference<Activity>>` backed by a `PublishProcessor`. Together they are the implicit UI coordination bus — anything needing "top activity" reads from it. Moving watcher registration between `onAppCreate` and `onSdkInit` causes watchers to miss early app lifecycle events or run without config. Evidence: `widgetssdk/src/main/java/com/glia/widgets/base/BaseActivityWatcher.kt`
 
 **Views ↔ `Dependencies.gliaThemeManager.theme`**
 

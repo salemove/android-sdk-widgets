@@ -14,8 +14,15 @@ import com.glia.widgets.databinding.ChatHeadLayoutBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.wrapWithGliaTheme
+import com.glia.widgets.internal.chathead.BubblePosition
+import com.glia.widgets.internal.chathead.ChatBubbleContract
+import com.glia.widgets.internal.chathead.domain.ResolveChatHeadNavigationUseCase.Destinations
 import com.glia.widgets.view.SimpleTouchListener
-import kotlin.properties.Delegates
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 
 internal class ChatHeadLayout @JvmOverloads constructor(
     context: Context,
@@ -25,15 +32,15 @@ internal class ChatHeadLayout @JvmOverloads constructor(
     context.wrapWithGliaTheme(),
     attrs,
     defStyleAttr
-), ChatHeadLayoutContract.View {
-    private var chatHeadController: ChatHeadLayoutContract.Controller by Delegates.notNull()
+) {
+    private val chatBubbleController: ChatBubbleContract.Controller by lazy { Dependencies.controllerFactory.chatBubbleController }
+
+    private var scope: CoroutineScope? = null
 
     private var navigationCallback: NavigationCallback? = null
 
     private val _chatHeadViewPosition: PointF
         get() = PointF(chatHeadView.x, chatHeadView.y)
-
-    val position: PointF get() = _chatHeadViewPosition
 
     private val chatHeadSize: Float by lazy { resources.getDimension(R.dimen.glia_chat_head_size) }
     private val chatHeadBottomRightMargin: Float by lazy { resources.getDimension(R.dimen.glia_chat_head_content_padding) }
@@ -50,78 +57,45 @@ internal class ChatHeadLayout @JvmOverloads constructor(
         z = 100f // Make sure chat head is on top of other views
     }
 
-    override fun showOperatorImage(operatorImgUrl: String) {
-        chatHeadView.showOperatorImage(operatorImgUrl)
+    private fun navigateToChat() {
+        navigationCallback?.onNavigateToChat() ?: chatHeadView.navigateToChat()
     }
 
-    override fun showUnreadMessageCount(count: Int) {
-        chatHeadView.showUnreadMessageCount(count)
+    private fun navigateToCall() {
+        navigationCallback?.onNavigateToCall() ?: chatHeadView.navigateToCall()
     }
 
-    override fun showPlaceholder() {
-        chatHeadView.showPlaceholder()
-    }
-
-    override fun showQueueing() {
-        chatHeadView.showQueueing()
-    }
-
-    override fun showOnHold() {
-        chatHeadView.showOnHold()
-    }
-
-    override fun hideOnHold() {
-        chatHeadView.hideOnHold()
-    }
-
-    override fun navigateToChat() {
-        if (navigationCallback != null) {
-            navigationCallback!!.onNavigateToChat()
-        } else {
-            chatHeadView.navigateToChat()
-        }
-    }
-
-    override fun navigateToCall() {
-        if (navigationCallback != null) {
-            navigationCallback!!.onNavigateToCall()
-        } else {
-            chatHeadView.navigateToCall()
-        }
-    }
-
-    override fun show() {
-        post { visibility = VISIBLE }
-    }
-
-    override fun hide() {
-        post { visibility = GONE }
-    }
-
-    override fun setController(controller: ChatHeadLayoutContract.Controller) {
-        chatHeadController = controller
-    }
-
+    /**
+     * Positions the bubble once the bounds are known: at the place the visitor dragged it to — shared
+     * with the overlay bubble and mapped into this layout's own range, which also carries it across
+     * rotations — or at the default corner if it was never dragged.
+     */
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-        val isPositioned = chatHeadView.x != 0f && chatHeadView.y != 0f
+        val xMax = w - chatHeadSize - chatHeadBottomRightMargin
+        val yMax = h - chatHeadSize - chatHeadBottomRightMargin
+        val position = chatBubbleController.bubblePosition
 
-        // isPositioned==true when the chat head already has valid coordinates
-        // (oldw == 0 && oldh == 0) occurs when view just added to the view hierarchy
-        // This way we will reset the position during the configuration change,
-        // but will keep it for the new activities with the same orientation
-        if (isPositioned && oldw == 0 && oldh == 0) return
-
-        val floatingViewX = w - chatHeadSize - chatHeadBottomRightMargin
-        val floatingViewY = h / 10f * 8f
-        chatHeadView.x = floatingViewX
-        chatHeadView.y = floatingViewY
+        chatHeadView.x = position?.xWithin(chatHeadTopLeftMargin, xMax) ?: xMax
+        chatHeadView.y = position?.yWithin(chatHeadTopLeftMargin, yMax) ?: (h / 10f * 8f)
         chatHeadView.invalidate()
         super.onSizeChanged(w, h, oldw, oldh)
     }
 
+    private fun saveBubblePosition() {
+        chatBubbleController.bubblePosition = BubblePosition.within(
+            x = chatHeadView.x,
+            y = chatHeadView.y,
+            xMin = chatHeadTopLeftMargin,
+            xMax = width - chatHeadSize - chatHeadBottomRightMargin,
+            yMin = chatHeadTopLeftMargin,
+            yMax = height - chatHeadSize - chatHeadBottomRightMargin
+        )
+    }
+
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        chatHeadController.onDestroy()
+        scope?.cancel()
+        scope = null
     }
 
     /**
@@ -137,15 +111,20 @@ internal class ChatHeadLayout @JvmOverloads constructor(
     }
 
     private fun initialize() {
-        visibility = GONE
         initConfigurations()
         setupViewActions()
-        setController(Dependencies.controllerFactory.chatHeadLayoutController)
-        chatHeadController.setView(this)
     }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
+
+        // Being attached is the visibility mechanism: the watcher only attaches this layout while the
+        // controller says the bubble renders in the app, and detaches it otherwise.
+        visibility = VISIBLE
+
+        CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate).also { scope = it }.launch {
+            chatBubbleController.uiState.collect(chatHeadView::render)
+        }
 
         // Request to apply insets so that we can adjust the chat head position for edge-to-edge
         ViewCompat.requestApplyInsets(this)
@@ -196,7 +175,10 @@ internal class ChatHeadLayout @JvmOverloads constructor(
             SimpleTouchListener(
                 retrieveInitialCoordinates = { _chatHeadViewPosition },
                 onMove = { x, y -> onChatHeadDragged(x, y) },
-                onRelease = { ChatHeadLogger.logPositionChanged() }
+                onRelease = {
+                    saveBubblePosition()
+                    ChatHeadLogger.logPositionChanged()
+                }
             )
         )
         chatHeadView.setOnClickListener { onChatHeadClicked() }
@@ -210,12 +192,11 @@ internal class ChatHeadLayout @JvmOverloads constructor(
         chatHeadView.invalidate()
     }
 
-    private fun onChatHeadClicked() = chatHeadController.onChatHeadClicked()
-
-    fun setPosition(x: Float, y: Float) {
-        chatHeadView.x = x
-        chatHeadView.y = y
-        chatHeadView.invalidate()
+    private fun onChatHeadClicked() {
+        when (chatBubbleController.onBubbleTapped()) {
+            Destinations.CALL_VIEW -> navigateToCall()
+            Destinations.CHAT_VIEW -> navigateToChat()
+        }
     }
 
     fun removeSelf() {

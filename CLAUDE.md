@@ -34,7 +34,7 @@ MVP pattern: View + Controller + Contract interfaces. `ChatController` and `Call
 | Add/change DI wiring | `di/Dependencies.kt` → see [di/CLAUDE.md](widgetssdk/src/main/java/com/glia/widgets/di/CLAUDE.md) |
 | Chat or secure conversations | `chat/` → see [chat/CLAUDE.md](widgetssdk/src/main/java/com/glia/widgets/chat/CLAUDE.md) |
 | Engagement state machine | `engagement/` → see [engagement/CLAUDE.md](widgetssdk/src/main/java/com/glia/widgets/engagement/CLAUDE.md) |
-| Theme / styling | `view/unifiedui/` → see [unifiedui/CLAUDE.md](widgetssdk/src/main/java/com/glia/widgets/view/unifiedui/CLAUDE.md) |
+| Theme / styling, theming a new view | `view/unifiedui/` → see [unifiedui/CLAUDE.md](widgetssdk/src/main/java/com/glia/widgets/view/unifiedui/CLAUDE.md); attribute composition in `helper/GliaThemeOverlays.kt` |
 | Snapshot (UI) tests | `widgetssdk/src/testSnapshot/` → see [testSnapshot/CLAUDE.md](widgetssdk/src/testSnapshot/CLAUDE.md) |
 | Version, dependency pins | `gradle/libs.versions.toml`, root `build.gradle` |
 | Push notifications | `fcm/`, `push/` |
@@ -56,13 +56,14 @@ MVP pattern: View + Controller + Contract interfaces. `ChatController` and `Call
 - Never bypass the `GliaCore` interface — all networking, auth, and data storage must flow through `GliaCoreImpl`, never through direct Glia SDK calls from feature code.
 - Never use `!!` — use `?.`, `?:`, `requireNotNull("message")`, or early returns.
 - Never block the main thread — use RxJava 3 schedulers (`io.reactivex.rxjava3.*`); always provide an error handler in `.subscribe()`.
-- Never hardcode colors, dimensions, or strings — use the Unified Theme system and string resources (prefix `glia_`, wrap in `LocaleString`); legacy `UiTheme.kt` is deprecated.
+- Never hardcode colors, dimensions, or strings — use the theme system and string resources (prefix `glia_`, wrap in `LocaleString`). Theming is two layered mechanisms: `?attr/glia*` in layouts (composed by `helper/GliaThemeOverlays.kt`) with the JSON Unified theme applied last. **Adding a View or widget: read "Theming a new View or widget" in [unifiedui/CLAUDE.md](widgetssdk/src/main/java/com/glia/widgets/view/unifiedui/CLAUDE.md) first** — put the value in the layout unless one of the four listed reasons forces a code-side read.
 - Never introduce a new singleton class — add dependencies to the `Dependencies` object.
 - Never use Jetpack Compose — traditional View system only.
 - Never write new classes in Java — all new code must be Kotlin. When touching an existing Java file for a small, self-contained change, migrate it to Kotlin in the same PR if doing so fits the task's context; leave large/high-churn Java files (e.g., `ControllerFactory.java`, `UseCaseFactory.java`, `RepositoryFactory.java`) for coordinated migration.
 - Always dispose `CompositeDisposable` in `onDestroy(retain = false)`, not in `onPause` or unconditional `onDestroy`.
 - Always declare explicit return types on Kotlin functions and class/file-level variables; local variables may use inference.
 - Always add or update unit tests for every changed layer; always run `recordSnapshots` + `verifySnapshots` for any UI change.
+- Never write a KDoc `[link]` that Dokka cannot resolve — the API-docs CI step (`./gradlew dokkaGeneratePublicationHtml`) fails on any warning. Generated classes (`R.*`, `BuildConfig`) and nested platform classes (e.g. `Resources.Theme`) never resolve; write those in backticks instead.
 - MockK and Mockito-Kotlin coexist in the test suite intentionally — do not migrate one to the other.
 
 ## Directory Map
@@ -108,6 +109,7 @@ scripts/                # version-updater.gradle, direct-core.gradle, changelog,
 | [testSnapshot/CLAUDE.md](widgetssdk/src/testSnapshot/CLAUDE.md) | Paparazzi setup, snapshot build type, record/verify workflow |
 
 ### External
+- [Theming migration guide](docs/theming-migration.md) — legacy `gliaChatStyle` chain → `GliaTheme`, precedence, removed APIs
 - [Developer Guide](.claude/DEVELOPER_GUIDE.md) — local setup, composite build, git hooks
 - [Developer Docs](https://developer.glia.com/api-usage-refs/android-api) — public API reference
 - [iOS counterpart](https://github.com/salemove/ios-sdk-widgets) — cross-platform parity reference

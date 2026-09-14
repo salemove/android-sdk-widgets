@@ -7,8 +7,8 @@ import com.glia.widgets.chat.model.GvaPersistentButtons
 import com.glia.widgets.databinding.ChatGvaPersistentButtonsContentBinding
 import com.glia.widgets.databinding.ChatOperatorMessageLayoutBinding
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.helper.applyGliaThemeFont
 import com.glia.widgets.helper.fromHtml
-import com.glia.widgets.helper.gliaAttrFont
 import com.glia.widgets.view.unifiedui.applyLayerTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
@@ -39,7 +39,7 @@ internal class GvaPersistentButtonsViewHolder(
             applyLayerTheme(persistentButtonTheme?.background ?: operatorTheme?.background)
         }
         contentBinding.message.apply {
-            context.gliaAttrFont()?.also(::setTypeface)
+            context.applyGliaThemeFont(this)
 
             importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
 

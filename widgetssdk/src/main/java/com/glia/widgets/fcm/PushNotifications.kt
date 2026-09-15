@@ -1,6 +1,8 @@
 package com.glia.widgets.fcm
 
 import android.content.Context
+import android.content.Intent
+import android.os.Bundle
 import com.glia.telemetry_lib.EventAttribute
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.telemetry_lib.LogEvents
@@ -80,6 +82,25 @@ interface PushNotifications {
      * @param service - FCM service
      */
     fun onNewMessage(service: FirebaseMessagingService, remoteMessage: RemoteMessage)
+
+    /**
+     * Returns the type of the Glia push notification the application was opened from, if any.
+     *
+     * This method has no side effects and can be called as often as needed. Call it from your launcher
+     * Activity's `onCreate`, and from `onNewIntent` after calling `setIntent(intent)`.
+     *
+     * @param intent The Activity intent, usually `getIntent()`
+     * @return the [PushMessageType], or `null` when the intent does not belong to a Glia push notification
+     */
+    fun pushMessageTypeOf(intent: Intent?): PushMessageType?
+
+    /**
+     * The same as [pushMessageTypeOf] but takes the intent extras directly.
+     *
+     * @param bundle The Activity intent extras, usually `getIntent().getExtras()`
+     * @return the [PushMessageType], or `null` when the bundle does not belong to a Glia push notification
+     */
+    fun pushMessageTypeOf(bundle: Bundle?): PushMessageType?
 }
 
 // Push notification key for the queue ID
@@ -140,4 +161,16 @@ internal class PushNotificationsImpl(
         }
     }
 
+    override fun pushMessageTypeOf(intent: Intent?): PushMessageType? {
+        GliaLogger.logMethodUse(PushNotifications::class, "pushMessageTypeOf", "intent")
+        return parse(intent?.extras)
+    }
+
+    override fun pushMessageTypeOf(bundle: Bundle?): PushMessageType? {
+        GliaLogger.logMethodUse(PushNotifications::class, "pushMessageTypeOf", "bundle")
+        return parse(bundle)
+    }
+
+    private fun parse(bundle: Bundle?): PushMessageType? =
+        corePushNotifications.parsePushMessageType(bundle)?.toWidgetsType()
 }

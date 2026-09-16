@@ -7,6 +7,7 @@ import com.glia.widgets.callvisualizer.controller.CallVisualizerController
 import com.glia.widgets.di.ControllerFactory
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.di.GliaCore
+import com.glia.widgets.push.notifications.PushClickHandlerController
 import com.glia.widgets.di.GliaCoreImpl
 import com.glia.widgets.di.RepositoryFactory
 import com.glia.widgets.engagement.EngagementRepository
@@ -159,6 +160,7 @@ class GliaWidgetsTest {
     private fun mockWidgetsInitialization() {
         val callVisualizerController = mock<CallVisualizerController>()
         whenever(controllerFactory.callVisualizerController).thenReturn(callVisualizerController)
+        whenever(controllerFactory.pushClickHandlerController) doReturn mock<PushClickHandlerController>()
         val engagementRepository = mock<EngagementRepository>()
         whenever(repositoryFactory.engagementRepository) doReturn engagementRepository
         val queueRepository = mock<QueueRepository>()

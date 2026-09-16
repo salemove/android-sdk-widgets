@@ -439,7 +439,8 @@ public class ControllerFactory {
                 uiComponentsDispatcher,
                 core,
                 useCaseFactory.getIsQueueingOrEngagementUseCase(),
-                useCaseFactory.createIsAuthenticatedUseCase()
+                useCaseFactory.createIsAuthenticatedUseCase(),
+                useCaseFactory.getEngagementStateUseCase()
             );
         }
         return pushClickHandlerController;

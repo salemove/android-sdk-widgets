@@ -20,6 +20,7 @@ import com.glia.widgets.callbacks.OnError
 import com.glia.widgets.helper.orNotApplicable
 import com.glia.widgets.helper.stringValue
 import com.glia.widgets.launcher.ConfigurationManager
+import com.glia.widgets.push.notifications.PushClickHandlerController
 import com.glia.widgets.locale.LocaleProvider
 import io.mockk.Ordering
 import io.mockk.every
@@ -51,6 +52,7 @@ class DependenciesTest {
     private lateinit var configurationManager: ConfigurationManager
     private lateinit var onComplete: OnComplete
     private lateinit var onError: OnError
+    private lateinit var pushClickHandlerController: PushClickHandlerController
 
     @Before
     fun setUp() {
@@ -65,6 +67,8 @@ class DependenciesTest {
         configurationManager = mockk(relaxUnitFun = true)
         onComplete = mockk(relaxUnitFun = true)
         onError = mockk(relaxUnitFun = true)
+        pushClickHandlerController = mockk(relaxUnitFun = true)
+        every { controllerFactory.pushClickHandlerController } returns pushClickHandlerController
 
         // assign mocks to Dependencies
         Dependencies.gliaCore = gliaCore
@@ -96,6 +100,7 @@ class DependenciesTest {
             repositoryFactory.initialize()
             configurationManager.applyConfiguration(widgetsConfig)
             localeProvider.setCompanyName(widgetsConfig.companyName)
+            pushClickHandlerController.onSdkInitialized()
             GliaLogger.i(LogEvents.WIDGETS_SDK_CONFIGURED)
         }
     }
@@ -194,6 +199,7 @@ class DependenciesTest {
             repositoryFactory.initialize()
             configurationManager.applyConfiguration(widgetsConfig)
             localeProvider.setCompanyName(widgetsConfig.companyName)
+            pushClickHandlerController.onSdkInitialized()
             GliaLogger.i(LogEvents.WIDGETS_SDK_CONFIGURED)
         }
     }
@@ -204,6 +210,7 @@ class DependenciesTest {
             repositoryFactory.initialize()
             configurationManager.applyConfiguration(any())
             localeProvider.setCompanyName(any())
+            pushClickHandlerController.onSdkInitialized()
         }
 
         verify(inverse = true) {

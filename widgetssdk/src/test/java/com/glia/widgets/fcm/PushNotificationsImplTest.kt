@@ -3,6 +3,7 @@ package com.glia.widgets.fcm
 import android.GLIA_LOGGER_PATH
 import android.content.Intent
 import android.os.Bundle
+import com.glia.widgets.push.notifications.PushClickHandlerController
 import com.glia.widgets.push.notifications.SecureMessagingPushController
 import io.mockk.every
 import io.mockk.mockk
@@ -19,13 +20,19 @@ import com.glia.androidsdk.fcm.PushNotifications as CorePushNotifications
 
 class PushNotificationsImplTest {
     private lateinit var corePushNotifications: CorePushNotifications
+    private lateinit var pushClickHandlerController: PushClickHandlerController
     private lateinit var pushNotifications: PushNotificationsImpl
 
     @Before
     fun setUp() {
         mockkStatic(GLIA_LOGGER_PATH)
         corePushNotifications = mockk(relaxed = true)
-        pushNotifications = PushNotificationsImpl(corePushNotifications, mockk<SecureMessagingPushController>(relaxed = true))
+        pushClickHandlerController = mockk(relaxUnitFun = true)
+        pushNotifications = PushNotificationsImpl(
+            corePushNotifications,
+            mockk<SecureMessagingPushController>(relaxed = true),
+            pushClickHandlerController
+        )
     }
 
     @After
@@ -73,5 +80,31 @@ class PushNotificationsImplTest {
         every { corePushNotifications.parsePushMessageType(null) } returns null
 
         assertNull(pushNotifications.pushMessageTypeOf(null as Bundle?))
+    }
+
+    @Test
+    fun `handlePushNotificationClick passes the intent extras to the controller`() {
+        val bundle = mockk<Bundle>()
+        val intent = mockk<Intent> { every { extras } returns bundle }
+
+        pushNotifications.handlePushNotificationClick(intent)
+
+        verify { pushClickHandlerController.handlePushNotificationClick(bundle) }
+    }
+
+    @Test
+    fun `handlePushNotificationClick passes the bundle to the controller`() {
+        val bundle = mockk<Bundle>()
+
+        pushNotifications.handlePushNotificationClick(bundle)
+
+        verify { pushClickHandlerController.handlePushNotificationClick(bundle) }
+    }
+
+    @Test
+    fun `handlePushNotificationClick passes null to the controller for a null intent`() {
+        pushNotifications.handlePushNotificationClick(null as Intent?)
+
+        verify { pushClickHandlerController.handlePushNotificationClick(null) }
     }
 }

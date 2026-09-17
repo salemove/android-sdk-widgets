@@ -39,6 +39,7 @@ internal class EngagementTypeUseCaseImpl(
             when {
                 operatorMediaState.hasVideo -> MediaType.VIDEO
                 operatorMediaState.hasAudio -> MediaType.AUDIO
+                isChatEngagement -> MediaType.TEXT
                 else -> MediaType.UNKNOWN
             }
         }

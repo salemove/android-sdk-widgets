@@ -17,6 +17,7 @@ public class TestingAppLauncherActivity extends AppCompatActivity {
         setContentView(R.layout.activity);
 
         initGliaWidgetsWithDeepLink();
+        GliaWidgets.getPushNotifications().handlePushNotificationClick(getIntent());
     }
 
     private void initGliaWidgetsWithDeepLink() {
@@ -29,6 +30,10 @@ public class TestingAppLauncherActivity extends AppCompatActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
+        // Without this getIntent() keeps returning the intent the Activity was first started with.
+        setIntent(intent);
+
+        GliaWidgets.getPushNotifications().handlePushNotificationClick(intent);
         Navigation.findNavController(this, R.id.nav_host_fragment).handleDeepLink(intent);
     }
 }

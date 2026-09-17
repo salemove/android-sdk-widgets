@@ -1,10 +1,13 @@
 package com.glia.widgets.fcm
 
 import android.content.Context
+import android.content.Intent
+import android.os.Bundle
 import com.glia.telemetry_lib.EventAttribute
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.telemetry_lib.LogEvents
 import com.glia.telemetry_lib.PushType
+import com.glia.widgets.push.notifications.PushClickHandlerController
 import com.glia.widgets.push.notifications.SecureMessagingPushController
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -80,6 +83,47 @@ interface PushNotifications {
      * @param service - FCM service
      */
     fun onNewMessage(service: FirebaseMessagingService, remoteMessage: RemoteMessage)
+
+    /**
+     * Returns the type of the Glia push notification the application was opened from, if any.
+     *
+     * This method has no side effects and can be called as often as needed. Call it from your launcher
+     * Activity's `onCreate`, and from `onNewIntent` after calling `setIntent(intent)`.
+     *
+     * @param intent The Activity intent, usually `getIntent()`
+     * @return the [PushMessageType], or `null` when the intent does not belong to a Glia push notification
+     */
+    fun pushMessageTypeOf(intent: Intent?): PushMessageType?
+
+    /**
+     * The same as [pushMessageTypeOf] but takes the intent extras directly.
+     *
+     * @param bundle The Activity intent extras, usually `getIntent().getExtras()`
+     * @return the [PushMessageType], or `null` when the bundle does not belong to a Glia push notification
+     */
+    fun pushMessageTypeOf(bundle: Bundle?): PushMessageType?
+
+    /**
+     * Opens the Glia screen the visitor tapped a push notification for.
+     *
+     * Call this from your launcher Activity's `onCreate`, and from `onNewIntent` after calling
+     * `setIntent(intent)` — `getIntent()` otherwise keeps returning the intent the Activity was first
+     * started with. Intents that do not belong to a Glia push notification are ignored, and the same
+     * notification is never handled twice.
+     *
+     * The screen opens once the SDK is initialized and, where the notification requires it, once the
+     * visitor is authenticated and the engagement has been restored.
+     *
+     * @param intent The Activity intent, usually `getIntent()`
+     */
+    fun handlePushNotificationClick(intent: Intent?)
+
+    /**
+     * The same as [handlePushNotificationClick] but takes the intent extras directly.
+     *
+     * @param bundle The Activity intent extras, usually `getIntent().getExtras()`
+     */
+    fun handlePushNotificationClick(bundle: Bundle?)
 }
 
 // Push notification key for the queue ID
@@ -99,7 +143,8 @@ private const val SECURE_MESSAGING_TYPE = "engagement.secure_conversation.messag
 
 internal class PushNotificationsImpl(
     private val corePushNotifications: CorePushNotifications,
-    private val secureMessagingPushController: SecureMessagingPushController
+    private val secureMessagingPushController: SecureMessagingPushController,
+    private val pushClickHandlerController: PushClickHandlerController
 ) : PushNotifications {
     override fun subscribeTo(events: Collection<PushNotificationEvent>) {
         GliaLogger.logMethodUse(PushNotifications::class, "subscribeTo", "eventsList")
@@ -140,4 +185,26 @@ internal class PushNotificationsImpl(
         }
     }
 
+    override fun pushMessageTypeOf(intent: Intent?): PushMessageType? {
+        GliaLogger.logMethodUse(PushNotifications::class, "pushMessageTypeOf", "intent")
+        return parse(intent?.extras)
+    }
+
+    override fun pushMessageTypeOf(bundle: Bundle?): PushMessageType? {
+        GliaLogger.logMethodUse(PushNotifications::class, "pushMessageTypeOf", "bundle")
+        return parse(bundle)
+    }
+
+    private fun parse(bundle: Bundle?): PushMessageType? =
+        corePushNotifications.parsePushMessageType(bundle)?.toWidgetsType()
+
+    override fun handlePushNotificationClick(intent: Intent?) {
+        GliaLogger.logMethodUse(PushNotifications::class, "handlePushNotificationClick", "intent")
+        pushClickHandlerController.handlePushNotificationClick(intent?.extras)
+    }
+
+    override fun handlePushNotificationClick(bundle: Bundle?) {
+        GliaLogger.logMethodUse(PushNotifications::class, "handlePushNotificationClick", "bundle")
+        pushClickHandlerController.handlePushNotificationClick(bundle)
+    }
 }

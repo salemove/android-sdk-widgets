@@ -216,17 +216,18 @@ dependencies {
   implementation libs.rxandroid
   implementation libs.rxjava
 
-  releaseApi "${libs.glia.core.get().module}:$gliaSdkVersion"
+  releaseImplementation "${libs.glia.core.get().module}:$gliaSdkVersion"
 
   def coreDebugVersion = coreSdkDebugVersion(gliaSdkVersion)
-  debugApi ("${libs.glia.core.get().module}:$coreDebugVersion") {
+  debugImplementation ("${libs.glia.core.get().module}:$coreDebugVersion") {
     if (coreDebugVersion.endsWith("-SNAPSHOT")) {
       changing = true
     }
   }
+  debugImplementation libs.leakcanary
 
   // includeBuild doesn't work with custom build types, use local maven version instead
-  snapshotApi "${libs.glia.core.get().module}:${coreSdkSnapshotVersion(gliaSdkVersion)}"
+  snapshotImplementation "${libs.glia.core.get().module}:${coreSdkSnapshotVersion(gliaSdkVersion)}"
 
   def telemetryVersion = telemetrySdkVersion(telemetryLibVersion)
   implementation ("${libs.glia.telemetry.get().module}:$telemetryVersion") {
@@ -261,7 +262,6 @@ dependencies {
   testImplementation libs.json
 
   lintChecks project(':lint_checker')
-  debugImplementation libs.leakcanary
 }
 
 configurations.configureEach {

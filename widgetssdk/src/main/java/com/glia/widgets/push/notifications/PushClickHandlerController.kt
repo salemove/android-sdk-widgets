@@ -68,7 +68,7 @@ internal class PushClickHandlerControllerImpl(
     private var pendingPushMessageType: PushMessageType? = null
 
     // `google.message_id` of the last click handled, so one notification is never acted on twice
-    private var handledMessageId: String? = null
+    private var handledMessageIds: MutableSet<String> = mutableSetOf()
 
     private var sdkInitialized: Boolean = false
 
@@ -99,12 +99,12 @@ internal class PushClickHandlerControllerImpl(
     override fun handlePushNotificationClick(bundle: Bundle?) {
         val pushMessageType = gliaCore.pushNotifications.parsePushMessageType(bundle)?.toWidgetsType() ?: return
 
-        val messageId = bundle?.getString(GOOGLE_MESSAGE_ID_KEY)
-        if (messageId != null && messageId == handledMessageId) {
+        val messageId = bundle?.getString(GOOGLE_MESSAGE_ID_KEY) ?: return
+        if (handledMessageIds.contains(messageId)) {
             Logger.d(TAG, "Push notification click is already handled, the repeated call is ignored.")
             return
         }
-        handledMessageId = messageId
+        handledMessageIds.add(messageId)
 
         when (pushMessageType) {
             PushMessageType.CHAT_MESSAGE, PushMessageType.QUEUED_MESSAGE -> {

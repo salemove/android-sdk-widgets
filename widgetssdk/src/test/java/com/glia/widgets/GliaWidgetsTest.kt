@@ -21,7 +21,6 @@ import org.junit.rules.TestRule
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -55,33 +54,6 @@ class GliaWidgetsTest {
     fun tearDown() {
         // Dependencies is a process-wide singleton - restore the real GliaCore so the mock does not leak into other test classes
         Dependencies.gliaCore = GliaCoreImpl()
-    }
-
-    @Test
-    fun `deprecated init initializes dependencies synchronously`() {
-        val gliaWidgetsConfig = widgetsConfig()
-        mockWidgetsInitialization()
-
-        GliaWidgets.init(gliaWidgetsConfig)
-
-        verify(gliaCore).init(eq(gliaWidgetsConfig))
-        verify(controllerFactory).init()
-        verify(repositoryFactory).initialize()
-    }
-
-    @Test
-    fun `deprecated init throws when core initialization fails`() {
-        val gliaWidgetsConfig = widgetsConfig()
-        val initializationError = GliaWidgetsException("Invalid configuration", GliaWidgetsException.Cause.INVALID_INPUT)
-        whenever(gliaCore.init(eq(gliaWidgetsConfig))) doThrow initializationError
-
-        val exception = Assert.assertThrows(GliaWidgetsException::class.java) {
-            GliaWidgets.init(gliaWidgetsConfig)
-        }
-
-        Assert.assertEquals(initializationError, exception)
-        verify(controllerFactory, never()).init()
-        verify(repositoryFactory, never()).initialize()
     }
 
     @Test

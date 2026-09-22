@@ -111,34 +111,6 @@ object GliaWidgets {
     }
 
     /**
-     * Initializes the Glia Widgets SDK using [GliaWidgetsConfig] without initialization callbacks.
-     *
-     * [GliaWidgets.isInitialized] returns `true` as soon as this method returns, so SDK-dependent
-     * actions can be performed immediately, but full initialization is not guaranteed - it
-     * completes asynchronously and its result is not reported back to the caller.
-     * [GliaWidgets.isInitialized] turns `false` again if initialization fails.
-     * Use the overload with [OnComplete] and [OnError] callbacks to be notified about the actual result.
-     *
-     * @param gliaWidgetsConfig Glia configuration
-     * @throws GliaWidgetsException with cause [GliaWidgetsException.Cause.INVALID_INPUT] when
-     * the provided configuration is invalid, or when the SDK is already initialized or
-     * initialization is already in progress
-     */
-    @JvmStatic
-    @Synchronized
-    @Deprecated(
-        message = "Use init(gliaWidgetsConfig, onComplete, onError) to be notified when initialization completes or fails",
-        replaceWith = ReplaceWith(
-            expression = "GliaWidgets.init(gliaWidgetsConfig, onComplete, onError)",
-            "com.glia.widgets.GliaWidgets"
-        )
-    )
-    fun init(gliaWidgetsConfig: GliaWidgetsConfig) {
-        GliaLogger.logDeprecatedApiUse(SdkType.WIDGETS_SDK, GliaWidgets::class, "init")
-        Dependencies.onSdkInit(gliaWidgetsConfig)
-    }
-
-    /**
      * Initializes the Glia Widgets SDK using [GliaWidgetsConfig].
      *
      * Initialization completes asynchronously. Exactly one of the callbacks is invoked when it

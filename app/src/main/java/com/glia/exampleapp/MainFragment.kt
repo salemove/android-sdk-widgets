@@ -116,33 +116,24 @@ class MainFragment : Fragment() {
         val visitorContextAssetId = getContextAssetIdFromPrefs(sharedPreferences)
         view.findViewById<View>(R.id.chat_activity_button)
             .setOnClickListener {
-                if (!GliaWidgets.isInitialized()) {
-                    initGliaWidgets(legacy = true)
-                }
-                runCatching {
+                startEngagementWhenInitialized {
                     visitorContextAssetId?.run { engagementLauncher.startChat(requireActivity(), this) }
                         ?: engagementLauncher.startChat(requireActivity())
-                }.onFailure { error -> showToast("Error: ${error.message}") }
+                }
             }
         view.findViewById<View>(R.id.audio_call_button)
             .setOnClickListener {
-                if (!GliaWidgets.isInitialized()) {
-                    initGliaWidgets(legacy = true)
-                }
-                runCatching {
+                startEngagementWhenInitialized {
                     visitorContextAssetId?.run { engagementLauncher.startAudioCall(requireActivity(), this) }
                         ?: engagementLauncher.startAudioCall(requireActivity())
-                }.onFailure { error -> showToast("Error: ${error.message}") }
+                }
             }
         view.findViewById<View>(R.id.video_call_button)
             .setOnClickListener {
-                if (!GliaWidgets.isInitialized()) {
-                    initGliaWidgets(legacy = true)
-                }
-                runCatching {
+                startEngagementWhenInitialized {
                     visitorContextAssetId?.run { engagementLauncher.startVideoCall(requireActivity(), this) }
                         ?: engagementLauncher.startVideoCall(requireActivity())
-                }.onFailure { error -> showToast("Error: ${error.message}") }
+                }
             }
         view.findViewById<View>(R.id.message_center_activity_button)
             .setOnClickListener {
@@ -517,11 +508,22 @@ class MainFragment : Fragment() {
         }
     }
 
-    private fun initGliaWidgets(legacy: Boolean = false) {
+    /**
+     * Starts an engagement once the SDK is ready. [GliaWidgets.init] completes asynchronously, so a
+     * launcher call issued in the same click handler would run before the SDK is usable.
+     */
+    private fun startEngagementWhenInitialized(startEngagement: () -> Unit) {
+        initGliaWidgets {
+            runCatching(startEngagement).onFailure { error -> showToast("Error: ${error.message}") }
+        }
+    }
+
+    private fun initGliaWidgets(onInitialized: (() -> Unit)? = null) {
         if (GliaWidgets.isInitialized()) {
             setupAuthButtonsVisibility()
             listenForCallVisualizerEngagements()
             listenForGliaEvents()
+            onInitialized?.invoke()
             return
         }
 
@@ -536,20 +538,19 @@ class MainFragment : Fragment() {
             listenForCallVisualizerEngagements()
             listenForGliaEvents()
 
-            view?.post { initMenu() }
+            // onComplete may arrive on a background thread; the launcher needs the main thread.
+            view?.post {
+                initMenu()
+                onInitialized?.invoke()
+            }
         }
-        if (legacy) {
-            GliaWidgets.init(gliaWidgetsConfig)
-            onComplete()
-        } else {
-            GliaWidgets.init(
-                gliaWidgetsConfig,
-                onComplete = onComplete,
-                onError = { error ->
-                    showToast(error.message.toString())
-                }
-            )
-        }
+        GliaWidgets.init(
+            gliaWidgetsConfig,
+            onComplete = onComplete,
+            onError = { error ->
+                showToast(error.message.toString())
+            }
+        )
     }
 
     private fun prepareAuthentication() {

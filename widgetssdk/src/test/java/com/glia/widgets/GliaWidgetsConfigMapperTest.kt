@@ -23,7 +23,7 @@ class GliaWidgetsConfigMapperTest {
     @Test(expected = GliaException::class)
     fun `toCoreType fails when the siteApiKey ID is blank`() {
         GliaWidgetsConfig.Builder()
-            .setSiteApiKey(SiteApiKey("", "Secret"))
+            .setAuthorizationMethod(AuthorizationMethod.UserApiKey("", "Secret"))
             .setSiteId("SiteId")
             .setRegion(GliaWidgetsConfig.Regions.US)
             .setContext(mockContext())
@@ -34,7 +34,7 @@ class GliaWidgetsConfigMapperTest {
     @Test(expected = GliaException::class)
     fun `toCoreType fails when the siteApiKey Secret is blank`() {
         GliaWidgetsConfig.Builder()
-            .setSiteApiKey(SiteApiKey("Id", ""))
+            .setAuthorizationMethod(AuthorizationMethod.UserApiKey("Id", ""))
             .setSiteId("SiteId")
             .setRegion(GliaWidgetsConfig.Regions.US)
             .setContext(mockContext())
@@ -45,7 +45,7 @@ class GliaWidgetsConfigMapperTest {
     @Test(expected = GliaException::class)
     fun `toCoreType fails when the siteID is blank`() {
         GliaWidgetsConfig.Builder()
-            .setSiteApiKey(SiteApiKey("Id", "Secret"))
+            .setAuthorizationMethod(AuthorizationMethod.UserApiKey("Id", "Secret"))
             .setSiteId("")
             .setRegion(Region.US)
             .setContext(mockContext())
@@ -56,7 +56,7 @@ class GliaWidgetsConfigMapperTest {
     @Test(expected = GliaWidgetsException::class)
     fun `toCoreType fails when the siteID is missing`() {
         GliaWidgetsConfig.Builder()
-            .setSiteApiKey(SiteApiKey("Id", "Secret"))
+            .setAuthorizationMethod(AuthorizationMethod.UserApiKey("Id", "Secret"))
             .setRegion(Region.US)
             .setContext(mockContext())
             .build()
@@ -66,7 +66,7 @@ class GliaWidgetsConfigMapperTest {
     @Test(expected = GliaWidgetsException::class)
     fun `toCoreType fails when the context is missing`() {
         GliaWidgetsConfig.Builder()
-            .setSiteApiKey(SiteApiKey("Id", "Secret"))
+            .setAuthorizationMethod(AuthorizationMethod.UserApiKey("Id", "Secret"))
             .setSiteId("SiteId")
             .setRegion(Region.US)
             .build()
@@ -76,7 +76,7 @@ class GliaWidgetsConfigMapperTest {
     @Test(expected = GliaWidgetsException::class)
     fun `toCoreType fails when the region is missing`() {
         GliaWidgetsConfig.Builder()
-            .setSiteApiKey(SiteApiKey("Id", "Secret"))
+            .setAuthorizationMethod(AuthorizationMethod.UserApiKey("Id", "Secret"))
             .setSiteId("SiteId")
             .setContext(mockContext())
             .build()
@@ -86,7 +86,7 @@ class GliaWidgetsConfigMapperTest {
     @Test(expected = GliaWidgetsException::class)
     fun `toCoreType fails when both regions are present`() {
         GliaWidgetsConfig.Builder()
-            .setSiteApiKey(SiteApiKey("Id", "Secret"))
+            .setAuthorizationMethod(AuthorizationMethod.UserApiKey("Id", "Secret"))
             .setSiteId("SiteId")
             .setRegion(Region.US)
             .setRegion(GliaWidgetsConfig.Regions.US)
@@ -98,7 +98,7 @@ class GliaWidgetsConfigMapperTest {
     @Test(expected = GliaWidgetsException::class)
     fun `toCoreType fails when provided incorrect string region`() {
         GliaWidgetsConfig.Builder()
-            .setSiteApiKey(SiteApiKey("Id", "Secret"))
+            .setAuthorizationMethod(AuthorizationMethod.UserApiKey("Id", "Secret"))
             .setSiteId("SiteId")
             .setRegion("beta")
             .setContext(mockContext())
@@ -109,7 +109,7 @@ class GliaWidgetsConfigMapperTest {
     @Test
     fun `toCoreType succeeds when all required fields are present`() {
         GliaWidgetsConfig.Builder()
-            .setSiteApiKey(SiteApiKey("Id", "Secret"))
+            .setAuthorizationMethod(AuthorizationMethod.UserApiKey("Id", "Secret"))
             .setSiteId("SiteId")
             .setRegion(Region.Beta)
             .setContext(mockContext())

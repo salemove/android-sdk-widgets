@@ -29,19 +29,6 @@ interface CallVisualizer {
      *
      * This dialog will overlay on top of any other dialogs without dismissing them.
      *
-     * Otherwise, it behaves the same way as [.createVisitorCodeView].
-     *
-     */
-    @Deprecated("Use {@link #showVisitorCodeDialog()}", ReplaceWith("showVisitorCodeDialog()"))
-    fun showVisitorCodeDialog(context: Context) {
-        showVisitorCodeDialog()
-    }
-
-    /**
-     * Shows the visitor code in a dialog box on top of the current activity within your application.
-     *
-     * This dialog will overlay on top of any other dialogs without dismissing them.
-     *
      * Otherwise, it behaves the same way as [createVisitorCodeView].
      */
     fun showVisitorCodeDialog()

@@ -37,6 +37,6 @@ See [root CLAUDE.md](../CLAUDE.md) for project-wide architecture, MVP pattern, D
 - **Do not run tests against the `snapshot` build variant expecting results.** The `snapshot` variant excludes `src/test/java` — it returns zero tests. Always use `testDebug` or `testRelease`. Evidence: `build.gradle` sourceSets
 
 ## For AI Agents
-- Never call `GliaWidgets.onAppCreate()` in new code — it is deprecated and redundant because `InitializationProvider.onCreate()` already runs `super.onCreate()` → `Dependencies.onAppCreate(application)` → `GliaWidgets.setupRxErrorHandler()`. Calling it again re-invokes the init path.
+- Never add a public app-create entry point to `GliaWidgets` — `InitializationProvider.onCreate()` already runs `super.onCreate()` → `Dependencies.onAppCreate(application)` → `GliaWidgets.setupRxErrorHandler()`. The deprecated `GliaWidgets.onAppCreate()` façade was removed in MOB-5542; re-adding one re-invokes the init path.
 - Never remove the `tools:node="remove"` entry for `com.glia.androidsdk.InitializationProvider` in `AndroidManifest.xml`. It suppresses the Core SDK's own provider so the Widgets provider can extend and replace it. Removing it causes both providers to register under the same authority and crashes at install time.
 - Never rename or remove `dokkaGeneratePublicationJavadoc`. The maven-publish plugin references it by name (`JavadocJar.Dokka('dokkaGeneratePublicationJavadoc')` in the `mavenPublishing` block) to build and attach the Javadoc JAR. Using the wrong task name silently omits the Javadoc JAR from the published artifact.

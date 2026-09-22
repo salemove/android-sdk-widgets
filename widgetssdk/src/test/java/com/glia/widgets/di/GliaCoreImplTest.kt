@@ -148,34 +148,6 @@ class GliaCoreImplTest {
     }
 
     @Test
-    fun `deprecated init passes converted config to core`() {
-        every { Glia.init(any<CoreConfiguration>()) } just Runs
-        val configSlot = slot<CoreConfiguration>()
-        val siteApiKey = SiteApiKey("SiteApiId", "SiteApiSecret")
-
-        gliaCore.init(widgetsConfig(siteApiKey))
-
-        verify { Glia.init(capture(configSlot)) }
-        val coreConfig = configSlot.captured
-        val authorizationMethod = coreConfig.authorizationMethod as AuthorizationMethod.SiteApiKey
-        assertEquals(siteApiKey.id, authorizationMethod.id)
-        assertEquals(siteApiKey.secret, authorizationMethod.secret)
-        assertEquals("SiteId", coreConfig.siteId)
-    }
-
-    @Test
-    fun `deprecated init throws GliaWidgetsException when core initialization throws`() {
-        every { Glia.init(any<CoreConfiguration>()) } throws
-            GliaException("Glia SDK is already initialized", GliaException.Cause.ALREADY_INITIALIZED)
-
-        val exception = assertThrows(GliaWidgetsException::class.java) {
-            gliaCore.init(widgetsConfig())
-        }
-
-        assertEquals(GliaWidgetsException.Cause.INVALID_INPUT, exception.gliaCause)
-    }
-
-    @Test
     fun `init maps ALREADY_INITIALIZED error to INVALID_INPUT`() {
         val error = initializationError(GliaException.Cause.ALREADY_INITIALIZED)
 

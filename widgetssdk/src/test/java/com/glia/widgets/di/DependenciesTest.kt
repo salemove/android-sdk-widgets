@@ -88,38 +88,6 @@ class DependenciesTest {
     }
 
     @Test
-    fun `onSdkInit initializes dependencies synchronously`() {
-        val widgetsConfig = mockConfiguration()
-
-        Dependencies.onSdkInit(widgetsConfig)
-
-        verifyInitLogger(widgetsConfig)
-        verifyOrder {
-            gliaCore.init(widgetsConfig)
-            controllerFactory.init()
-            repositoryFactory.initialize()
-            configurationManager.applyConfiguration(widgetsConfig)
-            localeProvider.setCompanyName(widgetsConfig.companyName)
-            pushClickHandlerController.onSdkInitialized()
-            GliaLogger.i(LogEvents.WIDGETS_SDK_CONFIGURED)
-        }
-    }
-
-    @Test
-    fun `onSdkInit propagates error and does not initialize dependencies when gliaCore init throws`() {
-        val widgetsConfig = mockConfiguration()
-        val initializationError = GliaWidgetsException("Invalid configuration", GliaWidgetsException.Cause.INVALID_INPUT)
-        every { gliaCore.init(widgetsConfig) } throws initializationError
-
-        val exception = assertThrows(GliaWidgetsException::class.java) {
-            Dependencies.onSdkInit(widgetsConfig)
-        }
-
-        assertEquals(initializationError, exception)
-        verifyNotInitialized()
-    }
-
-    @Test
     fun `onSdkInit(callbacks) passes onError to gliaCore and reports error when gliaCore init fails`() {
         val widgetsConfig = mockConfiguration()
         val coreOnErrorSlot = slot<OnError>()

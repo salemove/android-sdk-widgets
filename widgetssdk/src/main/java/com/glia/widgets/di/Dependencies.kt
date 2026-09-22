@@ -281,25 +281,6 @@ internal object Dependencies {
         )
     }
 
-    /**
-     * Legacy synchronous initialization: the SDK is considered initialized as soon as this
-     * method returns, and failures are thrown to the caller as [GliaWidgetsException].
-     */
-    @JvmStatic
-    @Throws(GliaWidgetsException::class)
-    fun onSdkInit(gliaWidgetsConfig: GliaWidgetsConfig) {
-        initLogger(gliaWidgetsConfig)
-        Logger.i(TAG, "Initialize Glia Widgets SDK")
-
-        gliaCore.init(gliaWidgetsConfig)
-
-        initializeWidgets(gliaWidgetsConfig)
-        GliaLogger.i(LogEvents.WIDGETS_SDK_CONFIGURED)
-
-        setupLoggingMetadata(gliaWidgetsConfig)
-        gliaThemeManager.applyJsonConfig(gliaWidgetsConfig.uiJsonRemoteConfig)
-    }
-
     @JvmStatic
     fun onSdkInit(gliaWidgetsConfig: GliaWidgetsConfig, onComplete: OnComplete, onError: OnError) {
         initLogger(gliaWidgetsConfig)

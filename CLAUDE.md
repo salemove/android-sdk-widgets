@@ -16,6 +16,19 @@ Controllers -> UseCases (operator fun invoke()) -> EngagementRepository (Behavio
 
 MVP pattern: View + Controller + Contract interfaces. `ChatController` and `CallController` are retained across Activity recreation via `ControllerFactory` (not ViewModel). DI is a single `Dependencies` Kotlin object — no Dagger/Hilt.
 
+## Platform Services
+
+> Read by Glia's engineering knowledge base and review bots. Update it when a
+> dependency is added or removed.
+
+This SDK reaches no Glia backend service directly — all networking, auth and
+data flow through the Core SDK. The Glia libraries it embeds:
+
+| Library | Role |
+|---------|------|
+| `android-sdk` | GliaCoreSDK — the only layer that talks to the platform |
+| `android-telemetry` | GliaLogger / GliaTracer (see For AI Agents) |
+
 ## Context Loading Order
 
 1. `.claude/CLAUDE.md` — authoritative rules: logging, PII, MVP cleanup, no singletons, theme mandate

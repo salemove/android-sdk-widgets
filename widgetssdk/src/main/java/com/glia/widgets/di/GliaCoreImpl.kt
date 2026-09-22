@@ -65,17 +65,6 @@ internal class GliaCoreImpl : GliaCore {
         get() = Glia.getLiveObservation()
 
     @Synchronized
-    @Throws(GliaWidgetsException::class)
-    override fun init(config: GliaWidgetsConfig) {
-        try {
-            @Suppress("DEPRECATION")
-            Glia.init(config.toCoreType())
-        } catch (gliaException: GliaException) {
-            throw gliaException.toWidgetsType()
-        }
-    }
-
-    @Synchronized
     override fun init(config: GliaWidgetsConfig, onComplete: OnComplete, onError: OnError) {
         // The initialization result is delivered asynchronously via the callbacks, but config
         // mapping and `Glia.init` can still throw synchronously (e.g. missing required

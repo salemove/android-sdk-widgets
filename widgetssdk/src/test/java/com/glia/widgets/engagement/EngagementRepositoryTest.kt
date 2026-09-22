@@ -1354,13 +1354,6 @@ class EngagementRepositoryTest {
     }
 
     @Test
-    fun `onActivityResult will call appropriate engagement function when ongoing engagement`() {
-        mockEngagementAndStart()
-        repository.onActivityResult(1, 2, null)
-        verify { engagement.onActivityResult(1, 2, null) }
-    }
-
-    @Test
     fun `unsubscribe from the old engagement will happen when new omnicore engagement received`() {
         mockEngagementAndStart()
         //emit new state start

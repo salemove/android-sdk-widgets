@@ -1,6 +1,5 @@
 package com.glia.widgets.engagement
 
-import android.content.Intent
 import com.glia.androidsdk.EngagementRequest.Outcome
 import com.glia.androidsdk.IncomingEngagementRequest
 import com.glia.androidsdk.Operator
@@ -61,6 +60,5 @@ internal interface EngagementRepository {
     fun pauseVisitorVideo()
     fun resumeVisitorVideo()
     fun setVisitorCamera(camera: CameraDevice)
-    fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?)
     fun updateIsSecureMessagingRequested(isSecureMessagingRequested: Boolean)
 }

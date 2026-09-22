@@ -7,11 +7,11 @@ import com.glia.widgets.engagement.MediaType
  *
  * @see com.glia.widgets.GliaWidgets.subscribeToEvents
  */
-sealed class GliaEvent {
+sealed class LifecycleEvent {
     /**
      * An engagement has started.
      */
-    data object EngagementStarted : GliaEvent()
+    data object EngagementStarted : LifecycleEvent()
 
     /**
      * An engagement is ongoing, with the given media type.
@@ -21,10 +21,10 @@ sealed class GliaEvent {
      *
      * @property mediaType The current engagement media type: [MediaType.TEXT], [MediaType.AUDIO], or [MediaType.VIDEO].
      */
-    data class EngagementOngoing(val mediaType: MediaType) : GliaEvent()
+    data class EngagementOngoing(val mediaType: MediaType) : LifecycleEvent()
 
     /**
      * The engagement has ended.
      */
-    data object EngagementEnded : GliaEvent()
+    data object EngagementEnded : LifecycleEvent()
 }

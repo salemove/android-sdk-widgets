@@ -54,8 +54,8 @@ import com.glia.widgets.launcher.ConfigurationManager
 import com.glia.widgets.launcher.ConfigurationManagerImpl
 import com.glia.widgets.launcher.EngagementLauncher
 import com.glia.widgets.launcher.EngagementLauncherImpl
-import com.glia.widgets.lifecycle.GliaLifecycleEvents
-import com.glia.widgets.lifecycle.GliaLifecycleEventsImpl
+import com.glia.widgets.lifecycle.LifecycleEvents
+import com.glia.widgets.lifecycle.LifecycleEventsImpl
 import com.glia.widgets.liveobservation.LiveObservation
 import com.glia.widgets.liveobservation.LiveObservationImpl
 import com.glia.widgets.locale.LocaleProvider
@@ -161,8 +161,8 @@ internal object Dependencies {
     }
 
     @JvmStatic
-    val lifecycleEvents: GliaLifecycleEvents by lazy {
-        GliaLifecycleEventsImpl(useCaseFactory.gliaLifecycleEventUseCase)
+    val lifecycleEvents: LifecycleEvents by lazy {
+        LifecycleEventsImpl(useCaseFactory.gliaLifecycleEventUseCase)
     }
 
     private val applicationLifecycleManager: ApplicationLifecycleManager by lazy {

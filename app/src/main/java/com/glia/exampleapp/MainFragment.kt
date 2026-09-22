@@ -356,7 +356,7 @@ class MainFragment : Fragment() {
     private fun listenForGliaEvents() {
         GliaWidgets.subscribeToEvents { event ->
             activity?.runOnUiThread {
-                Toast.makeText(context, "GliaEvent: $event", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Event: $event", Toast.LENGTH_SHORT).show()
             }
         }
     }

@@ -33,7 +33,7 @@ import com.glia.widgets.helper.Logger
 import com.glia.widgets.internal.authentication.toCoreType
 import com.glia.widgets.internal.authentication.toWidgetsType
 import com.glia.widgets.launcher.EngagementLauncher
-import com.glia.widgets.lifecycle.OnEvent
+import com.glia.widgets.lifecycle.OnLifecycleEvent
 import com.glia.widgets.liveobservation.LiveObservation
 import com.glia.widgets.queue.Queue
 import com.glia.widgets.queue.toWidgetsType
@@ -504,13 +504,13 @@ object GliaWidgets {
     /**
      * Subscribes to Widgets SDK lifecycle events.
      *
-     * @param listener [OnEvent] callback that will be invoked for lifecycle events.
+     * @param listener [OnLifecycleEvent] callback that will be invoked for lifecycle events.
      *
      * Note: Ensure to unsubscribe using [unsubscribeFromEvents] when updates are no longer needed
      * to avoid memory leaks or unnecessary updates.
      */
     @JvmStatic
-    fun subscribeToEvents(listener: OnEvent) {
+    fun subscribeToEvents(listener: OnLifecycleEvent) {
         GliaLogger.logMethodUse(GliaWidgets::class, "subscribeToEvents")
         lifecycleEvents.subscribe(listener)
     }
@@ -518,10 +518,10 @@ object GliaWidgets {
     /**
      * Unsubscribes from Widgets SDK lifecycle events.
      *
-     * @param listener [OnEvent] callback that was previously subscribed via [subscribeToEvents].
+     * @param listener [OnLifecycleEvent] callback that was previously subscribed via [subscribeToEvents].
      */
     @JvmStatic
-    fun unsubscribeFromEvents(listener: OnEvent) {
+    fun unsubscribeFromEvents(listener: OnLifecycleEvent) {
         GliaLogger.logMethodUse(GliaWidgets::class, "unsubscribeFromEvents")
         lifecycleEvents.unsubscribe(listener)
     }

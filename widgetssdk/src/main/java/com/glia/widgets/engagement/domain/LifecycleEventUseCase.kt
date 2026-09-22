@@ -2,24 +2,24 @@ package com.glia.widgets.engagement.domain
 
 import com.glia.widgets.engagement.MediaType
 import com.glia.widgets.engagement.State
-import com.glia.widgets.lifecycle.GliaEvent
+import com.glia.widgets.lifecycle.LifecycleEvent
 import io.reactivex.rxjava3.core.Flowable
 
-internal interface GliaLifecycleEventUseCase {
-    operator fun invoke(): Flowable<GliaEvent>
+internal interface LifecycleEventUseCase {
+    operator fun invoke(): Flowable<LifecycleEvent>
 }
 
-internal class GliaLifecycleEventUseCaseImpl(
+internal class LifecycleEventUseCaseImpl(
     private val engagementStateUseCase: EngagementStateUseCase,
     private val engagementTypeUseCase: EngagementTypeUseCase
-) : GliaLifecycleEventUseCase {
+) : LifecycleEventUseCase {
 
-    override fun invoke(): Flowable<GliaEvent> {
+    override fun invoke(): Flowable<LifecycleEvent> {
         val stateEvents = engagementStateUseCase().flatMap { state ->
             when (state) {
-                is State.EngagementStarted -> Flowable.just(GliaEvent.EngagementStarted)
+                is State.EngagementStarted -> Flowable.just(LifecycleEvent.EngagementStarted)
 
-                is State.EngagementEnded -> Flowable.just(GliaEvent.EngagementEnded)
+                is State.EngagementEnded -> Flowable.just(LifecycleEvent.EngagementEnded)
 
                 else -> Flowable.empty()
             }
@@ -31,7 +31,7 @@ internal class GliaLifecycleEventUseCaseImpl(
         val mediaTypeEvents = engagementTypeUseCase()
             .filter { it != MediaType.UNKNOWN }
             .distinctUntilChanged()
-            .map<GliaEvent> { GliaEvent.EngagementOngoing(it) }
+            .map<LifecycleEvent> { LifecycleEvent.EngagementOngoing(it) }
 
         return Flowable.merge(stateEvents, mediaTypeEvents)
     }

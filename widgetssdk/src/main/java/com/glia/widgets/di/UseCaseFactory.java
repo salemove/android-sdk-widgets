@@ -83,8 +83,8 @@ import com.glia.widgets.engagement.domain.FlipCameraButtonStateUseCase;
 import com.glia.widgets.engagement.domain.FlipCameraButtonStateUseCaseImpl;
 import com.glia.widgets.engagement.domain.FlipVisitorCameraUseCase;
 import com.glia.widgets.engagement.domain.FlipVisitorCameraUseCaseImpl;
-import com.glia.widgets.engagement.domain.GliaLifecycleEventUseCase;
-import com.glia.widgets.engagement.domain.GliaLifecycleEventUseCaseImpl;
+import com.glia.widgets.engagement.domain.LifecycleEventUseCase;
+import com.glia.widgets.engagement.domain.LifecycleEventUseCaseImpl;
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase;
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCaseImpl;
 import com.glia.widgets.engagement.domain.IsMediaQualityPoorUseCase;
@@ -868,8 +868,8 @@ public class UseCaseFactory {
     }
 
     @NonNull
-    public GliaLifecycleEventUseCase getGliaLifecycleEventUseCase() {
-        return new GliaLifecycleEventUseCaseImpl(
+    public LifecycleEventUseCase getGliaLifecycleEventUseCase() {
+        return new LifecycleEventUseCaseImpl(
             getEngagementStateUseCase(),
             getEngagementTypeUseCase()
         );

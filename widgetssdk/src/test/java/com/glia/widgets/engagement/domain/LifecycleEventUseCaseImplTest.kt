@@ -3,7 +3,7 @@ package com.glia.widgets.engagement.domain
 import com.glia.widgets.engagement.EndAction
 import com.glia.widgets.engagement.MediaType
 import com.glia.widgets.engagement.State
-import com.glia.widgets.lifecycle.GliaEvent
+import com.glia.widgets.lifecycle.LifecycleEvent
 import io.mockk.every
 import io.mockk.mockk
 import io.reactivex.rxjava3.core.Flowable
@@ -12,11 +12,11 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
-class GliaLifecycleEventUseCaseImplTest {
+class LifecycleEventUseCaseImplTest {
 
     private lateinit var engagementStateUseCase: EngagementStateUseCase
     private lateinit var engagementTypeUseCase: EngagementTypeUseCase
-    private lateinit var useCase: GliaLifecycleEventUseCaseImpl
+    private lateinit var useCase: LifecycleEventUseCaseImpl
 
     @Before
     fun setUp() {
@@ -24,7 +24,7 @@ class GliaLifecycleEventUseCaseImplTest {
         engagementTypeUseCase = mockk()
         every { engagementStateUseCase() } returns Flowable.empty()
         every { engagementTypeUseCase() } returns Flowable.empty()
-        useCase = GliaLifecycleEventUseCaseImpl(engagementStateUseCase, engagementTypeUseCase)
+        useCase = LifecycleEventUseCaseImpl(engagementStateUseCase, engagementTypeUseCase)
     }
 
     @Test
@@ -33,7 +33,7 @@ class GliaLifecycleEventUseCaseImplTest {
 
         val result = useCase().blockingFirst()
 
-        assertEquals(GliaEvent.EngagementStarted, result)
+        assertEquals(LifecycleEvent.EngagementStarted, result)
     }
 
     @Test
@@ -42,7 +42,7 @@ class GliaLifecycleEventUseCaseImplTest {
 
         val result = useCase().blockingFirst()
 
-        assertEquals(GliaEvent.EngagementEnded, result)
+        assertEquals(LifecycleEvent.EngagementEnded, result)
     }
 
     @Test
@@ -70,9 +70,9 @@ class GliaLifecycleEventUseCaseImplTest {
 
         assertEquals(
             listOf(
-                GliaEvent.EngagementOngoing(MediaType.TEXT),
-                GliaEvent.EngagementOngoing(MediaType.AUDIO),
-                GliaEvent.EngagementOngoing(MediaType.VIDEO)
+                LifecycleEvent.EngagementOngoing(MediaType.TEXT),
+                LifecycleEvent.EngagementOngoing(MediaType.AUDIO),
+                LifecycleEvent.EngagementOngoing(MediaType.VIDEO)
             ),
             result
         )
@@ -86,7 +86,7 @@ class GliaLifecycleEventUseCaseImplTest {
 
         val result = useCase().toList().blockingGet()
 
-        assertEquals(listOf(GliaEvent.EngagementOngoing(MediaType.AUDIO)), result)
+        assertEquals(listOf(LifecycleEvent.EngagementOngoing(MediaType.AUDIO)), result)
     }
 
     @Test
@@ -97,8 +97,8 @@ class GliaLifecycleEventUseCaseImplTest {
 
         assertEquals(
             listOf(
-                GliaEvent.EngagementOngoing(MediaType.AUDIO),
-                GliaEvent.EngagementOngoing(MediaType.VIDEO)
+                LifecycleEvent.EngagementOngoing(MediaType.AUDIO),
+                LifecycleEvent.EngagementOngoing(MediaType.VIDEO)
             ),
             result
         )

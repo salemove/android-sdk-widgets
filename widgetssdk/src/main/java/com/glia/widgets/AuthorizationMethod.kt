@@ -16,36 +16,15 @@ sealed interface AuthorizationMethod {
      * @see GliaWidgetsConfig
      */
     data class UserApiKey(val id: String, val secret: String) : AuthorizationMethod
-
-    /**
-     * Configuration for the Glia SDK when using a site API key ID and secret
-     *
-     * @param id     The site API key ID
-     * @param secret The site API key secret
-     *
-     * @see GliaWidgetsConfig
-     *
-     * @deprecated Will be removed in version 4.0.0.
-     */
-    @Deprecated(
-        "Use AuthorizationMethod.UserApiKey from com.glia.widgets package",
-        ReplaceWith(
-            "AuthorizationMethod.UserApiKey(id, secret)",
-            "com.glia.widgets.AuthorizationMethod"
-        )
-    )
-    open class SiteApiKey(val id: String, val secret: String) : AuthorizationMethod
 }
 
 internal fun AuthorizationMethod.toCoreType(): com.glia.androidsdk.AuthorizationMethod {
     return when (this) {
-        is AuthorizationMethod.SiteApiKey -> com.glia.androidsdk.AuthorizationMethod.SiteApiKey(id, secret)
         is AuthorizationMethod.UserApiKey -> com.glia.androidsdk.AuthorizationMethod.UserApiKey(id, secret)
     }
 }
 
 internal val AuthorizationMethod.apiKeyId: String
     get() = when (this) {
-        is AuthorizationMethod.SiteApiKey -> this.id
         is AuthorizationMethod.UserApiKey -> this.id
     }

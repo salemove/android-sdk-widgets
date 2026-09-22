@@ -5,11 +5,11 @@ package com.glia.widgets.lifecycle
  *
  * @see com.glia.widgets.GliaWidgets.subscribeToEvents
  */
-fun interface OnEvent {
+fun interface OnLifecycleEvent {
     /**
      * Function that is fired when a lifecycle event occurs.
      *
-     * @param event the [GliaEvent] that occurred
+     * @param event the [LifecycleEvent] that occurred
      */
-    fun onEvent(event: GliaEvent)
+    fun onEvent(event: LifecycleEvent)
 }

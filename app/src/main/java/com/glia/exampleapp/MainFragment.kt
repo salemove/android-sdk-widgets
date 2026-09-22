@@ -38,7 +38,7 @@ import com.glia.widgets.GliaWidgetsException
 import com.glia.widgets.authentication.Authentication
 import com.glia.widgets.entrywidget.EntryWidget
 import com.glia.widgets.launcher.EngagementLauncher
-import com.glia.widgets.lifecycle.OnEvent
+import com.glia.widgets.lifecycle.OnLifecycleEvent
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -360,9 +360,9 @@ class MainFragment : Fragment() {
     }
 
     // One instance, so the repeated subscribe calls from initGliaWidgets add no second listener.
-    private val lifecycleEventListener: OnEvent = OnEvent { event ->
+    private val lifecycleEventListener: OnLifecycleEvent = OnLifecycleEvent { event ->
         activity?.runOnUiThread {
-            Toast.makeText(context, "GliaEvent: $event", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Event: $event", Toast.LENGTH_SHORT).show()
         }
     }
 

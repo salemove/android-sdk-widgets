@@ -98,7 +98,7 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
      * <pre>
      * `
      * GliaBuildConfig gliaBuildConfig = new GliaBuildConfig.Builder(
-     * .setSiteApiKey(new SiteApiKey(SITE_API_KEY_ID, SITE_API_KEY_SECRET))
+     * .setAuthorizationMethod(new AuthorizationMethod.UserApiKey(API_KEY_ID, API_KEY_SECRET))
      * .setSiteId("SITE_ID")
      * .setRegion(Regions.US)
      * .setContext(getApplicationContext())
@@ -178,23 +178,6 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
         @Deprecated("Use {@link #setRegion(Region)}")
         fun setBaseDomain(baseDomain: String): Builder {
             this.baseDomain = baseDomain
-            return this
-        }
-
-        /**
-         * @param siteApiKey - your site API key
-         * @return Builder instance
-         * @deprecated Will be removed in version 4.0.0.
-         */
-        @Deprecated(
-            "Use {@link #setAuthorizationMethod(AuthorizationMethod.UserApiKey)}",
-            ReplaceWith(
-                "setAuthorizationMethod(AuthorizationMethod.UserApiKey(id, secret))",
-                "com.glia.widgets.AuthorizationMethod"
-            )
-        )
-        fun setSiteApiKey(siteApiKey: AuthorizationMethod.SiteApiKey): Builder {
-            this.authorizationMethod = siteApiKey
             return this
         }
 

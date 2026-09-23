@@ -22,8 +22,6 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
     @JvmField
     val region: Region?
 
-    @JvmField
-    val regionString: String?
 
     @JvmField
     val uiJsonRemoteConfig: String?
@@ -53,7 +51,6 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
         siteId = builder.siteId
         context = applicationContext
         region = builder.region
-        regionString = builder.regionString
         uiJsonRemoteConfig = builder.uiJsonRemoteConfig
         companyName = builder.companyName
         enableBubbleOutsideApp = builder.enableBubbleOutsideApp
@@ -117,10 +114,6 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
             private set
         var region: Region? = null
             private set
-        var regionString: String? = null
-            private set
-        var baseDomain: String? = null
-            private set
         var uiJsonRemoteConfig: String? = null
             private set
         var companyName: String? = null
@@ -158,30 +151,6 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
         }
 
         /**
-         * @param region Region in which the site is created.
-         * One of [Regions].
-         * @return Builder instance
-         * @deprecated Will be removed in version 4.0.0.
-         */
-        @Deprecated("Use {@link #setRegion(Region)}")
-        fun setRegion(region: String): Builder {
-            this.regionString = region
-            return this
-        }
-
-        /**
-         * @hidden
-         * @param baseDomain Base domain to be used.
-         * @return Builder instance
-         * @deprecated Will be removed in version 4.0.0.
-         */
-        @Deprecated("Use {@link #setRegion(Region)}")
-        fun setBaseDomain(baseDomain: String): Builder {
-            this.baseDomain = baseDomain
-            return this
-        }
-
-        /**
          * @param authorizationMethod - your API key
          * @return Builder instance
          *
@@ -194,11 +163,6 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
          */
         fun setAuthorizationMethod(authorizationMethod: AuthorizationMethod): Builder {
             this.authorizationMethod = authorizationMethod
-            return this
-        }
-
-        @Deprecated("All the permissions are requested automatically by the SDK when needed.")
-        fun setRequestCode(requestCode: Int): Builder {
             return this
         }
 

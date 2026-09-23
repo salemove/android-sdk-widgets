@@ -47,6 +47,8 @@ sealed interface Region {
     }
 }
 
+private const val BETA_REGION = "beta"
+
 /**
  * Converts a [String] to a [Region].
  *
@@ -60,13 +62,6 @@ sealed interface Region {
 fun String.toRegion(): Region = when (this.lowercase()) {
     GliaWidgetsConfig.Regions.US -> Region.US
     GliaWidgetsConfig.Regions.EU -> Region.EU
-    GliaWidgetsConfig.Regions.BETA -> Region.Beta
+    BETA_REGION -> Region.Beta
     else -> Region.Custom(this)
 }
-
-/**
- * This property is created to fill the gap while migrating from string-based regions to sealed interface [Region].
- * Marked as deprecated to prevent usage in new code.
- */
-@Deprecated("Use Regions object instead")
-private val GliaWidgetsConfig.Regions.BETA: String get() = "beta"

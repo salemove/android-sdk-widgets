@@ -316,7 +316,7 @@ internal object Dependencies {
         GliaTelemetry.setGlobalAttribute(GlobalAttribute.SdkWidgetsVersion, BuildConfig.GLIA_WIDGETS_SDK_VERSION)
         GliaLogger.i(LogEvents.WIDGETS_SDK_CONFIGURING) {
             put(EventAttribute.ApiKeyId, gliaWidgetsConfig.authorizationMethod?.apiKeyId.orNotApplicable)
-            put(EventAttribute.Environment, gliaWidgetsConfig.region?.stringValue ?: gliaWidgetsConfig.regionString.orNotApplicable)
+            put(EventAttribute.Environment, gliaWidgetsConfig.region?.stringValue.orNotApplicable)
             put(EventAttribute.LocaleCode, gliaWidgetsConfig.manualLocaleOverride)
         }
     }

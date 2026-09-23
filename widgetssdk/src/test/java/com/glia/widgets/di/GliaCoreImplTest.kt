@@ -199,7 +199,7 @@ class GliaCoreImplTest {
         GliaWidgetsConfig.Builder()
             .setAuthorizationMethod(userApiKey)
             .setSiteId("SiteId")
-            .setRegion(GliaWidgetsConfig.Regions.EU)
+            .setRegion(Region.EU)
             .setContext(RuntimeEnvironment.getApplication())
             .build()
 

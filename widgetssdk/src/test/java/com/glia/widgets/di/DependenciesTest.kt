@@ -157,7 +157,7 @@ class DependenciesTest {
         val attributes = attributeSlot.captured
 
         assertEquals(widgetsConfig.authorizationMethod?.apiKeyId.orNotApplicable, attributes[EventAttribute.ApiKeyId])
-        assertEquals(widgetsConfig.region?.stringValue ?: widgetsConfig.regionString.orNotApplicable, attributes[EventAttribute.Environment])
+        assertEquals(widgetsConfig.region?.stringValue.orNotApplicable, attributes[EventAttribute.Environment])
         assertEquals(widgetsConfig.manualLocaleOverride, attributes[EventAttribute.LocaleCode])
     }
 

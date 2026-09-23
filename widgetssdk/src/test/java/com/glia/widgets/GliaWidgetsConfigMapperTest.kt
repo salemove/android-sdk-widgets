@@ -14,7 +14,7 @@ class GliaWidgetsConfigMapperTest {
     fun `toCoreType fails when the siteApiKey is missing`() {
         GliaWidgetsConfig.Builder()
             .setSiteId("SiteId")
-            .setRegion(GliaWidgetsConfig.Regions.US)
+            .setRegion(Region.US)
             .setContext(mockContext())
             .build()
             .toCoreType()
@@ -25,7 +25,7 @@ class GliaWidgetsConfigMapperTest {
         GliaWidgetsConfig.Builder()
             .setAuthorizationMethod(AuthorizationMethod.UserApiKey("", "Secret"))
             .setSiteId("SiteId")
-            .setRegion(GliaWidgetsConfig.Regions.US)
+            .setRegion(Region.US)
             .setContext(mockContext())
             .build()
             .toCoreType()
@@ -36,7 +36,7 @@ class GliaWidgetsConfigMapperTest {
         GliaWidgetsConfig.Builder()
             .setAuthorizationMethod(AuthorizationMethod.UserApiKey("Id", ""))
             .setSiteId("SiteId")
-            .setRegion(GliaWidgetsConfig.Regions.US)
+            .setRegion(Region.US)
             .setContext(mockContext())
             .build()
             .toCoreType()
@@ -78,29 +78,6 @@ class GliaWidgetsConfigMapperTest {
         GliaWidgetsConfig.Builder()
             .setAuthorizationMethod(AuthorizationMethod.UserApiKey("Id", "Secret"))
             .setSiteId("SiteId")
-            .setContext(mockContext())
-            .build()
-            .toCoreType()
-    }
-
-    @Test(expected = GliaWidgetsException::class)
-    fun `toCoreType fails when both regions are present`() {
-        GliaWidgetsConfig.Builder()
-            .setAuthorizationMethod(AuthorizationMethod.UserApiKey("Id", "Secret"))
-            .setSiteId("SiteId")
-            .setRegion(Region.US)
-            .setRegion(GliaWidgetsConfig.Regions.US)
-            .setContext(mockContext())
-            .build()
-            .toCoreType()
-    }
-
-    @Test(expected = GliaWidgetsException::class)
-    fun `toCoreType fails when provided incorrect string region`() {
-        GliaWidgetsConfig.Builder()
-            .setAuthorizationMethod(AuthorizationMethod.UserApiKey("Id", "Secret"))
-            .setSiteId("SiteId")
-            .setRegion("beta")
             .setContext(mockContext())
             .build()
             .toCoreType()

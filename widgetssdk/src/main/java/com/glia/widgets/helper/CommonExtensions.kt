@@ -146,7 +146,7 @@ internal fun GliaWidgetsConfig.toCoreType(): CoreConfiguration {
     val authorizationMethod = authorizationMethod.requireNotNull { "Authorization method is required" }
     val siteId = siteId.requireNotNull { "Site ID is required" }
     context.requireNotNull { "Context is required" }
-    val region = requireRegion(region, regionString)
+    val region = region.requireNotNull { "Region is required" }
 
     return CoreConfiguration(
         authorizationMethod = authorizationMethod.toCoreType(),
@@ -155,30 +155,6 @@ internal fun GliaWidgetsConfig.toCoreType(): CoreConfiguration {
         applicationContext = context,
         manualLocaleOverride = manualLocaleOverride
     )
-}
-
-/**
- * Takes either region enum or region string and returns region enum.
- * Validates that only one of the parameters is provided, and if it is the String one, it is one of the known regions.
- * This is to support both new and deprecated way of setting region in the builder, but to deal only with enum internally.
- */
-private fun requireRegion(region: Region?, regionString: String?): Region = when {
-    // Both parameters are provided
-    region != null && regionString != null -> throwGliaException(GliaWidgetsException.Cause.INVALID_INPUT) {
-        "`setRegion(region: Region)` and `setRegion(region: String)` are mutually exclusive"
-    }
-    // Enum parameter is provided
-    region != null -> region
-    // None of the parameters is provided
-    regionString == null -> throwGliaException(GliaWidgetsException.Cause.INVALID_INPUT) {
-        "`setRegion(region: Region)` or `setRegion(region: String)` is required"
-    }
-
-    Regions.US.equals(regionString, ignoreCase = true) -> Region.US
-    Regions.EU.equals(regionString, ignoreCase = true) -> Region.EU
-
-    // Unknown region string provided
-    else -> throwGliaException(GliaWidgetsException.Cause.INVALID_INPUT) { "Unknown region: $regionString" }
 }
 
 internal fun Region.toCoreType(): CoreRegion = when (this) {

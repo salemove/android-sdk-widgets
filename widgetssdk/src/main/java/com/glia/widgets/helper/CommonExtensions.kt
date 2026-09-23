@@ -162,8 +162,9 @@ internal fun GliaWidgetsConfig.toCoreType(): CoreConfiguration {
 internal fun Region.toCoreType(): CoreRegion = when (this) {
     Region.US -> CoreRegion.US
     Region.EU -> CoreRegion.EU
-    Region.Beta -> CoreRegion.Beta
-    is Region.Custom -> CoreRegion.Custom(host)
+    // Glia's internal testing uses Custom("beta"). Core gives Beta its own TURN servers,
+    // so it must become Core's Beta region, not a custom host.
+    is Region.Custom -> if (host.equals(BETA_REGION, ignoreCase = true)) CoreRegion.Beta else CoreRegion.Custom(host)
 }
 
 // For logging only!!
@@ -171,7 +172,6 @@ internal val Region.stringValue: String
     get() = when (this) {
         Region.US -> US_REGION
         Region.EU -> EU_REGION
-        Region.Beta -> BETA_REGION
         is Region.Custom -> "region: custom, host: $host"
     }
 

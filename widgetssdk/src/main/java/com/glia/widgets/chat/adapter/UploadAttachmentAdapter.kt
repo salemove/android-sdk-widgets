@@ -182,7 +182,7 @@ internal class ViewHolder(
         itemView.setLocaleContentDescription(
             R.string.android_chat_file_accessibility,
             StringKeyPair(StringKey.NAME, displayName),
-            StringKeyPair(StringKey.SIZE, size ?: localeProvider.getRemoteString(R.string.general_unknown)),
+            StringKeyPair(StringKey.SIZE, size ?: localeProvider.getString(R.string.general_unknown)),
             StringKeyPair(StringKey.STATUS, getStatusIndicatorText(attachment.attachmentStatus))
         )
     }

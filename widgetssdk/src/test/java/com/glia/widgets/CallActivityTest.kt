@@ -70,7 +70,7 @@ internal class CallActivityTest {
         resourceProvider = ResourceProvider(appContext)
         Dependencies.resourceProvider = resourceProvider
 
-        // set up StringProvider
+        // set up LocaleProvider
         val localeProvider = LocaleProvider(resourceProvider)
         Dependencies.localeProvider = localeProvider
 

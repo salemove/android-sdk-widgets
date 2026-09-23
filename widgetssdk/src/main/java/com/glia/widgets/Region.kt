@@ -47,7 +47,9 @@ sealed interface Region {
     }
 }
 
-private const val BETA_REGION = "beta"
+internal const val US_REGION = "us"
+internal const val EU_REGION = "eu"
+internal const val BETA_REGION = "beta"
 
 /**
  * Converts a [String] to a [Region].
@@ -60,8 +62,8 @@ private const val BETA_REGION = "beta"
  */
 @JvmName("fromString")
 fun String.toRegion(): Region = when (this.lowercase()) {
-    GliaWidgetsConfig.Regions.US -> Region.US
-    GliaWidgetsConfig.Regions.EU -> Region.EU
+    US_REGION -> Region.US
+    EU_REGION -> Region.EU
     BETA_REGION -> Region.Beta
     else -> Region.Custom(this)
 }

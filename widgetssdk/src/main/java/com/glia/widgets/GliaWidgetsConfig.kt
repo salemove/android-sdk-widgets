@@ -60,14 +60,6 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
     }
 
     /**
-     * Defines regions that can be applied to [GliaWidgetsConfig].
-     */
-    object Regions {
-        const val US = "us"
-        const val EU = "eu"
-    }
-
-    /**
      * Glia configuration builder.
      *
      *
@@ -97,7 +89,7 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
      * GliaBuildConfig gliaBuildConfig = new GliaBuildConfig.Builder(
      * .setAuthorizationMethod(new AuthorizationMethod.UserApiKey(API_KEY_ID, API_KEY_SECRET))
      * .setSiteId("SITE_ID")
-     * .setRegion(Regions.US)
+     * .setRegion(Region.US)
      * .setContext(getApplicationContext())
      * .setCompanyName("Company Name")
      * .build();

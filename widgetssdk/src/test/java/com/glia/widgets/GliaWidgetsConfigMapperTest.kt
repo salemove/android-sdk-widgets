@@ -88,7 +88,7 @@ class GliaWidgetsConfigMapperTest {
         GliaWidgetsConfig.Builder()
             .setAuthorizationMethod(AuthorizationMethod.UserApiKey("Id", "Secret"))
             .setSiteId("SiteId")
-            .setRegion(Region.Beta)
+            .setRegion(BetaRegion)
             .setContext(mockContext())
             .build()
             .toCoreType()

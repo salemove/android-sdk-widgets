@@ -18,13 +18,6 @@ sealed interface Region {
      */
     data object EU : Region
 
-    // -- Internal use only
-
-    /**
-     * Beta region for testing purposes.
-     */
-    data object Beta : Region
-
     /**
      * Custom region that can accept a domain.
      */
@@ -47,6 +40,12 @@ sealed interface Region {
     }
 }
 
+/**
+ * Beta region. Reserved for Glia's own testing and deliberately kept off the public API —
+ * it is reachable only by passing "beta" to [toRegion].
+ */
+internal data object BetaRegion : Region
+
 internal const val US_REGION = "us"
 internal const val EU_REGION = "eu"
 internal const val BETA_REGION = "beta"
@@ -57,13 +56,14 @@ internal const val BETA_REGION = "beta"
  * Supported values are:
  * - "us" for [Region.US]
  * - "eu" for [Region.EU]
- * - "beta" for [Region.Beta]
  * - any other value will be treated as a custom domain for [Region.Custom]
+ *
+ * "beta" is reserved for Glia's internal testing.
  */
 @JvmName("fromString")
 fun String.toRegion(): Region = when (this.lowercase()) {
     US_REGION -> Region.US
     EU_REGION -> Region.EU
-    BETA_REGION -> Region.Beta
+    BETA_REGION -> BetaRegion
     else -> Region.Custom(this)
 }

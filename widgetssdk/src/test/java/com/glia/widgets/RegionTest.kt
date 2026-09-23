@@ -1,6 +1,7 @@
 package com.glia.widgets
 
 import com.glia.widgets.helper.stringValue
+import com.glia.widgets.helper.toCoreType
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Test
@@ -13,7 +14,7 @@ class RegionTest {
     fun `toRegion maps the known region strings`() {
         assertEquals(Region.US, "us".toRegion())
         assertEquals(Region.EU, "eu".toRegion())
-        assertEquals(Region.Beta, "beta".toRegion())
+        assertEquals(BetaRegion, "beta".toRegion())
     }
 
     @Test
@@ -47,7 +48,12 @@ class RegionTest {
     fun `stringValue renders every region`() {
         assertEquals("us", Region.US.stringValue)
         assertEquals("eu", Region.EU.stringValue)
-        assertEquals("beta", Region.Beta.stringValue)
+        assertEquals("beta", BetaRegion.stringValue)
         assertEquals("region: custom, host: dev.salemove.com", Region.Custom("dev.salemove.com").stringValue)
+    }
+
+    @Test
+    fun `beta maps to the core beta region rather than a custom one`() {
+        assertEquals(com.glia.androidsdk.Region.Beta, "beta".toRegion().toCoreType())
     }
 }

@@ -28,6 +28,7 @@ import com.glia.telemetry_lib.EventAttribute
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.telemetry_lib.LogEvents
 import com.glia.widgets.BETA_REGION
+import com.glia.widgets.BetaRegion
 import com.glia.widgets.EU_REGION
 import com.glia.widgets.GliaWidgetsConfig
 import com.glia.widgets.GliaWidgetsException
@@ -162,7 +163,7 @@ internal fun GliaWidgetsConfig.toCoreType(): CoreConfiguration {
 internal fun Region.toCoreType(): CoreRegion = when (this) {
     Region.US -> CoreRegion.US
     Region.EU -> CoreRegion.EU
-    Region.Beta -> CoreRegion.Beta
+    BetaRegion -> CoreRegion.Beta
     is Region.Custom -> CoreRegion.Custom(host)
 }
 
@@ -171,7 +172,7 @@ internal val Region.stringValue: String
     get() = when (this) {
         Region.US -> US_REGION
         Region.EU -> EU_REGION
-        Region.Beta -> BETA_REGION
+        BetaRegion -> BETA_REGION
         is Region.Custom -> "region: custom, host: $host"
     }
 

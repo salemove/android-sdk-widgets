@@ -539,7 +539,7 @@ class MainFragment : Fragment() {
         val gliaWidgetsConfig = createDefaultConfig(
             context = requireActivity().applicationContext,
 //            uiJsonRemoteConfig = UnifiedUiConfigurationLoader.fetchLocalConfigSample(requireContext()),
-//            region = Region.Beta
+//            region = Region.Custom("beta")
         )
         val onComplete: () -> Unit = {
             prepareAuthentication()

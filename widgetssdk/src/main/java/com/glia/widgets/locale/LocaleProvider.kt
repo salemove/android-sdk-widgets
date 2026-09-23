@@ -8,7 +8,6 @@ import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.locale.LocaleManager
 import com.glia.widgets.BuildConfig
 import com.glia.widgets.R
-import com.glia.widgets.StringProvider
 import com.glia.widgets.helper.IResourceProvider
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
@@ -29,14 +28,12 @@ data class LocaleString(
 ) : Parcelable {
 
     constructor(@StringRes stringKey: Int, vararg values: StringKeyPair) : this(stringKey, values.toList())
-
-    constructor(@StringRes stringKey: Int, vararg values: com.glia.widgets.StringKeyPair) : this(stringKey, values.map { StringKeyPair(it) }.toList())
 }
 
 @OpenForTesting
 internal open class LocaleProvider(
     private val resourceProvider: IResourceProvider
-) : StringProvider {
+) {
 
     private var hardcodedCompanyName: String? = null
     private val regex = "(\\{[a-zA-Z\\d]*\\})".toRegex()
@@ -66,20 +63,6 @@ internal open class LocaleProvider(
             }
         }
         return localeManager
-    }
-
-    // For backport support of legacy interface
-    @Deprecated("Deprecated in Java")
-    override fun getRemoteString(stringKey: Int, vararg values: com.glia.widgets.StringKeyPair): String {
-        Logger.logDeprecatedMethodUse(TAG, "getRemoteString(stringKey: Int, vararg values: com.glia.widgets.StringKeyPair)")
-        return getString(stringKey, values.map { StringKeyPair(it) })
-    }
-
-    // For backport support of legacy interface
-    @Deprecated("Deprecated in Java")
-    override fun reportImproperInitialisation(exception: Exception) {
-        Logger.logDeprecatedMethodUse(TAG, "reportImproperInitialisation(exception: Exception)")
-        // Nothing to do.
     }
 
     fun getString(stringKey: Int, vararg values: StringKeyPair): String {

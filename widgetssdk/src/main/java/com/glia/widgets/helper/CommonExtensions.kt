@@ -27,10 +27,12 @@ import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement
 import com.glia.telemetry_lib.EventAttribute
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.telemetry_lib.LogEvents
+import com.glia.widgets.BETA_REGION
+import com.glia.widgets.EU_REGION
 import com.glia.widgets.GliaWidgetsConfig
-import com.glia.widgets.GliaWidgetsConfig.Regions
 import com.glia.widgets.GliaWidgetsException
 import com.glia.widgets.Region
+import com.glia.widgets.US_REGION
 import com.glia.widgets.UiTheme
 import com.glia.widgets.engagement.MediaType
 import com.glia.widgets.queue.Queue
@@ -167,9 +169,9 @@ internal fun Region.toCoreType(): CoreRegion = when (this) {
 // For logging only!!
 internal val Region.stringValue: String
     get() = when (this) {
-        Region.US -> Regions.US
-        Region.EU -> Regions.EU
-        Region.Beta -> "beta"
+        Region.US -> US_REGION
+        Region.EU -> EU_REGION
+        Region.Beta -> BETA_REGION
         is Region.Custom -> "region: custom, host: $host"
     }
 

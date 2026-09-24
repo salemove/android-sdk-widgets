@@ -6,6 +6,7 @@ import com.glia.androidsdk.AuthorizationMethod
 import com.glia.androidsdk.CoreConfiguration
 import com.glia.androidsdk.Glia
 import com.glia.androidsdk.GliaException
+import com.glia.androidsdk.RequestCallback
 import com.glia.androidsdk.chat.ChatMessage
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.telemetry_lib.LogEvents
@@ -267,6 +268,39 @@ class GliaCoreImplTest {
 
         every { Glia.isInitInProgress() } returns false
         assertFalse(gliaCore.isInitializationInProgress)
+    }
+
+    @Test
+    fun `getOlderChatHistory maps Core array to a list`() {
+        val message: ChatMessage = mockk()
+        every { Glia.getOlderChatHistory(any()) } answers {
+            firstArg<RequestCallback<Array<ChatMessage>>>().onResult(arrayOf(message), null)
+        }
+        var result: List<ChatMessage>? = null
+
+        gliaCore.getOlderChatHistory { messages, _ -> result = messages }
+
+        assertEquals(listOf(message), result)
+    }
+
+    @Test
+    fun `getOlderChatHistory passes Core error through`() {
+        val error = GliaException("expired", GliaException.Cause.INTERNAL_ERROR)
+        every { Glia.getOlderChatHistory(any()) } answers {
+            firstArg<RequestCallback<Array<ChatMessage>>>().onResult(null, error)
+        }
+        var received: GliaException? = null
+
+        gliaCore.getOlderChatHistory { _, exception -> received = exception }
+
+        assertEquals(error, received)
+    }
+
+    @Test
+    fun `hasOlderChatHistory delegates to Core`() {
+        every { Glia.hasOlderChatHistory() } returns true
+
+        assertTrue(gliaCore.hasOlderChatHistory())
     }
 
     private fun widgetsConfig(siteApiKey: SiteApiKey = SiteApiKey("SiteApiId", "SiteApiSecret")): GliaWidgetsConfig =

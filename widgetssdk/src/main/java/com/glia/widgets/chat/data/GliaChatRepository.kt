@@ -17,6 +17,13 @@ internal class GliaChatRepository(private val gliaCore: GliaCore) {
         gliaCore.getChatHistory(onSuccess, onError)
     }
 
+    /** Next older page of history; Core keeps the cursor, see [hasOlderHistory]. */
+    fun loadOlderHistory(historyLoadedListener: HistoryLoadedListener) {
+        gliaCore.getOlderChatHistory { messages, error -> historyLoadedListener.loaded(messages, error) }
+    }
+
+    fun hasOlderHistory(): Boolean = gliaCore.hasOlderChatHistory()
+
     fun listenForAllMessages(listener: Consumer<ChatMessage>) {
         gliaCore.on(Glia.Events.CHAT_MESSAGE, listener)
     }

@@ -1,12 +1,14 @@
 package com.glia.widgets.base
 
 import android.content.Intent
+import android.content.res.Resources
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.helper.applyGliaThemeOverlays
 import com.glia.widgets.helper.insetsControllerCompat
 import com.glia.widgets.locale.LocaleString
 import io.reactivex.rxjava3.disposables.Disposable
@@ -40,6 +42,17 @@ open class FadeTransitionActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         }
+    }
+
+    /**
+     * The framework calls this right after the manifest theme has been force-applied to [theme], and
+     * again on every `setTheme`, so it is the only place where the Glia overlays are guaranteed to
+     * end up on top. Composing in `onCreate` instead would be silently undone by anything that
+     * re-applies the activity's theme resource.
+     */
+    override fun onApplyThemeResource(theme: Resources.Theme, resid: Int, first: Boolean) {
+        super.onApplyThemeResource(theme, resid, first)
+        applyGliaThemeOverlays()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

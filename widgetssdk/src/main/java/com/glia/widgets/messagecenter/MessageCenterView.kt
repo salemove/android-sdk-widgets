@@ -43,13 +43,12 @@ import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
 import com.glia.widgets.view.unifiedui.theme.base.HeaderTheme
 import com.glia.widgets.view.unifiedui.theme.defaulttheme.DefaultHeader
-import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import kotlinx.parcelize.Parcelize
 import java.util.concurrent.Executor
 import kotlin.properties.Delegates
 
 internal class MessageCenterView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : LinearLayout(
-    MaterialThemeOverlay.wrap(context, attrs, defStyleAttr, defStyleRes),
+    context,
     attrs,
     defStyleAttr,
     defStyleRes

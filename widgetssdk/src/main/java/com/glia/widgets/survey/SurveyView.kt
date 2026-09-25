@@ -28,7 +28,6 @@ import com.glia.widgets.helper.insetsController
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.helper.showToast
-import com.glia.widgets.helper.wrapWithMaterialThemeOverlay
 import com.glia.widgets.survey.SurveyAdapter.SurveyAdapterListener
 import com.glia.widgets.view.configuration.ButtonConfiguration
 import com.glia.widgets.view.configuration.survey.SurveyStyle
@@ -43,7 +42,7 @@ import com.google.android.material.shape.ShapeAppearanceModel
 
 internal class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) :
     FrameLayout(
-        context.wrapWithMaterialThemeOverlay(attrs, defStyleAttr, defStyleRes),
+        context,
         attrs,
         defStyleAttr,
         defStyleRes

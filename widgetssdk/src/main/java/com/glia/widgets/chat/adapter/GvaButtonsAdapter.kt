@@ -8,8 +8,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.model.GvaButton
-import com.glia.widgets.helper.Utils
 import com.glia.widgets.helper.getFontCompat
+import com.glia.widgets.helper.gliaAttrResourceId
 import com.glia.widgets.view.unifiedui.applyButtonTheme
 import com.glia.widgets.view.unifiedui.theme.base.ButtonTheme
 import com.google.android.material.button.MaterialButton
@@ -39,7 +39,7 @@ internal class GvaButtonsAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ButtonViewHolder {
-        val styleResId = Utils.getAttrResourceId(parent.context, R.attr.gvaOptionButtonStyle)
+        val styleResId = parent.context.gliaAttrResourceId(R.attr.gvaOptionButtonStyle, R.style.Application_Glia_Chat_Button_Gva)
         val button = MaterialButton(ContextThemeWrapper(parent.context, styleResId), null, 0).also {
             it.id = View.generateViewId()
 

@@ -24,6 +24,7 @@ paparazzi = "2.0.0-alpha05"
 # AndroidX
 appcompat = "1.7.1"
 constraintlayout = "2.2.1"
+swiperefreshlayout = "1.1.0" # latest stable; no newer release exists
 coreKtx = "1.18.0" # max for compileSdk 36 — AAR metadata of 1.19.0 hard-requires compileSdk 37
 lifecycleProcess = "2.10.0" # 2.10.0 requires compileSdk 36; 2.11.0+ requires compileSdk 37
 navigation = "2.9.8"
@@ -76,6 +77,7 @@ lint-tests = { module = "com.android.tools.lint:lint-tests", version.ref = "lint
 # AndroidX
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
 androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayout" }
+androidx-swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version.ref = "swiperefreshlayout" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
 androidx-lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "lifecycleProcess" }
 androidx-navigation-fragment = { module = "androidx.navigation:navigation-fragment", version.ref = "navigation" }

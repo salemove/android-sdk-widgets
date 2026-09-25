@@ -127,6 +127,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
 
     private var localeProvider = Dependencies.localeProvider
     private var isInBottom = true
+    private var isLoadingOlderHistory: Boolean = false
     private var theme: UiTheme by Delegates.notNull()
 
     private var onTitleUpdatedListener: OnTitleUpdatedListener? = null
@@ -161,6 +162,15 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     private val dataObserver: AdapterDataObserver = object : AdapterDataObserver() {
         override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
             super.onItemRangeInserted(positionStart, itemCount)
+
+            if (positionStart == 0 && adapter.itemCount > itemCount) {
+                // Older history prepended above existing items: keep the scroll anchor and let
+                // emitState announce the page once instead of reading every message out.
+                for (i in positionStart until positionStart + itemCount) {
+                    (adapter.currentList.getOrNull(i) as? OperatorMessageItem.PlainText)?.announced = true
+                }
+                return
+            }
 
             for (i in positionStart until positionStart + itemCount) {
                 adapter.currentList.getOrNull(i)?.let { item ->
@@ -321,6 +331,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         adapter.unregisterAdapterDataObserver(dataObserver)
         binding.chatRecyclerView.adapter = null
         binding.chatRecyclerView.removeOnScrollListener(onScrollListener)
+        binding.chatSwipeRefreshLayout.setOnRefreshListener(null)
         binding.addAttachmentQueue.adapter = null
         dialogController = null
     }
@@ -368,7 +379,17 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             updateAttachmentButton(chatState)
             updateQuickRepliesState(chatState)
             updateSecureMessagingState(chatState)
+            updateOlderHistoryState(chatState)
         }
+    }
+
+    private fun updateOlderHistoryState(chatState: ChatState) {
+        binding.chatSwipeRefreshLayout.isEnabled = chatState.canLoadOlderHistory || chatState.isLoadingOlderHistory
+        binding.chatSwipeRefreshLayout.isRefreshing = chatState.isLoadingOlderHistory
+        if (isLoadingOlderHistory && !chatState.isLoadingOlderHistory) {
+            binding.chatRecyclerView.announceForAccessibility(localeProvider.getString(R.string.chat_older_messages_loaded))
+        }
+        isLoadingOlderHistory = chatState.isLoadingOlderHistory
     }
 
     override fun emitItems(items: List<ChatItem>) {
@@ -640,6 +661,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         adapter.registerAdapterDataObserver(dataObserver)
         binding.chatRecyclerView.adapter = adapter
         binding.chatRecyclerView.addOnScrollListener(onScrollListener)
+        binding.chatSwipeRefreshLayout.setOnRefreshListener { controller?.onLoadOlderHistoryRequested() }
         uploadAttachmentAdapter = UploadAttachmentAdapter()
         uploadAttachmentAdapter.setItemCallback { controller?.onRemoveAttachment(it) }
         uploadAttachmentAdapter.registerAdapterDataObserver(object : AdapterDataObserver() {
@@ -669,6 +691,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             ?.also(binding.operatorTypingAnimationView::addColorFilter)
             ?.let(::getColorStateListCompat)
             ?.also(binding.newMessagesBadgeView::setBackgroundTintList)
+        theme.brandPrimaryColor?.let(::getColorCompat)?.also { binding.chatSwipeRefreshLayout.setColorSchemeColors(it) }
 
         theme.baseLightColor?.let(::getColorCompat)
             ?.also(binding.newMessagesBadgeView::setTextColor)
@@ -892,6 +915,8 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         applyInputTheme(chatTheme.input, chatTheme.inputDisabled)
 
         chatTheme.typingIndicator?.primaryColor?.also(binding.operatorTypingAnimationView::addColorFilter)
+
+        chatTheme.olderMessagesIndicator?.primaryColor?.also { binding.chatSwipeRefreshLayout.setColorSchemeColors(it) }
 
         chatTheme.unreadIndicator?.also(::applyUnreadMessagesTheme)
 

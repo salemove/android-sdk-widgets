@@ -174,6 +174,12 @@ internal class GliaCoreImpl : GliaCore {
         Glia.getChatHistory { messages, exception -> callback.onResult(messages?.toList(), exception) }
     }
 
+    override fun getOlderChatHistory(callback: RequestCallback<List<ChatMessage>?>) {
+        Glia.getOlderChatHistory { messages, exception -> callback.onResult(messages?.toList(), exception) }
+    }
+
+    override fun hasOlderChatHistory(): Boolean = Glia.hasOlderChatHistory()
+
     override fun getQueues(onResult: (Array<Queue>) -> Unit, onError: (GliaException?) -> Unit) {
         Glia.getQueues { queues, gliaException ->
             queues?.also { onResult(it) } ?: onError(gliaException)

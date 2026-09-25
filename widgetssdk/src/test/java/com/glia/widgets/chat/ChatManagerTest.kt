@@ -12,7 +12,9 @@ import com.glia.widgets.chat.domain.AppendNewChatMessageUseCase
 import com.glia.widgets.chat.domain.GliaLoadHistoryUseCase
 import com.glia.widgets.chat.domain.GliaOnMessageUseCase
 import com.glia.widgets.chat.domain.HandleCustomCardClickUseCase
+import com.glia.widgets.chat.domain.HasOlderHistoryUseCase
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
+import com.glia.widgets.chat.domain.LoadOlderHistoryUseCase
 import com.glia.widgets.chat.domain.SendUnsentMessagesUseCase
 import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.GvaButton
@@ -20,6 +22,7 @@ import com.glia.widgets.chat.model.GvaQuickReplies
 import com.glia.widgets.chat.model.MediaUpgradeStartedTimerItem
 import com.glia.widgets.chat.model.NewMessagesDividerItem
 import com.glia.widgets.chat.model.OperatorAttachmentItem
+import com.glia.widgets.chat.model.OperatorChatItem
 import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.chat.model.OperatorStatusItem
 import com.glia.widgets.chat.model.OutgoingMessage
@@ -53,11 +56,13 @@ import org.mockito.ArgumentMatchers.anyBoolean
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.spy
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
@@ -68,6 +73,8 @@ import java.util.UUID
 class ChatManagerTest {
     private lateinit var onMessageUseCase: GliaOnMessageUseCase
     private lateinit var loadHistoryUseCase: GliaLoadHistoryUseCase
+    private lateinit var loadOlderHistoryUseCase: LoadOlderHistoryUseCase
+    private lateinit var hasOlderHistoryUseCase: HasOlderHistoryUseCase
     private lateinit var addNewMessagesDividerUseCase: AddNewMessagesDividerUseCase
     private lateinit var shouldMarkMessagesReadUseCase: ShouldMarkMessagesReadUseCase
     private lateinit var markMessagesReadWithDelayUseCase: MarkMessagesReadWithDelayUseCase
@@ -95,6 +102,8 @@ class ChatManagerTest {
         state = ChatManager.State()
         onMessageUseCase = mock()
         loadHistoryUseCase = mock()
+        loadOlderHistoryUseCase = mock()
+        hasOlderHistoryUseCase = mock()
         addNewMessagesDividerUseCase = mock()
         shouldMarkMessagesReadUseCase = mock()
         markMessagesReadWithDelayUseCase = mock()
@@ -114,6 +123,8 @@ class ChatManagerTest {
         subjectUnderTest = ChatManager(
             onMessageUseCase,
             loadHistoryUseCase,
+            loadOlderHistoryUseCase,
+            hasOlderHistoryUseCase,
             addNewMessagesDividerUseCase,
             shouldMarkMessagesReadUseCase,
             markMessagesReadWithDelayUseCase,
@@ -940,6 +951,109 @@ class ChatManagerTest {
         whenever(loadHistoryUseCase()) doReturn Single.just(mock())
         subjectUnderTest.reloadHistoryIfNeeded()
         verify(loadHistoryUseCase).invoke()
+    }
+
+    @Test
+    fun `prependChatHistory inserts older items before existing ones in chronological order`() {
+        val existing = VisitorMessageItem("existing", "existing-id", isError = false)
+        state.chatItems.add(existing)
+        val older = mockChatMessage<VisitorMessage>("older")
+        val newer = mockChatMessage<VisitorMessage>("newer")
+        whenever(appendHistoryChatMessageUseCase(any(), any(), any())) doAnswer {
+            val items = it.getArgument<MutableList<ChatItem>>(0)
+            val message = it.getArgument<ChatMessageInternal>(1).chatMessage
+            items.add(VisitorMessageItem(message.content, message.id, isError = false))
+            Unit
+        }
+
+        val newState = subjectUnderTest.prependChatHistory(listOf(older, newer), state)
+
+        assertEquals(listOf(older.chatMessage.id, newer.chatMessage.id, "existing-id"), newState.chatItems.map { it.id })
+    }
+
+    @Test
+    fun `prependChatHistory passes isLatest false for every message`() {
+        val first = mockChatMessage<VisitorMessage>()
+        val second = mockChatMessage<OperatorMessage>()
+
+        subjectUnderTest.prependChatHistory(listOf(first, second), state)
+
+        verify(appendHistoryChatMessageUseCase, times(2)).invoke(any(), any(), eq(false))
+        verify(appendHistoryChatMessageUseCase, never()).invoke(any(), any(), eq(true))
+    }
+
+    @Test
+    fun `prependChatHistory skips messages already present`() {
+        val known = mockChatMessage<VisitorMessage>()
+        val fresh = mockChatMessage<VisitorMessage>()
+        state.chatItemIds.add(known.chatMessage.id)
+
+        subjectUnderTest.prependChatHistory(listOf(known, fresh), state)
+
+        verify(appendHistoryChatMessageUseCase).invoke(any(), eq(fresh), eq(false))
+        verify(appendHistoryChatMessageUseCase, never()).invoke(any(), eq(known), any())
+    }
+
+    @Test
+    fun `prependChatHistory does not touch new messages divider or operator image bookkeeping`() {
+        val operatorItem: OperatorChatItem = mock()
+        state.lastMessageWithVisibleOperatorImage = operatorItem
+
+        val newState = subjectUnderTest.prependChatHistory(listOf(mockChatMessage<OperatorMessage>()), state)
+
+        verify(addNewMessagesDividerUseCase, never()).invoke(any(), any())
+        verify(markMessagesReadWithDelayUseCase, never()).invoke()
+        assertEquals(operatorItem, newState.lastMessageWithVisibleOperatorImage)
+        assertFalse(historyLoaded.value ?: true)
+    }
+
+    @Test
+    fun `prependChatHistory returns state unchanged for empty page`() {
+        val existing = VisitorMessageItem("existing", "existing-id", isError = false)
+        state.chatItems.add(existing)
+
+        val newState = subjectUnderTest.prependChatHistory(emptyList(), state)
+
+        assertEquals(listOf(existing), newState.chatItems)
+        verify(appendHistoryChatMessageUseCase, never()).invoke(any(), any(), any())
+    }
+
+    @Test
+    fun `loadOlderHistory emits updated state and reports whether more remains`() {
+        val older = mockChatMessage<VisitorMessage>("older")
+        whenever(loadOlderHistoryUseCase()) doReturn Single.just(listOf(older))
+        whenever(hasOlderHistoryUseCase()) doReturn true
+        whenever(appendHistoryChatMessageUseCase(any(), any(), any())) doAnswer {
+            val items = it.getArgument<MutableList<ChatItem>>(0)
+            val message = it.getArgument<ChatMessageInternal>(1).chatMessage
+            items.add(VisitorMessageItem(message.content, message.id, isError = false))
+            Unit
+        }
+        val stateObserver = stateProcessor.test()
+
+        subjectUnderTest.loadOlderHistory().test().assertValue(true)
+
+        assertEquals(listOf(older.chatMessage.id), stateProcessor.value?.chatItems?.map { it.id })
+        assertEquals(2, stateObserver.values().size)
+    }
+
+    @Test
+    fun `loadOlderHistory propagates use case error without emitting state`() {
+        val error = RuntimeException("expired")
+        whenever(loadOlderHistoryUseCase()) doReturn Single.error(error)
+        val stateObserver = stateProcessor.test()
+
+        subjectUnderTest.loadOlderHistory().test().assertError(error)
+
+        assertEquals(1, stateObserver.values().size)
+        verify(hasOlderHistoryUseCase, never()).invoke()
+    }
+
+    @Test
+    fun `hasOlderHistory delegates to use case`() {
+        whenever(hasOlderHistoryUseCase()) doReturn true
+
+        assertTrue(subjectUnderTest.hasOlderHistory())
     }
 
     @Test

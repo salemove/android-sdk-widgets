@@ -27,6 +27,7 @@ internal data class ChatTheme(
     val typingIndicator: ColorTheme? = null,
     val newMessagesDividerColorTheme: ColorTheme? = null,
     val newMessagesDividerTextTheme: TextTheme? = null,
+    val olderMessagesIndicator: ColorTheme? = null,
     val gva: GvaTheme? = null,
     val secureMessaging: SecureMessagingTheme? = null
 ) : Mergeable<ChatTheme> {
@@ -47,6 +48,7 @@ internal data class ChatTheme(
         typingIndicator = typingIndicator merge other.typingIndicator,
         newMessagesDividerColorTheme = newMessagesDividerColorTheme merge other.newMessagesDividerColorTheme,
         newMessagesDividerTextTheme = newMessagesDividerTextTheme merge other.newMessagesDividerTextTheme,
+        olderMessagesIndicator = olderMessagesIndicator merge other.olderMessagesIndicator,
         gva = gva merge other.gva,
         secureMessaging = secureMessaging merge other.secureMessaging
     )

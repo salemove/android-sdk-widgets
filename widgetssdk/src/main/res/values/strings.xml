@@ -138,6 +138,7 @@
     <string name="glia_chat_attachment_upload_error_file_upload_forbidden">File uploading disabled</string>
     <string name="glia_chat_select_picture_title">Select Picture</string>
     <string name="glia_chat_select_file_title">Select file</string>
+    <string name="glia_chat_older_messages_loaded">Older messages loaded</string>
     <string name="glia_preview_activity_preview_failed_msg">Could not fetch the image. Please try again.</string>
     <string name="glia_preview_activity_image_save_success_msg">The image was saved successfully.</string>
     <string name="glia_preview_activity_image_save_fail_msg">Could not save the image.</string>

@@ -36,18 +36,20 @@ internal class AuthenticationManager(
         Dependencies.destroyControllersAndResetQueueing()
 
         Logger.i(TAG, "Authenticate. Is external access token used: ${externalAccessToken != null}")
-        authentication.authenticate(jwtToken, externalAccessToken) { _, gliaException ->
-            if (gliaException != null) {
-                onError.onError(gliaException.toWidgetsType())
-            } else {
+        authentication.authenticate(
+            jwtToken,
+            externalAccessToken,
+            onSuccess = {
                 //Here we need to subscribe to secure conversations repository to get the data for authenticated visitors
                 repositoryFactory.secureConversationsRepository.subscribe()
                 onComplete.onComplete()
+                reportAuthenticationAttempt()
+            },
+            onFailure = {
+                onError.onError(it.toWidgetsType())
+                reportAuthenticationAttempt()
             }
-
-            //This function must be called inside authentication callback regardless of the result, because we need to handle failed authentication as well
-            Dependencies.controllerFactory.pushClickHandlerController.onAuthenticationAttempt()
-        }
+        )
     }
 
     override fun deauthenticate(stopPushNotifications: Boolean, onComplete: OnComplete, onError: OnError) {
@@ -57,10 +59,9 @@ internal class AuthenticationManager(
         //Need to cancel queueing before de-authentication, because it uses current visitor id, so after de-authentication will be impossible.
         repositoryFactory.engagementRepository.cancelQueuing()
 
-        authentication.deauthenticate(stopPushNotifications) { _, gliaException ->
-            if (gliaException != null) {
-                onError.onError(gliaException.toWidgetsType())
-            } else {
+        authentication.deauthenticate(
+            stopPushNotifications,
+            onSuccess = {
                 //Reset controllers and data on success block, to keep current engagement interactive in case de-authentication is forbidden during engagement
                 Dependencies.destroyControllersAndResetEngagementData()
 
@@ -69,20 +70,25 @@ internal class AuthenticationManager(
                 repositoryFactory.secureConversationsRepository.unsubscribeAndResetData()
 
                 onComplete.onComplete()
-            }
-        }
+            },
+            onFailure = { onError.onError(it.toWidgetsType()) }
+        )
     }
 
     override fun refresh(jwtToken: String, externalAccessToken: String?, onComplete: OnComplete, onError: OnError) {
         GliaLogger.logMethodUse(Authentication::class, "refresh")
         Logger.i(TAG, "Refresh authentication")
-        authentication.refresh(jwtToken, externalAccessToken) { _, gliaException ->
-            if (gliaException != null) {
-                onError.onError(gliaException.toWidgetsType())
-            } else {
-                onComplete.onComplete()
-            }
-        }
+        authentication.refresh(
+            jwtToken,
+            externalAccessToken,
+            onSuccess = onComplete::onComplete,
+            onFailure = { onError.onError(it.toWidgetsType()) }
+        )
+    }
+
+    //A failed authentication must be reported as well, so every outcome has to report the attempt.
+    private fun reportAuthenticationAttempt() {
+        Dependencies.controllerFactory.pushClickHandlerController.onAuthenticationAttempt()
     }
 }
 

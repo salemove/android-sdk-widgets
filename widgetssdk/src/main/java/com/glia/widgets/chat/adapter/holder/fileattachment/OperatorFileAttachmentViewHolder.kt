@@ -3,7 +3,6 @@ package com.glia.widgets.chat.adapter.holder.fileattachment
 import android.text.format.Formatter
 import android.view.View
 import com.glia.widgets.R
-import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.adapter.ChatAdapter
 import com.glia.widgets.chat.model.OperatorAttachmentItem
 import com.glia.widgets.databinding.ChatAttachmentOperatorFileLayoutBinding
@@ -18,7 +17,6 @@ import com.glia.widgets.view.unifiedui.theme.chat.MessageBalloonTheme
 
 internal class OperatorFileAttachmentViewHolder @JvmOverloads constructor(
     private val binding: ChatAttachmentOperatorFileLayoutBinding,
-    uiTheme: UiTheme,
     private val onFileItemClickListener: ChatAdapter.OnFileItemClickListener,
     private val localeProvider: LocaleProvider = Dependencies.localeProvider
 ) : FileAttachmentViewHolder(binding.root) {
@@ -27,7 +25,7 @@ internal class OperatorFileAttachmentViewHolder @JvmOverloads constructor(
     }
 
     init {
-        setupOperatorStatusView(uiTheme)
+        setupOperatorStatusView()
     }
 
     fun bind(item: OperatorAttachmentItem.File) {
@@ -37,8 +35,7 @@ internal class OperatorFileAttachmentViewHolder @JvmOverloads constructor(
 
     private fun isFileExists(item: OperatorAttachmentItem.File): Boolean = item.isDownloaded(itemView.context)
 
-    private fun setupOperatorStatusView(uiTheme: UiTheme) {
-        binding.chatHeadView.setTheme(uiTheme)
+    private fun setupOperatorStatusView() {
         binding.chatHeadView.setShowRippleAnimation(false)
         binding.chatHeadView.applyUserImageTheme(operatorTheme?.userImage)
     }

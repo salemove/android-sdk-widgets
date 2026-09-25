@@ -32,5 +32,15 @@
     <color name="gvaQuickReplyBackgroundColor">#3C27B0</color>
     <color name="gvaQuickReplyStrokeColor">#536D9E</color>
     <color name="gvaQuickReplyTextColor">#FFFFFF</color>
+
+    <!--
+        Composition fixtures. Deliberately outside the palette above so that a
+        `GliaThemeCompositionSnapshotTest` golden shows at a glance which layer supplied each colour:
+        teal/pink can only have come from the legacy overlay, orange/indigo only from `GliaTheme`.
+    -->
+    <color name="compositionLegacyBrandColor">#00695C</color>
+    <color name="compositionLegacyNegativeColor">#AD1457</color>
+    <color name="compositionCustomizationBrandColor">#EF6C00</color>
+    <color name="compositionCustomizationDarkColor">#311B92</color>
 </resources>
 

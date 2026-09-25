@@ -4,7 +4,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
 import com.glia.widgets.databinding.ChatNewMessagesDividerLayoutBinding
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.helper.gliaAttrFont
+import com.glia.widgets.helper.applyGliaThemeFont
 import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.view.unifiedui.applyColorTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
@@ -29,7 +29,7 @@ internal class NewMessagesDividerViewHolder(
      * `?attr/gliaNewMessagesDivider{,Text}Color`.
      */
     private fun applyThemeFont(binding: ChatNewMessagesDividerLayoutBinding) {
-        itemView.context.gliaAttrFont()?.also { binding.newMessagesTv.typeface = it }
+        itemView.context.applyGliaThemeFont(binding.newMessagesTv)
     }
 
     private fun applyUnifiedTheme(binding: ChatNewMessagesDividerLayoutBinding) {

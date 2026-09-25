@@ -22,6 +22,9 @@ import com.glia.widgets.helper.DeviceMonitor;
 import com.glia.widgets.helper.IntentHelperImpl;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
+import com.glia.widgets.internal.chathead.ChatBubbleContract;
+import com.glia.widgets.internal.chathead.ChatBubbleController;
+import com.glia.widgets.internal.chathead.ChatHeadManager;
 import com.glia.widgets.internal.dialog.DialogContract;
 import com.glia.widgets.internal.dialog.DialogController;
 import com.glia.widgets.internal.notification.device.INotificationManager;
@@ -41,13 +44,6 @@ import com.glia.widgets.survey.SurveyController;
 import com.glia.widgets.view.MessagesNotSeenHandler;
 import com.glia.widgets.view.MinimizeHandler;
 import com.glia.widgets.view.dialog.UiComponentsDispatcher;
-import com.glia.widgets.view.head.ChatHeadContract;
-import com.glia.widgets.view.head.ChatHeadLayoutContract;
-import com.glia.widgets.view.head.ChatHeadPosition;
-import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadContract;
-import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadController;
-import com.glia.widgets.view.head.controller.ApplicationChatHeadLayoutController;
-import com.glia.widgets.view.head.controller.ServiceChatHeadController;
 import com.glia.widgets.view.snackbar.liveobservation.ActivityWatcherForLiveObservationContract;
 import com.glia.widgets.view.snackbar.liveobservation.ActivityWatcherForLiveObservationController;
 
@@ -59,8 +55,7 @@ import org.jetbrains.annotations.NotNull;
 public class ControllerFactory {
 
     private static final String TAG = "ControllerFactory";
-    private static ChatHeadContract.Controller serviceChatHeadController;
-    private static ChatHeadLayoutContract.Controller applicationChatHeadController;
+    private static ChatBubbleContract.Controller chatBubbleController;
     private final RepositoryFactory repositoryFactory;
     private final TimeCounter sharedTimer = new TimeCounter();
     private final MinimizeHandler minimizeHandler = new MinimizeHandler();
@@ -79,11 +74,11 @@ public class ControllerFactory {
     private CallContract.Controller retainedCallController;
     private SurveyController surveyController;
     private CallVisualizerContract.Controller callVisualizerController;
-    private ActivityWatcherForChatHeadController activityWatcherForChatHeadController;
     private ActivityWatcherForLiveObservationController activityWatcherForLiveObservationController;
     private EntryWidgetHideController entryWidgetHideController;
     private PushClickHandlerController pushClickHandlerController;
     private final DeviceMonitor deviceMonitor;
+    private final ChatHeadManager chatHeadManager;
 
     public ControllerFactory(
         RepositoryFactory repositoryFactory,
@@ -94,7 +89,8 @@ public class ControllerFactory {
         INotificationManager notificationManager,
         ConfigurationManager configurationManager,
         UiComponentsDispatcher uiComponentsDispatcher,
-        @NotNull DeviceMonitor deviceMonitor
+        @NotNull DeviceMonitor deviceMonitor,
+        @NotNull ChatHeadManager chatHeadManager
     ) {
         this.repositoryFactory = repositoryFactory;
         messagesNotSeenHandler = new MessagesNotSeenHandler(
@@ -115,6 +111,7 @@ public class ControllerFactory {
         );
         this.managerFactory = managerFactory;
         this.deviceMonitor = deviceMonitor;
+        this.chatHeadManager = chatHeadManager;
     }
 
     public ChatContract.Controller getChatController() {
@@ -218,8 +215,7 @@ public class ControllerFactory {
     public void destroyControllers() {
         destroyCallController();
         destroyChatController();
-        serviceChatHeadController.onDestroy();
-        applicationChatHeadController.onDestroy();
+        getChatBubbleController().onDestroy();
         messagesNotSeenHandler.onDestroy();
     }
 
@@ -255,41 +251,32 @@ public class ControllerFactory {
 
     public void init() {
         messagesNotSeenHandler.init();
-        getActivityWatcherForChatHeadController().init();
     }
 
     public ImagePreviewContract.Controller getImagePreviewController() {
         return filePreviewController;
     }
 
-    public ChatHeadContract.Controller getChatHeadController() {
-        if (serviceChatHeadController == null) {
-            serviceChatHeadController = new ServiceChatHeadController(
-                useCaseFactory.getDisplayBubbleOutsideAppUseCase(),
+
+    @NonNull
+    public ChatBubbleContract.Controller getChatBubbleController() {
+        if (chatBubbleController == null) {
+            chatBubbleController = new ChatBubbleController(
+                useCaseFactory.getDecideBubbleRenderTargetUseCase(),
                 useCaseFactory.getResolveChatHeadNavigationUseCase(),
+                useCaseFactory.getIsCurrentEngagementCallVisualizer(),
+                useCaseFactory.createIsFromCallScreenUseCase(),
+                useCaseFactory.createUpdateFromCallScreenUseCase(),
+                chatHeadManager,
                 messagesNotSeenHandler,
-                new ChatHeadPosition(),
                 useCaseFactory.getEngagementStateUseCase(),
                 useCaseFactory.getCurrentOperatorUseCase(),
                 useCaseFactory.getVisitorMediaUseCase()
             );
         }
-        return serviceChatHeadController;
+        return chatBubbleController;
     }
 
-    public ChatHeadLayoutContract.Controller getChatHeadLayoutController() {
-        if (applicationChatHeadController == null) {
-            applicationChatHeadController = new ApplicationChatHeadLayoutController(
-                useCaseFactory.getIsDisplayBubbleInsideAppUseCase(),
-                useCaseFactory.getResolveChatHeadNavigationUseCase(),
-                messagesNotSeenHandler,
-                useCaseFactory.getEngagementStateUseCase(),
-                useCaseFactory.getCurrentOperatorUseCase(),
-                useCaseFactory.getVisitorMediaUseCase()
-            );
-        }
-        return applicationChatHeadController;
-    }
 
     public SurveyContract.Controller getSurveyController() {
         if (surveyController == null) {
@@ -346,18 +333,6 @@ public class ControllerFactory {
         );
     }
 
-    public ActivityWatcherForChatHeadContract.Controller getActivityWatcherForChatHeadController() {
-        if (activityWatcherForChatHeadController == null) {
-            activityWatcherForChatHeadController = new ActivityWatcherForChatHeadController(
-                getChatHeadController(),
-                getChatHeadLayoutController(),
-                useCaseFactory.getEngagementStateUseCase(),
-                useCaseFactory.createIsFromCallScreenUseCase(),
-                useCaseFactory.createUpdateFromCallScreenUseCase()
-            );
-        }
-        return activityWatcherForChatHeadController;
-    }
 
     public PermissionsRequestContract.Controller getPermissionsController() {
         return new PermissionsRequestController(

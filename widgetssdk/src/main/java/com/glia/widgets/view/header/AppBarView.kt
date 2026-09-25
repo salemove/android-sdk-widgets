@@ -11,17 +11,13 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.TextViewCompat
 import com.glia.widgets.R
-import com.glia.widgets.UiTheme
 import com.glia.widgets.databinding.AppBarBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.ResourceProvider
-import com.glia.widgets.helper.Utils
-import com.glia.widgets.helper.applyButtonTheme
-import com.glia.widgets.helper.applyIconColorTheme
-import com.glia.widgets.helper.applyTextTheme
 import com.glia.widgets.helper.getColorCompat
-import com.glia.widgets.helper.getFontCompat
 import com.glia.widgets.helper.getTypedArrayResId
+import com.glia.widgets.helper.gliaAttrFont
+import com.glia.widgets.helper.gliaAttrResourceId
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.setLocaleNavigationContentDescription
@@ -98,48 +94,24 @@ internal class AppBarView @JvmOverloads constructor(
 
             setBackgroundColor(getColorCompat(backgroundTintList))
 
-            Utils.getTypedArrayStringValue(this, R.styleable.AppBarView_titleText)?.also {
+            getString(R.styleable.AppBarView_titleText)?.also {
                 binding.title.text = it
             }
         }
-        context.withStyledAttributes(attrs, R.styleable.GliaView) {
-            Utils.getFont(this, context)?.also { binding.title.typeface = it }
 
-            val leaveIconTint = getTypedArrayResId(
-                this,
-                R.styleable.GliaView_chatHeaderExitQueueButtonTintColor,
-                R.attr.gliaChatHeaderExitQueueButtonTintColor
-            )
-            leaveQueueIcon.icon?.setTint(getColorCompat(leaveIconTint))
-            leaveQueueIcon.title = localeProvider.getString(R.string.general_close)
-        }
-    }
-
-    fun setTheme(uiTheme: UiTheme?) {
-        if (uiTheme == null) return
-        // icons
-        uiTheme.iconAppBarBack?.also(binding.toolbar::setNavigationIcon)
-        uiTheme.iconLeaveQueue?.also(leaveQueueIcon::setIcon)
-
-        // colors
-        val brandPrimaryColor = uiTheme.brandPrimaryColor?.let(::getColorCompat)
-        val baseLightColor = uiTheme.baseLightColor?.let(::getColorCompat)
-        val systemNegativeColor = uiTheme.systemNegativeColor?.let(::getColorCompat)
-        val exitQueueButtonColor = uiTheme.gliaChatHeaderExitQueueButtonTintColor?.let(::getColorCompat) ?: baseLightColor
-        val chatHeaderTitleColor = uiTheme.gliaChatHeaderTitleTintColor?.let(::getColorCompat)
-        val chatHeaderHomeButtonColor = uiTheme.gliaChatHeaderHomeButtonTintColor?.let(::getColorCompat)
-        val textFont = uiTheme.fontRes?.let(::getFontCompat)
-
-        chatHeaderHomeButtonColor?.also { binding.toolbar.setNavigationIconTint(it) }
-        brandPrimaryColor?.also { setBackgroundColor(it) }
-
-        leaveQueueIcon.applyIconColorTheme(exitQueueButtonColor)
-        binding.title.applyTextTheme(chatHeaderTitleColor, textFont)
-        binding.endButton.applyButtonTheme(
-            backgroundColor = systemNegativeColor,
-            textColor = baseLightColor,
-            textFont = textFont
+        val leaveIconTint = context.gliaAttrResourceId(
+            R.attr.gliaChatHeaderExitQueueButtonTintColor,
+            R.color.glia_light_color
         )
+        leaveQueueIcon.icon?.setTint(getColorCompat(leaveIconTint))
+        leaveQueueIcon.title = localeProvider.getString(R.string.general_close)
+
+        // A `textAppearance` cannot express "the typeface the theme asks for", so this is the one
+        // value the app bar still has to resolve in code.
+        context.gliaAttrFont()?.also {
+            binding.title.typeface = it
+            binding.endButton.typeface = it
+        }
     }
 
     fun hideBackButton() {

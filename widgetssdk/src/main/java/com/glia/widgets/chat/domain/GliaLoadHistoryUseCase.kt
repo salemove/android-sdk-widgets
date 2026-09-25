@@ -1,5 +1,6 @@
 package com.glia.widgets.chat.domain
 
+import com.glia.androidsdk.chat.ChatMessage
 import com.glia.telemetry_lib.EventAttribute
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.telemetry_lib.LogEvents
@@ -46,17 +47,7 @@ internal class GliaLoadHistoryUseCase(
         .concatMapSingle { mapOperatorUseCase(chatMessage = it) }
         .toSortedList(Comparator.comparingLong { it.chatMessage.timestamp })
 
-    private fun loadHistory() = Single.create { emitter ->
-        loadHistory { messages, error ->
-            error?.also { emitter.onError(it) } ?: emitter.onSuccess(messages.orEmpty())
-        }
-    }
-
-    private fun loadHistory(listener: GliaChatRepository.HistoryLoadedListener) {
-        if (isSecureEngagement) {
-            secureConversationsRepository.fetchChatTranscript(listener)
-        } else {
-            gliaChatRepository.loadHistory(listener)
-        }
+    private fun loadHistory(): Single<List<ChatMessage>> = Single.create { emitter ->
+        gliaChatRepository.loadHistory(emitter::onSuccess, emitter::onError)
     }
 }

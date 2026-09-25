@@ -3,7 +3,6 @@ package com.glia.widgets.chat.data
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.Glia
 import com.glia.androidsdk.GliaException
-import com.glia.androidsdk.RequestCallback
 import com.glia.androidsdk.chat.Chat
 import com.glia.androidsdk.chat.ChatMessage
 import com.glia.androidsdk.chat.SingleChoiceAttachment
@@ -11,7 +10,6 @@ import com.glia.widgets.di.GliaCore
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.slot
 import io.mockk.verify
 import org.junit.After
 import org.junit.Before
@@ -39,17 +37,13 @@ class GliaChatRepositoryTest {
     }
 
     @Test
-    fun `loadHistory forwards Core result to the listener`() {
-        val messages: List<ChatMessage> = listOf(mockk())
-        val historyCallbackSlot = slot<RequestCallback<List<ChatMessage>?>>()
-        every { gliaCore.getChatHistory(capture(historyCallbackSlot)) } answers {
-            historyCallbackSlot.captured.onResult(messages, null)
-        }
-        val listener: GliaChatRepository.HistoryLoadedListener = mockk(relaxed = true)
+    fun `loadHistory delegates to Core with the same callbacks`() {
+        val onSuccess: (List<ChatMessage>) -> Unit = mockk(relaxed = true)
+        val onError: (GliaException) -> Unit = mockk(relaxed = true)
 
-        repository.loadHistory(listener)
+        repository.loadHistory(onSuccess, onError)
 
-        verify { listener.loaded(messages, null) }
+        verify { gliaCore.getChatHistory(onSuccess, onError) }
     }
 
     @Test

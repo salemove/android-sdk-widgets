@@ -1253,6 +1253,10 @@
       "type": "gradient",
       "value": ["784cea", "#3c4fb9"]
     },
+    "olderMessagesIndicator": {
+      "type": "fill",
+      "value": ["#c21ab4"]
+    },
     "newMessagesDividerText": {
       "alignment": "center",
       "background": {

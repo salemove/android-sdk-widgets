@@ -208,6 +208,7 @@ dependencies {
   implementation libs.androidx.appcompat
   implementation libs.material
   implementation libs.androidx.constraintlayout
+  implementation libs.androidx.swiperefreshlayout
   implementation libs.androidx.lifecycle.process
   implementation libs.coil.core
   implementation libs.coil.network.okhttp

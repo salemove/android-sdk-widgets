@@ -4,7 +4,6 @@ package com.glia.widgets.helper
 
 import android.content.Context
 import android.content.res.Resources
-import android.content.res.TypedArray
 import android.graphics.Typeface
 import android.util.TypedValue
 import androidx.annotation.AnyRes
@@ -24,11 +23,10 @@ private const val TAG = "GliaThemeOverlays"
 private const val NO_RESOURCE = 0
 
 /**
- * Resources are static for the lifetime of the process, so both legacy-mechanism diagnostics are
- * worth reporting exactly once instead of on every Glia surface that is created.
+ * Resources are static for the lifetime of the process, so the legacy-mechanism diagnostic is worth
+ * reporting exactly once instead of on every Glia surface that is created.
  */
 private var legacyOverlayDetectionLogged = false
-private var unPrefixedLegacyItemsChecked = false
 
 /**
  * Composes the Glia theme on top of the receiver's live `Resources.Theme`, in place.
@@ -151,12 +149,9 @@ internal fun Context.resolveLegacyThemeOverlay(
 ): Int? {
     val legacyChatStyle = resolveLegacyChatStyle(legacyActivityStyle) ?: return null
 
-    logLegacyMechanismUsage(legacyChatStyle)
+    logLegacyMechanismUsage()
 
-    return theme
-        .gliaResourceIds(legacyChatStyle, intArrayOf(com.google.android.material.R.attr.materialThemeOverlay))
-        .first()
-        .takeIf { it != NO_RESOURCE }
+    return theme.resolveMaterialThemeOverlay(legacyChatStyle)
 }
 
 /**
@@ -180,45 +175,14 @@ private fun Resources.Theme.resolveGliaChatStyle(): Int? {
     return typedValue.resourceId.takeIf { it != NO_RESOURCE }
 }
 
-/**
- * Whether the given legacy style sets any un-prefixed `R.styleable.GliaView` item itself.
- *
- * Those twins (`brandPrimaryColor` and friends) were never a supported way to customize the SDK:
- * layouts have always resolved the `glia*`-prefixed theme attributes and ignored them. They are no
- * longer honoured anywhere, so integrators that still set them need pointing at the 1:1 prefixed
- * replacement.
- *
- * `Application.Glia.Chat` - the documented parent of every legacy `gliaChatStyle` style - declares
- * the whole styleable as `?attr/glia*` indirections, so "has a value" alone cannot tell an inherited
- * item from one the integrator set. Comparing against that baseline can.
- */
-internal fun Context.declaresUnPrefixedLegacyItems(@StyleRes legacyChatStyle: Int): Boolean {
-    val baseline = theme.gliaResourceIds(R.style.Application_Glia_Chat, R.styleable.GliaView)
-    val actual = theme.gliaResourceIds(legacyChatStyle, R.styleable.GliaView)
-    return !baseline.contentEquals(actual)
+private fun logLegacyMechanismUsage() {
+    if (legacyOverlayDetectionLogged) return
+    legacyOverlayDetectionLogged = true
+    Logger.i(TAG, "Legacy gliaChatStyle theming detected")
 }
 
-private fun Context.logLegacyMechanismUsage(@StyleRes legacyChatStyle: Int) {
-    if (!legacyOverlayDetectionLogged) {
-        legacyOverlayDetectionLogged = true
-        Logger.i(TAG, "Legacy gliaChatStyle theming detected")
-    }
-
-    if (unPrefixedLegacyItemsChecked) return
-    unPrefixedLegacyItemsChecked = true
-
-    if (!declaresUnPrefixedLegacyItems(legacyChatStyle)) return
-
-    Logger.w(
-        TAG,
-        "The style set as gliaChatStyle declares un-prefixed GliaView attributes (for example " +
-            "brandPrimaryColor). Those are no longer applied. Use the glia-prefixed attribute of the " +
-            "same name (gliaBrandPrimaryColor) inside your materialThemeOverlay, or migrate to the " +
-            "GliaTheme style."
-    )
-}
-
-private fun Resources.Theme.gliaResourceIds(@StyleRes styleRes: Int, attrs: IntArray): IntArray =
-    obtainStyledAttributes(styleRes, attrs).use { it.resourceIds() }
-
-private fun TypedArray.resourceIds(): IntArray = IntArray(length()) { getResourceId(it, NO_RESOURCE) }
+@StyleRes
+private fun Resources.Theme.resolveMaterialThemeOverlay(@StyleRes styleRes: Int): Int? =
+    obtainStyledAttributes(styleRes, intArrayOf(com.google.android.material.R.attr.materialThemeOverlay))
+        .use { it.getResourceId(0, NO_RESOURCE) }
+        .takeIf { it != NO_RESOURCE }

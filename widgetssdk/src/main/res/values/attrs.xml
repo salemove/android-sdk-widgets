@@ -1,107 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <declare-styleable name="GliaView">
-        <!-- Text to be shown on the top of the app bar in the chat -->
-        <attr name="appBarTitle" format="string" />
-        <!-- Primary color for your brand. Used for example to set the color of the appbar -->
-        <attr name="brandPrimaryColor" format="reference" />
-        <!-- Dark color of the UI widgets. Used for example to change the body text colors.  -->
-        <attr name="baseDarkColor" format="reference" />
-        <!-- Light color of the UI widgets. Used for example to change the title text colors, etc. -->
-        <attr name="baseLightColor" format="reference" />
-        <!-- Base normal color of the chat  -->
-        <attr name="baseNormalColor" format="reference" />
-        <!-- Base shade color of the chat  -->
-        <attr name="baseShadeColor" format="reference" />
-        <!-- Color for the operator's chat messages background  -->
-        <attr name="systemAgentBubbleColor" format="reference" />
-        <!-- Color for any error or chat widgets.  -->
-        <attr name="systemNegativeColor" format="reference" />
-        <!-- Allow overriding the view's fontFamily.  -->
-        <attr name="android:fontFamily" format="reference" />
-        <!-- Allows overriding the text style for Visitor Code -->
-        <attr name="visitorCodeStyle" format="reference" />
-        <!-- The appbar's back icon resId.  -->
-        <attr name="iconAppBarBack" format="reference" />
-        <!-- The appbar's leave queue icon resId.  -->
-        <attr name="iconLeaveQueue" format="reference" />
-        <!-- The send message icon resId -->
-        <attr name="iconSendMessage" format="reference" />
-        <!-- The icon resId used in chat messages to display an ongoing audio upgrade timer -->
-        <attr name="iconChatAudioUpgrade" format="reference" />
-        <!-- The icon resId used in the header of an audio upgrade dialog -->
-        <attr name="iconUpgradeAudioDialog" format="reference" />
-        <!-- The icon resId used to set the call's audio on -->
-        <attr name="iconCallAudioOn" format="reference" />
-        <!-- The icon resId used in chat messages to display an ongoing video upgrade timer -->
-        <attr name="iconChatVideoUpgrade" format="reference" />
-        <!-- The icon resId used in the header of an video upgrade dialog -->
-        <attr name="iconUpgradeVideoDialog" format="reference" />
-        <!-- The icon resId used in the Entry Widget for the case of CallVisualizer engagement-->
-        <attr name="iconCallVisualizer" format="reference" />
-        <!-- The icon resId used to set the call's video on -->
-        <attr name="iconCallVideoOn" format="reference" />
-        <!-- The icon resId used to set the call's audio off -->
-        <attr name="iconCallAudioOff" format="reference" />
-        <!-- The icon resId used set the call's video off -->
-        <attr name="iconCallVideoOff" format="reference" />
-        <!-- The icon resId used to navigate back to the chat from a call -->
-        <attr name="iconCallChat" format="reference" />
-        <!-- The icon resId used to set the call's speaker on -->
-        <attr name="iconCallSpeakerOn" format="reference" />
-        <!-- The icon resId used to set the call's speaker off -->
-        <attr name="iconCallSpeakerOff" format="reference" />
-        <!-- The icon resId used to minimize a call -->
-        <attr name="iconCallMinimize" format="reference" />
-        <!-- The icon resId used in a chat head if an operator's profile image is absent -->
-        <attr name="iconPlaceholder" format="reference" />
-        <!-- The icon resId used when visitor is put on hold by operator -->
-        <attr name="iconOnHold" format="reference" />
-        <!-- Visitor message background color -->
-        <attr name="visitorMessageBackgroundColor" format="reference" />
-        <!-- Visitor message text color -->
-        <attr name="visitorMessageTextColor" format="reference" />
-        <!-- Operator message background color -->
-        <attr name="operatorMessageBackgroundColor" format="reference" />
-        <!-- Operator message text color -->
-        <attr name="operatorMessageTextColor" format="reference" />
-        <!-- Bot message action button background color -->
-        <attr name="botActionButtonBackgroundColor" format="reference" />
-        <!-- Bot message action button text color -->
-        <attr name="botActionButtonTextColor" format="reference" />
-        <!-- Bot message action button background color -->
-        <attr name="botActionButtonSelectedBackgroundColor" format="reference" />
-        <!-- Bot message action button text color -->
-        <attr name="botActionButtonSelectedTextColor" format="reference" />
-        <!-- Send message button tint color -->
-        <attr name="chatSendMessageButtonTintColor" format="reference" />
-        <!-- Call Visualizer icon tint color -->
-        <attr name="iconCallVisualizerTintColor" format="reference" />
-        <!-- Chat background color. Declared top-level below - listed here for membership only,
-             so `R.styleable.GliaView_gliaChatBackgroundColor` keeps resolving while the legacy
-             `UiTheme` parsing exists. Same arrangement as `whiteLabel` below. -->
-        <attr name="gliaChatBackgroundColor" />
-        <!--The color of "new messages" divider in the chat-->
-        <attr name="newMessagesDividerColor" format="reference" />
-        <!--The color of "new messages" divider text in the chat-->
-        <attr name="newMessagesDividerTextColor" format="reference" />
-
-        <attr name="chatHeaderTitleTintColor" format="reference" />
-        <attr name="chatHeaderHomeButtonTintColor" format="reference" />
-        <attr name="chatHeaderExitQueueButtonTintColor" format="reference" />
-
-        <!-- Operator Status Layout -->
-        <attr name="chatStartingHeadingTextColor" format="reference" />
-        <attr name="chatStartingCaptionTextColor" format="reference" />
-        <attr name="chatStartedHeadingTextColor" format="reference" />
-        <attr name="chatStartedCaptionTextColor" format="reference" />
-        <!-- @deprecated This attribute is deprecated and will be removed in future.
-             Use Unified Customization instead: https://docs.glia.com/glia-mobile/docs/android-widgets-unified-customization. -->
-        <attr name="whiteLabel" />
-        <attr name="gliaAlertDialogButtonUseVerticalAlignment" />
-    </declare-styleable>
-
     <attr name="gliaChatStyle" format="reference" />
 
     <!-- Primary color for your brand. Used for example to set the color of the appbar -->
@@ -185,10 +84,6 @@
     <attr name="gliaBotActionButtonBackgroundColor" format="reference" />
     <!-- Bot message action button text color -->
     <attr name="gliaBotActionButtonTextColor" format="reference" />
-    <!-- Bot message action button background color -->
-    <attr name="gliaBotActionButtonSelectedBackgroundColor" format="reference" />
-    <!-- Bot message action button text color -->
-    <attr name="gliaBotActionButtonSelectedTextColor" format="reference" />
     <!-- Send message button tint color -->
     <attr name="gliaSendMessageButtonTintColor" format="reference" />
     <!-- CallVisualizer icon tint color-->
@@ -225,18 +120,13 @@
     <!-- {@deprecated For internal use only} -->
     <attr name="gvaQuickReplyTextColor" format="color" />
 
-    <declare-styleable name="OutlinedOptionView">
-        <attr name="icon" format="reference" />
-        <attr name="title" format="string" />
-        <attr name="caption" format="string" />
-    </declare-styleable>
-
+    <!--
+        `titleText` is only ever set as `tools:titleText`, so this styleable exists purely so the
+        layouts embedding an app bar show a title in the layout editor. Its colour and icon entries
+        were dropped once the app bar started resolving them from the composed theme.
+    -->
     <declare-styleable name="AppBarView">
         <attr name="titleText" format="string" />
-        <attr name="android:backgroundTint" format="reference" />
-        <attr name="lightTint" format="reference" />
-        <attr name="negativeTint" format="reference" />
-        <attr name="backIcon" format="reference" />
     </declare-styleable>
 
     <declare-styleable name="OperatorStatusView">

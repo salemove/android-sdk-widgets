@@ -2,10 +2,8 @@ package com.glia.widgets.internal.secureconversations
 
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
-import com.glia.androidsdk.chat.ChatMessage
 import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.androidsdk.secureconversations.SecureConversations
-import com.glia.widgets.chat.data.GliaChatRepository
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.internal.queue.QueueRepository
 import io.mockk.clearAllMocks
@@ -136,20 +134,6 @@ class SecureConversationsRepositoryTest {
         repository.unreadMessagesCountObservable.test()
             .assertNotComplete()
             .assertValue(0)
-    }
-
-    @Test
-    fun `fetchChatTranscript should call secureConversations fetchChatTranscript`() {
-        val listener: GliaChatRepository.HistoryLoadedListener = mockk(relaxed = true)
-        val messages: Array<ChatMessage> = arrayOf(mockk())
-        val exception: GliaException? = null
-
-        repository.fetchChatTranscript(listener)
-
-        val callbackCapturingSlot = slot<RequestCallback<Array<ChatMessage>>>()
-        verify { secureConversations.fetchChatTranscript(capture(callbackCapturingSlot)) }
-        callbackCapturingSlot.captured.onResult(messages, exception)
-        verify { listener.loaded(messages.toList(), exception) }
     }
 
     @Test

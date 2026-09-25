@@ -5,7 +5,6 @@ import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
 import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.androidsdk.secureconversations.SecureConversations
-import com.glia.widgets.chat.data.GliaChatRepository
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.asStateFlowable
@@ -62,12 +61,6 @@ internal class SecureConversationsRepository @JvmOverloads constructor(
         secureConversations.apply {
             unSubscribeFromUnreadMessageCount(unreadMessagesCountCallback)
             unSubscribeFromPendingSecureConversationStatus(pendingSecureConversationsCallback)
-        }
-    }
-
-    fun fetchChatTranscript(listener: GliaChatRepository.HistoryLoadedListener) {
-        secureConversations.fetchChatTranscript { messages, exception ->
-            listener.loaded(messages?.toList(), exception)
         }
     }
 

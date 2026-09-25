@@ -157,7 +157,7 @@ internal class MessageCenterView(context: Context, attrs: AttributeSet?, defStyl
 
     private fun showUnAuthenticatedDialog() {
         showDialog {
-            Dialogs.showUnAuthenticatedDialog(context, theme) {
+            Dialogs.showUnAuthenticatedDialog(context) {
                 controller?.dismissCurrentDialog()
                 controller?.onCloseButtonClicked()
             }
@@ -182,13 +182,13 @@ internal class MessageCenterView(context: Context, attrs: AttributeSet?, defStyl
     }
 
     private fun showUnexpectedErrorDialog() = showDialog {
-        Dialogs.showUnexpectedErrorDialog(context, theme) {
+        Dialogs.showUnexpectedErrorDialog(context) {
             controller?.dismissCurrentDialog()
         }
     }
 
     private fun showMessageCenterUnavailableDialog() = showDialog {
-        Dialogs.showMessageCenterUnavailableDialog(this.context, theme)
+        Dialogs.showMessageCenterUnavailableDialog(this.context)
     }
 
     override fun showConfirmationScreen() {

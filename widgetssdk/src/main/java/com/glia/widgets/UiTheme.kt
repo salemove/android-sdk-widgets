@@ -1,22 +1,12 @@
 package com.glia.widgets
 
-import android.content.Context
 import android.os.Parcelable
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.FontRes
-import androidx.core.content.res.ResourcesCompat
-import com.glia.widgets.helper.isAlertDialogButtonUseVerticalAlignment
 import com.glia.widgets.view.configuration.survey.SurveyStyle
 import com.glia.widgets.view.unifiedui.Mergeable
 import com.glia.widgets.view.unifiedui.merge
-import com.glia.widgets.view.unifiedui.theme.AlertDialogConfiguration
-import com.glia.widgets.view.unifiedui.theme.ColorPallet
-import com.glia.widgets.view.unifiedui.theme.Icons
-import com.glia.widgets.view.unifiedui.theme.Properties
-import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
-import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
-import com.glia.widgets.view.unifiedui.theme.defaulttheme.AlertTheme
 import kotlinx.parcelize.Parcelize
 
 /**
@@ -426,34 +416,6 @@ internal data class UiTheme(
         gvaQuickReplyStrokeColor = gvaQuickReplyStrokeColor merge other.gvaQuickReplyStrokeColor,
         gvaQuickReplyTextColor = gvaQuickReplyTextColor merge other.gvaQuickReplyTextColor
     )
-
-    private fun toColorPallet(context: Context): ColorPallet = context.run {
-        ColorPallet(
-            darkColorTheme = ColorTheme(context.getColor(baseDarkColor ?: R.color.glia_dark_color)),
-            lightColorTheme = ColorTheme(context.getColor(baseLightColor ?: R.color.glia_light_color)),
-            neutralColorTheme = ColorTheme(context.getColor(R.color.glia_neutral_color)),
-            normalColorTheme = ColorTheme(context.getColor(baseNormalColor ?: R.color.glia_normal_color)),
-            shadeColorTheme = ColorTheme(context.getColor(baseShadeColor ?: R.color.glia_shade_color)),
-            primaryColorTheme = ColorTheme(context.getColor(brandPrimaryColor ?: R.color.glia_primary_color)),
-            secondaryColorTheme = null,
-            negativeColorTheme = ColorTheme(context.getColor(systemNegativeColor ?: R.color.glia_negative_color))
-        )
-    }
-
-    internal fun alertTheme(context: Context): AlertDialogConfiguration {
-        val alertTheme = toColorPallet(context).run(::AlertTheme).copy(isVerticalAxis = isAlertDialogButtonUseVerticalAlignment())
-        val theme = UnifiedTheme(alertTheme = alertTheme, isWhiteLabel = whiteLabel)
-
-        val properties = Properties(
-            typeface = fontRes?.let { ResourcesCompat.getFont(context, it) }
-        )
-
-        val icons = Icons(
-            iconLeaveQueue = iconLeaveQueue
-        )
-
-        return AlertDialogConfiguration(theme, properties, icons)
-    }
 
     /**
      * Builder for Glia UI customization at runtime.

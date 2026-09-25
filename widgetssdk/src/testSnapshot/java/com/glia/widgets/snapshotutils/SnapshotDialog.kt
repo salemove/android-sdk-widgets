@@ -1,10 +1,10 @@
 package com.glia.widgets.snapshotutils
 
 import android.content.Context
+import android.view.ContextThemeWrapper
 import android.view.View
 import androidx.annotation.DrawableRes
 import com.glia.widgets.R
-import com.glia.widgets.UiTheme
 import com.glia.widgets.internal.dialog.model.Link
 import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.view.dialog.base.DialogType
@@ -53,8 +53,15 @@ internal interface SnapshotDialog : SnapshotTheme, SnapshotProviders {
     val buttonDescription: LocaleString
         get() = LocaleString(R.string.dialog_button_description)
 
+    /**
+     * The unified-theme variants render white-labelled, which the fixture used to state as
+     * `UiTheme(whiteLabel = unifiedTheme != null)`. The dialog pipeline reads `whiteLabel` off the
+     * theme now, so the fixture says the same thing with a theme overlay - see
+     * `R.style.Test_Glia_WhiteLabel`.
+     */
     fun inflateView(context: Context, unifiedTheme: UnifiedTheme? = null, dialogType: DialogType): View {
-        return DialogViewFactory(context, UiTheme(whiteLabel = unifiedTheme != null), unifiedTheme).createView(dialogType)
+        val themedContext = if (unifiedTheme == null) context else ContextThemeWrapper(context, R.style.Test_Glia_WhiteLabel)
+        return DialogViewFactory(themedContext, unifiedTheme).createView(dialogType)
     }
 
     fun unifiedThemeWithoutDialog(): UnifiedTheme = unifiedTheme(R.raw.test_unified_config) { unifiedTheme ->

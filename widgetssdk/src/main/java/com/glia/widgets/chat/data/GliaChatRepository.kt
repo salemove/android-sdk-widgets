@@ -13,15 +13,8 @@ import java.util.function.Consumer
  */
 internal class GliaChatRepository(private val gliaCore: GliaCore) {
 
-    /**
-     * @hide
-     */
-    fun interface HistoryLoadedListener {
-        fun loaded(messages: List<ChatMessage>?, error: Throwable?)
-    }
-
-    fun loadHistory(historyLoadedListener: HistoryLoadedListener) {
-        gliaCore.getChatHistory { messages, error -> historyLoadedListener.loaded(messages, error) }
+    fun loadHistory(onSuccess: (List<ChatMessage>) -> Unit, onError: (GliaException) -> Unit) {
+        gliaCore.getChatHistory(onSuccess, onError)
     }
 
     fun listenForAllMessages(listener: Consumer<ChatMessage>) {

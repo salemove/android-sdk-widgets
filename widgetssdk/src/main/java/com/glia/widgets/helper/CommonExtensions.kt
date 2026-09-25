@@ -27,10 +27,13 @@ import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement
 import com.glia.telemetry_lib.EventAttribute
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.telemetry_lib.LogEvents
+import com.glia.widgets.BETA_REGION
+import com.glia.widgets.BetaRegion
+import com.glia.widgets.EU_REGION
 import com.glia.widgets.GliaWidgetsConfig
-import com.glia.widgets.GliaWidgetsConfig.Regions
 import com.glia.widgets.GliaWidgetsException
 import com.glia.widgets.Region
+import com.glia.widgets.US_REGION
 import com.glia.widgets.UiTheme
 import com.glia.widgets.engagement.MediaType
 import com.glia.widgets.queue.Queue
@@ -146,7 +149,7 @@ internal fun GliaWidgetsConfig.toCoreType(): CoreConfiguration {
     val authorizationMethod = authorizationMethod.requireNotNull { "Authorization method is required" }
     val siteId = siteId.requireNotNull { "Site ID is required" }
     context.requireNotNull { "Context is required" }
-    val region = requireRegion(region, regionString)
+    val region = region.requireNotNull { "Region is required" }
 
     return CoreConfiguration(
         authorizationMethod = authorizationMethod.toCoreType(),
@@ -157,43 +160,19 @@ internal fun GliaWidgetsConfig.toCoreType(): CoreConfiguration {
     )
 }
 
-/**
- * Takes either region enum or region string and returns region enum.
- * Validates that only one of the parameters is provided, and if it is the String one, it is one of the known regions.
- * This is to support both new and deprecated way of setting region in the builder, but to deal only with enum internally.
- */
-private fun requireRegion(region: Region?, regionString: String?): Region = when {
-    // Both parameters are provided
-    region != null && regionString != null -> throwGliaException(GliaWidgetsException.Cause.INVALID_INPUT) {
-        "`setRegion(region: Region)` and `setRegion(region: String)` are mutually exclusive"
-    }
-    // Enum parameter is provided
-    region != null -> region
-    // None of the parameters is provided
-    regionString == null -> throwGliaException(GliaWidgetsException.Cause.INVALID_INPUT) {
-        "`setRegion(region: Region)` or `setRegion(region: String)` is required"
-    }
-
-    Regions.US.equals(regionString, ignoreCase = true) -> Region.US
-    Regions.EU.equals(regionString, ignoreCase = true) -> Region.EU
-
-    // Unknown region string provided
-    else -> throwGliaException(GliaWidgetsException.Cause.INVALID_INPUT) { "Unknown region: $regionString" }
-}
-
 internal fun Region.toCoreType(): CoreRegion = when (this) {
     Region.US -> CoreRegion.US
     Region.EU -> CoreRegion.EU
-    Region.Beta -> CoreRegion.Beta
+    BetaRegion -> CoreRegion.Beta
     is Region.Custom -> CoreRegion.Custom(host)
 }
 
 // For logging only!!
 internal val Region.stringValue: String
     get() = when (this) {
-        Region.US -> Regions.US
-        Region.EU -> Regions.EU
-        Region.Beta -> "beta"
+        Region.US -> US_REGION
+        Region.EU -> EU_REGION
+        BetaRegion -> BETA_REGION
         is Region.Custom -> "region: custom, host: $host"
     }
 

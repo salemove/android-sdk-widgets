@@ -8,7 +8,6 @@ import androidx.preference.PreferenceManager
 import com.glia.widgets.AuthorizationMethod
 import com.glia.widgets.GliaWidgetsConfig
 import com.glia.widgets.Region
-import com.glia.widgets.SiteApiKey
 import com.glia.widgets.toRegion
 
 /**
@@ -40,7 +39,7 @@ object ExampleAppConfigManager {
 
 //       We're not checking availability for every query param separately because this is for acceptance tests and we assume that link would be correct
         if (SECRET_KEY == data.lastPathSegment) {
-            saveSiteApiKeyAuthToPrefs(data, applicationContext)
+            saveApiKeyAuthToPrefs(data, applicationContext)
         } else {
             throw RuntimeException("deep link must start with \"glia://widgets/secret\"")
         }
@@ -97,7 +96,7 @@ object ExampleAppConfigManager {
         }
     }
 
-    private fun saveSiteApiKeyAuthToPrefs(data: Uri, applicationContext: Context) {
+    private fun saveApiKeyAuthToPrefs(data: Uri, applicationContext: Context) {
         val apiKeyId = data.getQueryParameter(API_KEY_ID_KEY)
         val apiKeySecret = data.getQueryParameter(API_KEY_SECRET_KEY)
         if (apiKeyId == null || apiKeySecret == null) return
@@ -153,14 +152,7 @@ object ExampleAppConfigManager {
         val manualLocaleOverride = preferences.getString(context.getString(R.string.pref_manual_locale_override), null)
 
         return GliaWidgetsConfig.Builder()
-            .also {
-                // Decide authorization method based on the prefix of the apiKeySecret
-                if (apiKeySecret!!.startsWith("gls_")) {
-                    it.setSiteApiKey(SiteApiKey(apiKeyId!!, apiKeySecret))
-                } else {
-                    it.setAuthorizationMethod(AuthorizationMethod.UserApiKey(apiKeyId!!, apiKeySecret))
-                }
-            }
+            .setAuthorizationMethod(AuthorizationMethod.UserApiKey(apiKeyId!!, apiKeySecret!!))
             .setSiteId(siteId)
             .setRegion(siteRegion)
             .setCompanyName(companyName)

@@ -1,7 +1,6 @@
 package com.glia.widgets.engagement
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.EngagementRequest
 import com.glia.androidsdk.EngagementRequest.Outcome
@@ -636,10 +635,6 @@ internal class EngagementRepositoryImpl(
     //--Chat--
     private fun handleOperatorTypingStatus(operatorTypingStatus: OperatorTypingStatus) {
         _operatorTypingStatus.onNext(operatorTypingStatus.isTyping)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
-        currentEngagement?.onActivityResult(requestCode, resultCode, intent)
     }
 
     override fun updateIsSecureMessagingRequested(isSecureMessagingRequested: Boolean) {

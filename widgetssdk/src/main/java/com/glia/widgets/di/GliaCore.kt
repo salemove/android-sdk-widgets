@@ -40,8 +40,6 @@ internal interface GliaCore {
     val secureConversations: SecureConversations
     val liveObservation: LiveObservation
 
-    @Throws(GliaWidgetsException::class)
-    fun init(config: GliaWidgetsConfig)
     fun init(config: GliaWidgetsConfig, onComplete: OnComplete, onError: OnError)
     fun getVisitorInfo(visitorCallback: RequestCallback<VisitorInfo?>)
     fun updateVisitorInfo(visitorInfoUpdateRequest: VisitorInfoUpdateRequest, visitorCallback: Consumer<GliaException?>)

@@ -137,7 +137,8 @@ internal object Dependencies {
     val pushNotifications: PushNotifications by lazy {
         PushNotificationsImpl(
             gliaCore.pushNotifications,
-            controllerFactory.secureMessagingPushController
+            controllerFactory.secureMessagingPushController,
+            controllerFactory.pushClickHandlerController
         )
     }
 
@@ -319,6 +320,10 @@ internal object Dependencies {
         repositoryFactory.initialize()
         configurationManager.applyConfiguration(gliaWidgetsConfig)
         localeProvider.setCompanyName(gliaWidgetsConfig.companyName)
+
+        // Must stay last: flushes a push notification click parked before initialization, and the flush
+        // reads the repositories wired up above.
+        controllerFactory.pushClickHandlerController.onSdkInitialized()
     }
 
     private fun setupLoggingMetadata(gliaWidgetsConfig: GliaWidgetsConfig) {

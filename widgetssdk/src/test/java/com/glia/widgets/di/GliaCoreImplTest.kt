@@ -6,6 +6,7 @@ import com.glia.androidsdk.AuthorizationMethod
 import com.glia.androidsdk.CoreConfiguration
 import com.glia.androidsdk.Glia
 import com.glia.androidsdk.GliaException
+import com.glia.androidsdk.chat.ChatMessage
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.telemetry_lib.LogEvents
 import com.glia.widgets.GliaWidgetsConfig
@@ -16,6 +17,7 @@ import com.glia.widgets.helper.toCoreType
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
+import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.slot
 import io.mockk.unmockkStatic
@@ -221,6 +223,32 @@ class GliaCoreImplTest {
 
         assertEquals(GliaWidgetsException.Cause.INVALID_INPUT, error.gliaCause)
         assertEquals("Failed to initialise Glia Widgets SDK. Please check logs.", error.debugMessage)
+    }
+
+    @Test
+    fun `getChatHistory forwards the Core transcript to onSuccess only`() {
+        val messages: List<ChatMessage> = listOf(mockk(), mockk())
+        every { Glia.getChatHistory(any(), any()) } answers { firstArg<Consumer<List<ChatMessage>>>().accept(messages) }
+        val onSuccess: (List<ChatMessage>) -> Unit = mockk(relaxed = true)
+        val onError: (GliaException) -> Unit = mockk(relaxed = true)
+
+        gliaCore.getChatHistory(onSuccess, onError)
+
+        verify(exactly = 1) { onSuccess(messages) }
+        verify(exactly = 0) { onError(any()) }
+    }
+
+    @Test
+    fun `getChatHistory forwards the Core error to onError only`() {
+        val exception = GliaException("forbidden", GliaException.Cause.FORBIDDEN)
+        every { Glia.getChatHistory(any(), any()) } answers { secondArg<Consumer<GliaException>>().accept(exception) }
+        val onSuccess: (List<ChatMessage>) -> Unit = mockk(relaxed = true)
+        val onError: (GliaException) -> Unit = mockk(relaxed = true)
+
+        gliaCore.getChatHistory(onSuccess, onError)
+
+        verify(exactly = 1) { onError(exception) }
+        verify(exactly = 0) { onSuccess(any()) }
     }
 
     @Test

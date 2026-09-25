@@ -170,8 +170,8 @@ internal class GliaCoreImpl : GliaCore {
         Glia.fetchFile(attachmentFile, callback)
     }
 
-    override fun getChatHistory(callback: RequestCallback<List<ChatMessage>?>) {
-        Glia.getChatHistory { messages, exception -> callback.onResult(messages?.toList(), exception) }
+    override fun getChatHistory(onSuccess: (List<ChatMessage>) -> Unit, onError: (GliaException) -> Unit) {
+        Glia.getChatHistory(onSuccess, onError)
     }
 
     override fun getQueues(onResult: (Array<Queue>) -> Unit, onError: (GliaException?) -> Unit) {

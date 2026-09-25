@@ -374,14 +374,34 @@ object GliaWidgets {
     }
 
     /**
-     * Clears visitor session
-     * @throws GliaWidgetsException with [GliaWidgetsException.Cause]
+     * Clears the visitor session: forgets the current visitor and starts a new anonymous one.
+     *
+     * Does as much of the cleanup as it can. Cancelling queueing, ending the engagement and unsubscribing
+     * from push notifications are best-effort: if one fails, for example because there is no network
+     * connection, the failure is only logged and the session is still cleared. This method has no callback.
+     *
+     * @param endEngagementIfPresent if `true` (default), queueing is cancelled or the ongoing engagement is
+     * ended and its UI is closed without a survey before the session is cleared. If `false` and the visitor
+     * is queueing or in a live engagement, [GliaWidgetsException] with [GliaWidgetsException.Cause.FORBIDDEN]
+     * is thrown and nothing is cleared. An engagement transferred to Secure Conversations never blocks the clear.
+     * @param stopPushNotifications whether to unsubscribe an authenticated visitor from Secure Conversations push
+     * notifications. Default `false`. Has no effect for a visitor that was never authenticated.
+     * @throws GliaWidgetsException with [GliaWidgetsException.Cause.FORBIDDEN] when refused during an engagement, or
+     * [GliaWidgetsException.Cause.INVALID_INPUT] if the SDK is not set up.
      */
     @JvmStatic
-    fun clearVisitorSession() {
+    @JvmOverloads
+    fun clearVisitorSession(endEngagementIfPresent: Boolean = true, stopPushNotifications: Boolean = false) {
         GliaLogger.logMethodUse(GliaWidgets::class, "clearVisitorSession")
         Logger.i(TAG, "Clear visitor session")
+
+        if (!endEngagementIfPresent && repositoryFactory.engagementRepository.isQueueingOrLiveEngagement) {
+            throw GliaWidgetsException("Cannot clear visitor session during an ongoing engagement", GliaWidgetsException.Cause.FORBIDDEN)
+        }
+
         try {
+            // Local state goes first and does not depend on the network, so the visitor's data is gone
+            // from Widgets whatever Core manages to do. Core ends the engagement and unsubscribes pushes.
             destroyControllersAndResetEngagementData()
 
             //Here we reset the secure conversations repository to clear the data,
@@ -389,7 +409,7 @@ object GliaWidgets {
             //and we don't need secure conversations data for un-authenticated visitors.
             repositoryFactory.secureConversationsRepository.unsubscribeAndResetData()
 
-            gliaCore().clearVisitorSession()
+            gliaCore().clearVisitorSession(stopPushNotifications)
         } catch (gliaException: GliaException) {
             throw gliaException.toWidgetsType()
         }

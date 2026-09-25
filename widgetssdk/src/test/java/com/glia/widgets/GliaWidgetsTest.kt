@@ -1,6 +1,7 @@
 package com.glia.widgets
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.glia.androidsdk.GliaException
 import com.glia.widgets.callbacks.OnComplete
 import com.glia.widgets.callbacks.OnError
 import com.glia.widgets.callvisualizer.controller.CallVisualizerController
@@ -11,6 +12,7 @@ import com.glia.widgets.di.GliaCoreImpl
 import com.glia.widgets.di.RepositoryFactory
 import com.glia.widgets.engagement.EngagementRepository
 import com.glia.widgets.internal.queue.QueueRepository
+import com.glia.widgets.internal.secureconversations.SecureConversationsRepository
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
@@ -22,6 +24,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -147,6 +150,101 @@ class GliaWidgetsTest {
 
         whenever(gliaCore.isInitializationInProgress) doReturn true
         Assert.assertTrue(GliaWidgets.isInitializationInProgress())
+    }
+
+    @Test
+    fun `clearVisitorSession defaults to ending the engagement and keeping pushes`() {
+        val (engagementRepository, secureConversationsRepository) = mockClearVisitorSessionDependencies(isQueueingOrLiveEngagement = true)
+
+        GliaWidgets.clearVisitorSession()
+
+        verify(engagementRepository).reset()
+        verify(secureConversationsRepository).unsubscribeAndResetData()
+        verify(gliaCore).clearVisitorSession(false)
+    }
+
+    @Test
+    fun `clearVisitorSession passes stopPushNotifications to core`() {
+        mockClearVisitorSessionDependencies()
+
+        GliaWidgets.clearVisitorSession(stopPushNotifications = true)
+
+        verify(gliaCore).clearVisitorSession(true)
+    }
+
+    @Test
+    fun `clearVisitorSession throws FORBIDDEN and touches nothing when engagement is ongoing and endEngagementIfPresent is false`() {
+        val (engagementRepository, secureConversationsRepository) = mockClearVisitorSessionDependencies(isQueueingOrLiveEngagement = true)
+
+        val exception = Assert.assertThrows(GliaWidgetsException::class.java) {
+            GliaWidgets.clearVisitorSession(endEngagementIfPresent = false)
+        }
+
+        Assert.assertEquals(GliaWidgetsException.Cause.FORBIDDEN, exception.gliaCause)
+        verify(engagementRepository, never()).reset()
+        verify(secureConversationsRepository, never()).unsubscribeAndResetData()
+        verify(gliaCore, never()).clearVisitorSession(any())
+    }
+
+    @Test
+    fun `clearVisitorSession with endEngagementIfPresent false clears when nothing is ongoing`() {
+        val (engagementRepository, secureConversationsRepository) = mockClearVisitorSessionDependencies(isQueueingOrLiveEngagement = false)
+
+        GliaWidgets.clearVisitorSession(endEngagementIfPresent = false, stopPushNotifications = true)
+
+        verify(engagementRepository).reset()
+        verify(secureConversationsRepository).unsubscribeAndResetData()
+        verify(gliaCore).clearVisitorSession(true)
+    }
+
+    @Test
+    fun `clearVisitorSession resets local state before Core, in order`() {
+        val (engagementRepository, secureConversationsRepository) = mockClearVisitorSessionDependencies()
+
+        GliaWidgets.clearVisitorSession()
+
+        inOrder(engagementRepository, secureConversationsRepository, gliaCore) {
+            verify(engagementRepository).reset()
+            verify(secureConversationsRepository).unsubscribeAndResetData()
+            verify(gliaCore).clearVisitorSession(false)
+        }
+    }
+
+    @Test
+    fun `clearVisitorSession maps a Core exception and still resets local state`() {
+        val (engagementRepository, secureConversationsRepository) = mockClearVisitorSessionDependencies()
+        whenever(gliaCore.clearVisitorSession(any())) doThrow GliaException("Not set up", GliaException.Cause.INVALID_INPUT)
+
+        val exception = Assert.assertThrows(GliaWidgetsException::class.java) {
+            GliaWidgets.clearVisitorSession()
+        }
+
+        Assert.assertEquals(GliaWidgetsException.Cause.INVALID_INPUT, exception.gliaCause)
+        verify(engagementRepository).reset()
+        verify(secureConversationsRepository).unsubscribeAndResetData()
+    }
+
+    @Test
+    fun `clearVisitorSession never ends the engagement itself`() {
+        val (engagementRepository, _) = mockClearVisitorSessionDependencies(isQueueingOrLiveEngagement = true)
+
+        GliaWidgets.clearVisitorSession()
+
+        // Core ends it as the outgoing visitor; ending it here too would fire an integrator-style end.
+        verify(engagementRepository, never()).endEngagement()
+        verify(engagementRepository, never()).terminateEngagement()
+    }
+
+    private fun mockClearVisitorSessionDependencies(
+        isQueueingOrLiveEngagement: Boolean = false
+    ): Pair<EngagementRepository, SecureConversationsRepository> {
+        val engagementRepository = mock<EngagementRepository> {
+            on { this.isQueueingOrLiveEngagement } doReturn isQueueingOrLiveEngagement
+        }
+        val secureConversationsRepository = mock<SecureConversationsRepository>()
+        whenever(repositoryFactory.engagementRepository) doReturn engagementRepository
+        whenever(repositoryFactory.secureConversationsRepository) doReturn secureConversationsRepository
+        return engagementRepository to secureConversationsRepository
     }
 
     private fun widgetsConfig(): GliaWidgetsConfig = GliaWidgetsConfig.Builder()

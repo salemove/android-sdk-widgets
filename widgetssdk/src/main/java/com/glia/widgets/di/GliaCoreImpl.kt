@@ -214,8 +214,8 @@ internal class GliaCoreImpl : GliaCore {
         Glia.getSiteInfo(callback)
     }
 
-    override fun clearVisitorSession() {
-        Glia.clearVisitorSession()
+    override fun clearVisitorSession(stopPushNotifications: Boolean) {
+        Glia.clearVisitorSession(stopPushNotifications)
     }
 
     override fun getOperator(operatorId: String, callback: RequestCallback<Operator?>) {

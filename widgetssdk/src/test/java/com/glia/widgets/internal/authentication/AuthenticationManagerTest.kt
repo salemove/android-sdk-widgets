@@ -3,7 +3,6 @@ package com.glia.widgets.internal.authentication
 import android.mock
 import android.unMock
 import com.glia.androidsdk.GliaException
-import com.glia.androidsdk.RequestCallback
 import com.glia.widgets.authentication.Authentication
 import com.glia.widgets.callbacks.OnComplete
 import com.glia.widgets.callbacks.OnError
@@ -79,7 +78,8 @@ internal class AuthenticationManagerTest {
         val externalAccessToken = "external"
         val onComplete = mockk<OnComplete>(relaxUnitFun = true)
         val onError = mockk<OnError>(relaxUnitFun = true)
-        val authCallbackSlot = slot<RequestCallback<Void>>()
+        val onSuccessSlot = slot<() -> Unit>()
+        val onFailureSlot = slot<(GliaException) -> Unit>()
 
         authenticationManager.authenticate(token, externalAccessToken, onComplete, onError)
 
@@ -88,7 +88,7 @@ internal class AuthenticationManagerTest {
         verify { Logger.i(any(), any()) }
 
         verify {
-            coreAuthentication.authenticate(eq(token), eq(externalAccessToken), capture(authCallbackSlot))
+            coreAuthentication.authenticate(eq(token), eq(externalAccessToken), capture(onSuccessSlot), capture(onFailureSlot))
         }
 
         //verify that all the business logic is inside callback
@@ -103,7 +103,7 @@ internal class AuthenticationManagerTest {
         //error
         verify(exactly = 0) { onError.onError(any()) }
 
-        authCallbackSlot.captured.onResult(null, null)
+        onSuccessSlot.captured()
 
         //callback
         verify { pushClickHandlerController.onAuthenticationAttempt() }
@@ -123,7 +123,8 @@ internal class AuthenticationManagerTest {
         val externalAccessToken = "external"
         val onComplete = mockk<OnComplete>(relaxUnitFun = true)
         val onError = mockk<OnError>(relaxUnitFun = true)
-        val authCallbackSlot = slot<RequestCallback<Void>>()
+        val onSuccessSlot = slot<() -> Unit>()
+        val onFailureSlot = slot<(GliaException) -> Unit>()
 
         authenticationManager.authenticate(token, externalAccessToken, onComplete, onError)
 
@@ -132,7 +133,7 @@ internal class AuthenticationManagerTest {
         verify { Logger.i(any(), any()) }
 
         verify {
-            coreAuthentication.authenticate(eq(token), eq(externalAccessToken), capture(authCallbackSlot))
+            coreAuthentication.authenticate(eq(token), eq(externalAccessToken), capture(onSuccessSlot), capture(onFailureSlot))
         }
 
         //verify that all the business logic is inside callback
@@ -147,7 +148,7 @@ internal class AuthenticationManagerTest {
         //error
         verify(exactly = 0) { onError.onError(any()) }
 
-        authCallbackSlot.captured.onResult(null, GliaException("error", GliaException.Cause.INVALID_INPUT))
+        onFailureSlot.captured(GliaException("error", GliaException.Cause.INVALID_INPUT))
 
         //callback
         verify { pushClickHandlerController.onAuthenticationAttempt() }
@@ -165,17 +166,18 @@ internal class AuthenticationManagerTest {
 
         val onComplete = mockk<OnComplete>(relaxUnitFun = true)
         val onError = mockk<OnError>(relaxUnitFun = true)
-        val authCallbackSlot = slot<RequestCallback<Void>>()
+        val onSuccessSlot = slot<() -> Unit>()
+        val onFailureSlot = slot<(GliaException) -> Unit>()
 
         authenticationManager.deauthenticate(stopPushNotifications, onComplete, onError)
 
         verify { Logger.i(any(), any()) }
         verify { engagementRepository.cancelQueuing() }
         verify {
-            coreAuthentication.deauthenticate(eq(stopPushNotifications), capture(authCallbackSlot))
+            coreAuthentication.deauthenticate(eq(stopPushNotifications), capture(onSuccessSlot), capture(onFailureSlot))
         }
 
-        authCallbackSlot.captured.onResult(null, null)
+        onSuccessSlot.captured()
 
         verify { Dependencies.destroyControllersAndResetEngagementData() }
         verify { secureConversationsRepository.unsubscribeAndResetData() }
@@ -191,17 +193,18 @@ internal class AuthenticationManagerTest {
 
         val onComplete = mockk<OnComplete>(relaxUnitFun = true)
         val onError = mockk<OnError>(relaxUnitFun = true)
-        val authCallbackSlot = slot<RequestCallback<Void>>()
+        val onSuccessSlot = slot<() -> Unit>()
+        val onFailureSlot = slot<(GliaException) -> Unit>()
 
         authenticationManager.deauthenticate(stopPushNotifications, onComplete, onError)
 
         verify { Logger.i(any(), any()) }
         verify { engagementRepository.cancelQueuing() }
         verify {
-            coreAuthentication.deauthenticate(eq(stopPushNotifications), capture(authCallbackSlot))
+            coreAuthentication.deauthenticate(eq(stopPushNotifications), capture(onSuccessSlot), capture(onFailureSlot))
         }
 
-        authCallbackSlot.captured.onResult(null, GliaException("error", GliaException.Cause.INVALID_INPUT))
+        onFailureSlot.captured(GliaException("error", GliaException.Cause.INVALID_INPUT))
 
         verify(exactly = 0) { onComplete.onComplete() }
         verify(exactly = 0) { Dependencies.destroyControllersAndResetEngagementData() }
@@ -218,20 +221,21 @@ internal class AuthenticationManagerTest {
 
         val onComplete = mockk<OnComplete>(relaxUnitFun = true)
         val onError = mockk<OnError>(relaxUnitFun = true)
-        val authCallbackSlot = slot<RequestCallback<Void>>()
+        val onSuccessSlot = slot<() -> Unit>()
+        val onFailureSlot = slot<(GliaException) -> Unit>()
 
         authenticationManager.refresh(jwtToken, externalAccessToken, onComplete, onError)
 
         verify { Logger.i(any(), any()) }
         verify {
-            coreAuthentication.refresh(eq(jwtToken), eq(externalAccessToken), capture(authCallbackSlot))
+            coreAuthentication.refresh(eq(jwtToken), eq(externalAccessToken), capture(onSuccessSlot), capture(onFailureSlot))
         }
 
         //verify that all the business logic is inside callback
         verify(exactly = 0) { onComplete.onComplete() }
         verify(exactly = 0) { onError.onError(any()) }
 
-        authCallbackSlot.captured.onResult(null, null)
+        onSuccessSlot.captured()
 
         verify { onComplete.onComplete() }
         verify(exactly = 0) { onError.onError(any()) }
@@ -245,20 +249,21 @@ internal class AuthenticationManagerTest {
 
         val onComplete = mockk<OnComplete>(relaxUnitFun = true)
         val onError = mockk<OnError>(relaxUnitFun = true)
-        val authCallbackSlot = slot<RequestCallback<Void>>()
+        val onSuccessSlot = slot<() -> Unit>()
+        val onFailureSlot = slot<(GliaException) -> Unit>()
 
         authenticationManager.refresh(jwtToken, externalAccessToken, onComplete, onError)
 
         verify { Logger.i(any(), any()) }
         verify {
-            coreAuthentication.refresh(eq(jwtToken), eq(externalAccessToken), capture(authCallbackSlot))
+            coreAuthentication.refresh(eq(jwtToken), eq(externalAccessToken), capture(onSuccessSlot), capture(onFailureSlot))
         }
 
         //verify that all the business logic is inside callback
         verify(exactly = 0) { onComplete.onComplete() }
         verify(exactly = 0) { onError.onError(any()) }
 
-        authCallbackSlot.captured.onResult(null, GliaException("error", GliaException.Cause.INVALID_INPUT))
+        onFailureSlot.captured(GliaException("error", GliaException.Cause.INVALID_INPUT))
 
         verify(exactly = 0) { onComplete.onComplete() }
         verify(exactly = 1) { onError.onError(any()) }

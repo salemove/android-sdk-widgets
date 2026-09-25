@@ -3,26 +3,22 @@ package com.glia.widgets.messagecenter
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import android.content.res.TypedArray
 import android.net.Uri
 import android.os.Parcelable
 import android.util.AttributeSet
 import android.widget.LinearLayout
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
-import androidx.core.content.withStyledAttributes
 import androidx.core.graphics.Insets
 import androidx.core.view.isVisible
 import com.glia.telemetry_lib.ButtonNames
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.telemetry_lib.LogEvents
 import com.glia.widgets.R
-import com.glia.widgets.UiTheme
 import com.glia.widgets.databinding.MessageCenterViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.SimpleWindowInsetsAndAnimationHandler
-import com.glia.widgets.helper.Utils
-import com.glia.widgets.helper.getColorCompat
+import com.glia.widgets.helper.gliaAttrColor
 import com.glia.widgets.helper.hideKeyboard
 import com.glia.widgets.helper.insetsController
 import com.glia.widgets.helper.isKeyboardVisible
@@ -45,16 +41,17 @@ import com.glia.widgets.view.unifiedui.theme.base.HeaderTheme
 import com.glia.widgets.view.unifiedui.theme.defaulttheme.DefaultHeader
 import kotlinx.parcelize.Parcelize
 import java.util.concurrent.Executor
-import kotlin.properties.Delegates
 
-internal class MessageCenterView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : LinearLayout(
+internal class MessageCenterView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
+) : LinearLayout(
     context,
     attrs,
-    defStyleAttr,
-    defStyleRes
+    defStyleAttr
 ), MessageCenterContract.View, DialogDelegate by DialogDelegateImpl() {
 
-    private var theme: UiTheme by Delegates.notNull()
     private val unifiedTheme: UnifiedTheme? by lazy { Dependencies.gliaThemeManager.theme }
 
     var onFinishListener: OnFinishListener? = null
@@ -76,7 +73,6 @@ internal class MessageCenterView(context: Context, attrs: AttributeSet?, defStyl
     init {
         isSaveEnabled = true
         orientation = VERTICAL
-        readTypedArray(attrs, defStyleAttr, defStyleRes)
     }
 
     private fun onKeyboardAnimation(insets: Insets) {
@@ -86,13 +82,6 @@ internal class MessageCenterView(context: Context, attrs: AttributeSet?, defStyl
             smoothScrollTo(0, insets.bottom.coerceAtMost(messageTitleTop))
         }
     }
-
-    @JvmOverloads
-    constructor(
-        context: Context,
-        attrs: AttributeSet? = null,
-        defStyleAttr: Int = R.attr.gliaChatStyle
-    ) : this(context, attrs, defStyleAttr, R.style.Application_Glia_Chat)
 
     override fun setupViewAppearance() {
         // This is done to avoid view appearance when a visitor is not authenticated.
@@ -108,16 +97,6 @@ internal class MessageCenterView(context: Context, attrs: AttributeSet?, defStyl
 
     private fun setupAppBarUnifiedTheme(headerTheme: HeaderTheme?) {
         appBar?.applyHeaderTheme(headerTheme)
-    }
-
-    private fun readTypedArray(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
-        context.withStyledAttributes(attrs, R.styleable.GliaView, defStyleAttr, defStyleRes) {
-            setDefaultTheme(this)
-        }
-    }
-
-    private fun setDefaultTheme(typedArray: TypedArray) {
-        theme = Utils.getThemeFromTypedArray(typedArray, this.context)
     }
 
     private fun initCallbacks() {
@@ -200,12 +179,9 @@ internal class MessageCenterView(context: Context, attrs: AttributeSet?, defStyl
     }
 
     private fun showConfirmationAppBar() {
-        val primaryColorId = theme.brandPrimaryColor ?: R.color.glia_primary_color
-        val baseLightColorId = theme.baseLightColor ?: R.color.glia_light_color
-
         val appBarTheme = DefaultHeader(
-            ColorTheme(getColorCompat(primaryColorId)),
-            ColorTheme(getColorCompat(baseLightColorId)),
+            ColorTheme(context.gliaAttrColor(R.attr.gliaBrandPrimaryColor, R.color.glia_primary_color)),
+            ColorTheme(context.gliaAttrColor(R.attr.gliaBaseLightColor, R.color.glia_light_color)),
             null
         ) merge unifiedTheme?.secureMessagingConfirmationScreenTheme?.headerTheme
 

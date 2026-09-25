@@ -33,6 +33,7 @@ internal interface ChatContract {
         fun onRemoveAttachment(attachment: LocalAttachment)
         fun newMessagesIndicatorClicked()
         fun onRecyclerviewPositionChanged(isBottom: Boolean)
+        fun onLoadOlderHistoryRequested()
         fun sendCustomCardResponse(customCard: CustomCardChatItem, text: String, value: String)
         fun singleChoiceOptionClicked(item: OperatorMessageItem.ResponseCard, selectedOption: SingleChoiceOption)
         fun overlayPermissionsDialogDismissed()

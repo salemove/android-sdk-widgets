@@ -73,6 +73,8 @@
     <string name="settings_authentication_behavior_title">Authentication behavior</string>
     <string name="settings_authentication_behavior_forbidden_during_engagement">Forbidden during engagement</string>
     <string name="settings_authentication_behavior_allowed_during_engagement">Allowed during engagement</string>
+    <string name="settings_clear_session_end_engagement_if_present">Clear session: end engagement if present</string>
+    <string name="settings_clear_session_stop_push_notifications">Clear session: stop push notifications</string>
     <string name="settings_suppress_p_n_permission_dialog_during_auth">Suppress push notifications dialog during authentication \n (needs restart)</string>
 
     <string name="main_open_settings">Open Settings</string>

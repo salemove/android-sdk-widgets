@@ -613,8 +613,15 @@ class MainFragment : Fragment() {
     private fun clearSession() {
         ensureInitialized()
 
-        GliaWidgets.clearVisitorSession()
-        setupAuthButtonsVisibility()
+        val endEngagementIfPresent = sharedPreferences.getBoolean(resources.getString(R.string.pref_clear_session_end_engagement_if_present), true)
+        val stopPushNotifications = sharedPreferences.getBoolean(resources.getString(R.string.pref_clear_session_stop_push_notifications), false)
+
+        try {
+            GliaWidgets.clearVisitorSession(endEngagementIfPresent, stopPushNotifications)
+            setupAuthButtonsVisibility()
+        } catch (exception: GliaWidgetsException) {
+            showToast("Error: $exception")
+        }
     }
 
     // For testing the embedded Entry Widget

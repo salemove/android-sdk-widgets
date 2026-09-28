@@ -34,9 +34,7 @@ internal class LoadOlderHistoryUseCase(
     }
 
     private fun loadOlderHistory(): Single<List<ChatMessage>> = Single.create { emitter ->
-        gliaChatRepository.loadOlderHistory { messages, error ->
-            error?.also { emitter.onError(it) } ?: emitter.onSuccess(messages.orEmpty())
-        }
+        gliaChatRepository.loadOlderHistory(emitter::onSuccess, emitter::onError)
     }
 }
 

@@ -48,31 +48,13 @@ class GliaChatRepositoryTest {
     }
 
     @Test
-    fun `loadOlderHistory forwards Core result to the listener`() {
-        val messages: List<ChatMessage> = listOf(mockk())
-        val callbackSlot = slot<RequestCallback<List<ChatMessage>?>>()
-        every { gliaCore.getOlderChatHistory(capture(callbackSlot)) } answers {
-            callbackSlot.captured.onResult(messages, null)
-        }
-        val listener: GliaChatRepository.HistoryLoadedListener = mockk(relaxed = true)
+    fun `loadOlderHistory delegates to Core with the same callbacks`() {
+        val onSuccess: (List<ChatMessage>) -> Unit = mockk(relaxed = true)
+        val onError: (GliaException) -> Unit = mockk(relaxed = true)
 
-        repository.loadOlderHistory(listener)
+        repository.loadOlderHistory(onSuccess, onError)
 
-        verify { listener.loaded(messages, null) }
-    }
-
-    @Test
-    fun `loadOlderHistory forwards Core error to the listener`() {
-        val error = GliaException("expired", GliaException.Cause.INTERNAL_ERROR)
-        val callbackSlot = slot<RequestCallback<List<ChatMessage>?>>()
-        every { gliaCore.getOlderChatHistory(capture(callbackSlot)) } answers {
-            callbackSlot.captured.onResult(null, error)
-        }
-        val listener: GliaChatRepository.HistoryLoadedListener = mockk(relaxed = true)
-
-        repository.loadOlderHistory(listener)
-
-        verify { listener.loaded(null, error) }
+        verify { gliaCore.getOlderChatHistory(onSuccess, onError) }
     }
 
     @Test

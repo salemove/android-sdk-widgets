@@ -282,12 +282,37 @@ object GliaWidgets {
     }
 
     /**
+     * Clears everything the SDK knows about the current visitor and starts over with a new anonymous one.
+     *
+     * Leaves the queue or ends the ongoing engagement and closes its UI without a survey, de-authenticates
+     * the visitor, unsubscribes them from Secure Conversations push notifications and clears the visitor
+     * session. Steps that need the network are best-effort: without a connection they are only logged, the
+     * visitor is still de-authenticated and cleared locally, and a new anonymous visitor is created once the
+     * network is back. Does nothing if the SDK is not initialized. Has no callback and never throws.
+     */
+    @JvmStatic
+    fun clearVisitorData() {
+        GliaLogger.logMethodUse(GliaWidgets::class, "clearVisitorData")
+        if (!gliaCore().isInitialized) {
+            Logger.w(TAG, "Attempt to clear visitor data before SDK initialization")
+            return
+        }
+        Logger.i(TAG, "Clear visitor data")
+        // Local state goes first and does not depend on the network, so the visitor's data is gone
+        // from Widgets whatever Core manages to do. Core ends the engagement and unsubscribes pushes.
+        destroyControllersAndResetEngagementData()
+        repositoryFactory.secureConversationsRepository.unsubscribeAndResetData()
+        gliaCore().clearVisitorSession(stopPushNotifications = true)
+    }
+
+    /**
      * Clears visitor session
      * @throws GliaWidgetsException with [GliaWidgetsException.Cause]
      */
+    @Deprecated("Use clearVisitorData()", ReplaceWith("GliaWidgets.clearVisitorData()"))
     @JvmStatic
     fun clearVisitorSession() {
-        GliaLogger.logMethodUse(GliaWidgets::class, "clearVisitorSession")
+        GliaLogger.logDeprecatedApiUse(SdkType.WIDGETS_SDK, GliaWidgets::class, "clearVisitorSession")
         Logger.i(TAG, "Clear visitor session")
         try {
             destroyControllersAndResetEngagementData()
@@ -297,7 +322,7 @@ object GliaWidgets {
             //and we don't need secure conversations data for un-authenticated visitors.
             repositoryFactory.secureConversationsRepository.unsubscribeAndResetData()
 
-            gliaCore().clearVisitorSession()
+            gliaCore().clearVisitorSession(stopPushNotifications = false)
         } catch (gliaException: GliaException) {
             throw gliaException.toWidgetsType()
         }

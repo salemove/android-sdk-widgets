@@ -307,7 +307,7 @@ class MainFragment : Fragment() {
         updatePushNotificationPermissionState()
     }
 
-    private fun setupAuthButtonsVisibility() {
+    private fun setupAuthButtonsVisibility(isAuthenticated: Boolean? = authentication?.isAuthenticated) {
         if (activity == null || containerView == null) return
         if (!Glia.isInitialized()) {
             requireActivity().runOnUiThread {
@@ -326,8 +326,8 @@ class MainFragment : Fragment() {
             containerView!!.findViewById<View>(R.id.visitor_code_button).visibility = View.VISIBLE
             containerView!!.findViewById<View>(R.id.visitor_code_switch_container).visibility = View.VISIBLE
         }
-        if (authentication == null) return
-        if (authentication!!.isAuthenticated) {
+        if (isAuthenticated == null) return
+        if (isAuthenticated) {
             requireActivity().runOnUiThread {
                 containerView!!.findViewById<View>(R.id.initGliaWidgetsButton).visibility = View.GONE
                 containerView!!.findViewById<View>(R.id.authenticationButton).visibility = View.GONE
@@ -613,8 +613,10 @@ class MainFragment : Fragment() {
     private fun clearSession() {
         ensureInitialized()
 
-        GliaWidgets.clearVisitorSession()
-        setupAuthButtonsVisibility()
+        GliaWidgets.clearVisitorData()
+        // clearVisitorData always de-authenticates, but Core does it in the background,
+        // so isAuthenticated can still be true right after the call.
+        setupAuthButtonsVisibility(isAuthenticated = false)
     }
 
     // For testing the embedded Entry Widget

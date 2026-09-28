@@ -1,6 +1,7 @@
 package com.glia.widgets
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.glia.androidsdk.GliaException
 import com.glia.widgets.callbacks.OnComplete
 import com.glia.widgets.callbacks.OnError
 import com.glia.widgets.callvisualizer.controller.CallVisualizerController
@@ -11,6 +12,7 @@ import com.glia.widgets.di.GliaCoreImpl
 import com.glia.widgets.di.RepositoryFactory
 import com.glia.widgets.engagement.EngagementRepository
 import com.glia.widgets.internal.queue.QueueRepository
+import com.glia.widgets.internal.secureconversations.SecureConversationsRepository
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
@@ -22,6 +24,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -147,6 +150,76 @@ class GliaWidgetsTest {
 
         whenever(gliaCore.isInitializationInProgress) doReturn true
         Assert.assertTrue(GliaWidgets.isInitializationInProgress())
+    }
+
+    @Test
+    fun `clearVisitorData resets Widgets state, then clears the Core session with pushes stopped`() {
+        val (engagementRepository, secureConversationsRepository) = mockClearVisitorSessionDependencies()
+
+        GliaWidgets.clearVisitorData()
+
+        inOrder(engagementRepository, secureConversationsRepository, gliaCore) {
+            verify(engagementRepository).reset()
+            verify(secureConversationsRepository).unsubscribeAndResetData()
+            verify(gliaCore).clearVisitorSession(true)
+        }
+    }
+
+    @Test
+    fun `clearVisitorData swallows a Core exception after resetting Widgets state`() {
+        val (engagementRepository, secureConversationsRepository) = mockClearVisitorSessionDependencies()
+        whenever(gliaCore.clearVisitorSession(any())) doThrow GliaException("Not set up", GliaException.Cause.INVALID_INPUT)
+
+        GliaWidgets.clearVisitorData()
+
+        verify(engagementRepository).reset()
+        verify(secureConversationsRepository).unsubscribeAndResetData()
+    }
+
+    @Test
+    fun `clearVisitorData never ends the engagement itself`() {
+        val (engagementRepository, _) = mockClearVisitorSessionDependencies()
+
+        GliaWidgets.clearVisitorData()
+
+        // Core ends it as the outgoing visitor; ending it here too would fire an integrator-style end.
+        verify(engagementRepository, never()).endEngagement()
+        verify(engagementRepository, never()).terminateEngagement()
+    }
+
+    @Suppress("DEPRECATION")
+    @Test
+    fun `clearVisitorSession resets Widgets state and clears the Core session keeping pushes`() {
+        val (engagementRepository, secureConversationsRepository) = mockClearVisitorSessionDependencies()
+
+        GliaWidgets.clearVisitorSession()
+
+        inOrder(engagementRepository, secureConversationsRepository, gliaCore) {
+            verify(engagementRepository).reset()
+            verify(secureConversationsRepository).unsubscribeAndResetData()
+            verify(gliaCore).clearVisitorSession(false)
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    @Test
+    fun `clearVisitorSession maps a Core exception`() {
+        mockClearVisitorSessionDependencies()
+        whenever(gliaCore.clearVisitorSession(any())) doThrow GliaException("Not set up", GliaException.Cause.INVALID_INPUT)
+
+        val exception = Assert.assertThrows(GliaWidgetsException::class.java) {
+            GliaWidgets.clearVisitorSession()
+        }
+
+        Assert.assertEquals(GliaWidgetsException.Cause.INVALID_INPUT, exception.gliaCause)
+    }
+
+    private fun mockClearVisitorSessionDependencies(): Pair<EngagementRepository, SecureConversationsRepository> {
+        val engagementRepository = mock<EngagementRepository>()
+        val secureConversationsRepository = mock<SecureConversationsRepository>()
+        whenever(repositoryFactory.engagementRepository) doReturn engagementRepository
+        whenever(repositoryFactory.secureConversationsRepository) doReturn secureConversationsRepository
+        return engagementRepository to secureConversationsRepository
     }
 
     private fun widgetsConfig(): GliaWidgetsConfig = GliaWidgetsConfig.Builder()

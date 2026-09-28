@@ -241,6 +241,15 @@ class GliaCoreImplTest {
         assertFalse(gliaCore.isInitializationInProgress)
     }
 
+    @Test
+    fun `clearVisitorSession passes stopPushNotifications to core`() {
+        every { Glia.clearVisitorSession(any<Boolean>()) } just Runs
+
+        gliaCore.clearVisitorSession(true)
+
+        verify { Glia.clearVisitorSession(true) }
+    }
+
     private fun widgetsConfig(siteApiKey: SiteApiKey = SiteApiKey("SiteApiId", "SiteApiSecret")): GliaWidgetsConfig =
         GliaWidgetsConfig.Builder()
             .setSiteApiKey(siteApiKey)

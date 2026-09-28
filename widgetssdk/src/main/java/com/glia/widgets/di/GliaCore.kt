@@ -66,7 +66,7 @@ internal interface GliaCore {
     fun subscribeToQueueTicketUpdates(ticketId: String, callback: RequestCallback<QueueTicket?>)
 
     fun submitSurveyAnswers(answers: List<Survey.Answer>, surveyId: String, engagementId: String, callback: Consumer<GliaException?>)
-    fun clearVisitorSession()
+    fun clearVisitorSession(stopPushNotifications: Boolean)
     fun getSiteInfo(callback: RequestCallback<SiteInfo?>)
     fun getOperator(operatorId: String, callback: RequestCallback<Operator?>)
     fun getAuthentication(behavior: Authentication.Behavior): Authentication

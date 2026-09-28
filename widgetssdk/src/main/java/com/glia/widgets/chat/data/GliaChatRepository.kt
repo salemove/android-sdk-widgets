@@ -13,16 +13,16 @@ import java.util.function.Consumer
  */
 internal class GliaChatRepository(private val gliaCore: GliaCore) {
 
-    /**
-     * @hide
-     */
-    fun interface HistoryLoadedListener {
-        fun loaded(messages: List<ChatMessage>?, error: Throwable?)
+    fun loadHistory(onSuccess: (List<ChatMessage>) -> Unit, onError: (GliaException) -> Unit) {
+        gliaCore.getChatHistory(onSuccess, onError)
     }
 
-    fun loadHistory(historyLoadedListener: HistoryLoadedListener) {
-        gliaCore.getChatHistory { messages, error -> historyLoadedListener.loaded(messages, error) }
+    /** Next older page of history; Core keeps the cursor, see [hasOlderHistory]. */
+    fun loadOlderHistory(onSuccess: (List<ChatMessage>) -> Unit, onError: (GliaException) -> Unit) {
+        gliaCore.getOlderChatHistory(onSuccess, onError)
     }
+
+    fun hasOlderHistory(): Boolean = gliaCore.hasOlderChatHistory()
 
     fun listenForAllMessages(listener: Consumer<ChatMessage>) {
         gliaCore.on(Glia.Events.CHAT_MESSAGE, listener)

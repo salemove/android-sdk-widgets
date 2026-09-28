@@ -170,9 +170,19 @@ internal class GliaCoreImpl : GliaCore {
         Glia.fetchFile(attachmentFile, callback)
     }
 
-    override fun getChatHistory(callback: RequestCallback<List<ChatMessage>?>) {
-        Glia.getChatHistory { messages, exception -> callback.onResult(messages?.toList(), exception) }
+    override fun getChatHistory(onSuccess: (List<ChatMessage>) -> Unit, onError: (GliaException) -> Unit) {
+        Glia.getChatHistory { messages, exception ->
+            exception?.also(onError) ?: onSuccess(messages?.toList().orEmpty())
+        }
     }
+
+    override fun getOlderChatHistory(onSuccess: (List<ChatMessage>) -> Unit, onError: (GliaException) -> Unit) {
+        Glia.getOlderChatHistory { messages, exception ->
+            exception?.also(onError) ?: onSuccess(messages?.toList().orEmpty())
+        }
+    }
+
+    override fun hasOlderChatHistory(): Boolean = Glia.hasOlderChatHistory()
 
     override fun getQueues(onResult: (Array<Queue>) -> Unit, onError: (GliaException?) -> Unit) {
         Glia.getQueues { queues, gliaException ->

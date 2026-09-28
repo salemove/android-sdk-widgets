@@ -6,6 +6,8 @@ import com.glia.androidsdk.AuthorizationMethod
 import com.glia.androidsdk.CoreConfiguration
 import com.glia.androidsdk.Glia
 import com.glia.androidsdk.GliaException
+import com.glia.androidsdk.RequestCallback
+import com.glia.androidsdk.chat.ChatMessage
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.telemetry_lib.LogEvents
 import com.glia.widgets.GliaWidgetsConfig
@@ -16,6 +18,7 @@ import com.glia.widgets.helper.toCoreType
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
+import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.slot
 import io.mockk.unmockkStatic
@@ -224,6 +227,36 @@ class GliaCoreImplTest {
     }
 
     @Test
+    fun `getChatHistory forwards the Core transcript to onSuccess only`() {
+        val messages: List<ChatMessage> = listOf(mockk(), mockk())
+        every { Glia.getChatHistory(any()) } answers {
+            firstArg<RequestCallback<Array<ChatMessage>>>().onResult(messages.toTypedArray(), null)
+        }
+        val onSuccess: (List<ChatMessage>) -> Unit = mockk(relaxed = true)
+        val onError: (GliaException) -> Unit = mockk(relaxed = true)
+
+        gliaCore.getChatHistory(onSuccess, onError)
+
+        verify(exactly = 1) { onSuccess(messages) }
+        verify(exactly = 0) { onError(any()) }
+    }
+
+    @Test
+    fun `getChatHistory forwards the Core error to onError only`() {
+        val exception = GliaException("forbidden", GliaException.Cause.FORBIDDEN)
+        every { Glia.getChatHistory(any()) } answers {
+            firstArg<RequestCallback<Array<ChatMessage>>>().onResult(null, exception)
+        }
+        val onSuccess: (List<ChatMessage>) -> Unit = mockk(relaxed = true)
+        val onError: (GliaException) -> Unit = mockk(relaxed = true)
+
+        gliaCore.getChatHistory(onSuccess, onError)
+
+        verify(exactly = 1) { onError(exception) }
+        verify(exactly = 0) { onSuccess(any()) }
+    }
+
+    @Test
     fun `isInitialized delegates to core`() {
         every { Glia.isInitialized() } returns true
         assertTrue(gliaCore.isInitialized)
@@ -239,6 +272,43 @@ class GliaCoreImplTest {
 
         every { Glia.isInitInProgress() } returns false
         assertFalse(gliaCore.isInitializationInProgress)
+    }
+
+    @Test
+    fun `getOlderChatHistory maps Core array to a list`() {
+        val message: ChatMessage = mockk()
+        every { Glia.getOlderChatHistory(any()) } answers {
+            firstArg<RequestCallback<Array<ChatMessage>>>().onResult(arrayOf(message), null)
+        }
+        val onSuccess: (List<ChatMessage>) -> Unit = mockk(relaxed = true)
+        val onError: (GliaException) -> Unit = mockk(relaxed = true)
+
+        gliaCore.getOlderChatHistory(onSuccess, onError)
+
+        verify(exactly = 1) { onSuccess(listOf(message)) }
+        verify(exactly = 0) { onError(any()) }
+    }
+
+    @Test
+    fun `getOlderChatHistory passes Core error through`() {
+        val error = GliaException("expired", GliaException.Cause.INTERNAL_ERROR)
+        every { Glia.getOlderChatHistory(any()) } answers {
+            firstArg<RequestCallback<Array<ChatMessage>>>().onResult(null, error)
+        }
+        val onSuccess: (List<ChatMessage>) -> Unit = mockk(relaxed = true)
+        val onError: (GliaException) -> Unit = mockk(relaxed = true)
+
+        gliaCore.getOlderChatHistory(onSuccess, onError)
+
+        verify(exactly = 1) { onError(error) }
+        verify(exactly = 0) { onSuccess(any()) }
+    }
+
+    @Test
+    fun `hasOlderChatHistory delegates to Core`() {
+        every { Glia.hasOlderChatHistory() } returns true
+
+        assertTrue(gliaCore.hasOlderChatHistory())
     }
 
     private fun widgetsConfig(siteApiKey: SiteApiKey = SiteApiKey("SiteApiId", "SiteApiSecret")): GliaWidgetsConfig =

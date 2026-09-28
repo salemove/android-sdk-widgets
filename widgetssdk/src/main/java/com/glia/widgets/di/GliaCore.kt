@@ -49,7 +49,9 @@ internal interface GliaCore {
     fun <T> off(event: OmnicoreEvent<T>, listener: Consumer<T>)
     fun <T> off(event: OmnicoreEvent<T>)
     fun fetchFile(attachmentFile: AttachmentFile, callback: RequestCallback<InputStream?>)
-    fun getChatHistory(callback: RequestCallback<List<ChatMessage>?>)
+    fun getChatHistory(onSuccess: (List<ChatMessage>) -> Unit, onError: (GliaException) -> Unit)
+    fun getOlderChatHistory(onSuccess: (List<ChatMessage>) -> Unit, onError: (GliaException) -> Unit)
+    fun hasOlderChatHistory(): Boolean
     fun getQueues(onResult: (Array<Queue>) -> Unit, onError: (GliaException?) -> Unit)
 
     fun queueForEngagement(

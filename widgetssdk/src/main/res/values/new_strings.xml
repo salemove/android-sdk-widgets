@@ -95,6 +95,7 @@
     <string name="chat_message_failed_to_deliver_retry">Failed to deliver. Tap to retry.</string>
     <string name="chat_unread_message_divider">@string/glia_chat_new_messages</string>
     <string name="chat_attach_files">@string/glia_chat_add_attachment_description</string>
+    <string name="chat_older_messages_loaded">@string/glia_chat_older_messages_loaded</string>
     <string name="android_chat_visitor_file_accessibility">@string/glia_chat_visitor_file_content_description</string>
     <string name="android_chat_visitor_file_delivered_accessibility">@string/glia_chat_visitor_file_delivered_content_description</string>
     <string name="android_chat_visitor_file_not_delivered_accessibility">Your attached file %1$s, size %2$s. \n Failed to deliver.</string>

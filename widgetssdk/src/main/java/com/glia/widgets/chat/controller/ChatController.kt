@@ -792,6 +792,23 @@ internal class ChatController(
         }
     }
 
+    override fun onLoadOlderHistoryRequested() {
+        if (chatState.isLoadingOlderHistory || !chatState.canLoadOlderHistory) return
+        Logger.d(TAG, "onLoadOlderHistoryRequested")
+        emitViewState { chatState.loadingOlderHistory() }
+        chatManager.loadOlderHistory()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { hasMore -> emitViewState { chatState.olderHistoryAvailabilityChanged(hasMore) } },
+                { error ->
+                    Logger.w(TAG, "Older chat history load failed", mapOf("details" to error.javaClass.simpleName))
+                    // Core keeps the cursor on failure, so the next pull retries the same page.
+                    emitViewState { chatState.olderHistoryAvailabilityChanged(canLoadOlderHistory = true) }
+                }
+            )
+            .also(disposable::add)
+    }
+
     override fun newMessagesIndicatorClicked() {
         GliaLogger.i(LogEvents.CHAT_SCREEN_BUTTON_CLICKED) {
             put(EventAttribute.ButtonName, ButtonNames.NEW_MESSAGES_INDICATOR)
@@ -843,6 +860,12 @@ internal class ChatController(
             isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement -> emitViewState { chatState.engagementStarted() }
             else -> emitViewState { chatState.liveChatHistoryLoaded() }
         }
+
+        // Only a WCC fetch by an authenticated visitor leaves an older page behind, so this stays
+        // false for legacy engagements and unauthenticated visitors. reloadHistoryIfNeeded() is not
+        // re-evaluated here: it only runs when the first load was skipped, i.e. for an
+        // unauthenticated visitor, who can never page.
+        emitViewState { chatState.olderHistoryAvailabilityChanged(chatManager.hasOlderHistory()) }
 
         prepareChatComponents()
     }

@@ -15,7 +15,9 @@ import com.glia.widgets.chat.domain.AppendNewChatMessageUseCase
 import com.glia.widgets.chat.domain.GliaLoadHistoryUseCase
 import com.glia.widgets.chat.domain.GliaOnMessageUseCase
 import com.glia.widgets.chat.domain.HandleCustomCardClickUseCase
+import com.glia.widgets.chat.domain.HasOlderHistoryUseCase
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
+import com.glia.widgets.chat.domain.LoadOlderHistoryUseCase
 import com.glia.widgets.chat.domain.SendUnsentMessagesUseCase
 import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.CustomCardChatItem
@@ -42,6 +44,7 @@ import com.glia.widgets.internal.secureconversations.domain.ShouldMarkMessagesRe
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.processors.BehaviorProcessor
@@ -51,6 +54,8 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 internal class ChatManager(
     private val onMessageUseCase: GliaOnMessageUseCase,
     private val loadHistoryUseCase: GliaLoadHistoryUseCase,
+    private val loadOlderHistoryUseCase: LoadOlderHistoryUseCase,
+    private val hasOlderHistoryUseCase: HasOlderHistoryUseCase,
     private val addNewMessagesDividerUseCase: AddNewMessagesDividerUseCase,
     private val shouldMarkMessagesReadUseCase: ShouldMarkMessagesReadUseCase,
     private val markMessagesReadWithDelayUseCase: MarkMessagesReadWithDelayUseCase,
@@ -487,6 +492,39 @@ internal class ChatManager(
             .subscribe(state::onNext, { Logger.e(TAG, "Chat reload failed", it) }, { Logger.i(TAG, "Chat history is already loaded") })
 
         compositeDisposable.add(loadHistory)
+    }
+
+    /** Whether Core still has an older page of history after the most recent load. */
+    fun hasOlderHistory(): Boolean = hasOlderHistoryUseCase()
+
+    /**
+     * Loads the next older page, prepends it to the current chat items and emits the new state.
+     * Completes with whether a further older page remains. Errors propagate to the caller and
+     * leave the state untouched.
+     */
+    fun loadOlderHistory(): Single<Boolean> = loadOlderHistoryUseCase()
+        .zipWith(state.firstOrError(), ::prependChatHistory)
+        .doOnSuccess(state::onNext)
+        .map { hasOlderHistoryUseCase() }
+
+    @VisibleForTesting
+    fun prependChatHistory(olderMessages: List<ChatMessageInternal>, state: State): State {
+        if (olderMessages.isEmpty()) return state
+        val chatItems: MutableList<ChatItem> = mutableListOf()
+
+        // Newest to oldest like mapChatHistory, so operator chat-head grouping continues from the
+        // oldest item already shown. An older page is never "latest", so response cards stay inert.
+        for (index in olderMessages.indices.reversed()) {
+            val rawMessage = olderMessages[index]
+            if (state.isNew(rawMessage.chatMessage.id)) {
+                appendHistoryChatMessageUseCase(chatItems, rawMessage, false)
+            }
+        }
+
+        chatItems.reverse()
+        state.chatItems.addAll(0, chatItems)
+
+        return state
     }
 
     internal data class State(

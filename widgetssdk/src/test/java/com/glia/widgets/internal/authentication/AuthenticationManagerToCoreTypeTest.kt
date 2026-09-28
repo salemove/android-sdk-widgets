@@ -1,14 +1,16 @@
 package com.glia.widgets.internal.authentication
 
-import com.glia.androidsdk.RequestCallback
+import com.glia.androidsdk.GliaException
 import com.glia.widgets.authentication.Authentication
 import junit.framework.TestCase.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -31,24 +33,22 @@ class AuthenticationManagerToCoreTypeTest {
 
         val jwtToken = "validToken"
         val externalAccessToken = "externalToken"
-        val callback = mock<RequestCallback<Void>>()
 
-        coreAuthentication.authenticate(jwtToken, externalAccessToken, callback)
+        coreAuthentication.authenticate(jwtToken, externalAccessToken, {}, {})
 
         verify(widgetAuthentication).authenticate(eq(jwtToken), eq(externalAccessToken), any(), any())
     }
 
     @Test
-    fun toCoreType_authenticateWithoutCallback_callsAuthenticateOnWidgetAuthentication() {
+    fun toCoreType_authenticateWithBlankJwtToken_reportsInvalidInputWithoutCallingWidgetAuthentication() {
         val widgetAuthentication = mock<AuthenticationManager>()
         val coreAuthentication = widgetAuthentication.toCoreType()
+        var failure: GliaException? = null
 
-        val jwtToken = "validToken"
-        val externalAccessToken = "externalToken"
+        coreAuthentication.authenticate(" ", null, {}, { failure = it })
 
-        coreAuthentication.authenticate(jwtToken, externalAccessToken, null)
-
-        verify(widgetAuthentication).authenticate(eq(jwtToken), eq(externalAccessToken), any(), any())
+        assertEquals(GliaException.Cause.INVALID_INPUT, failure?.cause)
+        verify(widgetAuthentication, never()).authenticate(any(), anyOrNull(), any(), any())
     }
 
     @Test
@@ -56,21 +56,19 @@ class AuthenticationManagerToCoreTypeTest {
         val widgetAuthentication = mock<AuthenticationManager>()
         val coreAuthentication = widgetAuthentication.toCoreType()
 
-        val callback = mock<RequestCallback<Void>>()
-
-        coreAuthentication.deauthenticate(callback)
+        coreAuthentication.deauthenticate({}, {})
 
         verify(widgetAuthentication).deauthenticate(any(), any())
     }
 
     @Test
-    fun toCoreType_deauthenticateWithoutCallback_callsDeauthenticateOnWidgetAuthentication() {
+    fun toCoreType_deauthenticateWithStopPushNotifications_callsDeauthenticateOnWidgetAuthentication() {
         val widgetAuthentication = mock<AuthenticationManager>()
         val coreAuthentication = widgetAuthentication.toCoreType()
 
-        coreAuthentication.deauthenticate(null)
+        coreAuthentication.deauthenticate(true, {}, {})
 
-        verify(widgetAuthentication).deauthenticate(any(), any())
+        verify(widgetAuthentication).deauthenticate(eq(true), any(), any())
     }
 
     @Test
@@ -90,24 +88,22 @@ class AuthenticationManagerToCoreTypeTest {
 
         val jwtToken = "validToken"
         val externalAccessToken = "externalToken"
-        val callback = mock<RequestCallback<Void>>()
 
-        coreAuthentication.refresh(jwtToken, externalAccessToken, callback)
+        coreAuthentication.refresh(jwtToken, externalAccessToken, {}, {})
 
         verify(widgetAuthentication).refresh(eq(jwtToken), eq(externalAccessToken), any(), any())
     }
 
     @Test
-    fun toCoreType_refreshWithoutCallback_callsRefreshOnWidgetAuthentication() {
+    fun toCoreType_refreshWithBlankJwtToken_reportsInvalidInputWithoutCallingWidgetAuthentication() {
         val widgetAuthentication = mock<AuthenticationManager>()
         val coreAuthentication = widgetAuthentication.toCoreType()
+        var failure: GliaException? = null
 
-        val jwtToken = "validToken"
-        val externalAccessToken = "externalToken"
+        coreAuthentication.refresh("", null, {}, { failure = it })
 
-        coreAuthentication.refresh(jwtToken, externalAccessToken) { _, _ ->  }
-
-        verify(widgetAuthentication).refresh(eq(jwtToken), eq(externalAccessToken), any(), any())
+        assertEquals(GliaException.Cause.INVALID_INPUT, failure?.cause)
+        verify(widgetAuthentication, never()).refresh(any(), anyOrNull(), any(), any())
     }
 
     @Test

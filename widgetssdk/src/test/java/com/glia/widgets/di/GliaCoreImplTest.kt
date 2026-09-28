@@ -180,7 +180,9 @@ class GliaCoreImplTest {
     @Test
     fun `getChatHistory forwards the Core transcript to onSuccess only`() {
         val messages: List<ChatMessage> = listOf(mockk(), mockk())
-        every { Glia.getChatHistory(any(), any()) } answers { firstArg<Consumer<List<ChatMessage>>>().accept(messages) }
+        every { Glia.getChatHistory(any()) } answers {
+            firstArg<RequestCallback<Array<ChatMessage>>>().onResult(messages.toTypedArray(), null)
+        }
         val onSuccess: (List<ChatMessage>) -> Unit = mockk(relaxed = true)
         val onError: (GliaException) -> Unit = mockk(relaxed = true)
 
@@ -193,7 +195,9 @@ class GliaCoreImplTest {
     @Test
     fun `getChatHistory forwards the Core error to onError only`() {
         val exception = GliaException("forbidden", GliaException.Cause.FORBIDDEN)
-        every { Glia.getChatHistory(any(), any()) } answers { secondArg<Consumer<GliaException>>().accept(exception) }
+        every { Glia.getChatHistory(any()) } answers {
+            firstArg<RequestCallback<Array<ChatMessage>>>().onResult(null, exception)
+        }
         val onSuccess: (List<ChatMessage>) -> Unit = mockk(relaxed = true)
         val onError: (GliaException) -> Unit = mockk(relaxed = true)
 
@@ -227,11 +231,13 @@ class GliaCoreImplTest {
         every { Glia.getOlderChatHistory(any()) } answers {
             firstArg<RequestCallback<Array<ChatMessage>>>().onResult(arrayOf(message), null)
         }
-        var result: List<ChatMessage>? = null
+        val onSuccess: (List<ChatMessage>) -> Unit = mockk(relaxed = true)
+        val onError: (GliaException) -> Unit = mockk(relaxed = true)
 
-        gliaCore.getOlderChatHistory { messages, _ -> result = messages }
+        gliaCore.getOlderChatHistory(onSuccess, onError)
 
-        assertEquals(listOf(message), result)
+        verify(exactly = 1) { onSuccess(listOf(message)) }
+        verify(exactly = 0) { onError(any()) }
     }
 
     @Test
@@ -240,11 +246,13 @@ class GliaCoreImplTest {
         every { Glia.getOlderChatHistory(any()) } answers {
             firstArg<RequestCallback<Array<ChatMessage>>>().onResult(null, error)
         }
-        var received: GliaException? = null
+        val onSuccess: (List<ChatMessage>) -> Unit = mockk(relaxed = true)
+        val onError: (GliaException) -> Unit = mockk(relaxed = true)
 
-        gliaCore.getOlderChatHistory { _, exception -> received = exception }
+        gliaCore.getOlderChatHistory(onSuccess, onError)
 
-        assertEquals(error, received)
+        verify(exactly = 1) { onError(error) }
+        verify(exactly = 0) { onSuccess(any()) }
     }
 
     @Test

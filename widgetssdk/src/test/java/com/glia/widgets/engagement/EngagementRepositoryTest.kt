@@ -1291,6 +1291,15 @@ class EngagementRepositoryTest {
     }
 
     @Test
+    fun `reset clears a live engagement locally without ending it`() {
+        mockEngagementAndStart()
+        repository.reset()
+        verifyEngagementEnd(endAction = EndAction.ClearStateRegular)
+        // Core ends it as the outgoing visitor when the visitor session is cleared
+        verify(exactly = 0) { engagement.end(any()) }
+    }
+
+    @Test
     fun `reset should call endEngagement when engagement is  ongoing`() {
         mockEngagementAndStart(callVisualizer = true)
         repository.reset()

@@ -71,9 +71,13 @@ class LoadOlderHistoryUseCaseTest {
         assertFalse(hasOlderHistoryUseCase())
     }
 
-    private fun stubRepository(messages: List<ChatMessage>?, error: Throwable?) {
-        whenever(repository.loadOlderHistory(any())) doAnswer {
-            it.getArgument<GliaChatRepository.HistoryLoadedListener>(0).loaded(messages, error)
+    private fun stubRepository(messages: List<ChatMessage>?, error: GliaException?) {
+        whenever(repository.loadOlderHistory(any(), any())) doAnswer {
+            if (error != null) {
+                it.getArgument<(GliaException) -> Unit>(1)(error)
+            } else {
+                it.getArgument<(List<ChatMessage>) -> Unit>(0)(messages.orEmpty())
+            }
         }
     }
 

@@ -50,6 +50,8 @@ import com.glia.widgets.chat.domain.TakePictureUseCaseImpl;
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase;
 import com.glia.widgets.chat.domain.UriToFileAttachmentUseCase;
 import com.glia.widgets.chat.domain.UriToFileAttachmentUseCaseImpl;
+import com.glia.widgets.internal.fileupload.domain.GetShareableLocalAttachmentUriUseCase;
+import com.glia.widgets.internal.fileupload.domain.GetShareableLocalAttachmentUriUseCaseImpl;
 import com.glia.widgets.chat.domain.gva.DetermineGvaButtonTypeUseCase;
 import com.glia.widgets.chat.domain.gva.DetermineGvaUrlTypeUseCase;
 import com.glia.widgets.chat.domain.gva.GetGvaTypeUseCase;
@@ -938,6 +940,11 @@ public class UseCaseFactory {
     @NonNull
     public FixCapturedPictureRotationUseCase getFixCapturedPictureRotationUseCase() {
         return new FixCapturedPictureRotationUseCaseImpl(applicationContext);
+    }
+
+    @NonNull
+    public GetShareableLocalAttachmentUriUseCase getShareableLocalAttachmentUriUseCase() {
+        return new GetShareableLocalAttachmentUriUseCaseImpl(applicationContext, getFileProviderUseCase());
     }
 
     @NonNull

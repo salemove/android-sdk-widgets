@@ -12,7 +12,8 @@ internal data class State(
     val imageName: String = "",
     val imageId: String = "",
     val loadedImage: Bitmap? = null,
-    val localImageUri: Uri? = null
+    val localImageUri: Uri? = null,
+    val localImageMimeType: String? = null
 ) {
     enum class ImageLoadingState {
         INITIAL,
@@ -32,11 +33,12 @@ internal data class State(
         imageIdName = toFileName(id, name)
     )
 
-    fun withLocalImage(uri: Uri): State = copy(
+    fun withLocalImage(uri: Uri, mimeType: String?): State = copy(
         imageLoadingState = ImageLoadingState.LOCAL,
         isShowShareButton = true,
         isShowDownloadButton = false,
-        localImageUri = uri
+        localImageUri = uri,
+        localImageMimeType = mimeType
     )
 
     @JvmOverloads

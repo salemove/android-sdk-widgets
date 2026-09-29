@@ -11,7 +11,7 @@ internal interface ImagePreviewContract {
         fun onImageRequested()
         fun onImageDataReceived(bitmapId: String, bitmapName: String)
         fun setView(view: View)
-        fun onLocalImageReceived(uri: Uri)
+        fun onLocalImageReceived(uri: Uri, mimeType: String?)
     }
 
     interface View : BaseView<Controller> {
@@ -20,6 +20,7 @@ internal interface ImagePreviewContract {
         fun showOnImageSaveSuccess()
         fun showOnImageSaveFailed()
         fun showOnImageLoadingFailed()
-        fun shareImageFile(uri: Uri)
+        fun shareImageFile(uri: Uri, mimeType: String?)
+        fun showOnImageShareFailed()
     }
 }

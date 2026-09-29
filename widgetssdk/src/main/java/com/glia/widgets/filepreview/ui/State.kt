@@ -1,7 +1,6 @@
 package com.glia.widgets.filepreview.ui
 
 import android.graphics.Bitmap
-import android.net.Uri
 import com.glia.widgets.helper.toFileName
 
 internal data class State(
@@ -12,8 +11,7 @@ internal data class State(
     val imageName: String = "",
     val imageId: String = "",
     val loadedImage: Bitmap? = null,
-    val localImageUri: Uri? = null,
-    val localImageMimeType: String? = null
+    val localImage: LocalImagePreview? = null
 ) {
     enum class ImageLoadingState {
         INITIAL,
@@ -33,12 +31,11 @@ internal data class State(
         imageIdName = toFileName(id, name)
     )
 
-    fun withLocalImage(uri: Uri, mimeType: String?): State = copy(
+    fun withLocalImage(image: LocalImagePreview): State = copy(
         imageLoadingState = ImageLoadingState.LOCAL,
         isShowShareButton = true,
         isShowDownloadButton = false,
-        localImageUri = uri,
-        localImageMimeType = mimeType
+        localImage = image
     )
 
     @JvmOverloads

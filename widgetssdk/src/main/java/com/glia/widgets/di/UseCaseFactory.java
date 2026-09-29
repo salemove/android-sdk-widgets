@@ -837,7 +837,8 @@ public class UseCaseFactory {
             createCallNotificationUseCase(),
             repositoryFactory.getGliaFileAttachmentRepository(),
             createUpdateFromCallScreenUseCase(),
-            dialogController
+            dialogController,
+            getShareableLocalAttachmentUriUseCase()
         );
     }
 

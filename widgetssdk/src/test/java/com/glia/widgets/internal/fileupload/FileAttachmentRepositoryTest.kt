@@ -39,10 +39,10 @@ class LocalAttachmentRepositoryTest {
     private val gliaException = GliaException("", GliaException.Cause.INTERNAL_ERROR)
 
     private val fileAttachment1: LocalAttachment
-        get() = LocalAttachment(uri1, "image/jpeg", "attachment_1", 123)
+        get() = LocalAttachment(uri1, "image/jpeg", "attachment_1", 123, LocalAttachment.Source.MEDIA_PICKER)
 
     private val fileAttachment2: LocalAttachment
-        get() = LocalAttachment(uri2, "application/pdf", "attachment_2", 321)
+        get() = LocalAttachment(uri2, "application/pdf", "attachment_2", 321, LocalAttachment.Source.FILE_BROWSER)
 
     @Before
     fun setUp() {

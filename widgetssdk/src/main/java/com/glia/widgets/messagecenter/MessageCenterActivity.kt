@@ -15,6 +15,7 @@ import com.glia.widgets.chat.Intention
 import com.glia.widgets.databinding.MessageCenterActivityBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.internal.fileupload.PickVisualMediaMultipleMimeTypes
+import com.glia.widgets.internal.fileupload.model.LocalAttachment
 
 /**
  * This activity is used for displaying the welcome screen for secure messaging.
@@ -40,11 +41,11 @@ internal class MessageCenterActivity : GliaActivity<MessageCenterView>, FadeTran
 
     val pickContentMimeTypes = PickVisualMediaMultipleMimeTypes()
     private val getMediaContent = registerForActivityResult(pickContentMimeTypes) { uri: Uri? ->
-        uri?.also(controller::onContentChosen)
+        uri?.also { controller.onContentChosen(it, LocalAttachment.Source.MEDIA_PICKER) }
     }
 
     private val getContent = registerForActivityResult(OpenDocument()) { uri: Uri? ->
-        uri?.also(controller::onContentChosen)
+        uri?.also { controller.onContentChosen(it, LocalAttachment.Source.FILE_BROWSER) }
     }
 
     private val getImage = registerForActivityResult(TakePicture()) { captured ->

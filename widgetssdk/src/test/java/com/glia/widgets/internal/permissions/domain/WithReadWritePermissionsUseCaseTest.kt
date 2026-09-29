@@ -9,6 +9,7 @@ import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -20,25 +21,25 @@ import org.robolectric.util.ReflectionHelpers
 class WithReadWritePermissionsUseCaseTest {
     private lateinit var permissionManager: PermissionManager
     private lateinit var useCase: WithReadWritePermissionsUseCase
-    private lateinit var callback: () -> Unit
+    private var callbackInvocations: Int = 0
+    private val callback: () -> Unit = { callbackInvocations++ }
 
     @Before
     fun setUp() {
         permissionManager = mockk(relaxUnitFun = true)
-        callback = mockk(relaxed = true)
         useCase = WithReadWritePermissionsUseCaseImpl(permissionManager)
     }
 
     @After
     fun tearDown() {
-        confirmVerified(permissionManager, callback)
+        confirmVerified(permissionManager)
     }
 
     @Test
     fun `invoke invokes callback when API version is higher than 29`() {
         ReflectionHelpers.setStaticField(Build.VERSION::class.java, "SDK_INT", 34)
         useCase(callback)
-        verify { callback.invoke() }
+        assertEquals(1, callbackInvocations)
 
         verify(exactly = 0) { permissionManager.handlePermissions(any(), any()) }
     }
@@ -47,7 +48,7 @@ class WithReadWritePermissionsUseCaseTest {
     fun `invoke invokes callback when API version is 29`() {
         ReflectionHelpers.setStaticField(Build.VERSION::class.java, "SDK_INT", 29)
         useCase(callback)
-        verify { callback.invoke() }
+        assertEquals(1, callbackInvocations)
 
         verify(exactly = 0) { permissionManager.handlePermissions(any(), any()) }
     }
@@ -56,7 +57,7 @@ class WithReadWritePermissionsUseCaseTest {
     fun `invoke invokes callback when read and write permission is granted API version less then 29`() {
         ReflectionHelpers.setStaticField(Build.VERSION::class.java, "SDK_INT", 28)
         useCase(callback)
-        verify(exactly = 0) { callback.invoke() }
+        assertEquals(0, callbackInvocations)
         val permissionsGrantedCallbackSlot = slot<PermissionsGrantedCallback>()
 
         verify {
@@ -70,14 +71,14 @@ class WithReadWritePermissionsUseCaseTest {
             )
         }
         permissionsGrantedCallbackSlot.captured.invoke(true)
-        verify { callback.invoke() }
+        assertEquals(1, callbackInvocations)
     }
 
     @Test
     fun `invoke does nothing when read and write permission is not granted API version less then 29`() {
         ReflectionHelpers.setStaticField(Build.VERSION::class.java, "SDK_INT", 28)
         useCase(callback)
-        verify(exactly = 0) { callback.invoke() }
+        assertEquals(0, callbackInvocations)
         val permissionsGrantedCallbackSlot = slot<PermissionsGrantedCallback>()
 
         verify {
@@ -91,6 +92,6 @@ class WithReadWritePermissionsUseCaseTest {
             )
         }
         permissionsGrantedCallbackSlot.captured.invoke(false)
-        verify(exactly = 0) { callback.invoke() }
+        assertEquals(0, callbackInvocations)
     }
 }

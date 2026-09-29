@@ -65,6 +65,8 @@ import com.glia.widgets.webbrowser.domain.GetUrlFromLinkUseCase
 import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.subjects.SingleSubject
 import io.reactivex.rxjava3.processors.BehaviorProcessor
 import io.reactivex.rxjava3.schedulers.Schedulers
 import junit.framework.TestCase.assertEquals
@@ -73,8 +75,11 @@ import junit.framework.TestCase.assertTrue
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import com.glia.widgets.internal.fileupload.domain.GetShareableLocalAttachmentUriUseCase
+import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import org.mockito.Mockito
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.doAnswer
@@ -123,6 +128,7 @@ class ChatControllerTest {
     private lateinit var decideOnQueueingUseCase: DecideOnQueueingUseCase
     private lateinit var takePictureUseCase: TakePictureUseCase
     private lateinit var uriToFileAttachmentUseCase: UriToFileAttachmentUseCase
+    private lateinit var getShareableLocalAttachmentUriUseCase: GetShareableLocalAttachmentUriUseCase
     private lateinit var withCameraPermissionUseCase: WithCameraPermissionUseCase
     private lateinit var withReadWritePermissionsUseCase: WithReadWritePermissionsUseCase
     private lateinit var requestNotificationPermissionIfPushNotificationsSetUpUseCase: RequestNotificationPermissionIfPushNotificationsSetUpUseCase
@@ -200,6 +206,7 @@ class ChatControllerTest {
 
         takePictureUseCase = mock()
         uriToFileAttachmentUseCase = mock()
+        getShareableLocalAttachmentUriUseCase = mock()
         withCameraPermissionUseCase = mock()
         withReadWritePermissionsUseCase = mock()
         requestNotificationPermissionIfPushNotificationsSetUpUseCase = mock()
@@ -254,6 +261,7 @@ class ChatControllerTest {
             decideOnQueueingUseCase = decideOnQueueingUseCase,
             takePictureUseCase = takePictureUseCase,
             uriToFileAttachmentUseCase = uriToFileAttachmentUseCase,
+            getShareableLocalAttachmentUriUseCase = getShareableLocalAttachmentUriUseCase,
             withCameraPermissionUseCase = withCameraPermissionUseCase,
             withReadWritePermissionsUseCase = withReadWritePermissionsUseCase,
             requestNotificationPermissionIfPushNotificationsSetUpUseCase = requestNotificationPermissionIfPushNotificationsSetUpUseCase,
@@ -797,5 +805,58 @@ class ChatControllerTest {
 
         networkStateProcessor.onNext(NetworkState.DISCONNECTED)
         verify(chatView, times(1)).showConnectionSnackBar()
+    }
+
+    @Test
+    fun `onLocalFileOpenClick opens shareable uri with attachment mime type`() {
+        val attachment = LocalAttachment(mock(), "video/mp4", "video.mp4", 10, LocalAttachment.Source.MEDIA_PICKER)
+        val shareableUri: Uri = mock()
+        whenever(getShareableLocalAttachmentUriUseCase(attachment)) doReturn Single.just(shareableUri)
+
+        chatController.onLocalFileOpenClick(attachment)
+
+        verify(chatView).openLocalFile(shareableUri, "video/mp4")
+        verify(chatView, never()).fileViewFailed()
+    }
+
+    @Test
+    fun `onLocalFileOpenClick shows file view error when preparing the file fails`() {
+        val attachment = LocalAttachment(mock(), "video/mp4", "video.mp4", 10, LocalAttachment.Source.MEDIA_PICKER)
+        whenever(getShareableLocalAttachmentUriUseCase(attachment)) doReturn Single.error(RuntimeException("copy failed"))
+
+        chatController.onLocalFileOpenClick(attachment)
+
+        verify(chatView).fileViewFailed()
+        verify(chatView, never()).openLocalFile(any(), anyOrNull())
+    }
+
+    @Test
+    fun `onLocalFileOpenClick ignores taps while the file is still being prepared`() {
+        val attachment = LocalAttachment(mock(), "video/mp4", "video.mp4", 10, LocalAttachment.Source.MEDIA_PICKER)
+        val pending = SingleSubject.create<Uri>()
+        whenever(getShareableLocalAttachmentUriUseCase(attachment)) doReturn pending
+
+        chatController.onLocalFileOpenClick(attachment)
+        chatController.onLocalFileOpenClick(attachment)
+        verify(getShareableLocalAttachmentUriUseCase, times(1)).invoke(attachment)
+
+        val shareableUri: Uri = mock()
+        pending.onSuccess(shareableUri)
+        verify(chatView, times(1)).openLocalFile(shareableUri, "video/mp4")
+
+        whenever(getShareableLocalAttachmentUriUseCase(attachment)) doReturn Single.just(shareableUri)
+        chatController.onLocalFileOpenClick(attachment)
+        verify(chatView, times(2)).openLocalFile(shareableUri, "video/mp4")
+    }
+
+    @Test
+    fun `onContentChosen passes the picker source to the attachment use case`() {
+        val uri: Uri = mock()
+
+        chatController.onContentChosen(uri, LocalAttachment.Source.MEDIA_PICKER)
+        chatController.onContentChosen(uri, LocalAttachment.Source.FILE_BROWSER)
+
+        verify(uriToFileAttachmentUseCase).invoke(uri, LocalAttachment.Source.MEDIA_PICKER)
+        verify(uriToFileAttachmentUseCase).invoke(uri, LocalAttachment.Source.FILE_BROWSER)
     }
 }

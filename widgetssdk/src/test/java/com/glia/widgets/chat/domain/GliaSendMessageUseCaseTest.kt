@@ -245,6 +245,7 @@ class GliaSendMessageUseCaseTest {
             mimeType = "image/png",
             displayName = "display-name",
             size = 10L,
+            source = LocalAttachment.Source.MEDIA_PICKER,
             attachmentStatus = LocalAttachment.Status.READY_TO_SEND,
             engagementFile = engagementFile
         )

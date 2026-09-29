@@ -14,7 +14,9 @@ import com.glia.widgets.engagement.EngagementRepository
 import com.glia.widgets.helper.Data
 import com.glia.widgets.helper.formattedName
 import com.glia.widgets.internal.dialog.DialogContract
+import com.glia.widgets.helper.Logger
 import com.glia.widgets.internal.fileupload.FileAttachmentRepository
+import com.glia.widgets.internal.fileupload.domain.GetShareableLocalAttachmentUriUseCase
 import com.glia.widgets.internal.notification.domain.CallNotificationUseCase
 import com.glia.widgets.internal.permissions.PermissionManager
 import com.glia.widgets.internal.secureconversations.SecureConversationsRepository
@@ -30,6 +32,7 @@ import io.mockk.unmockkStatic
 import io.mockk.verify
 import io.mockk.verifyOrder
 import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
+import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.processors.BehaviorProcessor
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -483,12 +486,16 @@ class EngagementDomainTest {
         val fileAttachmentRepository: FileAttachmentRepository = mockk(relaxUnitFun = true)
         val updateFromCallScreenUseCase: UpdateFromCallScreenUseCase = mockk(relaxUnitFun = true)
         val dialogController: DialogContract.Controller = mockk(relaxUnitFun = true)
+        val getShareableLocalAttachmentUriUseCase: GetShareableLocalAttachmentUriUseCase = mockk {
+            every { clearCache() } returns Completable.complete()
+        }
 
         val useCase: ReleaseResourcesUseCase = ReleaseResourcesUseCaseImpl(
             callNotificationUseCase = callNotificationUseCase,
             fileAttachmentRepository = fileAttachmentRepository,
             updateFromCallScreenUseCase = updateFromCallScreenUseCase,
-            dialogController = dialogController
+            dialogController = dialogController,
+            getShareableLocalAttachmentUriUseCase = getShareableLocalAttachmentUriUseCase
         )
 
         useCase()
@@ -496,10 +503,38 @@ class EngagementDomainTest {
         verifyOrder {
             dialogController.dismissDialogs()
             fileAttachmentRepository.detachAllFiles()
+            getShareableLocalAttachmentUriUseCase.clearCache()
             callNotificationUseCase.removeAllNotifications()
             updateFromCallScreenUseCase(false)
             Dependencies.destroyControllers()
         }
+
+        unmockkStatic(Dependencies::class)
+    }
+
+    @Test
+    fun `ReleaseResourcesUseCase invoke releases remaining resources when clearing shared attachment copies fails`() {
+        Logger.setIsDebug(false)
+        mockkStatic(Dependencies::class)
+
+        every { Dependencies.destroyControllers() } just Runs
+        val callNotificationUseCase: CallNotificationUseCase = mockk(relaxUnitFun = true)
+        val getShareableLocalAttachmentUriUseCase: GetShareableLocalAttachmentUriUseCase = mockk {
+            every { clearCache() } returns Completable.error(RuntimeException("io"))
+        }
+
+        val useCase: ReleaseResourcesUseCase = ReleaseResourcesUseCaseImpl(
+            callNotificationUseCase = callNotificationUseCase,
+            fileAttachmentRepository = mockk(relaxUnitFun = true),
+            updateFromCallScreenUseCase = mockk(relaxUnitFun = true),
+            dialogController = mockk(relaxUnitFun = true),
+            getShareableLocalAttachmentUriUseCase = getShareableLocalAttachmentUriUseCase
+        )
+
+        useCase()
+
+        verify { callNotificationUseCase.removeAllNotifications() }
+        verify { Dependencies.destroyControllers() }
 
         unmockkStatic(Dependencies::class)
     }

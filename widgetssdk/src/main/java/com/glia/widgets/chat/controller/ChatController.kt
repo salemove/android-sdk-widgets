@@ -30,6 +30,7 @@ import com.glia.widgets.chat.domain.SetChatScreenOpenUseCase
 import com.glia.widgets.chat.domain.TakePictureUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
 import com.glia.widgets.chat.domain.UriToFileAttachmentUseCase
+import com.glia.widgets.internal.fileupload.domain.GetShareableLocalAttachmentUriUseCase
 import com.glia.widgets.chat.domain.gva.DetermineGvaButtonTypeUseCase
 import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.ChatState
@@ -135,6 +136,7 @@ internal class ChatController(
     private val decideOnQueueingUseCase: DecideOnQueueingUseCase,
     private val takePictureUseCase: TakePictureUseCase,
     private val uriToFileAttachmentUseCase: UriToFileAttachmentUseCase,
+    private val getShareableLocalAttachmentUriUseCase: GetShareableLocalAttachmentUriUseCase,
     private val withCameraPermissionUseCase: WithCameraPermissionUseCase,
     private val withReadWritePermissionsUseCase: WithReadWritePermissionsUseCase,
     private val requestNotificationPermissionIfPushNotificationsSetUpUseCase: RequestNotificationPermissionIfPushNotificationsSetUpUseCase,
@@ -157,6 +159,10 @@ internal class ChatController(
 
     private var allowedFileTypes: List<String> = listOf(Constants.MIME_TYPE_ALL)
     private var allowedMediaTypes: List<String> = listOf(Constants.MIME_TYPE_IMAGES)
+
+    // Guards against starting a second copy while the first tap on a local file is still being prepared.
+    @Volatile
+    private var isPreparingLocalFile: Boolean = false
 
     private val sendMessageCallback: GliaSendMessageUseCase.Listener = object : GliaSendMessageUseCase.Listener {
         override fun messageSent(messageId: String) {
@@ -393,6 +399,22 @@ internal class ChatController(
         } else {
             this.view?.fileIsNotReadyForPreview()
         }
+    }
+
+    override fun onLocalFileOpenClick(attachment: LocalAttachment) {
+        if (isPreparingLocalFile) return
+        isPreparingLocalFile = true
+
+        getShareableLocalAttachmentUriUseCase(attachment)
+            .observeOn(AndroidSchedulers.mainThread())
+            .doFinally { isPreparingLocalFile = false }
+            .subscribe(
+                { view?.openLocalFile(it, attachment.mimeType) },
+                {
+                    Logger.e(TAG, "Failed to prepare local attachment for viewing: ${it.javaClass.simpleName}")
+                    view?.fileViewFailed()
+                }
+            ).also(disposable::add)
     }
 
     override fun onLocalImageItemClick(attachment: LocalAttachment, view: View) {

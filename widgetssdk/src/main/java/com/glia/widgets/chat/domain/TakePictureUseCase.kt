@@ -45,7 +45,7 @@ internal class TakePictureUseCaseImpl(
         }
 
         fixCapturedPictureRotationUseCase(uri ?: return)
-        uriToFileAttachmentUseCase(uri ?: return)?.also(onFileReady)
+        uriToFileAttachmentUseCase(uri ?: return, LocalAttachment.Source.CAMERA)?.also(onFileReady)
     }
 
     override fun deleteCurrent() {

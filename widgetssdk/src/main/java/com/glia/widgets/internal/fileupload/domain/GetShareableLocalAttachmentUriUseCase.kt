@@ -3,7 +3,6 @@ package com.glia.widgets.internal.fileupload.domain
 import android.content.Context
 import android.net.Uri
 import com.glia.widgets.chat.domain.FileProviderUseCase
-import com.glia.widgets.helper.isPhotoPickerUri
 import com.glia.widgets.helper.toFileExtensionOrEmpty
 import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import io.reactivex.rxjava3.core.Completable
@@ -23,11 +22,14 @@ private val UNSAFE_FILE_NAME_CHARS: Regex = Regex("[^A-Za-z0-9._-]")
 /**
  * Provides a URI for a local attachment that can be granted to another app, e.g. an external viewer or a share target.
  *
- * Photo Picker URIs can only be read by this app, so their content is copied into the app cache on demand
- * and exposed through the SDK FileProvider. Other URIs are returned unchanged.
+ * Files picked with the system Photo Picker can only be read by this app, so their content is copied into the
+ * app cache on demand and exposed through the SDK FileProvider. Camera and Browse Files URIs are returned unchanged.
  */
 internal interface GetShareableLocalAttachmentUriUseCase {
     operator fun invoke(attachment: LocalAttachment): Single<Uri>
+
+    /** Same as the [LocalAttachment] variant, for callers that only hold the attachment fields. */
+    operator fun invoke(uri: Uri, source: LocalAttachment.Source, fileId: String, displayName: String, size: Long): Single<Uri>
 
     /** Deletes all copies made by this use case. */
     fun clearCache(): Completable
@@ -41,23 +43,32 @@ internal class GetShareableLocalAttachmentUriUseCaseImpl @JvmOverloads construct
 
     private val cacheDir: File get() = File(context.cacheDir, SHARED_ATTACHMENTS_DIR)
 
-    override fun invoke(attachment: LocalAttachment): Single<Uri> = if (attachment.uri.isPhotoPickerUri) {
-        Single.fromCallable { fileProviderUseCase.getUriForFile(copyToCache(attachment)) }.subscribeOn(ioScheduler)
+    override fun invoke(attachment: LocalAttachment): Single<Uri> =
+        invoke(attachment.uri, attachment.source, attachment.id, attachment.displayName, attachment.size)
+
+    override fun invoke(
+        uri: Uri,
+        source: LocalAttachment.Source,
+        fileId: String,
+        displayName: String,
+        size: Long
+    ): Single<Uri> = if (source == LocalAttachment.Source.MEDIA_PICKER) {
+        Single.fromCallable { fileProviderUseCase.getUriForFile(copyToCache(uri, fileId, displayName, size)) }.subscribeOn(ioScheduler)
     } else {
-        Single.just(attachment.uri)
+        Single.just(uri)
     }
 
     override fun clearCache(): Completable = Completable.fromAction { cacheDir.deleteRecursively() }.subscribeOn(ioScheduler)
 
-    private fun copyToCache(attachment: LocalAttachment): File {
+    private fun copyToCache(uri: Uri, fileId: String, displayName: String, size: Long): File {
         val directory = cacheDir.apply { mkdirs() }
-        val target = File(directory, fileNameFor(attachment))
-        if (target.exists() && target.length() == attachment.size) return target
+        val target = File(directory, fileNameFor(fileId, displayName))
+        if (target.exists() && target.length() == size) return target
 
         // Copy to a temporary file first, so an interrupted copy is never mistaken for a complete one.
         val temp = File(directory, target.name + TEMP_FILE_SUFFIX)
         try {
-            val input = context.contentResolver.openInputStream(attachment.uri) ?: throw FileNotFoundException("Can't open attachment input stream")
+            val input = context.contentResolver.openInputStream(uri) ?: throw FileNotFoundException("Can't open attachment input stream")
             input.use { source -> temp.outputStream().use { source.copyTo(it) } }
             if (!temp.renameTo(target)) throw FileNotFoundException("Can't move attachment copy into place")
         } finally {
@@ -66,9 +77,9 @@ internal class GetShareableLocalAttachmentUriUseCaseImpl @JvmOverloads construct
         return target
     }
 
-    private fun fileNameFor(attachment: LocalAttachment): String {
-        val baseName = attachment.id.replace(UNSAFE_FILE_NAME_CHARS, "_")
-        val extension = attachment.displayName.toFileExtensionOrEmpty().replace(UNSAFE_FILE_NAME_CHARS, "_")
+    private fun fileNameFor(fileId: String, displayName: String): String {
+        val baseName = fileId.replace(UNSAFE_FILE_NAME_CHARS, "_")
+        val extension = displayName.toFileExtensionOrEmpty().replace(UNSAFE_FILE_NAME_CHARS, "_")
         return if (extension.isEmpty()) baseName else "$baseName.$extension"
     }
 }

@@ -158,6 +158,7 @@ public class ControllerFactory {
                 useCaseFactory.getDecideOnQueueingUseCase(),
                 useCaseFactory.getTakePictureUseCase(),
                 useCaseFactory.getUriToFileAttachmentUseCase(),
+                useCaseFactory.getShareableLocalAttachmentUriUseCase(),
                 useCaseFactory.getWithCameraPermissionUseCase(),
                 useCaseFactory.getWithReadWritePermissionsUseCase(),
                 useCaseFactory.getRequestNotificationPermissionIfPushNotificationsSetUpUseCase(),

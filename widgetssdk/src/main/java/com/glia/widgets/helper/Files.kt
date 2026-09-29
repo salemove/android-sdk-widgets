@@ -36,6 +36,18 @@ internal fun toFileName(fileId: String?, name: String?): String {
     return "$fileId.$fileExtension"
 }
 
+private const val MEDIA_AUTHORITY = "media"
+private const val PICKER_PATH_SEGMENT_PREFIX = "picker"
+private const val PHOTO_PICKER_AUTHORITY_SUFFIX = "photopicker"
+
+/**
+ * True for URIs returned by the system Photo Picker, including the Google Play services backport.
+ * Their read grant belongs to this app only and can't be forwarded to another app.
+ */
+internal val Uri.isPhotoPickerUri: Boolean
+    get() = authority?.endsWith(PHOTO_PICKER_AUTHORITY_SUFFIX) == true ||
+        (authority == MEDIA_AUTHORITY && pathSegments.firstOrNull()?.startsWith(PICKER_PATH_SEGMENT_PREFIX) == true)
+
 internal val Context.fileProviderAuthority: String
     get() = "$packageName.com.glia.widgets.fileprovider"
 

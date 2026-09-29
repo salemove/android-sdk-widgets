@@ -865,9 +865,15 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     }
 
     override fun onLocalFileOpenClick(attachment: LocalAttachment) {
-        activityLauncher.launchFileReader(context, attachment.uri, attachment.mimeType.orEmpty()) {
-            showToast(message = localeProvider.getString(R.string.android_file_view_error))
-        }
+        controller?.onLocalFileOpenClick(attachment)
+    }
+
+    override fun openLocalFile(uri: Uri, mimeType: String?) {
+        activityLauncher.launchFileReader(context, uri, mimeType.orEmpty()) { fileViewFailed() }
+    }
+
+    override fun fileViewFailed() {
+        showToast(message = localeProvider.getString(R.string.android_file_view_error))
     }
 
     override fun onImageItemClick(item: AttachmentFile, view: View) {

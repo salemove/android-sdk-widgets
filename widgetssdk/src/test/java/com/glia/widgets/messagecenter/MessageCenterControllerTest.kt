@@ -1,5 +1,6 @@
 package com.glia.widgets.messagecenter
 
+import android.net.Uri
 import com.glia.androidsdk.GliaException
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.chat.domain.TakePictureUseCase
@@ -307,5 +308,23 @@ internal class MessageCenterControllerTest {
 
         verify(dialogController, never()).showMessageCenterUnavailableDialog()
         verify(dialogController, never()).showUnexpectedErrorDialog()
+    }
+
+    @Test
+    fun `onContentChosen passes the media picker source to the attachment use case`() {
+        val uri: Uri = mock()
+
+        messageCenterController.onContentChosen(uri, LocalAttachment.Source.MEDIA_PICKER)
+
+        verify(uriToFileAttachmentUseCase).invoke(uri, LocalAttachment.Source.MEDIA_PICKER)
+    }
+
+    @Test
+    fun `onContentChosen passes the file browser source to the attachment use case`() {
+        val uri: Uri = mock()
+
+        messageCenterController.onContentChosen(uri, LocalAttachment.Source.FILE_BROWSER)
+
+        verify(uriToFileAttachmentUseCase).invoke(uri, LocalAttachment.Source.FILE_BROWSER)
     }
 }

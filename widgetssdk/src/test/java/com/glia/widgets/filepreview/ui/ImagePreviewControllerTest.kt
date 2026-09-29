@@ -1,6 +1,7 @@
 package com.glia.widgets.filepreview.ui
 
 import android.graphics.Bitmap
+import android.net.Uri
 import com.glia.widgets.filepreview.domain.exception.FileNameMissingException
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase
@@ -121,6 +122,14 @@ class ImagePreviewControllerTest {
         imagePreviewController.onImageDataReceived(BITMAP_ID, BITMAP_NAME)
         imagePreviewController.onSharePressed()
         verify(view).shareImageFile(BITMAP_ID)
+    }
+
+    @Test
+    fun onSharePressed_callsShareImageFileWithUriAndMimeType_whenLocalImage() {
+        val uri: Uri = Uri.parse("content://com.glia.test.fileprovider/files/image.png")
+        imagePreviewController.onLocalImageReceived(uri, "image/png")
+        imagePreviewController.onSharePressed()
+        verify(view).shareImageFile(uri, "image/png")
     }
 
     @Test

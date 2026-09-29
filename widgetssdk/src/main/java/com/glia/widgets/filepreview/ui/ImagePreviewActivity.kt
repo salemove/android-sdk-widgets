@@ -88,7 +88,9 @@ internal class ImagePreviewActivity : GliaActivity<ImagePreviewView>, AppCompatA
 
     private fun onImageDataReceived(intent: Intent) {
         if (intent.hasExtra(ExtraKeys.IMAGE_PREVIEW_LOCAL_IMAGE_URI)) {
-            imagePreviewController?.onLocalImageReceived(intent.getParcelable<Uri>(ExtraKeys.IMAGE_PREVIEW_LOCAL_IMAGE_URI) ?: return)
+            val uri = intent.getParcelable<Uri>(ExtraKeys.IMAGE_PREVIEW_LOCAL_IMAGE_URI) ?: return
+            val mimeType = intent.getStringExtra(ExtraKeys.IMAGE_PREVIEW_LOCAL_IMAGE_MIME_TYPE)
+            imagePreviewController?.onLocalImageReceived(uri, mimeType)
         } else {
             val bitmapId = intent.getStringExtra(ExtraKeys.IMAGE_PREVIEW_IMAGE_ID).orEmpty()
             val bitmapName = intent.getStringExtra(ExtraKeys.IMAGE_PREVIEW_IMAGE_NAME).orEmpty()
@@ -200,11 +202,12 @@ internal class ImagePreviewActivity : GliaActivity<ImagePreviewView>, AppCompatA
         activityLauncher.launchShareImage(this, fileName)
     }
 
-    override fun shareImageFile(uri: Uri) {
-        val shareIntent = Intent(Intent.ACTION_SEND)
-        shareIntent.putExtra(Intent.EXTRA_STREAM, uri)
-        shareIntent.type = "image/jpeg"
-        startActivity(shareIntent)
+    override fun shareImageFile(uri: Uri, mimeType: String?) {
+        activityLauncher.launchShareLocalImage(this, uri, mimeType) { showOnImageShareFailed() }
+    }
+
+    override fun showOnImageShareFailed() {
+        showToast(localeProvider.getString(R.string.android_file_view_error))
     }
 
     override fun showOnImageSaveSuccess() {

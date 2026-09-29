@@ -26,6 +26,9 @@ private val UNSAFE_FILE_NAME_CHARS: Regex = Regex("[^A-Za-z0-9._-]")
 internal interface GetShareableLocalAttachmentUriUseCase {
     operator fun invoke(attachment: LocalAttachment): Single<Uri>
 
+    /** Same as the [LocalAttachment] variant, for callers that only hold the attachment fields. */
+    operator fun invoke(uri: Uri, fileId: String, displayName: String, size: Long): Single<Uri>
+
     /** Deletes all copies made by this use case. */
     fun clearCache(): Completable
 }
@@ -38,23 +41,26 @@ internal class GetShareableLocalAttachmentUriUseCaseImpl @JvmOverloads construct
 
     private val cacheDir: File get() = File(context.cacheDir, SHARED_ATTACHMENTS_DIR)
 
-    override fun invoke(attachment: LocalAttachment): Single<Uri> = if (attachment.uri.isPhotoPickerUri) {
-        Single.fromCallable { fileProviderUseCase.getUriForFile(copyToCache(attachment)) }.subscribeOn(ioScheduler)
+    override fun invoke(attachment: LocalAttachment): Single<Uri> =
+        invoke(attachment.uri, attachment.id, attachment.displayName, attachment.size)
+
+    override fun invoke(uri: Uri, fileId: String, displayName: String, size: Long): Single<Uri> = if (uri.isPhotoPickerUri) {
+        Single.fromCallable { fileProviderUseCase.getUriForFile(copyToCache(uri, fileId, displayName, size)) }.subscribeOn(ioScheduler)
     } else {
-        Single.just(attachment.uri)
+        Single.just(uri)
     }
 
     override fun clearCache(): Completable = Completable.fromAction { cacheDir.deleteRecursively() }.subscribeOn(ioScheduler)
 
-    private fun copyToCache(attachment: LocalAttachment): File {
+    private fun copyToCache(uri: Uri, fileId: String, displayName: String, size: Long): File {
         val directory = cacheDir.apply { mkdirs() }
-        val target = File(directory, fileNameFor(attachment))
-        if (target.exists() && target.length() == attachment.size) return target
+        val target = File(directory, fileNameFor(fileId, displayName))
+        if (target.exists() && target.length() == size) return target
 
         // Copy to a temporary file first, so an interrupted copy is never mistaken for a complete one.
         val temp = File(directory, target.name + TEMP_FILE_SUFFIX)
         try {
-            val input = context.contentResolver.openInputStream(attachment.uri) ?: throw FileNotFoundException("Can't open attachment input stream")
+            val input = context.contentResolver.openInputStream(uri) ?: throw FileNotFoundException("Can't open attachment input stream")
             input.use { source -> temp.outputStream().use { source.copyTo(it) } }
             if (!temp.renameTo(target)) throw FileNotFoundException("Can't move attachment copy into place")
         } finally {
@@ -63,9 +69,9 @@ internal class GetShareableLocalAttachmentUriUseCaseImpl @JvmOverloads construct
         return target
     }
 
-    private fun fileNameFor(attachment: LocalAttachment): String {
-        val baseName = attachment.id.replace(UNSAFE_FILE_NAME_CHARS, "_")
-        val extension = attachment.displayName.toFileExtensionOrEmpty().replace(UNSAFE_FILE_NAME_CHARS, "_")
+    private fun fileNameFor(fileId: String, displayName: String): String {
+        val baseName = fileId.replace(UNSAFE_FILE_NAME_CHARS, "_")
+        val extension = displayName.toFileExtensionOrEmpty().replace(UNSAFE_FILE_NAME_CHARS, "_")
         return if (extension.isEmpty()) baseName else "$baseName.$extension"
     }
 }

@@ -129,6 +129,16 @@ class GetShareableLocalAttachmentUriUseCaseTest {
     }
 
     @Test
+    fun `field based variant copies picker content under the given file id`() {
+        registerContent(PICKER_URI, CONTENT)
+
+        useCase(PICKER_URI, "preview-id", "photo.png", CONTENT.size.toLong()).test().assertValue(providerUri)
+
+        assertEquals("preview-id.png", copiedFile.captured.name)
+        assertArrayEquals(CONTENT, copiedFile.captured.readBytes())
+    }
+
+    @Test
     fun `clearCache deletes all copies`() {
         registerContent(PICKER_URI, CONTENT)
         useCase(attachment(PICKER_URI)).test().assertComplete()

@@ -20,6 +20,7 @@ import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.chat.Intention
 import com.glia.widgets.entrywidget.EntryWidgetActivity
 import com.glia.widgets.filepreview.ui.ImagePreviewActivity
+import com.glia.widgets.filepreview.ui.toLocalImagePreview
 import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.messagecenter.MessageCenterActivity
@@ -34,8 +35,7 @@ internal object ExtraKeys {
 
     const val IMAGE_PREVIEW_IMAGE_ID = "image_preview_image_id"
     const val IMAGE_PREVIEW_IMAGE_NAME = "image_preview_image_name"
-    const val IMAGE_PREVIEW_LOCAL_IMAGE_URI = "image_preview_local_image_uri"
-    const val IMAGE_PREVIEW_LOCAL_IMAGE_MIME_TYPE = "image_preview_local_image_mime_type"
+    const val IMAGE_PREVIEW_LOCAL_IMAGE = "image_preview_local_image"
 
     const val OPEN_CHAT_INTENTION = "open_chat_intention"
 
@@ -108,8 +108,7 @@ internal class IntentHelperImpl : IntentHelper {
 
     override fun imagePreviewIntent(context: Context, attachment: LocalAttachment): Intent {
         return Intent(context, ImagePreviewActivity::class.java)
-            .putExtra(ExtraKeys.IMAGE_PREVIEW_LOCAL_IMAGE_URI, attachment.uri)
-            .putExtra(ExtraKeys.IMAGE_PREVIEW_LOCAL_IMAGE_MIME_TYPE, attachment.mimeType)
+            .putExtra(ExtraKeys.IMAGE_PREVIEW_LOCAL_IMAGE, attachment.toLocalImagePreview())
             .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
     }
 

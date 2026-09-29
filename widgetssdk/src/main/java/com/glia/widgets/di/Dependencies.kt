@@ -1,5 +1,6 @@
 package com.glia.widgets.di
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.os.Build
 import androidx.annotation.VisibleForTesting
@@ -201,6 +202,7 @@ internal object Dependencies {
         initAudioControlManager(audioControlManager, useCaseFactory.createOnAudioStartedUseCase())
 
         managerFactory = ManagerFactory(useCaseFactory)
+        clearSharedAttachmentsCache()
 
         controllerFactory = ControllerFactory(
             repositoryFactory,
@@ -312,6 +314,14 @@ internal object Dependencies {
         repositoryFactory.initialize()
         configurationManager.applyConfiguration(gliaWidgetsConfig)
         localeProvider.setCompanyName(gliaWidgetsConfig.companyName)
+    }
+
+    // Copies made for opening or sharing local attachments are only needed while the process that made them is alive.
+    @SuppressLint("CheckResult")
+    private fun clearSharedAttachmentsCache() {
+        useCaseFactory.shareableLocalAttachmentUriUseCase.clearCache().subscribe({}, {
+            Logger.w(TAG, "Failed to clear shared attachments cache: ${it.javaClass.simpleName}")
+        })
     }
 
     private fun setupLoggingMetadata(gliaWidgetsConfig: GliaWidgetsConfig) {

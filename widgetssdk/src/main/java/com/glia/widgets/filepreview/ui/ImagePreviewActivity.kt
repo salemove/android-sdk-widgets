@@ -87,10 +87,8 @@ internal class ImagePreviewActivity : GliaActivity<ImagePreviewView>, AppCompatA
     }
 
     private fun onImageDataReceived(intent: Intent) {
-        if (intent.hasExtra(ExtraKeys.IMAGE_PREVIEW_LOCAL_IMAGE_URI)) {
-            val uri = intent.getParcelable<Uri>(ExtraKeys.IMAGE_PREVIEW_LOCAL_IMAGE_URI) ?: return
-            val mimeType = intent.getStringExtra(ExtraKeys.IMAGE_PREVIEW_LOCAL_IMAGE_MIME_TYPE)
-            imagePreviewController?.onLocalImageReceived(uri, mimeType)
+        if (intent.hasExtra(ExtraKeys.IMAGE_PREVIEW_LOCAL_IMAGE)) {
+            imagePreviewController?.onLocalImageReceived(intent.getParcelable<LocalImagePreview>(ExtraKeys.IMAGE_PREVIEW_LOCAL_IMAGE) ?: return)
         } else {
             val bitmapId = intent.getStringExtra(ExtraKeys.IMAGE_PREVIEW_IMAGE_ID).orEmpty()
             val bitmapName = intent.getStringExtra(ExtraKeys.IMAGE_PREVIEW_IMAGE_NAME).orEmpty()
@@ -195,7 +193,7 @@ internal class ImagePreviewActivity : GliaActivity<ImagePreviewView>, AppCompatA
         showShareIcon = state.isShowShareButton
         invalidateOptionsMenu()
         state.loadedImage?.let { setImageBitmap(it) }
-        state.localImageUri?.let { setImageUri(it) }
+        state.localImage?.let { setImageUri(it.uri) }
     }
 
     override fun shareImageFile(fileName: String) {

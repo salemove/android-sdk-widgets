@@ -43,7 +43,7 @@ internal class ImagePreviewController @JvmOverloads constructor(
 
     override fun onSharePressed() {
         if (state.imageLoadingState == State.ImageLoadingState.LOCAL) {
-            view?.shareImageFile(state.localImageUri ?: return)
+            view?.shareImageFile(state.localImageUri ?: return, state.localImageMimeType)
         } else {
             view?.shareImageFile(state.imageIdName)
         }
@@ -83,7 +83,7 @@ internal class ImagePreviewController @JvmOverloads constructor(
         state = State()
     }
 
-    override fun onLocalImageReceived(uri: Uri) {
-        setState(state.withLocalImage(uri))
+    override fun onLocalImageReceived(uri: Uri, mimeType: String?) {
+        setState(state.withLocalImage(uri, mimeType))
     }
 }

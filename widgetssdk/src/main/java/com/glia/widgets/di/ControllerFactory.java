@@ -111,7 +111,8 @@ public class ControllerFactory {
         this.filePreviewController = new ImagePreviewController(
             useCaseFactory.createGetImageFileFromDownloadsUseCase(),
             useCaseFactory.createGetImageFileFromCacheUseCase(),
-            useCaseFactory.createPutImageFileToDownloadsUseCase()
+            useCaseFactory.createPutImageFileToDownloadsUseCase(),
+            useCaseFactory.getShareableLocalAttachmentUriUseCase()
         );
         this.managerFactory = managerFactory;
         this.deviceMonitor = deviceMonitor;

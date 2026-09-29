@@ -11,7 +11,7 @@ internal interface ImagePreviewContract {
         fun onImageRequested()
         fun onImageDataReceived(bitmapId: String, bitmapName: String)
         fun setView(view: View)
-        fun onLocalImageReceived(uri: Uri, mimeType: String?)
+        fun onLocalImageReceived(image: LocalImagePreview)
     }
 
     interface View : BaseView<Controller> {

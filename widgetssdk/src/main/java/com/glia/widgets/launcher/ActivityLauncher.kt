@@ -28,6 +28,7 @@ internal interface ActivityLauncher {
     fun launchUri(context: Context, uri: Uri, onFailure: () -> Unit)
     fun launchFileReader(context: Context, contentUri: Uri, fileContentType: String?, onFailure: () -> Unit)
     fun launchShareImage(activity: Activity, fileName: String)
+    fun launchShareLocalImage(context: Context, uri: Uri, mimeType: String?, onFailure: () -> Unit)
     fun launchEntryWidget(activity: Activity)
     fun launchSurvey(activity: Activity, survey: Survey)
 }
@@ -76,6 +77,9 @@ internal class ActivityLauncherImpl(
         context.safeStartActivity(intentHelper.openFileIntent(contentUri, fileContentType), onFailure)
 
     override fun launchShareImage(activity: Activity, fileName: String) = activity.startActivity(intentHelper.shareImageIntent(activity, fileName))
+
+    override fun launchShareLocalImage(context: Context, uri: Uri, mimeType: String?, onFailure: () -> Unit) =
+        context.safeStartActivity(intentHelper.shareLocalImageIntent(uri, mimeType), onFailure)
 
     override fun launchEntryWidget(activity: Activity) = activity.startActivity(intentHelper.entryWidgetIntent(activity))
 

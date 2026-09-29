@@ -14,6 +14,7 @@ import androidx.core.net.toUri
 import com.glia.androidsdk.Engagement.MediaType
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.androidsdk.engagement.Survey
+import com.glia.widgets.Constants
 import com.glia.widgets.call.CallActivity
 import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.chat.Intention
@@ -34,6 +35,7 @@ internal object ExtraKeys {
     const val IMAGE_PREVIEW_IMAGE_ID = "image_preview_image_id"
     const val IMAGE_PREVIEW_IMAGE_NAME = "image_preview_image_name"
     const val IMAGE_PREVIEW_LOCAL_IMAGE_URI = "image_preview_local_image_uri"
+    const val IMAGE_PREVIEW_LOCAL_IMAGE_MIME_TYPE = "image_preview_local_image_mime_type"
 
     const val OPEN_CHAT_INTENTION = "open_chat_intention"
 
@@ -57,6 +59,8 @@ internal interface IntentHelper {
     fun imagePreviewIntent(context: Context, attachment: LocalAttachment): Intent
 
     fun shareImageIntent(context: Context, fileName: String): Intent
+
+    fun shareLocalImageIntent(uri: Uri, mimeType: String?): Intent
 
     fun surveyIntent(context: Context, survey: Survey): Intent
 
@@ -105,6 +109,7 @@ internal class IntentHelperImpl : IntentHelper {
     override fun imagePreviewIntent(context: Context, attachment: LocalAttachment): Intent {
         return Intent(context, ImagePreviewActivity::class.java)
             .putExtra(ExtraKeys.IMAGE_PREVIEW_LOCAL_IMAGE_URI, attachment.uri)
+            .putExtra(ExtraKeys.IMAGE_PREVIEW_LOCAL_IMAGE_MIME_TYPE, attachment.mimeType)
             .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
     }
 
@@ -118,7 +123,13 @@ internal class IntentHelperImpl : IntentHelper {
         return Intent(Intent.ACTION_SEND)
             .putExtra(Intent.EXTRA_STREAM, contentUri)
             .setType("image/jpeg")
+            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
     }
+
+    override fun shareLocalImageIntent(uri: Uri, mimeType: String?): Intent = Intent(Intent.ACTION_SEND)
+        .putExtra(Intent.EXTRA_STREAM, uri)
+        .setType(mimeType ?: Constants.MIME_TYPE_IMAGES)
+        .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
     override fun surveyIntent(context: Context, survey: Survey): Intent = Intent(context, SurveyActivity::class.java)
         .putExtra(ExtraKeys.SURVEY, survey as Parcelable)
@@ -143,7 +154,8 @@ internal class IntentHelperImpl : IntentHelper {
 
     override fun openFileIntent(contentUri: Uri, fileContentType: String?): Intent = with(Intent(Intent.ACTION_VIEW)) {
         clipData = ClipData.newRawUri("", contentUri)
-        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+        // Picked content is only ever granted read access, so requesting write would fail the grant check.
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         setDataAndType(contentUri, fileContentType)
     }
 

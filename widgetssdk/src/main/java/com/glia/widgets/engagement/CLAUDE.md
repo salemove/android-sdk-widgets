@@ -4,6 +4,8 @@
 
 Parent: [CLAUDE.md](../../../../../../../../CLAUDE.md) | [docs/claude-reference.md](../../../../../../../../docs/claude-reference.md)
 
+Kind, phase and real-time words follow the core vocabulary: android-sdk `.claude/CLAUDE.md`, section Interaction Vocabulary. This screen serves live chat and SC, and an SC stays an SC when it becomes real-time.
+
 ## Context Loading Order
 1. `States.kt` — sealed `State` and `EndAction` hierarchies; read before touching any engagement logic
 2. `EngagementRepository.kt` — public contract surface subscribed to by every downstream controller
@@ -35,5 +37,5 @@ Parent: [CLAUDE.md](../../../../../../../../CLAUDE.md) | [docs/claude-reference.
 ## For AI Agents
 - Never add a new `State` or `EndAction` variant without grepping for all `when (state)` and `when (state.endAction)` branches across the codebase — unhandled variants silently fall to `else` and drop the event.
 - Never route engagement lifecycle events through a new repository, manager, or subject. All engagement state flows exclusively through `EngagementRepository.engagementState`.
-- Never call `reset()` on `EngagementRepository` during an active live engagement without verifying the auth/de-auth path — the engagement-end-during-de-authentication fix was reverted (`bdcf1895`); any change in this area must be paired with push-notification and authentication regression testing.
+- Never call `reset()` on `EngagementRepository` while an engagement is ongoing without verifying the auth/de-auth path — the engagement-end-during-de-authentication fix was reverted (`bdcf1895`); any change in this area must be paired with push-notification and authentication regression testing.
 - Never instantiate `EngagementCompletionController` outside the single wiring path (`ControllerFactory.getEndEngagementController()` consumed once in `Dependencies.onAppCreate`) — a second instance produces duplicate UI events.

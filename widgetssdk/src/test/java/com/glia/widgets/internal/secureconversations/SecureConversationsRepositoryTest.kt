@@ -20,6 +20,7 @@ import org.junit.Assert.assertArrayEquals
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
+import java.util.function.Consumer
 import com.glia.widgets.helper.rx.Schedulers as GliaSchedulers
 
 class SecureConversationsRepositoryTest {
@@ -31,6 +32,7 @@ class SecureConversationsRepositoryTest {
     private val secureConversations: SecureConversations = mockk(relaxUnitFun = true)
     private val unreadMessagesSlot = slot<RequestCallback<Int>>()
     private val pendingSCSlot = slot<RequestCallback<Boolean>>()
+    private val fileUploadSlot = slot<Consumer<Boolean>>()
 
 
     private val testSchedulers: GliaSchedulers = object : GliaSchedulers {
@@ -56,6 +58,10 @@ class SecureConversationsRepositoryTest {
         verify { core.secureConversations }
         verify { secureConversations.subscribeToUnreadMessageCount(capture(unreadMessagesSlot)) }
         verify { secureConversations.subscribeToPendingSecureConversationStatus(capture(pendingSCSlot)) }
+        verify { secureConversations.subscribeToFileUploadAvailability(capture(fileUploadSlot)) }
+        repository.fileUploadAvailableObservable.test()
+            .assertNotComplete()
+            .assertValue(false)
         repository.unreadMessagesCountObservable.test()
             .assertNotComplete()
             .assertValue(0)
@@ -119,13 +125,27 @@ class SecureConversationsRepositoryTest {
     }
 
     @Test
+    fun `fileUploadAvailableObservable emits the availability Core reports`() {
+        fileUploadSlot.captured.accept(true)
+        repository.fileUploadAvailableObservable.test()
+            .assertNotComplete()
+            .assertValue(true)
+    }
+
+    @Test
     fun `unsubscribeAndResetData() unsubscribes and emits default values`() {
         `pendingSecureConversationsStatusObservable emits value when new value is received`() // to make sure that the values are not default
+        `fileUploadAvailableObservable emits the availability Core reports`() // to make sure that the values are not default
         `unreadMessagesCountObservable emits value when new value is received`() // to make sure that the values are not default
 
         repository.unsubscribeAndResetData()
         verify { secureConversations.unSubscribeFromUnreadMessageCount(any()) }
         verify { secureConversations.unSubscribeFromPendingSecureConversationStatus(any()) }
+        verify { secureConversations.unSubscribeFromFileUploadAvailability(fileUploadSlot.captured) }
+
+        repository.fileUploadAvailableObservable.test()
+            .assertNotComplete()
+            .assertValue(false)
 
         repository.pendingSecureConversationsStatusObservable.test()
             .assertNotComplete()

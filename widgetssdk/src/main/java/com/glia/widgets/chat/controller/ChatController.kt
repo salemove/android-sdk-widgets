@@ -86,6 +86,7 @@ import com.glia.widgets.internal.permissions.domain.WithCameraPermissionUseCase
 import com.glia.widgets.internal.permissions.domain.WithReadWritePermissionsUseCase
 import com.glia.widgets.internal.secureconversations.domain.HasOngoingSecureConversationUseCase
 import com.glia.widgets.internal.secureconversations.domain.IsMessagingAvailableUseCase
+import com.glia.widgets.internal.secureconversations.domain.IsSecureConversationFileUploadAvailableUseCase
 import com.glia.widgets.internal.secureconversations.domain.ManageSecureMessagingStatusUseCase
 import com.glia.widgets.internal.secureconversations.domain.SecureConversationTopBannerVisibilityUseCase
 import com.glia.widgets.internal.secureconversations.domain.SetLeaveSecureConversationDialogVisibleUseCase
@@ -143,6 +144,7 @@ internal class ChatController(
     private val releaseResourcesUseCase: ReleaseResourcesUseCase,
     private val getUrlFromLinkUseCase: GetUrlFromLinkUseCase,
     private val isMessagingAvailableUseCase: IsMessagingAvailableUseCase,
+    private val isSecureConversationFileUploadAvailableUseCase: IsSecureConversationFileUploadAvailableUseCase,
     private val shouldShowTopBannerUseCase: SecureConversationTopBannerVisibilityUseCase,
     private val setLeaveSecureConversationDialogVisibleUseCase: SetLeaveSecureConversationDialogVisibleUseCase,
     private val setChatScreenOpenUseCase: SetChatScreenOpenUseCase,
@@ -209,9 +211,13 @@ internal class ChatController(
         }
     }
 
-    private val attachmentButtonState: Observable<Pair<Boolean, Boolean>>
-        get() = Observable.combineLatest(fileUploadLimitNotExceededObservableUseCase(), isMessagingAvailableUseCase().toObservable(), ::Pair)
-            .observeOn(AndroidSchedulers.mainThread())
+    private val attachmentButtonState: Observable<Triple<Boolean, Boolean, Boolean>>
+        get() = Observable.combineLatest(
+            fileUploadLimitNotExceededObservableUseCase(),
+            isMessagingAvailableUseCase().toObservable(),
+            isSecureConversationFileUploadAvailableUseCase().toObservable(),
+            ::Triple
+        ).observeOn(AndroidSchedulers.mainThread())
 
     @Volatile
     private var chatState: ChatState
@@ -304,9 +310,9 @@ internal class ChatController(
     }
 
     private fun trackAttachmentButtonState() {
-        attachmentButtonState.subscribe { (limitNotExceeded, isMessagingAvailable) ->
+        attachmentButtonState.subscribe { (limitNotExceeded, isMessagingAvailable, isFileUploadAvailable) ->
             val isEnabled = when {
-                manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging -> isMessagingAvailable && limitNotExceeded
+                manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging -> isMessagingAvailable && isFileUploadAvailable && limitNotExceeded
                 else -> limitNotExceeded && isQueueingOrLiveEngagementUseCase.hasOngoingLiveEngagement
             }
             emitViewState { chatState.setIsAttachmentButtonEnabled(isEnabled) }

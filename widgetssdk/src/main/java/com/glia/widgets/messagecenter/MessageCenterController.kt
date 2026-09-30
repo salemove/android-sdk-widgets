@@ -23,6 +23,7 @@ import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.glia.widgets.internal.permissions.domain.RequestNotificationPermissionIfPushNotificationsSetUpUseCase
 import com.glia.widgets.internal.secureconversations.domain.AddSecureFileToAttachmentAndUploadUseCase
 import com.glia.widgets.internal.secureconversations.domain.IsMessagingAvailableUseCase
+import com.glia.widgets.internal.secureconversations.domain.IsSecureConversationFileUploadAvailableUseCase
 import com.glia.widgets.internal.secureconversations.domain.OnNextMessageUseCase
 import com.glia.widgets.internal.secureconversations.domain.ResetMessageCenterUseCase
 import com.glia.widgets.internal.secureconversations.domain.SendMessageButtonStateUseCase
@@ -48,7 +49,8 @@ internal class MessageCenterController(
     private val uriToFileAttachmentUseCase: UriToFileAttachmentUseCase,
     private val requestNotificationPermissionIfPushNotificationsSetUpUseCase: RequestNotificationPermissionIfPushNotificationsSetUpUseCase,
     private val isMessagingAvailableUseCase: IsMessagingAvailableUseCase,
-    private val isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase
+    private val isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase,
+    private val isSecureConversationFileUploadAvailableUseCase: IsSecureConversationFileUploadAvailableUseCase
 ) : MessageCenterContract.Controller {
     private var view: MessageCenterContract.View? = null
     private val disposables = CompositeDisposable()
@@ -91,6 +93,11 @@ internal class MessageCenterController(
         disposables.add(
             sendMessageButtonStateUseCase().subscribe {
                 setState(state.copy(sendMessageButtonState = it))
+            }
+        )
+        disposables.add(
+            isSecureConversationFileUploadAvailableUseCase().subscribe {
+                setState(state.copy(isFileUploadAvailable = it))
             }
         )
 

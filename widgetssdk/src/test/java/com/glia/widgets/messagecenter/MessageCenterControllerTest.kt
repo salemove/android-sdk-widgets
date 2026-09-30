@@ -15,6 +15,7 @@ import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.glia.widgets.internal.permissions.domain.RequestNotificationPermissionIfPushNotificationsSetUpUseCase
 import com.glia.widgets.internal.secureconversations.domain.AddSecureFileToAttachmentAndUploadUseCase
 import com.glia.widgets.internal.secureconversations.domain.IsMessagingAvailableUseCase
+import com.glia.widgets.internal.secureconversations.domain.IsSecureConversationFileUploadAvailableUseCase
 import com.glia.widgets.internal.secureconversations.domain.OnNextMessageUseCase
 import com.glia.widgets.internal.secureconversations.domain.ResetMessageCenterUseCase
 import com.glia.widgets.internal.secureconversations.domain.SendMessageButtonStateUseCase
@@ -22,8 +23,10 @@ import com.glia.widgets.internal.secureconversations.domain.SendSecureMessageUse
 import com.glia.widgets.internal.secureconversations.domain.ShowMessageLimitErrorUseCase
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Observable
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import org.mockito.Mockito.atLeastOnce
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.kotlin.any
@@ -55,6 +58,7 @@ internal class MessageCenterControllerTest {
     private lateinit var requestNotificationPermissionIfPushNotificationsSetUpUseCase: RequestNotificationPermissionIfPushNotificationsSetUpUseCase
     private lateinit var isMessagingAvailableUseCase: IsMessagingAvailableUseCase
     private lateinit var isQueueingOrLiveEngagementUseCase: IsQueueingOrLiveEngagementUseCase
+    private lateinit var isSecureConversationFileUploadAvailableUseCase: IsSecureConversationFileUploadAvailableUseCase
 
     @Before
     fun setUp() {
@@ -77,6 +81,9 @@ internal class MessageCenterControllerTest {
         requestNotificationPermissionIfPushNotificationsSetUpUseCase = mock()
         isMessagingAvailableUseCase = mock()
         isQueueingOrLiveEngagementUseCase = mock()
+        isSecureConversationFileUploadAvailableUseCase = mock {
+            on { invoke() } doReturn Flowable.just(true)
+        }
         messageCenterController = MessageCenterController(
             sendSecureMessageUseCase = sendSecureMessageUseCase,
             addFileAttachmentsObserverUseCase = addFileAttachmentsObserverUseCase,
@@ -94,7 +101,8 @@ internal class MessageCenterControllerTest {
             uriToFileAttachmentUseCase = uriToFileAttachmentUseCase,
             requestNotificationPermissionIfPushNotificationsSetUpUseCase = requestNotificationPermissionIfPushNotificationsSetUpUseCase,
             isMessagingAvailableUseCase = isMessagingAvailableUseCase,
-            isQueueingOrLiveEngagementUseCase = isQueueingOrLiveEngagementUseCase
+            isQueueingOrLiveEngagementUseCase = isQueueingOrLiveEngagementUseCase,
+            isSecureConversationFileUploadAvailableUseCase = isSecureConversationFileUploadAvailableUseCase
         )
     }
 
@@ -109,6 +117,22 @@ internal class MessageCenterControllerTest {
         messageCenterController.initialize()
 
         verify(addFileAttachmentsObserverUseCase, times(1)).invoke()
+    }
+
+    @Test
+    fun initialize_followsTheFileUploadAvailability() {
+        whenever(isAuthenticatedUseCase()) doReturn true
+        whenever(addFileAttachmentsObserverUseCase.invoke()) doReturn Observable.empty()
+        whenever(showMessageLimitErrorUseCase.invoke()) doReturn Observable.empty()
+        whenever(sendMessageButtonStateUseCase.invoke()) doReturn Observable.empty()
+        whenever(isSecureConversationFileUploadAvailableUseCase.invoke()) doReturn Flowable.just(false, true)
+        messageCenterController.setView(viewContract)
+
+        messageCenterController.initialize()
+
+        val stateCaptor = argumentCaptor<MessageCenterState>()
+        verify(viewContract, atLeastOnce()).onStateUpdated(stateCaptor.capture())
+        assertEquals(listOf(false, true), stateCaptor.allValues.map { it.isFileUploadAvailable }.distinct())
     }
 
     @Test

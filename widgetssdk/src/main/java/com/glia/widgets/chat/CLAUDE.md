@@ -4,6 +4,8 @@
 
 Parent: [CLAUDE.md](../../../../../../../../CLAUDE.md) | [docs/claude-reference.md](../../../../../../../../docs/claude-reference.md)
 
+Kind, phase and real-time words follow the core vocabulary: android-sdk `.claude/CLAUDE.md`, section Interaction Vocabulary. This screen serves live chat and SC, and an SC stays an SC when it becomes real-time.
+
 ## Context Loading Order
 1. `ChatContract.kt` — full MVP interface pair; read before touching Controller or View
 2. `controller/ChatController.kt` — retained controller; three segregated `CompositeDisposable` fields at the top are load-bearing
@@ -14,7 +16,7 @@ Parent: [CLAUDE.md](../../../../../../../../CLAUDE.md) | [docs/claude-reference.
 | Task | File |
 |------|------|
 | Add Controller method | `ChatContract.kt` (both sides), `controller/ChatController.kt` |
-| SC ↔ Live transition logic | `controller/ChatController.kt` — `initChat()`, `initSecureMessaging()`, `initLiveChat()` |
+| SC ↔ live chat mode switch | `controller/ChatController.kt` — `initChat()`, `initSecureMessaging()`, `initLiveChat()` |
 | Message list mutations | `ChatManager.kt` |
 | RecyclerView item types / view holders | `adapter/ChatAdapter.kt`, `adapter/holder/` |
 | Chat state shape | `model/ChatState.kt` |
@@ -33,7 +35,7 @@ Parent: [CLAUDE.md](../../../../../../../../CLAUDE.md) | [docs/claude-reference.
 
 ## Anti-Patterns
 - **Do NOT merge the three `CompositeDisposable` instances.** `mediaUpgradeDisposable` and `connectionDisposable` must be released on pause but the controller survives pause; `disposable` must survive pauses but release only on permanent destroy. Consolidating them causes either resource leaks or premature disposal during orientation change.
-- **Do NOT subscribe to `observeTopBannerUseCase()` conditionally on Activity re-attach.** The subscription lives inside `disposable`, which survives config changes. Resubscribing on re-attach doubles observers and produces duplicate banner-visibility events — the known regression pattern in SC↔Live boundary history.
+- **Do NOT subscribe to `observeTopBannerUseCase()` conditionally on Activity re-attach.** The subscription lives inside `disposable`, which survives config changes. Resubscribing on re-attach doubles observers and produces duplicate banner-visibility events — the known regression pattern where an SC becomes real-time.
 - **Do NOT emit view state from a non-`@Synchronized` path.** Direct `view?.emitState(...)` calls from a background thread race with `onDestroy`'s `synchronized(this) { view = null }`.
 - **Do NOT use `!!` for the view reference.** The view is nulled inside a `synchronized` block; unsafe non-null assertions crash on configuration change.
 
@@ -42,4 +44,4 @@ Parent: [CLAUDE.md](../../../../../../../../CLAUDE.md) | [docs/claude-reference.
 - Never call `onDestroy()` (no-arg) on `ChatController` — it throws intentionally. Always use `onDestroy(retain: Boolean)`.
 - Never inject or assign `ChatContract.Controller` from `ChatActivity` — `ChatView.setupControllers()` is the only wiring point; duplicating it creates double-subscription bugs.
 - Never remove `contentDescription` or accessibility roles from chat bubble views or the message `EditText` — TalkBack support was added deliberately and must be preserved on every edit to those layouts.
-- When touching SC↔Live transition code, manually verify: (1) SC top banner disappears after upgrade to Live, (2) pre-engagement hint does not reappear after upgrade, (3) banner does not linger after SC→Live hand-off. Each of these has caused a separate past regression.
+- When touching SC ↔ live chat transition code, manually verify: (1) the SC top banner disappears once the SC becomes real-time, (2) the pre-engagement hint does not reappear after that, (3) the banner does not linger after the switch to live chat mode. Each of these has caused a separate past regression.

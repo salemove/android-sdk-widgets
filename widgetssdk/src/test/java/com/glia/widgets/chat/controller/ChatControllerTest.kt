@@ -56,6 +56,7 @@ import com.glia.widgets.internal.permissions.domain.WithCameraPermissionUseCase
 import com.glia.widgets.internal.permissions.domain.WithReadWritePermissionsUseCase
 import com.glia.widgets.internal.secureconversations.domain.HasOngoingSecureConversationUseCase
 import com.glia.widgets.internal.secureconversations.domain.IsMessagingAvailableUseCase
+import com.glia.widgets.internal.secureconversations.domain.IsSecureConversationFileUploadAvailableUseCase
 import com.glia.widgets.internal.secureconversations.domain.ManageSecureMessagingStatusUseCase
 import com.glia.widgets.internal.secureconversations.domain.SecureConversationTopBannerVisibilityUseCase
 import com.glia.widgets.internal.secureconversations.domain.SetLeaveSecureConversationDialogVisibleUseCase
@@ -135,6 +136,7 @@ class ChatControllerTest {
 
     private lateinit var chatView: ChatContract.View
     private lateinit var isMessagingAvailableUseCase: IsMessagingAvailableUseCase
+    private lateinit var isSecureConversationFileUploadAvailableUseCase: IsSecureConversationFileUploadAvailableUseCase
 
     private lateinit var manageSecureMessagingStatusUseCase: ManageSecureMessagingStatusUseCase
     private lateinit var shouldShowTopBannerVisibilityUseCase: SecureConversationTopBannerVisibilityUseCase
@@ -206,6 +208,9 @@ class ChatControllerTest {
         releaseResourcesUseCase = mock()
         getUrlFromLinkUseCase = mock()
         isMessagingAvailableUseCase = mock()
+        isSecureConversationFileUploadAvailableUseCase = mock {
+            on { invoke() } doReturn Flowable.just(true)
+        }
         manageSecureMessagingStatusUseCase = mock()
         shouldShowTopBannerVisibilityUseCase = mock {
             on { invoke() } doReturn Flowable.empty()
@@ -260,6 +265,7 @@ class ChatControllerTest {
             releaseResourcesUseCase = releaseResourcesUseCase,
             getUrlFromLinkUseCase = getUrlFromLinkUseCase,
             isMessagingAvailableUseCase = isMessagingAvailableUseCase,
+            isSecureConversationFileUploadAvailableUseCase = isSecureConversationFileUploadAvailableUseCase,
             manageSecureMessagingStatusUseCase = manageSecureMessagingStatusUseCase,
             shouldShowTopBannerUseCase = shouldShowTopBannerVisibilityUseCase,
             setLeaveSecureConversationDialogVisibleUseCase = setLeaveSecureConversationDialogVisibleUseCase,
@@ -514,6 +520,22 @@ class ChatControllerTest {
         verify(chatView, times(2)).emitState(stateKArgumentCaptor.capture())
 
         assertFalse(stateKArgumentCaptor.lastValue.isAttachmentButtonEnabled)
+    }
+
+    @Test
+    fun `initChat disables the attachment button when core cannot upload secure conversation files yet`() {
+        whenever(chatManager.initialize(any(), any(), any())) doReturn Flowable.empty()
+        whenever(isMessagingAvailableUseCase()) doReturn Flowable.just(true)
+        whenever(fileUploadLimitNotExceededObservableUseCase()) doReturn Observable.just(true)
+        whenever(isSecureConversationFileUploadAvailableUseCase()) doReturn Flowable.just(false)
+        whenever(manageSecureMessagingStatusUseCase.shouldBehaveAsSecureMessaging) doReturn true
+
+        chatController.initChat(Intention.SC_CHAT)
+        val stateKArgumentCaptor = argumentCaptor<ChatState>()
+
+        verify(isSecureConversationFileUploadAvailableUseCase).invoke()
+        verify(chatView, atLeastOnce()).emitState(stateKArgumentCaptor.capture())
+        assertTrue(stateKArgumentCaptor.allValues.none { it.isAttachmentButtonEnabled })
     }
 
     @Test

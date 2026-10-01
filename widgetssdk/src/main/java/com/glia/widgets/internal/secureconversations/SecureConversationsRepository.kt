@@ -15,6 +15,7 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.processors.BehaviorProcessor
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.reactivex.rxjava3.subjects.Subject
+import java.util.function.Consumer
 
 internal class SecureConversationsRepository @JvmOverloads constructor(
     private val core: GliaCore,
@@ -40,6 +41,13 @@ internal class SecureConversationsRepository @JvmOverloads constructor(
         hasPendingSecureConversations?.let(_pendingSecureConversationsStatusObservable::onNext)
     }
 
+    private val _fileUploadAvailableObservable: BehaviorProcessor<Boolean> = BehaviorProcessor.createDefault(false)
+
+    /** Whether Core can upload a secure conversation file now. On interactions it needs an existing secure conversation. */
+    val fileUploadAvailableObservable: Flowable<Boolean> get() = _fileUploadAvailableObservable.asStateFlowable()
+
+    private val fileUploadAvailabilityListener: Consumer<Boolean> = Consumer(_fileUploadAvailableObservable::onNext)
+
     private val _isLeaveSecureConversationDialogVisibleObservable: BehaviorProcessor<Boolean> = BehaviorProcessor.createDefault(false)
     val isLeaveSecureConversationDialogVisibleObservable: Flowable<Boolean> get() = _isLeaveSecureConversationDialogVisibleObservable.asStateFlowable()
 
@@ -47,6 +55,7 @@ internal class SecureConversationsRepository @JvmOverloads constructor(
         secureConversations.apply {
             subscribeToUnreadMessageCount(unreadMessagesCountCallback)
             subscribeToPendingSecureConversationStatus(pendingSecureConversationsCallback)
+            subscribeToFileUploadAvailability(fileUploadAvailabilityListener)
         }
     }
 
@@ -55,12 +64,14 @@ internal class SecureConversationsRepository @JvmOverloads constructor(
 
         _unreadMessagesCountObservable.onNext(0)
         _pendingSecureConversationsStatusObservable.onNext(false)
+        _fileUploadAvailableObservable.onNext(false)
     }
 
     private fun unsubscribe() {
         secureConversations.apply {
             unSubscribeFromUnreadMessageCount(unreadMessagesCountCallback)
             unSubscribeFromPendingSecureConversationStatus(pendingSecureConversationsCallback)
+            unSubscribeFromFileUploadAvailability(fileUploadAvailabilityListener)
         }
     }
 

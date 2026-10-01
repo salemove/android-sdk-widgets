@@ -3,6 +3,7 @@ package com.glia.widgets.messagecenter
 internal data class MessageCenterState(
     val addAttachmentButtonVisible: Boolean = false,
     val addAttachmentButtonEnabled: Boolean = true,
+    val isFileUploadAvailable: Boolean = false,
     val isLibraryAttachmentVisible: Boolean = true,
     val isTakePhotoAttachmentVisible: Boolean = true,
     val isBrowseAttachmentVisible: Boolean = true,

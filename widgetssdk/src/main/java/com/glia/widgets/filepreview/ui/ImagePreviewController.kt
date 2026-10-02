@@ -89,12 +89,12 @@ internal class ImagePreviewController @JvmOverloads constructor(
 
     private fun shareLocalImage(image: LocalImagePreview) {
         disposables.add(
-            getShareableLocalAttachmentUriUseCase(image.uri, image.fileId, image.displayName, image.size)
+            getShareableLocalAttachmentUriUseCase(image.uri, image.source, image.fileId, image.displayName, image.size)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                     { view?.shareImageFile(it, image.mimeType) }
                 ) {
-                    Logger.e(TAG, "Failed to prepare local image for sharing: ${it.javaClass.simpleName}")
+                    Logger.w(TAG, "Failed to prepare local image for sharing: ${it.javaClass.simpleName}")
                     view?.showOnImageShareFailed()
                 }
         )

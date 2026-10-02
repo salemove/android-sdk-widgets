@@ -12,9 +12,10 @@ import kotlinx.parcelize.Parcelize
 internal data class LocalImagePreview(
     val uri: Uri,
     val mimeType: String?,
+    val source: LocalAttachment.Source,
     val fileId: String,
     val displayName: String,
     val size: Long
 ) : Parcelable
 
-internal fun LocalAttachment.toLocalImagePreview(): LocalImagePreview = LocalImagePreview(uri, mimeType, id, displayName, size)
+internal fun LocalAttachment.toLocalImagePreview(): LocalImagePreview = LocalImagePreview(uri, mimeType, source, id, displayName, size)

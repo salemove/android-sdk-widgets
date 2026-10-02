@@ -60,7 +60,15 @@ internal class NotificationManager(
     }
 
     override fun showVideoCallNotification(isTwoWayVideo: Boolean, hasAudio: Boolean) {
-        CallForegroundService.startVideo(applicationContext, isTwoWayVideo, hasAudio)
+        if (isTwoWayVideo || hasAudio) {
+            CallForegroundService.startVideo(applicationContext, isTwoWayVideo, hasAudio)
+        } else {
+            // The visitor sends no media, so no foreground service type fits this call.
+            notificationManager.notify(
+                NotificationFactory.CALL_NOTIFICATION_ID,
+                NotificationFactory.createVideoCallNotification(applicationContext, isTwoWayVideo = false, hasAudio = false)
+            )
+        }
     }
 
     override fun startNotificationRemovalService() {

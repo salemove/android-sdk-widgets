@@ -58,13 +58,11 @@ internal class CallForegroundService : Service() {
             else -> NotificationFactory.createAudioCallNotification(this)
         }
 
-        // Two-way video: visitor has both microphone and camera active.
-        // All other call types: visitor has microphone only.
-        val serviceType = if (callType == CALL_TYPE_TWO_WAY_VIDEO) {
-            FOREGROUND_TYPE_MICROPHONE or FOREGROUND_TYPE_CAMERA
-        } else {
-            FOREGROUND_TYPE_MICROPHONE
-        }
+        // A Call Visualizer video call has no audio, and asking for the microphone type
+        // without RECORD_AUDIO makes startForeground throw on Android 14+.
+        val microphone = if (hasAudio) FOREGROUND_TYPE_MICROPHONE else 0
+        val camera = if (callType == CALL_TYPE_TWO_WAY_VIDEO) FOREGROUND_TYPE_CAMERA else 0
+        val serviceType = microphone or camera
 
         try {
             ServiceCompat.startForeground(

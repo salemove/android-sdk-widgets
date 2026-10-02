@@ -4,10 +4,15 @@ import android.app.Application
 import android.mock
 import android.os.Build
 import android.unMock
+import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
+import com.glia.widgets.internal.notification.NotificationFactory
+import com.glia.widgets.locale.LocaleProvider
+import io.mockk.mockk
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,6 +31,7 @@ class NotificationManagerTest {
     fun setUp() {
         Logger.mock()
         application = RuntimeEnvironment.getApplication()
+        Dependencies.localeProvider = mockk<LocaleProvider>(relaxed = true)
         manager = NotificationManager(application)
     }
 
@@ -93,5 +99,22 @@ class NotificationManagerTest {
             CallForegroundService::class.java.name,
             intent?.component?.className
         )
+    }
+
+    @Test
+    fun `showVideoCallNotification two-way without audio starts CallForegroundService`() {
+        manager.showVideoCallNotification(isTwoWayVideo = true, hasAudio = false)
+
+        val intent = shadowOf(application).nextStartedService
+        assertEquals(CallForegroundService::class.java.name, intent?.component?.className)
+    }
+
+    @Test
+    fun `showVideoCallNotification one-way without audio posts the notification without a service`() {
+        manager.showVideoCallNotification(isTwoWayVideo = false, hasAudio = false)
+
+        assertNull(shadowOf(application).nextStartedService)
+        val systemNotificationManager = application.getSystemService(android.app.NotificationManager::class.java)
+        assertNotNull(shadowOf(systemNotificationManager).getNotification(NotificationFactory.CALL_NOTIFICATION_ID))
     }
 }

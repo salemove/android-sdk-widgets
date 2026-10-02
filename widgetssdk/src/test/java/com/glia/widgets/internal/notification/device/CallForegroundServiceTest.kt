@@ -1,6 +1,8 @@
 package com.glia.widgets.internal.notification.device
 
 import android.app.Application
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
 import android.mock
 import android.os.Build
 import android.unMock
@@ -77,6 +79,7 @@ class CallForegroundServiceTest {
 
         assertNotNull("Foreground notification should be set for audio call", shadow.lastForegroundNotification)
         assertEquals(NotificationFactory.CALL_NOTIFICATION_ID, shadow.lastForegroundNotificationId)
+        assertEquals(FOREGROUND_SERVICE_TYPE_MICROPHONE, controller.get().foregroundServiceType)
     }
 
     @Test
@@ -91,6 +94,20 @@ class CallForegroundServiceTest {
 
         assertNotNull("Foreground notification should be set for two-way video", shadow.lastForegroundNotification)
         assertEquals(NotificationFactory.CALL_NOTIFICATION_ID, shadow.lastForegroundNotificationId)
+        assertEquals(FOREGROUND_SERVICE_TYPE_MICROPHONE or FOREGROUND_SERVICE_TYPE_CAMERA, controller.get().foregroundServiceType)
+    }
+
+    @Test
+    fun `two-way video call without audio uses only the camera type`() {
+        CallForegroundService.startVideo(application, isTwoWayVideo = true, hasAudio = false)
+        val intent = shadowOf(application).nextStartedService
+
+        val controller = Robolectric.buildService(CallForegroundService::class.java, intent)
+            .create()
+            .startCommand(0, 0)
+
+        assertEquals(NotificationFactory.CALL_NOTIFICATION_ID, shadowOf(controller.get()).lastForegroundNotificationId)
+        assertEquals(FOREGROUND_SERVICE_TYPE_CAMERA, controller.get().foregroundServiceType)
     }
 
     @Test
@@ -105,6 +122,7 @@ class CallForegroundServiceTest {
 
         assertNotNull("Foreground notification should be set for one-way video", shadow.lastForegroundNotification)
         assertEquals(NotificationFactory.CALL_NOTIFICATION_ID, shadow.lastForegroundNotificationId)
+        assertEquals(FOREGROUND_SERVICE_TYPE_MICROPHONE, controller.get().foregroundServiceType)
     }
 
     @Test

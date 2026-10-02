@@ -213,12 +213,12 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
 
     val pickContentLauncherMimeTypes = PickVisualMediaMultipleMimeTypes()
     private val getContentLauncher = chatActivity?.registerForActivityResult(pickContentLauncherMimeTypes) {
-        it?.apply { controller?.onContentChosen(this) }
+        it?.apply { controller?.onContentChosen(this, LocalAttachment.Source.MEDIA_PICKER) }
     }
 
     //This will allow us to view picked files with Uri
     private val openDocumentLauncher = chatActivity?.registerForActivityResult(ActivityResultContracts.OpenDocument()) {
-        it?.apply { controller?.onContentChosen(this) }
+        it?.apply { controller?.onContentChosen(this, LocalAttachment.Source.FILE_BROWSER) }
     }
 
     private var snackBarDelegate: SnackBarDelegate? = null

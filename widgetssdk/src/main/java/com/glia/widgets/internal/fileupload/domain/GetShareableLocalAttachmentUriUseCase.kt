@@ -15,6 +15,9 @@ import java.io.FileNotFoundException
 
 internal const val SHARED_ATTACHMENTS_DIR = "glia_shared_attachments"
 private const val TEMP_FILE_SUFFIX = ".tmp"
+// The cached copy is named from the attachment id and the extension of its display name, which comes from
+// another app's content provider. Any character outside this set is replaced with "_", so the name can't
+// contain a path separator and the copy always lands directly in the shared attachments folder.
 private val UNSAFE_FILE_NAME_CHARS: Regex = Regex("[^A-Za-z0-9._-]")
 
 /**

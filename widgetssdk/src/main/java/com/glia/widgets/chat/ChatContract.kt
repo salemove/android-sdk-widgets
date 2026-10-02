@@ -61,7 +61,7 @@ internal interface ChatContract {
         fun onTakePhotoClicked()
         fun onBrowseFilesClicked()
         fun onImageCaptured(result: Boolean)
-        fun onContentChosen(uri: Uri)
+        fun onContentChosen(uri: Uri, source: LocalAttachment.Source)
         fun onLocalImageItemClick(attachment: LocalAttachment, view: android.view.View)
         fun onLocalFileOpenClick(attachment: LocalAttachment)
         fun leaveCurrentConversationDialogLeaveClicked(action: LeaveDialogAction)

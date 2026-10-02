@@ -411,7 +411,7 @@ internal class ChatController(
             .subscribe(
                 { view?.openLocalFile(it, attachment.mimeType) },
                 {
-                    Logger.e(TAG, "Failed to prepare local attachment for viewing: ${it.javaClass.simpleName}")
+                    Logger.w(TAG, "Failed to prepare local attachment for viewing: ${it.javaClass.simpleName}")
                     view?.fileViewFailed()
                 }
             ).also(disposable::add)
@@ -1077,8 +1077,8 @@ internal class ChatController(
         takePictureUseCase.onImageCaptured(result, ::onAttachmentReceived)
     }
 
-    override fun onContentChosen(uri: Uri) {
-        uriToFileAttachmentUseCase(uri)?.also(::onAttachmentReceived)
+    override fun onContentChosen(uri: Uri, source: LocalAttachment.Source) {
+        uriToFileAttachmentUseCase(uri, source)?.also(::onAttachmentReceived)
     }
 
     override fun leaveCurrentConversationDialogLeaveClicked(action: LeaveDialogAction) {

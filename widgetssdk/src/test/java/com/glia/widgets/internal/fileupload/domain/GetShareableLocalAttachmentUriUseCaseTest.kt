@@ -157,12 +157,14 @@ class GetShareableLocalAttachmentUriUseCaseTest {
         uri: Uri,
         id: String = "file-id",
         displayName: String = "clip.mp4",
-        size: Long = CONTENT.size.toLong()
+        size: Long = CONTENT.size.toLong(),
+        source: LocalAttachment.Source = LocalAttachment.Source.MEDIA_PICKER
     ): LocalAttachment = LocalAttachment(
         uri = uri,
         mimeType = "video/mp4",
         displayName = displayName,
         size = size,
+        source = source,
         engagementFile = mockk { every { this@mockk.id } returns id }
     )
 

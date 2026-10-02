@@ -10,6 +10,7 @@ internal data class LocalAttachment(
     val mimeType: String?,
     val displayName: String,
     val size: Long,
+    val source: Source,
     val attachmentStatus: Status = Status.UPLOADING,
     val engagementFile: EngagementFile? = null,
 ) {
@@ -31,6 +32,18 @@ internal data class LocalAttachment(
         engagementFile == null -> null
         isImage -> VisitorAttachmentItem.LocalImage(engagementFile.id, engagementFile.id, this)
         else -> VisitorAttachmentItem.LocalFile(engagementFile.id, engagementFile.id, this)
+    }
+
+    /** Where the visitor picked the file from. */
+    enum class Source {
+        CAMERA,
+
+        /**
+         * The system Photo Picker. Its read grant belongs to this app only and can't be forwarded to another app,
+         * so the content has to be copied before an external app can open it.
+         */
+        MEDIA_PICKER,
+        FILE_BROWSER
     }
 
     enum class Status(val isError: Boolean) {

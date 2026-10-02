@@ -809,7 +809,7 @@ class ChatControllerTest {
 
     @Test
     fun `onLocalFileOpenClick opens shareable uri with attachment mime type`() {
-        val attachment = LocalAttachment(mock(), "video/mp4", "video.mp4", 10)
+        val attachment = LocalAttachment(mock(), "video/mp4", "video.mp4", 10, LocalAttachment.Source.MEDIA_PICKER)
         val shareableUri: Uri = mock()
         whenever(getShareableLocalAttachmentUriUseCase(attachment)) doReturn Single.just(shareableUri)
 
@@ -821,7 +821,7 @@ class ChatControllerTest {
 
     @Test
     fun `onLocalFileOpenClick shows file view error when preparing the file fails`() {
-        val attachment = LocalAttachment(mock(), "video/mp4", "video.mp4", 10)
+        val attachment = LocalAttachment(mock(), "video/mp4", "video.mp4", 10, LocalAttachment.Source.MEDIA_PICKER)
         whenever(getShareableLocalAttachmentUriUseCase(attachment)) doReturn Single.error(RuntimeException("copy failed"))
 
         chatController.onLocalFileOpenClick(attachment)
@@ -832,7 +832,7 @@ class ChatControllerTest {
 
     @Test
     fun `onLocalFileOpenClick ignores taps while the file is still being prepared`() {
-        val attachment = LocalAttachment(mock(), "video/mp4", "video.mp4", 10)
+        val attachment = LocalAttachment(mock(), "video/mp4", "video.mp4", 10, LocalAttachment.Source.MEDIA_PICKER)
         val pending = SingleSubject.create<Uri>()
         whenever(getShareableLocalAttachmentUriUseCase(attachment)) doReturn pending
 
@@ -847,5 +847,16 @@ class ChatControllerTest {
         whenever(getShareableLocalAttachmentUriUseCase(attachment)) doReturn Single.just(shareableUri)
         chatController.onLocalFileOpenClick(attachment)
         verify(chatView, times(2)).openLocalFile(shareableUri, "video/mp4")
+    }
+
+    @Test
+    fun `onContentChosen passes the picker source to the attachment use case`() {
+        val uri: Uri = mock()
+
+        chatController.onContentChosen(uri, LocalAttachment.Source.MEDIA_PICKER)
+        chatController.onContentChosen(uri, LocalAttachment.Source.FILE_BROWSER)
+
+        verify(uriToFileAttachmentUseCase).invoke(uri, LocalAttachment.Source.MEDIA_PICKER)
+        verify(uriToFileAttachmentUseCase).invoke(uri, LocalAttachment.Source.FILE_BROWSER)
     }
 }

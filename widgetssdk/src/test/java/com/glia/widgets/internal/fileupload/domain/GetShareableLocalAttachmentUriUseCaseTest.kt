@@ -50,26 +50,38 @@ class GetShareableLocalAttachmentUriUseCaseTest {
     }
 
     @Test
-    fun `document provider uri is returned unchanged`() {
+    fun `browse files attachment is returned unchanged`() {
         val uri = Uri.parse("content://com.android.providers.media.documents/document/video%3A1")
 
-        useCase(attachment(uri)).test().assertValue(uri)
+        useCase(attachment(uri, source = LocalAttachment.Source.FILE_BROWSER)).test().assertValue(uri)
 
         verify(exactly = 0) { fileProviderUseCase.getUriForFile(any()) }
         assertFalse(sharedDir.exists())
     }
 
     @Test
-    fun `file provider uri is returned unchanged`() {
+    fun `camera attachment is returned unchanged`() {
         val uri = Uri.parse("content://com.glia.test.fileprovider/files/IMG_1.jpg")
 
-        useCase(attachment(uri)).test().assertValue(uri)
+        useCase(attachment(uri, source = LocalAttachment.Source.CAMERA)).test().assertValue(uri)
 
         verify(exactly = 0) { fileProviderUseCase.getUriForFile(any()) }
+        assertFalse(sharedDir.exists())
     }
 
     @Test
-    fun `photo picker uri is copied to cache and exposed through file provider`() {
+    fun `media picker attachment is copied whatever its uri authority`() {
+        // A manufacturer's fallback picker may use any authority, so the source decides, not the URI.
+        val uri = Uri.parse("content://com.example.oem.gallery/media/42")
+        registerContent(uri, CONTENT)
+
+        useCase(attachment(uri)).test().assertValue(providerUri)
+
+        assertArrayEquals(CONTENT, copiedFile.captured.readBytes())
+    }
+
+    @Test
+    fun `media picker attachment is copied to cache and exposed through file provider`() {
         val uri = PICKER_URI
         registerContent(uri, CONTENT)
 
@@ -132,7 +144,7 @@ class GetShareableLocalAttachmentUriUseCaseTest {
     fun `field based variant copies picker content under the given file id`() {
         registerContent(PICKER_URI, CONTENT)
 
-        useCase(PICKER_URI, "preview-id", "photo.png", CONTENT.size.toLong()).test().assertValue(providerUri)
+        useCase(PICKER_URI, LocalAttachment.Source.MEDIA_PICKER, "preview-id", "photo.png", CONTENT.size.toLong()).test().assertValue(providerUri)
 
         assertEquals("preview-id.png", copiedFile.captured.name)
         assertArrayEquals(CONTENT, copiedFile.captured.readBytes())

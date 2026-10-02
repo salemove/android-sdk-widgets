@@ -1,11 +1,18 @@
 package com.glia.widgets.filepreview.ui
 
 import android.graphics.Bitmap
+import android.net.Uri
 import com.glia.widgets.filepreview.domain.exception.FileNameMissingException
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase
 import com.glia.widgets.filepreview.domain.usecase.PutImageFileToDownloadsUseCase
+import com.glia.widgets.internal.fileupload.domain.GetShareableLocalAttachmentUriUseCase
+import com.glia.widgets.internal.fileupload.model.LocalAttachment
+import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
 import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.schedulers.Schedulers
+import org.junit.After
 import io.reactivex.rxjava3.core.Maybe
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -15,6 +22,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.never
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -29,6 +38,7 @@ class ImagePreviewControllerTest {
     private lateinit var getImageFileFromDownloadsUseCase: GetImageFileFromDownloadsUseCase
     private lateinit var getImageFileFromCacheUseCase: GetImageFileFromCacheUseCase
     private lateinit var putImageFileToDownloadsUseCase: PutImageFileToDownloadsUseCase
+    private lateinit var getShareableLocalAttachmentUriUseCase: GetShareableLocalAttachmentUriUseCase
     private lateinit var imagePreviewController: ImagePreviewController
 
     @Before
@@ -37,10 +47,13 @@ class ImagePreviewControllerTest {
         getImageFileFromDownloadsUseCase = mock()
         getImageFileFromCacheUseCase = mock()
         putImageFileToDownloadsUseCase = mock()
+        getShareableLocalAttachmentUriUseCase = mock()
+        RxAndroidPlugins.setMainThreadSchedulerHandler { Schedulers.trampoline() }
         imagePreviewController = ImagePreviewController(
             getImageFileFromDownloadsUseCase,
             getImageFileFromCacheUseCase,
             putImageFileToDownloadsUseCase,
+            getShareableLocalAttachmentUriUseCase,
             mock()
         )
         imagePreviewController.setView(view)
@@ -121,6 +134,49 @@ class ImagePreviewControllerTest {
         imagePreviewController.onImageDataReceived(BITMAP_ID, BITMAP_NAME)
         imagePreviewController.onSharePressed()
         verify(view).shareImageFile(BITMAP_ID)
+    }
+
+    @After
+    fun tearDown() {
+        RxAndroidPlugins.reset()
+    }
+
+    @Test
+    fun onSharePressed_sharesShareableUriWithMimeType_whenLocalImage() {
+        val pickerUri: Uri = Uri.parse("content://media/picker/0/com.android.providers.media.photopicker/media/1")
+        val shareableUri: Uri = Uri.parse("content://com.glia.test.fileprovider/shared_attachments/file-id.png")
+        whenever(getShareableLocalAttachmentUriUseCase(pickerUri, LocalAttachment.Source.MEDIA_PICKER, "file-id", "image.png", 10L)) doReturn Single.just(shareableUri)
+
+        imagePreviewController.onLocalImageReceived(LocalImagePreview(pickerUri, "image/png", LocalAttachment.Source.MEDIA_PICKER, "file-id", "image.png", 10L))
+        imagePreviewController.onSharePressed()
+
+        verify(view).shareImageFile(shareableUri, "image/png")
+        verify(view, never()).showOnImageShareFailed()
+    }
+
+    @Test
+    fun onSharePressed_showsShareError_whenLocalImageCanNotBePrepared() {
+        val pickerUri: Uri = Uri.parse("content://media/picker/0/com.android.providers.media.photopicker/media/1")
+        whenever(getShareableLocalAttachmentUriUseCase(pickerUri, LocalAttachment.Source.MEDIA_PICKER, "file-id", "image.png", 10L)) doReturn Single.error(RuntimeException("copy failed"))
+
+        imagePreviewController.onLocalImageReceived(LocalImagePreview(pickerUri, "image/png", LocalAttachment.Source.MEDIA_PICKER, "file-id", "image.png", 10L))
+        imagePreviewController.onSharePressed()
+
+        verify(view).showOnImageShareFailed()
+        verify(view, never()).shareImageFile(any<Uri>(), anyOrNull())
+    }
+
+    @Test
+    fun onLocalImageReceived_showsShareButtonAndKeepsImage() {
+        val image = LocalImagePreview(Uri.parse("content://media/picker/0/x/media/1"), "image/png", LocalAttachment.Source.MEDIA_PICKER, "file-id", "image.png", 10L)
+        val argument = argumentCaptor<State>()
+
+        imagePreviewController.onLocalImageReceived(image)
+
+        verify(view).onStateUpdated(argument.capture())
+        assertEquals(State.ImageLoadingState.LOCAL, argument.lastValue.imageLoadingState)
+        assertTrue(argument.lastValue.isShowShareButton)
+        assertEquals(image, argument.lastValue.localImage)
     }
 
     @Test

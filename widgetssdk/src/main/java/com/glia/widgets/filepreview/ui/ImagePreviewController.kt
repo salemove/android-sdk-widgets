@@ -1,15 +1,19 @@
 package com.glia.widgets.filepreview.ui
 
-import android.net.Uri
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase
 import com.glia.widgets.filepreview.domain.usecase.PutImageFileToDownloadsUseCase
+import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.TAG
+import com.glia.widgets.internal.fileupload.domain.GetShareableLocalAttachmentUriUseCase
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 internal class ImagePreviewController @JvmOverloads constructor(
     private val getImageFileFromDownloadsUseCase: GetImageFileFromDownloadsUseCase,
     private val getImageFileFromCacheUseCase: GetImageFileFromCacheUseCase,
     private val putImageFileToDownloadsUseCase: PutImageFileToDownloadsUseCase,
+    private val getShareableLocalAttachmentUriUseCase: GetShareableLocalAttachmentUriUseCase,
     private val disposables: CompositeDisposable = CompositeDisposable()
 ) : ImagePreviewContract.Controller {
     private var view: ImagePreviewContract.View? = null
@@ -43,7 +47,7 @@ internal class ImagePreviewController @JvmOverloads constructor(
 
     override fun onSharePressed() {
         if (state.imageLoadingState == State.ImageLoadingState.LOCAL) {
-            view?.shareImageFile(state.localImageUri ?: return)
+            shareLocalImage(state.localImage ?: return)
         } else {
             view?.shareImageFile(state.imageIdName)
         }
@@ -83,7 +87,20 @@ internal class ImagePreviewController @JvmOverloads constructor(
         state = State()
     }
 
-    override fun onLocalImageReceived(uri: Uri) {
-        setState(state.withLocalImage(uri))
+    private fun shareLocalImage(image: LocalImagePreview) {
+        disposables.add(
+            getShareableLocalAttachmentUriUseCase(image.uri, image.source, image.fileId, image.displayName, image.size)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                    { view?.shareImageFile(it, image.mimeType) }
+                ) {
+                    Logger.w(TAG, "Failed to prepare local image for sharing: ${it.javaClass.simpleName}")
+                    view?.showOnImageShareFailed()
+                }
+        )
+    }
+
+    override fun onLocalImageReceived(image: LocalImagePreview) {
+        setState(state.withLocalImage(image))
     }
 }

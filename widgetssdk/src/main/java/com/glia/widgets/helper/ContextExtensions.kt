@@ -3,6 +3,7 @@
 package com.glia.widgets.helper
 
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
@@ -78,11 +79,24 @@ internal val Activity.isGlia: Boolean
 
 internal val AlertDialog.parentActivity: Activity? get() = context.asActivity()
 
+private const val SAFE_START_ACTIVITY_TAG = "SafeStartActivity"
+
 internal fun Context.safeStartActivity(intent: Intent, onFailure: () -> Unit, onSuccess: () -> Unit = {}) {
-    if (intent.resolveActivity(packageManager) != null) {
+    if (intent.resolveActivity(packageManager) == null) {
+        onFailure()
+        return
+    }
+
+    try {
         startActivity(intent)
         onSuccess()
-    } else {
+    } catch (e: SecurityException) {
+        // Thrown when a content URI can't be granted to the target app, e.g. a Photo Picker URI.
+        // The exception message contains the URI, so only the action and exception type are logged.
+        Logger.e(SAFE_START_ACTIVITY_TAG, "Failed to start activity for ${intent.action}: ${e.javaClass.simpleName}")
+        onFailure()
+    } catch (e: ActivityNotFoundException) {
+        Logger.e(SAFE_START_ACTIVITY_TAG, "Failed to start activity for ${intent.action}: ${e.javaClass.simpleName}")
         onFailure()
     }
 }

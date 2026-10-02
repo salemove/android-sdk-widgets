@@ -111,7 +111,8 @@ public class ControllerFactory {
         this.filePreviewController = new ImagePreviewController(
             useCaseFactory.createGetImageFileFromDownloadsUseCase(),
             useCaseFactory.createGetImageFileFromCacheUseCase(),
-            useCaseFactory.createPutImageFileToDownloadsUseCase()
+            useCaseFactory.createPutImageFileToDownloadsUseCase(),
+            useCaseFactory.getShareableLocalAttachmentUriUseCase()
         );
         this.managerFactory = managerFactory;
         this.deviceMonitor = deviceMonitor;
@@ -158,6 +159,7 @@ public class ControllerFactory {
                 useCaseFactory.getDecideOnQueueingUseCase(),
                 useCaseFactory.getTakePictureUseCase(),
                 useCaseFactory.getUriToFileAttachmentUseCase(),
+                useCaseFactory.getShareableLocalAttachmentUriUseCase(),
                 useCaseFactory.getWithCameraPermissionUseCase(),
                 useCaseFactory.getWithReadWritePermissionsUseCase(),
                 useCaseFactory.getRequestNotificationPermissionIfPushNotificationsSetUpUseCase(),

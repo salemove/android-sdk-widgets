@@ -28,6 +28,7 @@ import com.glia.widgets.di.Dependencies.useCaseFactory
 import com.glia.widgets.entrywidget.EntryWidget
 import com.glia.widgets.fcm.PushNotifications
 import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.runIntegratorCallback
 import com.glia.widgets.launcher.EngagementLauncher
 import com.glia.widgets.lifecycle.OnLifecycleEvent
 import com.glia.widgets.liveobservation.LiveObservation
@@ -177,10 +178,10 @@ object GliaWidgets {
         GliaLogger.logMethodUse(GliaWidgets::class, "getQueues")
         gliaCore().getQueues(
             onResult = { queues ->
-                onResult.onResult(queues.toWidgetsType())
+                runIntegratorCallback { onResult.onResult(queues.toWidgetsType()) }
             },
             onError = {
-                onError?.onError(it.toWidgetsType("Failed to get queues"))
+                runIntegratorCallback { onError?.onError(it.toWidgetsType("Failed to get queues")) }
             }
         )
     }
@@ -245,9 +246,9 @@ object GliaWidgets {
             RequestCallback { visitorInfo: com.glia.androidsdk.visitor.VisitorInfo?,
                               error: GliaException? ->
                 if (error != null || visitorInfo == null) {
-                    onError?.onError(error.toWidgetsType("Failed to get visitor info"))
+                    runIntegratorCallback { onError?.onError(error.toWidgetsType("Failed to get visitor info")) }
                 } else {
-                    onResult.onResult(VisitorInfo(visitorInfo))
+                    runIntegratorCallback { onResult.onResult(VisitorInfo(visitorInfo)) }
                 }
             }
 
@@ -272,9 +273,9 @@ object GliaWidgets {
         val updateCallback =
             Consumer { error: GliaException? ->
                 if (error == null) {
-                    onComplete.onComplete()
+                    runIntegratorCallback { onComplete.onComplete() }
                 } else {
-                    onError.onError(error.toWidgetsType())
+                    runIntegratorCallback { onError.onError(error.toWidgetsType()) }
                 }
             }
         gliaCore().updateVisitorInfo(visitorInfoUpdateRequest.toCoreType(), updateCallback)

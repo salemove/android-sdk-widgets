@@ -1,6 +1,8 @@
 package com.glia.widgets.di
 
+import android.assertRethrownOnMainThread
 import android.mockk
+import android.runOnCoreThread
 import android.unMockk
 import com.glia.androidsdk.AuthorizationMethod
 import com.glia.androidsdk.CoreConfiguration
@@ -115,6 +117,31 @@ class GliaCoreImplTest {
         gliaCore.init(widgetsConfig(), { fail("onComplete should not be invoked") }) { }
 
         verify { GliaLogger.e(LogEvents.WIDGETS_SDK_UNCATEGORIZED, "Glia Widgets SDK initialization failed", any<GliaException>()) }
+    }
+
+    @Test
+    fun `init logs and re-throws on the main thread when the integrator onError throws for a Core failure`() {
+        val integratorBug = IllegalStateException("integrator bug")
+        val coreOnError = slot<Consumer<GliaException>>()
+        every { Glia.init(any<CoreConfiguration>(), any(), capture(coreOnError)) } just Runs
+        gliaCore.init(widgetsConfig(), { fail("onComplete should not be invoked") }) { throw integratorBug }
+
+        runOnCoreThread { coreOnError.captured.accept(GliaException("Core error", GliaException.Cause.NETWORK_TIMEOUT)) }
+
+        verify { GliaLogger.e(LogEvents.WIDGETS_SDK_UNCATEGORIZED, "Glia Widgets SDK initialization failed", any<GliaException>()) }
+        assertRethrownOnMainThread(integratorBug)
+    }
+
+    @Test
+    fun `init does not throw when the integrator onError throws for a synchronous failure`() {
+        val integratorBug = IllegalStateException("integrator bug")
+        every { Glia.init(any<CoreConfiguration>(), any(), any()) } throws
+            GliaException("Invalid configuration", GliaException.Cause.INVALID_INPUT)
+
+        gliaCore.init(widgetsConfig(), { fail("onComplete should not be invoked") }) { throw integratorBug }
+
+        verify { GliaLogger.e(LogEvents.WIDGETS_SDK_UNCATEGORIZED, "Glia Widgets SDK initialization failed", any<GliaException>()) }
+        assertRethrownOnMainThread(integratorBug)
     }
 
     @Test

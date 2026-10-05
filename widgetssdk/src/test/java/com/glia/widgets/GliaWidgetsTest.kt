@@ -1,8 +1,13 @@
 package com.glia.widgets
 
+import android.assertRethrownOnMainThread
+import android.runOnCoreThread
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.glia.androidsdk.GliaException
+import com.glia.androidsdk.RequestCallback
 import com.glia.widgets.callbacks.OnComplete
 import com.glia.widgets.callbacks.OnError
+import com.glia.widgets.callbacks.OnResult
 import com.glia.widgets.callvisualizer.controller.CallVisualizerController
 import com.glia.widgets.di.ControllerFactory
 import com.glia.widgets.di.Dependencies
@@ -12,6 +17,9 @@ import com.glia.widgets.di.GliaCoreImpl
 import com.glia.widgets.di.RepositoryFactory
 import com.glia.widgets.engagement.EngagementRepository
 import com.glia.widgets.internal.queue.QueueRepository
+import com.glia.widgets.queue.Queue
+import com.glia.widgets.visitor.VisitorInfo
+import com.glia.widgets.visitor.VisitorInfoUpdateRequest
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
@@ -20,6 +28,7 @@ import org.junit.Test
 import org.junit.rules.TestRule
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -28,6 +37,9 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
+import java.util.function.Consumer
+import com.glia.androidsdk.queuing.Queue as CoreQueue
+import com.glia.androidsdk.visitor.VisitorInfo as CoreVisitorInfo
 
 @get:ClassRule
 val rule: TestRule = InstantTaskExecutorRule()
@@ -102,6 +114,79 @@ class GliaWidgetsTest {
         verify(onComplete, never()).onComplete()
         verify(onError).onError(initializationError)
         verify(controllerFactory, never()).init()
+    }
+
+    @Test
+    fun `init initializes widgets and re-throws on the main thread when the integrator onComplete throws`() {
+        val integratorBug = IllegalStateException("integrator bug")
+        val onError = mock<OnError>()
+        val coreOnComplete = argumentCaptor<OnComplete>()
+        mockWidgetsInitialization()
+        GliaWidgets.init(widgetsConfig(), { throw integratorBug }, onError)
+        verify(gliaCore).init(any(), coreOnComplete.capture(), any())
+
+        runOnCoreThread { coreOnComplete.firstValue.onComplete() }
+
+        verify(controllerFactory).init()
+        verify(repositoryFactory).initialize()
+        verify(onError, never()).onError(any())
+        assertRethrownOnMainThread(integratorBug)
+    }
+
+    @Test
+    fun `getQueues re-throws on the main thread when the integrator onResult throws`() {
+        val integratorBug = IllegalStateException("integrator bug")
+        val onError = mock<OnError>()
+        val coreOnResult = argumentCaptor<(Array<CoreQueue>) -> Unit>()
+        GliaWidgets.getQueues({ throw integratorBug }, onError)
+        verify(gliaCore).getQueues(coreOnResult.capture(), any())
+
+        runOnCoreThread { coreOnResult.firstValue(emptyArray()) }
+
+        verify(onError, never()).onError(any())
+        assertRethrownOnMainThread(integratorBug)
+    }
+
+    @Test
+    fun `getQueues re-throws on the main thread when the integrator onError throws`() {
+        val integratorBug = IllegalStateException("integrator bug")
+        val onResult = mock<OnResult<Collection<Queue>>>()
+        val coreOnError = argumentCaptor<(GliaException?) -> Unit>()
+        GliaWidgets.getQueues(onResult) { throw integratorBug }
+        verify(gliaCore).getQueues(any(), coreOnError.capture())
+
+        runOnCoreThread { coreOnError.firstValue(GliaException("error", GliaException.Cause.NETWORK_TIMEOUT)) }
+
+        verify(onResult, never()).onResult(any())
+        assertRethrownOnMainThread(integratorBug)
+    }
+
+    @Test
+    fun `getVisitorInfo re-throws on the main thread when the integrator onError throws`() {
+        val integratorBug = IllegalStateException("integrator bug")
+        val onResult = mock<OnResult<VisitorInfo>>()
+        val coreCallback = argumentCaptor<RequestCallback<CoreVisitorInfo?>>()
+        GliaWidgets.getVisitorInfo(onResult) { throw integratorBug }
+        verify(gliaCore).getVisitorInfo(coreCallback.capture())
+
+        runOnCoreThread { coreCallback.firstValue.onResult(null, GliaException("error", GliaException.Cause.NETWORK_TIMEOUT)) }
+
+        verify(onResult, never()).onResult(any())
+        assertRethrownOnMainThread(integratorBug)
+    }
+
+    @Test
+    fun `updateVisitorInfo re-throws on the main thread when the integrator onComplete throws`() {
+        val integratorBug = IllegalStateException("integrator bug")
+        val onError = mock<OnError>()
+        val coreCallback = argumentCaptor<Consumer<GliaException?>>()
+        GliaWidgets.updateVisitorInfo(VisitorInfoUpdateRequest(), { throw integratorBug }, onError)
+        verify(gliaCore).updateVisitorInfo(any(), coreCallback.capture())
+
+        runOnCoreThread { coreCallback.firstValue.accept(null) }
+
+        verify(onError, never()).onError(any())
+        assertRethrownOnMainThread(integratorBug)
     }
 
     @Test

@@ -32,6 +32,7 @@ import com.glia.widgets.callbacks.OnComplete
 import com.glia.widgets.callbacks.OnError
 import com.glia.widgets.engagement.MediaType
 import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.runIntegratorCallback
 import com.glia.widgets.helper.toCoreType
 import com.glia.widgets.queue.toCoreType
 import com.glia.widgets.toWidgetsType
@@ -84,7 +85,7 @@ internal class GliaCoreImpl : GliaCore {
     }
 
     private fun reportInitializationFailure(onError: OnError, error: GliaWidgetsException, loggedError: Throwable = error) {
-        onError.onError(error)
+        runIntegratorCallback { onError.onError(error) }
 
         Logger.e(TAG, "Glia Widgets SDK initialization failed", loggedError)
         GliaLogger.e(LogEvents.WIDGETS_SDK_UNCATEGORIZED, "Glia Widgets SDK initialization failed", loggedError)

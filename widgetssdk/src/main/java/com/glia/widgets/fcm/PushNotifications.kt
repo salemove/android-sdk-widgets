@@ -70,7 +70,24 @@ interface PushNotifications {
      *
      * @param newFcmToken New FCM token
      */
+    @Deprecated(
+        "Firebase is replacing registration tokens with installation IDs. Set " +
+            "firebase_messaging_installation_id_enabled in your manifest and call " +
+            "updateRegistrationId from FirebaseMessagingService.onRegistered. This method will be " +
+            "removed once Firebase removes registration tokens."
+    )
     fun updateFcmToken(newFcmToken: String?)
+
+    /**
+     * Should be called when Firebase reports a new registration. Firebase does this when your app sets
+     * `firebase_messaging_installation_id_enabled` to `true` in its manifest.
+     *
+     * You should use this method only if you have your own FCM service. Call it from
+     * [FirebaseMessagingService.onRegistered]. [GliaFcmService] already does this.
+     *
+     * @param installationId Firebase installation ID identifying this app instance
+     */
+    fun updateRegistrationId(installationId: String)
 
     /**
      * Should be called when a new remote message is received from the Firebase Cloud Messaging framework.
@@ -161,9 +178,15 @@ internal class PushNotificationsImpl(
         return corePushNotifications.pushEvents.toWidgetsType().toSet()
     }
 
+    @Suppress("OVERRIDE_DEPRECATION")
     override fun updateFcmToken(newFcmToken: String?) {
         GliaLogger.logMethodUse(PushNotifications::class, "updateFcmToken")
         corePushNotifications.updateFcmToken(newFcmToken)
+    }
+
+    override fun updateRegistrationId(installationId: String) {
+        GliaLogger.logMethodUse(PushNotifications::class, "updateRegistrationId")
+        corePushNotifications.updateRegistrationId(installationId)
     }
 
     override fun onNewMessage(service: FirebaseMessagingService, remoteMessage: RemoteMessage) = with(remoteMessage) {

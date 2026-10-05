@@ -25,10 +25,26 @@ import com.google.firebase.messaging.RemoteMessage
  *     </application>
  * </manifest>
  * ```
+ *
+ * Firebase calls [onRegistered] instead of [onNewToken] when your app enables installation IDs in its
+ * manifest. This service handles both, so enabling them needs no code change:
+ *
+ * ```xml
+ * <meta-data
+ *     android:name="firebase_messaging_installation_id_enabled"
+ *     android:value="true" />
+ * ```
  */
 open class GliaFcmService : FirebaseMessagingService() {
     private val pushNotifications by lazy { Dependencies.pushNotifications }
 
+    @CallSuper
+    override fun onRegistered(installationId: String) {
+        pushNotifications.updateRegistrationId(installationId)
+    }
+
+    @Deprecated("Firebase calls onRegistered instead when installation IDs are enabled.")
+    @Suppress("DEPRECATION")
     @CallSuper
     override fun onNewToken(token: String) {
         pushNotifications.updateFcmToken(token)

@@ -3,6 +3,7 @@ package com.glia.widgets.secureconversations
 import com.glia.androidsdk.RequestCallback
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.widgets.callbacks.OnResult
+import com.glia.widgets.helper.runIntegratorCallback
 
 /**
  * Secure Conversations offers the ability to asynchronously and securely communications for authenticated visitors.
@@ -55,7 +56,7 @@ internal class SecureConversationsImpl(
         }
         val requestCallback: RequestCallback<Int> = RequestCallback { count, gliaException ->
             if (gliaException == null && count != null) {
-                callback.onResult(count)
+                runIntegratorCallback { callback.onResult(count) }
             }
         }
         subscribedCallbacks[callback.hashCode()] = requestCallback

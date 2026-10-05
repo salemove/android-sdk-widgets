@@ -35,6 +35,7 @@ import com.glia.widgets.helper.Logger.SITE_ID_KEY
 import com.glia.widgets.helper.Logger.addGlobalMetadata
 import com.glia.widgets.helper.ResourceProvider
 import com.glia.widgets.helper.orNotApplicable
+import com.glia.widgets.helper.runIntegratorCallback
 import com.glia.widgets.helper.rx.GliaWidgetsSchedulers
 import com.glia.widgets.helper.rx.Schedulers
 import com.glia.widgets.helper.stringValue
@@ -288,7 +289,7 @@ internal object Dependencies {
 
         gliaCore.init(gliaWidgetsConfig, onComplete = {
             initializeWidgets(gliaWidgetsConfig)
-            onComplete.onComplete()
+            runIntegratorCallback { onComplete.onComplete() }
             GliaLogger.i(LogEvents.WIDGETS_SDK_CONFIGURED)
         }, onError = onError)
 

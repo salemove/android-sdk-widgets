@@ -8,6 +8,7 @@ import com.glia.widgets.di.Dependencies
 import com.glia.widgets.di.Dependencies.repositoryFactory
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
+import com.glia.widgets.helper.runIntegratorCallback
 import com.glia.widgets.toWidgetsType
 import com.glia.androidsdk.visitor.Authentication as CoreAuthentication
 
@@ -38,11 +39,11 @@ internal class AuthenticationManager(
         Logger.i(TAG, "Authenticate. Is external access token used: ${externalAccessToken != null}")
         authentication.authenticate(jwtToken, externalAccessToken) { _, gliaException ->
             if (gliaException != null) {
-                onError.onError(gliaException.toWidgetsType())
+                runIntegratorCallback { onError.onError(gliaException.toWidgetsType()) }
             } else {
                 //Here we need to subscribe to secure conversations repository to get the data for authenticated visitors
                 repositoryFactory.secureConversationsRepository.subscribe()
-                onComplete.onComplete()
+                runIntegratorCallback { onComplete.onComplete() }
             }
 
             //This function must be called inside authentication callback regardless of the result, because we need to handle failed authentication as well
@@ -59,7 +60,7 @@ internal class AuthenticationManager(
 
         authentication.deauthenticate(stopPushNotifications) { _, gliaException ->
             if (gliaException != null) {
-                onError.onError(gliaException.toWidgetsType())
+                runIntegratorCallback { onError.onError(gliaException.toWidgetsType()) }
             } else {
                 //Reset controllers and data on success block, to keep current engagement interactive in case de-authentication is forbidden during engagement
                 Dependencies.destroyControllersAndResetEngagementData()
@@ -68,7 +69,7 @@ internal class AuthenticationManager(
                 //and we don't need secure conversations data for un-authenticated visitors.
                 repositoryFactory.secureConversationsRepository.unsubscribeAndResetData()
 
-                onComplete.onComplete()
+                runIntegratorCallback { onComplete.onComplete() }
             }
         }
     }
@@ -78,9 +79,9 @@ internal class AuthenticationManager(
         Logger.i(TAG, "Refresh authentication")
         authentication.refresh(jwtToken, externalAccessToken) { _, gliaException ->
             if (gliaException != null) {
-                onError.onError(gliaException.toWidgetsType())
+                runIntegratorCallback { onError.onError(gliaException.toWidgetsType()) }
             } else {
-                onComplete.onComplete()
+                runIntegratorCallback { onComplete.onComplete() }
             }
         }
     }

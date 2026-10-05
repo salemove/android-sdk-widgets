@@ -1,5 +1,7 @@
 package com.glia.widgets.secureconversations
 
+import android.assertRethrownOnMainThread
+import android.runOnCoreThread
 import com.glia.androidsdk.RequestCallback
 import com.glia.widgets.callbacks.OnResult
 import io.mockk.Runs
@@ -10,7 +12,10 @@ import io.mockk.slot
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 
+@RunWith(RobolectricTestRunner::class)
 class SecureConversationsImplTest {
 
     private lateinit var secureConversationsCore: com.glia.androidsdk.secureconversations.SecureConversations
@@ -35,6 +40,21 @@ class SecureConversationsImplTest {
         assert(secureConversationsWidgets.subscribedCallbacks.containsKey(callback.hashCode()))
         requestCallbackSlot.captured.onResult(unreadCount, null)
         verify { callback.onResult(unreadCount) }
+    }
+
+    @Test
+    fun `subscribeToUnreadMessageCount keeps the subscription and re-throws on the main thread when the integrator callback throws`() {
+        val integratorBug = IllegalStateException("integrator bug")
+        val callback = OnResult<Int> { throw integratorBug }
+        val requestCallbackSlot = slot<RequestCallback<Int>>()
+        every { secureConversationsCore.subscribeToUnreadMessageCount(capture(requestCallbackSlot)) } just Runs
+        secureConversationsWidgets.subscribeToUnreadMessageCount(callback)
+
+        runOnCoreThread { requestCallbackSlot.captured.onResult(10, null) }
+
+        assert(secureConversationsWidgets.subscribedCallbacks.containsKey(callback.hashCode()))
+        verify(exactly = 0) { secureConversationsCore.unSubscribeFromUnreadMessageCount(any()) }
+        assertRethrownOnMainThread(integratorBug)
     }
 
     @Test

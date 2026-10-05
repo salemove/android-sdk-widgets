@@ -1,6 +1,7 @@
 package android
 
 import android.content.Intent
+import android.os.Looper
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.telemetry_lib.GliaTelemetry
 import com.glia.widgets.di.Dependencies
@@ -14,7 +15,12 @@ import io.mockk.mockkStatic
 import io.mockk.unmockkStatic
 import io.reactivex.rxjava3.functions.Predicate
 import io.reactivex.rxjava3.subscribers.TestSubscriber
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertSame
+import org.junit.Assert.assertThrows
+import org.robolectric.Shadows.shadowOf
 import java.nio.charset.StandardCharsets
+import kotlin.concurrent.thread
 
 // This file is meant to write extensions that are used in the tests.
 
@@ -100,4 +106,20 @@ internal fun GliaLogger.mockk() {
 
 internal fun GliaLogger.unMockk() {
     unmockkStatic(GLIA_LOGGER_PATH)
+}
+
+/**
+ * Runs [block] on a background thread, the way Core SDK delivers callbacks, and fails if an exception escapes it.
+ */
+internal fun runOnCoreThread(block: () -> Unit) {
+    var escaped: Throwable? = null
+    thread { runCatching(block).onFailure { escaped = it } }.join()
+    assertNull("Exception escaped to the Core SDK thread", escaped)
+}
+
+/**
+ * Runs the tasks posted to the main thread and checks that [expected] is thrown there. Requires Robolectric.
+ */
+internal fun assertRethrownOnMainThread(expected: Throwable) {
+    assertSame(expected, assertThrows(Throwable::class.java) { shadowOf(Looper.getMainLooper()).idle() })
 }

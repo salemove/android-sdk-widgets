@@ -1,6 +1,8 @@
 package com.glia.widgets.internal.authentication
 
+import android.assertRethrownOnMainThread
 import android.mock
+import android.runOnCoreThread
 import android.unMock
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
@@ -24,12 +26,15 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 import com.glia.androidsdk.visitor.Authentication as CoreAuthentication
 
+@RunWith(RobolectricTestRunner::class)
 internal class AuthenticationManagerTest {
 
     private lateinit var coreAuthentication: CoreAuthentication
-    private lateinit var onAuthenticationRequestCallback: () -> Unit
+    private var authenticationRequests: Int = 0
 
     private lateinit var secureConversationsRepository: SecureConversationsRepository
     private lateinit var engagementRepository: EngagementRepository
@@ -41,7 +46,6 @@ internal class AuthenticationManagerTest {
     @Before
     fun setUp() {
         coreAuthentication = mockk(relaxUnitFun = true)
-        onAuthenticationRequestCallback = mockk<() -> Unit>(relaxed = true)
         secureConversationsRepository = mockk(relaxUnitFun = true)
         engagementRepository = mockk(relaxUnitFun = true)
         pushClickHandlerController = mockk(relaxUnitFun = true)
@@ -52,7 +56,7 @@ internal class AuthenticationManagerTest {
         every { Dependencies.repositoryFactory.engagementRepository } returns engagementRepository
         every { Dependencies.controllerFactory.pushClickHandlerController } returns pushClickHandlerController
 
-        authenticationManager = AuthenticationManager(coreAuthentication, onAuthenticationRequestCallback)
+        authenticationManager = AuthenticationManager(coreAuthentication) { authenticationRequests++ }
     }
 
     @After
@@ -85,7 +89,7 @@ internal class AuthenticationManagerTest {
 
         authenticationManager.authenticate(token, externalAccessToken, onComplete, onError)
 
-        verify { onAuthenticationRequestCallback() }
+        assertEquals(1, authenticationRequests)
         verify { Dependencies.destroyControllersAndResetQueueing() }
         verify { Logger.i(any(), any()) }
 
@@ -129,7 +133,7 @@ internal class AuthenticationManagerTest {
 
         authenticationManager.authenticate(token, externalAccessToken, onComplete, onError)
 
-        verify { onAuthenticationRequestCallback() }
+        assertEquals(1, authenticationRequests)
         verify { Dependencies.destroyControllersAndResetQueueing() }
         verify { Logger.i(any(), any()) }
 
@@ -280,4 +284,64 @@ internal class AuthenticationManagerTest {
         }
     }
 
+    @Test
+    fun `authenticate finishes its own work when the integrator onComplete throws`() {
+        every { Dependencies.destroyControllersAndResetQueueing() } just Runs
+        val integratorBug = IllegalStateException("integrator bug")
+        val onError = mockk<OnError>(relaxUnitFun = true)
+        val authCallbackSlot = slot<RequestCallback<Void>>()
+        authenticationManager.authenticate("token", null, { throw integratorBug }, onError)
+        verify { coreAuthentication.authenticate(any(), any(), capture(authCallbackSlot)) }
+
+        runOnCoreThread { authCallbackSlot.captured.onResult(null, null) }
+
+        verify { pushClickHandlerController.onAuthenticationAttempt() }
+        verify(exactly = 0) { onError.onError(any()) }
+        assertRethrownOnMainThread(integratorBug)
+    }
+
+    @Test
+    fun `authenticate finishes its own work when the integrator onError throws`() {
+        every { Dependencies.destroyControllersAndResetQueueing() } just Runs
+        val integratorBug = IllegalStateException("integrator bug")
+        val onComplete = mockk<OnComplete>(relaxUnitFun = true)
+        val authCallbackSlot = slot<RequestCallback<Void>>()
+        authenticationManager.authenticate("token", null, onComplete) { throw integratorBug }
+        verify { coreAuthentication.authenticate(any(), any(), capture(authCallbackSlot)) }
+
+        runOnCoreThread { authCallbackSlot.captured.onResult(null, GliaException("error", GliaException.Cause.INVALID_INPUT)) }
+
+        verify { pushClickHandlerController.onAuthenticationAttempt() }
+        verify(exactly = 0) { onComplete.onComplete() }
+        assertRethrownOnMainThread(integratorBug)
+    }
+
+    @Test
+    fun `deauthenticate re-throws on the main thread when the integrator onComplete throws`() {
+        every { Dependencies.destroyControllersAndResetEngagementData() } just Runs
+        val integratorBug = IllegalStateException("integrator bug")
+        val onError = mockk<OnError>(relaxUnitFun = true)
+        val authCallbackSlot = slot<RequestCallback<Void>>()
+        authenticationManager.deauthenticate(true, { throw integratorBug }, onError)
+        verify { coreAuthentication.deauthenticate(any(), capture(authCallbackSlot)) }
+
+        runOnCoreThread { authCallbackSlot.captured.onResult(null, null) }
+
+        verify(exactly = 0) { onError.onError(any()) }
+        assertRethrownOnMainThread(integratorBug)
+    }
+
+    @Test
+    fun `refresh re-throws on the main thread when the integrator onError throws`() {
+        val integratorBug = IllegalStateException("integrator bug")
+        val onComplete = mockk<OnComplete>(relaxUnitFun = true)
+        val authCallbackSlot = slot<RequestCallback<Void>>()
+        authenticationManager.refresh("token", null, onComplete) { throw integratorBug }
+        verify { coreAuthentication.refresh(any(), any(), capture(authCallbackSlot)) }
+
+        runOnCoreThread { authCallbackSlot.captured.onResult(null, GliaException("error", GliaException.Cause.INVALID_INPUT)) }
+
+        verify(exactly = 0) { onComplete.onComplete() }
+        assertRethrownOnMainThread(integratorBug)
+    }
 }

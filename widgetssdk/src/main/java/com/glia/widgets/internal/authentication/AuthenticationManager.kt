@@ -8,6 +8,7 @@ import com.glia.widgets.di.Dependencies
 import com.glia.widgets.di.Dependencies.repositoryFactory
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
+import com.glia.widgets.helper.runIntegratorCallback
 import com.glia.widgets.toWidgetsType
 import io.reactivex.rxjava3.core.Scheduler
 import com.glia.androidsdk.visitor.Authentication as CoreAuthentication
@@ -44,11 +45,11 @@ internal class AuthenticationManager(
             onSuccess = {
                 //Here we need to subscribe to secure conversations repository to get the data for authenticated visitors
                 repositoryFactory.secureConversationsRepository.subscribe()
-                onComplete.onComplete()
+                runIntegratorCallback { onComplete.onComplete() }
                 reportAuthenticationAttempt()
             },
             onFailure = {
-                onError.onError(it.toWidgetsType())
+                runIntegratorCallback { onError.onError(it.toWidgetsType()) }
                 reportAuthenticationAttempt()
             }
         )
@@ -71,9 +72,9 @@ internal class AuthenticationManager(
                 //and we don't need secure conversations data for un-authenticated visitors.
                 repositoryFactory.secureConversationsRepository.unsubscribeAndResetData()
 
-                onComplete.onComplete()
+                runIntegratorCallback { onComplete.onComplete() }
             },
-            onFailure = { onError.onError(it.toWidgetsType()) }
+            onFailure = { runIntegratorCallback { onError.onError(it.toWidgetsType()) } }
         )
     }
 
@@ -83,8 +84,8 @@ internal class AuthenticationManager(
         authentication.refresh(
             jwtToken,
             externalAccessToken,
-            onSuccess = onComplete::onComplete,
-            onFailure = { onError.onError(it.toWidgetsType()) }
+            onSuccess = { runIntegratorCallback { onComplete.onComplete() } },
+            onFailure = { runIntegratorCallback { onError.onError(it.toWidgetsType()) } }
         )
     }
 

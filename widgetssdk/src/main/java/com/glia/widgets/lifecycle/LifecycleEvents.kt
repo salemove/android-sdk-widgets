@@ -2,6 +2,7 @@ package com.glia.widgets.lifecycle
 
 import android.annotation.SuppressLint
 import com.glia.widgets.engagement.domain.LifecycleEventUseCase
+import com.glia.widgets.helper.runIntegratorCallback
 import io.reactivex.rxjava3.disposables.Disposable
 
 internal interface LifecycleEvents {
@@ -20,7 +21,7 @@ internal class LifecycleEventsImpl(
             // Already subscribed
             return
         }
-        subscriptions[listener.hashCode()] = lifecycleEventUseCase().subscribe(listener::onEvent)
+        subscriptions[listener.hashCode()] = lifecycleEventUseCase().subscribe { event -> runIntegratorCallback { listener.onEvent(event) } }
     }
 
     override fun unsubscribe(listener: OnLifecycleEvent) {

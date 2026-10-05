@@ -41,6 +41,25 @@ class PushNotificationsImplTest {
     }
 
     @Test
+    fun `updateRegistrationId passes the installation ID to core`() {
+        pushNotifications.updateRegistrationId("fDeShJIzS2K6x3Fi4S68bv")
+
+        verify(exactly = 1) { corePushNotifications.updateRegistrationId(any()) }
+        verify(exactly = 1) { corePushNotifications.updateRegistrationId("fDeShJIzS2K6x3Fi4S68bv") }
+        verify(exactly = 0) { corePushNotifications.updateFcmToken(any()) }
+    }
+
+    @Suppress("DEPRECATION")
+    @Test
+    fun `updateFcmToken passes the registration token to core`() {
+        pushNotifications.updateFcmToken("dGVzdA:APA91bHPRgkF3JUikC4ENAHEeMrd41Zxv3hVZjC9KtT8OvPVGJ")
+
+        verify(exactly = 1) { corePushNotifications.updateFcmToken(any()) }
+        verify(exactly = 1) { corePushNotifications.updateFcmToken("dGVzdA:APA91bHPRgkF3JUikC4ENAHEeMrd41Zxv3hVZjC9KtT8OvPVGJ") }
+        verify(exactly = 0) { corePushNotifications.updateRegistrationId(any()) }
+    }
+
+    @Test
     fun `pushMessageTypeOf maps every core push type to its widgets counterpart`() {
         CorePushType.entries.forEach { coreType ->
             val bundle = mockk<Bundle>()

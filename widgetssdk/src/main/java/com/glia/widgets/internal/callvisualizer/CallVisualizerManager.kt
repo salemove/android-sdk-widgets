@@ -7,6 +7,7 @@ import com.glia.telemetry_lib.GliaLogger
 import com.glia.widgets.callbacks.OnComplete
 import com.glia.widgets.callvisualizer.controller.CallVisualizerContract
 import com.glia.widgets.callvisualizer.CallVisualizer
+import com.glia.widgets.helper.runIntegratorCallback
 import com.glia.widgets.internal.callvisualizer.domain.VisitorCodeViewBuilderUseCase
 
 internal class CallVisualizerManager(
@@ -37,12 +38,12 @@ internal class CallVisualizerManager(
     @SuppressLint("CheckResult")
     override fun onEngagementStart(onComplete: OnComplete) {
         GliaLogger.logMethodUse(CallVisualizer::class, "onEngagementStart")
-        callVisualizerController.engagementStartFlow.subscribe { onComplete.onComplete() }
+        callVisualizerController.engagementStartFlow.subscribe { runIntegratorCallback { onComplete.onComplete() } }
     }
 
     @SuppressLint("CheckResult")
     override fun onEngagementEnd(onComplete: OnComplete) {
         GliaLogger.logMethodUse(CallVisualizer::class, "onEngagementEnd")
-        callVisualizerController.engagementEndFlow.subscribe { onComplete.onComplete() }
+        callVisualizerController.engagementEndFlow.subscribe { runIntegratorCallback { onComplete.onComplete() } }
     }
 }

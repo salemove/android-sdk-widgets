@@ -1,7 +1,9 @@
 package com.glia.widgets.internal.callvisualizer
 
+import android.assertRethrownOnMainThread
 import android.content.Context
 import android.mockk
+import android.runOnCoreThread
 import android.unMockk
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.widgets.callbacks.OnComplete
@@ -11,12 +13,19 @@ import com.glia.widgets.view.VisitorCodeView
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import io.reactivex.rxjava3.functions.Consumer
+import io.reactivex.rxjava3.plugins.RxJavaPlugins
 import io.reactivex.rxjava3.processors.PublishProcessor
 import org.junit.After
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 import com.glia.widgets.engagement.State as EngagementState
 
+@RunWith(RobolectricTestRunner::class)
 internal class CallVisualizerManagerTest {
 
     private lateinit var buildVisitorCodeUseCase: VisitorCodeViewBuilderUseCase
@@ -26,9 +35,14 @@ internal class CallVisualizerManagerTest {
 
     private lateinit var callVisualizerManager: CallVisualizerManager
 
+    private var previousRxErrorHandler: Consumer<in Throwable>? = null
+    private val rxErrors: MutableList<Throwable> = mutableListOf()
+
     @Before
     fun setUp() {
         GliaLogger.mockk()
+        previousRxErrorHandler = RxJavaPlugins.getErrorHandler()
+        RxJavaPlugins.setErrorHandler { rxErrors.add(it) }
 
         buildVisitorCodeUseCase = mockk()
         callVisualizerController = mockk(relaxUnitFun = true)
@@ -44,6 +58,7 @@ internal class CallVisualizerManagerTest {
     @After
     fun tearDown() {
         GliaLogger.unMockk()
+        RxJavaPlugins.setErrorHandler(previousRxErrorHandler)
     }
 
     @Test
@@ -96,5 +111,39 @@ internal class CallVisualizerManagerTest {
         engagementEndProcessor.onNext(mockk())
 
         assert(invoked)
+    }
+
+    @Test
+    fun `onEngagementStart keeps listening and re-throws on the main thread when the integrator callback throws`() {
+        val integratorBug = IllegalStateException("integrator bug")
+        var calls = 0
+        callVisualizerManager.onEngagementStart { calls++; throw integratorBug }
+
+        runOnCoreThread {
+            engagementStartProcessor.onNext(mockk())
+            engagementStartProcessor.onNext(mockk())
+        }
+
+        assertEquals(2, calls)
+        assertTrue(engagementStartProcessor.hasSubscribers())
+        assertEquals(emptyList<Throwable>(), rxErrors)
+        assertRethrownOnMainThread(integratorBug)
+    }
+
+    @Test
+    fun `onEngagementEnd keeps listening and re-throws on the main thread when the integrator callback throws`() {
+        val integratorBug = IllegalStateException("integrator bug")
+        var calls = 0
+        callVisualizerManager.onEngagementEnd { calls++; throw integratorBug }
+
+        runOnCoreThread {
+            engagementEndProcessor.onNext(mockk())
+            engagementEndProcessor.onNext(mockk())
+        }
+
+        assertEquals(2, calls)
+        assertTrue(engagementEndProcessor.hasSubscribers())
+        assertEquals(emptyList<Throwable>(), rxErrors)
+        assertRethrownOnMainThread(integratorBug)
     }
 }

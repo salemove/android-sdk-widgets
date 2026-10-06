@@ -41,7 +41,7 @@ import org.json.JSONException
  * }<pre/>
  * <p>
  * The card leaves the app only when the visitor taps an `http`, `https`, `tel` or `mailto` link.
- * Script-initiated navigation and iframes other than `about:srcdoc` are blocked.
+ * Script-initiated navigation, iframes other than `about:srcdoc`, and form submissions are blocked.
  * @see CustomCardViewHolder
 </pre> */
 class WebViewViewHolder @SuppressLint("SetJavaScriptEnabled") constructor(parent: ViewGroup) :
@@ -87,7 +87,7 @@ class WebViewViewHolder @SuppressLint("SetJavaScriptEnabled") constructor(parent
         val metadata = message.metadata
         if (metadata != null) {
             try {
-                val html = metadata.getString(METADATA_KEY)
+                val html = CustomCardHtml.withPrefix(metadata.getString(METADATA_KEY), CustomCardHtml.prefix())
                 webView.loadDataWithBaseURL("", html + JS_SCRIPT, MIME_TYPE, ENCODING, "")
             } catch (e: JSONException) {
                 e.printStackTrace()

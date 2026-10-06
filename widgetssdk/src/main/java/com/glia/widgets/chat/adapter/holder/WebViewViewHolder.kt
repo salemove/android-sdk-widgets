@@ -1,6 +1,8 @@
 package com.glia.widgets.chat.adapter.holder
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.webkit.JavascriptInterface
@@ -8,6 +10,9 @@ import android.webkit.WebView
 import com.glia.androidsdk.chat.ChatMessage
 import com.glia.widgets.R
 import com.glia.widgets.chat.adapter.CustomCardMessage
+import com.glia.widgets.di.Dependencies
+import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.TAG
 import org.json.JSONException
 
 /**
@@ -34,6 +39,9 @@ import org.json.JSONException
  *     <\/p>
  * " }
  * }<pre/>
+ * <p>
+ * The card leaves the app only when the visitor taps an `http`, `https`, `tel` or `mailto` link.
+ * Script-initiated navigation and iframes other than `about:srcdoc` are blocked.
  * @see CustomCardViewHolder
 </pre> */
 class WebViewViewHolder @SuppressLint("SetJavaScriptEnabled") constructor(parent: ViewGroup) :
@@ -49,6 +57,13 @@ class WebViewViewHolder @SuppressLint("SetJavaScriptEnabled") constructor(parent
         webViewSettings.javaScriptEnabled = true
         webViewSettings.allowFileAccess = false
         webView.addJavascriptInterface(JavaScriptInterface(), "Glia")
+        webView.webViewClient = CustomCardWebViewClient(::openTappedLink)
+    }
+
+    private fun openTappedLink(context: Context, uri: Uri) {
+        Dependencies.activityLauncher.launchUri(context, uri) {
+            Logger.w(TAG, "No app to open the tapped custom card link", mapOf("scheme" to (uri.scheme ?: "none")))
+        }
     }
 
     /**

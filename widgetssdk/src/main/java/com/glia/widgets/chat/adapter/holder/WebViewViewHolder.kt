@@ -56,6 +56,9 @@ class WebViewViewHolder @SuppressLint("SetJavaScriptEnabled") constructor(parent
         val webViewSettings = webView.settings
         webViewSettings.javaScriptEnabled = true
         webViewSettings.allowFileAccess = false
+        webViewSettings.allowContentAccess = false
+        webViewSettings.javaScriptCanOpenWindowsAutomatically = false
+        webViewSettings.setSupportMultipleWindows(false)
         webView.addJavascriptInterface(JavaScriptInterface(), "Glia")
         webView.webViewClient = CustomCardWebViewClient(::openTappedLink)
     }

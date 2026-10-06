@@ -4,6 +4,7 @@ import android.webkit.WebView
 import android.widget.FrameLayout
 import androidx.test.core.app.ApplicationProvider
 import com.glia.widgets.R
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -20,6 +21,18 @@ class WebViewViewHolderTest {
     fun setUp() {
         val holder = WebViewViewHolder(FrameLayout(ApplicationProvider.getApplicationContext()))
         webView = holder.itemView.findViewById(R.id.web_view)
+    }
+
+    @Test
+    fun `card WebView cannot access local files or content providers`() {
+        assertFalse(webView.settings.allowFileAccess)
+        assertFalse(webView.settings.allowContentAccess)
+    }
+
+    @Test
+    fun `card WebView cannot open new windows`() {
+        assertFalse(webView.settings.javaScriptCanOpenWindowsAutomatically)
+        assertFalse(webView.settings.supportMultipleWindows())
     }
 
     @Test

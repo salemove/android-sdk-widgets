@@ -4,6 +4,8 @@ import android.webkit.WebView
 import android.widget.FrameLayout
 import androidx.test.core.app.ApplicationProvider
 import com.glia.widgets.R
+import com.glia.widgets.chat.adapter.CustomCardMessage
+import org.json.JSONObject
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -15,11 +17,12 @@ import org.robolectric.Shadows.shadowOf
 @RunWith(RobolectricTestRunner::class)
 class WebViewViewHolderTest {
 
+    private lateinit var holder: WebViewViewHolder
     private lateinit var webView: WebView
 
     @Before
     fun setUp() {
-        val holder = WebViewViewHolder(FrameLayout(ApplicationProvider.getApplicationContext()))
+        holder = WebViewViewHolder(FrameLayout(ApplicationProvider.getApplicationContext()))
         webView = holder.itemView.findViewById(R.id.web_view)
     }
 
@@ -39,4 +42,20 @@ class WebViewViewHolderTest {
     fun `card WebView uses the gesture-gated client`() {
         assertTrue(shadowOf(webView).webViewClient is CustomCardWebViewClient)
     }
+
+    @Test
+    fun `bind loads the content security policy ahead of the card HTML`() {
+        val cardHtml = "<p>hi</p>"
+
+        holder.bind(message(cardHtml)) { _, _ -> }
+
+        val loaded = requireNotNull(shadowOf(webView).lastLoadDataWithBaseURL).data
+        val cspIndex = loaded.indexOf("http-equiv=\"Content-Security-Policy\"")
+        val cardIndex = loaded.indexOf(cardHtml)
+        assertTrue(cspIndex >= 0)
+        assertTrue(cardIndex > cspIndex)
+    }
+
+    private fun message(html: String): CustomCardMessage =
+        CustomCardMessage(id = "id", metadata = JSONObject().put("html", html), selectedOption = null)
 }

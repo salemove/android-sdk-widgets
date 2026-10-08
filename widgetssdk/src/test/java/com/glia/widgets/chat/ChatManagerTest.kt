@@ -2,6 +2,7 @@ package com.glia.widgets.chat
 
 import android.os.Looper
 import com.glia.androidsdk.GliaException
+import com.glia.androidsdk.chat.ChatHistory
 import com.glia.androidsdk.chat.ChatMessage
 import com.glia.androidsdk.chat.OperatorMessage
 import com.glia.androidsdk.chat.SystemMessage
@@ -12,7 +13,6 @@ import com.glia.widgets.chat.domain.AppendNewChatMessageUseCase
 import com.glia.widgets.chat.domain.GliaLoadHistoryUseCase
 import com.glia.widgets.chat.domain.GliaOnMessageUseCase
 import com.glia.widgets.chat.domain.HandleCustomCardClickUseCase
-import com.glia.widgets.chat.domain.HasOlderHistoryUseCase
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.chat.domain.LoadOlderHistoryUseCase
 import com.glia.widgets.chat.domain.SendUnsentMessagesUseCase
@@ -43,11 +43,13 @@ import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.processors.BehaviorProcessor
 import io.reactivex.rxjava3.schedulers.Schedulers
+import io.reactivex.rxjava3.subjects.SingleSubject
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -74,7 +76,6 @@ class ChatManagerTest {
     private lateinit var onMessageUseCase: GliaOnMessageUseCase
     private lateinit var loadHistoryUseCase: GliaLoadHistoryUseCase
     private lateinit var loadOlderHistoryUseCase: LoadOlderHistoryUseCase
-    private lateinit var hasOlderHistoryUseCase: HasOlderHistoryUseCase
     private lateinit var addNewMessagesDividerUseCase: AddNewMessagesDividerUseCase
     private lateinit var shouldMarkMessagesReadUseCase: ShouldMarkMessagesReadUseCase
     private lateinit var markMessagesReadWithDelayUseCase: MarkMessagesReadWithDelayUseCase
@@ -103,7 +104,6 @@ class ChatManagerTest {
         onMessageUseCase = mock()
         loadHistoryUseCase = mock()
         loadOlderHistoryUseCase = mock()
-        hasOlderHistoryUseCase = mock()
         addNewMessagesDividerUseCase = mock()
         shouldMarkMessagesReadUseCase = mock()
         markMessagesReadWithDelayUseCase = mock()
@@ -124,7 +124,6 @@ class ChatManagerTest {
             onMessageUseCase,
             loadHistoryUseCase,
             loadOlderHistoryUseCase,
-            hasOlderHistoryUseCase,
             addNewMessagesDividerUseCase,
             shouldMarkMessagesReadUseCase,
             markMessagesReadWithDelayUseCase,
@@ -966,7 +965,7 @@ class ChatManagerTest {
             Unit
         }
 
-        val newState = subjectUnderTest.prependChatHistory(listOf(older, newer), state)
+        val newState = subjectUnderTest.prependChatHistory(ChatHistoryResponse(listOf(older, newer)), state)
 
         assertEquals(listOf(older.chatMessage.id, newer.chatMessage.id, "existing-id"), newState.chatItems.map { it.id })
     }
@@ -976,7 +975,7 @@ class ChatManagerTest {
         val first = mockChatMessage<VisitorMessage>()
         val second = mockChatMessage<OperatorMessage>()
 
-        subjectUnderTest.prependChatHistory(listOf(first, second), state)
+        subjectUnderTest.prependChatHistory(ChatHistoryResponse(listOf(first, second)), state)
 
         verify(appendHistoryChatMessageUseCase, times(2)).invoke(any(), any(), eq(false))
         verify(appendHistoryChatMessageUseCase, never()).invoke(any(), any(), eq(true))
@@ -988,7 +987,7 @@ class ChatManagerTest {
         val fresh = mockChatMessage<VisitorMessage>()
         state.chatItemIds.add(known.chatMessage.id)
 
-        subjectUnderTest.prependChatHistory(listOf(known, fresh), state)
+        subjectUnderTest.prependChatHistory(ChatHistoryResponse(listOf(known, fresh)), state)
 
         verify(appendHistoryChatMessageUseCase).invoke(any(), eq(fresh), eq(false))
         verify(appendHistoryChatMessageUseCase, never()).invoke(any(), eq(known), any())
@@ -999,7 +998,7 @@ class ChatManagerTest {
         val operatorItem: OperatorChatItem = mock()
         state.lastMessageWithVisibleOperatorImage = operatorItem
 
-        val newState = subjectUnderTest.prependChatHistory(listOf(mockChatMessage<OperatorMessage>()), state)
+        val newState = subjectUnderTest.prependChatHistory(ChatHistoryResponse(listOf(mockChatMessage<OperatorMessage>())), state)
 
         verify(addNewMessagesDividerUseCase, never()).invoke(any(), any())
         verify(markMessagesReadWithDelayUseCase, never()).invoke()
@@ -1012,17 +1011,56 @@ class ChatManagerTest {
         val existing = VisitorMessageItem("existing", "existing-id", isError = false)
         state.chatItems.add(existing)
 
-        val newState = subjectUnderTest.prependChatHistory(emptyList(), state)
+        val newState = subjectUnderTest.prependChatHistory(ChatHistoryResponse(emptyList()), state)
 
         assertEquals(listOf(existing), newState.chatItems)
         verify(appendHistoryChatMessageUseCase, never()).invoke(any(), any(), any())
     }
 
     @Test
-    fun `loadOlderHistory emits updated state and reports whether more remains`() {
+    fun `prependChatHistory stores the next older page key`() {
+        state.olderPage = mock()
+        val nextOlderPage: ChatHistory.OlderPage = mock()
+
+        val newState = subjectUnderTest.prependChatHistory(ChatHistoryResponse(emptyList(), olderPage = nextOlderPage), state)
+
+        assertSame(nextOlderPage, newState.olderPage)
+    }
+
+    @Test
+    fun `mapChatHistory stores the older page key`() {
+        val olderPage: ChatHistory.OlderPage = mock()
+
+        val newState = subjectUnderTest.mapChatHistory(ChatHistoryResponse(listOf(mockChatMessage<VisitorMessage>()), olderPage = olderPage), state)
+
+        assertSame(olderPage, newState.olderPage)
+    }
+
+    @Test
+    fun `mapChatHistory stores the older page key for an empty first page`() {
+        val olderPage: ChatHistory.OlderPage = mock()
+
+        val newState = subjectUnderTest.mapChatHistory(ChatHistoryResponse(emptyList(), olderPage = olderPage), state)
+
+        assertSame(olderPage, newState.olderPage)
+    }
+
+    @Test
+    fun `mapChatHistory clears the older page key when the response has none`() {
+        state.olderPage = mock()
+
+        val newState = subjectUnderTest.mapChatHistory(ChatHistoryResponse(emptyList()), state)
+
+        assertNull(newState.olderPage)
+    }
+
+    @Test
+    fun `loadOlderHistory passes the stored key, emits updated state and stores the next key`() {
+        val olderPage: ChatHistory.OlderPage = mock()
+        val nextOlderPage: ChatHistory.OlderPage = mock()
+        state.olderPage = olderPage
         val older = mockChatMessage<VisitorMessage>("older")
-        whenever(loadOlderHistoryUseCase()) doReturn Single.just(listOf(older))
-        whenever(hasOlderHistoryUseCase()) doReturn true
+        whenever(loadOlderHistoryUseCase(olderPage)) doReturn Single.just(ChatHistoryResponse(listOf(older), olderPage = nextOlderPage))
         whenever(appendHistoryChatMessageUseCase(any(), any(), any())) doAnswer {
             val items = it.getArgument<MutableList<ChatItem>>(0)
             val message = it.getArgument<ChatMessageInternal>(1).chatMessage
@@ -1034,26 +1072,67 @@ class ChatManagerTest {
         subjectUnderTest.loadOlderHistory().test().assertValue(true)
 
         assertEquals(listOf(older.chatMessage.id), stateProcessor.value?.chatItems?.map { it.id })
+        assertSame(nextOlderPage, stateProcessor.value?.olderPage)
+        assertTrue(subjectUnderTest.hasOlderHistory())
         assertEquals(2, stateObserver.values().size)
     }
 
     @Test
-    fun `loadOlderHistory propagates use case error without emitting state`() {
+    fun `loadOlderHistory reports false after loading the oldest page`() {
+        state.olderPage = mock()
+        whenever(loadOlderHistoryUseCase(any())) doReturn Single.just(ChatHistoryResponse(emptyList()))
+
+        subjectUnderTest.loadOlderHistory().test().assertValue(false)
+
+        assertNull(stateProcessor.value?.olderPage)
+        assertFalse(subjectUnderTest.hasOlderHistory())
+    }
+
+    @Test
+    fun `loadOlderHistory without a key returns false without a request`() {
+        subjectUnderTest.loadOlderHistory().test().assertValue(false)
+
+        verify(loadOlderHistoryUseCase, never()).invoke(any())
+    }
+
+    @Test
+    fun `loadOlderHistory propagates use case error and keeps the key for a retry`() {
+        val olderPage: ChatHistory.OlderPage = mock()
+        state.olderPage = olderPage
         val error = RuntimeException("expired")
-        whenever(loadOlderHistoryUseCase()) doReturn Single.error(error)
+        whenever(loadOlderHistoryUseCase(olderPage)) doReturn Single.error(error)
         val stateObserver = stateProcessor.test()
 
         subjectUnderTest.loadOlderHistory().test().assertError(error)
 
         assertEquals(1, stateObserver.values().size)
-        verify(hasOlderHistoryUseCase, never()).invoke()
+        assertSame(olderPage, stateProcessor.value?.olderPage)
     }
 
     @Test
-    fun `hasOlderHistory delegates to use case`() {
-        whenever(hasOlderHistoryUseCase()) doReturn true
+    fun `loadOlderHistory drops a page that arrives after reset`() {
+        state.olderPage = mock()
+        val page = SingleSubject.create<ChatHistoryResponse>()
+        whenever(loadOlderHistoryUseCase(any())) doReturn page
+        val result = subjectUnderTest.loadOlderHistory().test()
 
-        assertTrue(subjectUnderTest.hasOlderHistory())
+        subjectUnderTest.reset()
+        page.onSuccess(ChatHistoryResponse(listOf(mockChatMessage<VisitorMessage>()), olderPage = mock()))
+
+        result.assertValue(false)
+        assertTrue(stateProcessor.value?.chatItems.orEmpty().isEmpty())
+        assertNull(stateProcessor.value?.olderPage)
+        verify(appendHistoryChatMessageUseCase, never()).invoke(any(), any(), any())
+    }
+
+    @Test
+    fun `reset clears the older page key`() {
+        state.olderPage = mock()
+
+        subjectUnderTest.reset()
+
+        assertNull(stateProcessor.value?.olderPage)
+        assertFalse(subjectUnderTest.hasOlderHistory())
     }
 
     @Test

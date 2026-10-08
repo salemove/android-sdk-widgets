@@ -3,6 +3,7 @@ package com.glia.widgets.chat.data
 import com.glia.androidsdk.Glia
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.chat.Chat
+import com.glia.androidsdk.chat.ChatHistory
 import com.glia.androidsdk.chat.ChatMessage
 import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.widgets.di.GliaCore
@@ -13,16 +14,14 @@ import java.util.function.Consumer
  */
 internal class GliaChatRepository(private val gliaCore: GliaCore) {
 
-    fun loadHistory(onSuccess: (List<ChatMessage>) -> Unit, onError: (GliaException) -> Unit) {
+    fun loadHistory(onSuccess: (ChatHistory) -> Unit, onError: (GliaException) -> Unit) {
         gliaCore.getChatHistory(onSuccess, onError)
     }
 
-    /** Next older page of history; Core keeps the cursor, see [hasOlderHistory]. */
-    fun loadOlderHistory(onSuccess: (List<ChatMessage>) -> Unit, onError: (GliaException) -> Unit) {
-        gliaCore.getOlderChatHistory(onSuccess, onError)
+    /** The page [olderPage] points at; the result carries the key of the page before it. */
+    fun loadOlderHistory(olderPage: ChatHistory.OlderPage, onSuccess: (ChatHistory) -> Unit, onError: (GliaException) -> Unit) {
+        gliaCore.getChatHistory(olderPage, onSuccess, onError)
     }
-
-    fun hasOlderHistory(): Boolean = gliaCore.hasOlderChatHistory()
 
     fun listenForAllMessages(listener: Consumer<ChatMessage>) {
         gliaCore.on(Glia.Events.CHAT_MESSAGE, listener)

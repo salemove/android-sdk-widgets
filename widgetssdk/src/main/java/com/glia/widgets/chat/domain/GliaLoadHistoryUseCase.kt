@@ -1,13 +1,12 @@
 package com.glia.widgets.chat.domain
 
-import com.glia.androidsdk.chat.ChatMessage
+import com.glia.androidsdk.chat.ChatHistory
 import com.glia.telemetry_lib.EventAttribute
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.telemetry_lib.LogEvents
 import com.glia.widgets.chat.data.GliaChatRepository
 import com.glia.widgets.internal.engagement.domain.MapOperatorUseCase
 import com.glia.widgets.internal.engagement.domain.model.ChatHistoryResponse
-import com.glia.widgets.internal.engagement.domain.model.ChatMessageInternal
 import com.glia.widgets.internal.secureconversations.SecureConversationsRepository
 import com.glia.widgets.internal.secureconversations.domain.ManageSecureMessagingStatusUseCase
 import io.reactivex.rxjava3.core.Flowable
@@ -27,7 +26,7 @@ internal class GliaLoadHistoryUseCase(
         val single = if (isSecureEngagement) {
             loadHistoryWithNewMessagesCount()
         } else {
-            loadHistoryAndMapOperator().map { ChatHistoryResponse(it) }
+            loadHistoryAndMapOperator()
         }
         return single
             .doOnSuccess {
@@ -37,17 +36,19 @@ internal class GliaLoadHistoryUseCase(
             }
     }
 
-    private fun loadHistoryWithNewMessagesCount() = Single.zip(
+    private fun loadHistoryWithNewMessagesCount(): Single<ChatHistoryResponse> = Single.zip(
         loadHistoryAndMapOperator(),
         secureConversationsRepository.unreadMessagesCountObservable.firstOrError()
-    ) { messages, count -> ChatHistoryResponse(messages, count) }
+    ) { response, count -> response.copy(newMessagesCount = count) }
 
-    private fun loadHistoryAndMapOperator(): Single<MutableList<ChatMessageInternal>> = loadHistory()
-        .flatMapPublisher { Flowable.fromIterable(it) }
-        .concatMapSingle { mapOperatorUseCase(chatMessage = it) }
-        .toSortedList(Comparator.comparingLong { it.chatMessage.timestamp })
+    private fun loadHistoryAndMapOperator(): Single<ChatHistoryResponse> = loadHistory().flatMap { history ->
+        Flowable.fromIterable(history.messages)
+            .concatMapSingle { mapOperatorUseCase(chatMessage = it) }
+            .toSortedList(Comparator.comparingLong { it.chatMessage.timestamp })
+            .map { ChatHistoryResponse(it, olderPage = history.olderPage) }
+    }
 
-    private fun loadHistory(): Single<List<ChatMessage>> = Single.create { emitter ->
+    private fun loadHistory(): Single<ChatHistory> = Single.create { emitter ->
         gliaChatRepository.loadHistory(emitter::onSuccess, emitter::onError)
     }
 }

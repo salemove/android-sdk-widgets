@@ -46,6 +46,54 @@ class LifecycleEventUseCaseImplTest {
     }
 
     @Test
+    fun `invoke emits one EngagementEnded when the survey follows the end`() {
+        every { engagementStateUseCase() } returns Flowable.just<State>(
+            State.EngagementStarted(isCallVisualizer = false),
+            State.EngagementEnded(EndAction.ClearStateRegular),
+            State.EngagementEnded(EndAction.ShowEndDialog)
+        )
+
+        val result = useCase().toList().blockingGet()
+
+        assertEquals(listOf(LifecycleEvent.EngagementStarted, LifecycleEvent.EngagementEnded), result)
+    }
+
+    @Test
+    fun `invoke emits one EngagementStarted when authentication restarts the engagement`() {
+        every { engagementStateUseCase() } returns Flowable.just<State>(
+            State.EngagementStarted(isCallVisualizer = false),
+            State.EngagementStarted(isCallVisualizer = false),
+            State.EngagementEnded(EndAction.ShowEndDialog)
+        )
+
+        val result = useCase().toList().blockingGet()
+
+        assertEquals(listOf(LifecycleEvent.EngagementStarted, LifecycleEvent.EngagementEnded), result)
+    }
+
+    @Test
+    fun `invoke emits every event of consecutive engagements`() {
+        every { engagementStateUseCase() } returns Flowable.just<State>(
+            State.EngagementStarted(isCallVisualizer = false),
+            State.EngagementEnded(EndAction.ShowEndDialog),
+            State.EngagementStarted(isCallVisualizer = false),
+            State.EngagementEnded(EndAction.ShowEndDialog)
+        )
+
+        val result = useCase().toList().blockingGet()
+
+        assertEquals(
+            listOf(
+                LifecycleEvent.EngagementStarted,
+                LifecycleEvent.EngagementEnded,
+                LifecycleEvent.EngagementStarted,
+                LifecycleEvent.EngagementEnded
+            ),
+            result
+        )
+    }
+
+    @Test
     fun `invoke emits nothing for states with no lifecycle event mapping`() {
         every { engagementStateUseCase() } returns Flowable.just<State>(
             State.NoEngagement,

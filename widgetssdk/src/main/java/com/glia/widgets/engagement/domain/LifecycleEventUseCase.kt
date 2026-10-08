@@ -24,6 +24,9 @@ internal class LifecycleEventUseCaseImpl(
                 else -> Flowable.empty()
             }
         }
+            // The survey path ends with two ended states, and an authentication restarts the
+            // engagement with a second started state. Integrators get one event for each.
+            .distinctUntilChanged()
 
         // UNKNOWN is EngagementTypeUseCase's fallback for "no chat/audio/video media" - which
         // includes having no ongoing engagement at all (e.g. right after SDK init, or after an

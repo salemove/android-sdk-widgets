@@ -7,8 +7,8 @@
     android:paddingHorizontal="@dimen/glia_large"
     android:paddingVertical="@dimen/glia_medium"
     android:background="@drawable/bg_message"
-    android:backgroundTint="?attr/gliaSystemAgentBubbleColor"
+    android:backgroundTint="?attr/gliaOperatorMessageBackgroundColor"
     android:textAppearance="?attr/textAppearanceBody1"
-    android:textColor="?attr/gliaBaseDarkColor"
+    android:textColor="?attr/gliaOperatorMessageTextColor"
     android:textIsSelectable="true"
-    android:textColorLink="?attr/gliaBaseDarkColor" />
+    android:textColorLink="?attr/gliaOperatorMessageTextColor" />

@@ -38,6 +38,7 @@ import com.glia.widgets.GliaWidgetsException
 import com.glia.widgets.authentication.Authentication
 import com.glia.widgets.entrywidget.EntryWidget
 import com.glia.widgets.launcher.EngagementLauncher
+import com.glia.widgets.lifecycle.OnLifecycleEvent
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -292,6 +293,11 @@ class MainFragment : Fragment() {
         }
     }
 
+    override fun onDestroyView() {
+        if (GliaWidgets.isInitialized()) GliaWidgets.unsubscribeFromEvents(lifecycleEventListener)
+        super.onDestroyView()
+    }
+
     override fun onResume() {
         super.onResume()
 
@@ -351,6 +357,17 @@ class MainFragment : Fragment() {
         GliaWidgets.getCallVisualizer().onEngagementStart {
             activity?.runOnUiThread { removeVisitorCodeFromDedicatedView() }
         }
+    }
+
+    // One instance, so the repeated subscribe calls from initGliaWidgets add no second listener.
+    private val lifecycleEventListener: OnLifecycleEvent = OnLifecycleEvent { event ->
+        activity?.runOnUiThread {
+            Toast.makeText(context, "Event: $event", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun listenForGliaEvents() {
+        GliaWidgets.subscribeToEvents(lifecycleEventListener)
     }
 
     private fun getQueueIdsFromPrefs(sharedPreferences: SharedPreferences): List<String> {
@@ -538,6 +555,7 @@ class MainFragment : Fragment() {
         if (GliaWidgets.isInitialized()) {
             setupAuthButtonsVisibility()
             listenForCallVisualizerEngagements()
+            listenForGliaEvents()
             return
         }
 
@@ -550,6 +568,7 @@ class MainFragment : Fragment() {
             prepareAuthentication()
             setupAuthButtonsVisibility()
             listenForCallVisualizerEngagements()
+            listenForGliaEvents()
 
             view?.post { initMenu() }
         }

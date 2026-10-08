@@ -12,7 +12,7 @@ import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.databinding.ChatOperatorMessageLayoutBinding
 import com.glia.widgets.databinding.ChatReceiveMessageContentBinding
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.helper.gliaAttrFont
+import com.glia.widgets.helper.applyGliaThemeFont
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.locale.StringKey
@@ -36,7 +36,7 @@ internal class OperatorMessageViewHolder(
             false
         ).root.apply {
             // The bubble's colours come from the layout's `?attr/gliaOperatorMessage*`.
-            context.gliaAttrFont()?.also(::setTypeface)
+            context.applyGliaThemeFont(this)
 
             importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
 

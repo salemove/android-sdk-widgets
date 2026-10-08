@@ -118,10 +118,7 @@ import com.glia.widgets.internal.audio.AudioControlManager;
 import com.glia.widgets.internal.audio.domain.OnAudioStartedUseCase;
 import com.glia.widgets.internal.audio.domain.TurnSpeakerphoneUseCase;
 import com.glia.widgets.internal.callvisualizer.domain.VisitorCodeViewBuilderUseCase;
-import com.glia.widgets.internal.chathead.ChatHeadManager;
-import com.glia.widgets.internal.chathead.domain.DisplayBubbleOutsideAppUseCase;
-import com.glia.widgets.internal.chathead.domain.IsBubbleNeededUseCase;
-import com.glia.widgets.internal.chathead.domain.IsDisplayBubbleInsideAppUseCase;
+import com.glia.widgets.internal.chathead.domain.DecideBubbleRenderTargetUseCase;
 import com.glia.widgets.internal.chathead.domain.ResolveChatHeadNavigationUseCase;
 import com.glia.widgets.internal.dialog.DialogContract;
 import com.glia.widgets.internal.dialog.PermissionDialogManager;
@@ -189,8 +186,7 @@ import java.util.Optional;
  */
 public class UseCaseFactory {
     private static CallNotificationUseCase callNotificationUseCase;
-    private static DisplayBubbleOutsideAppUseCase displayBubbleOutsideAppUseCase;
-    private static IsDisplayBubbleInsideAppUseCase isDisplayBubbleInsideAppUseCase;
+    private static DecideBubbleRenderTargetUseCase decideBubbleRenderTargetUseCase;
     private static ResolveChatHeadNavigationUseCase resolveChatHeadNavigationUseCase;
     private static VisitorCodeViewBuilderUseCase visitorCodeViewBuilderUseCase;
     private final RepositoryFactory repositoryFactory;
@@ -198,7 +194,6 @@ public class UseCaseFactory {
     private final PermissionDialogManager permissionDialogManager;
     private final ConfigurationManager configurationManager;
     private final INotificationManager notificationManager;
-    private final ChatHeadManager chatHeadManager;
     private final AudioControlManager audioControlManager;
     private final Dependencies.AuthenticationManagerProvider authenticationManagerProvider;
     private final Schedulers schedulers;
@@ -212,7 +207,6 @@ public class UseCaseFactory {
                    PermissionDialogManager permissionDialogManager,
                    INotificationManager notificationManager,
                    ConfigurationManager configurationManager,
-                   ChatHeadManager chatHeadManager,
                    AudioControlManager audioControlManager,
                    Dependencies.AuthenticationManagerProvider authenticationManagerProvider,
                    Schedulers schedulers,
@@ -224,7 +218,6 @@ public class UseCaseFactory {
         this.permissionDialogManager = permissionDialogManager;
         this.notificationManager = notificationManager;
         this.configurationManager = configurationManager;
-        this.chatHeadManager = chatHeadManager;
         this.audioControlManager = audioControlManager;
         this.schedulers = schedulers;
         this.localeProvider = localeProvider;
@@ -257,38 +250,21 @@ public class UseCaseFactory {
         return new MapOperatorPlainTextUseCase();
     }
 
-    @NonNull
-    public DisplayBubbleOutsideAppUseCase getDisplayBubbleOutsideAppUseCase() {
-        if (displayBubbleOutsideAppUseCase == null) {
-            displayBubbleOutsideAppUseCase = new DisplayBubbleOutsideAppUseCase(
-                chatHeadManager,
-                permissionManager,
-                configurationManager,
-                getIsBubbleNeededUseCase()
-            );
-        }
-        return displayBubbleOutsideAppUseCase;
-    }
+
 
     @NonNull
-    public IsDisplayBubbleInsideAppUseCase getIsDisplayBubbleInsideAppUseCase() {
-        if (isDisplayBubbleInsideAppUseCase == null) {
-            isDisplayBubbleInsideAppUseCase = new IsDisplayBubbleInsideAppUseCase(
+    public DecideBubbleRenderTargetUseCase getDecideBubbleRenderTargetUseCase() {
+        if (decideBubbleRenderTargetUseCase == null) {
+            decideBubbleRenderTargetUseCase = new DecideBubbleRenderTargetUseCase(
                 permissionManager,
                 configurationManager,
-                getIsBubbleNeededUseCase()
+                getIsQueueingOrEngagementUseCase(),
+                getEngagementTypeUseCase()
             );
         }
-        return isDisplayBubbleInsideAppUseCase;
+        return decideBubbleRenderTargetUseCase;
     }
 
-    @NonNull
-    public IsBubbleNeededUseCase getIsBubbleNeededUseCase() {
-        return new IsBubbleNeededUseCase(
-            getIsQueueingOrEngagementUseCase(),
-            getEngagementTypeUseCase()
-        );
-    }
 
     @NonNull
     public ResolveChatHeadNavigationUseCase getResolveChatHeadNavigationUseCase() {

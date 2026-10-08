@@ -25,7 +25,9 @@
                 android:layout_marginTop="@dimen/glia_large_x_large"
                 android:layout_marginEnd="24dp"
                 android:gravity="center"
-                android:paddingBottom="@dimen/glia_large_x_large" />
+                android:paddingBottom="@dimen/glia_large_x_large"
+                android:textColor="?attr/gliaBaseDarkColor"
+                android:textSize="@dimen/glia_survey_default_survey_title_text_size" />
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -63,10 +65,12 @@
                     android:elevation="4dp"/>
             </FrameLayout>
 
+            <!-- The elevated panel needs an opaque background to cast a shadow over the question list. -->
             <LinearLayout
                 android:id="@+id/button_panel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="?attr/gliaBaseLightColor"
                 android:orientation="horizontal" >
 
                 <com.glia.widgets.view.button.GliaNegativeButton

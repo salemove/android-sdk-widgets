@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    Single-choice radio button drawable.
+
+    The ring colour and the checked dot used to be overwritten by `SingleQuestionViewHolder` in code
+    (`border.setStroke(...)` plus a tint list on `center_item`); both are colour state lists now, so
+    the drawable renders every state on its own and the JSON unified theme is the only thing left
+    that overrides it.
+-->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/background_item"
@@ -16,7 +24,7 @@
         <shape android:shape="oval">
             <stroke
                 android:width="@dimen/glia_px"
-                android:color="?attr/gliaBaseShadeColor" />
+                android:color="@color/survey_radio_button_border_color" />
         </shape>
     </item>
 
@@ -27,7 +35,7 @@
         android:end="5.25dp"
         android:bottom="5.25dp">
         <shape android:shape="oval">
-            <solid android:color="?attr/gliaBrandPrimaryColor" />
+            <solid android:color="@color/survey_radio_button_center_color_states" />
         </shape>
     </item>
 </layer-list>

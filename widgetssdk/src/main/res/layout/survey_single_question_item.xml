@@ -17,7 +17,8 @@
         android:layout_height="wrap_content"
         android:textAppearance="?attr/textAppearanceBody1"
         tools:text="Title"
-        android:textColor="?attr/gliaBaseDarkColor" />
+        android:textColor="?attr/gliaBaseDarkColor"
+        android:textStyle="bold" />
 
     <RadioGroup
         android:id="@+id/radio_group"

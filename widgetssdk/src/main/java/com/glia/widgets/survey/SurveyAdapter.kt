@@ -14,11 +14,9 @@ import com.glia.widgets.survey.viewholder.InputQuestionViewHolder
 import com.glia.widgets.survey.viewholder.ScaleQuestionViewHolder
 import com.glia.widgets.survey.viewholder.SingleQuestionViewHolder
 import com.glia.widgets.survey.viewholder.SurveyViewHolder
-import com.glia.widgets.view.configuration.survey.SurveyStyle
 
 internal class SurveyAdapter(
-    private val listener: SurveyAdapterListener,
-    private val style: SurveyStyle
+    private val listener: SurveyAdapterListener
 ) : RecyclerView.Adapter<SurveyViewHolder>() {
     interface SurveyAdapterListener {
         fun onAnswer(answer: Survey.Answer)
@@ -41,22 +39,22 @@ internal class SurveyAdapter(
         return when (viewType) {
             SURVEY_SCALE -> {
                 val binding = SurveyScaleQuestionItemBinding.inflate(inflater, parent, false)
-                ScaleQuestionViewHolder(binding, style)
+                ScaleQuestionViewHolder(binding)
             }
 
             SURVEY_YES_NO -> {
                 val binding = SurveyBooleanQuestionItemBinding.inflate(inflater, parent, false)
-                BooleanQuestionViewHolder(binding, style)
+                BooleanQuestionViewHolder(binding)
             }
 
             SURVEY_SINGLE_CHOICE -> {
                 val binding = SurveySingleQuestionItemBinding.inflate(inflater, parent, false)
-                SingleQuestionViewHolder(binding, style)
+                SingleQuestionViewHolder(binding)
             }
 
             else -> {
                 val binding = SurveyInputQuestionItemBinding.inflate(inflater, parent, false)
-                InputQuestionViewHolder(binding, style)
+                InputQuestionViewHolder(binding)
             }
         }
     }

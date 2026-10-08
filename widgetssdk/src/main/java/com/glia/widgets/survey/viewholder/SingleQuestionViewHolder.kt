@@ -1,9 +1,8 @@
 package com.glia.widgets.survey.viewholder
 
 import android.content.res.ColorStateList
-import android.graphics.Typeface
-import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.LayerDrawable
+import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
@@ -14,18 +13,16 @@ import com.glia.androidsdk.engagement.Survey
 import com.glia.widgets.R
 import com.glia.widgets.databinding.SurveySingleQuestionItemBinding
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.helper.gliaAttrColor
 import com.glia.widgets.survey.QuestionItem
 import com.glia.widgets.survey.SurveyAdapter
-import com.glia.widgets.view.configuration.survey.SurveyStyle
 import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.survey.SurveySingleQuestionTheme
 import java.util.Optional
 import kotlin.jvm.optionals.getOrNull
-import androidx.core.graphics.toColorInt
 
 internal class SingleQuestionViewHolder(
-    private val binding: SurveySingleQuestionItemBinding,
-    var style: SurveyStyle
+    private val binding: SurveySingleQuestionItemBinding
 ) : SurveyViewHolder(binding.root, binding.tvTitle, binding.requiredError) {
     private val singleTheme: SurveySingleQuestionTheme? by lazy {
         Dependencies.gliaThemeManager.theme?.surveyTheme?.singleQuestion
@@ -34,12 +31,7 @@ internal class SingleQuestionViewHolder(
     private val radioGroup: RadioGroup get() = binding.radioGroup
 
     init {
-        val titleConfiguration = style.singleQuestion.title
-        title.setTextColor(titleConfiguration.textColor)
-        val textSize = titleConfiguration.textSize
-        title.textSize = textSize
-        if (titleConfiguration.isBold) title.typeface = Typeface.DEFAULT_BOLD
-
+        // The title's colour, size and weight come from `survey_single_question_item.xml`.
         singleTheme?.title?.also(title::applyTextTheme)
     }
 
@@ -65,30 +57,23 @@ internal class SingleQuestionViewHolder(
             val radioButton = RadioButton(context)
             radioButton.id = View.generateViewId()
             radioButton.text = option.label
-            radioButton.setTextColor(style.singleQuestion.title.textColor)
-            val textSize = style.singleQuestion.optionText.textSize
-            radioButton.textSize = textSize
+            // The option label is built in code, so it has no layout to carry its appearance.
+            radioButton.setTextColor(context.gliaAttrColor(R.attr.gliaBaseDarkColor, R.color.glia_dark_color))
+            radioButton.setTextSize(
+                TypedValue.COMPLEX_UNIT_PX,
+                context.resources.getDimension(R.dimen.glia_survey_default_text_size)
+            )
             radioButton.isChecked = option.id == selectedId
             radioButton.setOnClickListener { setAnswer(option.id) }
+            // `bg_survey_radio_button` resolves the ring and the checked dot from the theme itself;
+            // only the JSON theme's tint has to be pushed in from here.
             val drawable = ContextCompat.getDrawable(
                 context,
                 R.drawable.bg_survey_radio_button
             ) as LayerDrawable?
-            if (drawable != null) {
-                // Set color for the center dot
-                val centerDot = drawable.findDrawableByLayerId(R.id.center_item)
-                val radiobuttonColor = singleTheme?.tintColor?.primaryColor
-                    ?: style.singleQuestion.tintColor.toColorInt()
-                val colorStateList = getRadioButtonColors(radiobuttonColor)
-                centerDot.setTintList(colorStateList)
-
-                // Set color for the border
-                val border =
-                    drawable.findDrawableByLayerId(R.id.border_item) as GradientDrawable
-                val strokeColor =
-                    ContextCompat.getColorStateList(context, R.color.glia_normal_color_opacity_30)
-                val width = context.resources.getDimensionPixelSize(R.dimen.glia_px)
-                border.setStroke(width, strokeColor)
+            singleTheme?.tintColor?.primaryColor?.also { tintColor ->
+                drawable?.findDrawableByLayerId(R.id.center_item)
+                    ?.setTintList(getRadioButtonColors(tintColor))
             }
             radioButton.buttonDrawable = drawable
             val start = context.resources.getDimensionPixelSize(R.dimen.glia_medium)

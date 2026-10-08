@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Survey option button (boolean / scale) fill.
+
+    The error state deliberately keeps the normal fill - only the stroke turns negative - which is
+    what `GliaSurveyOptionButton.applyView()` used to do in code, so `state_activated` is absent here
+    on purpose.
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="?attr/gliaBrandPrimaryColor" android:state_selected="true" />
+    <item android:color="?attr/gliaBaseLightColor" />
+</selector>

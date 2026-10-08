@@ -7,9 +7,7 @@ import android.graphics.Typeface;
 import android.util.AttributeSet;
 
 import com.glia.widgets.R;
-import com.glia.widgets.UiTheme;
 import com.glia.widgets.di.Dependencies;
-import com.glia.widgets.view.configuration.ButtonConfiguration;
 import com.glia.widgets.view.configuration.LayerConfiguration;
 import com.glia.widgets.view.configuration.OptionButtonConfiguration;
 import com.glia.widgets.view.configuration.TextConfiguration;
@@ -20,11 +18,6 @@ import com.glia.widgets.view.configuration.TextConfiguration;
 public class GliaSurveyOptionButton extends BaseConfigurableButton {
     private boolean isError = false;
     private OptionButtonConfiguration buttonConfiguration;
-
-    @Override
-    public ButtonConfiguration getButtonConfigurationFromTheme(UiTheme theme) {
-        return theme.getGliaNeutralButtonConfiguration();
-    }
 
     public GliaSurveyOptionButton(Context context, AttributeSet attrs) {
         super(context, attrs, R.attr.buttonSurveyOptionButtonStyle);

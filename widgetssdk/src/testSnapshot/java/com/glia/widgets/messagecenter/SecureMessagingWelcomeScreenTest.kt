@@ -56,7 +56,8 @@ internal class SecureMessagingWelcomeScreenTest : SnapshotTest(
             showSendMessageGroup = true,
             sendMessageButtonState = MessageCenterState.ButtonState.NORMAL,
             addAttachmentButtonVisible = true,
-            addAttachmentButtonEnabled = true
+            addAttachmentButtonEnabled = true,
+            isFileUploadAvailable = true
         ),
         fileAttachments = listOf(
             fileAttachment(

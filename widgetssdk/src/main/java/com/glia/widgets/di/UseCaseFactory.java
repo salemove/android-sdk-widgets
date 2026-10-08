@@ -157,6 +157,7 @@ import com.glia.widgets.internal.permissions.domain.WithReadWritePermissionsUseC
 import com.glia.widgets.internal.secureconversations.domain.AddSecureFileToAttachmentAndUploadUseCase;
 import com.glia.widgets.internal.secureconversations.domain.HasOngoingSecureConversationUseCase;
 import com.glia.widgets.internal.secureconversations.domain.IsMessagingAvailableUseCase;
+import com.glia.widgets.internal.secureconversations.domain.IsSecureConversationFileUploadAvailableUseCase;
 import com.glia.widgets.internal.secureconversations.domain.ManageSecureMessagingStatusUseCase;
 import com.glia.widgets.internal.secureconversations.domain.MarkMessagesReadWithDelayUseCase;
 import com.glia.widgets.internal.secureconversations.domain.OnNextMessageUseCase;
@@ -547,6 +548,11 @@ public class UseCaseFactory {
     @NonNull
     public IsMessagingAvailableUseCase createIsMessagingAvailableUseCase() {
         return new IsMessagingAvailableUseCase(repositoryFactory.getQueueRepository(), repositoryFactory.getEngagementRepository());
+    }
+
+    @NonNull
+    public IsSecureConversationFileUploadAvailableUseCase createIsSecureConversationFileUploadAvailableUseCase() {
+        return new IsSecureConversationFileUploadAvailableUseCase(repositoryFactory.getSecureConversationsRepository());
     }
 
     @NonNull

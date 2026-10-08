@@ -236,7 +236,7 @@ internal class MessageView(context: Context, attrs: AttributeSet?, defStyleAttr:
 
         if (state.addAttachmentButtonVisible) {
             addAttachmentButton.visibility = VISIBLE
-            addAttachmentButton.isEnabled = state.addAttachmentButtonEnabled
+            addAttachmentButton.isEnabled = state.addAttachmentButtonEnabled && state.isFileUploadAvailable
 
             attachmentPopup.setupPhotoLibraryOptionVisible(state.isLibraryAttachmentVisible)
             attachmentPopup.setupTakePhotoOptionVisible(state.isTakePhotoAttachmentVisible)

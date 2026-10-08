@@ -35,7 +35,6 @@ import com.glia.widgets.helper.setCompoundDrawableTintListCompat
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.setLocaleHint
 import com.glia.widgets.helper.setLocaleText
-import com.glia.widgets.helper.wrapWithMaterialThemeOverlay
 import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.glia.widgets.view.unifiedui.applyColorTheme
 import com.glia.widgets.view.unifiedui.applyImageColorTheme
@@ -46,7 +45,7 @@ import java.util.concurrent.Executor
 import kotlin.properties.Delegates
 
 internal class MessageView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : NestedScrollView(
-    context.wrapWithMaterialThemeOverlay(attrs, defStyleAttr, defStyleRes),
+    context,
     attrs,
     defStyleAttr
 ) {

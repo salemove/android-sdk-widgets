@@ -12,7 +12,6 @@ import com.glia.widgets.chat.model.GvaButton
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.applyShadow
 import com.glia.widgets.helper.getColorCompat
-import com.glia.widgets.helper.wrapWithMaterialThemeOverlay
 import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.base.ButtonTheme
 import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
@@ -24,7 +23,7 @@ internal class GvaChip @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = com.google.android.material.R.attr.chipStyle
-) : Chip(context.wrapWithMaterialThemeOverlay(attrs, defStyleAttr), attrs, defStyleAttr) {
+) : Chip(context, attrs, defStyleAttr) {
 
     private val quickReplyTheme: ButtonTheme? by lazy {
         Dependencies.gliaThemeManager.theme?.chatTheme?.gva?.quickReplyTheme
@@ -68,7 +67,7 @@ internal class GvaChipGroup @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = com.google.android.material.R.attr.chipGroupStyle
-) : ChipGroup(context.wrapWithMaterialThemeOverlay(attrs, defStyleAttr), attrs, defStyleAttr) {
+) : ChipGroup(context, attrs, defStyleAttr) {
 
     internal var onItemClickedListener: OnItemClickedListener? = null
     private var theme: UiTheme? = null

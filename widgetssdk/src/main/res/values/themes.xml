@@ -1,97 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="Application.Glia.Chat" parent="">
-        <item name="brandPrimaryColor">?attr/gliaBrandPrimaryColor</item>
-        <item name="baseLightColor">?attr/gliaBaseLightColor</item>
-        <item name="baseDarkColor">?attr/gliaBaseDarkColor</item>
-        <item name="systemAgentBubbleColor">?attr/gliaSystemAgentBubbleColor</item>
-        <item name="baseNormalColor">?attr/gliaBaseNormalColor</item>
-        <item name="baseShadeColor">?attr/gliaBaseShadeColor</item>
-        <item name="android:fontFamily">?attr/fontFamily</item>
-        <item name="appBarTitle">@string/engagement_chat_title</item>
-        <item name="systemNegativeColor">?attr/gliaSystemNegativeColor</item>
-        <item name="iconAppBarBack">?attr/gliaIconAppBarBack</item>
-        <item name="iconLeaveQueue">?attr/gliaIconLeaveQueue</item>
-        <item name="iconSendMessage">?attr/gliaIconSendMessage</item>
-        <item name="iconChatAudioUpgrade">?attr/gliaIconChatAudioUpgrade</item>
-        <item name="iconUpgradeAudioDialog">?attr/gliaIconUpgradeAudioDialog</item>
-        <item name="iconCallAudioOn">?attr/gliaIconCallAudioOn</item>
-        <item name="iconChatVideoUpgrade">?attr/gliaIconChatVideoUpgrade</item>
-        <item name="iconUpgradeVideoDialog">?attr/gliaIconUpgradeVideoDialog</item>
-        <item name="iconCallVideoOn">?attr/gliaIconCallVideoOn</item>
-        <item name="iconCallAudioOff">?attr/gliaIconCallAudioOff</item>
-        <item name="iconCallVideoOff">?attr/gliaIconCallVideoOff</item>
-        <item name="iconCallChat">?attr/gliaIconCallChat</item>
-        <item name="iconCallSpeakerOn">?attr/gliaIconCallSpeakerOn</item>
-        <item name="iconCallSpeakerOff">?attr/gliaIconCallSpeakerOff</item>
-        <item name="iconCallMinimize">?attr/gliaIconCallMinimize</item>
-        <item name="iconPlaceholder">?attr/gliaIconPlaceholder</item>
-        <item name="iconOnHold">?attr/gliaIconOnHold</item>
-        <item name="iconCallVisualizer">?attr/gliaIconCallVisualizer</item>
-        <item name="chatSendMessageButtonTintColor">?attr/gliaSendMessageButtonTintColor</item>
-        <item name="gliaChatBackgroundColor">?attr/gliaChatBackgroundColor</item>
-        <item name="chatHeaderTitleTintColor">?attr/gliaChatHeaderTitleTintColor</item>
-        <item name="chatHeaderHomeButtonTintColor">?attr/gliaChatHeaderHomeButtonTintColor</item>
-        <item name="chatHeaderExitQueueButtonTintColor">?attr/gliaChatHeaderExitQueueButtonTintColor</item>
-        <item name="chatStartingHeadingTextColor">?attr/gliaChatStartingHeadingTextColor</item>
-        <item name="chatStartingCaptionTextColor">?attr/gliaChatStartingCaptionTextColor</item>
-        <item name="chatStartedHeadingTextColor">?attr/gliaChatStartedHeadingTextColor</item>
-        <item name="chatStartedCaptionTextColor">?attr/gliaChatStartedCaptionTextColor</item>
-        <item name="iconCallVisualizerTintColor">?attr/gliaIconCallVisualizerTintColor</item>
-        <item name="visitorMessageBackgroundColor">?attr/gliaVisitorMessageBackgroundColor</item>
-        <item name="visitorMessageTextColor">?attr/gliaVisitorMessageTextColor</item>
-        <item name="operatorMessageBackgroundColor">?attr/gliaOperatorMessageBackgroundColor</item>
-        <item name="operatorMessageTextColor">?attr/gliaOperatorMessageTextColor</item>
-        <item name="newMessagesDividerColor">?attr/gliaNewMessagesDividerColor</item>
-        <item name="newMessagesDividerTextColor">?attr/gliaNewMessagesDividerTextColor</item>
-        <item name="botActionButtonBackgroundColor">?attr/gliaBotActionButtonBackgroundColor</item>
-        <item name="botActionButtonTextColor">?attr/gliaBotActionButtonTextColor</item>
-        <item name="botActionButtonSelectedBackgroundColor">?attr/gliaBotActionButtonSelectedBackgroundColor</item>
-        <item name="botActionButtonSelectedTextColor">?attr/gliaBotActionButtonSelectedTextColor</item>
-        <item name="gliaHeaderEndButtonStyle">?attr/gliaHeaderEndButtonStyle</item>
-        <item name="buttonBarPositiveButtonStyle">?attr/buttonBarPositiveButtonStyle</item>
-        <item name="buttonBarNegativeButtonStyle">?attr/buttonBarNegativeButtonStyle</item>
-        <item name="buttonBarNeutralButtonStyle">?attr/buttonBarNeutralButtonStyle</item>
-        <item name="buttonSurveyOptionButtonStyle">?attr/buttonSurveyOptionButtonStyle</item>
+    <!--
+        Base theme of every Glia surface.
 
-        <item name="chatHeadStyle">?attr/chatHeadStyle</item>
+        It carries the Material chain plus default values for *all* `glia*` global attributes and
+        for every non-`glia*` infrastructure attribute the SDK reads. Layouts resolve those values
+        natively via `?attr/glia*`, so they must live in the real `Resources.Theme` of each
+        inflation context - which is why this is a full theme and not a `materialThemeOverlay`.
 
-        <item name="gliaAlertDialogButtonUseVerticalAlignment">?attr/gliaAlertDialogButtonUseVerticalAlignment</item>
-        <item name="whiteLabel">?attr/whiteLabel</item>
-
-        <item name="materialThemeOverlay">@style/ThemeOverlay.Glia.Chat</item>
-    </style>
-
-    <style name="Application.Glia.Activity.Style" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="materialThemeOverlay">@style/ThemeOverlay.Glia.Chat</item>
-    </style>
-
-    <style name="Application.Glia.Chat.Activity" parent="Application.Glia.Activity.Style">
-
-    </style>
-
-    <style name="Application.Glia.Call.Activity" parent="Application.Glia.Activity.Style">
-
-    </style>
-
-    <style name="Application.Glia.ImagePreview.Activity" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="android:windowBackground">@color/glia_black_color</item>
-        <item name="gliaIconAppBarBack">@drawable/ic_baseline_arrow_back</item>
-        <item name="colorPrimary">@color/glia_black_color</item>
-        <item name="android:colorPrimary">@color/glia_black_color</item>
-    </style>
-
-    <style name="Application.Glia.Translucent.Activity" parent="Application.Glia.Activity.Style">
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
-    </style>
-
-    <style name="ThemeOverlay.Glia.Chat" parent="">
+        Composition order (see `helper/GliaThemeOverlays.kt`):
+        Theme.Glia.Internal -> legacy `gliaChatStyle` -> `materialThemeOverlay` -> GliaTheme -> JSON.
+    -->
+    <style name="Theme.Glia.Internal" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="gliaBrandPrimaryColor">@color/glia_primary_color</item>
         <item name="gliaBaseDarkColor">@color/glia_dark_color</item>
         <item name="gliaBaseLightColor">@color/glia_light_color</item>
@@ -173,7 +94,160 @@
         <item name="whiteLabel">false</item>
 
         <item name="chipStyle">?attr/gvaQuickReplyButtonStyle</item>
+
+        <!--
+            Opt every Glia surface out of the platform's automatic dark conversion (API 29+).
+            The SDK ships no `values-night` colours, so it cannot render a designed dark theme;
+            machine-inverting it produces a worse result than staying light, and doing so per-screen
+            produced a visibly inconsistent flow. Declared once here so every surface inherits it -
+            it cannot live in `values-v29` because a qualified override replaces a style wholesale,
+            which would drop every item above.
+        -->
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
     </style>
+
+    <!--
+        The `Theme.Glia.Internal.*` styles rely on implicit parenting: a dotted style name inherits
+        the style it is prefixed by, so `parent` would only restate `Theme.Glia.Internal`. Do not
+        copy this to the `Application.Glia.*.Activity` aliases below - their implicit parents are
+        different styles (or do not exist), so those `parent` attributes are load-bearing.
+    -->
+
+    <!--
+        Chat-family surfaces (chat, secure messaging, web browser). Currently carries nothing in any
+        bucket - it is kept as the named seam for chat-family-only items, so adding one later does not
+        mean re-pointing three manifest entries or duplicating `Theme.Glia.Internal`.
+    -->
+    <style name="Theme.Glia.Internal.Chat" />
+
+    <style name="Theme.Glia.Internal.Translucent">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+
+    <style name="Theme.Glia.Internal.ImagePreview">
+        <item name="android:windowBackground">@color/glia_black_color</item>
+        <item name="gliaIconAppBarBack">@drawable/ic_baseline_arrow_back</item>
+        <item name="colorPrimary">@color/glia_black_color</item>
+        <item name="android:colorPrimary">@color/glia_black_color</item>
+    </style>
+
+    <!--
+        Public override hook. Ships EMPTY on purpose: every default lives in `Theme.Glia.Internal`,
+        so an integrator redefining this style only ever contributes the items they declare.
+
+        Integrators customize the SDK by redefining it in their own `res/values`:
+
+            <style name="GliaTheme">
+                <item name="gliaBrandPrimaryColor">@color/brand</item>
+                <item name="gliaIconAppBarBack">@drawable/back</item>
+            </style>
+
+        The name is intentionally a single segment - there is no dot-implicit parent to get wrong
+        and no `parent` attribute to remember. Attribute names are documented in `attrs.xml`.
+    -->
+    <style name="GliaTheme" />
+
+    <!--
+        ==========================================================================================
+        Legacy (pre-`GliaTheme`) resources.
+
+        Kept declared so integrator resources that reference them keep compiling, but blanked:
+        `ThemeOverlay.Glia.Chat` is the parent of every legacy integrator overlay, so keeping it
+        empty means such an overlay contributes *only* the items the integrator actually set when
+        it is applied with `Resources.Theme.applyStyle(style, force = true)`.
+        ==========================================================================================
+    -->
+
+    <!-- @deprecated Legacy `defStyleRes` for Glia views. Kept for backward compatibility only. -->
+    <style name="Application.Glia.Chat" parent="">
+        <item name="brandPrimaryColor">?attr/gliaBrandPrimaryColor</item>
+        <item name="baseLightColor">?attr/gliaBaseLightColor</item>
+        <item name="baseDarkColor">?attr/gliaBaseDarkColor</item>
+        <item name="systemAgentBubbleColor">?attr/gliaSystemAgentBubbleColor</item>
+        <item name="baseNormalColor">?attr/gliaBaseNormalColor</item>
+        <item name="baseShadeColor">?attr/gliaBaseShadeColor</item>
+        <item name="android:fontFamily">?attr/fontFamily</item>
+        <item name="appBarTitle">@string/engagement_chat_title</item>
+        <item name="systemNegativeColor">?attr/gliaSystemNegativeColor</item>
+        <item name="iconAppBarBack">?attr/gliaIconAppBarBack</item>
+        <item name="iconLeaveQueue">?attr/gliaIconLeaveQueue</item>
+        <item name="iconSendMessage">?attr/gliaIconSendMessage</item>
+        <item name="iconChatAudioUpgrade">?attr/gliaIconChatAudioUpgrade</item>
+        <item name="iconUpgradeAudioDialog">?attr/gliaIconUpgradeAudioDialog</item>
+        <item name="iconCallAudioOn">?attr/gliaIconCallAudioOn</item>
+        <item name="iconChatVideoUpgrade">?attr/gliaIconChatVideoUpgrade</item>
+        <item name="iconUpgradeVideoDialog">?attr/gliaIconUpgradeVideoDialog</item>
+        <item name="iconCallVideoOn">?attr/gliaIconCallVideoOn</item>
+        <item name="iconCallAudioOff">?attr/gliaIconCallAudioOff</item>
+        <item name="iconCallVideoOff">?attr/gliaIconCallVideoOff</item>
+        <item name="iconCallChat">?attr/gliaIconCallChat</item>
+        <item name="iconCallSpeakerOn">?attr/gliaIconCallSpeakerOn</item>
+        <item name="iconCallSpeakerOff">?attr/gliaIconCallSpeakerOff</item>
+        <item name="iconCallMinimize">?attr/gliaIconCallMinimize</item>
+        <item name="iconPlaceholder">?attr/gliaIconPlaceholder</item>
+        <item name="iconOnHold">?attr/gliaIconOnHold</item>
+        <item name="iconCallVisualizer">?attr/gliaIconCallVisualizer</item>
+        <item name="chatSendMessageButtonTintColor">?attr/gliaSendMessageButtonTintColor</item>
+        <item name="gliaChatBackgroundColor">?attr/gliaChatBackgroundColor</item>
+        <item name="chatHeaderTitleTintColor">?attr/gliaChatHeaderTitleTintColor</item>
+        <item name="chatHeaderHomeButtonTintColor">?attr/gliaChatHeaderHomeButtonTintColor</item>
+        <item name="chatHeaderExitQueueButtonTintColor">?attr/gliaChatHeaderExitQueueButtonTintColor</item>
+        <item name="chatStartingHeadingTextColor">?attr/gliaChatStartingHeadingTextColor</item>
+        <item name="chatStartingCaptionTextColor">?attr/gliaChatStartingCaptionTextColor</item>
+        <item name="chatStartedHeadingTextColor">?attr/gliaChatStartedHeadingTextColor</item>
+        <item name="chatStartedCaptionTextColor">?attr/gliaChatStartedCaptionTextColor</item>
+        <item name="iconCallVisualizerTintColor">?attr/gliaIconCallVisualizerTintColor</item>
+        <item name="visitorMessageBackgroundColor">?attr/gliaVisitorMessageBackgroundColor</item>
+        <item name="visitorMessageTextColor">?attr/gliaVisitorMessageTextColor</item>
+        <item name="operatorMessageBackgroundColor">?attr/gliaOperatorMessageBackgroundColor</item>
+        <item name="operatorMessageTextColor">?attr/gliaOperatorMessageTextColor</item>
+        <item name="newMessagesDividerColor">?attr/gliaNewMessagesDividerColor</item>
+        <item name="newMessagesDividerTextColor">?attr/gliaNewMessagesDividerTextColor</item>
+        <item name="botActionButtonBackgroundColor">?attr/gliaBotActionButtonBackgroundColor</item>
+        <item name="botActionButtonTextColor">?attr/gliaBotActionButtonTextColor</item>
+        <item name="botActionButtonSelectedBackgroundColor">?attr/gliaBotActionButtonSelectedBackgroundColor</item>
+        <item name="botActionButtonSelectedTextColor">?attr/gliaBotActionButtonSelectedTextColor</item>
+        <item name="gliaHeaderEndButtonStyle">?attr/gliaHeaderEndButtonStyle</item>
+        <item name="buttonBarPositiveButtonStyle">?attr/buttonBarPositiveButtonStyle</item>
+        <item name="buttonBarNegativeButtonStyle">?attr/buttonBarNegativeButtonStyle</item>
+        <item name="buttonBarNeutralButtonStyle">?attr/buttonBarNeutralButtonStyle</item>
+        <item name="buttonSurveyOptionButtonStyle">?attr/buttonSurveyOptionButtonStyle</item>
+
+        <item name="chatHeadStyle">?attr/chatHeadStyle</item>
+
+        <item name="gliaAlertDialogButtonUseVerticalAlignment">?attr/gliaAlertDialogButtonUseVerticalAlignment</item>
+        <item name="whiteLabel">?attr/whiteLabel</item>
+    </style>
+
+    <!--
+        @deprecated Legacy integrator hook: integrators redefine this resource to declare
+        `gliaChatStyle`. Ships blank - `GliaThemeOverlays.resolveLegacyThemeOverlay` reads
+        `gliaChatStyle` out of it.
+    -->
+    <style name="Application.Glia.Activity.Style" parent="Theme.MaterialComponents.DayNight.NoActionBar" />
+
+    <!-- @deprecated Superseded by `Theme.Glia.Internal.Chat`. Kept declared for compile compatibility. -->
+    <style name="Application.Glia.Chat.Activity" parent="Theme.Glia.Internal.Chat" />
+
+    <!-- @deprecated Superseded by `Theme.Glia.Internal`. Kept declared for compile compatibility. -->
+    <style name="Application.Glia.Call.Activity" parent="Theme.Glia.Internal" />
+
+    <!-- @deprecated Superseded by `Theme.Glia.Internal.ImagePreview`. Kept for compile compatibility. -->
+    <style name="Application.Glia.ImagePreview.Activity" parent="Theme.Glia.Internal.ImagePreview" />
+
+    <!-- @deprecated Superseded by `Theme.Glia.Internal.Translucent`. Kept for compile compatibility. -->
+    <style name="Application.Glia.Translucent.Activity" parent="Theme.Glia.Internal.Translucent" />
+
+    <!--
+        @deprecated Parent of every legacy integrator `materialThemeOverlay`. Intentionally EMPTY -
+        see the block comment above.
+    -->
+    <style name="ThemeOverlay.Glia.Chat" parent="" />
 
     <style name="ThemeOverlay.Glia.Chat.AlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
         <item name="alertDialogStyle">@style/MaterialAlertDialog.App</item>

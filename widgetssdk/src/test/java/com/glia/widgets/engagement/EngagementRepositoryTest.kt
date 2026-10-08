@@ -1242,45 +1242,29 @@ class EngagementRepositoryTest {
     }
 
     @Test
-    fun `reset should call cancelQueuing when current state is queuing`() {
+    fun `reset drops the queue ticket locally without cancelling it`() {
         val queueId = "queue_id"
         val mediaType = MediaType.TEXT
         every { queueRepository.relevantQueueIds } returns Single.just(listOf(queueId))
         val queueForEngagementCallbackSlot = slot<Consumer<GliaException?>>()
-        val subscribeQueueTicketCallbackSlot = slot<RequestCallback<QueueTicket?>>()
-        val cancelQueueTicketCallbackSlot = slot<Consumer<GliaException?>>()
         val ticketId = "ticket_id"
         val queueTicket: QueueTicket = mockk(relaxed = true) {
             every { id } returns ticketId
         }
         repository.queueForEngagement(mediaType, true)
-
         verify { queueRepository.relevantQueueIds }
         verify(exactly = 1) {
-            core.queueForEngagement(
-                listOf(queueId),
-                mediaType,
-                null,
-                any(),
-                eq(true),
-                capture(queueForEngagementCallbackSlot)
-            )
+            core.queueForEngagement(listOf(queueId), mediaType, null, any(), eq(true), capture(queueForEngagementCallbackSlot))
         }
         queueForEngagementCallbackSlot.captured.accept(null)
-
-        assertTrue(repository.isQueueing)
-        assertFalse(repository.isQueueingForMedia)
-
-        repository.engagementState.test().assertNotComplete().assertValue(State.PreQueuing(mediaType))
-
         queueTicketCallbackSlot.captured.accept(queueTicket)
-
-        verify { core.subscribeToQueueTicketUpdates(ticketId, capture(subscribeQueueTicketCallbackSlot)) }
+        verify { core.subscribeToQueueTicketUpdates(ticketId, any()) }
 
         repository.engagementState.test().apply {
             repository.reset()
-            verify { core.cancelQueueTicket(ticketId, capture(cancelQueueTicketCallbackSlot)) }
-            cancelQueueTicketCallbackSlot.captured.accept(null)
+
+            // Core cancels it as the outgoing visitor when the visitor session is cleared
+            verify(exactly = 0) { core.cancelQueueTicket(any(), any()) }
             assertNotComplete()
                 .assertValuesOnly(
                     State.Queuing(ticketId, mediaType),
@@ -1288,6 +1272,31 @@ class EngagementRepositoryTest {
                     State.NoEngagement
                 )
         }
+    }
+
+    @Test
+    fun `reset while pre-queuing cancels the ticket when it arrives`() {
+        val queueId = "queue_id"
+        val mediaType = MediaType.TEXT
+        every { queueRepository.relevantQueueIds } returns Single.just(listOf(queueId))
+        val queueForEngagementCallbackSlot = slot<Consumer<GliaException?>>()
+        val ticketId = "ticket_id"
+        val queueTicket: QueueTicket = mockk(relaxed = true) {
+            every { id } returns ticketId
+        }
+        repository.queueForEngagement(mediaType, true)
+        verify { queueRepository.relevantQueueIds }
+        verify(exactly = 1) {
+            core.queueForEngagement(listOf(queueId), mediaType, null, any(), eq(true), capture(queueForEngagementCallbackSlot))
+        }
+        queueForEngagementCallbackSlot.captured.accept(null)
+
+        repository.reset()
+        queueTicketCallbackSlot.captured.accept(queueTicket)
+
+        // Core had no ticket to cancel when it cleared, so the one that arrives later is cancelled here
+        verify(exactly = 1) { core.cancelQueueTicket(ticketId, any()) }
+        verify(exactly = 0) { core.subscribeToQueueTicketUpdates(any(), any()) }
     }
 
     @Test

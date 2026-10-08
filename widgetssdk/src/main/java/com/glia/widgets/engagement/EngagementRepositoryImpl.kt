@@ -162,11 +162,21 @@ internal class EngagementRepositoryImpl(
     override fun reset() {
         _isSecureMessagingRequested = false
 
-        if (currentState?.isQueueing == true) {
-            cancelQueuing()
-        } else {
-            ensureNotScTransferredEngagement(::clearState)
+        when (currentState) {
+            is State.Queuing -> dropQueueTicketLocally()
+            is State.PreQueuing -> cancelQueuing()
+            else -> ensureNotScTransferredEngagement(::clearState)
         }
+    }
+
+    /**
+     * Core cancels the ticket as the outgoing visitor when the visitor session is cleared. A cancel
+     * sent from here would be signed with whichever visitor is current when it runs, possibly the new one.
+     */
+    private fun dropQueueTicketLocally() {
+        Logger.i(TAG, "Queue ticket dropped locally, Core cancels it")
+        _engagementState.onNext(State.QueueingCanceled)
+        _engagementState.onNext(State.NoEngagement)
     }
 
     private fun resetState(retainSecureMessagingState: Boolean = false) {

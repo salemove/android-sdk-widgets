@@ -43,6 +43,12 @@ internal interface EngagementRepository {
     val currentVisitorCamera: VisitorCamera
 
     fun initialize()
+
+    /**
+     * Clears the engagement and queue state locally, before Core clears the visitor session. Ending the
+     * engagement and cancelling the queue ticket is Core's: it does both as the outgoing visitor. A
+     * ticket that has not arrived yet is still cancelled here when it arrives.
+     */
     fun reset()
 
     //used for ending engagement after visitor explicitly ends engagement

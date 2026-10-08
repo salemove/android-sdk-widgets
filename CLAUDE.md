@@ -58,7 +58,7 @@ data flow through the Core SDK. The Glia libraries it embeds:
 
 1. **Snapshot build type cannot use composite-build Core substitution.** Debug and release use `includeBuild` to substitute Core SDK; the `snapshot` build type cannot. Run `./gradlew widgetssdk:publishCoreSdkToLocalMaven` first, then snapshot tasks. Mixing these causes silent resolution failures.
 
-2. **ContentProvider auto-init makes manual init redundant.** `InitializationProvider` runs `Dependencies.onAppCreate()` before `Application.onCreate()`. The deprecated `GliaWidgets.onAppCreate()` still contains real work — calling it from integrator code re-invokes initialization and risks double-init. Do not call it.
+2. **There is no manual app-create entry point.** `InitializationProvider` runs `Dependencies.onAppCreate()` before `Application.onCreate()`, so integrators call nothing at app startup — they only call `GliaWidgets.init(config, onComplete, onError)`. The deprecated `GliaWidgets.onAppCreate()` façade was removed in MOB-5542; do not reintroduce a public wrapper for it.
 
 3. **`ChatController` and `CallController` are retained across Activity recreation by design.** `ControllerFactory` holds `retainedChatController` and `retainedCallController`. This is intentional — there is no ViewModel. The no-arg `onDestroy()` override throws `RuntimeException("no op")`; always call `onDestroy(retain: Boolean)` so the factory can decide whether to clear or keep the controller instance.
 

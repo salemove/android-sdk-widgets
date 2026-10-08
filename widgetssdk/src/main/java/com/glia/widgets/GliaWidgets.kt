@@ -1,7 +1,5 @@
 package com.glia.widgets
 
-import android.app.Application
-import android.content.Intent
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
 import com.glia.telemetry_lib.GliaLogger
@@ -110,55 +108,6 @@ object GliaWidgets {
     fun getCustomCardAdapter(): CustomCardAdapter? {
         GliaLogger.logMethodUse(GliaWidgets::class, "getCustomCardAdapter")
         return _customCardAdapter
-    }
-
-    /**
-     * This method is obsolete and no longer required.
-     * It is safe to remove calls to this method.
-     *
-     * @param application the application where it is initialized
-     * @throws GliaWidgetsException with [GliaWidgetsException.Cause]
-     */
-    @Deprecated("No longer required to call this method")
-    @JvmStatic
-    @Synchronized
-    fun onAppCreate(application: Application) {
-        GliaLogger.logDeprecatedApiUse(SdkType.WIDGETS_SDK, GliaWidgets::class, "onAppCreate")
-        try {
-            Dependencies.onAppCreate(application)
-        } catch (gliaException: GliaException) {
-            throw gliaException.toWidgetsType()
-        }
-        setupRxErrorHandler()
-        Logger.d(TAG, "onAppCreate")
-    }
-
-    /**
-     * Initializes the Glia Widgets SDK using [GliaWidgetsConfig] without initialization callbacks.
-     *
-     * [GliaWidgets.isInitialized] returns `true` as soon as this method returns, so SDK-dependent
-     * actions can be performed immediately, but full initialization is not guaranteed - it
-     * completes asynchronously and its result is not reported back to the caller.
-     * [GliaWidgets.isInitialized] turns `false` again if initialization fails.
-     * Use the overload with [OnComplete] and [OnError] callbacks to be notified about the actual result.
-     *
-     * @param gliaWidgetsConfig Glia configuration
-     * @throws GliaWidgetsException with cause [GliaWidgetsException.Cause.INVALID_INPUT] when
-     * the provided configuration is invalid, or when the SDK is already initialized or
-     * initialization is already in progress
-     */
-    @JvmStatic
-    @Synchronized
-    @Deprecated(
-        message = "Use init(gliaWidgetsConfig, onComplete, onError) to be notified when initialization completes or fails",
-        replaceWith = ReplaceWith(
-            expression = "GliaWidgets.init(gliaWidgetsConfig, onComplete, onError)",
-            "com.glia.widgets.GliaWidgets"
-        )
-    )
-    fun init(gliaWidgetsConfig: GliaWidgetsConfig) {
-        GliaLogger.logDeprecatedApiUse(SdkType.WIDGETS_SDK, GliaWidgets::class, "init")
-        Dependencies.onSdkInit(gliaWidgetsConfig)
     }
 
     /**
@@ -276,48 +225,6 @@ object GliaWidgets {
         try {
             setupQueueIds(queueIds)
             return entryWidget
-        } catch (gliaException: GliaException) {
-            throw gliaException.toWidgetsType()
-        }
-    }
-
-    /**
-     * Accepts permissions request results.
-     *
-     *
-     * Some functionalities, for example Video or Audio calls, require to request [runtime permissions](https://developer.android.com/reference/androidx/core/app/ActivityCompat?hl=en#requestPermissions(android.app.Activity,java.lang.String[],int)).
-     * The results of such request is passed to your activity's [onRequestPermissionsResult()](https://developer.android.com/reference/androidx/core/app/ActivityCompat.OnRequestPermissionsResultCallback?hl=en#onRequestPermissionsResult(int,java.lang.String[],int[])) function.
-     *
-     * Your activity in turn must call this method to pass the results of the request to Glia SDK.
-     *
-     *
-     * This method is no-op for other non-Glia triggered results.
-     *
-     */
-    @Deprecated("This method is no longer required, as all the required permissions are now managed internally.")
-    @JvmStatic
-    fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        // no op
-    }
-
-    /**
-     * Accepts permissions request results.
-     *
-     * Some functionalities, for example Video or Audio calls, require to request [runtime permissions](https://developer.android.com/reference/androidx/core/app/ActivityCompat?hl=en#requestPermissions(android.app.Activity,java.lang.String[],int)).
-     * The results of such request is passed to your activity's [onRequestPermissionsResult()](https://developer.android.com/reference/androidx/core/app/ActivityCompat.OnRequestPermissionsResultCallback?hl=en#onRequestPermissionsResult(int,java.lang.String[],int[])) function.
-     *
-     * Your activity in turn must call this method to pass the results of the request to Glia SDK.
-     *
-     * This method is no-op for other non-Glia triggered results.
-     *
-     */
-    @Deprecated("This method is no longer required, as required activity results are now managed internally.")
-    @JvmStatic
-    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        GliaLogger.logDeprecatedApiUse(SdkType.WIDGETS_SDK, GliaWidgets::class, "onActivityResult")
-        Logger.d(TAG, "onActivityResult")
-        try {
-            repositoryFactory.engagementRepository.onActivityResult(requestCode, resultCode, data)
         } catch (gliaException: GliaException) {
             throw gliaException.toWidgetsType()
         }

@@ -22,8 +22,6 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
     @JvmField
     val region: Region?
 
-    @JvmField
-    val regionString: String?
 
     @JvmField
     val uiJsonRemoteConfig: String?
@@ -53,21 +51,12 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
         siteId = builder.siteId
         context = applicationContext
         region = builder.region
-        regionString = builder.regionString
         uiJsonRemoteConfig = builder.uiJsonRemoteConfig
         companyName = builder.companyName
         enableBubbleOutsideApp = builder.enableBubbleOutsideApp
         enableBubbleInsideApp = builder.enableBubbleInsideApp
         manualLocaleOverride = builder.manualLocaleOverride
         suppressPushNotificationsPermissionRequestDuringAuthentication = builder.suppressPushNotificationsPermissionRequestDuringAuthentication
-    }
-
-    /**
-     * Defines regions that can be applied to [GliaWidgetsConfig].
-     */
-    object Regions {
-        const val US = "us"
-        const val EU = "eu"
     }
 
     /**
@@ -98,9 +87,9 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
      * <pre>
      * `
      * GliaBuildConfig gliaBuildConfig = new GliaBuildConfig.Builder(
-     * .setSiteApiKey(new SiteApiKey(SITE_API_KEY_ID, SITE_API_KEY_SECRET))
+     * .setAuthorizationMethod(new AuthorizationMethod.UserApiKey(API_KEY_ID, API_KEY_SECRET))
      * .setSiteId("SITE_ID")
-     * .setRegion(Regions.US)
+     * .setRegion(Region.US)
      * .setContext(getApplicationContext())
      * .setCompanyName("Company Name")
      * .build();
@@ -116,10 +105,6 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
         var context: Context? = null
             private set
         var region: Region? = null
-            private set
-        var regionString: String? = null
-            private set
-        var baseDomain: String? = null
             private set
         var uiJsonRemoteConfig: String? = null
             private set
@@ -158,47 +143,6 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
         }
 
         /**
-         * @param region Region in which the site is created.
-         * One of [Regions].
-         * @return Builder instance
-         * @deprecated Will be removed in version 4.0.0.
-         */
-        @Deprecated("Use {@link #setRegion(Region)}")
-        fun setRegion(region: String): Builder {
-            this.regionString = region
-            return this
-        }
-
-        /**
-         * @hidden
-         * @param baseDomain Base domain to be used.
-         * @return Builder instance
-         * @deprecated Will be removed in version 4.0.0.
-         */
-        @Deprecated("Use {@link #setRegion(Region)}")
-        fun setBaseDomain(baseDomain: String): Builder {
-            this.baseDomain = baseDomain
-            return this
-        }
-
-        /**
-         * @param siteApiKey - your site API key
-         * @return Builder instance
-         * @deprecated Will be removed in version 4.0.0.
-         */
-        @Deprecated(
-            "Use {@link #setAuthorizationMethod(AuthorizationMethod.UserApiKey)}",
-            ReplaceWith(
-                "setAuthorizationMethod(AuthorizationMethod.UserApiKey(id, secret))",
-                "com.glia.widgets.AuthorizationMethod"
-            )
-        )
-        fun setSiteApiKey(siteApiKey: AuthorizationMethod.SiteApiKey): Builder {
-            this.authorizationMethod = siteApiKey
-            return this
-        }
-
-        /**
          * @param authorizationMethod - your API key
          * @return Builder instance
          *
@@ -211,11 +155,6 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
          */
         fun setAuthorizationMethod(authorizationMethod: AuthorizationMethod): Builder {
             this.authorizationMethod = authorizationMethod
-            return this
-        }
-
-        @Deprecated("All the permissions are requested automatically by the SDK when needed.")
-        fun setRequestCode(requestCode: Int): Builder {
             return this
         }
 

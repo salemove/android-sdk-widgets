@@ -3,6 +3,7 @@ package com.glia.exampleapp;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.Navigation;
@@ -23,7 +24,11 @@ public class TestingAppLauncherActivity extends AppCompatActivity {
     private void initGliaWidgetsWithDeepLink() {
         Uri uri = getIntent().getData();
         if (!GliaWidgets.isInitialized() && uri != null) {
-            GliaWidgets.init(ExampleAppConfigManager.obtainConfigFromDeepLink(uri, getApplicationContext()));
+            GliaWidgets.init(
+                ExampleAppConfigManager.obtainConfigFromDeepLink(uri, getApplicationContext()),
+                () -> { },
+                error -> Toast.makeText(this, error.getMessage(), Toast.LENGTH_LONG).show()
+            );
         }
     }
 

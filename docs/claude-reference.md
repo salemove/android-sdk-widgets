@@ -145,7 +145,7 @@ Both channels are required when logging on public API paths:
 
 1. **Never add a singleton class.** Use the `Dependencies` object. `GliaWidgets` and `Dependencies` are the only sanctioned Kotlin `object` singletons. Java `*Factory` static fields are grandfathered.
 
-2. **Never call `GliaWidgets.onAppCreate()` from integrator code or tests.** It is deprecated and redundant because `InitializationProvider` already invoked the initialization path; calling it again re-runs setup and risks double-init side effects. Evidence: `widgetssdk/src/main/java/com/glia/widgets/GliaWidgets.kt`
+2. **Never add a public app-create entry point to `GliaWidgets`.** `InitializationProvider` already invokes the initialization path before `Application.onCreate()`; a second public entry re-runs setup and risks double-init side effects. The deprecated `GliaWidgets.onAppCreate()` was removed in MOB-5542 for exactly this reason. Evidence: `widgetssdk/src/main/java/com/glia/widgets/InitializationProvider.kt`
 
 3. **Never store Activity, Fragment, or View in static fields outside `ControllerFactory`'s retained slots.** Memory leaks. Use the `resumedActivity: Flowable<WeakReference<Activity>>` surface exposed by the registered `ActivityLifecycleCallbacks` watchers.
 

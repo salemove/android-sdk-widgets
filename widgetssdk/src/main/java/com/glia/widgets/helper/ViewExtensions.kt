@@ -1,7 +1,6 @@
 package com.glia.widgets.helper
 
 import android.content.res.ColorStateList
-import android.content.res.TypedArray
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.graphics.Typeface
@@ -20,7 +19,6 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.FontRes
 import androidx.annotation.StringRes
-import androidx.annotation.StyleableRes
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
@@ -57,13 +55,6 @@ internal fun View.getDrawableCompat(@DrawableRes resId: Int) =
     ContextCompat.getDrawable(context, resId)
 
 internal fun View.getFontCompat(@FontRes resId: Int) = ResourcesCompat.getFont(context, resId)
-
-@AnyRes
-internal fun View.getTypedArrayResId(
-    typedArray: TypedArray,
-    @StyleableRes index: Int,
-    @AttrRes fallbackAttr: Int
-) = Utils.getTypedArrayIntegerValue(typedArray, context, index, fallbackAttr)
 
 @AnyRes
 internal fun View.getAttr(@AttrRes attr: Int, @AnyRes fallBackResId: Int): Int =

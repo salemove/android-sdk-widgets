@@ -15,7 +15,6 @@ import com.glia.widgets.databinding.AppBarBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.ResourceProvider
 import com.glia.widgets.helper.getColorCompat
-import com.glia.widgets.helper.getTypedArrayResId
 import com.glia.widgets.helper.gliaAttrFont
 import com.glia.widgets.helper.gliaAttrResourceId
 import com.glia.widgets.helper.layoutInflater
@@ -36,7 +35,7 @@ import com.google.android.material.appbar.AppBarLayout
 internal class AppBarView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = R.attr.gliaChatStyle
+    defStyleAttr: Int = 0
 ) : AppBarLayout(context, attrs, defStyleAttr) {
     private val binding: AppBarBinding by lazy { AppBarBinding.inflate(layoutInflater, this) }
 
@@ -61,39 +60,37 @@ internal class AppBarView @JvmOverloads constructor(
         get() = binding.toolbar.menu.findItem(R.id.leave_queue_button)
 
     private fun setDefaults(attrs: AttributeSet?) {
+        iconAppBarBackRes = context.gliaAttrResourceId(
+            R.attr.gliaIconAppBarBack,
+            R.drawable.ic_baseline_arrow_back
+        ).also {
+            binding.toolbar.setNavigationIcon(it)
+        }
+        binding.endButton.setLocaleText(R.string.general_end)
+        binding.endButton.setLocaleContentDescription(R.string.android_app_bar_end_engagement_accessibility_label)
+
+        val titleColorRes = context.gliaAttrResourceId(
+            R.attr.gliaChatHeaderTitleTintColor,
+            R.color.glia_light_color
+        )
+        binding.title.setTextColor(getColorCompat(titleColorRes))
+
+        val homeButtonTintColor = context.gliaAttrResourceId(
+            R.attr.gliaChatHeaderHomeButtonTintColor,
+            R.color.glia_light_color
+        )
+        binding.toolbar.navigationIcon?.setTint(getColorCompat(homeButtonTintColor))
+        binding.toolbar.setLocaleNavigationContentDescription(R.string.android_app_bar_nav_up_accessibility)
+
+        val backgroundColor = context.gliaAttrResourceId(
+            R.attr.gliaBrandPrimaryColor,
+            R.color.glia_primary_color
+        )
+        setBackgroundColor(getColorCompat(backgroundColor))
+
+        // `titleText` is only ever set as `tools:titleText`, so this read exists purely so the four
+        // layouts embedding an app bar render a title in the layout editor.
         context.withStyledAttributes(attrs, R.styleable.AppBarView) {
-            iconAppBarBackRes = getTypedArrayResId(
-                this,
-                R.styleable.AppBarView_backIcon,
-                R.attr.gliaIconAppBarBack
-            ).also {
-                binding.toolbar.setNavigationIcon(it)
-            }
-            binding.endButton.setLocaleText(R.string.general_end)
-            binding.endButton.setLocaleContentDescription(R.string.android_app_bar_end_engagement_accessibility_label)
-
-            val titleColorRes = getTypedArrayResId(
-                this,
-                R.styleable.AppBarView_lightTint,
-                R.attr.gliaChatHeaderTitleTintColor
-            )
-            binding.title.setTextColor(getColorCompat(titleColorRes))
-
-            val homeButtonTintColor = getTypedArrayResId(
-                this,
-                R.styleable.AppBarView_lightTint,
-                R.attr.gliaChatHeaderHomeButtonTintColor
-            )
-            binding.toolbar.navigationIcon?.setTint(getColorCompat(homeButtonTintColor))
-            binding.toolbar.setLocaleNavigationContentDescription(R.string.android_app_bar_nav_up_accessibility)
-            val backgroundTintList = getTypedArrayResId(
-                this,
-                R.styleable.AppBarView_android_backgroundTint,
-                R.attr.gliaBrandPrimaryColor
-            )
-
-            setBackgroundColor(getColorCompat(backgroundTintList))
-
             getString(R.styleable.AppBarView_titleText)?.also {
                 binding.title.text = it
             }

@@ -99,7 +99,7 @@
     </style>
 
     <!-- {@deprecated For internal use only} -->
-    <style name="Application.Glia.Chat.ChatHead">
+    <style name="Application.Glia.Chat.ChatHead" parent="">
         <item name="badgeBackgroundTintList">?attr/gliaBrandPrimaryColor</item>
         <item name="badgeTextColor">?attr/gliaBaseLightColor</item>
         <item name="backgroundTintList">?attr/gliaBaseLightColor</item>

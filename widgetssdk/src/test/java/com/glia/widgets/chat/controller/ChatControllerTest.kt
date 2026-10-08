@@ -865,6 +865,47 @@ class ChatControllerTest {
         assertTrue(state.canLoadOlderHistory)
     }
 
+    @Test
+    fun `onLoadOlderHistoryRequested on error after the key was wiped disables older history`() {
+        loadHistory(hasOlderHistory = true)
+        whenever(chatManager.loadOlderHistory()) doReturn Single.error(RuntimeException("expired"))
+        whenever(chatManager.hasOlderHistory()) doReturn false
+
+        chatController.onLoadOlderHistoryRequested()
+
+        val state = lastEmittedState()
+        assertFalse(state.isLoadingOlderHistory)
+        assertFalse(state.canLoadOlderHistory)
+    }
+
+    @Test
+    fun `ending the chat while loading older history resets chatManager and clears the older history flags`() {
+        loadHistory(hasOlderHistory = true)
+        whenever(chatManager.loadOlderHistory()) doReturn Single.never()
+        chatController.onLoadOlderHistoryRequested()
+
+        chatController.endEngagementDialogYesClicked()
+
+        verify(chatManager).reset()
+        val state = lastEmittedState()
+        assertFalse(state.isLoadingOlderHistory)
+        assertFalse(state.canLoadOlderHistory)
+    }
+
+    @Test
+    fun `onDestroy without retain resets chatManager so the older page key does not outlive the visitor`() {
+        chatController.onDestroy(false)
+
+        verify(chatManager).reset()
+    }
+
+    @Test
+    fun `onDestroy with retain keeps chatManager state`() {
+        chatController.onDestroy(true)
+
+        verify(chatManager, never()).reset()
+    }
+
     /** Opens a live chat and completes the initial history load with [hasOlderHistory] reported by Core. */
     private fun loadHistory(hasOlderHistory: Boolean) {
         val historyLoadedCaptor = argumentCaptor<(Boolean) -> Unit>()

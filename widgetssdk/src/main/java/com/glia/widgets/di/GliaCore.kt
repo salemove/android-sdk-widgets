@@ -8,7 +8,7 @@ import com.glia.androidsdk.NetworkTracker
 import com.glia.androidsdk.Operator
 import com.glia.androidsdk.RequestCallback
 import com.glia.androidsdk.chat.AttachmentFile
-import com.glia.androidsdk.chat.ChatMessage
+import com.glia.androidsdk.chat.ChatHistory
 import com.glia.androidsdk.comms.EngagementOptions
 import com.glia.androidsdk.engagement.Survey
 import com.glia.androidsdk.fcm.PushNotifications
@@ -49,9 +49,8 @@ internal interface GliaCore {
     fun <T> off(event: OmnicoreEvent<T>, listener: Consumer<T>)
     fun <T> off(event: OmnicoreEvent<T>)
     fun fetchFile(attachmentFile: AttachmentFile, callback: RequestCallback<InputStream?>)
-    fun getChatHistory(onSuccess: (List<ChatMessage>) -> Unit, onError: (GliaException) -> Unit)
-    fun getOlderChatHistory(onSuccess: (List<ChatMessage>) -> Unit, onError: (GliaException) -> Unit)
-    fun hasOlderChatHistory(): Boolean
+    fun getChatHistory(onSuccess: (ChatHistory) -> Unit, onError: (GliaException) -> Unit)
+    fun getChatHistory(olderPage: ChatHistory.OlderPage, onSuccess: (ChatHistory) -> Unit, onError: (GliaException) -> Unit)
     fun getQueues(onResult: (Array<Queue>) -> Unit, onError: (GliaException?) -> Unit)
 
     fun queueForEngagement(

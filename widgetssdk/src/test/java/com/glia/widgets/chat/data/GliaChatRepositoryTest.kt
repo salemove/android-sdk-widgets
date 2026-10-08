@@ -4,6 +4,7 @@ import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.Glia
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.chat.Chat
+import com.glia.androidsdk.chat.ChatHistory
 import com.glia.androidsdk.chat.ChatMessage
 import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.widgets.di.GliaCore
@@ -12,7 +13,6 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.After
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import java.util.Optional
@@ -39,7 +39,7 @@ class GliaChatRepositoryTest {
 
     @Test
     fun `loadHistory delegates to Core with the same callbacks`() {
-        val onSuccess: (List<ChatMessage>) -> Unit = mockk(relaxed = true)
+        val onSuccess: (ChatHistory) -> Unit = mockk(relaxed = true)
         val onError: (GliaException) -> Unit = mockk(relaxed = true)
 
         repository.loadHistory(onSuccess, onError)
@@ -48,21 +48,14 @@ class GliaChatRepositoryTest {
     }
 
     @Test
-    fun `loadOlderHistory delegates to Core with the same callbacks`() {
-        val onSuccess: (List<ChatMessage>) -> Unit = mockk(relaxed = true)
+    fun `loadOlderHistory delegates the key to Core with the same callbacks`() {
+        val olderPage: ChatHistory.OlderPage = mockk()
+        val onSuccess: (ChatHistory) -> Unit = mockk(relaxed = true)
         val onError: (GliaException) -> Unit = mockk(relaxed = true)
 
-        repository.loadOlderHistory(onSuccess, onError)
+        repository.loadOlderHistory(olderPage, onSuccess, onError)
 
-        verify { gliaCore.getOlderChatHistory(onSuccess, onError) }
-    }
-
-    @Test
-    fun `hasOlderHistory delegates to Core`() {
-        every { gliaCore.hasOlderChatHistory() } returns true
-
-        assertTrue(repository.hasOlderHistory())
-        verify { gliaCore.hasOlderChatHistory() }
+        verify { gliaCore.getChatHistory(olderPage, onSuccess, onError) }
     }
 
     @Test

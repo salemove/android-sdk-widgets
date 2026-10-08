@@ -6,7 +6,7 @@ import com.glia.androidsdk.AuthorizationMethod
 import com.glia.androidsdk.CoreConfiguration
 import com.glia.androidsdk.Glia
 import com.glia.androidsdk.GliaException
-import com.glia.androidsdk.chat.ChatMessage
+import com.glia.androidsdk.chat.ChatHistory
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.telemetry_lib.LogEvents
 import com.glia.widgets.GliaWidgetsConfig
@@ -226,27 +226,27 @@ class GliaCoreImplTest {
     }
 
     @Test
-    fun `getChatHistory forwards the Core transcript to onSuccess only`() {
-        val messages: List<ChatMessage> = listOf(mockk(), mockk())
-        every { Glia.getChatHistory(any(), any()) } answers {
-            firstArg<Consumer<List<ChatMessage>>>().accept(messages)
+    fun `getChatHistory forwards the Core history to onSuccess only`() {
+        val history: ChatHistory = mockk()
+        every { Glia.getChatHistory(any<Consumer<ChatHistory>>(), any()) } answers {
+            firstArg<Consumer<ChatHistory>>().accept(history)
         }
-        val onSuccess: (List<ChatMessage>) -> Unit = mockk(relaxed = true)
+        val onSuccess: (ChatHistory) -> Unit = mockk(relaxed = true)
         val onError: (GliaException) -> Unit = mockk(relaxed = true)
 
         gliaCore.getChatHistory(onSuccess, onError)
 
-        verify(exactly = 1) { onSuccess(messages) }
+        verify(exactly = 1) { onSuccess(history) }
         verify(exactly = 0) { onError(any()) }
     }
 
     @Test
     fun `getChatHistory forwards the Core error to onError only`() {
         val exception = GliaException("forbidden", GliaException.Cause.FORBIDDEN)
-        every { Glia.getChatHistory(any(), any()) } answers {
+        every { Glia.getChatHistory(any<Consumer<ChatHistory>>(), any()) } answers {
             secondArg<Consumer<GliaException>>().accept(exception)
         }
-        val onSuccess: (List<ChatMessage>) -> Unit = mockk(relaxed = true)
+        val onSuccess: (ChatHistory) -> Unit = mockk(relaxed = true)
         val onError: (GliaException) -> Unit = mockk(relaxed = true)
 
         gliaCore.getChatHistory(onSuccess, onError)
@@ -274,40 +274,35 @@ class GliaCoreImplTest {
     }
 
     @Test
-    fun `getOlderChatHistory forwards the Core page to onSuccess only`() {
-        val message: ChatMessage = mockk()
-        every { Glia.getOlderChatHistory(any(), any()) } answers {
-            firstArg<Consumer<List<ChatMessage>>>().accept(listOf(message))
+    fun `getChatHistory with an older page forwards the key and the Core page to onSuccess only`() {
+        val olderPage: ChatHistory.OlderPage = mockk()
+        val history: ChatHistory = mockk()
+        every { Glia.getChatHistory(olderPage, any(), any()) } answers {
+            secondArg<Consumer<ChatHistory>>().accept(history)
         }
-        val onSuccess: (List<ChatMessage>) -> Unit = mockk(relaxed = true)
+        val onSuccess: (ChatHistory) -> Unit = mockk(relaxed = true)
         val onError: (GliaException) -> Unit = mockk(relaxed = true)
 
-        gliaCore.getOlderChatHistory(onSuccess, onError)
+        gliaCore.getChatHistory(olderPage, onSuccess, onError)
 
-        verify(exactly = 1) { onSuccess(listOf(message)) }
+        verify(exactly = 1) { onSuccess(history) }
         verify(exactly = 0) { onError(any()) }
     }
 
     @Test
-    fun `getOlderChatHistory passes Core error through`() {
+    fun `getChatHistory with an older page passes Core error through`() {
+        val olderPage: ChatHistory.OlderPage = mockk()
         val error = GliaException("expired", GliaException.Cause.INTERNAL_ERROR)
-        every { Glia.getOlderChatHistory(any(), any()) } answers {
-            secondArg<Consumer<GliaException>>().accept(error)
+        every { Glia.getChatHistory(olderPage, any(), any()) } answers {
+            thirdArg<Consumer<GliaException>>().accept(error)
         }
-        val onSuccess: (List<ChatMessage>) -> Unit = mockk(relaxed = true)
+        val onSuccess: (ChatHistory) -> Unit = mockk(relaxed = true)
         val onError: (GliaException) -> Unit = mockk(relaxed = true)
 
-        gliaCore.getOlderChatHistory(onSuccess, onError)
+        gliaCore.getChatHistory(olderPage, onSuccess, onError)
 
         verify(exactly = 1) { onError(error) }
         verify(exactly = 0) { onSuccess(any()) }
-    }
-
-    @Test
-    fun `hasOlderChatHistory delegates to Core`() {
-        every { Glia.hasOlderChatHistory() } returns true
-
-        assertTrue(gliaCore.hasOlderChatHistory())
     }
 
     private fun widgetsConfig(siteApiKey: SiteApiKey = SiteApiKey("SiteApiId", "SiteApiSecret")): GliaWidgetsConfig =

@@ -35,7 +35,6 @@ import com.glia.widgets.chat.domain.GliaOnMessageUseCase;
 import com.glia.widgets.chat.domain.GliaSendMessagePreviewUseCase;
 import com.glia.widgets.chat.domain.GliaSendMessageUseCase;
 import com.glia.widgets.chat.domain.HandleCustomCardClickUseCase;
-import com.glia.widgets.chat.domain.HasOlderHistoryUseCase;
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase;
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase;
 import com.glia.widgets.chat.domain.IsSendButtonEnableUseCase;
@@ -331,11 +330,6 @@ public class UseCaseFactory {
     @NonNull
     public LoadOlderHistoryUseCase createLoadOlderHistoryUseCase() {
         return new LoadOlderHistoryUseCase(repositoryFactory.getGliaMessageRepository(), getMapOperatorUseCase());
-    }
-
-    @NonNull
-    public HasOlderHistoryUseCase createHasOlderHistoryUseCase() {
-        return new HasOlderHistoryUseCase(repositoryFactory.getGliaMessageRepository());
     }
 
     @NonNull

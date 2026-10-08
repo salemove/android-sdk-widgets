@@ -802,8 +802,8 @@ internal class ChatController(
                 { hasMore -> emitViewState { chatState.olderHistoryAvailabilityChanged(hasMore) } },
                 { error ->
                     Logger.w(TAG, "Older chat history load failed", mapOf("details" to error.javaClass.simpleName))
-                    // Core keeps the cursor on failure, so the next pull retries the same page.
-                    emitViewState { chatState.olderHistoryAvailabilityChanged(canLoadOlderHistory = true) }
+                    // The key stays in ChatManager's state on failure, so the next pull retries the same page.
+                    emitViewState { chatState.olderHistoryAvailabilityChanged(chatManager.hasOlderHistory()) }
                 }
             )
             .also(disposable::add)

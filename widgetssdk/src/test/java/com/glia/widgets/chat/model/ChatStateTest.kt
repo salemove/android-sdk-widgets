@@ -34,4 +34,12 @@ class ChatStateTest {
         assertFalse(exhausted.isLoadingOlderHistory)
         assertFalse(exhausted.canLoadOlderHistory)
     }
+
+    @Test
+    fun `chatUnavailableState disables and stops older history loading`() {
+        val state = ChatState(canLoadOlderHistory = true).loadingOlderHistory().chatUnavailableState()
+
+        assertFalse(state.isLoadingOlderHistory)
+        assertFalse(state.canLoadOlderHistory)
+    }
 }

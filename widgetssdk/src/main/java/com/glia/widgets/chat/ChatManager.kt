@@ -2,6 +2,7 @@ package com.glia.widgets.chat
 
 import android.text.format.DateUtils
 import androidx.annotation.VisibleForTesting
+import com.glia.androidsdk.chat.ChatHistory
 import com.glia.androidsdk.chat.OperatorMessage
 import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.androidsdk.chat.SystemMessage
@@ -15,7 +16,6 @@ import com.glia.widgets.chat.domain.AppendNewChatMessageUseCase
 import com.glia.widgets.chat.domain.GliaLoadHistoryUseCase
 import com.glia.widgets.chat.domain.GliaOnMessageUseCase
 import com.glia.widgets.chat.domain.HandleCustomCardClickUseCase
-import com.glia.widgets.chat.domain.HasOlderHistoryUseCase
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.chat.domain.LoadOlderHistoryUseCase
 import com.glia.widgets.chat.domain.SendUnsentMessagesUseCase
@@ -55,7 +55,6 @@ internal class ChatManager(
     private val onMessageUseCase: GliaOnMessageUseCase,
     private val loadHistoryUseCase: GliaLoadHistoryUseCase,
     private val loadOlderHistoryUseCase: LoadOlderHistoryUseCase,
-    private val hasOlderHistoryUseCase: HasOlderHistoryUseCase,
     private val addNewMessagesDividerUseCase: AddNewMessagesDividerUseCase,
     private val shouldMarkMessagesReadUseCase: ShouldMarkMessagesReadUseCase,
     private val markMessagesReadWithDelayUseCase: MarkMessagesReadWithDelayUseCase,
@@ -189,6 +188,7 @@ internal class ChatManager(
 
     @VisibleForTesting
     fun mapChatHistory(historyResponse: ChatHistoryResponse, state: State): State {
+        state.olderPage = historyResponse.olderPage
         if (historyResponse.items.isEmpty()) return state
         val chatItems: MutableList<ChatItem> = mutableListOf()
         val rawItems = historyResponse.items
@@ -494,21 +494,31 @@ internal class ChatManager(
         compositeDisposable.add(loadHistory)
     }
 
-    /** Whether Core still has an older page of history after the most recent load. */
-    fun hasOlderHistory(): Boolean = hasOlderHistoryUseCase()
+    /** Whether the most recent history load left an older page to load. */
+    fun hasOlderHistory(): Boolean = state.value?.olderPage != null
 
     /**
-     * Loads the next older page, prepends it to the current chat items and emits the new state.
-     * Completes with whether a further older page remains. Errors propagate to the caller and
-     * leave the state untouched.
+     * Loads the older page the stored key points at, prepends it to the current chat items and
+     * emits the new state. Completes with whether a further older page remains, or `false` without
+     * a request when there is no key. Errors propagate to the caller and leave the state, key
+     * included, untouched so the next call retries the same page.
      */
-    fun loadOlderHistory(): Single<Boolean> = loadOlderHistoryUseCase()
-        .zipWith(state.firstOrError(), ::prependChatHistory)
-        .doOnSuccess(state::onNext)
-        .map { hasOlderHistoryUseCase() }
+    fun loadOlderHistory(): Single<Boolean> = state.firstOrError().flatMap { current ->
+        val olderPage: ChatHistory.OlderPage = current.olderPage ?: return@flatMap Single.just(false)
+        loadOlderHistoryUseCase(olderPage)
+            // reset() replaces State when the engagement ends or the visitor changes; a page that
+            // arrives afterwards must not bring the old items or key into the new state.
+            .filter { current === state.value }
+            .map { prependChatHistory(it, current) }
+            .doOnSuccess(state::onNext)
+            .map { it.olderPage != null }
+            .defaultIfEmpty(false)
+    }
 
     @VisibleForTesting
-    fun prependChatHistory(olderMessages: List<ChatMessageInternal>, state: State): State {
+    fun prependChatHistory(historyResponse: ChatHistoryResponse, state: State): State {
+        state.olderPage = historyResponse.olderPage
+        val olderMessages: List<ChatMessageInternal> = historyResponse.items
         if (olderMessages.isEmpty()) return state
         val chatItems: MutableList<ChatItem> = mutableListOf()
 
@@ -535,7 +545,9 @@ internal class ChatManager(
         var lastMessageWithVisibleOperatorImage: OperatorChatItem? = null,
         var operatorStatusItem: OperatorStatusItem? = null,
         var mediaUpgradeTimerItem: MediaUpgradeStartedTimerItem? = null,
-        var addedMessagesCount: Int = 0
+        var addedMessagesCount: Int = 0,
+        /** Key of the page before the oldest loaded history; lives and dies with this State. */
+        var olderPage: ChatHistory.OlderPage? = null
     ) {
         val immutableChatItems: List<ChatItem> get() = chatItems.toList()
 

@@ -1,7 +1,6 @@
 package com.glia.widgets.chat.adapter.holder
 
 import com.glia.widgets.SnapshotTest
-import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.adapter.ChatItemHeightManager
 import com.glia.widgets.chat.model.GvaButton
 import com.glia.widgets.chat.model.GvaGalleryCard
@@ -136,11 +135,11 @@ internal class GvaGalleryViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, S
     private data class ViewData(val binding: ChatGvaGalleryLayoutBinding, val viewHolder: GvaGalleryViewHolder)
 
     private fun setupView(galleryCards: GvaGalleryCards, unifiedTheme: UnifiedTheme? = null): ViewData {
-        val heightManager = ChatItemHeightManager(UiTheme(), layoutInflater, resources, unifiedTheme)
+        val heightManager = ChatItemHeightManager(layoutInflater, resources, unifiedTheme)
         heightManager.measureHeight(listOf(galleryCards))
 
         val binding = ChatGvaGalleryLayoutBinding.inflate(layoutInflater)
-        val viewHolder = GvaGalleryViewHolder(binding, {}, UiTheme(), unifiedTheme)
+        val viewHolder = GvaGalleryViewHolder(binding, {}, unifiedTheme)
 
         viewHolder.bind(galleryCards, heightManager.getMeasuredHeight(galleryCards))
 

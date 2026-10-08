@@ -5,6 +5,7 @@ package com.glia.widgets.helper
 import android.content.Context
 import android.content.res.Resources
 import android.content.res.TypedArray
+import android.graphics.Typeface
 import android.util.TypedValue
 import androidx.annotation.AnyRes
 import androidx.annotation.AttrRes
@@ -14,6 +15,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StyleRes
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.content.res.use
 import com.glia.widgets.R
 import com.google.android.material.color.MaterialColors
@@ -118,6 +120,16 @@ internal fun Context.gliaAttrDrawableRes(@AttrRes attr: Int, @DrawableRes fallba
 @ColorInt
 internal fun Context.gliaAttrColor(@AttrRes attr: Int, @ColorRes fallback: Int): Int =
     MaterialColors.getColor(this, attr, ContextCompat.getColor(this, fallback))
+
+/**
+ * Resolves the typeface the theme asks for, or `null` when it asks for none.
+ *
+ * `fontFamily` accepts a family name (`sans-serif`) as well as a font resource, and only the latter
+ * can become a `Typeface` - so a theme that names a family resolves to `null` here and the view keeps
+ * whatever its `textAppearance` gave it. That is the same contract the removed `UiTheme.fontRes` had.
+ */
+internal fun Context.gliaAttrFont(@AttrRes attr: Int = androidx.appcompat.R.attr.fontFamily): Typeface? =
+    gliaAttrResourceId(attr)?.let { ResourcesCompat.getFont(this, it) }
 
 /** Resolves a boolean attribute, e.g. `whiteLabel`. */
 internal fun Context.gliaAttrBoolean(@AttrRes attr: Int, default: Boolean = false): Boolean {

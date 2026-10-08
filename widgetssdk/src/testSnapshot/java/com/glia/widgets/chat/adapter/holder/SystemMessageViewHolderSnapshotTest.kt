@@ -1,7 +1,6 @@
 package com.glia.widgets.chat.adapter.holder
 
 import com.glia.widgets.SnapshotTest
-import com.glia.widgets.UiTheme
 import com.glia.widgets.databinding.ChatReceiveMessageContentBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.snapshotutils.SnapshotChatScreen
@@ -61,8 +60,7 @@ internal class SystemMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotCha
         }
 
         return SystemMessageViewHolder(
-            ChatReceiveMessageContentBinding.inflate(layoutInflater),
-            UiTheme()
+            ChatReceiveMessageContentBinding.inflate(layoutInflater)
         ).also { viewHolder ->
             viewHolder.bind(message)
         }

@@ -2,7 +2,6 @@ package com.glia.widgets.chat.adapter.holder
 
 import com.glia.widgets.R
 import com.glia.widgets.SnapshotTest
-import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.databinding.ChatOperatorMessageLayoutBinding
 import com.glia.widgets.di.Dependencies
@@ -160,8 +159,7 @@ internal class OperatorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotC
         }
 
         return OperatorMessageViewHolder(
-            ChatOperatorMessageLayoutBinding.inflate(layoutInflater),
-            UiTheme()
+            ChatOperatorMessageLayoutBinding.inflate(layoutInflater)
         ).also { viewHolder ->
             viewHolder.bind(item) { _, _ -> }
         }

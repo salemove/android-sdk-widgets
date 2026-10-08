@@ -2,7 +2,6 @@ package com.glia.widgets.chat.adapter.holder
 
 import android.view.View
 import com.glia.widgets.SnapshotTest
-import com.glia.widgets.UiTheme
 import com.glia.widgets.databinding.ChatTapToRetryItemLayoutBinding
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import org.junit.Test
@@ -38,7 +37,6 @@ internal class TapToRetryItemViewHolderSnapshotTest : SnapshotTest() {
         unifiedTheme: UnifiedTheme? = null
     ): View = TapToRetryItemViewHolder(
         ChatTapToRetryItemLayoutBinding.inflate(layoutInflater),
-        UiTheme(),
         {},
         unifiedTheme
     ).itemView

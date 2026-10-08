@@ -41,7 +41,7 @@ interface SecureConversations {
 /**
  * @hide
  */
-class SecureConversationsImpl(
+internal class SecureConversationsImpl(
     private val secureConversations: com.glia.androidsdk.secureconversations.SecureConversations
 ) : SecureConversations {
 

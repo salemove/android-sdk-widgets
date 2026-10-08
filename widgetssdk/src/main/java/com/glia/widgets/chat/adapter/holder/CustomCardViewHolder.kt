@@ -2,7 +2,6 @@ package com.glia.widgets.chat.adapter.holder
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
-import com.glia.androidsdk.chat.ChatMessage
 import com.glia.widgets.chat.adapter.CustomCardMessage
 
 /**
@@ -34,23 +33,6 @@ import com.glia.widgets.chat.adapter.CustomCardMessage
  * @see WebViewViewHolder
  */
 abstract class CustomCardViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    /**
-     * Called to display the data for the specified `ChatMessage`. This method should
-     * update the content of [itemView] to reflect the item for the given message.
-     * Override this function for your own implementation of the message renderer.
-     * @param message a chat message with metadata.
-     * @param callback can be used to send the selected card option.
-     */
-    @Deprecated(
-        "Use {@link #bind(CustomCardMessage, ResponseCallback)}", ReplaceWith(
-            "bind(message: CustomCardMessage, callback: ResponseCallback)",
-            "com.glia.widgets.chat.adapter.CustomCardMessage"
-        )
-    )
-    open fun bind(message: ChatMessage, callback: ResponseCallback) {
-        bind(CustomCardMessage(message), callback)
-    }
-
     /**
      * Called to display the data for the specified [CustomCardMessage]. This method should
      * update the content of [itemView] to reflect the item for the given message.

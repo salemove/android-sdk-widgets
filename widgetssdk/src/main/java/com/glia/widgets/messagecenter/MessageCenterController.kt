@@ -275,7 +275,7 @@ internal class MessageCenterController(
         takePictureUseCase.onImageCaptured(result, ::onAttachmentReceived)
     }
 
-    override fun onContentChosen(uri: Uri) {
-        uriToFileAttachmentUseCase(uri)?.also(::onAttachmentReceived)
+    override fun onContentChosen(uri: Uri, source: LocalAttachment.Source) {
+        uriToFileAttachmentUseCase(uri, source)?.also(::onAttachmentReceived)
     }
 }

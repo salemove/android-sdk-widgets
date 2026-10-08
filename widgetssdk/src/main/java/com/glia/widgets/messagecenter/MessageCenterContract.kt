@@ -26,7 +26,7 @@ internal interface MessageCenterContract {
         fun dismissDialogs()
         fun dismissCurrentDialog()
         fun onImageCaptured(result: Boolean)
-        fun onContentChosen(uri: Uri)
+        fun onContentChosen(uri: Uri, source: LocalAttachment.Source)
     }
 
     interface View : BaseView<Controller> {

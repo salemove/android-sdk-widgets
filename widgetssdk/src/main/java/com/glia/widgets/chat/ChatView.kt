@@ -213,12 +213,12 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
 
     val pickContentLauncherMimeTypes = PickVisualMediaMultipleMimeTypes()
     private val getContentLauncher = chatActivity?.registerForActivityResult(pickContentLauncherMimeTypes) {
-        it?.apply { controller?.onContentChosen(this) }
+        it?.apply { controller?.onContentChosen(this, LocalAttachment.Source.MEDIA_PICKER) }
     }
 
     //This will allow us to view picked files with Uri
     private val openDocumentLauncher = chatActivity?.registerForActivityResult(ActivityResultContracts.OpenDocument()) {
-        it?.apply { controller?.onContentChosen(this) }
+        it?.apply { controller?.onContentChosen(this, LocalAttachment.Source.FILE_BROWSER) }
     }
 
     private var snackBarDelegate: SnackBarDelegate? = null
@@ -865,9 +865,15 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     }
 
     override fun onLocalFileOpenClick(attachment: LocalAttachment) {
-        activityLauncher.launchFileReader(context, attachment.uri, attachment.mimeType.orEmpty()) {
-            showToast(message = localeProvider.getString(R.string.android_file_view_error))
-        }
+        controller?.onLocalFileOpenClick(attachment)
+    }
+
+    override fun openLocalFile(uri: Uri, mimeType: String?) {
+        activityLauncher.launchFileReader(context, uri, mimeType.orEmpty()) { fileViewFailed() }
+    }
+
+    override fun fileViewFailed() {
+        showToast(message = localeProvider.getString(R.string.android_file_view_error))
     }
 
     override fun onImageItemClick(item: AttachmentFile, view: View) {

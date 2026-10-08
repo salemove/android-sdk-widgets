@@ -184,6 +184,16 @@ class ActivityLauncherImplTest {
     }
 
     @Test
+    fun `launchShareLocalImage shares local image safely`() {
+        val onFailure = mockk<() -> Unit>(relaxed = true)
+
+        activityLauncher.launchShareLocalImage(context, uri, "image/png", onFailure)
+
+        verify { intentHelper.shareLocalImageIntent(uri, "image/png") }
+        verify { context.safeStartActivity(any(), onFailure) }
+    }
+
+    @Test
     fun `launchEntryWidget starts entry widget activity`() {
         every { activity.startActivity(any()) } just Runs
 

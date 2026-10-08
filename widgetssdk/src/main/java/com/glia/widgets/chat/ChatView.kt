@@ -443,7 +443,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             showDialog {
                 Dialogs.showEngagementConfirmationDialog(
                     context = context,
-                    theme = theme,
                     links = links,
                     positiveButtonClickListener = { onEngagementConfirmationDialogAllowed() },
                     negativeButtonClickListener = { onEngagementConfirmationDialogDismissed() },
@@ -786,7 +785,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     }
 
     private fun showExitQueueDialog() = showDialog {
-        Dialogs.showExitQueueDialog(context = context, uiTheme = theme, positiveButtonClickListener = {
+        Dialogs.showExitQueueDialog(context = context, positiveButtonClickListener = {
             resetDialogStateAndDismiss()
             controller?.endEngagementDialogYesClicked()
             onEndListener?.onEnd()
@@ -798,7 +797,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     }
 
     private fun showEndEngagementDialog() = showDialog {
-        Dialogs.showEndEngagementDialog(context = context, uiTheme = theme, positiveButtonClickListener = {
+        Dialogs.showEndEngagementDialog(context = context, positiveButtonClickListener = {
             resetDialogStateAndDismiss()
             controller?.endEngagementDialogYesClicked()
         }, negativeButtonClickListener = {
@@ -808,7 +807,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     }
 
     private fun showUnexpectedErrorDialog() = showDialog {
-        Dialogs.showUnexpectedErrorDialog(context, theme) {
+        Dialogs.showUnexpectedErrorDialog(context) {
             resetDialogStateAndDismiss()
             controller?.unexpectedErrorDialogDismissed()
             onEndListener?.onEnd()
@@ -816,7 +815,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     }
 
     private fun showOverlayPermissionsDialog() = showDialog {
-        Dialogs.showOverlayPermissionsDialog(context = context, uiTheme = theme, positiveButtonClickListener = {
+        Dialogs.showOverlayPermissionsDialog(context = context, positiveButtonClickListener = {
             controller?.overlayPermissionsDialogDismissed()
             resetDialogStateAndDismiss()
             activityLauncher.launchOverlayPermission(context)
@@ -829,7 +828,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     private fun showLeaveCurrentConversationDialog(action: LeaveDialogAction) = showDialog {
         Dialogs.showLeaveCurrentConversationDialog(
             context,
-            theme,
             onStay = {
                 resetDialogStateAndDismiss()
                 controller?.leaveCurrentConversationDialogStayClicked()

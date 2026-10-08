@@ -83,8 +83,8 @@ internal class OperatorRequestActivityWatcher(
     }
 
     private fun showUpgradeDialog(state: ControllerState.RequestMediaUpgrade, activity: Activity, consumeCallback: () -> Unit) {
-        showAlertDialogWithStyledContext(activity) { context, theme ->
-            Dialogs.showUpgradeDialog(context, theme, state.data, {
+        showAlertDialogWithStyledContext(activity) { context ->
+            Dialogs.showUpgradeDialog(context, state.data, {
                 consumeCallback()
                 controller.onMediaUpgradeAccepted(state.data.offer, activity)
             }) {

@@ -314,6 +314,24 @@ class OperatorRequestActivityWatcherTest {
         }
     }
 
+    @Test
+    fun `onActivityCreated delegates to gliaActivityManager`() {
+        val activity: Activity = mockk(relaxed = true)
+
+        watcher.onActivityCreated(activity, null)
+
+        verify { gliaActivityManager.onActivityCreated(activity) }
+    }
+
+    @Test
+    fun `onActivityDestroyed delegates to gliaActivityManager`() {
+        val activity: Activity = mockk(relaxed = true)
+
+        watcher.onActivityDestroyed(activity)
+
+        verify { gliaActivityManager.onActivityDestroyed(activity) }
+    }
+
     private fun mockLogger() {
         mockkStatic(LOGGER_PATH)
         every { Logger.d(any(), any()) } just Runs

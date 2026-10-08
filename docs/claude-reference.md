@@ -195,7 +195,7 @@ Both channels are required when logging on public API paths:
 
 **Snapshot-variant test tasks only exist when `testBuildType=snapshot`.** AGP 9 registers unit-test components solely for `android.testBuildType` (default `debug`), so `testSnapshotUnitTest`/`verifyPaparazziSnapshot` are absent on a plain checkout. Use `./gradlew widgetssdk:test` for unit tests and the `./gradlew widgetssdk:verifySnapshots` / `recordSnapshots` wrappers for snapshot tests — they run a nested build with `-PtestBuildType=snapshot`. Unit tests stay out of the snapshot variant via `test.java.srcDirs = []` **and** `test.kotlin.srcDirs = []` (clearing only `java` is a no-op under AGP 9 built-in Kotlin), with sources re-added only to `testDebug`/`testRelease`.
 
-**Screen sharing in Widgets SDK was fully removed (MOB-4366).** It is not deprecated — it was deleted. Any residual references are dead ends. CallVisualizer retains screen sharing capability; that is a separate path.
+**Screen sharing in Widgets SDK was fully removed (MOB-4366, second pass MOB-5544).** It is not deprecated — it was deleted. No screen sharing path survives anywhere, including Call Visualizer, and the Core SDK ships no screen sharing classes. Do not confuse it with Live Observation, which is live and unrelated: Live Observation is a Core SDK view-hierarchy stream and never used MediaProjection.
 
 **Secure Conversations ↔ Live engagement transitions are a known regression area.** The bidirectional transition (GVA→SC and SC→Live upgrade) has produced multiple regressions: SC banner lingering after SC→Live transition, pre-engagement hint persisting after SC upgrades to Live. Regression-test both directions on any change touching `SecureConversationsRepository`, `EngagementRepository` state transitions, or the SC↔Live upgrade path.
 
@@ -355,7 +355,7 @@ Maven Central signing: `ORG_GRADLE_PROJECT_signAllPublications=true` is set by B
 
 ### Architectural Decisions — Never Revert
 
-- **Screen sharing removal from Widgets SDK (MOB-4366)** — deliberately deleted, not deprecated. Residual references are dead ends. CallVisualizer retains screen sharing as a separate code path. Never propose restoring Widgets-side screen sharing.
+- **Screen sharing removal from Widgets SDK (MOB-4366, MOB-5544)** — deliberately deleted, not deprecated. No screen sharing path survives, Call Visualizer included. Never propose restoring it. Live Observation is a separate, live feature and is not affected.
 
 - **`use_overlay` flag deprecation** — the "display bubble inside app" behavior was reverted once. Replacement flags are `enableBubbleOutsideApp` and `enableBubbleInsideApp`. Never propose reinstating `use_overlay`.
 

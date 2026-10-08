@@ -1,11 +1,6 @@
 package com.glia.widgets.operator
 
 import android.app.Activity
-import android.content.Intent
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.result.ActivityResultLauncher
-import androidx.collection.ArrayMap
 import com.glia.androidsdk.Engagement
 import com.glia.widgets.base.BaseSingleActivityWatcher
 import com.glia.widgets.call.CallActivity
@@ -28,20 +23,8 @@ internal class OperatorRequestActivityWatcher(
     gliaActivityManager: GliaActivityManager
 ) : BaseSingleActivityWatcher(gliaActivityManager) {
 
-    private val mediaProjectionResultLaunchers: ArrayMap<String, ActivityResultLauncher<Intent>> = ArrayMap()
-
     init {
         Flowable.combineLatest(resumedActivity, controller.state, ::handleState).subscribe()
-    }
-
-    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
-        super.onActivityCreated(activity, savedInstanceState)
-        if (activity !is ComponentActivity) return
-    }
-
-    override fun onActivityDestroyed(activity: Activity) {
-        super.onActivityDestroyed(activity)
-        mediaProjectionResultLaunchers.remove(activity.localClassName)
     }
 
     private fun handleState(activityReference: WeakReference<Activity>, event: OneTimeEvent<ControllerState>) {

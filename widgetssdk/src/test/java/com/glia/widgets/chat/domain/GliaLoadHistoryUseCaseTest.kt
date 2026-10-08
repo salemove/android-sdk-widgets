@@ -3,6 +3,7 @@ package com.glia.widgets.chat.domain
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
 import com.glia.androidsdk.chat.Chat
+import com.glia.androidsdk.chat.ChatHistory
 import com.glia.androidsdk.chat.ChatMessage
 import com.glia.androidsdk.secureconversations.SecureConversations
 import com.glia.widgets.chat.data.GliaChatRepository
@@ -42,6 +43,7 @@ class GliaLoadHistoryUseCaseTest {
 
     private val earlierMessage: ChatMessage = visitorMessage(timestamp = 1)
     private val laterMessage: ChatMessage = visitorMessage(timestamp = 2)
+    private val olderPage: ChatHistory.OlderPage = mockk()
 
     private lateinit var secureConversationsRepository: SecureConversationsRepository
     private lateinit var useCase: GliaLoadHistoryUseCase
@@ -89,6 +91,23 @@ class GliaLoadHistoryUseCaseTest {
     }
 
     @Test
+    fun `invoke carries the older page key for a live engagement`() {
+        givenSecureConversation(false)
+        givenCoreTranscript(laterMessage, olderPage = olderPage)
+
+        useCase().test().assertResult(ChatHistoryResponse(listOf(ChatMessageInternal(laterMessage)), olderPage = olderPage))
+    }
+
+    @Test
+    fun `invoke carries the older page key for a secure conversation`() {
+        givenSecureConversation(true)
+        givenUnreadMessagesCount(3)
+        givenCoreTranscript(laterMessage, olderPage = olderPage)
+
+        useCase().test().assertResult(ChatHistoryResponse(listOf(ChatMessageInternal(laterMessage)), 3, olderPage))
+    }
+
+    @Test
     fun `invoke fails with the Core error and emits no history`() {
         val exception = GliaException("forbidden", GliaException.Cause.FORBIDDEN)
         givenSecureConversation(false)
@@ -105,8 +124,12 @@ class GliaLoadHistoryUseCaseTest {
         every { engagementRepository.isTransferredSecureConversation } returns false
     }
 
-    private fun givenCoreTranscript(vararg messages: ChatMessage) {
-        every { gliaCore.getChatHistory(any(), any()) } answers { firstArg<(List<ChatMessage>) -> Unit>()(messages.toList()) }
+    private fun givenCoreTranscript(vararg messages: ChatMessage, olderPage: ChatHistory.OlderPage? = null) {
+        val history: ChatHistory = mockk {
+            every { this@mockk.messages } returns messages.toList()
+            every { this@mockk.olderPage } returns olderPage
+        }
+        every { gliaCore.getChatHistory(any(), any()) } answers { firstArg<(ChatHistory) -> Unit>()(history) }
     }
 
     private fun givenUnreadMessagesCount(count: Int) {

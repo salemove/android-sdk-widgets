@@ -163,6 +163,8 @@ internal data class ChatState(
         operatorProfileImgUrl = null,
         isVisible = false,
         isAttachmentButtonNeeded = false,
-        isMediaUpgradeVide = null
+        isMediaUpgradeVide = null,
+        canLoadOlderHistory = false,
+        isLoadingOlderHistory = false
     )
 }

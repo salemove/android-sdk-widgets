@@ -24,7 +24,9 @@ internal data class ChatState(
     val isBrowseAttachmentVisible: Boolean = true,
     val isSecureMessaging: Boolean = false,
     val gvaQuickReplies: List<GvaButton> = emptyList(),
-    val isInitialized: Boolean = false
+    val isInitialized: Boolean = false,
+    val canLoadOlderHistory: Boolean = false,
+    val isLoadingOlderHistory: Boolean = false
 ) {
     val isOperatorOnline: Boolean get() = formattedOperatorName != null
 
@@ -122,6 +124,12 @@ internal data class ChatState(
 
     fun isInBottomChanged(isChatInBottom: Boolean): ChatState = copy(isChatInBottom = isChatInBottom)
 
+    /** Older-page load finished (or availability was re-evaluated): stops the indicator and gates the next pull. */
+    fun olderHistoryAvailabilityChanged(canLoadOlderHistory: Boolean): ChatState =
+        copy(canLoadOlderHistory = canLoadOlderHistory, isLoadingOlderHistory = false)
+
+    fun loadingOlderHistory(): ChatState = copy(isLoadingOlderHistory = true)
+
     fun messagesNotSeenChanged(messagesNotSeen: Int): ChatState = copy(messagesNotSeen = messagesNotSeen)
 
     fun setSendButtonEnabled(isShow: Boolean): ChatState = copy(isSendButtonEnabled = isShow)
@@ -155,6 +163,8 @@ internal data class ChatState(
         operatorProfileImgUrl = null,
         isVisible = false,
         isAttachmentButtonNeeded = false,
-        isMediaUpgradeVide = null
+        isMediaUpgradeVide = null,
+        canLoadOlderHistory = false,
+        isLoadingOlderHistory = false
     )
 }

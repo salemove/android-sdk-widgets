@@ -63,15 +63,22 @@
         app:barrierDirection="bottom"
         app:constraint_referenced_ids="sc_top_banner_title, sc_top_banner_icon, app_bar_view, sc_top_banner_divider" />
 
-    <com.glia.widgets.chat.ChatRecyclerView
-        android:id="@+id/chat_recycler_view"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/chat_swipe_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:clipToPadding="false"
-        android:paddingBottom="@dimen/glia_medium"
+        android:enabled="false"
         app:layout_constraintTop_toBottomOf="@+id/header_barrier"
-        app:layout_constraintBottom_toTopOf="@+id/gva_quick_replies_layout"
-        tools:listitem="@layout/chat_visitor_message_layout" />
+        app:layout_constraintBottom_toTopOf="@+id/gva_quick_replies_layout">
+
+        <com.glia.widgets.chat.ChatRecyclerView
+            android:id="@+id/chat_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="@dimen/glia_medium"
+            tools:listitem="@layout/chat_visitor_message_layout" />
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <com.glia.widgets.chat.GvaChipGroup
         android:id="@+id/gva_quick_replies_layout"

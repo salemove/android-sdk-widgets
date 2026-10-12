@@ -59,6 +59,9 @@ internal data class ChatRemoteConfig(
     @SerializedName("newMessagesDividerText")
     val newMessagesDividerTextRemoteConfig: TextRemoteConfig?,
 
+    @SerializedName("olderMessagesIndicator")
+    val olderMessagesIndicator: ColorLayerRemoteConfig?,
+
     @SerializedName("gva")
     val gvaRemoteConfig: GvaRemoteConfig?,
 
@@ -82,6 +85,7 @@ internal data class ChatRemoteConfig(
         typingIndicator = typingIndicator?.toColorTheme(),
         newMessagesDividerColorTheme = newMessagesDividerColorRemoteConfig?.toColorTheme(),
         newMessagesDividerTextTheme = newMessagesDividerTextRemoteConfig?.toTextTheme(),
+        olderMessagesIndicator = olderMessagesIndicator?.toColorTheme(),
         gva = gvaRemoteConfig?.toGvaTheme(),
         secureMessaging = secureMessagingRemoteConfig?.toSecureMessagingTheme()
     )

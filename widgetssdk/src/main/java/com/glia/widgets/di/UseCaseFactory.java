@@ -38,6 +38,7 @@ import com.glia.widgets.chat.domain.HandleCustomCardClickUseCase;
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase;
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase;
 import com.glia.widgets.chat.domain.IsSendButtonEnableUseCase;
+import com.glia.widgets.chat.domain.LoadOlderHistoryUseCase;
 import com.glia.widgets.chat.domain.MapOperatorAttachmentUseCase;
 import com.glia.widgets.chat.domain.MapOperatorPlainTextUseCase;
 import com.glia.widgets.chat.domain.MapResponseCardUseCase;
@@ -324,6 +325,11 @@ public class UseCaseFactory {
             createManageSecureMessagingStatusUseCase(),
             getMapOperatorUseCase()
         );
+    }
+
+    @NonNull
+    public LoadOlderHistoryUseCase createLoadOlderHistoryUseCase() {
+        return new LoadOlderHistoryUseCase(repositoryFactory.getGliaMessageRepository(), getMapOperatorUseCase());
     }
 
     @NonNull

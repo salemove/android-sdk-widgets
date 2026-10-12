@@ -65,6 +65,7 @@ import com.glia.widgets.webbrowser.domain.GetUrlFromLinkUseCase
 import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.processors.BehaviorProcessor
 import io.reactivex.rxjava3.schedulers.Schedulers
 import junit.framework.TestCase.assertEquals
@@ -797,5 +798,130 @@ class ChatControllerTest {
 
         networkStateProcessor.onNext(NetworkState.DISCONNECTED)
         verify(chatView, times(1)).showConnectionSnackBar()
+    }
+
+    // --- older history -------------------------------------------------------------------
+
+    @Test
+    fun `onHistoryLoaded emits canLoadOlderHistory from chatManager`() {
+        loadHistory(hasOlderHistory = true)
+
+        val state = lastEmittedState()
+        assertTrue(state.canLoadOlderHistory)
+        assertFalse(state.isLoadingOlderHistory)
+    }
+
+    @Test
+    fun `onHistoryLoaded emits canLoadOlderHistory false when chatManager reports none`() {
+        loadHistory(hasOlderHistory = false)
+
+        assertFalse(lastEmittedState().canLoadOlderHistory)
+    }
+
+    @Test
+    fun `onLoadOlderHistoryRequested ignores request when nothing older`() {
+        loadHistory(hasOlderHistory = false)
+
+        chatController.onLoadOlderHistoryRequested()
+
+        verify(chatManager, never()).loadOlderHistory()
+    }
+
+    @Test
+    fun `onLoadOlderHistoryRequested emits loading then availability from result`() {
+        loadHistory(hasOlderHistory = true)
+        whenever(chatManager.loadOlderHistory()) doReturn Single.just(false)
+        Mockito.clearInvocations(chatView)
+
+        chatController.onLoadOlderHistoryRequested()
+
+        val captor = argumentCaptor<ChatState>()
+        verify(chatView, times(2)).emitState(captor.capture())
+        assertTrue(captor.firstValue.isLoadingOlderHistory)
+        assertFalse(captor.lastValue.isLoadingOlderHistory)
+        assertFalse(captor.lastValue.canLoadOlderHistory)
+    }
+
+    @Test
+    fun `onLoadOlderHistoryRequested ignores request while loading`() {
+        loadHistory(hasOlderHistory = true)
+        whenever(chatManager.loadOlderHistory()) doReturn Single.never()
+
+        chatController.onLoadOlderHistoryRequested()
+        chatController.onLoadOlderHistoryRequested()
+
+        verify(chatManager, times(1)).loadOlderHistory()
+    }
+
+    @Test
+    fun `onLoadOlderHistoryRequested on error stops loading and keeps availability`() {
+        loadHistory(hasOlderHistory = true)
+        whenever(chatManager.loadOlderHistory()) doReturn Single.error(RuntimeException("expired"))
+
+        chatController.onLoadOlderHistoryRequested()
+
+        val state = lastEmittedState()
+        assertFalse(state.isLoadingOlderHistory)
+        assertTrue(state.canLoadOlderHistory)
+    }
+
+    @Test
+    fun `onLoadOlderHistoryRequested on error after the key was wiped disables older history`() {
+        loadHistory(hasOlderHistory = true)
+        whenever(chatManager.loadOlderHistory()) doReturn Single.error(RuntimeException("expired"))
+        whenever(chatManager.hasOlderHistory()) doReturn false
+
+        chatController.onLoadOlderHistoryRequested()
+
+        val state = lastEmittedState()
+        assertFalse(state.isLoadingOlderHistory)
+        assertFalse(state.canLoadOlderHistory)
+    }
+
+    @Test
+    fun `ending the chat while loading older history resets chatManager and clears the older history flags`() {
+        loadHistory(hasOlderHistory = true)
+        whenever(chatManager.loadOlderHistory()) doReturn Single.never()
+        chatController.onLoadOlderHistoryRequested()
+
+        chatController.endEngagementDialogYesClicked()
+
+        verify(chatManager).reset()
+        val state = lastEmittedState()
+        assertFalse(state.isLoadingOlderHistory)
+        assertFalse(state.canLoadOlderHistory)
+    }
+
+    @Test
+    fun `onDestroy without retain resets chatManager so the older page key does not outlive the visitor`() {
+        chatController.onDestroy(false)
+
+        verify(chatManager).reset()
+    }
+
+    @Test
+    fun `onDestroy with retain keeps chatManager state`() {
+        chatController.onDestroy(true)
+
+        verify(chatManager, never()).reset()
+    }
+
+    /** Opens a live chat and completes the initial history load with [hasOlderHistory] reported by Core. */
+    private fun loadHistory(hasOlderHistory: Boolean) {
+        val historyLoadedCaptor = argumentCaptor<(Boolean) -> Unit>()
+        whenever(chatManager.initialize(historyLoadedCaptor.capture(), any(), any())) doReturn Flowable.empty()
+        whenever(chatManager.hasOlderHistory()) doReturn hasOlderHistory
+        whenever(isMessagingAvailableUseCase()) doReturn Flowable.empty()
+        whenever(fileUploadLimitNotExceededObservableUseCase()) doReturn Observable.empty()
+        whenever(addFileAttachmentsObserverUseCase()) doReturn Observable.empty()
+
+        chatController.initChat(Intention.LIVE_CHAT)
+        historyLoadedCaptor.lastValue.invoke(true)
+    }
+
+    private fun lastEmittedState(): ChatState {
+        val captor = argumentCaptor<ChatState>()
+        verify(chatView, atLeastOnce()).emitState(captor.capture())
+        return captor.lastValue
     }
 }

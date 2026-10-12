@@ -5,6 +5,7 @@ import com.glia.widgets.R
 import com.glia.widgets.SnapshotTest
 import com.glia.widgets.chat.model.ChatState
 import com.glia.widgets.chat.model.OperatorStatusItem
+import com.glia.widgets.chat.model.VisitorMessageItem
 import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.glia.widgets.entrywidget.EntryWidgetContract
 import com.glia.widgets.entrywidget.EntryWidgetView
@@ -331,6 +332,56 @@ internal class ChatViewSnapshotTest : SnapshotTest(), SnapshotChatView, Snapshot
     fun transferringWithUnifiedThemeWithoutChat() {
         snapshot(
             transferringView(
+                unifiedTheme = unifiedThemeWithoutChat()
+            ).root
+        )
+    }
+
+    // MARK: Older history available (pull-to-refresh enabled)
+
+    // The SwipeRefreshLayout spinner is captured at frame 0 of its scale-in animation, so the
+    // loading state renders identically to the idle one; snapshot the enabled state instead.
+    private fun olderHistoryAvailableView(unifiedTheme: UnifiedTheme? = null) = setupView(
+        chatState = ChatState()
+            .initChat()
+            .changeVisibility(true)
+            .olderHistoryAvailabilityChanged(true),
+        chatItems = listOf(
+            VisitorMessageItem("First message", "visitor-1", timestamp = 1L),
+            VisitorMessageItem("Second message", "visitor-2", timestamp = 2L)
+        ),
+        unifiedTheme = unifiedTheme
+    )
+
+    @Test
+    fun olderHistoryAvailable() {
+        snapshot(
+            olderHistoryAvailableView().root
+        )
+    }
+
+    @Test
+    fun olderHistoryAvailableWithGlobalColors() {
+        snapshot(
+            olderHistoryAvailableView(
+                unifiedTheme = unifiedThemeWithGlobalColors()
+            ).root
+        )
+    }
+
+    @Test
+    fun olderHistoryAvailableWithUnifiedTheme() {
+        snapshot(
+            olderHistoryAvailableView(
+                unifiedTheme = unifiedTheme()
+            ).root
+        )
+    }
+
+    @Test
+    fun olderHistoryAvailableWithUnifiedThemeWithoutChat() {
+        snapshot(
+            olderHistoryAvailableView(
                 unifiedTheme = unifiedThemeWithoutChat()
             ).root
         )

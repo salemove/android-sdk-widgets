@@ -9,7 +9,7 @@ import com.glia.androidsdk.NetworkTracker
 import com.glia.androidsdk.Operator
 import com.glia.androidsdk.RequestCallback
 import com.glia.androidsdk.chat.AttachmentFile
-import com.glia.androidsdk.chat.ChatMessage
+import com.glia.androidsdk.chat.ChatHistory
 import com.glia.androidsdk.comms.EngagementOptions
 import com.glia.androidsdk.engagement.Survey
 import com.glia.androidsdk.fcm.PushNotifications
@@ -170,8 +170,12 @@ internal class GliaCoreImpl : GliaCore {
         Glia.fetchFile(attachmentFile, callback)
     }
 
-    override fun getChatHistory(callback: RequestCallback<List<ChatMessage>?>) {
-        Glia.getChatHistory { messages, exception -> callback.onResult(messages?.toList(), exception) }
+    override fun getChatHistory(onSuccess: (ChatHistory) -> Unit, onError: (GliaException) -> Unit) {
+        Glia.getChatHistory(onSuccess, onError)
+    }
+
+    override fun getChatHistory(olderPage: ChatHistory.OlderPage, onSuccess: (ChatHistory) -> Unit, onError: (GliaException) -> Unit) {
+        Glia.getChatHistory(olderPage, onSuccess, onError)
     }
 
     override fun getQueues(onResult: (Array<Queue>) -> Unit, onError: (GliaException?) -> Unit) {

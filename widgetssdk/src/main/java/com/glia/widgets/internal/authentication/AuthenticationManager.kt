@@ -9,6 +9,7 @@ import com.glia.widgets.di.Dependencies.repositoryFactory
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.toWidgetsType
+import io.reactivex.rxjava3.core.Scheduler
 import com.glia.androidsdk.visitor.Authentication as CoreAuthentication
 
 /**
@@ -18,7 +19,8 @@ import com.glia.androidsdk.visitor.Authentication as CoreAuthentication
  */
 internal class AuthenticationManager(
     private val authentication: CoreAuthentication,
-    private val onAuthenticationRequestedCallback: () -> Unit
+    private val onAuthenticationRequestedCallback: () -> Unit,
+    private val mainScheduler: Scheduler
 ) : Authentication {
 
     override val isAuthenticated: Boolean
@@ -83,6 +85,13 @@ internal class AuthenticationManager(
             externalAccessToken,
             onSuccess = onComplete::onComplete,
             onFailure = { onError.onError(it.toWidgetsType()) }
+        )
+    }
+
+    override fun setTokenExpiredListener(listener: Authentication.TokenExpiredListener?) {
+        GliaLogger.logMethodUse(Authentication::class, "setTokenExpiredListener", "listener")
+        authentication.setTokenExpiredListener(
+            listener?.let { CoreAuthentication.TokenExpiredListener { mainScheduler.scheduleDirect(it::onTokenExpired) } }
         )
     }
 

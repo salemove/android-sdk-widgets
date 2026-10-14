@@ -565,6 +565,11 @@ class MainFragment : Fragment() {
     private fun prepareAuthentication() {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
         authentication = GliaWidgets.getAuthentication(getAuthenticationBehaviorFromPrefs(sharedPreferences, resources))
+        // The SDK keeps this listener for the whole process, so it must not hold the fragment.
+        val appContext = requireContext().applicationContext
+        authentication?.setTokenExpiredListener {
+            Toast.makeText(appContext, "The JWT expired. Refresh it to continue.", Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun authenticate(

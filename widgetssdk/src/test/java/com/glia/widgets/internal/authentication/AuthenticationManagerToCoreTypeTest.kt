@@ -31,6 +31,25 @@ class AuthenticationManagerToCoreTypeTest {
     private val onErrorCaptor = argumentCaptor<OnError>()
 
     @Test
+    fun toCoreType_setTokenExpiredListener_forwardsTheListener() {
+        var heard = 0
+        coreAuthentication.setTokenExpiredListener { heard++ }
+        val listenerCaptor = argumentCaptor<Authentication.TokenExpiredListener>()
+        verify(widgetAuthentication).setTokenExpiredListener(listenerCaptor.capture())
+
+        listenerCaptor.firstValue.onTokenExpired()
+
+        assertEquals(1, heard)
+    }
+
+    @Test
+    fun toCoreType_setTokenExpiredListener_null_removesTheListener() {
+        coreAuthentication.setTokenExpiredListener(null)
+
+        verify(widgetAuthentication).setTokenExpiredListener(null)
+    }
+
+    @Test
     fun toCoreType_setBehavior_delegatesMappedBehavior() {
         val behavior = CoreAuthentication.Behavior.FORBIDDEN_DURING_ENGAGEMENT
 

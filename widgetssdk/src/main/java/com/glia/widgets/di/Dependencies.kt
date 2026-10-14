@@ -335,7 +335,7 @@ internal object Dependencies {
 
     @JvmStatic
     fun getAuthenticationManager(behavior: Authentication.Behavior): AuthenticationManager =
-        AuthenticationManager(gliaCore.getAuthentication(behavior.toCoreType()), authenticationRequestCallback).apply {
+        AuthenticationManager(gliaCore.getAuthentication(behavior.toCoreType()), authenticationRequestCallback, schedulers.mainScheduler).apply {
             authenticationManagerProvider.authenticationManager = this
         }
 

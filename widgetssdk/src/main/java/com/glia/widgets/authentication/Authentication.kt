@@ -99,6 +99,27 @@ interface Authentication {
     )
 
     /**
+     * Sets the listener called when the backend refuses the JWT the visitor is authenticated with,
+     * which happens once it expired. The visitor stays authenticated and keeps its engagement, but its
+     * requests fail until [refresh] succeeds with a new JWT.
+     *
+     * Called once per expired JWT, on the main thread.
+     *
+     * @param listener the listener, or null to remove the current one.
+     */
+    fun setTokenExpiredListener(listener: TokenExpiredListener?)
+
+    /**
+     * See [setTokenExpiredListener].
+     */
+    fun interface TokenExpiredListener {
+        /**
+         * Called when the JWT the visitor is authenticated with expired. Call [refresh] with a new JWT.
+         */
+        fun onTokenExpired()
+    }
+
+    /**
      * Behavior for authentication and de-authentication.
      */
     enum class Behavior {

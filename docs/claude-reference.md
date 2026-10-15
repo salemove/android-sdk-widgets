@@ -197,7 +197,7 @@ Both channels are required when logging on public API paths:
 
 **Screen sharing in Widgets SDK was fully removed (MOB-4366).** It is not deprecated — it was deleted. Any residual references are dead ends. CallVisualizer retains screen sharing capability; that is a separate path.
 
-**Secure Conversations ↔ Live engagement transitions are a known regression area.** The bidirectional transition (GVA→SC and SC→Live upgrade) has produced multiple regressions: SC banner lingering after SC→Live transition, pre-engagement hint persisting after SC upgrades to Live. Regression-test both directions on any change touching `SecureConversationsRepository`, `EngagementRepository` state transitions, or the SC↔Live upgrade path.
+**Secure Conversations ↔ Live engagement transitions are a known regression area.** The bidirectional transition (GVA→SC and an SC becoming real-time) has produced multiple regressions: SC banner lingering after an SC becoming real-time, pre-engagement hint persisting after an SC becoming real-time. Regression-test both directions on any change touching `SecureConversationsRepository`, `EngagementRepository` state transitions, or the SC ↔ live chat path.
 
 **Auth + engagement-end lifecycle boundary is fragile.** A fix for "engagement end during de-authentication" was deliberately reverted (commit `bdcf1895`). A flag was added separately to suppress the push notification permission dialog during authentication flow. Any change touching auth state, engagement end, or push notification permission timing in the same commit should be treated with heightened caution.
 
@@ -343,7 +343,7 @@ Maven Central signing: `ORG_GRADLE_PROJECT_signAllPublications=true` is set by B
 
 - `widgetssdk/src/main/java/com/glia/widgets/di/UseCaseFactory.java` — moves in lockstep with `ControllerFactory.java`. Every new use case registration lands here. Same Java-retention caveat.
 
-- `widgetssdk/src/main/java/com/glia/widgets/chat/controller/ChatController.kt` — convergence point for Secure Conversations ↔ Live transitions, media upgrade logic, read tracking, and telemetry. Java→Kotlin migration history; accumulates targeted fixes for chat-related edge cases.
+- `widgetssdk/src/main/java/com/glia/widgets/chat/controller/ChatController.kt` — convergence point for SC ↔ live chat transitions, media upgrade logic, read tracking, and telemetry. Java→Kotlin migration history; accumulates targeted fixes for chat-related edge cases.
 
 ### Recurring Fix Patterns
 

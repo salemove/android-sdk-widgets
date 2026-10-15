@@ -166,6 +166,7 @@ public class ControllerFactory {
                 useCaseFactory.getReleaseResourcesUseCase(getDialogController()),
                 useCaseFactory.createGetUrlFromLinkUseCase(),
                 useCaseFactory.createIsMessagingAvailableUseCase(),
+                useCaseFactory.createIsSecureConversationFileUploadAvailableUseCase(),
                 useCaseFactory.createSecureConversationTopBannerVisibilityUseCase(),
                 useCaseFactory.createSetLeaveSecureConversationDialogVisibleUseCase(),
                 useCaseFactory.getSetChatScreenOpenUseCase(),
@@ -335,7 +336,8 @@ public class ControllerFactory {
             useCaseFactory.getUriToFileAttachmentUseCase(),
             useCaseFactory.getRequestNotificationPermissionIfPushNotificationsSetUpUseCase(),
             useCaseFactory.createIsMessagingAvailableUseCase(),
-            useCaseFactory.getIsQueueingOrEngagementUseCase()
+            useCaseFactory.getIsQueueingOrEngagementUseCase(),
+            useCaseFactory.createIsSecureConversationFileUploadAvailableUseCase()
         );
     }
 

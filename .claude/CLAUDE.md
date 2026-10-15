@@ -45,6 +45,11 @@ app/                    # Demo app
 - Always dispose subscriptions in lifecycle methods
 - Always provide error handlers in `.subscribe()`
 
+## Interaction Vocabulary
+
+Engagement kinds, phases and states follow the core vocabulary: android-sdk `.claude/CLAUDE.md`, section
+"Interaction Vocabulary".
+
 ## Testing Commands
 ```bash
 # Snapshot tests (UI validation)

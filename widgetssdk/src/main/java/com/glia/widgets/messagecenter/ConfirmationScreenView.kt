@@ -27,11 +27,14 @@ import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.securemessaging.SecureMessagingConfirmationScreenTheme
 import com.google.android.material.transition.MaterialFadeThrough
 
-internal class ConfirmationScreenView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : LinearLayout(
+internal class ConfirmationScreenView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
+) : LinearLayout(
     context,
     attrs,
-    defStyleAttr,
-    defStyleRes
+    defStyleAttr
 ) {
 
     private val unifiedTheme: SecureMessagingConfirmationScreenTheme? by lazy {
@@ -62,14 +65,6 @@ internal class ConfirmationScreenView(context: Context, attrs: AttributeSet?, de
         )
         setupUnifiedTheme()
     }
-
-    @JvmOverloads
-    constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = R.attr.gliaChatStyle) : this(
-        context,
-        attrs,
-        defStyleAttr,
-        R.style.Application_Glia_Chat
-    )
 
     private fun setupUnifiedTheme() {
         unifiedTheme?.apply {

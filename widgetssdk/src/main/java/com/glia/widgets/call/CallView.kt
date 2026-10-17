@@ -2,7 +2,6 @@ package com.glia.widgets.call
 
 import android.content.Context
 import android.content.res.Configuration
-import android.content.res.TypedArray
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -10,11 +9,11 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.AttrRes
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.withStyledAttributes
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.transition.TransitionManager
@@ -24,7 +23,6 @@ import com.glia.androidsdk.comms.VideoView
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.telemetry_lib.LogEvents
 import com.glia.widgets.R
-import com.glia.widgets.UiTheme
 import com.glia.widgets.call.CallState.ViewState
 import com.glia.widgets.databinding.CallButtonsLayoutBinding
 import com.glia.widgets.databinding.CallViewBinding
@@ -33,11 +31,10 @@ import com.glia.widgets.engagement.MediaType
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.SimpleWindowInsetsAndAnimationHandler
 import com.glia.widgets.helper.TAG
-import com.glia.widgets.helper.Utils
 import com.glia.widgets.helper.asActivity
 import com.glia.widgets.helper.getColorCompat
-import com.glia.widgets.helper.getColorStateListCompat
-import com.glia.widgets.helper.getFontCompat
+import com.glia.widgets.helper.gliaAttrFont
+import com.glia.widgets.helper.gliaAttrResourceId
 import com.glia.widgets.helper.hideKeyboard
 import com.glia.widgets.helper.insetsController
 import com.glia.widgets.helper.requireActivity
@@ -72,16 +69,18 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.transition.MaterialFade
 import com.google.android.material.transition.SlideDistanceProvider
 import java.util.concurrent.Executor
-import kotlin.properties.Delegates
 
 private const val CONTROLS_ALPHA_SEMI_TRANSPARENT = 0.9f
 private const val CONTROLS_ALPHA = 1f
 
-internal class CallView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : ConstraintLayout(
+internal class CallView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
+) : ConstraintLayout(
     context,
     attrs,
-    defStyleAttr,
-    defStyleRes
+    defStyleAttr
 ), CallContract.View, DialogDelegate by DialogDelegateImpl() {
     private val activityLauncher: ActivityLauncher by lazy { Dependencies.activityLauncher }
 
@@ -123,8 +122,6 @@ internal class CallView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     private val floatingVisitorVideoContainer: FloatingVisitorVideoContainer get() = binding.floatingVisitorVideo
     private val poorConnectionView: AppCompatTextView get() = binding.poorConnectionView
 
-    private var theme: UiTheme by Delegates.notNull()
-
     private var callController: CallContract.Controller? = null
     private var serviceChatHeadController: ChatHeadContract.Controller? = null
     private var dialogCallback: DialogContract.Controller.Callback? = null
@@ -141,16 +138,8 @@ internal class CallView(context: Context, attrs: AttributeSet?, defStyleAttr: In
 
     private var snackBarDelegate: SnackBarDelegate? = null
 
-    @JvmOverloads
-    constructor(
-        context: Context,
-        attrs: AttributeSet? = null,
-        defStyleAttr: Int = R.attr.gliaChatStyle
-    ) : this(context, attrs, defStyleAttr, R.style.Application_Glia_Chat)
-
     init {
         initConfigurations()
-        readTypedArray(attrs, defStyleAttr, defStyleRes)
         setupViewAppearance()
         setupViewActions()
         setupControllers()
@@ -337,8 +326,8 @@ internal class CallView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     private fun onIsSpeakerOnStateChanged(isSpeakerOn: Boolean) {
         setButtonActivated(
             speakerButton,
-            theme.iconCallSpeakerOn,
-            theme.iconCallSpeakerOff,
+            R.attr.gliaIconCallSpeakerOn,
+            R.attr.gliaIconCallSpeakerOff,
             R.string.android_call_turn_speaker_off_button_accessibility,
             R.string.android_call_turn_speaker_on_button_accessibility,
             isSpeakerOn
@@ -362,15 +351,19 @@ internal class CallView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         )
     }
 
+    /**
+     * The activated/deactivated icons are picked when the state arrives, so they cannot be static
+     * layout values - the attribute is resolved here instead.
+     */
     private fun setButtonActivated(
         floatingActionButton: FloatingActionButton,
-        activatedDrawableRes: Int?,
-        notActivatedDrawableRes: Int?,
+        @AttrRes activatedIconAttr: Int,
+        @AttrRes notActivatedIconAttr: Int,
         @StringRes activatedContentDescription: Int,
         @StringRes notActivatedContentDescription: Int,
         isActivated: Boolean
     ) {
-        val imageRes = if (isActivated) activatedDrawableRes else notActivatedDrawableRes
+        val imageRes = context.gliaAttrResourceId(if (isActivated) activatedIconAttr else notActivatedIconAttr)
         val contentDescription =
             if (isActivated) activatedContentDescription else notActivatedContentDescription
 
@@ -419,16 +412,8 @@ internal class CallView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         // icons
         operatorStatusView.applyOperatorTheme(callTheme?.connect?.operator)
 
-        theme.iconCallChat?.also(chatButton::setImageResource)
-        theme.iconCallVideoOn?.also(videoButton::setImageResource)
-        theme.iconCallAudioOn?.also(muteButton::setImageResource)
-        theme.iconCallSpeakerOn?.also(speakerButton::setImageResource)
-        theme.iconCallMinimize?.also(minimizeButton::setImageResource)
-        theme.brandPrimaryColor?.let(::getColorStateListCompat)
-            ?.also(chatButtonBadgeView::setBackgroundTintList)
-
         // fonts
-        theme.fontRes?.let(::getFontCompat)?.also {
+        context.gliaAttrFont()?.also {
             operatorNameView.typeface = it
             companyNameView.typeface = it
             msrView.typeface = it
@@ -489,16 +474,6 @@ internal class CallView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     private fun initConfigurations() {
         visibility = INVISIBLE
         setBackgroundColor(getColorCompat(R.color.glia_call_view_background_color))
-    }
-
-    private fun readTypedArray(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
-        context.withStyledAttributes(attrs, R.styleable.GliaView, defStyleAttr, defStyleRes) {
-            setDefaultTheme(this)
-        }
-    }
-
-    private fun setDefaultTheme(typedArray: TypedArray) {
-        theme = Utils.getThemeFromTypedArray(typedArray, this.context)
     }
 
     fun setOnBackClickedListener(onBackClicked: OnBackClickedListener) {
@@ -767,8 +742,8 @@ internal class CallView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             applyViewState(callState.speakerButtonViewState, speakerButton, speakerButtonLabel)
             setButtonActivated(
                 videoButton,
-                theme.iconCallVideoOn,
-                theme.iconCallVideoOff,
+                R.attr.gliaIconCallVideoOn,
+                R.attr.gliaIconCallVideoOff,
                 R.string.android_call_turn_video_off_button_accessibility,
                 R.string.android_call_turn_video_on_button_accessibility,
                 callState.hasVideo
@@ -780,8 +755,8 @@ internal class CallView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             applyViewState(callState.muteButtonViewState, muteButton, muteButtonLabel)
             setButtonActivated(
                 muteButton,
-                theme.iconCallAudioOff, // mute (e.g., mic-off) button activated icon
-                theme.iconCallAudioOn, // mute (e.g., mic-off) button deactivated icon
+                R.attr.gliaIconCallAudioOff, // mute (e.g., mic-off) button activated icon
+                R.attr.gliaIconCallAudioOn, // mute (e.g., mic-off) button deactivated icon
                 R.string.android_call_unmute_button_accessibility,
                 R.string.android_call_mute_button_accessibility,
                 callState.isMuted
@@ -817,7 +792,7 @@ internal class CallView(context: Context, attrs: AttributeSet?, defStyleAttr: In
                 }
                 applyViewState(this, chatButton, chatButtonLabel)
                 // Re-set the drawable to force FAB to refresh icon
-                theme.iconCallChat?.apply(chatButton::setImageResource)
+                context.gliaAttrResourceId(R.attr.gliaIconCallChat)?.also(chatButton::setImageResource)
             }
 
             chatButton.setContentDescription(

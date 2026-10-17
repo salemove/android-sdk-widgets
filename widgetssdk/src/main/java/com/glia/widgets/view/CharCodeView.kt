@@ -120,16 +120,11 @@ internal class CharCodeView @JvmOverloads constructor(
         }
 
         val fontFamily = theme.fontRes?.let { getFontCompat(it) }
-        val backgroundColor = theme.visitorCodeBackgroundColor?.let { getColorCompat(it) }
-            ?: charViewProps.backgroundColor
-        val borderColor =
-            theme.visitorCodeBorderColor?.let { getColorCompat(it) } ?: charViewProps.borderColor
-        val textColor = theme.visitorCodeTextColor?.let { getColorCompat(it) }
-            ?: theme.baseDarkColor?.let { getColorCompat(it) }
+        val textColor = theme.baseDarkColor?.let { getColorCompat(it) }
 
         val backgroundTheme = LayerTheme(
-            fill = ColorTheme(backgroundColor),
-            stroke = borderColor,
+            fill = ColorTheme(charViewProps.backgroundColor),
+            stroke = charViewProps.borderColor,
             borderWidth = charViewProps.borderWidth,
             cornerRadius = charViewProps.borderRadius
         )

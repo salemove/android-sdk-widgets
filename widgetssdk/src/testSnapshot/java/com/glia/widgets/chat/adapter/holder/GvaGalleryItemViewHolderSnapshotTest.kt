@@ -5,7 +5,6 @@ import android.widget.LinearLayout.LayoutParams
 import androidx.annotation.DrawableRes
 import com.glia.widgets.R
 import com.glia.widgets.SnapshotTest
-import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.model.GvaButton
 import com.glia.widgets.chat.model.GvaGalleryCard
 import com.glia.widgets.databinding.ChatGvaGalleryItemBinding
@@ -273,7 +272,7 @@ internal class GvaGalleryItemViewHolderSnapshotTest : SnapshotTest(), SnapshotGv
         mockCoil(imageResources = listOf(imageRes))
 
         val binding = ChatGvaGalleryItemBinding.inflate(layoutInflater)
-        val viewHolder = GvaGalleryItemViewHolder(binding, {}, UiTheme(), unifiedTheme)
+        val viewHolder = GvaGalleryItemViewHolder(binding, {}, unifiedTheme)
 
         viewHolder.bind(card, 1, 4)
 

@@ -3,7 +3,6 @@ package com.glia.widgets.chat.adapter.holder
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.widgets.R
 import com.glia.widgets.SnapshotTest
-import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.adapter.ChatAdapter
 import com.glia.widgets.chat.adapter.holder.fileattachment.OperatorFileAttachmentViewHolder
 import com.glia.widgets.chat.model.OperatorAttachmentItem
@@ -161,7 +160,6 @@ internal class OperatorFileAttachmentViewHolderSnapshotTest : SnapshotTest(
 
         return OperatorFileAttachmentViewHolder(
             ChatAttachmentOperatorFileLayoutBinding.inflate(layoutInflater),
-            UiTheme(),
             object : ChatAdapter.OnFileItemClickListener {
                 override fun onFileOpenClick(file: AttachmentFile) {}
                 override fun onFileDownloadClick(file: AttachmentFile) {}

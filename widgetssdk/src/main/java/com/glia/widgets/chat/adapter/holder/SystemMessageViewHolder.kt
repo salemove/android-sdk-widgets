@@ -5,12 +5,9 @@ import android.widget.TextView
 import androidx.core.view.MarginLayoutParamsCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
-import com.glia.widgets.UiTheme
 import com.glia.widgets.databinding.ChatReceiveMessageContentBinding
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.helper.getColorCompat
-import com.glia.widgets.helper.getColorStateListCompat
-import com.glia.widgets.helper.getFontCompat
+import com.glia.widgets.helper.gliaAttrFont
 import com.glia.widgets.locale.StringKey
 import com.glia.widgets.locale.StringKeyPair
 import com.glia.widgets.view.unifiedui.applyLayerTheme
@@ -19,8 +16,7 @@ import com.glia.widgets.view.unifiedui.theme.chat.MessageBalloonTheme
 import kotlin.math.roundToInt
 
 internal class SystemMessageViewHolder(
-    binding: ChatReceiveMessageContentBinding,
-    uiTheme: UiTheme
+    binding: ChatReceiveMessageContentBinding
 ) : RecyclerView.ViewHolder(binding.root) {
     private val content: TextView by lazy { binding.root }
     private val localeProvider = Dependencies.localeProvider
@@ -29,7 +25,7 @@ internal class SystemMessageViewHolder(
     }
 
     init {
-        setupTheme(uiTheme)
+        setupTheme()
         updateMargins()
     }
 
@@ -45,15 +41,10 @@ internal class SystemMessageViewHolder(
         }
     }
 
-    private fun setupTheme(uiTheme: UiTheme) {
+    /** The bubble's colours come from the layout's `?attr/gliaOperatorMessage*`. */
+    private fun setupTheme() {
         content.apply {
-            uiTheme.operatorMessageBackgroundColor?.let(::getColorStateListCompat)?.also {
-                backgroundTintList = it
-            }
-            uiTheme.operatorMessageTextColor?.let(::getColorCompat)?.also(::setTextColor)
-            uiTheme.operatorMessageTextColor?.let(::getColorCompat)?.also(::setLinkTextColor)
-
-            uiTheme.fontRes?.let(::getFontCompat)?.also(::setTypeface)
+            context.gliaAttrFont()?.also(::setTypeface)
 
             // Unified Ui
             applyLayerTheme(operatorTheme?.background)

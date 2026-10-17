@@ -1,6 +1,5 @@
 package com.glia.widgets.view.head
 
-import android.app.Service
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
@@ -17,7 +16,6 @@ import com.glia.widgets.R
 import com.glia.widgets.chat.Intention
 import com.glia.widgets.databinding.ChatHeadViewBinding
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
 import com.glia.widgets.helper.addColorFilter
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getColorStateListCompat
@@ -26,6 +24,8 @@ import com.glia.widgets.helper.gliaAttrResourceId
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.load
 import com.glia.widgets.helper.setLocaleContentDescription
+import com.glia.widgets.internal.chathead.BubbleContent
+import com.glia.widgets.internal.chathead.BubbleUiModel
 import com.glia.widgets.launcher.ActivityLauncher
 import com.glia.widgets.view.unifiedui.applyColorTheme
 import com.glia.widgets.view.unifiedui.applyImageColorTheme
@@ -41,7 +41,7 @@ internal class ChatHeadView @JvmOverloads constructor(
     context,
     attrs,
     defStyleAttr
-), ChatHeadContract.View {
+) {
     private val activityLauncher: ActivityLauncher by lazy { Dependencies.activityLauncher }
     private val binding by lazy { ChatHeadViewBinding.inflate(layoutInflater, this) }
 
@@ -65,42 +65,60 @@ internal class ChatHeadView @JvmOverloads constructor(
     private val onHoldIconRes: Int
         get() = context.gliaAttrDrawableRes(R.attr.gliaIconOnHold, R.drawable.ic_pause_circle)
 
-    private val isService by lazy { context is Service }
+    private var isOnChatScreen: Boolean = false
 
+    /**
+     * The bubble on the chat screen is part of the chat UI, so it is themed by `chatTheme.bubble`.
+     * Everywhere else — any other screen and the overlay — it is the standalone bubble, themed by the
+     * top-level `bubbleTheme`. The screen, not the host, decides: the model carries the answer.
+     */
     private val bubbleTheme: BubbleTheme?
-        get() = Dependencies.gliaThemeManager.theme?.run { if (isService) bubbleTheme else chatTheme?.bubble }
-
-    @Suppress("JoinDeclarationAndAssignment")
-    private var serviceChatHeadController: ChatHeadContract.Controller
-    private var isCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase
+        get() = Dependencies.gliaThemeManager.theme?.run { if (isOnChatScreen) chatTheme?.bubble else bubbleTheme }
 
     init {
-        serviceChatHeadController = Dependencies.controllerFactory.chatHeadController
-        isCallVisualizerUseCase = Dependencies.useCaseFactory.isCurrentEngagementCallVisualizer
         setAccessibilityLabels()
         post { updateView() }
         updateView()
     }
 
-    override fun showUnreadMessageCount(count: Int) {
+    /**
+     * Draws the model the controller published. The bubble applies no rules of its own —
+     * `state.unreadCount` already accounts for engagements that must not show a badge.
+     */
+    fun render(state: BubbleUiModel) {
+        applyThemeForScreen(state.isOnChatScreen)
+
+        when (val content = state.content) {
+            is BubbleContent.Engaged -> content.operatorImageUrl?.also(::showOperatorImage) ?: showPlaceholder()
+            BubbleContent.Queueing -> showQueueing()
+            BubbleContent.Ended -> showPlaceholder()
+        }
+
+        if (state.isOnHold) showOnHold() else hideOnHold()
+        showUnreadMessageCount(state.unreadCount)
+    }
+
+    /**
+     * Repaints from scratch when the screen kind changes, because the two themes are applied on top of
+     * the base colours and would otherwise blend into each other.
+     */
+    private fun applyThemeForScreen(isOnChatScreen: Boolean) {
+        if (this.isOnChatScreen == isOnChatScreen) return
+        this.isOnChatScreen = isOnChatScreen
+        updateView()
+    }
+
+    fun showUnreadMessageCount(count: Int) {
         post {
-            if (isCallVisualizerUseCase()) {
-                binding.chatBubbleBadge.isVisible = false
-            } else {
-                binding.chatBubbleBadge.apply {
-                    text = count.toString()
-                    isVisible = isDisplayUnreadMessageBadge(count)
-                    ChatHeadLogger.logUnreadMessageCountChanged(count.toString())
-                }
+            binding.chatBubbleBadge.apply {
+                text = count.toString()
+                isVisible = isDisplayUnreadMessageBadge(count)
+                ChatHeadLogger.logUnreadMessageCountChanged(count.toString())
             }
         }
     }
 
-    override fun setController(controller: ChatHeadContract.Controller) {
-        // Unused
-    }
-
-    override fun showOperatorImage(operatorImgUrl: String) {
+    fun showOperatorImage(operatorImgUrl: String) {
         post {
             binding.apply {
                 queueingLottieAnimation.visibility = GONE
@@ -111,7 +129,7 @@ internal class ChatHeadView @JvmOverloads constructor(
         }
     }
 
-    override fun showPlaceholder() {
+    fun showPlaceholder() {
         post {
             binding.apply {
                 queueingLottieAnimation.visibility = GONE
@@ -124,7 +142,7 @@ internal class ChatHeadView @JvmOverloads constructor(
         }
     }
 
-    override fun showQueueing() {
+    fun showQueueing() {
         post {
             binding.apply {
                 placeholderView.visibility = GONE
@@ -137,12 +155,12 @@ internal class ChatHeadView @JvmOverloads constructor(
         ChatHeadLogger.logEnqueueingStarted()
     }
 
-    override fun showOnHold() {
+    fun showOnHold() {
         post { binding.onHoldIcon.visibility = VISIBLE }
         ChatHeadLogger.logOnHold()
     }
 
-    override fun hideOnHold() {
+    fun hideOnHold() {
         post { binding.onHoldIcon.visibility = GONE }
     }
 
@@ -164,11 +182,11 @@ internal class ChatHeadView @JvmOverloads constructor(
         userImageTheme?.placeholderColor.also(binding.queueingLottieAnimationPlaceholder::applyImageColorTheme)
     }
 
-    override fun navigateToChat() {
+    fun navigateToChat() {
         activityLauncher.launchChat(context, Intention.RETURN_TO_CHAT)
     }
 
-    override fun navigateToCall() {
+    fun navigateToCall() {
         activityLauncher.launchCall(context, null, false)
     }
 

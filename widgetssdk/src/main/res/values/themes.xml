@@ -172,46 +172,73 @@
 
     <!--
         ==========================================================================================
-        Legacy (pre-`GliaTheme`) resources.
+        DEPRECATED - legacy (pre-`GliaTheme`) resources.
 
-        Kept declared so integrator resources that reference them keep compiling, but blanked:
-        `ThemeOverlay.Glia.Chat` is the parent of every legacy integrator overlay, so keeping it
-        empty means such an overlay contributes *only* the items the integrator actually set when
-        it is applied with `Resources.Theme.applyStyle(style, force = true)`.
+        Every style below is superseded by the `GliaTheme` hook above. They are kept declared so
+        integrator resources that reference them keep compiling, and the legacy chain is still read
+        and still applied - one layer *below* `GliaTheme`, so an integrator can migrate attribute by
+        attribute. Nothing here needs to change for an existing integration to keep working.
+
+        The four `Application.Glia.*.Activity` themes are no longer used by the SDK manifest; the
+        other three are blanked. `ThemeOverlay.Glia.Chat` in particular is the parent of every legacy
+        integrator overlay, so keeping it empty means such an overlay contributes *only* the items
+        the integrator actually set when it is applied with
+        `Resources.Theme.applyStyle(style, force = true)`.
+
+        Migration: docs/theming-migration.md.
         ==========================================================================================
     -->
 
     <!--
-        @deprecated Legacy `defStyleRes` for Glia views, and the documented parent of every legacy
-        integrator `gliaChatStyle` style. Kept declared so those styles still compile, but blanked:
-        it used to bridge each un-prefixed `GliaView` attribute to its `?attr/glia*` twin, and both
-        the styleable and the `UiTheme` parsing that read it are gone. Every value it carried is now
+        @deprecated Use the `GliaTheme` style instead.
+
+        Legacy `defStyleRes` for Glia views, and the documented parent of every legacy integrator
+        `gliaChatStyle` style. Kept declared so those styles still compile, but blanked: it used to
+        bridge each un-prefixed `GliaView` attribute to its `?attr/glia*` twin, and both the
+        styleable and the `UiTheme` parsing that read it are gone. Every value it carried is now
         resolved from the composed theme directly.
     -->
     <style name="Application.Glia.Chat" parent="" />
 
     <!--
-        @deprecated Legacy integrator hook: integrators redefine this resource to declare
-        `gliaChatStyle`. Ships blank - `GliaThemeOverlays.resolveLegacyThemeOverlay` reads
-        `gliaChatStyle` out of it.
+        @deprecated Use the `GliaTheme` style instead.
+
+        Legacy integrator hook: integrators redefine this resource to declare `gliaChatStyle`. Ships
+        blank - `GliaThemeOverlays.resolveLegacyThemeOverlay` reads `gliaChatStyle` out of it, and
+        still applies whatever it finds.
     -->
     <style name="Application.Glia.Activity.Style" parent="Theme.MaterialComponents.DayNight.NoActionBar" />
 
-    <!-- @deprecated Superseded by `Theme.Glia.Internal.Chat`. Kept declared for compile compatibility. -->
+    <!--
+        @deprecated Superseded by `Theme.Glia.Internal.Chat`, which the manifest now declares. Kept
+        for compile compatibility; customize with `GliaTheme` rather than by overriding this.
+    -->
     <style name="Application.Glia.Chat.Activity" parent="Theme.Glia.Internal.Chat" />
 
-    <!-- @deprecated Superseded by `Theme.Glia.Internal`. Kept declared for compile compatibility. -->
+    <!--
+        @deprecated Superseded by `Theme.Glia.Internal`, which the manifest now declares. Kept for
+        compile compatibility; customize with `GliaTheme` rather than by overriding this.
+    -->
     <style name="Application.Glia.Call.Activity" parent="Theme.Glia.Internal" />
 
-    <!-- @deprecated Superseded by `Theme.Glia.Internal.ImagePreview`. Kept for compile compatibility. -->
+    <!--
+        @deprecated Superseded by `Theme.Glia.Internal.ImagePreview`, which the manifest now
+        declares. Kept for compile compatibility; customize with `GliaTheme` rather than by
+        overriding this.
+    -->
     <style name="Application.Glia.ImagePreview.Activity" parent="Theme.Glia.Internal.ImagePreview" />
 
-    <!-- @deprecated Superseded by `Theme.Glia.Internal.Translucent`. Kept for compile compatibility. -->
+    <!--
+        @deprecated Superseded by `Theme.Glia.Internal.Translucent`, which the manifest now declares.
+        Kept for compile compatibility; customize with `GliaTheme` rather than by overriding this.
+    -->
     <style name="Application.Glia.Translucent.Activity" parent="Theme.Glia.Internal.Translucent" />
 
     <!--
-        @deprecated Parent of every legacy integrator `materialThemeOverlay`. Intentionally EMPTY -
-        see the block comment above.
+        @deprecated Use the `GliaTheme` style instead.
+
+        Parent of every legacy integrator `materialThemeOverlay`. Intentionally EMPTY - see the block
+        comment above.
     -->
     <style name="ThemeOverlay.Glia.Chat" parent="" />
 

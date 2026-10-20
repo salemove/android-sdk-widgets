@@ -163,6 +163,7 @@
                 android:drawablePadding="@dimen/glia_small"
                 android:visibility="gone"
                 app:drawableStartCompat="@drawable/ic_attention"
+                app:drawableTint="?attr/gliaSystemNegativeColor"
                 android:textColor="?attr/gliaSystemNegativeColor"
                 app:layout_constraintTop_toBottomOf="@id/message_edit_text"
                 app:layout_constraintStart_toStartOf="@id/leftGuideline"

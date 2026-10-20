@@ -56,12 +56,12 @@ import com.glia.widgets.helper.SimpleTextWatcher
 import com.glia.widgets.helper.SimpleWindowInsetsAndAnimationHandler
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.addColorFilter
+import com.glia.widgets.helper.applyGliaThemeFont
 import com.glia.widgets.helper.asActivity
 import com.glia.widgets.helper.ensureVisibility
 import com.glia.widgets.helper.fileName
 import com.glia.widgets.helper.getContentUriCompat
 import com.glia.widgets.helper.gliaAttrColor
-import com.glia.widgets.helper.gliaAttrFont
 import com.glia.widgets.helper.hideKeyboard
 import com.glia.widgets.helper.insetsController
 import com.glia.widgets.helper.layoutInflater
@@ -644,7 +644,7 @@ internal class ChatView @JvmOverloads constructor(
         setBackgroundColor(context.gliaAttrColor(R.attr.gliaChatBackgroundColor, R.color.glia_chat_background_color))
 
         // A `textAppearance` would win over a typeface set by the theme, so it has to be applied here.
-        context.gliaAttrFont()?.also { binding.chatEditText.typeface = it }
+        context.applyGliaThemeFont(binding.chatEditText)
 
         // remote locales
         binding.scErrorLabel.setLocaleText(R.string.secure_messaging_chat_unavailable_message)

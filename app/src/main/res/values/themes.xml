@@ -9,9 +9,50 @@
         </item>
     </style>
 
-    <!-- Must be included for dialog styling -->
+    <!--
+        ==============================================================================================
+        Customizing the Glia SDK - the current mechanism.
+
+        Redefine `GliaTheme` and set the `glia*` attributes you want to change. That is the whole
+        contract: no activity theme to override, no `gliaChatStyle`, no `materialThemeOverlay`, and
+        nothing to declare for the attributes you leave alone - the SDK's own `Theme.Glia.Internal`
+        supplies every default and this style replaces only the items it declares.
+
+        It is redefined here (rather than left to the SDK's empty declaration) so the demo app builds
+        the resource-merge path that integrators rely on. The example items are commented out so the
+        app ships showing the SDK's default look; uncomment any of them to see it applied across
+        chat, call, dialogs, the survey, the entry widget and the chat-head bubble.
+
+        Attribute names are documented in the SDK's `attrs.xml`. Remote JSON configuration
+        (`GliaWidgetsConfig.setUiJsonRemoteConfig`) is still applied last and still wins over this.
+        ==============================================================================================
+    -->
+    <style name="GliaTheme">
+        <!--        <item name="gliaBrandPrimaryColor">@color/color_pure_yellow</item>-->
+        <!--        <item name="gliaSendMessageButtonTintColor">@color/color_pure_yellow</item>-->
+        <!--        <item name="gliaIconAppBarBack">@drawable/ic_baseline_volume_off</item>-->
+        <!--        <item name="gliaIconCallMinimize">@drawable/ic_person</item>-->
+        <!--        <item name="gliaIconCallVisualizer">@drawable/ic_callvisualizer</item>-->
+        <!--        <item name="gliaIconCallVisualizerTintColor">@color/color_pure_yellow</item>-->
+        <!--        <item name="gliaNewMessagesDividerColor">@color/color_red</item>-->
+        <!--        <item name="gliaNewMessagesDividerTextColor">@color/color_pure_yellow</item>-->
+        <!--        <item name="gliaAlertDialogButtonUseVerticalAlignment">true</item>-->
+        <!--        <item name="whiteLabel">true</item>-->
+    </style>
+
+    <!--
+        ==============================================================================================
+        Legacy mechanism - kept for backward-compatibility QA, not a pattern to copy.
+
+        The chain is `Application.Glia.Activity.Style` -> `gliaChatStyle` -> a style parenting
+        `Application.Glia.Chat` -> `materialThemeOverlay` -> an overlay parenting
+        `ThemeOverlay.Glia.Chat`. It still works unchanged, and its items are applied *underneath*
+        `GliaTheme` above, so wherever both set the same attribute `GliaTheme` wins.
+
+        Uncomment the `gliaChatStyle` item below to exercise it.
+        ==============================================================================================
+    -->
     <style name="Application.Glia.Activity.Style" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <!-- example usage of compile time styling -->
         <!--        <item name="gliaChatStyle">@style/Theme.GliaAndroidSdkWidgetsExample.Chat</item>-->
     </style>
 

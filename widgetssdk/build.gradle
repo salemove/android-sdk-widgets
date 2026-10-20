@@ -241,6 +241,7 @@ dependencies {
   implementation libs.androidx.core.ktx
   implementation libs.androidx.exifinterface
   implementation libs.kotlin.parcelize.runtime
+  implementation libs.kotlinx.coroutines.android
   // AGP 9 built-in Kotlin doesn't auto-register the parcelize compiler plugin via the
   // kotlin-parcelize Gradle plugin alone, so add the compiler artifact explicitly.
   kotlinCompilerPluginClasspath "org.jetbrains.kotlin:kotlin-parcelize-compiler:${libs.versions.kotlin.get()}"
@@ -253,6 +254,7 @@ dependencies {
   testImplementation libs.androidx.arch.core.testing
   testImplementation libs.robolectric
   testImplementation libs.mockk.android
+  testImplementation libs.kotlinx.coroutines.test
   testImplementation libs.androidx.test.ext.junit
   testImplementation libs.androidx.test.espresso.core
 

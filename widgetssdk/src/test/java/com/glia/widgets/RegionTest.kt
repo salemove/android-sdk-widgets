@@ -11,23 +11,6 @@ import org.robolectric.RobolectricTestRunner
 @RunWith(RobolectricTestRunner::class)
 class RegionTest {
     @Test
-    fun `toRegion maps the known region strings`() {
-        assertEquals(Region.US, "us".toRegion())
-        assertEquals(Region.EU, "eu".toRegion())
-    }
-
-    @Test
-    fun `toRegion is case insensitive`() {
-        assertEquals(Region.US, "US".toRegion())
-        assertEquals(Region.EU, "Eu".toRegion())
-    }
-
-    @Test
-    fun `toRegion treats an unknown value as a custom region`() {
-        assertEquals(Region.Custom("acceptance.salemove.com"), "acceptance.salemove.com".toRegion())
-    }
-
-    @Test
     fun `Custom strips the scheme from a full url`() {
         assertEquals("acceptance.salemove.com", Region.Custom("https://acceptance.salemove.com").host)
     }
@@ -53,6 +36,6 @@ class RegionTest {
     @Test
     fun `beta maps to the core beta region rather than a custom one`() {
         assertEquals(com.glia.androidsdk.Region.Beta, Region.Custom("beta").toCoreType())
-        assertEquals(com.glia.androidsdk.Region.Beta, "BETA".toRegion().toCoreType())
+        assertEquals(com.glia.androidsdk.Region.Beta, Region.Custom("BETA").toCoreType())
     }
 }

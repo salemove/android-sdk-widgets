@@ -83,7 +83,7 @@ interface PushNotifications {
      * `firebase_messaging_installation_id_enabled` to `true` in its manifest.
      *
      * You should use this method only if you have your own FCM service. Call it from
-     * [FirebaseMessagingService.onRegistered]. [GliaFcmService] already does this.
+     * `FirebaseMessagingService.onRegistered`. [GliaFcmService] already does this.
      *
      * @param installationId Firebase installation ID identifying this app instance
      */

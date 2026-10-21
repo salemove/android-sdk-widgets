@@ -92,7 +92,7 @@ internal class AuthenticationManager(
     override fun setTokenExpiredListener(listener: Authentication.TokenExpiredListener?) {
         GliaLogger.logMethodUse(Authentication::class, "setTokenExpiredListener", "listener")
         authentication.setTokenExpiredListener(
-            listener?.let { CoreAuthentication.TokenExpiredListener { mainScheduler.scheduleDirect(it::onTokenExpired) } }
+            listener?.let { CoreAuthentication.TokenExpiredListener { mainScheduler.scheduleDirect { runIntegratorCallback(it::onTokenExpired) } } }
         )
     }
 

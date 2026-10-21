@@ -8,7 +8,6 @@ import androidx.preference.PreferenceManager
 import com.glia.widgets.AuthorizationMethod
 import com.glia.widgets.GliaWidgetsConfig
 import com.glia.widgets.Region
-import com.glia.widgets.toRegion
 
 /**
  * Helper class to obtain Glia Config params from deep-link or preferences.
@@ -118,7 +117,7 @@ object ExampleAppConfigManager {
         val siteRegion = region ?: preferences.requireString(
             context.getString(R.string.pref_environment),
             context.getString(R.string.glia_region)
-        ).toRegion()
+        ).let(::regionFromSetting)
 
         val apiKeyId = preferences.getString(
             context.getString(R.string.pref_api_key_id),
@@ -166,4 +165,10 @@ object ExampleAppConfigManager {
     }
 
     private fun SharedPreferences.requireString(key: String, defaultValue: String): String = getString(key, defaultValue)!!
+
+    private fun regionFromSetting(value: String): Region = when (value.lowercase()) {
+        "us" -> Region.US
+        "eu" -> Region.EU
+        else -> Region.Custom(value)
+    }
 }

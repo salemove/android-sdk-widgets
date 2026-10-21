@@ -27,12 +27,9 @@ import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement
 import com.glia.telemetry_lib.EventAttribute
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.telemetry_lib.LogEvents
-import com.glia.widgets.BETA_REGION
-import com.glia.widgets.EU_REGION
 import com.glia.widgets.GliaWidgetsConfig
 import com.glia.widgets.GliaWidgetsException
 import com.glia.widgets.Region
-import com.glia.widgets.US_REGION
 import com.glia.widgets.UiTheme
 import com.glia.widgets.engagement.MediaType
 import com.glia.widgets.queue.Queue
@@ -164,14 +161,14 @@ internal fun Region.toCoreType(): CoreRegion = when (this) {
     Region.EU -> CoreRegion.EU
     // Glia's internal testing uses Custom("beta"). Core gives Beta its own TURN servers,
     // so it must become Core's Beta region, not a custom host.
-    is Region.Custom -> if (host.equals(BETA_REGION, ignoreCase = true)) CoreRegion.Beta else CoreRegion.Custom(host)
+    is Region.Custom -> if (host.equals("beta", ignoreCase = true)) CoreRegion.Beta else CoreRegion.Custom(host)
 }
 
 // For logging only!!
 internal val Region.stringValue: String
     get() = when (this) {
-        Region.US -> US_REGION
-        Region.EU -> EU_REGION
+        Region.US -> "us"
+        Region.EU -> "eu"
         is Region.Custom -> "region: custom, host: $host"
     }
 

@@ -1,5 +1,3 @@
-@file:JvmName("Regions")
-
 package com.glia.widgets
 
 import androidx.core.net.toUri
@@ -38,25 +36,4 @@ sealed interface Region {
         }
 
     }
-}
-
-internal const val US_REGION = "us"
-internal const val EU_REGION = "eu"
-internal const val BETA_REGION = "beta"
-
-/**
- * Converts a [String] to a [Region].
- *
- * Supported values are:
- * - "us" for [Region.US]
- * - "eu" for [Region.EU]
- * - any other value will be treated as a custom domain for [Region.Custom]
- *
- * "beta" is reserved for Glia's internal testing.
- */
-@JvmName("fromString")
-fun String.toRegion(): Region = when (this.lowercase()) {
-    US_REGION -> Region.US
-    EU_REGION -> Region.EU
-    else -> Region.Custom(this)
 }

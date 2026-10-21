@@ -82,6 +82,19 @@ internal class AuthenticationManagerTest {
     }
 
     @Test
+    fun `setTokenExpiredListener re-throws on the main thread when the integrator listener throws`() {
+        val coreListener = slot<CoreAuthentication.TokenExpiredListener>()
+        every { coreAuthentication.setTokenExpiredListener(capture(coreListener)) } just Runs
+        val integratorBug = IllegalStateException("integrator bug")
+        authenticationManager.setTokenExpiredListener { throw integratorBug }
+
+        runOnCoreThread { coreListener.captured.onTokenExpired() }
+        mainScheduler.triggerActions()
+
+        assertRethrownOnMainThread(integratorBug)
+    }
+
+    @Test
     fun `setTokenExpiredListener with null removes the Core listener`() {
         authenticationManager.setTokenExpiredListener(null)
 

@@ -20,6 +20,7 @@ import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.FontRes
+import androidx.annotation.IdRes
 import androidx.annotation.StringRes
 import androidx.annotation.StyleableRes
 import androidx.appcompat.widget.Toolbar
@@ -43,12 +44,14 @@ import coil3.request.target
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.model.KeyPath
+import com.glia.widgets.R
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.locale.LocaleProvider
 import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.locale.StringKeyPair
 import com.glia.widgets.view.textview.SingleLineHintEditText
 import com.google.android.material.button.MaterialButton
+import io.reactivex.rxjava3.disposables.Disposable
 
 internal fun View.getColorCompat(@ColorRes resId: Int) = ContextCompat.getColor(context, resId)
 internal fun View.getColorStateListCompat(@ColorRes resId: Int) =
@@ -156,24 +159,25 @@ internal fun TextView.setCompoundDrawableTintListCompat(tint: ColorStateList?) {
 }
 
 internal fun TextView.setLocaleText(@StringRes stringKey: Int, vararg values: StringKeyPair) {
-    registerLocaleListener(stringKey, *values) { upToDateTranslation ->
+    registerLocaleListener(LocaleTarget.TEXT, stringKey, *values) { upToDateTranslation ->
         text = upToDateTranslation
     }
 }
 
 internal fun TextView.setText(locale: LocaleString?, listener: ((String) -> Unit)? = null) {
     if (locale == null) {
+        clearLocaleListener(LocaleTarget.TEXT)
         text = ""
         return
     }
-    registerLocaleListener(locale.stringKey, *locale.values.toTypedArray()) { upToDateTranslation ->
+    registerLocaleListener(LocaleTarget.TEXT, locale.stringKey, *locale.values.toTypedArray()) { upToDateTranslation ->
         text = upToDateTranslation
         listener?.invoke(upToDateTranslation)
     }
 }
 
 internal fun TextView.setLocaleHint(@StringRes stringKey: Int, vararg values: StringKeyPair) {
-    registerLocaleListener(stringKey, *values) { upToDateTranslation ->
+    registerLocaleListener(LocaleTarget.HINT, stringKey, *values) { upToDateTranslation ->
         if (this is SingleLineHintEditText) {
             setHintOverride(upToDateTranslation)
         } else {
@@ -184,10 +188,11 @@ internal fun TextView.setLocaleHint(@StringRes stringKey: Int, vararg values: St
 
 internal fun TextView.setHint(locale: LocaleString?) {
     if (locale == null) {
+        clearLocaleListener(LocaleTarget.HINT)
         hint = ""
         return
     }
-    registerLocaleListener(locale.stringKey, *locale.values.toTypedArray()) { upToDateTranslation ->
+    registerLocaleListener(LocaleTarget.HINT, locale.stringKey, *locale.values.toTypedArray()) { upToDateTranslation ->
         hint = upToDateTranslation
     }
 }
@@ -206,13 +211,13 @@ internal fun View.setAccessibilityHint(hint: String) {
 }
 
 internal fun View.setAccessibilityHint(@StringRes stringKey: Int, vararg values: StringKeyPair) {
-    registerLocaleListener(stringKey, *values) { upToDateTranslation ->
+    registerLocaleListener(LocaleTarget.ACCESSIBILITY_HINT, stringKey, *values) { upToDateTranslation ->
         setAccessibilityHint(upToDateTranslation)
     }
 }
 
 internal fun View.setLocaleAccessibilityHint(locale: LocaleString) {
-    registerLocaleListener(locale.stringKey, *locale.values.toTypedArray()) { upToDateTranslation ->
+    registerLocaleListener(LocaleTarget.ACCESSIBILITY_HINT, locale.stringKey, *locale.values.toTypedArray()) { upToDateTranslation ->
         ViewCompat.setAccessibilityDelegate(this, object : AccessibilityDelegateCompat() {
             override fun onInitializeAccessibilityNodeInfo(host: View, info: AccessibilityNodeInfoCompat) {
                 super.onInitializeAccessibilityNodeInfo(host, info)
@@ -223,29 +228,30 @@ internal fun View.setLocaleAccessibilityHint(locale: LocaleString) {
 }
 
 internal fun View.setLocaleContentDescription(@StringRes stringKey: Int, vararg values: StringKeyPair) {
-    registerLocaleListener(stringKey, *values) { upToDateTranslation ->
+    registerLocaleListener(LocaleTarget.CONTENT_DESCRIPTION, stringKey, *values) { upToDateTranslation ->
         contentDescription = upToDateTranslation
     }
 }
 
 internal fun View.setPrefixedContentDescription(prefix: String, @StringRes stringKey: Int, vararg values: StringKeyPair) {
-    registerLocaleListener(stringKey, *values) { upToDateTranslation ->
+    registerLocaleListener(LocaleTarget.CONTENT_DESCRIPTION, stringKey, *values) { upToDateTranslation ->
         contentDescription = "$prefix. $upToDateTranslation"
     }
 }
 
 internal fun View.setContentDescription(locale: LocaleString?) {
     if (locale == null) {
+        clearLocaleListener(LocaleTarget.CONTENT_DESCRIPTION)
         contentDescription = ""
         return
     }
-    registerLocaleListener(locale.stringKey, *locale.values.toTypedArray()) { upToDateTranslation ->
+    registerLocaleListener(LocaleTarget.CONTENT_DESCRIPTION, locale.stringKey, *locale.values.toTypedArray()) { upToDateTranslation ->
         contentDescription = upToDateTranslation
     }
 }
 
 internal fun Toolbar.setLocaleNavigationContentDescription(@StringRes stringKey: Int, vararg values: StringKeyPair) {
-    registerLocaleListener(stringKey, *values) { upToDateTranslation ->
+    registerLocaleListener(LocaleTarget.NAVIGATION_CONTENT_DESCRIPTION, stringKey, *values) { upToDateTranslation ->
         navigationContentDescription = upToDateTranslation
     }
 }
@@ -269,27 +275,66 @@ internal fun View.removeAccessibilityClickAction() {
     })
 }
 
-private fun View.registerLocaleListener(@StringRes stringKey: Int, vararg values: StringKeyPair, listener: (String) -> Unit) {
-    val localeManager = if (isInEditMode) LocaleProvider(ResourceProvider(context)) else Dependencies.localeProvider
-    val disposable = localeManager.getLocaleObservable()
-        .startWithItem("stub")
-        .map { localeManager.getString(stringKey, values.toList()) }
-        .distinctUntilChanged()
-        .subscribe(
-            { listener(it) },
-            { /* no-op */ }
-        )
+/**
+ * A view property that shows a localized string. Each one keeps its own locale listener in a view tag,
+ * so setting the same property again replaces the old listener instead of adding another one.
+ */
+private enum class LocaleTarget(@param:IdRes val tagKey: Int) {
+    TEXT(R.id.glia_locale_text),
+    HINT(R.id.glia_locale_hint),
+    CONTENT_DESCRIPTION(R.id.glia_locale_content_description),
+    ACCESSIBILITY_HINT(R.id.glia_locale_accessibility_hint),
+    NAVIGATION_CONTENT_DESCRIPTION(R.id.glia_locale_navigation_content_description)
+}
 
-    addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
-        override fun onViewAttachedToWindow(v: View) {
-            /* no-op */
-        }
+/**
+ * Listens for locale changes only while the view is attached.
+ * The locale stream lives for the whole app, so a view that never attaches must not subscribe to it,
+ * or it would keep its Activity in memory forever.
+ */
+private class LocaleListener(
+    private val localeProvider: LocaleProvider,
+    @param:StringRes private val stringKey: Int,
+    private val values: List<StringKeyPair>,
+    private val onTranslation: (String) -> Unit
+) : View.OnAttachStateChangeListener {
+    private var translation: String? = null
+    private var disposable: Disposable? = null
 
-        override fun onViewDetachedFromWindow(v: View) {
-            disposable.dispose()
-            removeOnAttachStateChangeListener(this)
-        }
-    })
+    fun update() {
+        val upToDateTranslation = localeProvider.getString(stringKey, values)
+        if (upToDateTranslation == translation) return
+        translation = upToDateTranslation
+        onTranslation(upToDateTranslation)
+    }
+
+    override fun onViewAttachedToWindow(v: View) {
+        // The locale may have changed while the view was detached.
+        update()
+        disposable = localeProvider.getLocaleObservable().subscribe({ update() }, { /* no-op */ })
+    }
+
+    override fun onViewDetachedFromWindow(v: View) {
+        disposable?.dispose()
+        disposable = null
+    }
+}
+
+private fun View.registerLocaleListener(target: LocaleTarget, @StringRes stringKey: Int, vararg values: StringKeyPair, listener: (String) -> Unit) {
+    val localeProvider = if (isInEditMode) LocaleProvider(ResourceProvider(context)) else Dependencies.localeProvider
+    val localeListener = LocaleListener(localeProvider, stringKey, values.toList(), listener)
+
+    clearLocaleListener(target)
+    setTag(target.tagKey, localeListener)
+    addOnAttachStateChangeListener(localeListener)
+    if (isAttachedToWindow) localeListener.onViewAttachedToWindow(this) else localeListener.update()
+}
+
+private fun View.clearLocaleListener(target: LocaleTarget) {
+    val localeListener = getTag(target.tagKey) as? LocaleListener ?: return
+    removeOnAttachStateChangeListener(localeListener)
+    localeListener.onViewDetachedFromWindow(this)
+    setTag(target.tagKey, null)
 }
 
 /**

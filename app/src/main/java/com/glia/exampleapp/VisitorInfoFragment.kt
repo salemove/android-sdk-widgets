@@ -147,8 +147,10 @@ class VisitorInfoFragment : Fragment() {
         }
 
         val onError = OnError { exception ->
-            saveButton.text = getString(R.string.visitor_info_save)
-            showError(exception)
+            activity?.runOnUiThread {
+                saveButton.text = getString(R.string.visitor_info_save)
+                showError(exception)
+            }
         }
         GliaWidgets.updateVisitorInfo(visitorInfo, onComplete, onError)
     }

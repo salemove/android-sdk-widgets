@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item name="dialog_holder_activity_view_id" type="id" />
+    <item name="glia_locale_text" type="id" />
+    <item name="glia_locale_hint" type="id" />
+    <item name="glia_locale_content_description" type="id" />
+    <item name="glia_locale_accessibility_hint" type="id" />
+    <item name="glia_locale_navigation_content_description" type="id" />
 </resources>

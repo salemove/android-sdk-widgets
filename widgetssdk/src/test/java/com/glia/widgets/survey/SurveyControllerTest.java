@@ -2,7 +2,12 @@ package com.glia.widgets.survey;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static java.util.Collections.singletonList;
 
@@ -134,5 +139,37 @@ public class SurveyControllerTest {
             .createSurveyState();
 
         assertFalse(surveyController.isAlreadyInit(null));
+    }
+
+    @Test
+    public void onSubmitClicked_closesSurveyAndSubmitsOnce_whenAnswersPassValidationAndTappedTwice() {
+        SurveyContract.View view = setUpSurveyWithView();
+        when(gliaSurveyAnswerUseCase.submit(anyList(), any(Survey.class))).thenReturn(true);
+
+        surveyController.onSubmitClicked();
+        surveyController.onSubmitClicked();
+
+        verify(gliaSurveyAnswerUseCase, times(1)).submit(anyList(), any(Survey.class));
+        verify(view, times(1)).finish();
+    }
+
+    @Test
+    public void onSubmitClicked_keepsSurveyOpen_whenAnswersFailValidation() {
+        SurveyContract.View view = setUpSurveyWithView();
+        when(gliaSurveyAnswerUseCase.submit(anyList(), any(Survey.class))).thenReturn(false);
+
+        surveyController.onSubmitClicked();
+
+        verify(view, never()).finish();
+    }
+
+    private SurveyContract.View setUpSurveyWithView() {
+        SurveyContract.View view = mock(SurveyContract.View.class);
+        surveyController.setView(view);
+        surveyController.survey = mock(Survey.class);
+        surveyController.state = new SurveyState.Builder()
+            .setQuestions(singletonList(mock(QuestionItem.class)))
+            .createSurveyState();
+        return view;
     }
 }

@@ -2,32 +2,27 @@ package com.glia.widgets.internal.survey.domain
 
 import android.text.TextUtils
 import androidx.annotation.VisibleForTesting
-import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.engagement.Survey
 import com.glia.widgets.internal.survey.GliaSurveyRepository
 import com.glia.widgets.survey.QuestionItem
 import com.glia.widgets.survey.SurveyValidationException
-import java.util.function.Consumer
 
 internal class GliaSurveyAnswerUseCase(private val repository: GliaSurveyRepository) {
-    fun submit(
-        questions: List<QuestionItem>?,
-        survey: Survey,
-        callback: Consumer<RuntimeException?>
-    ) {
+    /**
+     * Sends the answers when they pass validation, without waiting for the result: the survey is best effort.
+     *
+     * @return false when a required question has no answer, in which case nothing is sent.
+     */
+    fun submit(questions: List<QuestionItem>?, survey: Survey): Boolean {
         trim(questions)
         try {
             validate(questions)
         } catch (exception: SurveyValidationException) {
-            callback.accept(exception)
-            return
+            return false
         }
         val answers: List<Survey.Answer> = questions?.mapNotNull { it.answer } ?: emptyList()
-        val surveyId = survey.id
-        val engagementId = survey.engagementId
-        repository.submitSurveyAnswers(
-            answers, surveyId, engagementId,
-            Consumer { t: GliaException? -> callback.accept(t) })
+        repository.submitSurveyAnswers(answers, survey.id, survey.engagementId)
+        return true
     }
 
     @VisibleForTesting

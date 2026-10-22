@@ -27,7 +27,6 @@ import com.glia.widgets.helper.hideKeyboard
 import com.glia.widgets.helper.insetsController
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.setLocaleText
-import com.glia.widgets.helper.showToast
 import com.glia.widgets.helper.wrapWithMaterialThemeOverlay
 import com.glia.widgets.survey.SurveyAdapter.SurveyAdapterListener
 import com.glia.widgets.view.configuration.ButtonConfiguration
@@ -61,7 +60,6 @@ internal class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: 
     private val binding: SurveyViewBinding by lazy {
         SurveyViewBinding.inflate(layoutInflater, this)
     }
-    private val localeProvider = Dependencies.localeProvider
 
     private val cardView: CardView get() = binding.cardView
     private val title: TextView get() = binding.surveyTitle
@@ -247,10 +245,6 @@ internal class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: 
 
     override fun hideSoftKeyboard() {
         insetsController?.hideKeyboard()
-    }
-
-    override fun onNetworkTimeout() {
-        context.showToast(localeProvider.getString(R.string.glia_survey_network_unavailable))
     }
 
     override fun finish() {

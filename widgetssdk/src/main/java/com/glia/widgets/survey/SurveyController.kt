@@ -1,7 +1,6 @@
 package com.glia.widgets.survey
 
 import androidx.annotation.VisibleForTesting
-import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.engagement.Survey
 import com.glia.widgets.internal.survey.domain.GliaSurveyAnswerUseCase
 
@@ -144,25 +143,17 @@ internal class SurveyController(
     override fun onSubmitClicked() {
         val questionItems = state.questions ?: return
         val currentSurvey = survey ?: return
-        gliaSurveyAnswerUseCase.submit(questionItems, currentSurvey) { exception ->
-            if (exception == null) {
-                view?.let {
-                    it.finish()
-                    resetController()
-                }
-                return@submit
-            } else if (exception is GliaException) {
-                if (exception.cause == GliaException.Cause.NETWORK_TIMEOUT) {
-                    view?.onNetworkTimeout()
-                }
-                // Ignore other Glia exceptions
-            }
-            questionItems.forEach { item ->
-                item.answerCallback?.answerCallback(item.isShowError)
-            }
-            questionItems.firstOrNull { it.isShowError }
-                ?.let { view?.scrollTo(questionItems.indexOf(it)) }
+        if (gliaSurveyAnswerUseCase.submit(questionItems, currentSurvey)) {
+            view?.finish()
+            // Also stops a second tap from sending the answers again while the screen closes.
+            resetController()
+            return
         }
+        questionItems.forEach { item ->
+            item.answerCallback?.answerCallback(item.isShowError)
+        }
+        questionItems.firstOrNull { it.isShowError }
+            ?.let { view?.scrollTo(questionItems.indexOf(it)) }
     }
 
     @Synchronized

@@ -3,7 +3,12 @@ package com.glia.widgets.internal.survey.domain;
 import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -15,20 +20,20 @@ import com.glia.widgets.survey.SurveyValidationException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentMatchers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Consumer;
 
 public class GliaSurveyAnswerUseCaseTest {
 
+    private GliaSurveyRepository repository;
     private GliaSurveyAnswerUseCase gliaSurveyAnswerUseCase;
 
     @Before
     public void setUp() {
-        GliaSurveyRepository repository = mock(GliaSurveyRepository.class);
+        repository = mock(GliaSurveyRepository.class);
         gliaSurveyAnswerUseCase = new GliaSurveyAnswerUseCase(repository);
     }
 
@@ -612,11 +617,10 @@ public class GliaSurveyAnswerUseCaseTest {
     // Tests for a submit() function
 
     @Test
-    public void submit_succeeds_whenQuestionsContainsOnlyValidAnswers() {
+    public void submit_sendsAnswersAndReturnsTrue_whenQuestionsContainsOnlyValidAnswers() {
         Survey survey = mock(Survey.class);
         when(survey.getId()).thenReturn("survey_id");
         when(survey.getEngagementId()).thenReturn("engagement_id");
-        Consumer<RuntimeException> callback = mock(Consumer.class);
 
         Survey.Question textQuestion = mock(Survey.Question.class);
         when(textQuestion.isRequired()).thenReturn(true);
@@ -637,20 +641,19 @@ public class GliaSurveyAnswerUseCaseTest {
         QuestionItem validBooleanItem = new QuestionItem(booleanQuestion, validBooleanAnswer);
         questions.add(validBooleanItem);
 
-        try {
-            gliaSurveyAnswerUseCase.submit(questions, survey, callback);
-        } catch (Exception e) {
-            if (!e.getClass().equals(SurveyValidationException.class)) {
-                Assert.fail();
-            }
-            // Do nothing, basically succeeds test if same exception was thrown.
-        }
+        assertTrue(gliaSurveyAnswerUseCase.submit(questions, survey));
+
+        // trim() replaces text answers with new instances, so expect the answers the items hold now.
+        verify(repository).submitSurveyAnswers(
+            Arrays.asList(validTextItem.getAnswer(), validBooleanItem.getAnswer()),
+            "survey_id",
+            "engagement_id"
+        );
     }
 
     @Test
-    public void submit_throwsException_whenQuestionsContainsTextAnswerWithSpacesOnly() {
+    public void submit_sendsNothingAndReturnsFalse_whenQuestionsContainsTextAnswerWithSpacesOnly() {
         Survey survey = mock(Survey.class);
-        Consumer<RuntimeException> callback = mock(Consumer.class);
 
         Survey.Question textQuestion = mock(Survey.Question.class);
         when(textQuestion.isRequired()).thenReturn(true);
@@ -671,8 +674,8 @@ public class GliaSurveyAnswerUseCaseTest {
         QuestionItem validBooleanItem = new QuestionItem(booleanQuestion, validBooleanAnswer);
         questions.add(validBooleanItem);
 
-        gliaSurveyAnswerUseCase.submit(questions, survey, callback);
+        assertFalse(gliaSurveyAnswerUseCase.submit(questions, survey));
 
-        verify(callback).accept(ArgumentMatchers.any(SurveyValidationException.class));
+        verify(repository, never()).submitSurveyAnswers(anyList(), anyString(), anyString());
     }
 }

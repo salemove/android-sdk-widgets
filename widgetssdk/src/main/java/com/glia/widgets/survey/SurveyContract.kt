@@ -34,8 +34,6 @@ internal interface SurveyContract {
 
         fun hideSoftKeyboard()
 
-        fun onNetworkTimeout()
-
         fun finish()
     }
 }

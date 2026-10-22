@@ -15,8 +15,13 @@ import com.glia.widgets.di.GliaCore
 import com.glia.widgets.push.notifications.PushClickHandlerController
 import com.glia.widgets.di.GliaCoreImpl
 import com.glia.widgets.di.RepositoryFactory
+import com.glia.widgets.di.UseCaseFactory
 import com.glia.widgets.engagement.EngagementRepository
+import com.glia.widgets.entrywidget.EntryWidgetHideController
+import com.glia.widgets.entrywidget.EntryWidgetImpl
 import com.glia.widgets.internal.queue.QueueRepository
+import com.glia.widgets.internal.secureconversations.domain.HasOngoingSecureConversationUseCase
+import com.glia.widgets.launcher.ConfigurationManagerImpl
 import com.glia.widgets.queue.Queue
 import com.glia.widgets.visitor.VisitorInfo
 import com.glia.widgets.visitor.VisitorInfoUpdateRequest
@@ -211,6 +216,30 @@ class GliaWidgetsTest {
     }
 
     @Test
+    fun `getEntryWidget returns the Entry Widget and keeps the queue ids before SDK initialization`() {
+        val configurationManager = ConfigurationManagerImpl()
+        Dependencies.configurationManager = configurationManager
+        mockUninitializedCore()
+        mockEntryWidgetDependencies()
+
+        val entryWidget = GliaWidgets.getEntryWidget(listOf("queueId"))
+
+        Assert.assertTrue(entryWidget is EntryWidgetImpl)
+        configurationManager.queueIdsObservable.test().assertValue(listOf("queueId"))
+    }
+
+    @Test
+    fun `getEngagementLauncher throws before SDK initialization`() {
+        mockUninitializedCore()
+
+        val exception = Assert.assertThrows(GliaWidgetsException::class.java) {
+            GliaWidgets.getEngagementLauncher(listOf("queueId"))
+        }
+
+        Assert.assertEquals(GliaWidgetsException.Cause.INVALID_INPUT, exception.gliaCause)
+    }
+
+    @Test
     fun `clearVisitorData resets Widgets state, then clears the Core session with pushes stopped`() {
         val (engagementRepository, secureConversationsRepository) = mockClearVisitorSessionDependencies()
 
@@ -280,6 +309,19 @@ class GliaWidgetsTest {
         whenever(repositoryFactory.secureConversationsRepository) doReturn secureConversationsRepository
         whenever(gliaCore.isInitialized) doReturn true
         return engagementRepository to secureConversationsRepository
+    }
+
+    private fun mockUninitializedCore() {
+        whenever(gliaCore.isInitialized) doReturn false
+        doThrow(GliaException("Glia SDK is not initialized", GliaException.Cause.INVALID_INPUT)).whenever(gliaCore).ensureInitialized()
+    }
+
+    private fun mockEntryWidgetDependencies() {
+        val useCaseFactory = mock<UseCaseFactory>()
+        whenever(useCaseFactory.hasOngoingSecureConversationUseCase) doReturn mock<HasOngoingSecureConversationUseCase>()
+        Dependencies.useCaseFactory = useCaseFactory
+        whenever(controllerFactory.entryWidgetHideController) doReturn mock<EntryWidgetHideController>()
+        whenever(repositoryFactory.engagementRepository) doReturn mock<EngagementRepository>()
     }
 
     private fun widgetsConfig(): GliaWidgetsConfig = GliaWidgetsConfig.Builder()

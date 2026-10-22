@@ -210,10 +210,11 @@ object GliaWidgets {
     /**
      * Retrieves an instance of [EntryWidget].
      *
+     * Before the SDK is initialized, the widget shows that the SDK is not initialized instead of the engagement options.
+     *
      * @param queueIds A list of queue IDs to be used for the entry widget.
      * When empty or invalid, the default queues will be used.
      * @return An instance of [EntryWidget].
-     * @throws GliaWidgetsException with the [GliaWidgetsException.Cause.INVALID_INPUT] if the SDK is not initialized.
      */
     @Synchronized
     @JvmStatic
@@ -223,12 +224,8 @@ object GliaWidgets {
             Logger.e(TAG, "Attempt to get EntryWidget before SDK initialization")
         }
 
-        try {
-            setupQueueIds(queueIds)
-            return entryWidget
-        } catch (gliaException: GliaException) {
-            throw gliaException.toWidgetsType()
-        }
+        configurationManager.setQueueIds(queueIds)
+        return entryWidget
     }
 
     /**

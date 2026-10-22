@@ -27,7 +27,7 @@ public class TestingAppLauncherActivity extends AppCompatActivity {
             GliaWidgets.init(
                 ExampleAppConfigManager.obtainConfigFromDeepLink(uri, getApplicationContext()),
                 () -> { },
-                error -> Toast.makeText(this, error.getMessage(), Toast.LENGTH_LONG).show()
+                error -> runOnUiThread(() -> Toast.makeText(this, error.getMessage(), Toast.LENGTH_LONG).show())
             );
         }
     }

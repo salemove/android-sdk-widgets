@@ -11,13 +11,16 @@ import com.glia.widgets.engagement.MediaType
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import com.glia.widgets.engagement.domain.EngagementTypeUseCase
+import com.glia.widgets.helper.DeviceMonitor
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.mediaTypes
 import com.glia.widgets.internal.queue.QueueRepository
+import com.glia.widgets.internal.queue.QueueRepositoryImpl
 import com.glia.widgets.internal.queue.QueuesState
 import com.glia.widgets.internal.secureconversations.SecureConversationsRepository
 import com.glia.widgets.internal.secureconversations.domain.HasOngoingSecureConversationUseCase
 import com.glia.widgets.launcher.ActivityLauncher
+import com.glia.widgets.launcher.ConfigurationManagerImpl
 import com.glia.widgets.launcher.EngagementLauncher
 import com.glia.widgets.queue.Queue
 import io.mockk.every
@@ -139,6 +142,18 @@ class EntryWidgetControllerTest {
         every { view.whiteLabel } returns whiteLabel
     }
 
+    // Each stream emits the value it holds before initialization.
+    // The queues come from a real repository, which loads nothing until the SDK is initialized.
+    private fun mockUninitializedInputData() {
+        mockInputData(unreadMessagesCount = 0, hasOngoingSc = false)
+        val deviceMonitor = mockk<DeviceMonitor> {
+            every { networkState } returns Flowable.never()
+            every { deviceState } returns Flowable.never()
+        }
+        val uninitializedQueueRepository = QueueRepositoryImpl(core, ConfigurationManagerImpl(), deviceMonitor)
+        every { queueRepository.queuesState } returns uninitializedQueueRepository.queuesState
+    }
+
     @Test
     fun `showItems is called with ERROR_STATE if SDK is not initialized and view type is not Messaging Live Support`() {
         mockInputData()
@@ -173,6 +188,28 @@ class EntryWidgetControllerTest {
         verify { queueRepository.queuesState }
         verify(exactly = 0) { secureConversationsRepository.unreadMessagesCountObservable }
         verify(exactly = 0) { hasOngoingSecureConversationUseCase.invoke() }
+    }
+
+    @Test
+    fun `nothing replaces the SDK not initialized state while the SDK is not initialized and view type is not Messaging Live Support`() {
+        mockUninitializedInputData()
+
+        controller.setView(view, EntryWidgetContract.ViewType.BOTTOM_SHEET)
+
+        verify(exactly = 1) { view.showItems(any()) }
+        verify { view.showItems(sdkNotInitializedState + poweredByItem) }
+        verify(exactly = 0) { core.getQueues(any(), any()) }
+    }
+
+    @Test
+    fun `nothing replaces the SDK not initialized state while the SDK is not initialized and view type is Messaging Live Support`() {
+        mockUninitializedInputData()
+
+        controller.setView(view, EntryWidgetContract.ViewType.MESSAGING_LIVE_SUPPORT)
+
+        verify(exactly = 1) { view.showItems(any()) }
+        verify { view.showItems(sdkNotInitializedState) }
+        verify(exactly = 0) { core.getQueues(any(), any()) }
     }
 
     @Test

@@ -262,16 +262,22 @@ class MainFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        if (GliaWidgets.isInitialized()) {
-            initMenu()
-
-            if (authentication == null) {
-                prepareAuthentication()
-            }
-            setupAuthButtonsVisibility()
-        }
+        if (GliaWidgets.isInitialized()) onGliaWidgetsInitialized()
 
         updatePushNotificationPermissionState()
+    }
+
+    /**
+     * Shows the controls that need an initialized SDK. [TestingAppLauncherActivity] calls this when its
+     * deep-link init completes, because that init finishes after this screen has already resumed.
+     */
+    fun onGliaWidgetsInitialized() {
+        initMenu()
+
+        if (authentication == null) {
+            prepareAuthentication()
+        }
+        setupAuthButtonsVisibility()
     }
 
     private fun setupAuthButtonsVisibility(isAuthenticated: Boolean? = authentication?.isAuthenticated) {

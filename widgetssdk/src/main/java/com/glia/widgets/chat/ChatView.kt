@@ -144,7 +144,14 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     private val onScrollListener: RecyclerView.OnScrollListener = object : RecyclerView.OnScrollListener() {
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
-            controller?.onRecyclerviewPositionChanged(!recyclerView.canScrollVertically(1))
+            val isAtBottom = !recyclerView.canScrollVertically(1)
+            // A layout pass reports dy == 0. When rows change, the list follows the bottom instead of
+            // treating it as the visitor scrolling away, which would stop following new messages.
+            if (dy == 0 && recyclerView.scrollState == RecyclerView.SCROLL_STATE_IDLE && isInBottom && !isAtBottom) {
+                scrollToBottomImmediate()
+                return
+            }
+            controller?.onRecyclerviewPositionChanged(isAtBottom)
         }
 
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {

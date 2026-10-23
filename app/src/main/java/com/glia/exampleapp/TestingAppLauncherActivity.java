@@ -6,7 +6,9 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.glia.widgets.GliaWidgets;
 
@@ -26,9 +28,19 @@ public class TestingAppLauncherActivity extends AppCompatActivity {
         if (!GliaWidgets.isInitialized() && uri != null) {
             GliaWidgets.init(
                 ExampleAppConfigManager.obtainConfigFromDeepLink(uri, getApplicationContext()),
-                () -> { },
+                () -> runOnUiThread(this::refreshMainScreen),
                 error -> runOnUiThread(() -> Toast.makeText(this, error.getMessage(), Toast.LENGTH_LONG).show())
             );
+        }
+    }
+
+    // A main screen that is not resumed yet refreshes itself in onResume.
+    private void refreshMainScreen() {
+        if (isDestroyed()) return;
+        NavHostFragment navHost = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+        Fragment current = navHost.getChildFragmentManager().getPrimaryNavigationFragment();
+        if (current instanceof MainFragment && current.isResumed()) {
+            ((MainFragment) current).onGliaWidgetsInitialized();
         }
     }
 

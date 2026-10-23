@@ -271,4 +271,18 @@ class AppendNewVisitorMessageUseCaseTest {
         val deliveredItem = state.chatItems.last() as DeliveredItem
         assertEquals(secondId, deliveredItem.messageId)
     }
+
+    @Test
+    fun `markMessageDelivered keeps DeliveredItem under a later message when an earlier one is confirmed late`() {
+        val text = VisitorMessageItem("text", "text-id", isError = true, timestamp = 1)
+        val file = VisitorAttachmentItem.LocalFile(id = "file-id", messageId = "file-id", attachment = mock(), timestamp = 2)
+        state.chatItems += text
+        state.chatItems += file
+
+        useCase.markMessageDelivered(state, file.id)
+        val deliveredItem = state.chatItems.last()
+        useCase.markMessageDelivered(state, text.id)
+
+        assertEquals(listOf(text.copy(isError = false), file, deliveredItem), state.chatItems)
+    }
 }

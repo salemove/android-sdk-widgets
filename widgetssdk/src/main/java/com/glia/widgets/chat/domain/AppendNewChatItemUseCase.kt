@@ -232,8 +232,6 @@ internal class AppendNewVisitorMessageUseCase(private val mapVisitorAttachmentUs
     }
 
     fun markMessageDelivered(state: ChatManager.State, messageId: String) {
-        markLastDeliveredItemAsDelivered(state)
-
         val chatItems = state.chatItems
 
         val messageIndex = chatItems.indexOfLast { it.id == messageId }
@@ -242,10 +240,16 @@ internal class AppendNewVisitorMessageUseCase(private val mapVisitorAttachmentUs
             chatItems[messageIndex] = (chatItems[messageIndex] as VisitorChatItem).copyWithError(false)
         }
 
+        // Text and files are sent concurrently, so confirmations can arrive out of order. A late one
+        // for an earlier message leaves the label under the later message that is already delivered.
+        if (messageIndex < (lastDeliveredItem?.let(chatItems::indexOf) ?: -1)) return
+
+        markLastDeliveredItemAsDelivered(state)
+
         val deliveredItem = DeliveredItem(messageId = messageId).also {
             lastDeliveredItem = it
         }
 
-        chatItems.add(messageIndex + 1, deliveredItem)
+        chatItems.add(chatItems.indexOfLast { it.id == messageId } + 1, deliveredItem)
     }
 }

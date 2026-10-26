@@ -32,6 +32,14 @@
     </style>
 
     <!--
+        An integrator's `GliaTheme` pointing `fontFamily` at a font resource. Used by snapshots of
+        text that is styled in code, which only gets the theme font when the code applies it.
+    -->
+    <style name="Test.Glia.CustomFont" parent="ThemeOverlay.Glia.Chat.Material">
+        <item name="fontFamily">@font/expletus</item>
+    </style>
+
+    <!--
         The whole-screen equivalent of the survey fixture: what an integrator's `GliaTheme` looks
         like once it covers the palette rather than a single widget. Rendered by
         `ChatViewCustomizedThemeSnapshotTest` and `CallViewCustomizedThemeSnapshotTest`.

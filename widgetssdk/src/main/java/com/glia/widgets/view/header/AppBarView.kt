@@ -163,7 +163,11 @@ internal class AppBarView @JvmOverloads constructor(
     internal fun resetTheme() {
         val textAttrs = intArrayOf(com.google.android.material.R.attr.textAppearanceHeadline2)
         context.obtainStyledAttributes(textAttrs).apply {
-            toolbarTitleText?.also { TextViewCompat.setTextAppearance(it, getResourceId(0, 0)) }
+            toolbarTitleText?.also {
+                TextViewCompat.setTextAppearance(it, getResourceId(0, 0))
+                // A text appearance replaces the typeface, so the theme font has to be applied again.
+                context.applyGliaThemeFont(it)
+            }
             recycle()
         }
     }

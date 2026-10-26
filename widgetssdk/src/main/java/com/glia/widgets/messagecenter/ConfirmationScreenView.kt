@@ -1,6 +1,7 @@
 package com.glia.widgets.messagecenter
 
 import android.content.Context
+import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.View
@@ -15,6 +16,7 @@ import com.glia.telemetry_lib.GliaLogger
 import com.glia.widgets.R
 import com.glia.widgets.databinding.MessageCenterConfirmationViewBinding
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.helper.applyGliaThemeFont
 import com.glia.widgets.helper.gliaAttrColor
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.logScConfirmationScreenButtonClicked
@@ -63,6 +65,8 @@ internal class ConfirmationScreenView @JvmOverloads constructor(
         binding.btnCheckMessagesConfirmationScreen.setLocaleContentDescription(
             R.string.message_center_confirmation_check_messages_accessibility_hint
         )
+        context.applyGliaThemeFont(binding.title, style = Typeface.BOLD)
+        context.applyGliaThemeFont(binding.subtitle, checkMessagesButton)
         setupUnifiedTheme()
     }
 

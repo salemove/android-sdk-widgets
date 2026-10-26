@@ -1,6 +1,5 @@
 package com.glia.widgets.internal.callvisualizer
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
 import com.glia.telemetry_lib.GliaLogger
@@ -9,11 +8,17 @@ import com.glia.widgets.callvisualizer.controller.CallVisualizerContract
 import com.glia.widgets.callvisualizer.CallVisualizer
 import com.glia.widgets.helper.runIntegratorCallback
 import com.glia.widgets.internal.callvisualizer.domain.VisitorCodeViewBuilderUseCase
+import io.reactivex.rxjava3.disposables.Disposable
 
 internal class CallVisualizerManager(
     private val buildVisitorCodeUseCase: VisitorCodeViewBuilderUseCase,
     private val callVisualizerController: CallVisualizerContract.Controller
 ) : CallVisualizer {
+
+    // A new callback replaces the previous one, as the public API promises. Disposing the old
+    // subscription also releases whatever the old callback holds, such as a destroyed Fragment.
+    private var engagementStartDisposable: Disposable? = null
+    private var engagementEndDisposable: Disposable? = null
 
     override fun createVisitorCodeView(context: Context): View {
         GliaLogger.logMethodUse(CallVisualizer::class, "createVisitorCodeView")
@@ -35,15 +40,17 @@ internal class CallVisualizerManager(
         callVisualizerController.saveVisitorContextAssetId(visitorContextAssetId)
     }
 
-    @SuppressLint("CheckResult")
     override fun onEngagementStart(onComplete: OnComplete) {
         GliaLogger.logMethodUse(CallVisualizer::class, "onEngagementStart")
-        callVisualizerController.engagementStartFlow.subscribe { runIntegratorCallback { onComplete.onComplete() } }
+        engagementStartDisposable?.dispose()
+        engagementStartDisposable = callVisualizerController.engagementStartFlow
+            .subscribe { runIntegratorCallback { onComplete.onComplete() } }
     }
 
-    @SuppressLint("CheckResult")
     override fun onEngagementEnd(onComplete: OnComplete) {
         GliaLogger.logMethodUse(CallVisualizer::class, "onEngagementEnd")
-        callVisualizerController.engagementEndFlow.subscribe { runIntegratorCallback { onComplete.onComplete() } }
+        engagementEndDisposable?.dispose()
+        engagementEndDisposable = callVisualizerController.engagementEndFlow
+            .subscribe { runIntegratorCallback { onComplete.onComplete() } }
     }
 }

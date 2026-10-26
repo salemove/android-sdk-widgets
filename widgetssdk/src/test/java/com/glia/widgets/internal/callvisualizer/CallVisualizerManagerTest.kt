@@ -114,6 +114,32 @@ internal class CallVisualizerManagerTest {
     }
 
     @Test
+    fun `a new onEngagementStart callback replaces the previous one`() {
+        var firstCalls = 0
+        var secondCalls = 0
+        callVisualizerManager.onEngagementStart { firstCalls++ }
+        callVisualizerManager.onEngagementStart { secondCalls++ }
+
+        engagementStartProcessor.onNext(mockk())
+
+        assertEquals(0, firstCalls)
+        assertEquals(1, secondCalls)
+    }
+
+    @Test
+    fun `a new onEngagementEnd callback replaces the previous one`() {
+        var firstCalls = 0
+        var secondCalls = 0
+        callVisualizerManager.onEngagementEnd { firstCalls++ }
+        callVisualizerManager.onEngagementEnd { secondCalls++ }
+
+        engagementEndProcessor.onNext(mockk())
+
+        assertEquals(0, firstCalls)
+        assertEquals(1, secondCalls)
+    }
+
+    @Test
     fun `onEngagementStart keeps listening and re-throws on the main thread when the integrator callback throws`() {
         val integratorBug = IllegalStateException("integrator bug")
         var calls = 0

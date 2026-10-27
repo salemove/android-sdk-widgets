@@ -3,7 +3,6 @@ package com.glia.widgets.di
 import android.mockk
 import android.unMockk
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.glia.widgets.AuthorizationMethod as WidgetsAuthorizationMethod
 import com.glia.widgets.Region
 import com.glia.telemetry_lib.EventAttribute
 import com.glia.telemetry_lib.GliaLogger
@@ -14,7 +13,6 @@ import com.glia.telemetry_lib.StringAttribute
 import com.glia.widgets.BuildConfig
 import com.glia.widgets.GliaWidgetsConfig
 import com.glia.widgets.GliaWidgetsException
-import com.glia.widgets.apiKeyId
 import com.glia.widgets.callbacks.OnComplete
 import com.glia.widgets.callbacks.OnError
 import com.glia.widgets.helper.orNotApplicable
@@ -30,6 +28,7 @@ import io.mockk.verify
 import io.mockk.verifyOrder
 import junit.framework.TestCase.assertEquals
 import org.junit.After
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.ClassRule
@@ -125,13 +124,11 @@ class DependenciesTest {
     }
 
     @Test
-    fun `onSdkInit logs UserApiKey ID in telemetry`() {
-        val userApiKey = WidgetsAuthorizationMethod.UserApiKey("user-api-key-123", "secret")
+    fun `onSdkInit does not log an API key ID`() {
         val config = GliaWidgetsConfig.Builder()
             .setContext(RuntimeEnvironment.getApplication())
             .setSiteId("test-site-id")
             .setRegion(Region.EU)
-            .setAuthorizationMethod(userApiKey)
             .build()
 
         Dependencies.onSdkInit(config, onComplete, onError)
@@ -141,8 +138,7 @@ class DependenciesTest {
             GliaLogger.i(event = eq(LogEvents.WIDGETS_SDK_CONFIGURING), message = isNull<String>(), attributes = capture(attributeSlot))
         }
 
-        val attributes = attributeSlot.captured
-        assertEquals("user-api-key-123", attributes[EventAttribute.ApiKeyId])
+        assertFalse(attributeSlot.captured.containsKey(EventAttribute.ApiKeyId))
     }
 
     private fun mockConfiguration(): GliaWidgetsConfig = mockk(relaxed = true)
@@ -156,7 +152,6 @@ class DependenciesTest {
 
         val attributes = attributeSlot.captured
 
-        assertEquals(widgetsConfig.authorizationMethod?.apiKeyId.orNotApplicable, attributes[EventAttribute.ApiKeyId])
         assertEquals(widgetsConfig.region?.stringValue.orNotApplicable, attributes[EventAttribute.Environment])
         assertEquals(widgetsConfig.manualLocaleOverride, attributes[EventAttribute.LocaleCode])
     }

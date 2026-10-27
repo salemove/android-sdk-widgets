@@ -23,8 +23,6 @@
     <string name="pref_glia_remote_theme_settings">glia_widgets_remote_theme_settings</string>
     <string name="pref_app_authorization">app_authorization</string>
     <string name="pref_site_id">site_id</string>
-    <string name="pref_api_key_id">api_key</string>
-    <string name="pref_api_key_secret">api_key_secret</string>
     <string name="pref_company_name">company_name</string>
     <string name="pref_manual_locale_override">manual_locale_override</string>
     <string name="pref_auth_token">auth_token</string>

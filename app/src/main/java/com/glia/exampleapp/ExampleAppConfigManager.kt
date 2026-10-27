@@ -5,7 +5,6 @@ import android.content.SharedPreferences
 import android.net.Uri
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
-import com.glia.widgets.AuthorizationMethod
 import com.glia.widgets.GliaWidgetsConfig
 import com.glia.widgets.Region
 import com.glia.widgets.toRegion
@@ -14,14 +13,12 @@ import com.glia.widgets.toRegion
  * Helper class to obtain Glia Config params from deep-link or preferences.
  *
  * for setup with a secret link must be
- * glia://widgets/secret?site_id={site_id}&api_key_secret={api_key_secret}&api_key_id={api_key_id}&queue_id={queue_id}&visitor_context_asset_id={visitor_context_asset_id}
+ * glia://widgets/secret?site_id={site_id}&queue_id={queue_id}&visitor_context_asset_id={visitor_context_asset_id}
  * where all query params are mandatory except visitor_context_asset_id
  */
 object ExampleAppConfigManager {
     private const val SECRET_KEY = "secret"
     private const val SITE_ID_KEY = "site_id"
-    private const val API_KEY_SECRET_KEY = "api_key_secret"
-    private const val API_KEY_ID_KEY = "api_key_id"
     private const val QUEUE_ID_KEY = "queue_id"
     private const val VISITOR_CONTEXT_ASSET_ID_KEY = "visitor_context_asset_id"
     private const val REGION_KEY = "environment"
@@ -38,9 +35,7 @@ object ExampleAppConfigManager {
         saveSuppressPushNotificationDialogToPrefs(data, applicationContext)
 
 //       We're not checking availability for every query param separately because this is for acceptance tests and we assume that link would be correct
-        if (SECRET_KEY == data.lastPathSegment) {
-            saveApiKeyAuthToPrefs(data, applicationContext)
-        } else {
+        if (SECRET_KEY != data.lastPathSegment) {
             throw RuntimeException("deep link must start with \"glia://widgets/secret\"")
         }
         val baseDomain = data.getQueryParameter(BASE_DOMAIN) ?: ACCEPTANCE_DOMAIN
@@ -96,17 +91,6 @@ object ExampleAppConfigManager {
         }
     }
 
-    private fun saveApiKeyAuthToPrefs(data: Uri, applicationContext: Context) {
-        val apiKeyId = data.getQueryParameter(API_KEY_ID_KEY)
-        val apiKeySecret = data.getQueryParameter(API_KEY_SECRET_KEY)
-        if (apiKeyId == null || apiKeySecret == null) return
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-        sharedPreferences.edit {
-            putString(applicationContext.getString(R.string.pref_api_key_id), apiKeyId)
-                .putString(applicationContext.getString(R.string.pref_api_key_secret), apiKeySecret)
-        }
-    }
-
     @JvmStatic
     @JvmOverloads
     fun createDefaultConfig(
@@ -120,14 +104,6 @@ object ExampleAppConfigManager {
             context.getString(R.string.glia_region)
         ).toRegion()
 
-        val apiKeyId = preferences.getString(
-            context.getString(R.string.pref_api_key_id),
-            context.getString(R.string.glia_api_key_id)
-        )
-        val apiKeySecret = preferences.getString(
-            context.getString(R.string.pref_api_key_secret),
-            context.getString(R.string.glia_api_key_secret)
-        )
         val siteId = preferences.requireString(
             context.getString(R.string.pref_site_id),
             context.getString(R.string.site_id)
@@ -152,7 +128,6 @@ object ExampleAppConfigManager {
         val manualLocaleOverride = preferences.getString(context.getString(R.string.pref_manual_locale_override), null)
 
         return GliaWidgetsConfig.Builder()
-            .setAuthorizationMethod(AuthorizationMethod.UserApiKey(apiKeyId!!, apiKeySecret!!))
             .setSiteId(siteId)
             .setRegion(siteRegion)
             .setCompanyName(companyName)

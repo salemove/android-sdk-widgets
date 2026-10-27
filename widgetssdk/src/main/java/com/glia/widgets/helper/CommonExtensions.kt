@@ -142,13 +142,11 @@ internal val String?.orNotApplicable: String
 
 @Throws(GliaWidgetsException::class, GliaException::class)
 internal fun GliaWidgetsConfig.toCoreType(): CoreConfiguration {
-    val authorizationMethod = authorizationMethod.requireNotNull { "Authorization method is required" }
     val siteId = siteId.requireNotNull { "Site ID is required" }
     context.requireNotNull { "Context is required" }
     val region = region.requireNotNull { "Region is required" }
 
     return CoreConfiguration(
-        authorizationMethod = authorizationMethod.toCoreType(),
         siteId = siteId,
         region = region.toCoreType(),
         applicationContext = context,

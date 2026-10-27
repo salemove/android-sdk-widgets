@@ -213,7 +213,7 @@ Both channels are required when logging on public API paths:
 
 **Telemetry is initialized inside Core SDK via `InitializationProvider`.** There is no `TelemetryHelper.init` call in Widgets — removed as redundant after telemetry init moved to Core.
 
-**`SiteApiKey` is deprecated in favor of the `AuthorizationMethod` sealed interface (MOB-5010).** Code on `development` may reference the sealed interface. Do not add new callers using `SiteApiKey`.
+**The SDK has no API key (MOB-5625).** `SiteApiKey` and `AuthorizationMethod` were removed. Core creates the visitor from the site ID and signs site requests with the visitor token, so `GliaWidgetsConfig` needs only site ID, region and context. Do not reintroduce a key/secret.
 
 **The `use_overlay` bubble flag is deprecated and was reverted once.** The "display inside app" bubble behavior using `use_overlay` was reverted. Current flags: `enableBubbleOutsideApp` and `enableBubbleInsideApp`. Never propose reinstating `use_overlay`.
 
@@ -299,7 +299,7 @@ When iterating against an unreleased local Core SDK:
 
 Set in `local.properties` or as environment variables:
 
-- Required: `GLIA_REGION` (default: `beta`), `GLIA_API_KEY_SECRET`, `GLIA_API_KEY_ID`, `GLIA_SITE_ID`, `GLIA_QUEUE_ID`
+- Required: `GLIA_REGION` (default: `beta`), `GLIA_SITE_ID`, `GLIA_QUEUE_ID`
 - Optional: `GLIA_JWT`, `FIREBASE_PROJECT_ID`, `FIREBASE_API_KEY`, `FIREBASE_APP_ID`, `FIREBASE_APP_ID_DEBUG`
 
 ### Git Hooks
@@ -359,7 +359,7 @@ Maven Central signing: `ORG_GRADLE_PROJECT_signAllPublications=true` is set by B
 
 - **Telemetry initialization moved to Core SDK** — `TelemetryHelper.init` was removed from Widgets as a no-op after Core SDK took over telemetry initialization in `InitializationProvider`. Do not add it back.
 
-- **`SiteApiKey` deprecation in favor of `AuthorizationMethod` sealed interface (MOB-5010)** — do not add new usages of `SiteApiKey`.
+- **Service Credential API key removed (MOB-5625)** — `SiteApiKey` and `AuthorizationMethod` are gone; do not add a key/secret back.
 
 - **`version.properties` timestamp field removal** — removed specifically to prevent bot-authored Bitrise version-bump PRs from conflicting with developer PRs. Do not add any auto-generated or timestamp-based field back.
 

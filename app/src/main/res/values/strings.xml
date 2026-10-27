@@ -29,8 +29,6 @@
     <string name="settings_chat_system_agent_bubble_color">System agent bubble color</string>
     <string name="settings_chat_font_family">Chat message font family</string>
     <string name="settings_header_title">Title</string>
-    <string name="settings_site_api_key_id">Site Api Key id</string>
-    <string name="settings_site_api_key_secret">Site Api Key Secret</string>
     <string name="settings_site_id">Site id (needs restart)</string>
     <string name="settings_environment">Region (needs restart)</string>
     <string name="settings_chat_background_color">Background color</string>

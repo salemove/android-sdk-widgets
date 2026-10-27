@@ -14,9 +14,6 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
     val siteId: String?
 
     @JvmField
-    val authorizationMethod: AuthorizationMethod?
-
-    @JvmField
     val context: Context?
 
     @JvmField
@@ -49,7 +46,6 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
         // An Application object lives all the time when the application is active, so it is safe to store it.
         val applicationContext = builder.context?.applicationContext
 
-        authorizationMethod = builder.authorizationMethod
         siteId = builder.siteId
         context = applicationContext
         region = builder.region
@@ -81,8 +77,6 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
      *
      * Required information is:
      *
-     *  * Site Api Key Id
-     *  * Site Api Key Secret
      *  * Site ID
      *  * Region
      *  * Context
@@ -98,7 +92,6 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
      * <pre>
      * `
      * GliaBuildConfig gliaBuildConfig = new GliaBuildConfig.Builder(
-     * .setAuthorizationMethod(new AuthorizationMethod.UserApiKey(API_KEY_ID, API_KEY_SECRET))
      * .setSiteId("SITE_ID")
      * .setRegion(Regions.US)
      * .setContext(getApplicationContext())
@@ -110,8 +103,6 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
      */
     class Builder {
         var siteId: String? = null
-            private set
-        var authorizationMethod: AuthorizationMethod? = null
             private set
         var context: Context? = null
             private set
@@ -178,22 +169,6 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
         @Deprecated("Use {@link #setRegion(Region)}")
         fun setBaseDomain(baseDomain: String): Builder {
             this.baseDomain = baseDomain
-            return this
-        }
-
-        /**
-         * @param authorizationMethod - your API key
-         * @return Builder instance
-         *
-         * Example:
-         * ```
-         * .setAuthorizationMethod(
-         *     AuthorizationMethod.UserApiKey("API_KEY_ID", "API_KEY_SECRET")
-         * )
-         * ```
-         */
-        fun setAuthorizationMethod(authorizationMethod: AuthorizationMethod): Builder {
-            this.authorizationMethod = authorizationMethod
             return this
         }
 

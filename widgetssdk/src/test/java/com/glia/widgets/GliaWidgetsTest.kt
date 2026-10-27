@@ -150,7 +150,6 @@ class GliaWidgetsTest {
     }
 
     private fun widgetsConfig(): GliaWidgetsConfig = GliaWidgetsConfig.Builder()
-        .setAuthorizationMethod(AuthorizationMethod.UserApiKey("SiteApiId", "SiteApiSecret"))
         .setSiteId("SiteId")
         .setRegion(GliaWidgetsConfig.Regions.EU)
         .setContext(RuntimeEnvironment.getApplication())

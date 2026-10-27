@@ -2,7 +2,6 @@ package com.glia.widgets.di
 
 import android.mockk
 import android.unMockk
-import com.glia.androidsdk.AuthorizationMethod
 import com.glia.androidsdk.CoreConfiguration
 import com.glia.androidsdk.Glia
 import com.glia.androidsdk.GliaException
@@ -54,16 +53,12 @@ class GliaCoreImplTest {
     fun `init passes converted config to core`() {
         every { Glia.init(any<CoreConfiguration>(), any(), any()) } just Runs
         val configSlot = slot<CoreConfiguration>()
-        val userApiKey = com.glia.widgets.AuthorizationMethod.UserApiKey("UserApiId", "UserApiSecret")
-        val widgetsConfig = widgetsConfig(userApiKey)
+        val widgetsConfig = widgetsConfig()
 
         gliaCore.init(widgetsConfig, {}) {}
 
         verify { Glia.init(capture(configSlot), any(), any()) }
         val coreConfig = configSlot.captured
-        val authorizationMethod = coreConfig.authorizationMethod as AuthorizationMethod.UserApiKey
-        assertEquals(userApiKey.id, authorizationMethod.id)
-        assertEquals(userApiKey.secret, authorizationMethod.secret)
         assertEquals("SiteId", coreConfig.siteId)
         assertEquals(Region.EU.toCoreType(), coreConfig.region)
         assertEquals(RuntimeEnvironment.getApplication(), coreConfig.applicationContext)
@@ -130,15 +125,11 @@ class GliaCoreImplTest {
     fun `deprecated init passes converted config to core`() {
         every { Glia.init(any<CoreConfiguration>()) } just Runs
         val configSlot = slot<CoreConfiguration>()
-        val userApiKey = com.glia.widgets.AuthorizationMethod.UserApiKey("UserApiId", "UserApiSecret")
 
-        gliaCore.init(widgetsConfig(userApiKey))
+        gliaCore.init(widgetsConfig())
 
         verify { Glia.init(capture(configSlot)) }
         val coreConfig = configSlot.captured
-        val authorizationMethod = coreConfig.authorizationMethod as AuthorizationMethod.UserApiKey
-        assertEquals(userApiKey.id, authorizationMethod.id)
-        assertEquals(userApiKey.secret, authorizationMethod.secret)
         assertEquals("SiteId", coreConfig.siteId)
     }
 
@@ -220,12 +211,8 @@ class GliaCoreImplTest {
         assertFalse(gliaCore.isInitializationInProgress)
     }
 
-    private fun widgetsConfig(
-        userApiKey: com.glia.widgets.AuthorizationMethod.UserApiKey =
-            com.glia.widgets.AuthorizationMethod.UserApiKey("UserApiId", "UserApiSecret")
-    ): GliaWidgetsConfig =
+    private fun widgetsConfig(): GliaWidgetsConfig =
         GliaWidgetsConfig.Builder()
-            .setAuthorizationMethod(userApiKey)
             .setSiteId("SiteId")
             .setRegion(GliaWidgetsConfig.Regions.EU)
             .setContext(RuntimeEnvironment.getApplication())

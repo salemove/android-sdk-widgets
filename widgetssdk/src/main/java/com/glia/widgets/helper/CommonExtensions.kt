@@ -34,7 +34,6 @@ import com.glia.widgets.Region
 import com.glia.widgets.UiTheme
 import com.glia.widgets.engagement.MediaType
 import com.glia.widgets.queue.Queue
-import com.glia.widgets.toCoreType
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.processors.FlowableProcessor
@@ -143,13 +142,11 @@ internal val String?.orNotApplicable: String
 
 @Throws(GliaWidgetsException::class, GliaException::class)
 internal fun GliaWidgetsConfig.toCoreType(): CoreConfiguration {
-    val authorizationMethod = authorizationMethod.requireNotNull { "Authorization method is required" }
     val siteId = siteId.requireNotNull { "Site ID is required" }
     context.requireNotNull { "Context is required" }
     val region = requireRegion(region, regionString)
 
     return CoreConfiguration(
-        authorizationMethod = authorizationMethod.toCoreType(),
         siteId = siteId,
         region = region.toCoreType(),
         applicationContext = context,

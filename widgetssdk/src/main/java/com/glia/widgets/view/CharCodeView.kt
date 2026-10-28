@@ -76,7 +76,7 @@ internal class CharCodeView @JvmOverloads constructor(
     }
 
     private fun createCharSlotView(character: Char, remoteTheme: VisitorCodeTheme?): TextView {
-        val charView = TextView(context, null, R.attr.visitorCodeStyle, R.style.Application_Glia_VisitorCode) // TODO: confirm this
+        val charView = TextView(context, null, R.attr.gliaVisitorCodeStyle, R.style.Application_Glia_VisitorCode)
         charView.isFocusable = false
         charView.text = character.toString()
         charView.textAlignment = TEXT_ALIGNMENT_CENTER

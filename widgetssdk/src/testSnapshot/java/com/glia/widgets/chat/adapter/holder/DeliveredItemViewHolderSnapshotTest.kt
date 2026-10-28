@@ -2,7 +2,6 @@ package com.glia.widgets.chat.adapter.holder
 
 import android.view.View
 import com.glia.widgets.SnapshotTest
-import com.glia.widgets.UiTheme
 import com.glia.widgets.databinding.ChatDeliveredItemLayoutBinding
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import org.junit.Test
@@ -38,7 +37,6 @@ internal class DeliveredItemViewHolderSnapshotTest : SnapshotTest() {
         unifiedTheme: UnifiedTheme? = null
     ): View = DeliveredItemViewHolder(
         ChatDeliveredItemLayoutBinding.inflate(layoutInflater),
-        UiTheme(),
         unifiedTheme
     ).itemView
 

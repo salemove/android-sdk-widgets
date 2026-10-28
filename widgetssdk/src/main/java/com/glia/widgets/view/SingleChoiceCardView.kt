@@ -13,14 +13,14 @@ import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import com.glia.androidsdk.chat.SingleChoiceOption
 import com.glia.widgets.R
-import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.databinding.SingleChoiceCardViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.getAttr
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getColorStateListCompat
-import com.glia.widgets.helper.getFontCompat
+import com.glia.widgets.helper.gliaAttrFont
+import com.glia.widgets.helper.gliaAttrResourceId
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.load
 import com.glia.widgets.view.unifiedui.applyButtonTheme
@@ -64,14 +64,11 @@ internal class SingleChoiceCardView @JvmOverloads constructor(
         bgDrawable.setStroke(strokeSize, color)
     }
 
-    internal fun setData(
-        item: OperatorMessageItem.ResponseCard,
-        theme: UiTheme
-    ) {
-        setupCardView(theme)
+    internal fun setData(item: OperatorMessageItem.ResponseCard) {
+        setupCardView()
         setupImage(item.choiceCardImageUrl)
         setupText(item.content.orEmpty())
-        setupButtons(item, theme)
+        setupButtons(item)
     }
 
     internal fun setOnOptionClickedListener(onOptionClickedListener: OnOptionClickedListener?) {
@@ -82,17 +79,17 @@ internal class SingleChoiceCardView @JvmOverloads constructor(
         fun onClicked(item: OperatorMessageItem.ResponseCard, selectedOption: SingleChoiceOption)
     }
 
-    private fun setupCardView(theme: UiTheme) {
+    /** `init` has already painted the card from the theme; only the unified theme can still change it. */
+    private fun setupCardView() {
         responseCardTheme?.background?.fill?.also {
             if (it.isGradient) {
                 bgDrawable.colors = it.valuesArray
             } else {
                 bgDrawable.setColor(it.primaryColor)
             }
-        } ?: theme.baseLightColor?.also { bgDrawable.setColor(getColorCompat(it)) }
+        }
 
         responseCardTheme?.background?.stroke?.also(::setStroke)
-            ?: theme.brandPrimaryColor?.also { setStroke(getColorCompat(it)) }
     }
 
     private fun setupImage(imageUrl: String?) {
@@ -107,9 +104,14 @@ internal class SingleChoiceCardView @JvmOverloads constructor(
         binding.contentView.applyTextTheme(responseCardTheme?.text, true)
     }
 
+    /**
+     * The response-card option button is the only consumer of `gliaBotActionButton*`. It shares
+     * `buttonBarNeutralButtonStyle` with the dialog neutral button, so those two attributes cannot be
+     * folded into that style and are resolved here instead. Their defaults are the very values the
+     * shared style sets, so an uncustomized card is unaffected.
+     */
     private fun composeButton(
         text: String,
-        uiTheme: UiTheme,
         onClickListener: OnClickListener?
     ): MaterialButton {
         val styleResId = getAttr(R.attr.buttonBarNeutralButtonStyle, R.style.Application_Glia_Chat_Button_Neutral)
@@ -118,21 +120,22 @@ internal class SingleChoiceCardView @JvmOverloads constructor(
             it.text = text
             onClickListener?.also(it::setOnClickListener)
 
-            uiTheme.fontRes?.let(::getFontCompat)?.also(it::setTypeface)
+            context.gliaAttrFont()?.also(it::setTypeface)
 
-            uiTheme.botActionButtonBackgroundColor?.let(::getColorStateListCompat)
-                ?.also(it::setBackgroundTintList)
-            uiTheme.botActionButtonTextColor?.let(::getColorStateListCompat)
-                ?.also(it::setTextColor)
+            it.backgroundTintList = getColorStateListCompat(
+                context.gliaAttrResourceId(R.attr.gliaBotActionButtonBackgroundColor, R.color.glia_neutral_color)
+            )
+            it.setTextColor(
+                getColorStateListCompat(
+                    context.gliaAttrResourceId(R.attr.gliaBotActionButtonTextColor, R.color.glia_dark_color)
+                )
+            )
 
             responseCardTheme?.option?.normal.also(it::applyButtonTheme)
         }
     }
 
-    private fun setupButtons(
-        item: OperatorMessageItem.ResponseCard,
-        theme: UiTheme
-    ) {
+    private fun setupButtons(item: OperatorMessageItem.ResponseCard) {
         val horizontalMargin = resources.getDimensionPixelOffset(R.dimen.glia_large)
         val topMargin = resources.getDimensionPixelOffset(R.dimen.glia_medium)
         for (option in item.singleChoiceOptions) {
@@ -142,7 +145,6 @@ internal class SingleChoiceCardView @JvmOverloads constructor(
 
             val button = composeButton(
                 text = option.text,
-                uiTheme = theme,
                 onClickListener = onClickListener
             )
 

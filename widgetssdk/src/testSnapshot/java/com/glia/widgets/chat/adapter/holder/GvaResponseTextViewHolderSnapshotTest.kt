@@ -1,7 +1,6 @@
 package com.glia.widgets.chat.adapter.holder
 
 import com.glia.widgets.SnapshotTest
-import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.model.GvaResponseText
 import com.glia.widgets.databinding.ChatOperatorMessageLayoutBinding
 import com.glia.widgets.databinding.ChatReceiveMessageContentBinding
@@ -103,7 +102,6 @@ internal class GvaResponseTextViewHolderSnapshotTest : SnapshotTest(), SnapshotG
         val viewHolder = GvaResponseTextViewHolder(
             chatOperatorMessageLayoutBinding,
             gvaPersistentButtonsContentBinding,
-            UiTheme(),
             unifiedTheme
         )
 

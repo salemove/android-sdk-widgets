@@ -32,7 +32,7 @@ import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.separateStringWithSymbol
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.setLocaleText
-import com.glia.widgets.helper.wrapWithMaterialThemeOverlay
+import com.glia.widgets.helper.wrapWithGliaTheme
 import com.glia.widgets.locale.LocaleProvider
 import com.glia.widgets.view.button.GliaPositiveButton
 import com.glia.widgets.view.unifiedui.applyButtonTheme
@@ -54,7 +54,7 @@ import java.util.concurrent.Executor
 internal class VisitorCodeView internal constructor(
     context: Context,
     private val uiThreadExecutor: Executor? = null
-) : FrameLayout(context.wrapWithMaterialThemeOverlay(), null, 0), VisitorCodeContract.View {
+) : FrameLayout(context.wrapWithGliaTheme(), null, 0), VisitorCodeContract.View {
     private var controller: VisitorCodeContract.Controller? = null
 
     private var timer: CountDownTimer? = null

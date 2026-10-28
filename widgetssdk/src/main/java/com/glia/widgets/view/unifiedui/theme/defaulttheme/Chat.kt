@@ -100,11 +100,11 @@ private fun ChatVisitorMessageTheme(pallet: ColorPallet): MessageBalloonTheme? =
  * Default theme for Response Card
  */
 private fun ChatResponseCardTheme(pallet: ColorPallet): ResponseCardTheme? = pallet.run {
-    composeIfAtLeastOneNotNull(primaryColorTheme, neutralColorTheme, darkColorTheme) {
+    composeIfAtLeastOneNotNull(primaryColorTheme, lightColorTheme, neutralColorTheme, darkColorTheme) {
         ResponseCardTheme(
             option = ResponseCardOptionTheme(normal = NeutralDefaultButtonTheme(this)),
             background = LayerTheme(
-                fill = neutralColorTheme,
+                fill = lightColorTheme,
                 stroke = primaryColorTheme?.primaryColor
             ),
             text = BaseDarkColorTextTheme(this)

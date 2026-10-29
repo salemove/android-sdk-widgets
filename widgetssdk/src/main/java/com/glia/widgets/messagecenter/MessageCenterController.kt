@@ -151,11 +151,6 @@ internal class MessageCenterController(
                         setState(state.copy(showSendMessageGroup = false))
                     }
 
-                    GliaException.Cause.INTERNAL_ERROR -> {
-                        dialogController.showUnexpectedErrorDialog()
-                        setState(state.copy(showSendMessageGroup = false))
-                    }
-
                     else -> {
                         dialogController.showUnexpectedErrorDialog()
                         setState(

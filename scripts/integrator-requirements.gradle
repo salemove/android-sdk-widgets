@@ -1,0 +1,177 @@
+/**
+ * Fails the build when the Widgets SDK, or anything it pulls into an integrator's app, needs a newer
+ * toolchain than `integrator-compat/minimums.properties` declares.
+ *
+ * Scans the release AAR and every artifact of `releaseRuntimeClasspath` for:
+ * - AAR metadata `minCompileSdk` / `minAndroidGradlePluginVersion` (enforced by AGP in the integrator's build)
+ * - Kotlin module metadata version (a Kotlin compiler reads metadata at most one minor version newer than itself)
+ * - class-file version (the integrator's JDK must load it)
+ *
+ * Any declared value can be overridden for testing, e.g. `-PintegratorCompat.kotlin=2.1.0`.
+ */
+
+import java.util.zip.ZipInputStream
+
+def minimumsFile = rootProject.file('integrator-compat/minimums.properties')
+def minimums = new Properties()
+minimumsFile.withInputStream { minimums.load(it) }
+def declared = { String key -> (findProperty("integratorCompat.$key") ?: minimums.getProperty(key)) as String }
+
+tasks.register('checkIntegratorRequirements') {
+  group = 'verification'
+  description = 'Fails if the SDK or its runtime dependencies need more than integrator-compat/minimums.properties'
+  notCompatibleWithConfigurationCache('Scans resolved dependency artifacts at execution time')
+
+  def aar = tasks.named('bundleReleaseAar').flatMap { it.archiveFile }
+  def runtimeArtifacts = configurations.named('releaseRuntimeClasspath').flatMap { it.incoming.artifacts.resolvedArtifacts }
+  def selfName = "${project.group}:android-widgets:${rootProject.widgetsVersionName} (this build)"
+  def reportFile = layout.buildDirectory.file('reports/integrator-requirements.txt')
+  def minimumsPath = rootProject.relativePath(minimumsFile)
+
+  inputs.file(aar)
+  inputs.file(minimumsFile)
+
+  doLast {
+    def compileSdk = declared('compileSdk') as int
+    def agp = declared('agp')
+    def kotlin = parseVersion(declared('kotlin'))
+    def jdk = declared('jdk') as int
+
+    def scanned = [[name: selfName] + scanArtifact(aar.get().asFile)]
+    runtimeArtifacts.get().each { scanned << [name: it.id.componentIdentifier.displayName] + scanArtifact(it.file) }
+
+    def requirements = [
+      [
+        label: 'compileSdk', declared: "$compileSdk",
+        value: { it.minCompileSdk },
+        compare: { a, b -> a <=> b },
+        exceeds: { it > compileSdk },
+        needs: { "$it" },
+        describe: { "minCompileSdk $it" },
+      ],
+      [
+        label: 'AGP', declared: agp,
+        value: { it.minAgp },
+        compare: { a, b -> compareVersions(a, b) },
+        exceeds: { compareVersions(it, agp) > 0 },
+        needs: { it },
+        describe: { "minAndroidGradlePluginVersion $it" },
+      ],
+      [
+        label: 'Kotlin', declared: declared('kotlin'),
+        value: { it.kotlinMetadata },
+        compare: { a, b -> compareVersions(a.join('.'), b.join('.')) },
+        exceeds: { compareVersions("${it[0]}.${it[1]}", "${kotlin[0]}.${kotlin[1] + 1}") > 0 },
+        needs: { kotlinReaderOf(it) },
+        describe: { "Kotlin metadata ${it.join('.')}" },
+      ],
+      [
+        label: 'JDK', declared: "$jdk",
+        value: { it.classMajor },
+        compare: { a, b -> a <=> b },
+        exceeds: { it - 44 > jdk },
+        needs: { "${it - 44}" },
+        describe: { "class file version $it" },
+      ],
+    ]
+
+    def lines = [
+      "Integrator requirements of ${selfName - ' (this build)'} and its ${scanned.size() - 1} release runtime dependencies",
+      "Declared in $minimumsPath",
+      '',
+      String.format('  %-11s %-9s %-7s %s', 'Toolchain', 'Declared', 'Needed', 'Pinned by'),
+    ]
+    def offenders = []
+    requirements.each { req ->
+      def found = scanned.findAll { req.value(it) != null }
+      def max = found.collect { req.value(it) }.max(req.compare)
+      def pinnedBy = found.findAll { req.compare(req.value(it), max) == 0 }*.name.unique()
+      lines << String.format('  %-11s %-9s %-7s %s', req.label, req.declared, max == null ? '-' : req.needs(max),
+        max == null ? '' : "${req.describe(max)}: ${pinnedBy.join(', ')}")
+      offenders.addAll(found.findAll { req.exceeds(req.value(it)) }.collect {
+        "  ${it.name}: ${req.describe(req.value(it))} needs ${req.label} ${req.needs(req.value(it))} (declared ${req.declared})"
+      }.unique())
+    }
+    lines << ''
+    if (offenders) {
+      lines << "${offenders.size()} requirement(s) above the declared minimums:"
+      lines.addAll(offenders)
+      lines << ''
+      lines << "Either keep the dependency at a version that fits, or raise the minimum in $minimumsPath (a public requirement change)."
+    } else {
+      lines << 'Nothing needs more than the declared minimums.'
+    }
+
+    def report = lines.join('\n')
+    reportFile.get().asFile.with {
+      parentFile.mkdirs()
+      text = report + '\n'
+    }
+    if (offenders) {
+      throw new GradleException(report)
+    }
+    logger.lifecycle(report)
+  }
+}
+
+private static Map scanArtifact(File file) {
+  def result = [minCompileSdk: null, minAgp: null, kotlinMetadata: null, classMajor: null]
+  file.withInputStream { scanZip(it, file.name.endsWith('.aar'), result) }
+  return result
+}
+
+private static void scanZip(InputStream input, boolean isAar, Map result) {
+  // Nested jars are read straight from the outer stream, so neither stream may be closed here
+  def zip = new ZipInputStream(input)
+  def entry
+  while ((entry = zip.nextEntry) != null) {
+    def name = entry.name
+    if (isAar) {
+      if (name == 'META-INF/com/android/build/gradle/aar-metadata.properties') {
+        def metadata = new Properties()
+        metadata.load(zip)
+        metadata.getProperty('minCompileSdk')?.with { result.minCompileSdk = it as int }
+        result.minAgp = metadata.getProperty('minAndroidGradlePluginVersion')
+      } else if (name == 'classes.jar' || name ==~ /libs\/[^\/]+\.jar/) {
+        scanZip(zip, false, result)
+      }
+    } else if (name ==~ /META-INF\/[^\/]+\.kotlin_module/) {
+      def data = new DataInputStream(zip)
+      def size = data.readInt()
+      if (size in 1..5) {
+        def version = (1..size).collect { data.readInt() }
+        if (result.kotlinMetadata == null || compareVersions(version.join('.'), result.kotlinMetadata.join('.')) > 0) {
+          result.kotlinMetadata = version
+        }
+      }
+    } else if (name.endsWith('.class') && !name.startsWith('META-INF/versions/') && !name.endsWith('module-info.class')) {
+      def data = new DataInputStream(zip)
+      if (data.readInt() == 0xCAFEBABE.intValue()) {
+        data.readUnsignedShort()
+        def major = data.readUnsignedShort()
+        if (result.classMajor == null || major > result.classMajor) {
+          result.classMajor = major
+        }
+      }
+    }
+  }
+}
+
+private static List<Integer> parseVersion(String version) {
+  return version.split(/[^0-9.]/)[0].tokenize('.').collect { it as int }
+}
+
+private static int compareVersions(String a, String b) {
+  def pa = parseVersion(a)
+  def pb = parseVersion(b)
+  for (int i = 0; i < Math.max(pa.size(), pb.size()); i++) {
+    def diff = (i < pa.size() ? pa[i] : 0) <=> (i < pb.size() ? pb[i] : 0)
+    if (diff != 0) return diff
+  }
+  return 0
+}
+
+// The oldest Kotlin compiler able to read the given metadata version
+private static String kotlinReaderOf(List<Integer> metadata) {
+  return metadata[1] > 0 ? "${metadata[0]}.${metadata[1] - 1}" : "${metadata[0] - 1}.9"
+}

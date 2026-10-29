@@ -6,6 +6,7 @@
 #   Without profiles, runs every integrator-compat/profiles/*.properties.
 #
 # Profile keys: gradle, agp, kotlin (omit for a Java-only app), compileSdk, minSdk, jdk, javaTarget,
+# compose, composeBom, activityCompose (Compose app with those versions),
 # gradleProperties (';'-separated lines for the app's gradle.properties), knownFailing (reason the
 # profile is expected to fail), description, source. base=minimums starts from minimums.properties.
 #
@@ -107,8 +108,11 @@ for name in "${profiles[@]}"; do
   kotlin="$(prop "$merged" kotlin)"
   compile_sdk="$(prop "$merged" compileSdk)"
   jdk="$(prop "$merged" jdk)"
+  compose="$(prop "$merged" compose)"
+  compose_bom="$(prop "$merged" composeBom)"
   known_failing="$(prop "$merged" knownFailing)"
   toolchain="Gradle $gradle, AGP $agp, $([ -n "$kotlin" ] && echo "Kotlin $kotlin" || echo "no Kotlin"), compileSdk $compile_sdk, JDK $jdk"
+  [ "$compose" = true ] && toolchain="$toolchain, Compose BOM $compose_bom"
 
   dir="$OUT/$name"
   log="$OUT/$name.log"
@@ -127,6 +131,11 @@ for name in "${profiles[@]}"; do
     echo "compat.compileSdk=$compile_sdk"
     echo "compat.minSdk=$(prop "$merged" minSdk)"
     echo "compat.javaTarget=$(prop "$merged" javaTarget)"
+    if [ "$compose" = true ]; then
+      echo "compat.compose=true"
+      echo "compat.composeBom=$compose_bom"
+      echo "compat.activityCompose=$(prop "$merged" activityCompose)"
+    fi
     prop "$merged" gradleProperties | tr ';' '\n'
   } | grep . > "$dir/gradle.properties"
 

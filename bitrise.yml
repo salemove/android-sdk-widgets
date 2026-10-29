@@ -392,6 +392,26 @@ workflows:
             - project_location: "$PROJECT_LOCATION"
             - module: "$EXAMPLE_APP_MODULE"
             - variant: "$DEBUG_VARIANT"
+      - gradle-runner@5:
+          title: Check integrator minimum requirements
+          inputs:
+            - gradlew_path: "./gradlew"
+            - gradle_task: "$WIDGET_SDK_MODULE:checkIntegratorRequirements"
+      - script@1:
+          title: Export integrator requirements report
+          inputs:
+            - content: |-
+                #!/usr/bin/env bash
+                # fail if any commands fails
+                set -e
+                # debug log
+                set -x
+
+                REPORT=$BITRISE_SOURCE_DIR/widgetssdk/build/reports/integrator-requirements.txt
+                if [ -f "$REPORT" ]; then
+                  cp $REPORT $BITRISE_DEPLOY_DIR/
+                fi
+          is_always_run: true
       - deploy-to-bitrise-io@2: {}
       - save-gradle-cache@1: {}
   upgrade_dependencies:

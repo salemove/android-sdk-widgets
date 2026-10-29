@@ -68,7 +68,11 @@ evidence() {
   local pattern line
   for pattern in "Minimum supported Gradle version" "Dependency '[^']+' requires" \
     "metadata is [0-9.]+, expected version" "2 files found with path" "^e: "; do
-    line="$(grep -m1 -E "$pattern" "$1" || true)"
+    # First match, joined with the indented lines it wraps onto
+    line="$(awk -v p="$pattern" '
+      found { if ($0 ~ /^[[:space:]]+[^[:space:]]/ && prev !~ /\.$/) { prev = $0; sub(/^[[:space:]]+/, ""); out = out " " $0; next } exit }
+      $0 ~ p { out = $0; prev = $0; found = 1 }
+      END { if (found) print out }' "$1")"
     if [ -n "$line" ]; then
       echo "$line" | sed -E 's#^e: file://[^!]*/([^/!]+)!/[^ ]+ #\1: #; s/^[[:space:]>]*([0-9]+\.[[:space:]]+)?//' | cut -c1-200
       return

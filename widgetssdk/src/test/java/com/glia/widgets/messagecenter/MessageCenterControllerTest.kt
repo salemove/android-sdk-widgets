@@ -25,6 +25,7 @@ import com.glia.widgets.internal.secureconversations.domain.ShowMessageLimitErro
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Observable
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.atLeastOnce
@@ -232,13 +233,21 @@ internal class MessageCenterControllerTest {
     }
 
     @Test
-    fun onSendMessageClicked_ShowsUnexpectedErrorDialog_WhenInternalError() {
+    fun onSendMessageClicked_ShowsUnexpectedErrorDialogAndKeepsSendBox_WhenInternalError() {
         messageCenterController.setView(viewContract)
+        whenever(isMessagingAvailableUseCase.invoke()) doReturn Flowable.just(true)
+        messageCenterController.ensureMessageCenterAvailability()
         stubSendMessageFlow(GliaException("Message", GliaException.Cause.INTERNAL_ERROR))
 
         messageCenterController.onSendMessageClicked()
 
         verify(dialogController).showUnexpectedErrorDialog()
+        verify(dialogController, never()).showMessageCenterUnavailableDialog()
+        val stateCaptor = argumentCaptor<MessageCenterState>()
+        verify(viewContract, atLeastOnce()).onStateUpdated(stateCaptor.capture())
+        assertEquals(listOf(true), stateCaptor.allValues.map { it.showSendMessageGroup }.distinct())
+        assertTrue(stateCaptor.lastValue.messageEditTextEnabled)
+        assertTrue(stateCaptor.lastValue.addAttachmentButtonEnabled)
     }
 
     @Test

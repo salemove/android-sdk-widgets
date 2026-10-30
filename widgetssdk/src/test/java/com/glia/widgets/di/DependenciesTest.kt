@@ -138,7 +138,7 @@ class DependenciesTest {
             GliaLogger.i(event = eq(LogEvents.WIDGETS_SDK_CONFIGURING), message = isNull<String>(), attributes = capture(attributeSlot))
         }
 
-        assertFalse(attributeSlot.captured.containsKey(EventAttribute.ApiKeyId))
+        assertFalse(attributeSlot.captured.keys.any { it.asOtelAttribute.key == "api_key_id" })
     }
 
     private fun mockConfiguration(): GliaWidgetsConfig = mockk(relaxed = true)

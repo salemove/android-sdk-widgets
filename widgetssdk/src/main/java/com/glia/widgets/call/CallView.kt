@@ -70,7 +70,6 @@ import com.glia.widgets.view.unifiedui.applyColorTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.call.CallTheme
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import com.google.android.material.transition.MaterialFade
 import com.google.android.material.transition.SlideDistanceProvider
 import java.util.concurrent.Executor
@@ -80,7 +79,7 @@ private const val CONTROLS_ALPHA_SEMI_TRANSPARENT = 0.9f
 private const val CONTROLS_ALPHA = 1f
 
 internal class CallView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : ConstraintLayout(
-    MaterialThemeOverlay.wrap(context, attrs, defStyleAttr, defStyleRes),
+    context,
     attrs,
     defStyleAttr,
     defStyleRes

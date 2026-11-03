@@ -20,7 +20,6 @@ import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.view.header.AppBarView
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.glia.widgets.view.unifiedui.theme.base.HeaderTheme
-import com.google.android.material.theme.overlay.MaterialThemeOverlay
 
 internal class WebBrowserView(
     context: Context,
@@ -28,7 +27,7 @@ internal class WebBrowserView(
     defStyleAttr: Int,
     defStyleRes: Int
 ) : LinearLayout(
-    MaterialThemeOverlay.wrap(context, attrs, defStyleAttr, defStyleRes),
+    context,
     attrs,
     defStyleAttr,
     defStyleRes

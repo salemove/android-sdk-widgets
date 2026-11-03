@@ -9,7 +9,7 @@ import com.glia.widgets.R
 import com.glia.widgets.chat.model.OperatorStatusItem
 import com.glia.widgets.databinding.ChatOperatorStatusLayoutBinding
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.helper.gliaAttrFont
+import com.glia.widgets.helper.applyGliaThemeFont
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.locale.StringKey
@@ -46,13 +46,8 @@ internal class OperatorStatusViewHolder(
      * theme typeface still has to be applied here, since a `textAppearance` would otherwise win.
      */
     private fun applyBaseConfig() {
-        itemView.context.gliaAttrFont()?.also {
-            chatStartingHeadingView.setTypeface(it, Typeface.BOLD)
-            chatStartingCaptionView.typeface = it
-            chatStartedNameView.setTypeface(it, Typeface.BOLD)
-            chatStartedCaptionView.typeface = it
-            chatStartedCaptionView.setLocaleText(R.string.engagement_connection_screen_message)
-        }
+        itemView.context.applyGliaThemeFont(chatStartingHeadingView, chatStartedNameView, style = Typeface.BOLD)
+        itemView.context.applyGliaThemeFont(chatStartingCaptionView, chatStartedCaptionView)
         engagementStatesTheme?.operator.also(statusPictureView::applyOperatorTheme)
     }
 

@@ -5,12 +5,9 @@
         Paparazzi renders with this theme. It used to duplicate every default by hand because views
         picked the real defaults up from `ThemeOverlay.Glia.Chat` at inflation time, via
         `MaterialThemeOverlay`. Now that `Theme.Glia.Internal` *is* the default set and views no
-        longer wrap their context, this only has to extend it - plus the one attribute the SDK has
-        no default for.
+        longer wrap their context, this only has to extend it.
     -->
-    <style name="ThemeOverlay.Glia.Chat.Material" parent="Theme.Glia.Internal">
-        <item name="gliaIconCallVisualizer">@drawable/ic_callvisualizer</item>
-    </style>
+    <style name="ThemeOverlay.Glia.Chat.Material" parent="Theme.Glia.Internal" />
 
     <!--
         The dialog fixtures have always rendered their unified-theme variants white-labelled, back

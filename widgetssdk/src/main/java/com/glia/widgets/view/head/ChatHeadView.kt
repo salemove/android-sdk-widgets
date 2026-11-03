@@ -167,20 +167,17 @@ internal class ChatHeadView @JvmOverloads constructor(
         activityLauncher.launchCall(context, null, false)
     }
 
-    private fun createConfiguration(buildTimeTheme: UiTheme): ChatHeadConfiguration {
-        return buildTimeTheme.chatHeadConfiguration.let {
-            ChatHeadConfiguration.builder()
-                .operatorPlaceholderBackgroundColor(it?.operatorPlaceholderBackgroundColor ?: buildTimeTheme.brandPrimaryColor)
-                .operatorPlaceholderIcon(it?.operatorPlaceholderIcon ?: buildTimeTheme.iconPlaceholder)
-                .operatorPlaceholderIconTintList(it?.operatorPlaceholderIconTintList ?: buildTimeTheme.baseLightColor)
-                .badgeTextColor(it?.badgeTextColor ?: buildTimeTheme.baseLightColor)
-                .badgeBackgroundTintList(it?.badgeBackgroundTintList ?: buildTimeTheme.brandPrimaryColor)
-                .backgroundColorRes(it?.backgroundColorRes ?: buildTimeTheme.brandPrimaryColor)
-                .iconOnHold(it?.iconOnHold ?: buildTimeTheme.iconOnHold)
-                .iconOnHoldTintList(it?.iconOnHoldTintList ?: buildTimeTheme.baseLightColor)
-                .build()
-        }
-    }
+    private fun createConfiguration(buildTimeTheme: UiTheme): ChatHeadConfiguration =
+        ChatHeadConfiguration.builder()
+            .operatorPlaceholderBackgroundColor(buildTimeTheme.brandPrimaryColor)
+            .operatorPlaceholderIcon(buildTimeTheme.iconPlaceholder)
+            .operatorPlaceholderIconTintList(buildTimeTheme.baseLightColor)
+            .badgeTextColor(buildTimeTheme.baseLightColor)
+            .badgeBackgroundTintList(buildTimeTheme.brandPrimaryColor)
+            .backgroundColorRes(buildTimeTheme.brandPrimaryColor)
+            .iconOnHold(buildTimeTheme.iconOnHold)
+            .iconOnHoldTintList(buildTimeTheme.baseLightColor)
+            .build()
 
     private fun setAccessibilityLabels() {
         val view = binding.root

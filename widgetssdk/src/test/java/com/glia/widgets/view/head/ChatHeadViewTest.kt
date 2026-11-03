@@ -1,14 +1,22 @@
 package com.glia.widgets.view.head
 
+import android.content.Context
+import android.view.ContextThemeWrapper
 import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.Button
+import androidx.annotation.ColorRes
+import androidx.annotation.StyleRes
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
+import com.glia.widgets.R
+import com.glia.widgets.databinding.ChatHeadViewBinding
 import com.glia.widgets.di.ControllerFactory
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.di.UseCaseFactory
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
 import com.glia.widgets.helper.ResourceProvider
+import com.glia.widgets.helper.applyGliaThemeOverlays
 import com.glia.widgets.helper.wrapWithGliaTheme
 import io.reactivex.rxjava3.core.Observable
 import org.junit.Assert.assertEquals
@@ -76,6 +84,43 @@ internal class ChatHeadViewTest {
         val hasClickAction = nodeInfo.actionList.any { it.id == AccessibilityNodeInfoCompat.ACTION_CLICK }
         assertTrue("ACTION_CLICK must be present in accessibility actions", hasClickAction)
     }
+
+    /**
+     * The bubble carried a `ChatHeadConfiguration` built from `UiTheme` until it started resolving
+     * `gliaBrandPrimaryColor` / `gliaBaseLightColor` / `gliaIconPlaceholder` / `gliaIconOnHold` from
+     * its own context. Snapshots render the bubble under the default theme only, so the customized
+     * case is locked here.
+     */
+    @Test
+    fun `bubble colours and icons follow the composed theme`() {
+        val customized = themed(R.style.Test_Glia_Customization)
+        val binding = ChatHeadViewBinding.bind(ChatHeadView(customized))
+
+        val brand = customized.color(R.color.glia_test_customization_brand)
+        val light = customized.color(R.color.glia_light_color)
+
+        assertEquals(brand, binding.chatBubbleBadge.backgroundTintList?.defaultColor)
+        assertEquals(light, binding.chatBubbleBadge.textColors.defaultColor)
+        assertEquals(light, binding.placeholderView.imageTintList?.defaultColor)
+        assertEquals(light, binding.queueingLottieAnimationPlaceholder.imageTintList?.defaultColor)
+        assertEquals(light, binding.onHoldIcon.imageTintList?.defaultColor)
+    }
+
+    @Test
+    fun `bubble colours fall back to the SDK defaults when nothing is customized`() {
+        val default = themed(customizationStyle = null)
+        val binding = ChatHeadViewBinding.bind(ChatHeadView(default))
+
+        assertEquals(default.color(R.color.glia_primary_color), binding.chatBubbleBadge.backgroundTintList?.defaultColor)
+        assertEquals(default.color(R.color.glia_light_color), binding.placeholderView.imageTintList?.defaultColor)
+    }
+
+    private fun themed(@StyleRes customizationStyle: Int?): Context =
+        ContextThemeWrapper(RuntimeEnvironment.getApplication(), R.style.Theme_Glia_Internal).also { context ->
+            customizationStyle?.also { context.applyGliaThemeOverlays(customizationStyle = it) }
+        }
+
+    private fun Context.color(@ColorRes colorRes: Int): Int = ContextCompat.getColor(this, colorRes)
 
     @Suppress("DEPRECATION")
     private fun obtainNodeInfo(): AccessibilityNodeInfoCompat =

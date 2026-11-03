@@ -1,7 +1,6 @@
 package com.glia.widgets.webbrowser
 
 import android.content.Context
-import android.content.res.TypedArray
 import android.net.Uri
 import android.os.Build
 import android.util.AttributeSet
@@ -9,12 +8,10 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.LinearLayout
-import androidx.core.content.withStyledAttributes
 import com.glia.widgets.R
 import com.glia.widgets.databinding.WebBrowserViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.SimpleWindowInsetsAndAnimationHandler
-import com.glia.widgets.helper.Utils
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.view.header.AppBarView
@@ -46,8 +43,6 @@ internal class WebBrowserView(
     init {
         isSaveEnabled = true
         orientation = VERTICAL
-        readTypedArray(attrs, defStyleAttr, defStyleRes)
-
         setupViewAppearance()
         SimpleWindowInsetsAndAnimationHandler(this, appBar)
     }
@@ -91,16 +86,6 @@ internal class WebBrowserView(
 
     private fun setupAppBarUnifiedTheme(headerTheme: HeaderTheme?) {
         appBar?.applyHeaderTheme(headerTheme)
-    }
-
-    private fun readTypedArray(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
-        context.withStyledAttributes(attrs, R.styleable.GliaView, defStyleAttr, defStyleRes) {
-            setDefaultTheme(this)
-        }
-    }
-
-    private fun setDefaultTheme(typedArray: TypedArray) {
-        binding?.appBarView?.setTheme(Utils.getThemeFromTypedArray(typedArray, this.context))
     }
 
     private fun initCallbacks() {

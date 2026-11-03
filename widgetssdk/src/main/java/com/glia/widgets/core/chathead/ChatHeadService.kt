@@ -21,12 +21,20 @@ import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.applyGliaThemeOverlays
+import com.glia.widgets.internal.chathead.BubblePosition
+import com.glia.widgets.internal.chathead.BubbleRenderTarget
+import com.glia.widgets.internal.chathead.BubbleUiModel
+import com.glia.widgets.internal.chathead.ChatBubbleContract
+import com.glia.widgets.internal.chathead.domain.ResolveChatHeadNavigationUseCase.Destinations
 import com.glia.widgets.view.SimpleTouchListener
-import com.glia.widgets.view.head.ChatHeadContract
 import com.glia.widgets.view.head.ChatHeadLogger
-import com.glia.widgets.view.head.ChatHeadPosition
 import com.glia.widgets.view.head.ChatHeadView
 import com.glia.widgets.view.head.ChatHeadView.Companion.getInstance
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 /**
@@ -51,8 +59,8 @@ internal class ChatHeadService : Service() {
         }
     private val displaySize: Size get() = obtainScreenSize()
 
-    private val layoutParams: WindowManager.LayoutParams
-        get() = WindowManager.LayoutParams(
+    private fun createLayoutParams(): WindowManager.LayoutParams =
+        WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.WRAP_CONTENT,
             layoutFlag,
@@ -63,6 +71,15 @@ internal class ChatHeadService : Service() {
         }
 
     private var chatHeadView: ChatHeadView? = null
+
+    private var controller: ChatBubbleContract.Controller? = null
+
+    /** The single instance handed to `WindowManager`; dragging mutates it in place. */
+    private var windowParams: WindowManager.LayoutParams? = null
+
+    private var isWindowAdded: Boolean = false
+
+    private var scope: CoroutineScope? = null
 
     private fun obtainScreenSize(): Size {
         val windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
@@ -98,13 +115,76 @@ internal class ChatHeadService : Service() {
         applyGliaThemeOverlays()
 
         Logger.d(TAG, "onCreate")
-        val controller = Dependencies.controllerFactory.chatHeadController
-        val layoutParams = layoutParams
-        initChatHeadPosition(layoutParams, controller.chatHeadPosition)
-        initChatHeadView(controller, windowManager, layoutParams)
-        controller.onSetChatHeadView(chatHeadView!!)
-        controller.updateChatHeadView()
-        windowManager.addView(chatHeadView, layoutParams)
+        val controller = Dependencies.controllerFactory.chatBubbleController
+        this.controller = controller
+        windowParams = createLayoutParams()
+
+        // The service outlives the bubble being on screen - it is kept running for as long as the
+        // overlay could be needed, because API 26+ would refuse to start it once the app is in the
+        // background. So the window is added and removed here, off the render target.
+        CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate).also { scope = it }.launch {
+            controller.uiState.collect(::render)
+        }
+    }
+
+    private fun render(state: BubbleUiModel) {
+        if (state.target != BubbleRenderTarget.SERVICE) {
+            removeWindowIfPresent()
+            return
+        }
+        addWindowIfAbsent()
+        chatHeadView?.render(state)
+    }
+
+    private fun addWindowIfAbsent() {
+        if (isWindowAdded) return
+        val controller = controller ?: return
+        val params = windowParams ?: return
+        // Positioned here, not at onCreate: the service runs long before the window first shows, and
+        // the shared position may have moved in the meantime - the in-app bubble writes to it too.
+        applyBubblePosition(params)
+        Logger.i(TAG, "Bubble: add overlay window")
+        // A new view for every window. Reusing the removed one would keep it, and the operator image
+        // it shows, in memory for as long as the service runs.
+        val view = createChatHeadView(controller, windowManager, params)
+        windowManager.addView(view, params)
+        chatHeadView = view
+        isWindowAdded = true
+    }
+
+    /**
+     * Places the window where the visitor last left the bubble — on either surface, mapped from the
+     * shared fraction into this display's range — or at the default corner if it was never dragged.
+     */
+    private fun applyBubblePosition(params: WindowManager.LayoutParams) {
+        val display = displaySize
+        val position = controller?.bubblePosition
+        params.x = position?.xWithin(0f, maxX(display).toFloat())?.roundToInt() ?: getDefaultXPosition(display.width)
+        params.y = position?.yWithin(0f, maxY(display).toFloat())?.roundToInt() ?: getDefaultYPosition(display.height)
+    }
+
+    private fun saveBubblePosition(params: WindowManager.LayoutParams) {
+        val display = displaySize
+        controller?.bubblePosition = BubblePosition.within(
+            x = params.x.toFloat(),
+            y = params.y.toFloat(),
+            xMin = 0f,
+            xMax = maxX(display).toFloat(),
+            yMin = 0f,
+            yMax = maxY(display).toFloat()
+        )
+    }
+
+    private fun maxX(display: Size): Int = display.width - chatHeadSize - chatHeadMargin
+
+    private fun maxY(display: Size): Int = display.height - chatHeadSize - chatHeadMargin
+
+    private fun removeWindowIfPresent() {
+        if (!isWindowAdded) return
+        Logger.d(TAG, "Bubble: remove overlay window")
+        chatHeadView?.also(windowManager::removeView)
+        chatHeadView = null
+        isWindowAdded = false
     }
 
     override fun onDestroy() {
@@ -112,34 +192,38 @@ internal class ChatHeadService : Service() {
 
         Logger.d(TAG, "onDestroy")
 
-        chatHeadView?.also {
-            windowManager.removeView(it)
-            Dependencies.controllerFactory.chatHeadController.onClearChatHeadView(it)
-        }
-        chatHeadView = null
+        scope?.cancel()
+        scope = null
+        removeWindowIfPresent()
+        windowParams = null
+        controller = null
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private fun initChatHeadView(controller: ChatHeadContract.Controller, windowManager: WindowManager, layoutParams: WindowManager.LayoutParams) {
-        chatHeadView = getInstance(this)
-        chatHeadView?.setOnTouchListener(
+    private fun createChatHeadView(
+        controller: ChatBubbleContract.Controller,
+        windowManager: WindowManager,
+        layoutParams: WindowManager.LayoutParams
+    ): ChatHeadView = getInstance(this).apply {
+        setOnTouchListener(
             SimpleTouchListener(
                 retrieveInitialCoordinates = { Point(layoutParams.x, layoutParams.y).toPointF() },
                 onMove = { x, y ->
                     layoutParams.x = x.roundToInt()
                     layoutParams.y = y.roundToInt()
-                    windowManager.updateViewLayout(chatHeadView, layoutParams)
-                    controller.onChatHeadPositionChanged(layoutParams.x, layoutParams.y)
+                    windowManager.updateViewLayout(this, layoutParams)
                 },
-                onRelease = { ChatHeadLogger.logPositionChanged() }
+                onRelease = {
+                    saveBubblePosition(layoutParams)
+                    ChatHeadLogger.logPositionChanged()
+                }
             ))
-        chatHeadView?.setOnClickListener { controller.onChatHeadClicked() }
-    }
-
-    private fun initChatHeadPosition(params: WindowManager.LayoutParams, chatHeadPosition: ChatHeadPosition) {
-        val display = displaySize
-        params.x = chatHeadPosition.posX ?: getDefaultXPosition(display.width)
-        params.y = chatHeadPosition.posY ?: getDefaultYPosition(display.height)
+        setOnClickListener {
+            when (controller.onBubbleTapped()) {
+                Destinations.CALL_VIEW -> navigateToCall()
+                Destinations.CHAT_VIEW -> navigateToChat()
+            }
+        }
     }
 
     private fun getDefaultXPosition(screenWidth: Int): Int = screenWidth - chatHeadSize - chatHeadMargin

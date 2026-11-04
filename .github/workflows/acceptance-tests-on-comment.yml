@@ -20,20 +20,30 @@ permissions:
 
 jobs:
   trigger:
-    # The repository is public: only people with a role in the repository or
-    # the organization may start a run.
     if: >-
       (github.event.issue.pull_request || github.event.pull_request) &&
       ((github.event.comment.body || github.event.review.body) == '!test' ||
-        startsWith(github.event.comment.body || github.event.review.body, '!test ')) &&
-      contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'),
-        github.event.comment.author_association || github.event.review.author_association)
+        startsWith(github.event.comment.body || github.event.review.body, '!test '))
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
       PR_NUMBER: ${{ github.event.issue.number || github.event.pull_request.number }}
       COMMENT: ${{ github.event.comment.body || github.event.review.body }}
     steps:
+      # The repository is public, so only people with write access may start a
+      # run. `author_association` can't be used for this: members whose
+      # organization membership is private appear as CONTRIBUTOR.
+      - name: Check commenter has write access
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ACTOR: ${{ github.event.comment.user.login || github.event.review.user.login }}
+        run: |
+          permission=$(gh api "repos/$GITHUB_REPOSITORY/collaborators/$ACTOR/permission" --jq .permission)
+          case "$permission" in
+            admin|maintain|write) ;;
+            *) echo "::error::$ACTOR has '$permission' access; write access is required."; exit 1 ;;
+          esac
+
       - name: Resolve PR branch
         id: pr
         env:

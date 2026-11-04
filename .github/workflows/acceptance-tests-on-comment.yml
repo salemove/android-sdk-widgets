@@ -1,0 +1,89 @@
+# PoC: a `!test` comment on a PR starts the Bitrise workflow that uploads the
+# PR's test app to BrowserStack and then starts the Android Widgets acceptance
+# tests in Jenkins.
+#
+# GitHub runs `issue_comment` workflows from the default branch only, so a
+# plain `!test` comment has no effect until this file is on `master`.
+# A PR review submitted with the body `!test` runs this file from the PR's own
+# branch, which allows testing it before it reaches `master`.
+name: Acceptance tests on PR comment
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review:
+    types: [submitted]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  trigger:
+    # The repository is public: only people with a role in the repository or
+    # the organization may start a run.
+    if: >-
+      (github.event.issue.pull_request || github.event.pull_request) &&
+      ((github.event.comment.body || github.event.review.body) == '!test' ||
+        startsWith(github.event.comment.body || github.event.review.body, '!test ')) &&
+      contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'),
+        github.event.comment.author_association || github.event.review.author_association)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      PR_NUMBER: ${{ github.event.issue.number || github.event.pull_request.number }}
+      COMMENT: ${{ github.event.comment.body || github.event.review.body }}
+    steps:
+      - name: Resolve PR branch
+        id: pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          pr=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER")
+          if [ "$(jq -r '.head.repo.full_name' <<<"$pr")" != "$GITHUB_REPOSITORY" ]; then
+            echo "::error::PRs from forks are not supported: Bitrise can only build branches of $GITHUB_REPOSITORY."
+            exit 1
+          fi
+          echo "branch=$(jq -r '.head.ref' <<<"$pr")" >> "$GITHUB_OUTPUT"
+          echo "sha=$(jq -r '.head.sha' <<<"$pr")" >> "$GITHUB_OUTPUT"
+          echo "custom_id=widgets_app_build_${GITHUB_REPOSITORY#*/}_${PR_NUMBER}" >> "$GITHUB_OUTPUT"
+
+      - name: Start Bitrise workflow
+        id: bitrise
+        env:
+          BITRISE_APP_ID: ${{ secrets.BITRISE_APP_ID }}
+          BITRISE_BUILD_TRIGGER_TOKEN: ${{ secrets.BITRISE_BUILD_TRIGGER_TOKEN }}
+          BRANCH: ${{ steps.pr.outputs.branch }}
+          SHA: ${{ steps.pr.outputs.sha }}
+          CUSTOM_ID: ${{ steps.pr.outputs.custom_id }}
+        run: |
+          payload=$(jq -n \
+            --arg token "$BITRISE_BUILD_TRIGGER_TOKEN" \
+            --arg branch "$BRANCH" \
+            --arg sha "$SHA" \
+            --arg custom_id "$CUSTOM_ID" \
+            --arg comment "$COMMENT" \
+            '{
+              hook_info: {type: "bitrise", build_trigger_token: $token},
+              build_params: {
+                branch: $branch,
+                commit_hash: $sha,
+                workflow_id: "custom_id_upload_to_browser_stack",
+                environments: [
+                  {mapped_to: "BROWSERSTACK_CUSTOM_ID", value: $custom_id, is_expand: false},
+                  {mapped_to: "TEST_COMMAND", value: $comment, is_expand: false}
+                ]
+              },
+              triggered_by: "github-actions-pr-comment"
+            }')
+          response=$(curl -sS --fail "https://app.bitrise.io/app/$BITRISE_APP_ID/build/start.json" --data "$payload")
+          echo "build_url=$(jq -r '.build_url' <<<"$response")" >> "$GITHUB_OUTPUT"
+
+      - name: Acknowledge on the PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BUILD_URL: ${{ steps.bitrise.outputs.build_url }}
+          CUSTOM_ID: ${{ steps.pr.outputs.custom_id }}
+        run: |
+          gh pr comment "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --body \
+            "Started Bitrise build $BUILD_URL for BrowserStack app \`$CUSTOM_ID\`. It will start the \`android_widgets\` acceptance tests in Jenkins."

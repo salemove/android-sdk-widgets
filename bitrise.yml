@@ -110,6 +110,34 @@ workflows:
           inputs:
             - notify_email_list: "$BUILD_EMAILS"
       - save-gradle-cache@1: {}
+  custom_id_upload_to_browser_stack:
+    summary: "PoC: started by a !test PR comment. Uploads the PR's app to BrowserStack (placeholder) and starts the Android Widgets acceptance tests in Jenkins."
+    steps:
+      - script@1:
+          title: "Placeholder: build and upload the app to BrowserStack"
+          inputs:
+            - content: |-
+                #!/usr/bin/env bash
+                set -euo pipefail
+                if [ -z "${BROWSERSTACK_CUSTOM_ID:-}" ]; then
+                  echo "BROWSERSTACK_CUSTOM_ID is not set" >&2
+                  exit 1
+                fi
+                echo "Requested by PR comment: ${TEST_COMMAND:-!test}"
+                echo "Would upload the app to BrowserStack with custom_id: $BROWSERSTACK_CUSTOM_ID"
+                sleep 5
+      - script@1:
+          title: Start android_widgets acceptance tests in Jenkins
+          inputs:
+            - content: |-
+                #!/usr/bin/env bash
+                set -euo pipefail
+                # An API token authenticates the call, so Jenkins needs no CSRF crumb.
+                # The job runs with its defaults, i.e. the shared WidgetsSdkAndroidTestApp build.
+                curl -sS --fail -X POST -D jenkins_headers.txt -o /dev/null \
+                  --user "$JENKINS_USER:$JENKINS_API_TOKEN" \
+                  "https://jenkins.cicd.glia-dev.com/job/acceptance-tests/job/tests/job/android_widgets_acceptance_tests/buildWithParameters"
+                echo "Jenkins queued the build: $(grep -i '^location:' jenkins_headers.txt | cut -d' ' -f2)"
   development:
     steps:
       - activate-ssh-key@4:

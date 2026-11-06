@@ -31,6 +31,7 @@ import com.glia.widgets.view.MinimizeHandler
 import com.glia.widgets.webbrowser.domain.GetUrlFromLinkUseCase
 import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
 import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.processors.PublishProcessor
 import io.reactivex.rxjava3.schedulers.Schedulers
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
@@ -38,9 +39,11 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 
 class CallControllerTest {
@@ -74,6 +77,7 @@ class CallControllerTest {
     private lateinit var getUrlFromLinkUseCase: GetUrlFromLinkUseCase
     private lateinit var deviceMonitor: DeviceMonitor
     private lateinit var isMediaQualityPoorUseCase: IsMediaQualityPoorUseCase
+    private val isMediaQualityPoor: PublishProcessor<Boolean> = PublishProcessor.create()
 
     private lateinit var callView: CallContract.View
 
@@ -126,7 +130,7 @@ class CallControllerTest {
         getUrlFromLinkUseCase = mock()
         deviceMonitor = mock()
         isMediaQualityPoorUseCase = mock {
-            on { invoke() } doReturn Flowable.empty()
+            on { invoke() } doReturn isMediaQualityPoor
         }
 
         callView = mock()
@@ -222,5 +226,17 @@ class CallControllerTest {
         callController.setView(newView)
 
         assertEquals(newView, callController.getView())
+    }
+
+    @Test
+    fun `the view gets every media quality change`() {
+        callController.setView(callView)
+
+        isMediaQualityPoor.onNext(true)
+        isMediaQualityPoor.onNext(false)
+
+        val states = argumentCaptor<CallState>()
+        verify(callView, times(3)).emitState(states.capture())
+        assertEquals(listOf(false, true, false), states.allValues.map { it.isMediaQualityPoor })
     }
 }

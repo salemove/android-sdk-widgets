@@ -81,7 +81,8 @@ class CallState {
             isOnHold == callState.isOnHold &&
             isOnlyTimeChanged == callState.isOnlyTimeChanged &&
             isCallVisualizer == callState.isCallVisualizer &&
-            flipButtonState == callState.flipButtonState;
+            flipButtonState == callState.flipButtonState &&
+            isMediaQualityPoor == callState.isMediaQualityPoor;
     }
 
     @Override
@@ -89,7 +90,7 @@ class CallState {
         return Objects.hash(integratorCallStarted, isVisible, messagesNotSeen,
             callStatus, landscapeLayoutControlsVisible, isMuted, hasVideo,
             requestedMediaType, isSpeakerOn, isOnHold, isOnlyTimeChanged,
-            isCallVisualizer, flipButtonState);
+            isCallVisualizer, flipButtonState, isMediaQualityPoor);
     }
 
     public boolean showOperatorStatusView() {

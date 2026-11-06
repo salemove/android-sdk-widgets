@@ -6,11 +6,24 @@ on:
       version:
         description: 'Version in semantic versioning format (i.e. 1.0.2)'
         required: true
+permissions: {}
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
       - name: Runs the deployment workflow in Bitrise
+        env:
+          BITRISE_APP_ID: ${{ secrets.BITRISE_APP_ID }}
+          BITRISE_BUILD_TRIGGER_TOKEN: ${{ secrets.BITRISE_BUILD_TRIGGER_TOKEN }}
+          INPUT_VALUE: ${{ github.event.inputs.version }}
         run: |
-          curl https://app.bitrise.io/app/${{ secrets.BITRISE_APP_ID }}/build/start.json --data '{"hook_info":{"type":"bitrise","build_trigger_token":"${{ secrets.BITRISE_BUILD_TRIGGER_TOKEN }}"},"build_params":{"branch":"master","workflow_id":"publish_to_nexus","environments":[{"mapped_to":"NEW_VERSION","value":"${{ github.event.inputs.version }}","is_expand":true}]},"triggered_by":"curl"}'
+          if ! [[ "$INPUT_VALUE" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::version must be in X.Y.Z format"
+            exit 1
+          fi
+          payload=$(jq -n \
+            --arg token "$BITRISE_BUILD_TRIGGER_TOKEN" \
+            --arg value "$INPUT_VALUE" \
+            '{hook_info: {type: "bitrise", build_trigger_token: $token}, build_params: {branch: "master", workflow_id: "publish_to_nexus", environments: [{mapped_to: "NEW_VERSION", value: $value, is_expand: false}]}, triggered_by: "curl"}')
+          curl "https://app.bitrise.io/app/${BITRISE_APP_ID}/build/start.json" --data "$payload"

@@ -12,6 +12,8 @@
 #
 # The JDK for a profile comes from $INTEGRATOR_COMPAT_JDK_<jdk>, or /usr/libexec/java_home on macOS.
 # Exits 1 when a profile without knownFailing fails, or when a profile could not be checked at all.
+#
+# Publishing refuses to run with direct Core enabled (dependency.coreSdk.useDirect / CORE_SDK_USE_DIRECT).
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -81,6 +83,31 @@ evidence() {
   done
   grep -A1 -m1 "What went wrong" "$1" | tail -1 | sed -E 's/^[[:space:]>]*//' | cut -c1-200 || true
 }
+
+# Mirrors scripts/direct-core.gradle: local.properties wins, then the environment variable, which
+# Groovy reads as true for any non-empty value
+direct_core_source() {
+  local file="$ROOT/local.properties"
+  if [ -f "$file" ] && grep -qE '^dependency\.coreSdk\.useDirect=' "$file"; then
+    if [ "$(prop "$file" dependency.coreSdk.useDirect | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]')" = true ]; then
+      echo "dependency.coreSdk.useDirect=true in local.properties"
+    fi
+  elif [ -n "${CORE_SDK_USE_DIRECT:-}" ]; then
+    echo "CORE_SDK_USE_DIRECT=$CORE_SDK_USE_DIRECT"
+  fi
+}
+
+if [ "$publish" = true ]; then
+  # The publish task is a nested GradleBuild, which cannot include the Core build
+  direct_core="$(direct_core_source)"
+  if [ -n "$direct_core" ]; then
+    {
+      echo "Not allowed: run.sh cannot publish the SDK with direct Core enabled ($direct_core)."
+      echo "Disable direct Core, or publish the SDK and Core yourself and pass --skip-publish."
+    } >&2
+    exit 1
+  fi
+fi
 
 mkdir -p "$OUT"
 if [ "$publish" = true ]; then

@@ -230,10 +230,11 @@ Both channels are required when logging on public API paths:
 All of the following pins have WHY comments in `gradle/libs.versions.toml` and must not be changed without resolving the underlying issue:
 
 - `core-ktx 1.18.0` — version 1.19.0 hard-requires `compileSdk 37`, which the SDK module (`compileSdk 36`) does not use.
-- `lifecycle-process 2.10.0` — version 2.11.0+ requires `compileSdk 37`, which the SDK module does not use.
+- `lifecycle-process 2.10.0` — 2.11.0 itself needs only `compileSdk 34`, but lifecycle artifacts align to one version: pinning 2.11.0 moves a Compose integrator's `lifecycle-runtime-compose` / `lifecycle-viewmodel-compose` to 2.11.0, which need `compileSdk 37` and AGP 9.1.0. Core SDK 4.0.6 pins 2.10.0 for the same reason.
 - `dokka 2.2.0` — Kotlin and Dokka must share the same minor version (project is on Kotlin 2.2.21).
 - `paparazzi 2.0.0-alpha05` — older-than-alpha04 versions reference `BaseExtension`, which AGP 9 removed; alpha05 is still built against its own bundled Kotlin compiler (unrelated to the project's Kotlin pin) and only raises its internal Gradle requirement to 9.3.1. Keep the HTML-test-reports workaround in `widgetssdk/build.gradle` regardless of Paparazzi version.
-- `coil 3.4.0` / `ktor 3.4.3` — the next minor of each (`3.5.0`) is built against a newer Kotlin than the project's 2.2.21 pin (Coil 3.5.0 ships Kotlin 2.4.0 metadata; Ktor 3.5.x is built on Kotlin 2.3.21).
+- `coil 3.3.0` — 3.4.0 pulls `kotlin-stdlib` 2.3.10, raising the integrator's minimum Kotlin to 2.2.0; 3.5.0 ships Kotlin 2.4.0 metadata, unreadable by the project's Kotlin 2.2.21 compiler.
+- `ktor 3.4.3` — 3.5.x is built on Kotlin 2.3.21, above the project's 2.2.21 pin.
 - `leakcanary 3.0-alpha-8` — 3.0-alpha-9 ships an `<adaptive-icon>` resource requiring `sdk 26`, which breaks AAPT resource linking at this project's `minSdk 24`.
 
 ### Forced Resolution Rules

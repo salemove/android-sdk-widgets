@@ -5,9 +5,13 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        // Only the SDK snapshot published by run.sh comes from mavenLocal
+        // Only the SDK snapshot published by run.sh comes from mavenLocal, plus a Core SDK
+        // version not yet on Maven Central, so a Core release can be checked before publishing
         mavenLocal {
-            content { includeModule("com.glia", "android-widgets") }
+            content {
+                includeModule("com.glia", "android-widgets")
+                includeModule("com.glia", "android-sdk")
+            }
         }
     }
 }

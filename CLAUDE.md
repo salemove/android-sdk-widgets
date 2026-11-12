@@ -50,6 +50,7 @@ data flow through the Core SDK. The Glia libraries it embeds:
 | Theme / styling | `view/unifiedui/` → see [unifiedui/CLAUDE.md](widgetssdk/src/main/java/com/glia/widgets/view/unifiedui/CLAUDE.md) |
 | Snapshot (UI) tests | `widgetssdk/src/testSnapshot/` → see [testSnapshot/CLAUDE.md](widgetssdk/src/testSnapshot/CLAUDE.md) |
 | Version, dependency pins | `gradle/libs.versions.toml`, root `build.gradle` |
+| Integrator minimum requirements | `integrator-compat/`, `scripts/integrator-requirements.gradle` → see [integrator-requirements skill](.claude/skills/integrator-requirements/SKILL.md) |
 | Push notifications | `fcm/`, `push/` |
 | Custom lint rules | `lint_checker/` |
 | Release / version scripts | `scripts/` |
@@ -77,6 +78,7 @@ data flow through the Core SDK. The Glia libraries it embeds:
 - Always declare explicit return types on Kotlin functions and class/file-level variables; local variables may use inference.
 - Always add or update unit tests for every changed layer; always run `recordSnapshots` + `verifySnapshots` for any UI change.
 - MockK and Mockito-Kotlin coexist in the test suite intentionally — do not migrate one to the other.
+- After changing any dependency version (`gradle/libs.versions.toml`, Core or Telemetry in `version.properties`), run `./gradlew :widgetssdk:checkIntegratorRequirements` and report the result, then offer `integrator-compat/run.sh` and state in the final summary whether it ran (skill `integrator-requirements`). Never skip the check silently. Never raise `integrator-compat/minimums.properties` without flagging it as a public requirement change.
 
 ## Directory Map
 

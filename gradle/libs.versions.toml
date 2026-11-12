@@ -36,7 +36,9 @@ coroutines = "1.11.0"
 # UI / media
 material = "1.14.0"
 lottie = "6.7.1"
-coil = "3.4.0" # do NOT bump to 3.5.0: it ships Kotlin 2.4.0 metadata, unreadable by the Kotlin 2.2.21 compiler
+# do NOT bump to 3.4.0: it pulls kotlin-stdlib 2.3.10, raising the integrator's minimum Kotlin to 2.2.0
+# do NOT bump to 3.5.0: it ships Kotlin 2.4.0 metadata, unreadable by the Kotlin 2.2.21 compiler
+coil = "3.3.0"
 audioswitch = "1.2.5"
 
 # Networking / serialization

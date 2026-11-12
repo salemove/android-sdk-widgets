@@ -35,6 +35,11 @@ android {
         compose = composeEnabled
     }
 
+    // Only for a profile that sets packagingExcludes, as an integrator below the declared AGP would
+    compat("packagingExcludes").orNull?.split(';')?.filter { it.isNotBlank() }?.forEach {
+        packaging.resources.excludes += it
+    }
+
     // Kotlin and Compose sources make the Kotlin compiler load the SDK's metadata, as an integrator's code does
     sourceSets["main"].apply {
         if (kotlinEnabled) java.srcDir("src/kotlin")

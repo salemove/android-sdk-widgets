@@ -1,19 +1,15 @@
 package com.glia.widgets.callvisualizer
 
-import android.CONTEXT_EXTENSIONS_CLASS_PATH
 import android.LOGGER_PATH
 import android.app.Activity
-import android.content.Context
 import android.view.View
 import androidx.appcompat.app.AlertDialog
-import com.glia.widgets.UiTheme
 import com.glia.widgets.callvisualizer.controller.CallVisualizerContract
 import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.helper.DialogHolderActivity
 import com.glia.widgets.helper.GliaActivityManager
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.OneTimeEvent
-import com.glia.widgets.helper.withRuntimeTheme
 import com.glia.widgets.internal.dialog.model.ConfirmationDialogLinks
 import com.glia.widgets.internal.dialog.model.Link
 import com.glia.widgets.launcher.ActivityLauncher
@@ -57,7 +53,7 @@ class CallVisualizerActivityWatcherTest {
         RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
 
         Logger.setIsDebug(false)
-        mockkStatic(LOGGER_PATH, CONTEXT_EXTENSIONS_CLASS_PATH)
+        mockkStatic(LOGGER_PATH)
         every { Logger.d(any(), any()) } just Runs
 
         controller = mockk(relaxUnitFun = true) {
@@ -78,7 +74,7 @@ class CallVisualizerActivityWatcherTest {
         RxAndroidPlugins.reset()
 
         confirmVerified(controller)
-        unmockkStatic(LOGGER_PATH, CONTEXT_EXTENSIONS_CLASS_PATH)
+        unmockkStatic(LOGGER_PATH)
     }
 
     @Test
@@ -135,7 +131,6 @@ class CallVisualizerActivityWatcherTest {
         verify(exactly = 0) { event.consume(any()) }
         verify { event.consumed }
         verify { event.value }
-        verify { activity.withRuntimeTheme(any()) }
         verify { activity.isFinishing }
 
         verify { Dialogs.showVisitorCodeDialog(any()) }
@@ -159,16 +154,15 @@ class CallVisualizerActivityWatcherTest {
     fun `confirmation dialog will be shown when activity is not a WebBrowserActivity and state is a DisplayConfirmationDialog`() {
         mockkObject(Dialogs)
         val dialog: AlertDialog = mockk(relaxed = true)
-        every { Dialogs.showEngagementConfirmationDialog(any(), any(), any(), any(), any(), any()) } returns dialog
+        every { Dialogs.showEngagementConfirmationDialog(any(), any(), any(), any(), any()) } returns dialog
 
         val activity = emitActivity<ChatActivity>()
         val event = createMockEvent(CallVisualizerContract.State.DisplayConfirmationDialog(mockk()))
         emitState(event)
 
         verify(exactly = 0) { event.markConsumed() }
-        verify { activity.withRuntimeTheme(any()) }
 
-        verify { Dialogs.showEngagementConfirmationDialog(any(), any(), any(), any(), any(), any()) }
+        verify { Dialogs.showEngagementConfirmationDialog(any(), any(), any(), any(), any()) }
 
         unmockkObject(Dialogs)
     }
@@ -178,7 +172,7 @@ class CallVisualizerActivityWatcherTest {
         mockkObject(Dialogs)
         val dialog: AlertDialog = mockk(relaxed = true)
         val onLinkClickedSlot = slot<(Link) -> Unit>()
-        every { Dialogs.showEngagementConfirmationDialog(any(), any(), any(), any(), any(), any()) } returns dialog
+        every { Dialogs.showEngagementConfirmationDialog(any(), any(), any(), any(), any()) } returns dialog
 
         val links = ConfirmationDialogLinks(
             link1 = Link(mockLocale, mockLocale),
@@ -190,14 +184,12 @@ class CallVisualizerActivityWatcherTest {
         emitState(event)
 
         verify { activity.isFinishing }
-        verify { activity.withRuntimeTheme(any()) }
         verify(exactly = 0) { event.markConsumed() }
         verify { event.consumed }
         verify { event.value }
 
         verify {
             Dialogs.showEngagementConfirmationDialog(
-                any(),
                 any(),
                 eq(links),
                 capture(onLinkClickedSlot),
@@ -222,7 +214,7 @@ class CallVisualizerActivityWatcherTest {
         mockkObject(Dialogs)
         val dialog: AlertDialog = mockk(relaxed = true)
         val onAcceptSlot = slot<View.OnClickListener>()
-        every { Dialogs.showEngagementConfirmationDialog(any(), any(), any(), any(), any(), any()) } returns dialog
+        every { Dialogs.showEngagementConfirmationDialog(any(), any(), any(), any(), any()) } returns dialog
 
         val links = ConfirmationDialogLinks(
             link1 = Link(mockLocale, mockLocale),
@@ -234,14 +226,12 @@ class CallVisualizerActivityWatcherTest {
         emitState(event)
 
         verify { activity.isFinishing }
-        verify { activity.withRuntimeTheme(any()) }
         verify(exactly = 0) { event.markConsumed() }
         verify { event.consumed }
         verify { event.value }
 
         verify {
             Dialogs.showEngagementConfirmationDialog(
-                any(),
                 any(),
                 eq(links),
                 any(),
@@ -266,7 +256,7 @@ class CallVisualizerActivityWatcherTest {
         mockkObject(Dialogs)
         val dialog: AlertDialog = mockk(relaxed = true)
         val onDeclineSlot = slot<View.OnClickListener>()
-        every { Dialogs.showEngagementConfirmationDialog(any(), any(), any(), any(), any(), any()) } returns dialog
+        every { Dialogs.showEngagementConfirmationDialog(any(), any(), any(), any(), any()) } returns dialog
 
         val links = ConfirmationDialogLinks(
             link1 = Link(mockLocale, mockLocale),
@@ -278,14 +268,12 @@ class CallVisualizerActivityWatcherTest {
         emitState(event)
 
         verify { activity.isFinishing }
-        verify { activity.withRuntimeTheme(any()) }
         verify(exactly = 0) { event.markConsumed() }
         verify { event.consumed }
         verify { event.value }
 
         verify {
             Dialogs.showEngagementConfirmationDialog(
-                any(),
                 any(),
                 eq(links),
                 any(),
@@ -357,10 +345,6 @@ class CallVisualizerActivityWatcherTest {
     private inline fun <reified T : Activity> emitActivity(finishing: Boolean = false): T {
         val activity = mockk<T>(relaxed = true) {
             every { isFinishing } returns finishing
-        }
-
-        every { any<Activity>().withRuntimeTheme(captureLambda()) } answers {
-            secondArg<(Context, UiTheme) -> Unit>().invoke(activity, UiTheme())
         }
 
         watcher.onActivityResumed(activity)

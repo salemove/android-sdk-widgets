@@ -6,7 +6,6 @@ import android.view.View
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.widgets.chat.Intention
 import com.glia.widgets.entrywidget.adapter.EntryWidgetAdapter
-import com.glia.widgets.helper.wrapWithTheme
 import com.glia.widgets.internal.secureconversations.domain.HasOngoingSecureConversationUseCase
 import com.glia.widgets.launcher.ActivityLauncher
 import com.glia.widgets.view.unifiedui.theme.UnifiedThemeManager
@@ -55,8 +54,8 @@ internal class EntryWidgetImpl(
         val unifiedTheme = themeManager.theme
         val adapter = EntryWidgetAdapter(EntryWidgetContract.ViewType.EMBEDDED_VIEW, unifiedTheme?.entryWidgetTheme)
 
-        //Wrapping with Glia theme to make the Theme available for embedded view
-        return EntryWidgetView(context.wrapWithTheme()).apply {
+        // EntryWidgetView wraps the context with the Glia theme itself
+        return EntryWidgetView(context).apply {
             unifiedThemeWhiteLabel = unifiedTheme?.isWhiteLabel
             setAdapter(adapter)
             setEntryWidgetTheme(unifiedTheme?.entryWidgetTheme)

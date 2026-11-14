@@ -13,6 +13,7 @@ import com.glia.androidsdk.engagement.Survey
 import com.glia.widgets.R
 import com.glia.widgets.databinding.SurveySingleQuestionItemBinding
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.helper.applyGliaThemeFont
 import com.glia.widgets.helper.gliaAttrColor
 import com.glia.widgets.survey.QuestionItem
 import com.glia.widgets.survey.SurveyAdapter
@@ -63,6 +64,7 @@ internal class SingleQuestionViewHolder(
                 TypedValue.COMPLEX_UNIT_PX,
                 context.resources.getDimension(R.dimen.glia_survey_default_text_size)
             )
+            context.applyGliaThemeFont(radioButton)
             radioButton.isChecked = option.id == selectedId
             radioButton.setOnClickListener { setAnswer(option.id) }
             // `bg_survey_radio_button` resolves the ring and the checked dot from the theme itself;

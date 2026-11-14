@@ -2,7 +2,6 @@ package com.glia.widgets.chat.adapter.holder
 
 import com.glia.widgets.R
 import com.glia.widgets.SnapshotTest
-import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.model.OperatorStatusItem
 import com.glia.widgets.databinding.ChatOperatorStatusLayoutBinding
 import com.glia.widgets.di.Dependencies
@@ -221,7 +220,7 @@ internal class OperatorStatusViewHolderSnapshotTest : SnapshotTest(
         unifiedTheme?.let { Dependencies.gliaThemeManager.theme = it }
 
         val binding = ChatOperatorStatusLayoutBinding.inflate(layoutInflater)
-        val viewHolder = OperatorStatusViewHolder(binding, UiTheme())
+        val viewHolder = OperatorStatusViewHolder(binding)
 
         viewHolder.bind(item)
 

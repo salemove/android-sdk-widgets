@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import androidx.collection.ArrayMap
 import com.glia.widgets.R
-import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.adapter.holder.GvaGalleryItemViewHolder
 import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.GvaGalleryCard
@@ -15,7 +14,6 @@ import com.glia.widgets.di.Dependencies
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 
 internal class ChatItemHeightManager(
-    private val uiTheme: UiTheme,
     private val layoutInflater: LayoutInflater,
     private val resources: Resources,
     private val unifiedTheme: UnifiedTheme? = Dependencies.gliaThemeManager.theme
@@ -23,7 +21,7 @@ internal class ChatItemHeightManager(
     private val measuredHeightsMap = ArrayMap<ChatItem, Int>()
 
     private val gvaGalleryItemViewHolder: GvaGalleryItemViewHolder by lazy {
-        GvaGalleryItemViewHolder(ChatGvaGalleryItemBinding.inflate(layoutInflater), {}, uiTheme, unifiedTheme)
+        GvaGalleryItemViewHolder(ChatGvaGalleryItemBinding.inflate(layoutInflater), {}, unifiedTheme)
     }
 
     private val gvaGalleryCardWidth: Int by lazy {

@@ -139,6 +139,7 @@ internal object Dependencies {
         PushNotificationsImpl(
             gliaCore.pushNotifications,
             controllerFactory.secureMessagingPushController,
+            controllerFactory.interactionPushController,
             controllerFactory.pushClickHandlerController
         )
     }

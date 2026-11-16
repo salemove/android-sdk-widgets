@@ -47,6 +47,12 @@ internal class NotificationManager(
         NotificationManager.IMPORTANCE_HIGH
     )
 
+    override fun createInteractionChannel() = createChannelIfDoesNotExist(
+        NotificationFactory.NOTIFICATION_INTERACTION_CHANNEL_ID,
+        R.string.android_notification_interaction_channel_name,
+        NotificationManager.IMPORTANCE_HIGH
+    )
+
     private fun createChannelIfDoesNotExist(id: String, @StringRes nameRes: Int, importance: Int) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && notificationManager.getNotificationChannel(id) == null) {
             notificationManager.createNotificationChannel(
@@ -97,6 +103,15 @@ internal class NotificationManager(
                     content,
                     contentIntent
                 )
+            )
+        }
+    }
+
+    override fun showInteractionNotification(content: String, contentIntent: PendingIntent) {
+        if (areNotificationsEnabledForChannel(NotificationFactory.NOTIFICATION_INTERACTION_CHANNEL_ID)) {
+            notificationManager.notify(
+                NotificationFactory.INTERACTION_NOTIFICATION_ID,
+                NotificationFactory.createInteractionNotification(applicationContext, content, contentIntent)
             )
         }
     }

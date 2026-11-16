@@ -38,7 +38,7 @@ internal interface PushClickHandlerController {
 }
 
 // Intent extra that Firebase puts on every notification it delivers, used here to recognise a repeated call
-private const val GOOGLE_MESSAGE_ID_KEY = "google.message_id"
+internal const val GOOGLE_MESSAGE_ID_KEY: String = "google.message_id"
 
 /**
  * How long to wait for the engagement the notification is about to be restored over the socket.

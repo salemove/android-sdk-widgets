@@ -7,6 +7,7 @@ import com.glia.telemetry_lib.EventAttribute
 import com.glia.telemetry_lib.GliaLogger
 import com.glia.telemetry_lib.LogEvents
 import com.glia.telemetry_lib.PushType
+import com.glia.widgets.push.notifications.InteractionPushController
 import com.glia.widgets.push.notifications.PushClickHandlerController
 import com.glia.widgets.push.notifications.SecureMessagingPushController
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -158,9 +159,13 @@ private const val EVENT_TYPE_KEY = "event_type"
 // Push notification event type for secure messaging
 private const val SECURE_MESSAGING_TYPE = "engagement.secure_conversation.message"
 
+// Push notification key that marks a push sent for the push subscription, which arrives data-only
+private const val PUSH_SUBSCRIPTION_KEY = "push_subscription"
+
 internal class PushNotificationsImpl(
     private val corePushNotifications: CorePushNotifications,
     private val secureMessagingPushController: SecureMessagingPushController,
+    private val interactionPushController: InteractionPushController,
     private val pushClickHandlerController: PushClickHandlerController
 ) : PushNotifications {
     override fun subscribeTo(events: Collection<PushNotificationEvent>) {
@@ -205,6 +210,9 @@ internal class PushNotificationsImpl(
             }
         } else {
             corePushNotifications.onNewMessage(this)
+            if (data[PUSH_SUBSCRIPTION_KEY] == "true") {
+                interactionPushController.handleInteractionPush(service, data, messageId)
+            }
         }
     }
 

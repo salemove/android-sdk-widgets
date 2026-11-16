@@ -3,8 +3,11 @@ package com.glia.widgets.fcm
 import android.GLIA_LOGGER_PATH
 import android.content.Intent
 import android.os.Bundle
+import com.glia.widgets.push.notifications.InteractionPushController
 import com.glia.widgets.push.notifications.PushClickHandlerController
 import com.glia.widgets.push.notifications.SecureMessagingPushController
+import com.google.firebase.messaging.FirebaseMessagingService
+import com.google.firebase.messaging.RemoteMessage
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
@@ -21,6 +24,7 @@ import com.glia.androidsdk.fcm.PushNotifications as CorePushNotifications
 class PushNotificationsImplTest {
     private lateinit var corePushNotifications: CorePushNotifications
     private lateinit var pushClickHandlerController: PushClickHandlerController
+    private lateinit var interactionPushController: InteractionPushController
     private lateinit var pushNotifications: PushNotificationsImpl
 
     @Before
@@ -28,9 +32,11 @@ class PushNotificationsImplTest {
         mockkStatic(GLIA_LOGGER_PATH)
         corePushNotifications = mockk(relaxed = true)
         pushClickHandlerController = mockk(relaxUnitFun = true)
+        interactionPushController = mockk(relaxUnitFun = true)
         pushNotifications = PushNotificationsImpl(
             corePushNotifications,
             mockk<SecureMessagingPushController>(relaxed = true),
+            interactionPushController,
             pushClickHandlerController
         )
     }
@@ -125,5 +131,32 @@ class PushNotificationsImplTest {
         pushNotifications.handlePushNotificationClick(null as Intent?)
 
         verify { pushClickHandlerController.handlePushNotificationClick(null) }
+    }
+
+    private fun remoteMessage(data: Map<String, String>): RemoteMessage = mockk {
+        every { this@mockk.data } returns data
+        every { messageId } returns "0:1763278884318%a1b2c3d4"
+    }
+
+    @Test
+    fun `onNewMessage shows a push sent for the push subscription`() {
+        val service = mockk<FirebaseMessagingService>()
+        val data = mapOf("event_type" to "engagement.start", "push_subscription" to "true", "body" to "Interaction picked up")
+        val message = remoteMessage(data)
+
+        pushNotifications.onNewMessage(service, message)
+
+        verify { corePushNotifications.onNewMessage(message) }
+        verify { interactionPushController.handleInteractionPush(service, data, "0:1763278884318%a1b2c3d4") }
+    }
+
+    @Test
+    fun `onNewMessage leaves a webhook push to the system, which shows its notification block`() {
+        val message = remoteMessage(mapOf("event_type" to "engagement.chat.message"))
+
+        pushNotifications.onNewMessage(mockk(), message)
+
+        verify { corePushNotifications.onNewMessage(message) }
+        verify(exactly = 0) { interactionPushController.handleInteractionPush(any(), any(), any()) }
     }
 }

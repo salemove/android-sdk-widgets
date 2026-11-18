@@ -203,6 +203,7 @@ tasks.register("publishCoreSdkToLocalMaven") {
 }
 
 apply from: "${rootProject.projectDir}/scripts/direct-core.gradle"
+apply from: "${rootProject.projectDir}/scripts/integrator-requirements.gradle"
 
 dependencies {
   implementation libs.androidx.appcompat

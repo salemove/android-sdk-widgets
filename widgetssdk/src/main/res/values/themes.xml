@@ -193,7 +193,6 @@
         <item name="iconOnHold">?attr/gliaIconOnHold</item>
         <item name="iconCallVisualizer">?attr/gliaIconCallVisualizer</item>
         <item name="chatSendMessageButtonTintColor">?attr/gliaSendMessageButtonTintColor</item>
-        <item name="gliaChatBackgroundColor">?attr/gliaChatBackgroundColor</item>
         <item name="chatHeaderTitleTintColor">?attr/gliaChatHeaderTitleTintColor</item>
         <item name="chatHeaderHomeButtonTintColor">?attr/gliaChatHeaderHomeButtonTintColor</item>
         <item name="chatHeaderExitQueueButtonTintColor">?attr/gliaChatHeaderExitQueueButtonTintColor</item>

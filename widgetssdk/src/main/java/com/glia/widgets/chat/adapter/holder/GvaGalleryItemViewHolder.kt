@@ -13,8 +13,8 @@ import com.glia.widgets.chat.adapter.ChatAdapter
 import com.glia.widgets.chat.adapter.GvaButtonsAdapter
 import com.glia.widgets.chat.model.GvaGalleryCard
 import com.glia.widgets.databinding.ChatGvaGalleryItemBinding
+import com.glia.widgets.helper.applyGliaThemeFont
 import com.glia.widgets.helper.fromHtml
-import com.glia.widgets.helper.gliaAttrFont
 import com.glia.widgets.helper.load
 import com.glia.widgets.view.unifiedui.applyLayerTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
@@ -63,7 +63,7 @@ internal class GvaGalleryItemViewHolder(
             applyLayerTheme(galleryCardTheme?.background ?: operatorTheme?.background)
         }
         binding.title.apply {
-            context.gliaAttrFont()?.also(::setTypeface)
+            context.applyGliaThemeFont(this)
 
             importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
 
@@ -71,7 +71,7 @@ internal class GvaGalleryItemViewHolder(
             applyTextTheme(galleryCardTheme?.title ?: operatorTheme?.text)
         }
         binding.subtitle.apply {
-            context.gliaAttrFont()?.also(::setTypeface)
+            context.applyGliaThemeFont(this)
 
             importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
 

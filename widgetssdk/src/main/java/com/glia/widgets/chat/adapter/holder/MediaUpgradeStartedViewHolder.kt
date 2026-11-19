@@ -6,8 +6,8 @@ import com.glia.widgets.R
 import com.glia.widgets.chat.model.MediaUpgradeStartedTimerItem
 import com.glia.widgets.databinding.ChatMediaUpgradeLayoutBinding
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.helper.applyGliaThemeFont
 import com.glia.widgets.helper.gliaAttrDrawableRes
-import com.glia.widgets.helper.gliaAttrFont
 import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.view.unifiedui.applyCardLayerTheme
 import com.glia.widgets.view.unifiedui.applyImageColorTheme
@@ -37,10 +37,7 @@ internal class MediaUpgradeStartedViewHolder(
     }
 
     init {
-        itemView.context.gliaAttrFont()?.also {
-            binding.titleView.typeface = it
-            binding.timerView.typeface = it
-        }
+        itemView.context.applyGliaThemeFont(binding.titleView, binding.timerView)
     }
 
     private fun setMediaUpgradeTheme(mediaUpgradeTheme: MediaUpgradeTheme?) {

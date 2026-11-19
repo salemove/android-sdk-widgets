@@ -4,7 +4,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
 import com.glia.widgets.databinding.ChatDeliveredItemLayoutBinding
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.helper.gliaAttrFont
+import com.glia.widgets.helper.applyGliaThemeFont
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.view.unifiedui.applyTextTheme
@@ -30,6 +30,6 @@ internal class DeliveredItemViewHolder(
 
     /** The text colour comes from the layout's `?attr/gliaBaseNormalColor`. */
     private fun applyThemeFont() {
-        itemView.context.gliaAttrFont()?.also { binding.deliveredView.typeface = it }
+        itemView.context.applyGliaThemeFont(binding.deliveredView)
     }
 }

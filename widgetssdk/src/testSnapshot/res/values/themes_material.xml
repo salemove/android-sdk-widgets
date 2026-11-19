@@ -21,4 +21,17 @@
         <item name="whiteLabel">true</item>
     </style>
 
+    <!--
+        Stands in for an integrator's `GliaTheme`: the three attributes the survey widgets are
+        expected to follow, set to values that are unmistakable against the SDK defaults. Used by
+        `SurveyViewCustomizedThemeSnapshotTest` to prove the survey no longer renders Glia-blue when
+        the brand colour is customized.
+    -->
+    <style name="Test.Glia.Survey.Customized" parent="ThemeOverlay.Glia.Chat.Material">
+        <item name="gliaBrandPrimaryColor">@color/brandPrimaryColor</item>
+        <item name="gliaBaseDarkColor">@color/baseDarkColor</item>
+        <item name="gliaBaseNormalColor">@color/baseNormalColor</item>
+        <item name="gliaSystemNegativeColor">@color/systemNegativeColor</item>
+    </style>
+
 </resources>

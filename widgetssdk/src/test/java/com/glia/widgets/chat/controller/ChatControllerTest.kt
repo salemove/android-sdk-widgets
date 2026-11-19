@@ -50,7 +50,6 @@ import com.glia.widgets.internal.fileupload.domain.FileUploadLimitNotExceededObs
 import com.glia.widgets.internal.fileupload.domain.GetFileAttachmentsUseCase
 import com.glia.widgets.internal.fileupload.domain.RemoveFileAttachmentUseCase
 import com.glia.widgets.internal.fileupload.domain.SupportedUploadFileTypesUseCase
-import com.glia.widgets.internal.notification.domain.CallNotificationUseCase
 import com.glia.widgets.internal.permissions.domain.RequestNotificationPermissionIfPushNotificationsSetUpUseCase
 import com.glia.widgets.internal.permissions.domain.WithCameraPermissionUseCase
 import com.glia.widgets.internal.permissions.domain.WithReadWritePermissionsUseCase
@@ -97,7 +96,6 @@ class ChatControllerTest {
     private lateinit var minimizeHandler: MinimizeHandler
     private lateinit var dialogController: DialogContract.Controller
     private lateinit var messagesNotSeenHandler: MessagesNotSeenHandler
-    private lateinit var callNotificationUseCase: CallNotificationUseCase
     private lateinit var sendMessagePreviewUseCase: GliaSendMessagePreviewUseCase
     private lateinit var sendMessageUseCase: GliaSendMessageUseCase
     private lateinit var addFileToAttachmentAndUploadUseCase: AddFileToAttachmentAndUploadUseCase
@@ -162,7 +160,6 @@ class ChatControllerTest {
         minimizeHandler = mock()
         dialogController = mock()
         messagesNotSeenHandler = mock()
-        callNotificationUseCase = mock()
         sendMessagePreviewUseCase = mock()
         sendMessageUseCase = mock()
         addFileToAttachmentAndUploadUseCase = mock()
@@ -234,7 +231,6 @@ class ChatControllerTest {
             minimizeHandler = minimizeHandler,
             dialogController = dialogController,
             messagesNotSeenHandler = messagesNotSeenHandler,
-            callNotificationUseCase = callNotificationUseCase,
             sendMessagePreviewUseCase = sendMessagePreviewUseCase,
             sendMessageUseCase = sendMessageUseCase,
             addFileToAttachmentAndUploadUseCase = addFileToAttachmentAndUploadUseCase,

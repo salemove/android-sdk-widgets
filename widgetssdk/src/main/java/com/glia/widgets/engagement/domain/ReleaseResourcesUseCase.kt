@@ -8,14 +8,12 @@ import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.internal.fileupload.FileAttachmentRepository
 import com.glia.widgets.internal.fileupload.domain.GetShareableLocalAttachmentUriUseCase
-import com.glia.widgets.internal.notification.domain.CallNotificationUseCase
 
 internal interface ReleaseResourcesUseCase {
     operator fun invoke()
 }
 
 internal class ReleaseResourcesUseCaseImpl(
-    private val callNotificationUseCase: CallNotificationUseCase,
     private val fileAttachmentRepository: FileAttachmentRepository,
     private val updateFromCallScreenUseCase: UpdateFromCallScreenUseCase,
     private val dialogController: DialogContract.Controller,
@@ -28,7 +26,6 @@ internal class ReleaseResourcesUseCaseImpl(
         getShareableLocalAttachmentUriUseCase.clearCache().subscribe({}, {
             Logger.w(TAG, "Failed to clear shared attachments cache: ${it.javaClass.simpleName}")
         })
-        callNotificationUseCase.removeAllNotifications()
         updateFromCallScreenUseCase(false)
         Dependencies.destroyControllers()
     }

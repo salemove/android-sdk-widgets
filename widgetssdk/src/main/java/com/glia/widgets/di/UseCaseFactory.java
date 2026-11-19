@@ -146,7 +146,6 @@ import com.glia.widgets.internal.fileupload.domain.FileUploadLimitNotExceededObs
 import com.glia.widgets.internal.fileupload.domain.GetFileAttachmentsUseCase;
 import com.glia.widgets.internal.fileupload.domain.RemoveFileAttachmentUseCase;
 import com.glia.widgets.internal.fileupload.domain.SupportedUploadFileTypesUseCase;
-import com.glia.widgets.internal.notification.device.INotificationManager;
 import com.glia.widgets.internal.notification.domain.CallNotificationUseCase;
 import com.glia.widgets.internal.permissions.PermissionManager;
 import com.glia.widgets.internal.permissions.domain.IsNotificationPermissionGrantedUseCase;
@@ -203,7 +202,6 @@ public class UseCaseFactory {
     private final PermissionManager permissionManager;
     private final PermissionDialogManager permissionDialogManager;
     private final ConfigurationManager configurationManager;
-    private final INotificationManager notificationManager;
     private final ChatHeadManager chatHeadManager;
     private final AudioControlManager audioControlManager;
     private final Dependencies.AuthenticationManagerProvider authenticationManagerProvider;
@@ -216,7 +214,6 @@ public class UseCaseFactory {
     UseCaseFactory(RepositoryFactory repositoryFactory,
                    PermissionManager permissionManager,
                    PermissionDialogManager permissionDialogManager,
-                   INotificationManager notificationManager,
                    ConfigurationManager configurationManager,
                    ChatHeadManager chatHeadManager,
                    AudioControlManager audioControlManager,
@@ -228,7 +225,6 @@ public class UseCaseFactory {
         this.repositoryFactory = repositoryFactory;
         this.permissionManager = permissionManager;
         this.permissionDialogManager = permissionDialogManager;
-        this.notificationManager = notificationManager;
         this.configurationManager = configurationManager;
         this.chatHeadManager = chatHeadManager;
         this.audioControlManager = audioControlManager;
@@ -318,7 +314,7 @@ public class UseCaseFactory {
     @NonNull
     public CallNotificationUseCase createCallNotificationUseCase() {
         if (callNotificationUseCase == null)
-            callNotificationUseCase = new CallNotificationUseCase(notificationManager);
+            callNotificationUseCase = new CallNotificationUseCase();
         return callNotificationUseCase;
     }
 
@@ -848,7 +844,6 @@ public class UseCaseFactory {
     @NonNull
     public ReleaseResourcesUseCase getReleaseResourcesUseCase(DialogContract.Controller dialogController) {
         return new ReleaseResourcesUseCaseImpl(
-            createCallNotificationUseCase(),
             repositoryFactory.getGliaFileAttachmentRepository(),
             createUpdateFromCallScreenUseCase(),
             dialogController,

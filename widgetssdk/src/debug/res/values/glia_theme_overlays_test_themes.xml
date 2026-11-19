@@ -88,6 +88,12 @@
         <item name="gliaIconLeaveQueue">@drawable/glia_test_customization_icon</item>
     </style>
 
+    <!-- Flips the two boolean attributes, which default to `false` in `Theme.Glia.Internal`. -->
+    <style name="Test.Glia.Customization.Booleans" parent="">
+        <item name="whiteLabel">true</item>
+        <item name="gliaAlertDialogButtonUseVerticalAlignment">true</item>
+    </style>
+
     <!-- Plain host-app theme, deliberately not a Glia theme: used to test `wrapWithGliaTheme`. -->
     <style name="Test.Glia.Theme.HostApp" parent="Theme.MaterialComponents.DayNight.NoActionBar" />
 

@@ -18,7 +18,7 @@ import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.helper.setTintCompat
-import com.glia.widgets.helper.wrapWithMaterialThemeOverlay
+import com.glia.widgets.helper.wrapWithGliaTheme
 import com.glia.widgets.view.unifiedui.applyImageColorTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.chat.AttachmentsPopupTheme
@@ -30,7 +30,7 @@ internal class AttachmentPopup(
 ) {
 
     private val margin by lazy { context.resources.getDimensionPixelSize(R.dimen.glia_chat_attachment_menu_margin) }
-    private val binding: ChatAttachmentPopupBinding by lazy { bindLayout(context.wrapWithMaterialThemeOverlay()) }
+    private val binding: ChatAttachmentPopupBinding by lazy { bindLayout(context.wrapWithGliaTheme()) }
     private val popupWindow: PopupWindow by lazy { createPopupMenu() }
 
     private fun createPopupMenu(): PopupWindow {

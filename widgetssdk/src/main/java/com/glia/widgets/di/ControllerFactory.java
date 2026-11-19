@@ -34,6 +34,8 @@ import com.glia.widgets.permissions.PermissionsRequestContract;
 import com.glia.widgets.permissions.controller.PermissionsRequestController;
 import com.glia.widgets.push.notifications.PushClickHandlerController;
 import com.glia.widgets.push.notifications.PushClickHandlerControllerImpl;
+import com.glia.widgets.push.notifications.InteractionPushController;
+import com.glia.widgets.push.notifications.InteractionPushControllerImpl;
 import com.glia.widgets.push.notifications.SecureMessagingPushController;
 import com.glia.widgets.push.notifications.SecureMessagingPushControllerImpl;
 import com.glia.widgets.survey.SurveyContract;
@@ -426,6 +428,16 @@ public class ControllerFactory {
     @NonNull
     public SecureMessagingPushController getSecureMessagingPushController() {
         return new SecureMessagingPushControllerImpl(
+            applicationLifecycleManager,
+            notificationManager,
+            useCaseFactory.getIsNotificationPermissionGrantedUseCase(),
+            new IntentHelperImpl()
+        );
+    }
+
+    @NonNull
+    public InteractionPushController getInteractionPushController() {
+        return new InteractionPushControllerImpl(
             applicationLifecycleManager,
             notificationManager,
             useCaseFactory.getIsNotificationPermissionGrantedUseCase(),

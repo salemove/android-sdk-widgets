@@ -24,6 +24,7 @@ import com.glia.widgets.filepreview.ui.toLocalImagePreview
 import com.glia.widgets.internal.fileupload.model.LocalAttachment
 import com.glia.widgets.locale.LocaleString
 import com.glia.widgets.messagecenter.MessageCenterActivity
+import com.glia.widgets.push.notifications.GOOGLE_MESSAGE_ID_KEY
 import com.glia.widgets.push.notifications.PushClickHandlerActivity
 import com.glia.widgets.survey.SurveyActivity
 import com.glia.widgets.webbrowser.WebBrowserActivity
@@ -79,6 +80,13 @@ internal interface IntentHelper {
     fun entryWidgetIntent(activity: Activity): Intent
 
     fun pushClickHandlerPendingIntent(context: Context, queueId: String?, visitorId: String): PendingIntent
+
+    /**
+     * Opens the application the way the system does when a push with a notification block is tapped: its
+     * launch Activity, with the push data and message id as extras, so the integrator's existing
+     * `handlePushNotificationClick` call handles it. Null when the application has no launch Activity.
+     */
+    fun pushNotificationLaunchPendingIntent(context: Context, data: Map<String, String>, messageId: String?): PendingIntent?
 }
 
 internal class IntentHelperImpl : IntentHelper {
@@ -165,6 +173,14 @@ internal class IntentHelperImpl : IntentHelper {
         context, 0, pushClickHandlerIntent(context, queueId, visitorId),
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
     )
+
+    override fun pushNotificationLaunchPendingIntent(context: Context, data: Map<String, String>, messageId: String?): PendingIntent? {
+        val launchIntent: Intent = context.packageManager.getLaunchIntentForPackage(context.packageName) ?: return null
+        launchIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        data.forEach { (key, value) -> launchIntent.putExtra(key, value) }
+        messageId?.let { launchIntent.putExtra(GOOGLE_MESSAGE_ID_KEY, it) }
+        return PendingIntent.getActivity(context, 0, launchIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+    }
 
     // About these flags and overall why this activity has separate affinity etc. please refer to the official documentation:
     // https://developer.android.com/develop/ui/views/notifications/navigation#ExtendedNotification

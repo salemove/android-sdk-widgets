@@ -17,6 +17,10 @@ internal object NotificationFactory {
     const val SECURE_MESSAGING_NOTIFICATION_ID = 3
     const val NOTIFICATION_SECURE_MESSAGING_CHANNEL_ID = "secure_messaging_channel"
 
+    // One ID for interaction push notifications too, so a newer push replaces the older one.
+    const val INTERACTION_NOTIFICATION_ID = 4
+    const val NOTIFICATION_INTERACTION_CHANNEL_ID = "interaction_channel"
+
     private val localeProvider by lazy { Dependencies.localeProvider }
 
     fun createAudioCallNotification(context: Context): Notification =
@@ -87,7 +91,13 @@ internal object NotificationFactory {
     }
 
     fun createSecureMessagingNotification(context: Context, content: String, contentIntent: PendingIntent): Notification =
-        NotificationCompat.Builder(context, NOTIFICATION_SECURE_MESSAGING_CHANNEL_ID)
+        createMessageNotification(context, NOTIFICATION_SECURE_MESSAGING_CHANNEL_ID, content, contentIntent)
+
+    fun createInteractionNotification(context: Context, content: String, contentIntent: PendingIntent): Notification =
+        createMessageNotification(context, NOTIFICATION_INTERACTION_CHANNEL_ID, content, contentIntent)
+
+    private fun createMessageNotification(context: Context, channelId: String, content: String, contentIntent: PendingIntent): Notification =
+        NotificationCompat.Builder(context, channelId)
             .setSmallIcon(R.drawable.ic_chat)
             .setContentIntent(contentIntent)
             .setContentText(content)

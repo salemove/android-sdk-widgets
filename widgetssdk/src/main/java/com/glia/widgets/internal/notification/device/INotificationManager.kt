@@ -9,4 +9,6 @@ internal interface INotificationManager {
     fun startNotificationRemovalService()
     fun showSecureMessageNotification(content: String, contentIntent: PendingIntent)
     fun createSecureMessagingChannel()
+    fun showInteractionNotification(content: String, contentIntent: PendingIntent)
+    fun createInteractionChannel()
 }

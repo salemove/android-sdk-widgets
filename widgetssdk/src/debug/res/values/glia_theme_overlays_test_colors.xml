@@ -5,4 +5,5 @@
     <color name="glia_test_customization_brand">#FF0002</color>
     <color name="glia_test_context_brand">#FF0003</color>
     <color name="glia_test_unprefixed_brand">#FF0004</color>
+    <color name="glia_test_customization_normal">#FF0005</color>
 </resources>

@@ -94,6 +94,13 @@
         <item name="gliaAlertDialogButtonUseVerticalAlignment">true</item>
     </style>
 
+    <!-- Names a font family rather than pointing at a font resource - the case `gliaAttrFont` must
+         resolve to `null`, and the only one an uncustomized SDK ever hits. -->
+    <style name="Test.Glia.Customization.FontFamilyName" parent="">
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
     <!-- Plain host-app theme, deliberately not a Glia theme: used to test `wrapWithGliaTheme`. -->
     <style name="Test.Glia.Theme.HostApp" parent="Theme.MaterialComponents.DayNight.NoActionBar" />
 

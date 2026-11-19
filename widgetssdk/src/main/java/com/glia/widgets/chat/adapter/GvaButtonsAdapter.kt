@@ -6,9 +6,8 @@ import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
-import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.model.GvaButton
-import com.glia.widgets.helper.getFontCompat
+import com.glia.widgets.helper.gliaAttrFont
 import com.glia.widgets.helper.gliaAttrResourceId
 import com.glia.widgets.view.unifiedui.applyButtonTheme
 import com.glia.widgets.view.unifiedui.theme.base.ButtonTheme
@@ -16,7 +15,6 @@ import com.google.android.material.button.MaterialButton
 
 internal class GvaButtonsAdapter(
     private val buttonsClickListener: ChatAdapter.OnGvaButtonsClickListener,
-    private val uiTheme: UiTheme,
     private val buttonTheme: ButtonTheme?
 ) : RecyclerView.Adapter<GvaButtonsAdapter.ButtonViewHolder>() {
     private var options: List<GvaButton>? = null
@@ -43,7 +41,7 @@ internal class GvaButtonsAdapter(
         val button = MaterialButton(ContextThemeWrapper(parent.context, styleResId), null, 0).also {
             it.id = View.generateViewId()
 
-            uiTheme.fontRes?.let(parent::getFontCompat)?.also(it::setTypeface)
+            parent.context.gliaAttrFont()?.also(it::setTypeface)
 
             buttonTheme?.also(it::applyButtonTheme)
         }

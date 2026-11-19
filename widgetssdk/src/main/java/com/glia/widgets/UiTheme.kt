@@ -979,59 +979,6 @@ internal data class UiTheme(
             this.gvaQuickReplyTextColor = gvaQuickReplyTextColor
         }
 
-        fun setTheme(theme: UiTheme) {
-            brandPrimaryColor = theme.brandPrimaryColor
-            baseLightColor = theme.baseLightColor
-            baseDarkColor = theme.baseDarkColor
-            baseNormalColor = theme.baseNormalColor
-            baseShadeColor = theme.baseShadeColor
-            systemAgentBubbleColor = theme.systemAgentBubbleColor
-            fontRes = theme.fontRes
-            systemNegativeColor = theme.systemNegativeColor
-            visitorMessageBackgroundColor = theme.visitorMessageBackgroundColor
-            visitorMessageTextColor = theme.visitorMessageTextColor
-            operatorMessageBackgroundColor = theme.operatorMessageBackgroundColor
-            newMessageDividerColor = theme.newMessageDividerColor
-            newMessageDividerTextColor = theme.newMessageDividerTextColor
-            operatorMessageTextColor = theme.operatorMessageTextColor
-            botActionButtonBackgroundColor = theme.botActionButtonBackgroundColor
-            botActionButtonTextColor = theme.botActionButtonTextColor
-            botActionButtonSelectedBackgroundColor = theme.botActionButtonSelectedBackgroundColor
-            botActionButtonSelectedTextColor = theme.botActionButtonSelectedTextColor
-            iconAppBarBack = theme.iconAppBarBack
-            iconLeaveQueue = theme.iconLeaveQueue
-            iconSendMessage = theme.iconSendMessage
-            iconChatAudioUpgrade = theme.iconChatAudioUpgrade
-            iconUpgradeAudioDialog = theme.iconUpgradeAudioDialog
-            iconCallAudioOn = theme.iconCallAudioOn
-            iconChatVideoUpgrade = theme.iconChatVideoUpgrade
-            iconUpgradeVideoDialog = theme.iconUpgradeVideoDialog
-            iconCallVisualizer = theme.iconCallVisualizer
-            iconCallVideoOn = theme.iconCallVideoOn
-            iconCallAudioOff = theme.iconCallAudioOff
-            iconCallVideoOff = theme.iconCallVideoOff
-            iconCallChat = theme.iconCallChat
-            iconCallSpeakerOn = theme.iconCallSpeakerOn
-            iconCallSpeakerOff = theme.iconCallSpeakerOff
-            iconCallMinimize = theme.iconCallMinimize
-            iconPlaceholder = theme.iconPlaceholder
-            iconOnHold = theme.iconOnHold
-            whiteLabel = theme.whiteLabel
-            sendMessageButtonTintColor = theme.sendMessageButtonTintColor
-            gliaChatBackgroundColor = theme.gliaChatBackgroundColor
-            gliaChatHeaderTitleTintColor = theme.gliaChatHeaderTitleTintColor
-            gliaChatHomeButtonTintColor = theme.gliaChatHeaderHomeButtonTintColor
-            gliaChatHeaderExitQueueButtonTintColor = theme.gliaChatHeaderExitQueueButtonTintColor
-            chatStartingCaptionTextColor = theme.gliaChatStartingCaptionTextColor
-            chatStartingHeadingTextColor = theme.gliaChatStartingHeadingTextColor
-            chatStartedCaptionTextColor = theme.gliaChatStartedCaptionTextColor
-            chatStartedHeadingTextColor = theme.gliaChatStartedHeadingTextColor
-            surveyStyle = theme.surveyStyle
-            gvaQuickReplyBackgroundColor = theme.gvaQuickReplyBackgroundColor
-            gvaQuickReplyStrokeColor = theme.gvaQuickReplyStrokeColor
-            gvaQuickReplyTextColor = theme.gvaQuickReplyTextColor
-        }
-
         fun build(): UiTheme {
             return UiTheme(this)
         }

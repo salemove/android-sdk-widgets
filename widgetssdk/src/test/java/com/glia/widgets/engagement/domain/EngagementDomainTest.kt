@@ -17,7 +17,6 @@ import com.glia.widgets.internal.dialog.DialogContract
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.internal.fileupload.FileAttachmentRepository
 import com.glia.widgets.internal.fileupload.domain.GetShareableLocalAttachmentUriUseCase
-import com.glia.widgets.internal.notification.domain.CallNotificationUseCase
 import com.glia.widgets.internal.permissions.PermissionManager
 import com.glia.widgets.internal.secureconversations.SecureConversationsRepository
 import com.glia.widgets.permissions.Permissions
@@ -482,7 +481,6 @@ class EngagementDomainTest {
         mockkStatic(Dependencies::class)
 
         every { Dependencies.destroyControllers() } just Runs
-        val callNotificationUseCase: CallNotificationUseCase = mockk(relaxUnitFun = true)
         val fileAttachmentRepository: FileAttachmentRepository = mockk(relaxUnitFun = true)
         val updateFromCallScreenUseCase: UpdateFromCallScreenUseCase = mockk(relaxUnitFun = true)
         val dialogController: DialogContract.Controller = mockk(relaxUnitFun = true)
@@ -491,7 +489,6 @@ class EngagementDomainTest {
         }
 
         val useCase: ReleaseResourcesUseCase = ReleaseResourcesUseCaseImpl(
-            callNotificationUseCase = callNotificationUseCase,
             fileAttachmentRepository = fileAttachmentRepository,
             updateFromCallScreenUseCase = updateFromCallScreenUseCase,
             dialogController = dialogController,
@@ -504,7 +501,6 @@ class EngagementDomainTest {
             dialogController.dismissDialogs()
             fileAttachmentRepository.detachAllFiles()
             getShareableLocalAttachmentUriUseCase.clearCache()
-            callNotificationUseCase.removeAllNotifications()
             updateFromCallScreenUseCase(false)
             Dependencies.destroyControllers()
         }
@@ -518,13 +514,11 @@ class EngagementDomainTest {
         mockkStatic(Dependencies::class)
 
         every { Dependencies.destroyControllers() } just Runs
-        val callNotificationUseCase: CallNotificationUseCase = mockk(relaxUnitFun = true)
         val getShareableLocalAttachmentUriUseCase: GetShareableLocalAttachmentUriUseCase = mockk {
             every { clearCache() } returns Completable.error(RuntimeException("io"))
         }
 
         val useCase: ReleaseResourcesUseCase = ReleaseResourcesUseCaseImpl(
-            callNotificationUseCase = callNotificationUseCase,
             fileAttachmentRepository = mockk(relaxUnitFun = true),
             updateFromCallScreenUseCase = mockk(relaxUnitFun = true),
             dialogController = mockk(relaxUnitFun = true),
@@ -533,7 +527,6 @@ class EngagementDomainTest {
 
         useCase()
 
-        verify { callNotificationUseCase.removeAllNotifications() }
         verify { Dependencies.destroyControllers() }
 
         unmockkStatic(Dependencies::class)

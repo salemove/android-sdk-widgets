@@ -1,110 +1,60 @@
 package com.glia.widgets.internal.notification.domain
 
-import android.mock
-import android.unMock
 import com.glia.androidsdk.comms.Audio
+import com.glia.androidsdk.comms.MediaDirection
 import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.comms.Video
-import com.glia.widgets.helper.Logger
-import com.glia.widgets.internal.notification.device.INotificationManager
+import com.glia.widgets.internal.notification.domain.CallNotification.Phase.LIVE
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.verify
-import org.junit.After
-import org.junit.Before
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 class CallNotificationUseCaseTest {
-    private lateinit var notificationManager: INotificationManager
-    private lateinit var useCase: CallNotificationUseCase
+    private val useCase = CallNotificationUseCase()
 
-    @Before
-    fun setUp() {
-        Logger.mock()
-        notificationManager = mockk(relaxUnitFun = true)
-        useCase = CallNotificationUseCase(notificationManager)
-    }
+    @Test
+    fun `returns an audio call when both sides have audio but no video`() {
+        val call = useCase(mediaState(audio = mockk(), video = null), mediaState(audio = mockk(), video = null))
 
-    @After
-    fun tearDown() {
-        Logger.unMock()
+        assertEquals(CallNotification(LIVE, MediaDirection.NONE, hasAudio = true), call)
     }
 
     @Test
-    fun `shows audio notification when both sides have audio but no video`() {
-        val visitorMedia = mediaState(audio = mockk(), video = null)
-        val operatorMedia = mediaState(audio = mockk(), video = null)
+    fun `returns a one-way video call when the operator has video and the visitor does not`() {
+        val call = useCase(mediaState(audio = mockk(), video = null), mediaState(audio = mockk(), video = mockk()))
 
-        useCase(visitorMedia, operatorMedia)
-
-        verify { notificationManager.showAudioCallNotification() }
+        assertEquals(CallNotification(LIVE, MediaDirection.ONE_WAY, hasAudio = true), call)
     }
 
     @Test
-    fun `shows one-way video notification when operator has video and visitor does not`() {
-        val visitorMedia = mediaState(audio = mockk(), video = null)
-        val operatorMedia = mediaState(audio = mockk(), video = mockk())
+    fun `returns a two-way video call when both sides have video`() {
+        val call = useCase(mediaState(audio = mockk(), video = mockk()), mediaState(audio = mockk(), video = mockk()))
 
-        useCase(visitorMedia, operatorMedia)
-
-        verify { notificationManager.showVideoCallNotification(isTwoWayVideo = false, hasAudio = true) }
+        assertEquals(CallNotification(LIVE, MediaDirection.TWO_WAY, hasAudio = true), call)
     }
 
     @Test
-    fun `shows two-way video notification when both sides have video`() {
-        val visitorMedia = mediaState(audio = mockk(), video = mockk())
-        val operatorMedia = mediaState(audio = mockk(), video = mockk())
+    fun `returns a two-way video call without audio when neither side has audio`() {
+        val call = useCase(mediaState(audio = null, video = mockk()), mediaState(audio = null, video = mockk()))
 
-        useCase(visitorMedia, operatorMedia)
-
-        verify { notificationManager.showVideoCallNotification(isTwoWayVideo = true, hasAudio = true) }
+        assertEquals(CallNotification(LIVE, MediaDirection.TWO_WAY, hasAudio = false), call)
     }
 
     @Test
-    fun `shows two-way video without audio when both have video but no audio`() {
-        val visitorMedia = mediaState(audio = null, video = mockk())
-        val operatorMedia = mediaState(audio = null, video = mockk())
-
-        useCase(visitorMedia, operatorMedia)
-
-        verify { notificationManager.showVideoCallNotification(isTwoWayVideo = true, hasAudio = false) }
+    fun `returns no call when neither side has media`() {
+        assertNull(useCase(mediaState(audio = null, video = null), mediaState(audio = null, video = null)))
     }
 
-    @Test
-    fun `removes notification when both sides have no media`() {
-        useCase(null, null)
-
-        verify { notificationManager.removeCallNotification() }
+    @Test(expected = IllegalStateException::class)
+    fun `rejects one-way visitor video`() {
+        useCase(mediaState(audio = null, video = mockk()), mediaState(audio = null, video = null))
     }
 
-    @Test
-    fun `removes notification when both have no audio and no video`() {
-        val visitorMedia = mediaState(audio = null, video = null)
-        val operatorMedia = mediaState(audio = null, video = null)
-
-        useCase(visitorMedia, operatorMedia)
-
-        verify { notificationManager.removeCallNotification() }
-    }
-
-    @Test
-    fun `removeAllNotifications removes notification`() {
-        useCase.removeAllNotifications()
-
-        verify { notificationManager.removeCallNotification() }
-    }
-
-    @Test
-    fun `does not crash on unsupported one-way visitor video`() {
-        val visitorMedia = mediaState(audio = null, video = mockk())
-        val operatorMedia = mediaState(audio = null, video = null)
-
-        // Should not throw — logs and returns early
-        useCase(visitorMedia, operatorMedia)
-
-        verify(exactly = 0) { notificationManager.showVideoCallNotification(any(), any()) }
-        verify(exactly = 0) { notificationManager.showAudioCallNotification() }
-        verify(exactly = 0) { notificationManager.removeCallNotification() }
+    @Test(expected = IllegalStateException::class)
+    fun `rejects one-way audio`() {
+        useCase(mediaState(audio = mockk(), video = null), mediaState(audio = null, video = null))
     }
 
     private fun mediaState(audio: Audio?, video: Video?): MediaState = mockk<MediaState>().also {

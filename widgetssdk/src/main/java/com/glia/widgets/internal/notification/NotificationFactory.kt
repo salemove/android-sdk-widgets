@@ -5,8 +5,11 @@ import android.app.PendingIntent
 import android.content.Context
 import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationCompat
+import com.glia.androidsdk.comms.MediaDirection
 import com.glia.widgets.R
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.internal.notification.domain.CallNotification
+import com.glia.widgets.internal.notification.domain.CallNotification.Phase
 
 internal object NotificationFactory {
     const val NOTIFICATION_CALL_CHANNEL_ID = "call_channel"
@@ -23,54 +26,37 @@ internal object NotificationFactory {
 
     private val localeProvider by lazy { Dependencies.localeProvider }
 
-    fun createAudioCallNotification(context: Context): Notification =
-        createCallNotification(
-            context = context,
-            icon = R.drawable.ic_baseline_mic,
-            title = localeProvider.getString(R.string.android_notification_audio_call_title),
-            message = localeProvider.getString(R.string.android_notification_audio_call_message)
-        )
-
-    fun createVideoCallNotification(
-        context: Context,
-        isTwoWayVideo: Boolean,
-        hasAudio: Boolean
-    ): Notification {
-        return if (isTwoWayVideo) {
-            createTwoWayVideoNotification(context, hasAudio)
-        } else {
-            createOneWayVideoNotification(context, hasAudio)
+    fun createCallNotification(context: Context, call: CallNotification): Notification {
+        val isVideo = call.video != MediaDirection.NONE
+        val (title, message) = when (call.phase) {
+            Phase.WAITING -> callTitle(isVideo) to R.string.android_call_queue_message
+            Phase.CONNECTING -> callTitle(isVideo) to R.string.glia_notification_call_connecting_message
+            Phase.LIVE -> liveCallTexts(call)
         }
-    }
-
-    private fun createOneWayVideoNotification(context: Context, hasAudio: Boolean): Notification {
-        val message =
-            if (hasAudio) {
-                localeProvider.getString(R.string.android_notification_one_way_video_message)
-            } else {
-                localeProvider.getString(R.string.android_notification_one_way_video_no_audio_message)
-            }
         return createCallNotification(
             context = context,
-            icon = R.drawable.ic_baseline_videocam,
-            title = localeProvider.getString(R.string.android_notification_one_way_video_title),
-            message = message
+            icon = if (isVideo) R.drawable.ic_baseline_videocam else R.drawable.ic_baseline_mic,
+            title = localeProvider.getString(title),
+            message = localeProvider.getString(message)
         )
     }
 
-    private fun createTwoWayVideoNotification(context: Context, hasAudio: Boolean): Notification {
-        val message =
-            if (hasAudio) {
-                localeProvider.getString(R.string.android_notification_two_way_video_message)
-            } else {
-                localeProvider.getString(R.string.android_notification_two_way_video_no_audio_message)
-            }
-        return createCallNotification(
-            context = context,
-            icon = R.drawable.ic_baseline_videocam,
-            title = localeProvider.getString(R.string.android_notification_two_way_video_title),
-            message = message
-        )
+    private fun callTitle(isVideo: Boolean): Int = if (isVideo) R.string.engagement_video_title else R.string.engagement_audio_title
+
+    private fun liveCallTexts(call: CallNotification): Pair<Int, Int> = when (call.video) {
+        MediaDirection.TWO_WAY -> R.string.android_notification_two_way_video_title to if (call.hasAudio) {
+            R.string.android_notification_two_way_video_message
+        } else {
+            R.string.android_notification_two_way_video_no_audio_message
+        }
+
+        MediaDirection.ONE_WAY -> R.string.android_notification_one_way_video_title to if (call.hasAudio) {
+            R.string.android_notification_one_way_video_message
+        } else {
+            R.string.android_notification_one_way_video_no_audio_message
+        }
+
+        else -> R.string.android_notification_audio_call_title to R.string.android_notification_audio_call_message
     }
 
     private fun createCallNotification(

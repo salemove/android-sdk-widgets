@@ -46,6 +46,7 @@ import com.glia.widgets.internal.authentication.toCoreType
 import com.glia.widgets.internal.callvisualizer.CallVisualizerManager
 import com.glia.widgets.internal.chathead.ChatHeadManager
 import com.glia.widgets.internal.dialog.PermissionDialogManager
+import com.glia.widgets.internal.notification.OngoingCallNotificationManager
 import com.glia.widgets.internal.notification.device.INotificationManager
 import com.glia.widgets.internal.notification.device.NotificationManager
 import com.glia.widgets.internal.permissions.PermissionManager
@@ -86,6 +87,9 @@ internal object Dependencies {
     @JvmStatic
     lateinit var callVisualizerManager: CallVisualizerManager
         private set
+
+    lateinit var ongoingCallNotificationManager: OngoingCallNotificationManager
+        @VisibleForTesting set
 
     @JvmStatic
     lateinit var useCaseFactory: UseCaseFactory
@@ -198,7 +202,6 @@ internal object Dependencies {
             repositoryFactory,
             permissionManager,
             PermissionDialogManager(application),
-            notificationManager,
             configurationManager,
             ChatHeadManager(application),
             audioControlManager,
@@ -209,6 +212,16 @@ internal object Dependencies {
             application
         )
         initAudioControlManager(audioControlManager, useCaseFactory.createOnAudioStartedUseCase())
+        ongoingCallNotificationManager = OngoingCallNotificationManager(
+            useCaseFactory.engagementStateUseCase,
+            useCaseFactory.visitorMediaUseCase,
+            useCaseFactory.operatorMediaUseCase,
+            useCaseFactory.acceptMediaUpgradeOfferUseCase,
+            useCaseFactory.createCallNotificationUseCase(),
+            permissionManager,
+            notificationManager
+        )
+        application.registerActivityLifecycleCallbacks(ongoingCallNotificationManager)
 
         managerFactory = ManagerFactory(useCaseFactory)
         clearSharedAttachmentsCache()

@@ -49,7 +49,6 @@ import com.glia.widgets.internal.dialog.model.ConfirmationDialogLinks
 import com.glia.widgets.internal.dialog.model.Link
 import com.glia.widgets.internal.engagement.domain.ConfirmationDialogUseCase
 import com.glia.widgets.internal.engagement.domain.ShouldShowMediaEngagementViewUseCase
-import com.glia.widgets.internal.notification.domain.CallNotificationUseCase
 import com.glia.widgets.view.MessagesNotSeenHandler
 import com.glia.widgets.view.MessagesNotSeenHandler.MessagesNotSeenHandlerListener
 import com.glia.widgets.view.MinimizeHandler
@@ -72,7 +71,6 @@ internal class CallController(
     private val minimizeHandler: MinimizeHandler,
     private val dialogController: DialogContract.Controller,
     private val messagesNotSeenHandler: MessagesNotSeenHandler,
-    private val callNotificationUseCase: CallNotificationUseCase,
     private val endEngagementUseCase: EndEngagementUseCase,
     private val shouldShowMediaEngagementViewUseCase: ShouldShowMediaEngagementViewUseCase,
     private val isShowOverlayPermissionRequestDialogUseCase: IsShowOverlayPermissionRequestDialogUseCase,
@@ -131,9 +129,8 @@ internal class CallController(
         flipCameraButtonStateUseCase().subscribe(::onNewFlipCameraButtonState).also(disposable::add)
     }
 
-    // This method combines both visitor and operator media state updates so that they would be fired one after another.
-    // This is done to prevent errors such as "does not support one-way audio calls" only because the
-    // other participant media state is passed few milliseconds late.
+    // Combines the visitor and operator media updates so the screen handles them together.
+    // One side's update often arrives a few milliseconds after the other's.
     private fun subscribeToMediaState() {
         val initialState = object : MediaState {
             override fun getVideo(): Video? = null
@@ -151,7 +148,6 @@ internal class CallController(
                 val operatorMedia = it.second.orElse(null)
                 onNewVisitorMediaState(visitorMedia)
                 onNewOperatorMediaState(operatorMedia)
-                callNotificationUseCase(visitorMedia, operatorMedia)
             }.also(disposable::add)
     }
 
@@ -546,7 +542,6 @@ internal class CallController(
         if (callState.isMediaEngagementStarted) {
             emitViewState(callState.backToOngoing())
         }
-        callNotificationUseCase.removeAllNotifications()
         if (!connectingTimerCounter.isRunning) {
             connectingTimerCounter.startNew(Constants.CALL_TIMER_DELAY, Constants.CALL_TIMER_INTERVAL_VALUE)
         }

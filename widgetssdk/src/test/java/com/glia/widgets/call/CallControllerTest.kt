@@ -25,7 +25,6 @@ import com.glia.widgets.internal.dialog.domain.ConfirmationDialogLinksUseCase
 import com.glia.widgets.internal.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
 import com.glia.widgets.internal.engagement.domain.ConfirmationDialogUseCase
 import com.glia.widgets.internal.engagement.domain.ShouldShowMediaEngagementViewUseCase
-import com.glia.widgets.internal.notification.domain.CallNotificationUseCase
 import com.glia.widgets.view.MessagesNotSeenHandler
 import com.glia.widgets.view.MinimizeHandler
 import com.glia.widgets.webbrowser.domain.GetUrlFromLinkUseCase
@@ -53,7 +52,6 @@ class CallControllerTest {
     private lateinit var minimizeHandler: MinimizeHandler
     private lateinit var dialogController: DialogContract.Controller
     private lateinit var messagesNotSeenHandler: MessagesNotSeenHandler
-    private lateinit var callNotificationUseCase: CallNotificationUseCase
     private lateinit var endEngagementUseCase: EndEngagementUseCase
     private lateinit var shouldShowMediaEngagementViewUseCase: ShouldShowMediaEngagementViewUseCase
     private lateinit var isShowOverlayPermissionRequestDialogUseCase: IsShowOverlayPermissionRequestDialogUseCase
@@ -93,7 +91,6 @@ class CallControllerTest {
         minimizeHandler = mock()
         dialogController = mock()
         messagesNotSeenHandler = mock()
-        callNotificationUseCase = mock()
         endEngagementUseCase = mock()
         shouldShowMediaEngagementViewUseCase = mock()
         isShowOverlayPermissionRequestDialogUseCase = mock()
@@ -142,7 +139,6 @@ class CallControllerTest {
             minimizeHandler = minimizeHandler,
             dialogController = dialogController,
             messagesNotSeenHandler = messagesNotSeenHandler,
-            callNotificationUseCase = callNotificationUseCase,
             endEngagementUseCase = endEngagementUseCase,
             shouldShowMediaEngagementViewUseCase = shouldShowMediaEngagementViewUseCase,
             isShowOverlayPermissionRequestDialogUseCase = isShowOverlayPermissionRequestDialogUseCase,

@@ -175,5 +175,6 @@
     <string name="glia_notification_one_way_video_call_title">One-Way Video Started</string>
     <string name="glia_notification_one_way_video_call_message">The operator’s camera is on. You can now see and hear them.</string>
     <string name="glia_notification_one_way_video_call_message_no_audio">The operator’s camera is on. You can now see them.</string>
+    <string name="glia_notification_call_connecting_message">Connecting your call.</string>
     <string name="glia_notification_action_end_sharing">End Sharing</string>
 </resources>

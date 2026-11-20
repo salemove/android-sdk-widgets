@@ -218,6 +218,9 @@ dependencies {
   implementation libs.rxandroid
   implementation libs.rxjava
 
+  implementation libs.kotlinx.coroutines.android
+  implementation libs.kotlinx.coroutines.reactive
+
   releaseImplementation "${libs.glia.core.get().module}:$gliaSdkVersion"
 
   def coreDebugVersion = coreSdkDebugVersion(gliaSdkVersion)
@@ -255,6 +258,7 @@ dependencies {
   testImplementation libs.mockito.kotlin
   testImplementation libs.androidx.arch.core.testing
   testImplementation libs.robolectric
+  testImplementation libs.kotlinx.coroutines.test
   testImplementation libs.mockk.android
   testImplementation libs.androidx.test.ext.junit
   testImplementation libs.androidx.test.espresso.core

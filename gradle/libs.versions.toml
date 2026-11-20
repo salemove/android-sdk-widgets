@@ -90,6 +90,7 @@ androidx-exifinterface = { module = "androidx.exifinterface:exifinterface", vers
 # Kotlin / Kotlinx
 kotlin-parcelize-runtime = { module = "org.jetbrains.kotlin:kotlin-parcelize-runtime", version.ref = "kotlin" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
+kotlinx-coroutines-reactive = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactive", version.ref = "coroutines" }
 
 # UI / media
 material = { module = "com.google.android.material:material", version.ref = "material" }
@@ -123,6 +124,7 @@ androidx-arch-core-testing = { module = "androidx.arch.core:core-testing", versi
 mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk" }
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 json = { module = "org.json:json", version.ref = "json" }
 
 # Debug tooling

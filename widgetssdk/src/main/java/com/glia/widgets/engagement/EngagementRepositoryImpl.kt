@@ -387,9 +387,22 @@ internal class EngagementRepositoryImpl(
 
     private fun trackQueueTicketUpdates(ticket: QueueTicket) {
         core.subscribeToQueueTicketUpdates(ticket.id) { queueTicket, _ ->
-            if (queueTicket?.state == QueueTicket.State.UNSTAFFED) {
-                _engagementState.onNext(State.QueueUnstaffed)
-                _engagementState.onNext(State.NoEngagement)
+            // A late update for a cancelled, already failed or older ticket must not show a second dialog
+            if ((currentState as? State.Queuing)?.queueTicketId != ticket.id) return@subscribeToQueueTicketUpdates
+
+            when (queueTicket?.state) {
+                QueueTicket.State.UNSTAFFED, QueueTicket.State.FULL -> {
+                    _engagementState.onNext(State.QueueUnstaffed)
+                    _engagementState.onNext(State.NoEngagement)
+                }
+
+                QueueTicket.State.FAILED -> {
+                    _engagementState.onNext(State.UnexpectedErrorHappened)
+                    _engagementState.onNext(State.NoEngagement)
+                }
+
+                // FINISHED hands over to the engagement event. CANCELED is a visitor cancel or an "already queued" rejection.
+                else -> Unit
             }
         }
     }

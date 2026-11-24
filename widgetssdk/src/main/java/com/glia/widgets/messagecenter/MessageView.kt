@@ -234,9 +234,9 @@ internal class MessageView(context: Context, attrs: AttributeSet?, defStyleAttr:
     private fun showSendMessageGroup(state: MessageCenterState) {
         sendMessageGroup.isVisible = true
 
-        if (state.addAttachmentButtonVisible) {
+        if (state.addAttachmentButtonVisible && state.isFileUploadAvailable) {
             addAttachmentButton.visibility = VISIBLE
-            addAttachmentButton.isEnabled = state.addAttachmentButtonEnabled && state.isFileUploadAvailable
+            addAttachmentButton.isEnabled = state.addAttachmentButtonEnabled
 
             attachmentPopup.setupPhotoLibraryOptionVisible(state.isLibraryAttachmentVisible)
             attachmentPopup.setupTakePhotoOptionVisible(state.isTakePhotoAttachmentVisible)

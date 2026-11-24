@@ -61,6 +61,13 @@ internal class MessageCenterController(
     @Volatile
     private var state = MessageCenterState()
 
+    @Volatile
+    private var isSending: Boolean = false
+
+    /** Core's latest value. [state] holds it back while [isSending]. */
+    @Volatile
+    private var latestFileUploadAvailable: Boolean = false
+
     override fun setView(view: MessageCenterContract.View) {
         this.view = view
     }
@@ -97,7 +104,9 @@ internal class MessageCenterController(
         )
         disposables.add(
             isSecureConversationFileUploadAvailableUseCase().subscribe {
-                setState(state.copy(isFileUploadAvailable = it))
+                latestFileUploadAvailable = it
+                // A send can start the secure conversation, making upload available just before the confirmation screen.
+                if (!isSending) setState(state.copy(isFileUploadAvailable = it))
             }
         )
 
@@ -133,6 +142,7 @@ internal class MessageCenterController(
     }
 
     override fun onSendMessageClicked() {
+        isSending = true
         setState(
             state.copy(
                 messageEditTextEnabled = false,
@@ -148,13 +158,13 @@ internal class MessageCenterController(
                 when (it.cause) {
                     GliaException.Cause.AUTHENTICATION_ERROR -> {
                         dialogController.showMessageCenterUnavailableDialog()
-                        setState(state.copy(showSendMessageGroup = false))
+                        setState(endFailedSend().copy(showSendMessageGroup = false))
                     }
 
                     else -> {
                         dialogController.showUnexpectedErrorDialog()
                         setState(
-                            state.copy(
+                            endFailedSend().copy(
                                 messageEditTextEnabled = true,
                                 addAttachmentButtonEnabled = true
                             )
@@ -163,6 +173,11 @@ internal class MessageCenterController(
                 }
             }
         }
+    }
+
+    private fun endFailedSend(): MessageCenterState {
+        isSending = false
+        return state.copy(isFileUploadAvailable = latestFileUploadAvailable)
     }
 
     override fun onCloseButtonClicked() {

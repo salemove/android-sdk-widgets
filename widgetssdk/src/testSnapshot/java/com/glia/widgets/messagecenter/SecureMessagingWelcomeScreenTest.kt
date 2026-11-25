@@ -115,6 +115,20 @@ internal class SecureMessagingWelcomeScreenTest : SnapshotTest(
         )
     }
 
+    @Test
+    fun availableWithoutFileUpload() {
+        snapshot(
+            setupView(
+                state = MessageCenterState(
+                    showSendMessageGroup = true,
+                    sendMessageButtonState = MessageCenterState.ButtonState.NORMAL,
+                    addAttachmentButtonVisible = true,
+                    isFileUploadAvailable = false
+                )
+            ).view
+        )
+    }
+
     // MARK: Welcome screen with errors
 
     private fun limitErrorView(unifiedTheme: UnifiedTheme? = null) = setupView(
@@ -122,6 +136,7 @@ internal class SecureMessagingWelcomeScreenTest : SnapshotTest(
             showSendMessageGroup = true,
             addAttachmentButtonVisible = true,
             addAttachmentButtonEnabled = false,
+            isFileUploadAvailable = true,
             showMessageLimitError = true,
             sendMessageButtonState = MessageCenterState.ButtonState.DISABLE
         ),

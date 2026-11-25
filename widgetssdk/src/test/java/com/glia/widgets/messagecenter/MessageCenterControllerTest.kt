@@ -24,7 +24,9 @@ import com.glia.widgets.internal.secureconversations.domain.SendSecureMessageUse
 import com.glia.widgets.internal.secureconversations.domain.ShowMessageLimitErrorUseCase
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.processors.BehaviorProcessor
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -258,6 +260,61 @@ internal class MessageCenterControllerTest {
         messageCenterController.onSendMessageClicked()
 
         verify(dialogController).showUnexpectedErrorDialog()
+    }
+
+    private fun startSendWhileFileUploadUnavailable(): BehaviorProcessor<Boolean> {
+        val fileUploadAvailability = BehaviorProcessor.createDefault(false)
+        whenever(isAuthenticatedUseCase()) doReturn true
+        whenever(addFileAttachmentsObserverUseCase.invoke()) doReturn Observable.empty()
+        whenever(showMessageLimitErrorUseCase.invoke()) doReturn Observable.empty()
+        whenever(sendMessageButtonStateUseCase.invoke()) doReturn Observable.empty()
+        whenever(isSecureConversationFileUploadAvailableUseCase.invoke()) doReturn fileUploadAvailability
+        whenever(requestNotificationPermissionIfPushNotificationsSetUpUseCase.invoke(any())) doAnswer {
+            it.getArgument<() -> Unit>(0).invoke()
+        }
+        messageCenterController.setView(viewContract)
+        messageCenterController.initialize()
+
+        messageCenterController.onSendMessageClicked()
+        return fileUploadAvailability
+    }
+
+    private fun lastState(): MessageCenterState {
+        val stateCaptor = argumentCaptor<MessageCenterState>()
+        verify(viewContract, atLeastOnce()).onStateUpdated(stateCaptor.capture())
+        return stateCaptor.lastValue
+    }
+
+    @Test
+    fun onSendMessageClicked_HoldsBackFileUploadAvailability_WhileSending() {
+        val fileUploadAvailability = startSendWhileFileUploadUnavailable()
+
+        fileUploadAvailability.onNext(true)
+
+        assertFalse(lastState().isFileUploadAvailable)
+    }
+
+    private fun assertFollowsFileUploadAvailabilityAfterSendFails(cause: GliaException.Cause) {
+        val fileUploadAvailability = startSendWhileFileUploadUnavailable()
+        fileUploadAvailability.onNext(true)
+
+        val onFailure = argumentCaptor<(GliaException) -> Unit>()
+        verify(sendSecureMessageUseCase).invoke(any(), onFailure.capture())
+        onFailure.firstValue(GliaException("Message", cause))
+        assertTrue(lastState().isFileUploadAvailable)
+
+        fileUploadAvailability.onNext(false)
+        assertFalse(lastState().isFileUploadAvailable)
+    }
+
+    @Test
+    fun onSendMessageClicked_FollowsFileUploadAvailability_WhenSendFailsWithInternalError() {
+        assertFollowsFileUploadAvailabilityAfterSendFails(GliaException.Cause.INTERNAL_ERROR)
+    }
+
+    @Test
+    fun onSendMessageClicked_FollowsFileUploadAvailability_WhenSendFailsWithAuthError() {
+        assertFollowsFileUploadAvailabilityAfterSendFails(GliaException.Cause.AUTHENTICATION_ERROR)
     }
 
     @Test

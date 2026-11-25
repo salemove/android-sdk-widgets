@@ -55,6 +55,8 @@ import org.junit.Before
 import org.junit.Test
 import java.util.function.Consumer
 
+private const val TICKET_ID: String = "ticket_id"
+
 class EngagementRepositoryTest {
     @MockK(relaxUnitFun = true)
     private lateinit var core: GliaCore
@@ -1142,6 +1144,78 @@ class EngagementRepositoryTest {
                 State.NoEngagement
             )
         }
+    }
+
+    @Test
+    fun `failed queue ticket produces UnexpectedError`() {
+        val ticketUpdates = queueAndCaptureTicketUpdates()
+
+        repository.engagementState.test().apply {
+            ticketUpdates.onResult(queueTicketWithState(QueueTicket.State.FAILED), null)
+
+            assertNotComplete().assertValuesOnly(
+                State.Queuing(TICKET_ID, MediaType.TEXT),
+                State.UnexpectedErrorHappened,
+                State.NoEngagement
+            )
+        }
+    }
+
+    @Test
+    fun `full queue ticket produces QueueUnstaffed`() {
+        val ticketUpdates = queueAndCaptureTicketUpdates()
+
+        repository.engagementState.test().apply {
+            ticketUpdates.onResult(queueTicketWithState(QueueTicket.State.FULL), null)
+
+            assertNotComplete().assertValuesOnly(
+                State.Queuing(TICKET_ID, MediaType.TEXT),
+                State.QueueUnstaffed,
+                State.NoEngagement
+            )
+        }
+    }
+
+    @Test
+    fun `canceled queue ticket produces no state`() {
+        val ticketUpdates = queueAndCaptureTicketUpdates()
+
+        repository.engagementState.test().apply {
+            ticketUpdates.onResult(queueTicketWithState(QueueTicket.State.CANCELED), null)
+
+            assertNotComplete().assertValuesOnly(State.Queuing(TICKET_ID, MediaType.TEXT))
+        }
+    }
+
+    @Test
+    fun `failed queue ticket after queueing was canceled produces no state`() {
+        val ticketUpdates = queueAndCaptureTicketUpdates()
+        val cancelQueueTicketCallbackSlot = slot<Consumer<GliaException?>>()
+        repository.cancelQueuing()
+        verify { core.cancelQueueTicket(TICKET_ID, capture(cancelQueueTicketCallbackSlot)) }
+        cancelQueueTicketCallbackSlot.captured.accept(null)
+
+        repository.engagementState.test().apply {
+            ticketUpdates.onResult(queueTicketWithState(QueueTicket.State.FAILED), null)
+
+            assertNotComplete().assertValuesOnly(State.NoEngagement)
+        }
+    }
+
+    private fun queueAndCaptureTicketUpdates(): RequestCallback<QueueTicket?> {
+        every { queueRepository.relevantQueueIds } returns Single.just(listOf("queue_id"))
+        repository.queueForEngagement(MediaType.TEXT, true)
+        verify { queueRepository.relevantQueueIds }
+        verify { core.queueForEngagement(listOf("queue_id"), MediaType.TEXT, null, any(), eq(true), any()) }
+        queueTicketCallbackSlot.captured.accept(mockk(relaxed = true) { every { id } returns TICKET_ID })
+
+        val ticketUpdatesSlot = slot<RequestCallback<QueueTicket?>>()
+        verify { core.subscribeToQueueTicketUpdates(TICKET_ID, capture(ticketUpdatesSlot)) }
+        return ticketUpdatesSlot.captured
+    }
+
+    private fun queueTicketWithState(ticketState: QueueTicket.State): QueueTicket = mockk(relaxed = true) {
+        every { state } returns ticketState
     }
 
     @Test

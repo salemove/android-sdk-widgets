@@ -13,6 +13,7 @@ import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.internal.notification.NotificationFactory
 import com.glia.widgets.internal.notification.areNotificationsEnabledForChannel
+import com.glia.widgets.internal.notification.domain.CallNotification
 
 internal class NotificationManager(
     private val applicationContext: Application,
@@ -61,20 +62,11 @@ internal class NotificationManager(
         }
     }
 
-    override fun showAudioCallNotification() {
-        CallForegroundService.startAudio(applicationContext)
-    }
+    override fun startCallService(call: CallNotification, usesMicrophone: Boolean, usesCamera: Boolean): Boolean =
+        CallForegroundService.start(applicationContext, call, usesMicrophone, usesCamera)
 
-    override fun showVideoCallNotification(isTwoWayVideo: Boolean, hasAudio: Boolean) {
-        if (isTwoWayVideo || hasAudio) {
-            CallForegroundService.startVideo(applicationContext, isTwoWayVideo, hasAudio)
-        } else {
-            // The visitor sends no media, so no foreground service type fits this call.
-            notificationManager.notify(
-                NotificationFactory.CALL_NOTIFICATION_ID,
-                NotificationFactory.createVideoCallNotification(applicationContext, isTwoWayVideo = false, hasAudio = false)
-            )
-        }
+    override fun showCallNotification(call: CallNotification) {
+        notificationManager.notify(NotificationFactory.CALL_NOTIFICATION_ID, NotificationFactory.createCallNotification(applicationContext, call))
     }
 
     override fun startNotificationRemovalService() {

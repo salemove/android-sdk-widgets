@@ -4,15 +4,18 @@ import android.app.Application
 import android.mock
 import android.os.Build
 import android.unMock
+import com.glia.androidsdk.comms.MediaDirection
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.internal.notification.NotificationFactory
+import com.glia.widgets.internal.notification.domain.CallNotification
 import com.glia.widgets.locale.LocaleProvider
 import io.mockk.mockk
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,6 +29,8 @@ import org.robolectric.annotation.Config
 class NotificationManagerTest {
     private lateinit var application: Application
     private lateinit var manager: NotificationManager
+
+    private val audioCall = CallNotification(CallNotification.Phase.LIVE, MediaDirection.NONE, hasAudio = true)
 
     @Before
     fun setUp() {
@@ -41,80 +46,40 @@ class NotificationManagerTest {
     }
 
     @Test
-    fun `showAudioCallNotification starts CallForegroundService`() {
-        manager.showAudioCallNotification()
-
-        val intent = shadowOf(application).nextStartedService
-        assertNotNull("Expected CallForegroundService to be started", intent)
-        assertEquals(
-            CallForegroundService::class.java.name,
-            intent?.component?.className
-        )
-    }
-
-    @Test
-    fun `showVideoCallNotification starts CallForegroundService`() {
-        manager.showVideoCallNotification(isTwoWayVideo = true, hasAudio = true)
-
-        val intent = shadowOf(application).nextStartedService
-        assertNotNull("Expected CallForegroundService to be started", intent)
-        assertEquals(
-            CallForegroundService::class.java.name,
-            intent?.component?.className
-        )
-    }
-
-    @Test
-    @Config(sdk = [Build.VERSION_CODES.S])
-    fun `showAudioCallNotification starts CallForegroundService on API 31`() {
-        manager.showAudioCallNotification()
-
-        val intent = shadowOf(application).nextStartedService
-        assertNotNull("Expected CallForegroundService to be started on API 31+", intent)
-        assertEquals(
-            CallForegroundService::class.java.name,
-            intent?.component?.className
-        )
-    }
-
-    @Test
-    fun `removeCallNotification stops CallForegroundService`() {
-        manager.removeCallNotification()
-
-        val stopped = shadowOf(application).nextStoppedService
-        assertNotNull("Expected CallForegroundService to be stopped", stopped)
-        assertEquals(
-            CallForegroundService::class.java.name,
-            stopped?.component?.className
-        )
-    }
-
-    @Test
-    fun `showVideoCallNotification one-way starts CallForegroundService`() {
-        manager.showVideoCallNotification(isTwoWayVideo = false, hasAudio = true)
-
-        val intent = shadowOf(application).nextStartedService
-        assertNotNull("Expected CallForegroundService to be started for one-way video", intent)
-        assertEquals(
-            CallForegroundService::class.java.name,
-            intent?.component?.className
-        )
-    }
-
-    @Test
-    fun `showVideoCallNotification two-way without audio starts CallForegroundService`() {
-        manager.showVideoCallNotification(isTwoWayVideo = true, hasAudio = false)
+    fun `startCallService starts CallForegroundService`() {
+        assertTrue(manager.startCallService(audioCall, usesMicrophone = true, usesCamera = false))
 
         val intent = shadowOf(application).nextStartedService
         assertEquals(CallForegroundService::class.java.name, intent?.component?.className)
     }
 
     @Test
-    fun `showVideoCallNotification one-way without audio posts the notification without a service`() {
-        manager.showVideoCallNotification(isTwoWayVideo = false, hasAudio = false)
+    @Config(sdk = [Build.VERSION_CODES.S])
+    fun `startCallService starts CallForegroundService on API 31`() {
+        manager.startCallService(audioCall, usesMicrophone = true, usesCamera = false)
+
+        val intent = shadowOf(application).nextStartedService
+        assertEquals(CallForegroundService::class.java.name, intent?.component?.className)
+    }
+
+    @Test
+    fun `showCallNotification posts the notification without starting a service`() {
+        manager.showCallNotification(audioCall)
 
         assertNull(shadowOf(application).nextStartedService)
-        val systemNotificationManager = application.getSystemService(android.app.NotificationManager::class.java)
-        assertNotNull(shadowOf(systemNotificationManager).getNotification(NotificationFactory.CALL_NOTIFICATION_ID))
+        assertNotNull(systemNotificationManager().getNotification(NotificationFactory.CALL_NOTIFICATION_ID))
     }
+
+    @Test
+    fun `removeCallNotification stops CallForegroundService and removes the notification`() {
+        manager.showCallNotification(audioCall)
+
+        manager.removeCallNotification()
+
+        val stopped = shadowOf(application).nextStoppedService
+        assertEquals(CallForegroundService::class.java.name, stopped?.component?.className)
+        assertNull(systemNotificationManager().getNotification(NotificationFactory.CALL_NOTIFICATION_ID))
+    }
+
+    private fun systemNotificationManager() = shadowOf(application.getSystemService(android.app.NotificationManager::class.java))
 }

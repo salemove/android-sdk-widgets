@@ -80,7 +80,6 @@ import com.glia.widgets.internal.fileupload.domain.GetFileAttachmentsUseCase
 import com.glia.widgets.internal.fileupload.domain.RemoveFileAttachmentUseCase
 import com.glia.widgets.internal.fileupload.domain.SupportedUploadFileTypesUseCase
 import com.glia.widgets.internal.fileupload.model.LocalAttachment
-import com.glia.widgets.internal.notification.domain.CallNotificationUseCase
 import com.glia.widgets.internal.permissions.domain.RequestNotificationPermissionIfPushNotificationsSetUpUseCase
 import com.glia.widgets.internal.permissions.domain.WithCameraPermissionUseCase
 import com.glia.widgets.internal.permissions.domain.WithReadWritePermissionsUseCase
@@ -104,7 +103,6 @@ internal class ChatController(
     private val minimizeHandler: MinimizeHandler,
     private val dialogController: DialogContract.Controller,
     private val messagesNotSeenHandler: MessagesNotSeenHandler,
-    private val callNotificationUseCase: CallNotificationUseCase,
     private val onOperatorTypingUseCase: OperatorTypingUseCase,
     private val sendMessagePreviewUseCase: GliaSendMessagePreviewUseCase,
     private val sendMessageUseCase: GliaSendMessageUseCase,
@@ -912,8 +910,6 @@ internal class ChatController(
                 startTimer()
             }
         }
-
-        callNotificationUseCase(operatorMedia = operatorMediaState)
     }
 
     private fun addMediaUpgradeItemToChatItems(operatorMediaState: MediaState) {

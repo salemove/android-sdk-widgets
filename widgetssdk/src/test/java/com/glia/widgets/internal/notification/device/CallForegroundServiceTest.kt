@@ -1,16 +1,25 @@
 package com.glia.widgets.internal.notification.device
 
 import android.app.Application
+import android.content.Context
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
 import android.mock
 import android.os.Build
 import android.unMock
+import com.glia.androidsdk.comms.MediaDirection
+import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.internal.notification.NotificationFactory
+import com.glia.widgets.internal.notification.OngoingCallNotificationManager
+import com.glia.widgets.internal.notification.domain.CallNotification
+import com.glia.widgets.locale.LocaleProvider
+import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -21,18 +30,23 @@ import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.Shadows.shadowOf
+import org.robolectric.android.controller.ServiceController
 import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.UPSIDE_DOWN_CAKE])
 class CallForegroundServiceTest {
     private lateinit var application: Application
+    private val ongoingCallNotificationManager: OngoingCallNotificationManager = mockk(relaxUnitFun = true)
+
+    private val audioCall = CallNotification(CallNotification.Phase.LIVE, MediaDirection.NONE, hasAudio = true)
 
     @Before
     fun setUp() {
         Logger.mock()
         application = RuntimeEnvironment.getApplication()
-        setupLocaleProvider()
+        Dependencies.localeProvider = mockk<LocaleProvider>(relaxed = true)
+        Dependencies.ongoingCallNotificationManager = ongoingCallNotificationManager
     }
 
     @After
@@ -41,20 +55,10 @@ class CallForegroundServiceTest {
     }
 
     @Test
-    fun `startAudio enqueues a start intent for CallForegroundService`() {
-        CallForegroundService.startAudio(application)
+    fun `start enqueues a start intent for CallForegroundService`() {
+        CallForegroundService.start(application, audioCall, usesMicrophone = true, usesCamera = false)
 
         val started = shadowOf(application).nextStartedService
-        assertNotNull(started)
-        assertEquals(CallForegroundService::class.java.name, started?.component?.className)
-    }
-
-    @Test
-    fun `startVideo enqueues a start intent for CallForegroundService`() {
-        CallForegroundService.startVideo(application, isTwoWayVideo = true, hasAudio = true)
-
-        val started = shadowOf(application).nextStartedService
-        assertNotNull(started)
         assertEquals(CallForegroundService::class.java.name, started?.component?.className)
     }
 
@@ -63,118 +67,95 @@ class CallForegroundServiceTest {
         CallForegroundService.stop(application)
 
         val stopped = shadowOf(application).nextStoppedService
-        assertNotNull(stopped)
         assertEquals(CallForegroundService::class.java.name, stopped?.component?.className)
     }
 
     @Test
-    fun `audio call promotes service to foreground`() {
-        CallForegroundService.startAudio(application)
-        val intent = shadowOf(application).nextStartedService
+    fun `microphone call promotes the service to foreground with the microphone type`() {
+        val controller = startService(audioCall, usesMicrophone = true, usesCamera = false)
 
-        val controller = Robolectric.buildService(CallForegroundService::class.java, intent)
-            .create()
-            .startCommand(0, 0)
-        val shadow = shadowOf(controller.get())
-
-        assertNotNull("Foreground notification should be set for audio call", shadow.lastForegroundNotification)
-        assertEquals(NotificationFactory.CALL_NOTIFICATION_ID, shadow.lastForegroundNotificationId)
+        assertNotNull(shadowOf(controller.get()).lastForegroundNotification)
+        assertEquals(NotificationFactory.CALL_NOTIFICATION_ID, shadowOf(controller.get()).lastForegroundNotificationId)
         assertEquals(FOREGROUND_SERVICE_TYPE_MICROPHONE, controller.get().foregroundServiceType)
     }
 
     @Test
-    fun `two-way video call promotes service to foreground`() {
-        CallForegroundService.startVideo(application, isTwoWayVideo = true, hasAudio = true)
-        val intent = shadowOf(application).nextStartedService
+    fun `microphone and camera call uses both types`() {
+        val videoCall = CallNotification(CallNotification.Phase.WAITING, MediaDirection.TWO_WAY, hasAudio = true)
 
-        val controller = Robolectric.buildService(CallForegroundService::class.java, intent)
-            .create()
-            .startCommand(0, 0)
-        val shadow = shadowOf(controller.get())
+        val controller = startService(videoCall, usesMicrophone = true, usesCamera = true)
 
-        assertNotNull("Foreground notification should be set for two-way video", shadow.lastForegroundNotification)
-        assertEquals(NotificationFactory.CALL_NOTIFICATION_ID, shadow.lastForegroundNotificationId)
         assertEquals(FOREGROUND_SERVICE_TYPE_MICROPHONE or FOREGROUND_SERVICE_TYPE_CAMERA, controller.get().foregroundServiceType)
     }
 
     @Test
-    fun `two-way video call without audio uses only the camera type`() {
-        CallForegroundService.startVideo(application, isTwoWayVideo = true, hasAudio = false)
-        val intent = shadowOf(application).nextStartedService
+    fun `camera-only call does not ask for the microphone type`() {
+        val videoCall = CallNotification(CallNotification.Phase.LIVE, MediaDirection.TWO_WAY, hasAudio = false)
 
-        val controller = Robolectric.buildService(CallForegroundService::class.java, intent)
-            .create()
-            .startCommand(0, 0)
+        val controller = startService(videoCall, usesMicrophone = false, usesCamera = true)
 
-        assertEquals(NotificationFactory.CALL_NOTIFICATION_ID, shadowOf(controller.get()).lastForegroundNotificationId)
         assertEquals(FOREGROUND_SERVICE_TYPE_CAMERA, controller.get().foregroundServiceType)
     }
 
     @Test
-    fun `one-way video call promotes service to foreground`() {
-        CallForegroundService.startVideo(application, isTwoWayVideo = false, hasAudio = true)
-        val intent = shadowOf(application).nextStartedService
+    @Config(sdk = [Build.VERSION_CODES.S])
+    fun `microphone call promotes the service to foreground on API 31`() {
+        val controller = startService(audioCall, usesMicrophone = true, usesCamera = false)
 
-        val controller = Robolectric.buildService(CallForegroundService::class.java, intent)
-            .create()
-            .startCommand(0, 0)
-        val shadow = shadowOf(controller.get())
-
-        assertNotNull("Foreground notification should be set for one-way video", shadow.lastForegroundNotification)
-        assertEquals(NotificationFactory.CALL_NOTIFICATION_ID, shadow.lastForegroundNotificationId)
-        assertEquals(FOREGROUND_SERVICE_TYPE_MICROPHONE, controller.get().foregroundServiceType)
+        assertEquals(NotificationFactory.CALL_NOTIFICATION_ID, shadowOf(controller.get()).lastForegroundNotificationId)
     }
 
     @Test
     fun `onTaskRemoved removes the foreground notification`() {
-        CallForegroundService.startAudio(application)
-        val intent = shadowOf(application).nextStartedService
-
-        val controller = Robolectric.buildService(CallForegroundService::class.java, intent)
-            .create()
-            .startCommand(0, 0)
+        val controller = startService(audioCall, usesMicrophone = true, usesCamera = false)
         val service = controller.get()
 
         service.onTaskRemoved(null)
         controller.destroy()
 
-        assertTrue(
-            "Foreground should be stopped after onTaskRemoved",
-            shadowOf(service).isForegroundStopped
-        )
+        assertTrue(shadowOf(service).isForegroundStopped)
+        verify(exactly = 1) { ongoingCallNotificationManager.onCallServiceStopped() }
     }
 
     @Test
-    fun `startForeground failure is swallowed without crashing`() {
-        CallForegroundService.startAudio(application)
-        val intent = shadowOf(application).nextStartedService
+    fun `refused promotion stops the service and reports it`() {
+        CallForegroundService.start(application, audioCall, usesMicrophone = true, usesCamera = false)
+        val controller = Robolectric.buildService(CallForegroundService::class.java, shadowOf(application).nextStartedService).create()
+        shadowOf(controller.get()).setThrowInStartForeground(SecurityException("app is not in the foreground"))
 
-        val controller = Robolectric.buildService(CallForegroundService::class.java, intent).create()
-        shadowOf(controller.get()).setThrowInStartForeground(RuntimeException("simulated failure"))
-
-        // Should not throw
         controller.startCommand(0, 0)
 
-        assertNull("Foreground notification should be null after failure", shadowOf(controller.get()).lastForegroundNotification)
+        assertNull(shadowOf(controller.get()).lastForegroundNotification)
+        assertTrue(shadowOf(controller.get()).isStoppedBySelf)
+        verify(exactly = 1) { ongoingCallNotificationManager.onCallServiceStopped() }
     }
 
     @Test
-    @Config(sdk = [Build.VERSION_CODES.S])
-    fun `audio call promotes service to foreground on API 31`() {
-        CallForegroundService.startAudio(application)
-        val intent = shadowOf(application).nextStartedService
+    fun `successful promotion keeps the service running`() {
+        val controller = startService(audioCall, usesMicrophone = true, usesCamera = false)
 
-        val controller = Robolectric.buildService(CallForegroundService::class.java, intent)
-            .create()
-            .startCommand(0, 0)
-        val shadow = shadowOf(controller.get())
-
-        assertNotNull("Foreground notification should be set on API 31", shadow.lastForegroundNotification)
-        assertEquals(NotificationFactory.CALL_NOTIFICATION_ID, shadow.lastForegroundNotificationId)
+        assertFalse(shadowOf(controller.get()).isStoppedBySelf)
+        verify(exactly = 0) { ongoingCallNotificationManager.onCallServiceStopped() }
     }
 
-    private fun setupLocaleProvider() {
-        com.glia.widgets.di.Dependencies.localeProvider =
-            mockk<com.glia.widgets.locale.LocaleProvider>(relaxed = true)
+    @Test
+    fun `start reports a start the system refused`() {
+        val context: Context = mockk(relaxed = true) {
+            every { startForegroundService(any()) } throws IllegalStateException("not allowed to start service")
+        }
+
+        assertFalse(CallForegroundService.start(context, audioCall, usesMicrophone = true, usesCamera = false))
+    }
+
+    @Test
+    fun `start reports an accepted start`() {
+        assertTrue(CallForegroundService.start(application, audioCall, usesMicrophone = true, usesCamera = false))
+    }
+
+    private fun startService(call: CallNotification, usesMicrophone: Boolean, usesCamera: Boolean): ServiceController<CallForegroundService> {
+        CallForegroundService.start(application, call, usesMicrophone, usesCamera)
+        return Robolectric.buildService(CallForegroundService::class.java, shadowOf(application).nextStartedService)
+            .create()
+            .startCommand(0, 0)
     }
 }

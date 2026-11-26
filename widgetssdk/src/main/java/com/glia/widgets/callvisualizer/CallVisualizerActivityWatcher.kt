@@ -61,16 +61,15 @@ internal class CallVisualizerActivityWatcher(
     private fun closeHolderActivity() = finishActivity(DialogHolderActivity::class)
 
     private fun displayVisitorCodeDialog(activity: Activity) {
-        showAlertDialogWithStyledContext(activity) { context, _ ->
+        showAlertDialogWithStyledContext(activity) { context ->
             Dialogs.showVisitorCodeDialog(context)
         }
     }
 
     private fun displayConfirmationDialog(activity: Activity, links: ConfirmationDialogLinks, consumeCallback: () -> Unit) {
-        showAlertDialogWithStyledContext(activity) { context, uiTheme ->
+        showAlertDialogWithStyledContext(activity) { context ->
             Dialogs.showEngagementConfirmationDialog(
                 context = context,
-                theme = uiTheme,
                 links = links,
                 linkClickListener = {
                     consumeCallback()

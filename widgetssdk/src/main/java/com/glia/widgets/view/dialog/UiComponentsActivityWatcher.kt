@@ -60,10 +60,9 @@ internal class UiComponentsActivityWatcher(
         SnackBarDelegateFactory(activity, messageResId, localeProvider, themeManager.theme).createDelegate().show()
 
     private fun showPermissionsDialog(activity: Activity, consumeCallback: () -> Unit, onAllow: () -> Unit) {
-        showAlertDialogWithStyledContext(activity) { context, uiTheme ->
+        showAlertDialogWithStyledContext(activity) { context ->
             Dialogs.showPushNotificationsPermissionDialog(
                 context = context,
-                uiTheme = uiTheme,
                 positiveButtonClickListener = {
                     dismissDialogAndFinishHolderActivity()
                     consumeCallback()

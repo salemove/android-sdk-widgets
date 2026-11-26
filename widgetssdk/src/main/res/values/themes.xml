@@ -137,6 +137,26 @@
     </style>
 
     <!--
+        The call app bar floats over the video surface, so it has to stay dark-with-white-content
+        whatever the integrator's brand palette is. `CallView.setAppBarTheme()` used to force exactly
+        these six values into the `UiTheme` it handed the app bar, which made `call_view.xml`'s own
+        `android:backgroundTint` / `app:lightTint` dead attributes. Applied as a view-level
+        `android:theme` on the `AppBarView` instead, so the app bar resolves them the same way every
+        other Glia view resolves its colours.
+
+        `gliaBaseLightColor` and `gliaSystemNegativeColor` are pinned to the SDK defaults rather than
+        left inherited, because the end-engagement button has to stay legible on the dark bar.
+    -->
+    <style name="ThemeOverlay.Glia.Internal.CallAppBar" parent="">
+        <item name="gliaBrandPrimaryColor">@color/glia_call_view_background_color</item>
+        <item name="gliaBaseLightColor">@color/glia_light_color</item>
+        <item name="gliaSystemNegativeColor">@color/glia_negative_color</item>
+        <item name="gliaChatHeaderTitleTintColor">@android:color/white</item>
+        <item name="gliaChatHeaderHomeButtonTintColor">@android:color/white</item>
+        <item name="gliaChatHeaderExitQueueButtonTintColor">@android:color/white</item>
+    </style>
+
+    <!--
         Public override hook. Ships EMPTY on purpose: every default lives in `Theme.Glia.Internal`,
         so an integrator redefining this style only ever contributes the items they declare.
 

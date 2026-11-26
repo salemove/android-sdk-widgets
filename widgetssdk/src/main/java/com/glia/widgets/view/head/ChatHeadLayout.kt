@@ -20,13 +20,11 @@ import kotlin.properties.Delegates
 internal class ChatHeadLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = R.attr.gliaChatStyle,
-    defStyleRes: Int = R.style.Application_Glia_Chat
+    defStyleAttr: Int = 0
 ) : FrameLayout(
     context.wrapWithGliaTheme(),
     attrs,
-    defStyleAttr,
-    defStyleRes
+    defStyleAttr
 ), ChatHeadLayoutContract.View {
     private var chatHeadController: ChatHeadLayoutContract.Controller by Delegates.notNull()
 

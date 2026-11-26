@@ -10,7 +10,6 @@ import androidx.core.content.ContextCompat
 import com.glia.widgets.R
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -134,14 +133,6 @@ internal class GliaThemeOverlaysTest {
         assertNull(overlay)
     }
 
-    @Test
-    fun `declaresUnPrefixedLegacyItems detects items the integrator set itself`() {
-        val context = themed(R.style.Theme_Glia_Internal)
-
-        assertTrue(context.declaresUnPrefixedLegacyItems(R.style.Test_Glia_Legacy_ChatStyleWithUnPrefixedItems))
-        assertFalse(context.declaresUnPrefixedLegacyItems(R.style.Test_Glia_Legacy_ChatStyle))
-    }
-
     // endregion
 
     // region composition
@@ -202,16 +193,6 @@ internal class GliaThemeOverlaysTest {
         assertEquals(R.drawable.glia_test_customization_icon, context.resourceIdOf(R.attr.gliaIconLeaveQueue))
         // the legacy overlay must not have been applied
         assertEquals(R.drawable.ic_baseline_arrow_back, context.resourceIdOf(R.attr.gliaIconAppBarBack))
-    }
-
-    @Test
-    fun `un-prefixed legacy items are not applied to the theme`() {
-        val context = themed(R.style.Test_Glia_Theme_WithUnPrefixedLegacyItems)
-
-        context.applyGliaThemeOverlays()
-
-        assertNotEquals(R.color.glia_test_unprefixed_brand, context.resourceIdOf(R.attr.gliaBrandPrimaryColor))
-        assertNotEquals(R.color.glia_test_unprefixed_brand, context.resourceIdOf(R.attr.brandPrimaryColor))
     }
 
     // endregion

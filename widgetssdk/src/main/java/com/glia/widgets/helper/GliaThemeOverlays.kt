@@ -6,10 +6,17 @@ import android.content.Context
 import android.content.res.Resources
 import android.content.res.TypedArray
 import android.util.TypedValue
+import androidx.annotation.AnyRes
+import androidx.annotation.AttrRes
+import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
 import androidx.annotation.StyleRes
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.use
 import com.glia.widgets.R
+import com.google.android.material.color.MaterialColors
 
 private const val TAG = "GliaThemeOverlays"
 private const val NO_RESOURCE = 0
@@ -70,6 +77,54 @@ internal fun Context.applyGliaThemeOverlays(
  */
 internal fun Context.wrapWithGliaTheme(): Context =
     ContextThemeWrapper(this, R.style.Theme_Glia_Internal).apply { applyGliaThemeOverlays() }
+
+/**
+ * Resolves a theme attribute to the resource it points at, or `null` when the theme does not declare
+ * it or declares an inline value instead of a resource reference.
+ *
+ * This is the attribute-resolution primitive of the new mechanism: every `glia*` value the SDK reads
+ * lives in the composed theme, so a view asks its own context for one instead of being handed a
+ * projection of the theme.
+ */
+@AnyRes
+internal fun Context.gliaAttrResourceId(@AttrRes attr: Int): Int? {
+    val typedValue = TypedValue()
+    if (!theme.resolveAttribute(attr, typedValue, true)) return null
+    return typedValue.resourceId.takeIf { it != NO_RESOURCE }
+}
+
+/**
+ * [gliaAttrResourceId] with a default, for use where the caller cannot act on `null`.
+ *
+ * Every `glia*` attribute is declared `format="reference"`, so within a Glia surface the fallback is
+ * unreachable - it covers inflation into a context whose theme is not a Glia one at all.
+ */
+@AnyRes
+internal fun Context.gliaAttrResourceId(@AttrRes attr: Int, @AnyRes fallback: Int): Int =
+    gliaAttrResourceId(attr) ?: fallback
+
+/** Typed [gliaAttrResourceId] for the icon attributes, e.g. `gliaIconAppBarBack`. */
+@DrawableRes
+internal fun Context.gliaAttrDrawableRes(@AttrRes attr: Int, @DrawableRes fallback: Int): Int =
+    gliaAttrResourceId(attr, fallback)
+
+/**
+ * Resolves a colour attribute to a colour value.
+ *
+ * Prefer this over [gliaAttrResourceId] plus a manual lookup wherever a colour is what the caller
+ * actually wants: it also handles the Material attributes (`colorPrimary` and friends), which - unlike
+ * the `glia*` ones - accept an inline literal as well as a reference.
+ */
+@ColorInt
+internal fun Context.gliaAttrColor(@AttrRes attr: Int, @ColorRes fallback: Int): Int =
+    MaterialColors.getColor(this, attr, ContextCompat.getColor(this, fallback))
+
+/** Resolves a boolean attribute, e.g. `whiteLabel`. */
+internal fun Context.gliaAttrBoolean(@AttrRes attr: Int, default: Boolean = false): Boolean {
+    val typedValue = TypedValue()
+    if (!theme.resolveAttribute(attr, typedValue, true)) return default
+    return typedValue.data != 0
+}
 
 /**
  * Resolves the `materialThemeOverlay` of the legacy `gliaChatStyle` style, or `null` when the

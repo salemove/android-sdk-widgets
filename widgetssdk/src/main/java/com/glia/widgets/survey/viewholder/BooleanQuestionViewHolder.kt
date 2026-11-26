@@ -1,6 +1,5 @@
 package com.glia.widgets.survey.viewholder
 
-import android.graphics.Typeface
 import com.glia.androidsdk.engagement.Survey
 import com.glia.widgets.R
 import com.glia.widgets.databinding.SurveyBooleanQuestionItemBinding
@@ -9,15 +8,12 @@ import com.glia.widgets.helper.setLocaleText
 import com.glia.widgets.survey.QuestionItem
 import com.glia.widgets.survey.SurveyAdapter
 import com.glia.widgets.view.button.GliaSurveyOptionButton
-import com.glia.widgets.view.configuration.OptionButtonConfiguration
-import com.glia.widgets.view.configuration.survey.SurveyStyle
 import com.glia.widgets.view.unifiedui.applyOptionButtonTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.survey.SurveyBooleanQuestionTheme
 
 internal class BooleanQuestionViewHolder(
-    private val binding: SurveyBooleanQuestionItemBinding,
-    style: SurveyStyle
+    private val binding: SurveyBooleanQuestionItemBinding
 ) : SurveyViewHolder(binding.root, binding.tvTitle, binding.requiredError) {
     private val booleanTheme: SurveyBooleanQuestionTheme? by lazy {
         Dependencies.gliaThemeManager.theme?.surveyTheme?.booleanQuestion
@@ -26,28 +22,14 @@ internal class BooleanQuestionViewHolder(
     private val noButton: GliaSurveyOptionButton get() = binding.noButton
 
     init {
-        val questionStyle = style.booleanQuestion
-        val titleConfiguration = questionStyle.title
-        title.setTextColor(titleConfiguration.textColor)
-        val textSize = titleConfiguration.textSize
-        title.textSize = textSize
-        if (titleConfiguration.isBold) title.typeface = Typeface.DEFAULT_BOLD
+        // The title's colour, size and weight come from `survey_boolean_question_item.xml`; the
+        // buttons' from `?attr/buttonSurveyOptionButtonStyle`. Only the JSON theme is left to apply.
         booleanTheme?.title?.also(title::applyTextTheme)
 
-        val buttonConfiguration = questionStyle.optionButton
-        setupYesButton(buttonConfiguration)
-        setupNoButton(buttonConfiguration)
-    }
-
-    private fun setupYesButton(buttonConfiguration: OptionButtonConfiguration?) {
         yesButton.setLocaleText(R.string.general_yes)
-        yesButton.setStyle(buttonConfiguration)
         yesButton.setOnClickListener { setAnswer(true) }
-    }
 
-    private fun setupNoButton(buttonConfiguration: OptionButtonConfiguration?) {
         noButton.setLocaleText(R.string.general_no)
-        noButton.setStyle(buttonConfiguration)
         noButton.setOnClickListener { setAnswer(false) }
     }
 

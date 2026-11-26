@@ -4,7 +4,6 @@ import android.view.View
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
-import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.model.OperatorChatItem
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.setLocaleContentDescription
@@ -17,7 +16,6 @@ import com.glia.widgets.view.unifiedui.theme.chat.MessageBalloonTheme
 internal open class OperatorBaseViewHolder(
     itemView: View,
     private val chatHeadView: OperatorStatusView,
-    private val uiTheme: UiTheme,
     unifiedTheme: UnifiedTheme? = Dependencies.gliaThemeManager.theme
 ) : RecyclerView.ViewHolder(itemView) {
 
@@ -62,7 +60,6 @@ internal open class OperatorBaseViewHolder(
     }
 
     private fun setupOperatorStatusView() {
-        chatHeadView.setTheme(uiTheme)
         chatHeadView.setShowRippleAnimation(false)
         chatHeadView.applyUserImageTheme(operatorTheme?.userImage)
     }

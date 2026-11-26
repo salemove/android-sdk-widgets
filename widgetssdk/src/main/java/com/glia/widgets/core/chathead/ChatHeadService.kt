@@ -20,6 +20,7 @@ import com.glia.widgets.R
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
+import com.glia.widgets.helper.applyGliaThemeOverlays
 import com.glia.widgets.view.SimpleTouchListener
 import com.glia.widgets.view.head.ChatHeadContract
 import com.glia.widgets.view.head.ChatHeadLogger
@@ -81,11 +82,20 @@ internal class ChatHeadService : Service() {
     override fun attachBaseContext(newBase: Context) {
         /*Since a Service doesn't really have a theme, need to force style to avoid crashes in views attached with this context.
         Otherwise, this leads to exceptions like "You need to use a Theme.AppCompat theme (or descendant) with ShapeableImageView.*/
-        super.attachBaseContext(ContextThemeWrapper(newBase, R.style.Application_Glia_Chat_Activity))
+
+        /* The wrapper must NOT be asked for its theme yet. Service.attach() calls attachBaseContext()
+           before assigning mBase, and materialising the wrapper's theme walks
+           ContextImpl.getTheme() -> getOuterContext() (this Service) -> getApplicationInfo(), which
+           NPEs on the still-null mBase. The Glia overlays are therefore composed in onCreate(). */
+        super.attachBaseContext(ContextThemeWrapper(newBase, R.style.Theme_Glia_Internal))
     }
 
     override fun onCreate() {
         super.onCreate()
+
+        // Safe here: mBase is assigned, so the base theme can be read. ContextThemeWrapper creates its
+        // theme lazily and only once, so the overlays land on top of Theme.Glia.Internal and stay there.
+        applyGliaThemeOverlays()
 
         Logger.d(TAG, "onCreate")
         val controller = Dependencies.controllerFactory.chatHeadController

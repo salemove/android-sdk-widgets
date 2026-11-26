@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
@@ -26,6 +27,7 @@ import com.glia.widgets.helper.ExtraKeys
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.SimpleWindowInsetsAndAnimationHandler
 import com.glia.widgets.helper.TAG
+import com.glia.widgets.helper.applyGliaThemeOverlays
 import com.glia.widgets.helper.getParcelable
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.helper.showToast
@@ -67,6 +69,18 @@ internal class ImagePreviewActivity : GliaActivity<ImagePreviewView>, AppCompatA
         super.attachBaseContext(newBase)
 
         setController(Dependencies.controllerFactory.imagePreviewController)
+    }
+
+    /**
+     * See `FadeTransitionActivity.onApplyThemeResource` for why this is the hook.
+     *
+     * The legacy overlay is skipped on purpose: this screen's manifest theme never went through
+     * `MaterialThemeOverlay`, so honouring `gliaChatStyle` here would be a *new* visual change for
+     * integrators still on the legacy mechanism. `GliaTheme` (and JSON) do apply.
+     */
+    override fun onApplyThemeResource(theme: Resources.Theme, resid: Int, first: Boolean) {
+        super.onApplyThemeResource(theme, resid, first)
+        applyGliaThemeOverlays(includeLegacyOverlay = false)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -32,7 +32,6 @@ import com.glia.widgets.view.unifiedui.applyColorTheme
 import com.glia.widgets.view.unifiedui.applyImageColorTheme
 import com.glia.widgets.view.unifiedui.theme.bubble.BubbleTheme
 import com.glia.widgets.view.unifiedui.theme.chat.UserImageTheme
-import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import java.util.concurrent.Executor
 import kotlin.properties.Delegates
 
@@ -42,7 +41,7 @@ internal class ChatHeadView @JvmOverloads constructor(
     defStyleAttr: Int = R.attr.gliaChatStyle,
     defStyleRes: Int = R.style.Application_Glia_Chat
 ) : FrameLayout(
-    MaterialThemeOverlay.wrap(context, attrs, defStyleAttr, defStyleRes),
+    context,
     attrs,
     defStyleAttr
 ), ChatHeadContract.View {

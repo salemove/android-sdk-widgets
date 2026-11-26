@@ -21,8 +21,11 @@ import com.glia.widgets.internal.secureconversations.domain.ResetMessageCenterUs
 import com.glia.widgets.internal.secureconversations.domain.SendMessageButtonStateUseCase
 import com.glia.widgets.internal.secureconversations.domain.SendSecureMessageUseCase
 import com.glia.widgets.internal.secureconversations.domain.ShowMessageLimitErrorUseCase
+import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.schedulers.Schedulers
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.times
@@ -59,6 +62,7 @@ internal class MessageCenterControllerTest {
 
     @Before
     fun setUp() {
+        RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
         Logger.setIsDebug(false)
         sendSecureMessageUseCase = mock()
         addFileAttachmentsObserverUseCase = mock()
@@ -97,6 +101,11 @@ internal class MessageCenterControllerTest {
             isMessagingAvailableUseCase = isMessagingAvailableUseCase,
             isQueueingOrLiveEngagementUseCase = isQueueingOrLiveEngagementUseCase
         )
+    }
+
+    @After
+    fun tearDown() {
+        RxAndroidPlugins.reset()
     }
 
     @Test

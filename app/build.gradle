@@ -40,8 +40,6 @@ android {
   }
 
   initEnvProperty('GLIA_REGION', "beta")
-  initEnvProperty('GLIA_API_KEY_SECRET')
-  initEnvProperty('GLIA_API_KEY_ID')
   initEnvProperty('GLIA_SITE_ID')
   initEnvProperty('GLIA_QUEUE_ID')
   initEnvProperty('GLIA_JWT', "")
@@ -54,8 +52,6 @@ android {
     configureEach {
       resValue("string", "glia_region", GLIA_REGION)
       resValue("string", "site_id", GLIA_SITE_ID)
-      resValue("string", "glia_api_key_id", GLIA_API_KEY_ID)
-      resValue("string", "glia_api_key_secret", GLIA_API_KEY_SECRET)
       resValue("string", "glia_queue_id", GLIA_QUEUE_ID)
       resValue("string", "glia_jwt", GLIA_JWT)
       resValue("string", "firebase_proj_id", FIREBASE_PROJECT_ID)

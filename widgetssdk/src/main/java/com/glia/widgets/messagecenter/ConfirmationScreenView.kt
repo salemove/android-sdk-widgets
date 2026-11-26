@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
-import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.transition.TransitionManager
@@ -16,6 +15,7 @@ import com.glia.telemetry_lib.GliaLogger
 import com.glia.widgets.R
 import com.glia.widgets.databinding.MessageCenterConfirmationViewBinding
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.helper.gliaAttrColor
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.logScConfirmationScreenButtonClicked
 import com.glia.widgets.helper.setLocaleContentDescription
@@ -27,11 +27,14 @@ import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.securemessaging.SecureMessagingConfirmationScreenTheme
 import com.google.android.material.transition.MaterialFadeThrough
 
-internal class ConfirmationScreenView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : LinearLayout(
+internal class ConfirmationScreenView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
+) : LinearLayout(
     context,
     attrs,
-    defStyleAttr,
-    defStyleRes
+    defStyleAttr
 ) {
 
     private val unifiedTheme: SecureMessagingConfirmationScreenTheme? by lazy {
@@ -49,7 +52,7 @@ internal class ConfirmationScreenView(context: Context, attrs: AttributeSet?, de
     init {
         gravity = Gravity.CENTER
         orientation = VERTICAL
-        setBackgroundColor(ContextCompat.getColor(this.context, R.color.glia_chat_background_color))
+        setBackgroundColor(context.gliaAttrColor(R.attr.gliaChatBackgroundColor, R.color.glia_chat_background_color))
         checkMessagesButton.setOnClickListener {
             onCheckMessagesButtonClickListener?.onClick(it)
             GliaLogger.logScConfirmationScreenButtonClicked(ButtonNames.CHECK_MESSAGES)
@@ -62,14 +65,6 @@ internal class ConfirmationScreenView(context: Context, attrs: AttributeSet?, de
         )
         setupUnifiedTheme()
     }
-
-    @JvmOverloads
-    constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = R.attr.gliaChatStyle) : this(
-        context,
-        attrs,
-        defStyleAttr,
-        R.style.Application_Glia_Chat
-    )
 
     private fun setupUnifiedTheme() {
         unifiedTheme?.apply {

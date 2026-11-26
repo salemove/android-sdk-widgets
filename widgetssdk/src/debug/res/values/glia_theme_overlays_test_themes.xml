@@ -88,6 +88,20 @@
         <item name="gliaIconLeaveQueue">@drawable/glia_test_customization_icon</item>
     </style>
 
+    <!--
+        Sets only `gliaSendMessageButtonTintColor`, leaving `gliaBrandPrimaryColor` at its default.
+        `chat_send_button_color_state_list` used to read the coarse brand attribute while `ChatView`
+        applied the precise one on top, so this is what proves the state list honours it now.
+    -->
+    <style name="Test.Glia.Customization.SendButtonTint" parent="">
+        <item name="gliaSendMessageButtonTintColor">@color/glia_test_customization_brand</item>
+    </style>
+
+    <!-- Sets only `gliaBaseNormalColor` - used to prove the file-upload title text follows it. -->
+    <style name="Test.Glia.Customization.NormalColor" parent="">
+        <item name="gliaBaseNormalColor">@color/glia_test_customization_normal</item>
+    </style>
+
     <!-- Flips the two boolean attributes, which default to `false` in `Theme.Glia.Internal`. -->
     <style name="Test.Glia.Customization.Booleans" parent="">
         <item name="whiteLabel">true</item>

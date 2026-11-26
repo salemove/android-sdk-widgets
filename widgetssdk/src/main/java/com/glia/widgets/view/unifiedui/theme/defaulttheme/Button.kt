@@ -14,7 +14,7 @@ import com.glia.widgets.view.unifiedui.theme.base.TextTheme
  * Default theme for Neutral Button
  */
 internal fun NeutralDefaultButtonTheme(pallet: ColorPallet) =
-    DefaultButtonTheme(text = pallet.darkColorTheme)
+    DefaultButtonTheme(text = pallet.darkColorTheme, background = pallet.neutralColorTheme)
 
 /**
  * Default theme for Positive Button

@@ -39,6 +39,7 @@ internal abstract class DialogViewInflater<T : DialogViewBinding<out ViewBinding
 
     abstract fun setup(binding: T, configuration: AlertDialogConfiguration, payload: R)
 
+    /** Call it before the JSON theme, which derives its text style from the typeface set here. */
     private fun setupTypeface(tv: TextView, typeface: Typeface?) {
         typeface?.also { tv.typeface = it }
     }
@@ -46,8 +47,8 @@ internal abstract class DialogViewInflater<T : DialogViewBinding<out ViewBinding
     protected fun setupText(tv: TextView, text: LocaleString, textTheme: TextTheme?, typeface: Typeface?) {
         tv.apply {
             this.setText(text)
-            applyTextTheme(textTheme)
             setupTypeface(this, typeface)
+            applyTextTheme(textTheme)
         }
     }
 
@@ -61,8 +62,8 @@ internal abstract class DialogViewInflater<T : DialogViewBinding<out ViewBinding
     ) {
         btn.apply {
             setText(text)
-            applyButtonTheme(btnTheme)
             setupTypeface(this, typeface)
+            applyButtonTheme(btnTheme)
             setOnClickListener(onClickListener)
             accessibilityHint?.let { setLocaleAccessibilityHint(it) }
         }
@@ -78,8 +79,8 @@ internal abstract class DialogViewInflater<T : DialogViewBinding<out ViewBinding
 
                 this.isVisible = upToDateTitle.isNotBlank() && upToDateUrl.isNotBlank()
             }
-            applyButtonTheme(btnTheme)
             setupTypeface(this, typeface)
+            applyButtonTheme(btnTheme)
             setOnClickListener(onClickListener)
         }
     }

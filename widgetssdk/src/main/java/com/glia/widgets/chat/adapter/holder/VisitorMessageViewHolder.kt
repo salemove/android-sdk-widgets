@@ -7,7 +7,7 @@ import com.glia.widgets.chat.model.VisitorMessageItem
 import com.glia.widgets.databinding.ChatVisitorMessageLayoutBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.addClickActionAccessibilityLabel
-import com.glia.widgets.helper.gliaAttrFont
+import com.glia.widgets.helper.applyGliaThemeFont
 import com.glia.widgets.helper.removeAccessibilityClickAction
 import com.glia.widgets.helper.setLocaleContentDescription
 import com.glia.widgets.locale.LocaleProvider
@@ -41,7 +41,7 @@ internal class VisitorMessageViewHolder(
 
     /** The bubble's background and text colours come from the layout's `?attr/gliaVisitorMessage*`. */
     private fun applyThemeFont() {
-        itemView.context.gliaAttrFont()?.also { binding.content.typeface = it }
+        itemView.context.applyGliaThemeFont(binding.content)
     }
 
     fun bind(item: VisitorMessageItem) {

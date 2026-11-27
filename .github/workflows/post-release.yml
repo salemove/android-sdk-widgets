@@ -1,3 +1,6 @@
+# Replaces the Bitrise `post_release` workflow. Run it once the release is
+# visible on Maven Central: each downstream repo opens a PR that bumps its
+# Widgets SDK dependency, and that PR's CI resolves the new version.
 name: Post Release
 
 on:
@@ -6,24 +9,48 @@ on:
       version:
         description: 'Version in semantic versioning format (i.e. 1.0.2)'
         required: true
+
 permissions: {}
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  dispatch:
+    name: Bump Widgets SDK in ${{ matrix.repo }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false # one failed hop must not stop the others
+      matrix:
+        repo:
+          - android_cortex_banking_app
+          - widgets_sdk_flutter
+          - widgets_sdk_ionic
+          - widgets_sdk_reactnative
     steps:
-      - name: Runs the post-release workflow in Bitrise
+      - name: Validate version
         env:
-          BITRISE_APP_ID: ${{ secrets.BITRISE_APP_ID }}
-          BITRISE_BUILD_TRIGGER_TOKEN: ${{ secrets.BITRISE_BUILD_TRIGGER_TOKEN }}
-          INPUT_VALUE: ${{ github.event.inputs.version }}
+          VERSION: ${{ inputs.version }}
         run: |
-          if ! [[ "$INPUT_VALUE" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "::error::version must be in X.Y.Z format"
             exit 1
           fi
-          payload=$(jq -n \
-            --arg token "$BITRISE_BUILD_TRIGGER_TOKEN" \
-            --arg value "$INPUT_VALUE" \
-            '{hook_info: {type: "bitrise", build_trigger_token: $token}, build_params: {branch: "development", workflow_id: "post_release", environments: [{mapped_to: "NEW_VERSION", value: $value, is_expand: false}]}, triggered_by: "curl"}')
-          curl "https://app.bitrise.io/app/${BITRISE_APP_ID}/build/start.json" --data "$payload"
+
+      # Scoped to the one target repo. Needs the app installed there with
+      # Actions write access.
+      - name: Generate PR bot token
+        id: app-token
+        uses: actions/create-github-app-token@f418cff399f7aef4c2f0ad47e25ca7a6abbdd6fc # v3.4.0
+        with:
+          app-id: ${{ secrets.PR_BOT_APP_ID }}
+          private-key: ${{ secrets.PR_BOT_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ matrix.repo }}
+
+      - name: Dispatch set-android-sdk-version
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          REPO: ${{ github.repository_owner }}/${{ matrix.repo }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          gh workflow run set-android-sdk-version.yml \
+            --repo "$REPO" --ref development -f version="$VERSION"

@@ -1,29 +1,117 @@
+# Replaces the Bitrise `publish_to_nexus` workflow.
+# Dispatch it on master. The job waits for approval in the `release` environment.
 name: Deployment
 
 on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version in semantic versioning format (i.e. 1.0.2)'
+        description: 'Version in semantic versioning format (i.e. 1.0.2). Must match version.properties.'
         required: true
-permissions: {}
+
+permissions:
+  contents: read
+
+# Mitigation for CVE-2026-114938 (Java4Shell). Remove once JDKs are patched.
+env:
+  JAVA_TOOL_OPTIONS: -XX:-UseBASE64Intrinsics
+
+concurrency:
+  group: deployment
+  cancel-in-progress: false
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  release:
+    name: Publish ${{ inputs.version }} to Maven Central
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    environment: release
+    permissions:
+      contents: write     # tag and GitHub release
+      id-token: write     # build provenance attestation
+      attestations: write
+    env:
+      AAR: widgetssdk/build/outputs/aar/widgetssdk-release.aar
     steps:
-      - name: Runs the deployment workflow in Bitrise
-        env:
-          BITRISE_APP_ID: ${{ secrets.BITRISE_APP_ID }}
-          BITRISE_BUILD_TRIGGER_TOKEN: ${{ secrets.BITRISE_BUILD_TRIGGER_TOKEN }}
-          INPUT_VALUE: ${{ github.event.inputs.version }}
+      - name: Require master
+        if: github.ref != 'refs/heads/master'
         run: |
-          if ! [[ "$INPUT_VALUE" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "::error::version must be in X.Y.Z format"
+          echo "::error::Releases run from master only (got ${{ github.ref }})"
+          exit 1
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0     # the changelog walks back to the previous tag
+          fetch-tags: true
+
+      - name: Check version matches version.properties
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          actual="$(scripts/ci/version-name.sh)"
+          if [[ "$VERSION" != "$actual" ]]; then
+            echo "::error::Input version $VERSION does not match version.properties ($actual)"
             exit 1
           fi
-          payload=$(jq -n \
-            --arg token "$BITRISE_BUILD_TRIGGER_TOKEN" \
-            --arg value "$INPUT_VALUE" \
-            '{hook_info: {type: "bitrise", build_trigger_token: $token}, build_params: {branch: "master", workflow_id: "publish_to_nexus", environments: [{mapped_to: "NEW_VERSION", value: $value, is_expand: false}]}, triggered_by: "curl"}')
-          curl "https://app.bitrise.io/app/${BITRISE_APP_ID}/build/start.json" --data "$payload"
+          if git rev-parse -q --verify "refs/tags/$VERSION" >/dev/null; then
+            echo "::error::Tag $VERSION already exists"
+            exit 1
+          fi
+
+      - uses: ./.github/actions/setup-android-build
+
+      - name: Unit tests and API docs
+        run: >
+          ./gradlew
+          :widgetssdk:testDebugUnitTest
+          :app:testDebugUnitTest
+          dokkaGeneratePublicationHtml
+
+      - name: Publish to Maven Central
+        env:
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_KEY_PASSWORD }}
+          ORG_GRADLE_PROJECT_signAllPublications: 'true'
+        run: ./gradlew :widgetssdk:publishMavenPublicationToMavenCentralRepository
+
+      # The deprecated Bitrise amazon-s3-upload step applied public-read and
+      # deleted stale objects, so keep the same sync semantics.
+      - name: Upload API docs
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.DOCS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.DOCS_AWS_SECRET_ACCESS_KEY }}
+          DOCS_S3_BUCKET: ${{ secrets.DOCS_S3_BUCKET }}
+        run: |
+          aws s3 sync widgetssdk/build/dokka "s3://$DOCS_S3_BUCKET/widgets" --delete --acl public-read
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: ${{ env.AAR }}
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          # The changelog script reads the two newest tags, so tag locally first.
+          # gh creates the remote tag at --target.
+          git tag "$VERSION" "$GITHUB_SHA"
+          bash scripts/generate-changelog.sh
+          gh release create "$VERSION" "$AAR" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "Glia Android Widgets $VERSION" \
+            --notes-file CHANGELOG.md
+
+  increment-version:
+    needs: release
+    uses: ./.github/workflows/increment-project-version.yml
+    with:
+      type: patch
+    secrets:
+      PR_BOT_APP_ID: ${{ secrets.PR_BOT_APP_ID }}
+      PR_BOT_PRIVATE_KEY: ${{ secrets.PR_BOT_PRIVATE_KEY }}

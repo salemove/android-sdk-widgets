@@ -1,3 +1,5 @@
+# Replaces the Bitrise `authenticated_increment_project_version` workflow.
+# Also called by deployment.yml after each release, as Bitrise did with after_run.
 name: Increment project version
 
 on:
@@ -11,24 +13,70 @@ on:
           - patch
           - minor
           - major
-permissions: {}
+  workflow_call:
+    inputs:
+      type:
+        required: true
+        type: string
+    secrets:
+      PR_BOT_APP_ID:
+        required: true
+      PR_BOT_PRIVATE_KEY:
+        required: true
+
+permissions:
+  contents: read
+
+# Mitigation for CVE-2026-114938 (Java4Shell). Remove once JDKs are patched.
+env:
+  JAVA_TOOL_OPTIONS: -XX:-UseBASE64Intrinsics
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  increment:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     steps:
-      - name: Runs the increment project version workflow in Bitrise
+      - name: Validate type
         env:
-          BITRISE_APP_ID: ${{ secrets.BITRISE_APP_ID }}
-          BITRISE_BUILD_TRIGGER_TOKEN: ${{ secrets.BITRISE_BUILD_TRIGGER_TOKEN }}
-          INPUT_VALUE: ${{ github.event.inputs.type }}
+          TYPE: ${{ inputs.type }}
         run: |
-          case "$INPUT_VALUE" in
+          case "$TYPE" in
             patch|minor|major) ;;
             *) echo "::error::type must be patch, minor or major"; exit 1 ;;
           esac
-          payload=$(jq -n \
-            --arg token "$BITRISE_BUILD_TRIGGER_TOKEN" \
-            --arg value "$INPUT_VALUE" \
-            '{hook_info: {type: "bitrise", build_trigger_token: $token}, build_params: {branch: "development", workflow_id: "authenticated_increment_project_version", environments: [{mapped_to: "GITHUB_VERSION_INCREMENT_TYPE", value: $value, is_expand: false}]}, triggered_by: "curl"}')
-          curl "https://app.bitrise.io/app/${BITRISE_APP_ID}/build/start.json" --data "$payload"
+
+      # A GitHub App token, not GITHUB_TOKEN: PRs opened with GITHUB_TOKEN don't
+      # trigger CI, so the required checks would never run on them.
+      - name: Generate PR bot token
+        id: app-token
+        uses: actions/create-github-app-token@f418cff399f7aef4c2f0ad47e25ca7a6abbdd6fc # v3.4.0
+        with:
+          app-id: ${{ secrets.PR_BOT_APP_ID }}
+          private-key: ${{ secrets.PR_BOT_PRIVATE_KEY }}
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: development
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup-android-build
+
+      - name: Increment project version
+        id: bump
+        env:
+          TYPE: ${{ inputs.type }}
+        run: |
+          ./gradlew -q saveWidgetsVersion --type="$TYPE"
+          echo "version=$(scripts/ci/version-name.sh)" >> "$GITHUB_OUTPUT"
+
+      - name: Create PR
+        uses: peter-evans/create-pull-request@3ffccacd46053766916f087ce41d627c0b8cf2d1 # v8.1.3
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          base: development
+          branch: project-version-increment/${{ steps.bump.outputs.version }}
+          add-paths: version.properties
+          commit-message: Increment project version to ${{ steps.bump.outputs.version }}
+          title: Increment project version to ${{ steps.bump.outputs.version }}
+          body: Opened by the `${{ github.workflow }}` workflow (${{ inputs.type }} bump).
+          team-reviewers: tm-mobile-android

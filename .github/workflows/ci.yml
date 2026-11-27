@@ -1,0 +1,109 @@
+# Replaces the Bitrise `pull_request` and `development` workflows.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [development]
+
+permissions:
+  contents: read
+
+# Mitigation for CVE-2026-114938 (Java4Shell). Remove once JDKs are patched.
+env:
+  JAVA_TOOL_OPTIONS: -XX:-UseBASE64Intrinsics
+
+concurrency:
+  group: ci-${{ github.ref }}
+  # Superseded PR pushes are cancelled. Every development merge gets its own run.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  check:
+    name: Lint, docs, unit and snapshot tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          lfs: true # Paparazzi reference images live in LFS
+
+      - uses: ./.github/actions/setup-android-build
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/development' }}
+
+      # dokkaGeneratePublicationHtml fails on warnings, so it doubles as the KDoc check.
+      - name: Lint, docs and unit tests
+        run: >
+          ./gradlew
+          :widgetssdk:lintDebug
+          dokkaGeneratePublicationHtml
+          :widgetssdk:testDebugUnitTest
+          :app:lintDebug
+          :app:testDebugUnitTest
+
+      - name: Snapshot tests
+        if: ${{ !cancelled() }}
+        run: ./gradlew :widgetssdk:verifySnapshots
+
+      - name: Upload reports
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: reports
+          path: |
+            widgetssdk/build/reports/
+            widgetssdk/build/test-results/
+            widgetssdk/build/paparazzi/
+            app/build/reports/
+            app/build/test-results/
+          retention-days: 14
+          if-no-files-found: ignore
+
+  test-app:
+    name: Build test app and upload to BrowserStack
+    if: github.event_name == 'push'
+    needs: check
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      # Read by app/build.gradle when local.properties is absent.
+      GLIA_SITE_ID: ${{ secrets.GLIA_SITE_ID }}
+      GLIA_QUEUE_ID: ${{ secrets.GLIA_QUEUE_ID }}
+      FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+      FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+      FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+      APK: app/build/outputs/apk/release/app-release.apk
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup-android-build
+        with:
+          cache-read-only: 'false'
+
+      # The release variant builds against the SDK published to Maven Local,
+      # as an integrator would consume it (see app/build.gradle).
+      - name: Build test app
+        run: ./gradlew :app:assembleRelease
+
+      - name: Upload to BrowserStack
+        env:
+          BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
+          BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+        run: |
+          curl --fail-with-body -sS \
+            -u "$BROWSERSTACK_USERNAME:$BROWSERSTACK_ACCESS_KEY" \
+            -X POST "https://api-cloud.browserstack.com/app-automate/upload" \
+            -F "file=@$APK" \
+            --form-string "custom_id=WidgetsSdkAndroidTestApp"
+
+      # Takes over from the Bitrise install page for development builds.
+      - name: Keep test app APK
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: widgets-test-app-release-apk
+          path: ${{ env.APK }}
+          retention-days: 14

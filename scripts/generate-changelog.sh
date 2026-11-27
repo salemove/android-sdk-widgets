@@ -40,9 +40,6 @@ CHANGELOG_FILE_NAME=CHANGELOG.md
 
 generate_changelog
 
-# Expose the changelog as Bitrise environment variable for the next steps.
-# `envman` is Bitrise command https://github.com/bitrise-io/envman
-envman add --key BITRISE_CHANGELOG --valuefile $CHANGELOG_FILE_NAME
-
+# CI passes the file to `gh release create --notes-file`.
 printf "\n"
-envman run bash -c 'echo "$BITRISE_CHANGELOG"'
+cat "$CHANGELOG_FILE_NAME"
